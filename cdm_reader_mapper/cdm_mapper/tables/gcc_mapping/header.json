@@ -1,0 +1,132 @@
+{
+  "report_id": {
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "GG",
+      "ID"
+    ],
+    "transform": "guid",
+    "kwargs": {
+      "prepend": "gdac_"
+    }
+  },
+  "region": {
+    "default": 0
+  },
+  "sub_region": {},
+  "application_area": {
+    "default": 11
+  },
+  "observing_programme": {
+    "default": 56
+  },
+  "report_type": {
+    "default": 0
+  },
+  "station_name": {
+    "elements": "ID"
+  },
+  "station_type": {
+    "default": 2
+  },
+  "platform_type": {
+    "default": 2
+  },
+  "platform_sub_type": {},
+  "primary_station_id": {
+    "elements": "ID"
+  },
+  "station_record_number": {},
+  "primary_station_id_scheme": {
+    "default": 5
+  },
+  "longitude": {
+    "elements": "LON",
+    "transform": "longitude_360to180",
+    "decimal_places": "decimal_places"
+  },
+  "latitude": {
+    "elements": "LAT",
+    "decimal_places": "decimal_places"
+  },
+  "location_accuracy": {},
+  "location_method": {},
+  "location_quality": {
+    "default": 3
+  },
+  "crs": {
+    "default": 0
+  },
+  "station_speed": {
+    "elements": [
+      "YR",
+      "VS"
+    ],
+    "code_table": "ship_speed_ms",
+    "decimal_places": 1
+  },
+  "station_course": {
+    "elements": "DS",
+    "code_table": "station_course",
+    "decimal_places": 0
+  },
+  "station_heading": {},
+  "height_of_station_above_local_ground": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "height_of_station_above_sea_level": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "height_of_station_above_sea_level_accuracy": {},
+  "sea_level_datum": {},
+  "report_meaning_of_timestamp": {
+    "default": 2
+  },
+  "report_timestamp": {
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "GG"
+    ],
+    "transform": "datetime_imma1"
+  },
+  "report_duration": {
+    "default": 11
+  },
+  "report_time_accuracy": {},
+  "report_time_quality": {
+    "default": 2
+  },
+  "report_time_reference": {},
+  "profile_id": {},
+  "events_at_station": {},
+  "report_quality": {
+    "elements": "QCI",
+    "code_table": "qc_flag"
+  },
+  "duplicate_status": {
+    "default": 4
+  },
+  "duplicates": {},
+  "record_timestamp": {
+    "transform": "datetime_utcnow"
+  },
+  "history": {
+    "elements": "YR",
+    "transform": "lineage"
+  },
+  "processing_level": {},
+  "processing_codes": {},
+  "source_id": {},
+  "source_record_id": {
+    "default": [
+      0,
+      5
+    ]
+  }
+}

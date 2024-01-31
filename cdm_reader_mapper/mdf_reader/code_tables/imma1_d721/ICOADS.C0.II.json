@@ -1,0 +1,14 @@
+{
+  "0": "ID present, but unknown type",
+  "1": "ship, Ocean Station Vessel (OSV), or ice station callsign",
+  "2": "generic ID (e.g., SHIP, BUOY, RIGG, PLAT)",
+  "3": "WMO 5-digit buoy number",
+  "4": "other buoy number (e.g., Argos or national buoy number)",
+  "5": "Coastal-Marine Automated Network (C-MAN) ID (assigned by US NDBC or other organizations)",
+  "6": "station name or number",
+  "7": "oceanographic platform/cruise number",
+  "8": "fishing vessel psuedo-ID",
+  "9": "national ship number",
+  "10": "composite information from early ship data",
+  "11": "7-digit buoy ID (proposed)"
+}

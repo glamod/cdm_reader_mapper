@@ -1,0 +1,131 @@
+{
+  "report_id": {
+    "data_type": "varchar"
+  },
+  "region": {
+    "data_type": "int"
+  },
+  "sub_region": {
+    "data_type": "int"
+  },
+  "application_area": {
+    "data_type": "int[]"
+  },
+  "observing_programme": {
+    "data_type": "int[]"
+  },
+  "report_type": {
+    "data_type": "int"
+  },
+  "station_name": {
+    "data_type": "varchar"
+  },
+  "station_type": {
+    "data_type": "int"
+  },
+  "platform_type": {
+    "data_type": "int"
+  },
+  "platform_sub_type": {
+    "data_type": "int"
+  },
+  "primary_station_id": {
+    "data_type": "varchar"
+  },
+  "station_record_number": {
+    "data_type": "int"
+  },
+  "primary_station_id_scheme": {
+    "data_type": "int"
+  },
+  "longitude": {
+    "data_type": "numeric"
+  },
+  "latitude": {
+    "data_type": "numeric"
+  },
+  "location_accuracy": {
+    "data_type": "numeric"
+  },
+  "location_method": {
+    "data_type": "int"
+  },
+  "location_quality": {
+    "data_type": "int"
+  },
+  "crs": {
+    "data_type": "int"
+  },
+  "station_speed": {
+    "data_type": "numeric"
+  },
+  "station_course": {
+    "data_type": "numeric"
+  },
+  "station_heading": {
+    "data_type": "numeric"
+  },
+  "height_of_station_above_local_ground": {
+    "data_type": "numeric"
+  },
+  "height_of_station_above_sea_level": {
+    "data_type": "numeric"
+  },
+  "height_of_station_above_sea_level_accuracy": {
+    "data_type": "numeric"
+  },
+  "sea_level_datum": {
+    "data_type": "int"
+  },
+  "report_meaning_of_timestamp": {
+    "data_type": "int"
+  },
+  "report_timestamp": {
+    "data_type": "timestamp with timezone"
+  },
+  "report_duration": {
+    "data_type": "int"
+  },
+  "report_time_accuracy": {
+    "data_type": "numeric"
+  },
+  "report_time_quality": {
+    "data_type": "int"
+  },
+  "report_time_reference": {
+    "data_type": "int"
+  },
+  "profile_id": {
+    "data_type": "varchar"
+  },
+  "events_at_station": {
+    "data_type": "int[]"
+  },
+  "report_quality": {
+    "data_type": "int"
+  },
+  "duplicate_status": {
+    "data_type": "int"
+  },
+  "duplicates": {
+    "data_type": "varchar[]"
+  },
+  "record_timestamp": {
+    "data_type": "timestamp with timezone"
+  },
+  "history": {
+    "data_type": "varchar"
+  },
+  "processing_level": {
+    "data_type": "int"
+  },
+  "processing_codes": {
+    "data_type": "int[]"
+  },
+  "source_id": {
+    "data_type": "varchar"
+  },
+  "source_record_id": {
+    "data_type": "varchar"
+  }
+}

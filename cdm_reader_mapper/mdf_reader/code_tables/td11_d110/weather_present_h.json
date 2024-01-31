@@ -1,0 +1,10 @@
+{
+  "0": "No weather or obstructions to vision",
+  "1": "Light smoke",
+  "2": "Moderate smoke",
+  "3": "Heavy smoke",
+  "5": "Haze",
+  "7": "Light smoke and haze",
+  "8": "Moderate smoke and haze",
+  "9": "Dense smoke and haze"
+}

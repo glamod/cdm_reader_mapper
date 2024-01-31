@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"wind sea and swell estimated shipborne wave recorder"},
+{"codes":[1],"description":"wind sea and swell measured shipborne wave recorder"},
+{"codes":[2],"description":"mixed wave measured, swell estimated shipborne wave recorder"},
+{"codes":[3],"description":"other combinations measured and estimated shipborne wave recorder"},
+{"codes":[4],"description":"wind sea and swell measured buoy"},
+{"codes":[5],"description":"mixed wave measured, swell estimated buoy"},
+{"codes":[6],"description":"other combinations measured and estimated buoy"},
+{"codes":[7],"description":"wind sea and swell measured other measurement system"},
+{"codes":[8],"description":"mixed wave measured, swell estimated other measurement system"},
+{"codes":[9],"description":"other combinations measured and estimated other measurement system"}
+]

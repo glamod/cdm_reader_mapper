@@ -1,0 +1,5 @@
+{
+  "0": "Intermediate (i.e. Retain in Intermediate data file, reject from Final dataset)",
+  "1": "Final (i.e. Retain in both Intermediate and Final datasets)",
+  "2": "Reject (i.e. Reject from both Intermediate and Final datasets)"
+}

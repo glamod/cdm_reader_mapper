@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"unknown"},
+{"codes":[1],"description":"selected ship"},
+{"codes":[2],"description":"supplementary ship"},
+{"codes":[3],"description":"auxiliary ship"},
+{"codes":[4],"description":"registered VOSClim ship"},
+{"codes":[5],"description":"fixed sea station (e.g., rig or platform)"},
+{"codes":[6],"description":"coastal station"},
+{"codes":[7],"description":"[reserved]"},
+{"codes":[8],"description":"[reserved]"},
+{"codes":[9],"description":"others \/ data buoy"}
+]

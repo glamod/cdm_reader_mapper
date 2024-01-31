@@ -1,0 +1,13 @@
+{
+  "0": "No sea ice in sight",
+  "1": "Ship in open lead more than 1.0 nautical mile wide, or ship in fast ice with boundary beyond limit of visibility",
+  "2": "Sea ice present in concentrations less than 3/10 (3/8), open water or very open pack ice-Sea ice concentration is uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "3": "4/10 to 6/10 (3/8 to less than 6/8), open pack ice-Sea ice concentration is uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "4": "7/10 to 8/10 (6/8 to less than 7/8), close pack ice-Sea ice concentration is uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "5": "9/10 or more, but not 10/10 (7/8 to less than 8/8), very close pack ice-Sea ice concentration is uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "6": "Strips and patches of pack ice with open water between-Sea ice concentration is not uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "7": "Strips and patches of close or very close pack ice with areas of lesser concentration between-Sea ice concentration is not uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "8": "Fast ice with open water, very open or open pack ice to seaward of the ice boundary-Sea ice concentration is not uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "9": "Fast ice with close or very close pack ice to seaward of the ice boundary-Sea ice concentration is not uniform in the observation area-Ship in ice or within 0.5 nautical mile of ice edge",
+  "/": "Unable to report, because of darkness, lack of visibility, or because ship is more than 0.5 nautical mile away from ice edge"
+}

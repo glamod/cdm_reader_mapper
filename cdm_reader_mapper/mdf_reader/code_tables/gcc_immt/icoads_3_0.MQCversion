@@ -1,0 +1,9 @@
+[
+{"codes":[1],"description":"MQCS- I (Original version, Feb. 1989): CMM-X"},
+{"codes":[2],"description":"MQCS-II (Version 2, March 1997) CMM-XII"},
+{"codes":[3],"description":"MQCS-III (Version 3, April 2000) SGMC-VIII"},
+{"codes":[4],"description":"MQCS-IV (Version 4, June 2001): JCOMM-I"},
+{"codes":[5],"description":"MQCS-V (Version 5, July 2004): ETMC-I"},
+{"codes":[6],"description":"MQCS-VI (Version 6, January 2011): JCOMM-III"},
+{"codes":[7],"description":"MQCS-VII (Version 7, June 2012): JCOMM-IV"}
+]

@@ -1,0 +1,178 @@
+{
+  "header": {
+    "format": "fixed width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "LOG TYP": {
+      "description": "Log book type",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "logbook_type"
+    },
+    "CODE SHEET": {
+      "description": "Code sheet number",
+      "field_length": 6,
+      "column_type": "str"
+    },
+    "BF WD": {
+      "description": "Beaufort wind force",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "wind_force_beaufort"
+    },
+    "WX": {
+      "description": "Present weather",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "weather_present"
+    },
+    "PPP": {
+      "description": "Sea level pressure",
+      "field_length": 3,
+      "column_type": "str"
+    },
+    "V I S": {
+      "description": "Visibility",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "visibility"
+    },
+    "C L": {
+      "description": "Low cloud type",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_type_low"
+    },
+    "C M": {
+      "description": "Middle cloud type",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_type_middle"
+    },
+    "C H": {
+      "description": "High cloud type",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_type_high"
+    },
+    "N": {
+      "description": "Total cloud amount",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_amount"
+    },
+    "N h": {
+      "description": "Low cloud amount",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_amount"
+    },
+    "SEA DIR": {
+      "description": "Direction of sea",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "direction"
+    },
+    "S T A": {
+      "description": "State of the sea",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "sea_state"
+    },
+    "SWL DIR": {
+      "description": "Direction of swell",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "direction"
+    },
+    "T Y P": {
+      "description": "Swell type",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "swell_type"
+    },
+    "a": {
+      "description": "Barometric tendency",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "bar_tendency"
+    },
+    "pp": {
+      "description": "Amount of pressure change",
+      "field_length": 2,
+      "column_type": "str"
+    },
+    "RH": {
+      "description": "Relative humidity",
+      "field_length": 2,
+      "column_type": "str"
+    },
+    "LS PRE": {
+      "description": "Precipitation from lightship",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "precipitation_lightship"
+    },
+    "BEAU. WX A": {
+      "description": "Cloud cover",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_cover"
+    },
+    "BEAU. WX B": {
+      "description": "Beaufort weather B",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_b"
+    },
+    "BEAU. WX C": {
+      "description": "Beaufort weather C",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_c"
+    },
+    "BEAU. WX D": {
+      "description": "Beaufort weather D",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_d"
+    },
+    "BEAU. WX E": {
+      "description": "Beaufort weather E",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_e"
+    },
+    "BEAU. WX F": {
+      "description": "Beaufort weather F",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_f"
+    },
+    "BEAU. WX G": {
+      "description": "Beaufort weather G",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_g"
+    },
+    "BEAU. WX H": {
+      "description": "Beaufort weather H",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "weather_h"
+    },
+    "BEAU. WX I": {
+      "description": "Gale duration",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "duration"
+    },
+    "BEAU. WX J": {
+      "description": "Fog duration",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "duration"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "z_coordinate": {
+    "elements": "sea_thermometer1_height_above_summer_load_line"
+  },
+  "observation_height_above_station_surface": {
+    "elements": "sea_thermometer1_height_above_summer_load_line"
+  },
+  "sensor_id": {
+    "elements": "sea_thermometer1_parameter"
+  },
+  "sensor_automation_status": {
+    "elements": "automation"
+  }
+}

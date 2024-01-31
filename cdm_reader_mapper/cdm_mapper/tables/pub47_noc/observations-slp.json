@@ -1,0 +1,22 @@
+{
+  "z_coordinate": {
+    "elements": [
+      "barometer1_height_above_summer_load_line",
+      "visual_observing_height"
+    ],
+    "transform": "select_column"
+  },
+  "observation_height_above_station_surface": {
+    "elements": [
+      "barometer1_height_above_summer_load_line",
+      "visual_observing_height"
+    ],
+    "transform": "select_column"
+  },
+  "sensor_id": {
+    "elements": "barometer1_parameter"
+  },
+  "sensor_automation_status": {
+    "elements": "automation"
+  }
+}

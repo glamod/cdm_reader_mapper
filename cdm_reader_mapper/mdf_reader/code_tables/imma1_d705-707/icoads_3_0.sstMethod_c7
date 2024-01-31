@@ -1,0 +1,14 @@
+[
+{"codes":["BU"],"description":"bucket"},
+{"codes":["C"],"description":"condenser inlet (intake)"},
+{"codes":["TT"],"description":"trailing thermistor"},
+{"codes":["HC"],"description":"hull contact sensor"},
+{"codes":["HT"],"description":"through hull sensor"},
+{"codes":["RAD"],"description":"radiation thermometer"},
+{"codes":["BTT"],"description":"bait tanks thermometer"},
+{"codes":["OT"],"description":"others"},
+{"codes":[null],"description":"unknown or non-bucket"},
+{"codes":[null],"description":"implied bucket [note: applicable to early ICOADS data]"},
+{"codes":[null],"description":"reversing thermometer or mechanical sensor"},
+{"codes":[null],"description":"electronic sensor"}
+]

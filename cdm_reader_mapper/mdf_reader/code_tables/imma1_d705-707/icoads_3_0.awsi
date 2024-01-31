@@ -1,0 +1,5 @@
+[
+{"codes":[0],"description":"No AWS"},
+{"codes":[1],"description":"AWS"},
+{"codes":[2],"description":"AWS plus manual observations"}
+]

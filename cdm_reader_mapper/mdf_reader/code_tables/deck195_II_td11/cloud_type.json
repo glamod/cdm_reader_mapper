@@ -1,0 +1,14 @@
+{
+  "0": "Clear",
+  "1": "Cumulus or Fractocumulus",
+  "2": "Stratocumulus",
+  "3": "Stratus or Fractostratus",
+  "4": "Cumulonimbus",
+  "5": "Nimbostratus",
+  "6": "Altocumulus",
+  "7": "Altostratus",
+  "8": "Cirrus",
+  "9": "Cirrostratus",
+  "-": "Cirroculumus",
+  " ": "Unknown or obscured"
+}

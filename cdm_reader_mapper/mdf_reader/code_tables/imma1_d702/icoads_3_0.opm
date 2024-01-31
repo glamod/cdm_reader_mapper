@@ -1,0 +1,11 @@
+[
+{"codes":[10],"description":"Selected ships"},
+{"codes":[15],"description":"Selected ships (AWS)"},
+{"codes":[30],"description":"VOSClim"},
+{"codes":[35],"description":"VOSClim (AWS)"},
+{"codes":[40],"description":"Supplementary ships"},
+{"codes":[45],"description":"Supplementary ships (AWS)"},
+{"codes":[70],"description":"Auxiliary ships"},
+{"codes":[75],"description":"Auxiliary ships (AWS)"},
+{"codes":[99],"description":"Unknown"}
+]

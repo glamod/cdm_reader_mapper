@@ -1,0 +1,7 @@
+{
+  "0": "Precipitation data are reported in Sections 1 and 3; Group 6RRRtr is included in both sections",
+  "1": "Precipitation data are reported in Section 1; Group 6RRRtr is included",
+  "2": "Precipitation data are reported in Section 3; Group 6RRRtr is included",
+  "3": "Precipitation data are reported in none of the two Sections 1 and 3; Group 6RRRtr is omitted (precipitation amount = 0)",
+  "4": "Precipitation data are reported in none of the two Sections 1 and 3; Group 6RRRtr is omitted (precipitation amount not available)"
+}

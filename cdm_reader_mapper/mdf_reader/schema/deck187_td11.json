@@ -1,0 +1,104 @@
+{
+  "header": {
+    "format": "fixed_width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "SHP NO": {
+      "description": "Ship number",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "ship_description"
+    },
+    "WHL SES": {
+      "description": "Whaling season",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "season"
+    },
+    "O C T": {
+      "description": "Octant",
+      "field_length": 1,
+      "column_type": "key",
+      "codetable": "octant"
+    },
+    "LAT": {
+      "description": "Latitude (all south)",
+      "field_length": 3,
+      "column_type": "float16",
+      "scale": 0.1,
+      "valid_min": 0.0,
+      "valid_max": 90.0,
+      "decimal_places": 1,
+      "units": "deg"
+    },
+    "LON": {
+      "description": "Longitude (no hundreds)",
+      "field_length": 3,
+      "column_type": "float16",
+      "scale": 0.1,
+      "valid_min": 0.0,
+      "valid_max": 99.9,
+      "decimal_places": 1,
+      "units": "deg"
+    },
+    "PRS": {
+      "description": "Pressure (mb no thousands nor hundreds)",
+      "field_length": 3,
+      "column_type": "float16",
+      "scale": 0.1,
+      "valid_min": 0.0,
+      "valid_max": 99.9,
+      "decimal_places": 1,
+      "units": "hPa"
+    },
+    "DRY BLB": {
+      "description": "Air temperature (F<0: F + 100)",
+      "field_length": 2,
+      "column_type": "int16",
+      "valid_min": 0,
+      "valid_max": 99,
+      "units": "F"
+    },
+    "SEA TMP": {
+      "description": "Sea temperature (F<0: F + 100)",
+      "field_length": 2,
+      "column_type": "int16",
+      "valid_min": 0,
+      "valid_max": 99,
+      "units": "F"
+    },
+    "DEW PT.": {
+      "description": "Dew point temperature (F<0: F + 100)",
+      "field_length": 2,
+      "column_type": "int16",
+      "valid_min": 0,
+      "valid_max": 99,
+      "units": "F"
+    },
+    "WND DIR": {
+      "description": "Wind direction",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "wind_direction"
+    },
+    "B E U": {
+      "description": "Beaufort wind force",
+      "field_length": 1,
+      "column_type": "key",
+      "codetable": "wind_force"
+    },
+    "MER ZON": {
+      "description": "Meridional zone",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "zone_number_meridional"
+    },
+    "L A Z": {
+      "description": "Latitude zone",
+      "field_length": 1,
+      "column_type": "key",
+      "codetable": "zone_number_latitudinal"
+    }
+  }
+}

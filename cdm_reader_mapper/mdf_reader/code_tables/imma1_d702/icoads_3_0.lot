@@ -1,0 +1,18 @@
+[
+{"codes":["1"],"description":"Bridge wing port"},
+{"codes":["2"],"description":"Bridge wing starboard"},
+{"codes":["3"],"description":"Bridge wing both sides"},
+{"codes":["4"],"description":"Bridge wing windward side"},
+{"codes":["5"],"description":"Wheelhouse top port"},
+{"codes":["6"],"description":"Wheelhouse top starboard"},
+{"codes":["7"],"description":"Wheelhouse top both"},
+{"codes":["8"],"description":"Wheelhouse top center"},
+{"codes":["9"],"description":"Wheelhouse top windward side"},
+{"codes":["10"],"description":"Mainmast"},
+{"codes":["11"],"description":"Foremast"},
+{"codes":["12"],"description":"Mast on Wheelhouse top"},
+{"codes":["13"],"description":"Main deck port side"},
+{"codes":["14"],"description":"Main deck starboard side"},
+{"codes":["15"],"description":"Main deck both sides"},
+{"codes":["OT"],"description":"Other (specify in footnote)"}
+]

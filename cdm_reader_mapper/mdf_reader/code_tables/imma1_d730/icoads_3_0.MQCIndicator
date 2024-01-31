@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"No quality control (QC) has been performed on this element"},
+{"codes":[1],"description":"QC has been performed; element appears to be correct"},
+{"codes":[2],"description":"QC has been performed; element appears to be inconsistent with other elements"},
+{"codes":[3],"description":"QC has been performed; element appears to be doubtful"},
+{"codes":[4],"description":"QC has been performed; element appears to be erroneous"},
+{"codes":[5],"description":"The value has been changed as a result of QC"},
+{"codes":[6],"description":"The original flag is set (1) (correct) and the value will be classified by MQCS as inconsistent, dubious, erroneous or missing"},
+{"codes":[7],"description":"The original flag is set (5) (amended) and the value will be classified by MQCS as inconsistent, dubious, erroneous or missing"},
+{"codes":[8],"description":"[reserved]"},
+{"codes":[9],"description":"The value of the element is missing"}
+]

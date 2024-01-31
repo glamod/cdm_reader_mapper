@@ -1,0 +1,8 @@
+[
+{"codes":["AN"],"description":"Aneroid barometer (issued by Port Meteorological Officer or Meteorological Agency)"},
+{"codes":["DA"],"description":"Digital Aneroid Barometer"},
+{"codes":["MER"],"description":"Mercury Barometer"},
+{"codes":["SAN"],"description":"Ship's Aneroid Barometer"},
+{"codes":["ELE"],"description":"electronic digital barometer"},
+{"codes":["OT"],"description":"Other"}
+]

@@ -1,0 +1,15 @@
+[
+{"codes":[0],"description":"previous to FM 24-V"},
+{"codes":[1],"description":"FM 24-V"},
+{"codes":[2],"description":"FM 24-VI Ext."},
+{"codes":[3],"description":"FM 13-VII"},
+{"codes":[4],"description":"FM 13-VIII"},
+{"codes":[5],"description":"FM 13-VIII Ext."},
+{"codes":[6],"description":"FM 13-IX"},
+{"codes":[7],"description":"FM 13-IX Ext."},
+{"codes":[8],"description":"FM 13-X"},
+{"codes":[9],"description":"FM 13-XI"},
+{"codes":[10],"description":"FM 13-XII Ext."},
+{"codes":[11],"description":"FM 13-XIII"},
+{"codes":[12],"description":"FM 13-XIV Ext."}
+]

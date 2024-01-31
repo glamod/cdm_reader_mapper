@@ -1,0 +1,12 @@
+{
+  "CI": "Cirrus",
+  "CC": "Cirrocumulus",
+  "CS": "Cirrostratus",
+  "AC": "Altocumulus",
+  "AS": "Altostratus",
+  "ST": "Stratus",
+  "SC": "Stratocumulus",
+  "NS": "Nimbostratus",
+  "CU": "Cumulus",
+  "CB": "Cumulonimbus"
+}

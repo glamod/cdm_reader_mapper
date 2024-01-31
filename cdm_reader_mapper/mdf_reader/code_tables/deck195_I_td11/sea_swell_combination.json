@@ -1,0 +1,13 @@
+{
+  "0": "Calm or slight sea, no swell",
+  "1": "Calm or slight sea, moderate swell",
+  "2": "Calm or slight sea, heavy swell",
+  "3": "Moderate sea, no swell",
+  "4": "Moderate sea, moderate swell",
+  "5": "Moderate sea, heavy swell",
+  "6": "Rather rough sea",
+  "7": "Rough sea",
+  "8": "Very rough sea",
+  "9": "Mountainous sea",
+  " ": "Unknown or in port"
+}

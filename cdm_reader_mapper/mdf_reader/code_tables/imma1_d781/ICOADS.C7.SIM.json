@@ -1,0 +1,10 @@
+{
+  "BU": "bucket",
+  "C": "condenser inlet (intake)",
+  "TT": "trailing thermistor",
+  "HC": "hull contact sensor",
+  "HT": "through hull sensor",
+  "RAD": "radiation thermometer",
+  "BTT": "bait tanks thermometer",
+  "OT": "others"
+}

@@ -1,0 +1,20 @@
+{
+  "SHIP": 26,
+  "BARQUE": 105,
+  "FRIGATE": 109,
+  "BRIG": 110,
+  "SCHOONER": 108,
+  "STEAMER": 120,
+  "STEAMSHIP": 120,
+  "SLOOP": 117,
+  "M.S.S.": 120,
+  "R.M.S.S.": 120,
+  "STEAM SHIP": 120,
+  "CORVETTE": 111,
+  "STEAM FRIGATE": 119,
+  "BRIGANTINE": 107,
+  "STAEMFRIGATE": 119,
+  "U.S.M.S.S.": 120,
+  "YACHT": 31,
+  "R.M.S.S": 120
+}

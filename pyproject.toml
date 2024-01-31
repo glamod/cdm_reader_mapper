@@ -1,0 +1,150 @@
+[build-system]
+requires = [
+  "setuptools>=42",
+  "wheel",
+  "setuptools_scm[toml]>=3.4",
+  "setuptools_scm_git_archive"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cdm_reader_mapper"
+description = "Comman Data Model reader and mapper toolbox"
+authors = [
+  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"}
+]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+keywords = ["cdm_reader_mapper"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11"
+]
+dynamic = ["version", "dependencies"]
+
+[project.scripts]
+mdf_reader = "cdm_reader_mapper.cli:main"
+
+[project.urls]
+"Homepage" = "https://cdm-reader-mapper.readthedocs.io"
+"Source" = "https://github.com/glamod/cdm_reader_mapper"
+"Changelog" = "https://cdm_reader_mapper.readthedocs.io/en/latest/history.html"
+"Issue tracker" = "https://github.com/glamod/cdm_reader_mapper"
+
+[tool]
+
+[tool.black]
+target-version = [
+  "py39",
+  "py310",
+  "py311"
+]
+
+[tool.coverage.run]
+relative_files = true
+omit = ["tests/*.py"]
+
+[tool.isort]
+profile = "black"
+py_version = 39
+append_only = true
+add_imports = "from __future__ import annotations"
+
+[tool.mypy]
+python_version = 3.9
+show_error_codes = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+  "pandas",
+  "matplotlib",
+  "pytest"
+]
+ignore_missing_imports = true
+
+[tool.nbqa.md]
+mdformat = true
+
+[tool.pytest]
+python_files = "test_*.py"
+testpaths = ["./tests"]
+
+[tool.rstcheck]
+report_level = "WARNING"
+ignore_roles = [
+  "pull",
+  "issue"
+]
+
+[tool.ruff]
+src = ["cdm_reader_mapper"]
+line-length = 150
+target-version = "py38"
+builtins = ["ellipsis"]
+exclude = [
+  ".git",
+  ".eggs",
+  "docs",
+  "build",
+  "tests"
+]
+ignore = [
+  "D205",
+  "D400",
+  "D401"
+]
+select = [
+  "C9",
+  "D",
+  "E",
+  "F",
+  "W"
+]
+
+[tool.ruff.flake8-bandit]
+check-typed-exception = true
+
+[tool.ruff.format]
+line-ending = "auto"
+
+[tool.ruff.isort]
+known-first-party = ["cdm_reader_mapper"]
+case-sensitive = true
+detect-same-package = false
+lines-after-imports = 1
+no-lines-before = ["future", "standard-library"]
+
+[tool.ruff.mccabe]
+max-complexity = 15
+
+[tool.ruff.per-file-ignores]
+"docs/*.py" = ["D100", "D101", "D102", "D103"]
+"tests/*.py" = ["D100", "D101", "D102", "D103"]
+"cdm_reader_mapper/**/__init__.py" = ["F401", "F403", "I001"]
+
+[tool.ruff.pycodestyle]
+max-doc-length = 180
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+[tool.setuptools]
+packages = ["cdm_reader_mapper"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = "ci/requirements/requirements.txt"}
+
+[tool.setuptools_scm]
+fallback_version = "999"
+write_to = "cdm_reader_mapper/_version.py"
+write_to_template = '__version__ = "{version}"'
+tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"

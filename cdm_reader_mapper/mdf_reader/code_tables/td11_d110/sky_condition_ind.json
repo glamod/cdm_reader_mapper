@@ -1,0 +1,19 @@
+{
+  "0": "Clear, clouds not visible or less than 6 tenths of sky covered by low clouds",
+  "J": "less than 6 tenths covered by high thin clouds",
+  "2": "less than 6 tenths of clouds over less than 6 tenths clouds at height nn (reported cloud height)",
+  "K": "less than 6 tenths of high clouds",
+  "L": "less than 6 tenths of high thick clouds",
+  "4": "at least 6 but less than 10 tenths covered by low thin clouds",
+  "M": "at least 6 but less than 10 tenths covered by high thin clouds",
+  "5": "at least 6 but less than 10 tenths covered by low clouds",
+  "N": "at least 6 but less than 10 tenths covered by high clouds",
+  "6": "at least 6 but less than 10 tenths covered by low thick clouds",
+  "O": "at least 6 but less than 10 tenths covered by high thick clouds",
+  "7": "10 tenths covered by low thin clouds",
+  "P": "10 tenths covered by high thin clouds",
+  "8": "10 tenths covered by low clouds",
+  "Q": "10 tenths covered by high clouds",
+  "9": "10 tenths covered by low thick clouds",
+  "R": "10 tenths covered by high thick clouds"
+}

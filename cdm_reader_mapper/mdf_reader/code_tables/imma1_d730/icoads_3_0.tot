@@ -1,0 +1,5 @@
+[
+{"codes":["ALC"],"description":"Alcohol Thermometer"},
+{"codes":["ELE"],"description":"Electric (resistance) Thermometer"},
+{"codes":["MER"],"description":"Dry Bulb Mercury Thermometer"}
+]

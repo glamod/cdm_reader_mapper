@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"undefined"},
+{"codes":[1],"description":"Total precipitation during the 6 hours preceding the observation"},
+{"codes":[2],"description":"Total precipitation during the 12 hours preceding the observation"},
+{"codes":[3],"description":"Total precipitation during the 18 hours preceding the observation"},
+{"codes":[4],"description":"Total precipitation during the 24 hours preceding the observation"},
+{"codes":[5],"description":"Total precipitation during the 1 hour preceding the observation"},
+{"codes":[6],"description":"Total precipitation during the 2 hours preceding the observation"},
+{"codes":[7],"description":"Total precipitation during the 3 hours preceding the observation"},
+{"codes":[8],"description":"Total precipitation during the 9 hours preceding the observation"},
+{"codes":[9],"description":"Total precipitation during the 15 hours preceding the observation"}
+]

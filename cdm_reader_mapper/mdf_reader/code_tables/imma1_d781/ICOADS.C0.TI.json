@@ -1,0 +1,7 @@
+{
+  "0": "nearest whole hour",
+  "1": "hour to tenths",
+  "2": "hour plus minutes",
+  "3": "high resolution (e.g., hour to hundredths)",
+  "4": "Daily (assumed local solar midday)"
+}

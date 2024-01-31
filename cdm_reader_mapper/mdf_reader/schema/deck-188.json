@@ -1,0 +1,19 @@
+{
+  "header": {
+    "format": "fixed_width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "RH": {
+      "description": "Relative humidity",
+      "field_length": 3,
+      "column_type": "object"
+    },
+    "S H P": {
+      "description": "Ship number",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ship"
+    }
+  }
+}

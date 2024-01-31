@@ -1,0 +1,92 @@
+{
+  "header": {
+    "multiple_reports_per_line": true,
+    "reports_per_line": 6,
+    "encoding": "ascii"
+  },
+  "sections": {
+    "header": {
+      "header": {
+        "sentinal": null,
+        "sentinal_length": null,
+        "length": null
+      },
+      "elements": {
+        "TAPE DECK": {
+          "description": "Card deck number",
+          "field_length": 3,
+          "column_type": "str"
+        },
+        "STN NUMB": {
+          "description": "Marsden 10 degree square",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 936,
+          "valid_min": 1
+        },
+        "YR": {
+          "description": "Marsden 1 degree sub-square",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "MO": {
+          "description": "Quadrant",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "coordinates_quadrants"
+        },
+        "DY": {
+          "description": "Latitude",
+          "field_length": 3,
+          "column_type": "float16",
+          "valid_max": 90.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        }
+      }
+    },
+    "report": {
+      "header": {
+        "sentinal": null,
+        "sentinal_length": null,
+        "length": null
+      },
+      "elements": {
+        "HR": {
+          "description": "Additional data indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "CEIL": {
+          "description": "Type of ice",
+          "field_length": 1,
+          "column_type": "str",
+          "codetable": "ice_type"
+        },
+        "VIS": {
+          "description": "Thickness of ice in centimetres",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "WIND DR": {
+          "description": "Rate of ice accretion",
+          "field_length": 1,
+          "column_type": "str",
+          "codetable": "ice_accretion_rate"
+        },
+        "WIND SPD": {
+          "description": "Blank",
+          "field_length": 2,
+          "column_type": "object",
+          "ignore": true
+        }
+      }
+    }
+  }
+}

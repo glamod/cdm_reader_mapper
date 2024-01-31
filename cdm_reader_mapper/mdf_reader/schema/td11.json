@@ -1,0 +1,504 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core1"
+        ]
+      },
+      {
+        "e": [
+          "additional blank",
+          "additional 1",
+          "additional 6",
+          "additional 8"
+        ]
+      },
+      {
+        "s": [
+          "core2",
+          "supplemental"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "core1": {
+      "header": {
+        "sentinal": null,
+        "length": 81
+      },
+      "elements": {
+        "CARD DECK": {
+          "description": "Card deck number",
+          "field_length": 3,
+          "column_type": "str"
+        },
+        "MAR SQ": {
+          "description": "Marsden 10 degree square",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 936,
+          "valid_min": 1
+        },
+        "SUB SQ": {
+          "description": "Marsden 1 degree sub-square",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "Q": {
+          "description": "Quadrant",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "coordinates_quadrants"
+        },
+        "LAT": {
+          "description": "Latitude",
+          "field_length": 3,
+          "column_type": "float16",
+          "valid_max": 90.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "deg"
+        },
+        "LONG": {
+          "description": "Longitude",
+          "field_length": 4,
+          "column_type": "float16",
+          "valid_max": 180.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "deg"
+        },
+        "YEAR": {
+          "description": "Year",
+          "field_length": 4,
+          "column_type": "int16",
+          "valid_max": 1999,
+          "valid_min": 1800,
+          "units": "a"
+        },
+        "MO": {
+          "description": "Month",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 12,
+          "valid_min": 1,
+          "units": "mon"
+        },
+        "DA": {
+          "description": "Day",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 31,
+          "valid_min": 1,
+          "units": "d"
+        },
+        "HR": {
+          "description": "Hour GMT",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 23,
+          "valid_min": 0,
+          "units": "h"
+        },
+        "WIND DIR I": {
+          "description": "Wind direction indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "wind_direction_ind"
+        },
+        "WIND DIR": {
+          "description": "Wind direction",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "wind_direction"
+        },
+        "WIND SPD I": {
+          "description": "Wind speed indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "wind_speed_ind"
+        },
+        "WIND SPD": {
+          "description": "Wind speed",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_min": 0,
+          "valid_max": 199,
+          "units": "knots"
+        },
+        "VIS I": {
+          "description": "Visibility indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "visibility_ind"
+        },
+        "VIS": {
+          "description": "Visibility",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "visibility"
+        },
+        "WX": {
+          "description": "Present weather",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "weather_present"
+        },
+        "W": {
+          "description": "Past weather",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "weather_past"
+        },
+        "PRESS": {
+          "description": "Sea level pressure",
+          "field_length": 5,
+          "column_type": "float16",
+          "valid_max": 1070.0,
+          "valid_min": 890.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "hPa"
+        },
+        "T I": {
+          "description": "Temperatures indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "temperatures_ind"
+        },
+        "AIR TMP": {
+          "description": "Air temperature",
+          "field_length": 3,
+          "column_type": "float16",
+          "encoding": "signed_overpunch",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "WET BLB": {
+          "description": "Wet bulb temperature",
+          "field_length": 3,
+          "column_type": "float16",
+          "encoding": "signed_overpunch",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "C"
+        },
+        "DEW PT": {
+          "description": "Dew point temperature",
+          "field_length": 3,
+          "column_type": "float16",
+          "encoding": "signed_overpunch",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "C"
+        },
+        "SEA TMP": {
+          "description": "Sea surface temperature",
+          "field_length": 3,
+          "column_type": "float16",
+          "encoding": "signed_overpunch",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "C"
+        },
+        "A-S DIFF": {
+          "description": "Air-sea temperature difference",
+          "field_length": 3,
+          "column_type": "float16",
+          "encoding": "signed_overpunch",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "C"
+        },
+        "CLOUDS N": {
+          "description": "Total cloud amount",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_amount_oktas"
+        },
+        "CLOUDS Nh": {
+          "description": "Lower cloud amount",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_amount_oktas"
+        },
+        "CLOUDS CL": {
+          "description": "Type of low cloud",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_type_low"
+        },
+        "CLOUDS I": {
+          "description": "Cloud height indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "cloud_height_ind"
+        },
+        "CLOUDS h": {
+          "description": "Cloud height",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_height_metres"
+        },
+        "CLOUDS CM": {
+          "description": "Type of middle cloud",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_type_middle"
+        },
+        "CLOUDS CH": {
+          "description": "Type of high cloud",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_type_high"
+        },
+        "WAVE DIR": {
+          "description": "Direction of waves",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "wave_direction_from"
+        },
+        "P E R WAVES": {
+          "description": "Period of waves",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "wave_period"
+        },
+        "WAVE HGT": {
+          "description": "Height of waves",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "wave_height"
+        },
+        "SWL DIR": {
+          "description": "Direction of swell",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "wave_direction_from"
+        },
+        "P E R SWELL": {
+          "description": "Period of swell",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "swell_period"
+        },
+        "SWL HGT": {
+          "description": "Height of swell",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "wave_height"
+        },
+        "OSV NO.": {
+          "description": "Ocean weather station number",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ocean_weather_station"
+        },
+        "C D": {
+          "description": "Card indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "card_indicator"
+        },
+        "SHP": {
+          "description": "Osv or ship indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "disable_white_strip": true,
+          "codetable": "osv_ship_indicator"
+        }
+      }
+    },
+    "additional blank": {
+      "header": {
+        "sentinal": " ",
+        "length": 7
+      },
+      "elements": {
+        "ADD 0": {
+          "description": "No data",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": true
+        },
+        "Blank": {
+          "description": "No data",
+          "field_length": 6,
+          "column_type": "object",
+          "ignore": true
+        }
+      }
+    },
+    "additional 1": {
+      "header": {
+        "sentinal": "1",
+        "length": 7
+      },
+      "elements": {
+        "A D D": {
+          "description": "Additional data indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "I C E": {
+          "description": "Type of ice",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ice_type"
+        },
+        "ICE THK": {
+          "description": "Thickness of ice in centimetres",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0,
+          "units": "cm"
+        },
+        "ACC": {
+          "description": "Rate of ice accretion",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ice_accretion_rate"
+        },
+        "Blank": {
+          "description": "Blank",
+          "field_length": 2,
+          "column_type": "object",
+          "ignore": true
+        }
+      }
+    },
+    "additional 6": {
+      "header": {
+        "sentinal": "6",
+        "length": 7
+      },
+      "elements": {
+        "A D D": {
+          "description": "Additional data indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "D I R": {
+          "description": "Ship direction",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ship_direction"
+        },
+        "S P D": {
+          "description": "Ship speed",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ship_speed_knots"
+        },
+        "a": {
+          "description": "Barometric tendency",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "barometric_tendency"
+        },
+        "ppp": {
+          "description": "Amount of pressure change (3h, tenths of millibars)",
+          "field_length": 3,
+          "column_type": "float16",
+          "valid_max": 29.9,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "hPa"
+        }
+      }
+    },
+    "additional 8": {
+      "header": {
+        "sentinal": "8",
+        "length": 7
+      },
+      "elements": {
+        "A D D": {
+          "description": "Additional data indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "SIG N": {
+          "description": "Significant cloud amount",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_amount_oktas_significant"
+        },
+        "SIG T": {
+          "description": "Significant cloud type",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "cloud_type_significant"
+        },
+        "SIG HGT": {
+          "description": "Significant cloud height",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "cloud_height_significant"
+        },
+        "Blank": {
+          "description": "Blank",
+          "field_length": 2,
+          "column_type": "object",
+          "ignore": true
+        }
+      }
+    },
+    "core2": {
+      "header": {
+        "sentinal": null,
+        "length": 5
+      },
+      "elements": {
+        "I C E": {
+          "description": "Ice indicator",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "SHIP NO.": {
+          "description": "Ship number",
+          "field_length": 4,
+          "column_type": "str"
+        }
+      }
+    },
+    "supplemental": {
+      "header": {
+        "sentinal": null,
+        "length": null
+      },
+      "elements": {
+        "supp": {
+          "description": "Supplemental data fields",
+          "column_type": "object"
+        }
+      }
+    }
+  }
+}

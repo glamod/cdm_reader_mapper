@@ -1,0 +1,12 @@
+{
+  "0": "tenths degC",
+  "1": "half degC",
+  "2": "whole degC",
+  "3": "whole or tenths degC (mixed precision among temperature fields)",
+  "4": "tenths degF",
+  "5": "half degF",
+  "6": "whole degF",
+  "7": "whole or tenths degF (mixed precision among temperature fields)",
+  "8": "high resolution data (e.g., hundredths degC)",
+  "9": "other"
+}

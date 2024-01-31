@@ -1,0 +1,178 @@
+{
+  "report_id": {
+    "sections": "c98",
+    "elements": "UID",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "ICOADS-30",
+      "separator": "-"
+    }
+  },
+  "application_area": {
+    "default": [
+      1,
+      7,
+      10,
+      11
+    ]
+  },
+  "observing_programme": {
+    "sections": "c1",
+    "elements": "PT",
+    "transform": "observing_programme"
+  },
+  "report_type": {
+    "default": 0
+  },
+  "station_name": {
+    "sections": "c99_data",
+    "elements": "ship_name"
+  },
+  "station_type": {
+    "default": 2
+  },
+  "platform_type": {
+    "sections": "c1",
+    "elements": "PT",
+    "code_table": "platform_type"
+  },
+  "platform_sub_type": {
+    "sections": "c1",
+    "elements": "PT",
+    "code_table": "platform_sub_type"
+  },
+  "primary_station_id": {
+    "sections": "c99_data",
+    "elements": "ship_name"
+  },
+  "station_record_number": {
+    "default": 1
+  },
+  "primary_station_id_scheme": {
+    "sections": "core",
+    "elements": "II",
+    "fill_value": 8,
+    "code_table": "primary_station_id_scheme"
+  },
+  "longitude": {
+    "sections": "core",
+    "elements": "LON",
+    "transform": "longitude_360to180",
+    "decimal_places": "decimal_places"
+  },
+  "latitude": {
+    "sections": "core",
+    "elements": "LAT",
+    "decimal_places": "decimal_places"
+  },
+  "location_accuracy": {
+    "sections": "core",
+    "elements": [
+      "LI",
+      "LAT"
+    ],
+    "transform": "location_accuracy",
+    "decimal_places": 0
+  },
+  "location_quality": {
+    "default": 3
+  },
+  "crs": {
+    "default": 0
+  },
+  "station_speed": {
+    "sections": "core",
+    "elements": [
+      "YR",
+      "VS"
+    ],
+    "code_table": "ship_speed_ms",
+    "decimal_places": 1
+  },
+  "station_course": {
+    "sections": "core",
+    "elements": "DS",
+    "code_table": "station_course",
+    "decimal_places": 0
+  },
+  "height_of_station_above_local_ground": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "height_of_station_above_sea_level": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "report_meaning_of_timestamp": {
+    "default": 2
+  },
+  "report_timestamp": {
+    "sections": "core",
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "HR"
+    ],
+    "transform": "datetime_imma1"
+  },
+  "report_duration": {
+    "default": 11
+  },
+  "report_time_accuracy": {
+    "sections": "core",
+    "elements": "TI",
+    "transform": "time_accuracy",
+    "decimal_places": 0
+  },
+  "report_time_quality": {
+    "default": 2
+  },
+  "report_quality": {
+    "sections": "c98",
+    "elements": "IRF",
+    "code_table": "report_quality"
+  },
+  "duplicate_status": {
+    "default": 4
+  },
+  "record_timestamp": {
+    "transform": "datetime_utcnow"
+  },
+  "history": {
+    "sections": "core",
+    "elements": "YR",
+    "transform": "lineage"
+  },
+  "source_id": {
+    "sections": [
+      "c1",
+      "c1",
+      "core",
+      "core"
+    ],
+    "elements": [
+      "SID",
+      "DCK",
+      "YR",
+      "MO"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "ICOADS-3-0-0T",
+      "separator": "-",
+      "zfill_col": [
+        0,
+        3
+      ],
+      "zfill": [
+        3,
+        2
+      ]
+    }
+  },
+  "source_record_id": {
+    "sections": "c98",
+    "elements": "UID"
+  }
+}

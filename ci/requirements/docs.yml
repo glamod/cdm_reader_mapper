@@ -1,0 +1,30 @@
+name: cdm-docs
+
+channels:
+    - conda-forge
+    - nodefaults
+
+dependencies:
+    #cdm_reader_mapepr
+    - python>=3.10
+    - pandas
+    - matplotlib
+    - datashader
+    - xarray
+
+    #documentation
+    - ipython
+    - nbsphinx
+    - sphinx
+    - sphinx-autodoc-typehints
+    - sphinx-codeautolink
+    - sphinx-copybutton
+    - sphinx_rtd_theme >=1.0
+
+    #from pypi
+    - pip:
+      - msgpack
+      - requests
+      - timezonefinder
+      - python-slugify
+      - textdistance

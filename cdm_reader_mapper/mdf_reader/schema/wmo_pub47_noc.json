@@ -1,0 +1,114 @@
+{
+  "header": {
+    "format": "delimited",
+    "delimiter": ";"
+  },
+  "elements": {
+    "call": {
+      "description": "Ship call sign (IMMA ID)",
+      "column_type": "object",
+      "missing_value": "MSNG"
+    },
+    "record": {
+      "description": "Record number for call",
+      "column_type": "int8"
+    },
+    "name": {
+      "description": "Name of ship",
+      "column_type": "object",
+      "missing_value": "MSNG"
+    },
+    "freq": {
+      "description": "Freq mapped to report duration from CDM (e.g. 8 obs per day mapped to 3 hour duration)",
+      "column_type": "int8",
+      "missing_value": "MSNG"
+    },
+    "vsslM": {
+      "description": "Type of meteorological reporting ship",
+      "column_type": "object",
+      "missing_value": "MSNG"
+    },
+    "vssl": {
+      "description": "Type of ship mapped to platform_sub_type from CDM",
+      "column_type": "int8",
+      "missing_value": "MSNG"
+    },
+    "atm": {
+      "description": "Automation status for ship, mapped to automation from CDM",
+      "column_type": "int8"
+    },
+    "rcnty": {
+      "description": "Recruiting country for ship",
+      "column_type": "object"
+    },
+    "valid_from": {
+      "description": "Date which record is valid from",
+      "column_type": "datetime",
+      "datetime_format": "%Y-%m-%d"
+    },
+    "valid_to": {
+      "description": "Date which record is valid to",
+      "column_type": "datetime",
+      "datetime_format": "%Y-%m-%d"
+    },
+    "uid": {
+      "description": "Internal unique ID for ship",
+      "column_type": "object"
+    },
+    "thmH1": {
+      "description": "Thermometer height",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "platH": {
+      "description": "Platform height",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "brmH1": {
+      "description": "Barometer height",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "anmH": {
+      "description": "Anemometer height",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "anHL1": {
+      "description": "Anemometer height above max load line",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "wwH": {
+      "description": "Wind wave observing height",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "sstD1": {
+      "description": "Depth of SST sensor",
+      "column_type": "float16",
+      "units": "m"
+    },
+    "th1": {
+      "description": "Air temperature sensor",
+      "column_type": "object"
+    },
+    "hy1": {
+      "description": "Wet bulb and dew point temperature sensor",
+      "column_type": "object"
+    },
+    "st1": {
+      "description": "Sea surface temperature sensor",
+      "column_type": "object"
+    },
+    "bm1": {
+      "description": "Sea level pressure sensor",
+      "column_type": "object"
+    },
+    "an1": {
+      "description": "Wind speed sensor",
+      "column_type": "object"
+    }
+  }
+}

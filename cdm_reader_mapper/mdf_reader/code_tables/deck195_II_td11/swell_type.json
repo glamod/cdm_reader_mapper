@@ -1,0 +1,13 @@
+{
+  "0": "None. Aprox values (feet): H()/L(0)",
+  "1": "Low - short or average. Aprox values (feet): H(1-6)/L(0-600)",
+  "2": "Low - long. Aprox values (feet): H(1-6)/L(>600)",
+  "3": "Moderate - short. Aprox values (feet): H(6-12)/L(0-300)",
+  "4": "Moderate - average. Aprox values (feet): H(6-12)/L(300-600)",
+  "5": "Moderate - long. Aprox values (feet): H(6-12)/L(> 600)",
+  "6": "High - short. Aprox values (feet): H(>12)/L(0-300)",
+  "7": "High - average. Aprox values (feet): H(>12)/L(300-600)",
+  "8": "High - long. Aprox values (feet): H(>12)/L(>600)",
+  "9": "Confused",
+  " ": "Unknown or in port"
+}

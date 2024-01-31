@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"no QC has been performed on this element"},
+{"codes":[1],"description":"QC performed; element appears correct"},
+{"codes":[2],"description":"QC performed; element appears inconsistent with other elements"},
+{"codes":[3],"description":"QC performed; element appears doubtful"},
+{"codes":[4],"description":"QC performed; element appears erroneous"},
+{"codes":[5],"description":"QC performed; element changed (possibly to missing) as a result"},
+{"codes":[6],"description":"QC flag amended: element flagged by CMas correct (1), but according to MQCS still appears suspect (2-4) or missing (9)"},
+{"codes":[7],"description":"QC flag amended: element flagged by CM as changed (5), but according to MQCS still appears suspect (2-4)"},
+{"codes":[8],"description":"[reserved]"},
+{"codes":[9],"description":"element is missing"}
+]

@@ -1,0 +1,157 @@
+{
+  "observation_id": {
+    "sections": "c98",
+    "elements": "UID",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "ICOADS-30",
+      "append": "SLP",
+      "separator": "-"
+    }
+  },
+  "report_id": {
+    "sections": "c98",
+    "elements": "UID",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "ICOADS-30",
+      "separator": "-"
+    }
+  },
+  "data_policy_licence": {
+    "default": 0
+  },
+  "date_time": {
+    "sections": "core",
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "HR"
+    ],
+    "transform": "datetime_imma1"
+  },
+  "date_time_meaning": {
+    "default": 2
+  },
+  "observation_duration": {
+    "default": 8
+  },
+  "longitude": {
+    "sections": "core",
+    "elements": "LON",
+    "transform": "longitude_360to180",
+    "decimal_places": "decimal_places"
+  },
+  "latitude": {
+    "sections": "core",
+    "elements": "LAT",
+    "decimal_places": "decimal_places"
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "SLP",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": "decimal_places_pressure_pascal"
+  },
+  "value_significance": {
+    "default": 2
+  },
+  "units": {
+    "default": 32
+  },
+  "conversion_flag": {
+    "default": 0
+  },
+  "location_precision": {
+    "sections": "core",
+    "elements": [
+      "LI",
+      "LAT"
+    ],
+    "transform": "location_accuracy",
+    "decimal_places": 0
+  },
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "quality_flag": {
+    "default": 2
+  },
+  "numerical_precision": {},
+  "sensor_automation_status": {
+    "default": 5
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "atm_units",
+    "code_table": "baro_units",
+    "decimal_places": 0
+  },
+  "original_value": {
+    "sections": "c99_data",
+    "elements": "atm",
+    "decimal_places": "decimal_places"
+  },
+  "conversion_method": {
+    "default": 7
+  },
+  "processing_level": {
+    "default": 3
+  },
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {
+    "sections": [
+      "c1",
+      "c1",
+      "core",
+      "core"
+    ],
+    "elements": [
+      "SID",
+      "DCK",
+      "YR",
+      "MO"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "ICOADS-3-0-0T",
+      "separator": "-",
+      "zfill_col": [
+        0,
+        3
+      ],
+      "zfill": [
+        3,
+        2
+      ]
+    }
+  }
+}

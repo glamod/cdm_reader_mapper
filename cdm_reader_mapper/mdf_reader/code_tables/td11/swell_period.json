@@ -1,0 +1,28 @@
+{
+  "range_key(1750,1967)": {
+    "0": "20-21 seconds",
+    "1": "over 21 seconds",
+    "2": "5 seconds or less",
+    "3": "6-7 seconds",
+    "4": "8-9 seconds",
+    "5": "10-11 seconds",
+    "6": "12-13 seconds",
+    "7": "14-15 seconds",
+    "8": "16-17 seconds",
+    "9": "18-19 seconds",
+    "-": "calm or no period determined"
+  },
+  "range_key(1968,yyyy)": {
+    "0": "10 seconds",
+    "1": "11 seconds",
+    "2": "12 seconds",
+    "3": "13 seconds",
+    "4": "14 seconds or more",
+    "5": "5 seconds or less",
+    "6": "6 seconds",
+    "7": "7 seconds",
+    "8": "8 seconds",
+    "9": "9 seconds",
+    "-": "calm or period not determined"
+  }
+}

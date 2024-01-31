@@ -1,0 +1,11 @@
+[
+{"codes":[null],"description":null},
+{"codes":["1"],"description":"Hygristor"},
+{"codes":["2"],"description":"Chilled Mirror"},
+{"codes":["3"],"description":"Other"},
+{"codes":["C"],"description":"Capacitance"},
+{"codes":["E"],"description":"Electric"},
+{"codes":["H"],"description":"Hair hygrometer"},
+{"codes":["P"],"description":"Psychrometer"},
+{"codes":["T"],"description":"Torsion"}
+]

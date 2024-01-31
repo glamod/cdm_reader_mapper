@@ -1,0 +1,141 @@
+{
+  "observation_id": {
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "GG",
+      "ID"
+    ],
+    "transform": "guid",
+    "kwargs": {
+      "prepend": "gdac_",
+      "append": "_AT"
+    }
+  },
+  "report_id": {
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "GG",
+      "ID"
+    ],
+    "transform": "guid",
+    "kwargs": {
+      "prepend": "gdac_"
+    }
+  },
+  "data_policy_licence": {
+    "default": 0
+  },
+  "date_time": {
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "GG"
+    ],
+    "transform": "datetime_imma1"
+  },
+  "date_time_meaning": {},
+  "observation_duration": {
+    "default": 8
+  },
+  "longitude": {
+    "elements": "LON",
+    "transform": "longitude_360to180",
+    "decimal_places": "decimal_places"
+  },
+  "latitude": {
+    "elements": "LAT",
+    "decimal_places": "decimal_places"
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate": {},
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "observation_height_above_station_surface": {},
+  "secondary_variable": {
+    "default": 16
+  },
+  "observed_variable": {
+    "default": 85
+  },
+  "observation_value": {
+    "elements": [
+      "SN",
+      "AT"
+    ],
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": "decimal_places_temperature_kelvin"
+  },
+  "value_significance": {
+    "default": 12
+  },
+  "secondary_value": {
+    "elements": "SN",
+    "code_table": "T_sign"
+  },
+  "units": {
+    "default": 5
+  },
+  "code_table": {},
+  "conversion_flag": {
+    "default": 0
+  },
+  "location_method": {},
+  "location_precision": {},
+  "z_coordinate_method": {},
+  "bbox_min_longitude": {},
+  "bbox_max_longitude": {},
+  "bbox_min_latitude": {},
+  "bbox_max_latitude": {},
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "quality_flag": {
+    "default": 2
+  },
+  "numerical_precision": {},
+  "sensor_id": {},
+  "sensor_automation_status": {
+    "default": 5
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "original_units": {
+    "elements": "IT"
+  },
+  "original_code_table": {},
+  "original_value": {
+    "elements": "AT",
+    "decimal_places": "decimal_places"
+  },
+  "conversion_method": {
+    "default": 1
+  },
+  "processing_code": {},
+  "processing_level": {
+    "default": 3
+  },
+  "adjustment_id": {},
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {}
+}

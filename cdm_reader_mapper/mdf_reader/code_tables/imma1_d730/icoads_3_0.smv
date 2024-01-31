@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":null},
+{"codes":[1],"description":"Output from digitization project, semi-colon delimited format (1955)"},
+{"codes":[2],"description":"Output from digitization project, semi-colon delimited format (1956)"},
+{"codes":[3],"description":"Output from digitization project, semi-colon delimited format (1957,1967)"},
+{"codes":[4],"description":"Output from digitization project, semi-colon delimited format (1968 to 1969)"},
+{"codes":[5],"description":"Fixed format (1970\u00d094)"},
+{"codes":[6],"description":"Semicolon delimited format (1995 to 2001)"},
+{"codes":[7],"description":"Semicolon delimited format (2002 to 2007 q1)"},
+{"codes":[8],"description":"Semicolon delimited format (2007 q2 - 2008)"},
+{"codes":[9],"description":"Semicolon delimited format (2009 - 2014)"}
+]

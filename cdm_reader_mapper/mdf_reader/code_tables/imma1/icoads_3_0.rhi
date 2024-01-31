@@ -1,0 +1,7 @@
+[
+{"codes":[0],"description":"Relative humidity in tenths of Percentage, measured and originally reported"},
+{"codes":[1],"description":"Relative humidity in whole Percentage, measured and originally reported"},
+{"codes":[2],"description":"[Reserved]"},
+{"codes":[3],"description":"Relative humidity in tenths of Percentage, computed"},
+{"codes":[4],"description":"Relative humidity in whole Percentage, computed"}
+]

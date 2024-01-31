@@ -1,0 +1,12 @@
+[
+{"codes":["A"],"description":"Aspirated (Assmann type)"},
+{"codes":["S"],"description":"Screen (not ventilated)"},
+{"codes":["HH"],"description":"Hand-held digital thermometer \/ humidity sensor"},
+{"codes":["RS"],"description":"Radiation shield (e.g. cylindrical \/ Gill multi-plate)"},
+{"codes":["SG"],"description":"Ship's Sling"},
+{"codes":["SL"],"description":"Sling"},
+{"codes":["SN"],"description":"Ship's screen"},
+{"codes":["US"],"description":"Unscreened"},
+{"codes":["VS"],"description":"Screen (ventilated)"},
+{"codes":["W"],"description":"Whirling"}
+]

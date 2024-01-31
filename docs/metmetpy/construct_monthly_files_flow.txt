@@ -1,0 +1,141 @@
+MAIN STEPS PERFORMED BY construct_monthly_files.R
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+INPUT ARGUMENTS TO MAIN ROUTINE:
+--------------------------------------------------------------------------------
+init year, end year and read_gap info OR default.
+
+LIST OF SUBROUTINES APPLIED:
+--------------------------------------------------------------------------------
+dir = /noc/mpoc/surface_data/TRACKING/FinalTrack/RSCRIPTS/
+
+get_dup_uid.R
+reformat_ids.R
+correct_ids.R
+check_regex.R # gives classify_ids function
+add_date.R
+
+
+STEP 1. PLATFORM TYPE: INFO CORRECTION AND DATA FILTERING
+--------------------------------------------------------------------------------
+1.1. Adding PT=5 to some decks if no PT:
+---------------------------------------
+For a known list of decks, PT information is missing but they are thought to be
+ships (this includes a buoy data deck): 5 is assigned to PT in this decks
+
+
+STEP 2. DATA FILTERING BASED ON PT, ID
+--------------------------------------------------------------------------------
+2.1. Discarding records based on PT:
+-----------------------------------
+- CMAN deck data (995)
+- Records from a specific deck list with no PT or PT==5,4
+- Records with no PT or PT<=5? or PT==9,10,11,12,17
+
+2.2. Discarding records based on ID:
+-----------------------------------
+- ID missing
+- ID == "PLAT","BUOY","RIGG","BOUY"? again?
+- ID contains "PLAT","RIGG"
+
+2.3. Discarding records based on MD values combination:
+------------------------------------------------------
+- ID missing and DECK==700
+- All numeric ID and DECK==700[892] and SID==147[29] and PT==5[5]
+
+STEP 3. REFORMAT IDS: SUBROUTINE reformat_ids.R
+--------------------------------------------------------------------------------
+Replace IDs for given decks and time periods (see if need monthly precision
+ or just yearly)
+
+INPUT:
+OUTPUT:
+
+Some examples:
+  - deck 702, 1867-1889: "PHOENIX" from "PH_ENIX","PH ENIX"....,"TENAXPRO" from
+"TENAX_PR" or "TENAX PR", etc....
+  - deck 187, 1946-1956: "2" to "0202", "8" to "0708"
+  - deck 184, 1953-1961: more complex thing, including: removing first character,
+  PT dependency, year dependency, etc...
+  - deck 194, 1856-1955: currently commented. Includes replace blanks with 0
+  - deck 897, 1962-1963: if no ID, ship is "Eltanin"
+  - deck 780,782, 1663-2020(!,present...): consistent formatting...
+  ....
+
+STEP 4. CORRECT IDS: SUBROUTINE correct_ids.R
+--------------------------------------------------------------------------------
+Whats the actual difference in concept with reformat_ids above?
+For given decks and time periods (see if need monthly precision
+ or just yearly)
+
+INPUT:
+OUTPUT:
+
+Some examples:
+  - deck 704, 1878-1894: replacements like deck 702 above.
+  - deck 194, 1856-1955: again, commented
+  - deck 730, 1663-1860: build from external file with logs-names-dups info
+  - deck 701, 1663-1863: build from external file, plus further corrections on
+  that
+  - deck 701, 1663-1863, missing ID: strange or missing ID plus depends on year.
+  - deck 721, 1851,1868: replacements like deck 702 above, plus assignement if
+  missing depending on year and year-month
+  - deck 701,721: add deck number to ID (d701, d721)
+  - deck 705-707, 1910-1946: build from external file
+  - CONTINUE TO SORT OUT EXAMPLES FROM SEQUENTIAL IDs ON....
+
+STEP 5. CLASSIFY IDS: SUBROUTINE classify_ids.R
+--------------------------------------------------------------------------------
+ (also, but commented after STEP3 AND BEFORE STEP 4)
+ If input is null, then calls reformat_ids.R on input df.
+
+ INPUT:
+ OUTPUT:
+
+ For a particular set of decks
+
+ First, ID is converted to a code with the following:
+    - C: uppercase characters
+    - c: lowercase characters
+    - N: numbers
+
+Then length of ID is checked to assign inidital idtOK and idttype.
+
+Then classification (idtOK) in periods and deck and sid dependent:
+  - Check against specific formats (i.e. NNCCc, CCNcc,...)
+  - Against list of formats
+  - Combination of one of the above and someting, like a character....
+  - Allows specific names no matter their NCc like format (non deck,date dependent)
+  - And a couple of things more...
+
+Then assign idtype:
+  - Based on idOK: 1 or 2
+  - Based on qcid, additionally, 3
+  - and some more stuff....
+
+STEP 6. GAPS
+--------------------------------------------------------------------------------
+
+STEP 7. ADD DATE
+--------------------------------------------------------------------------------
+Adds a 'date' column, which I currently ignore if it is a datetime R type (and
+therefore a valid date is present) or just a yr-mo-dy string.
+
+STEP 8. PREPARES DATA PROBABLY TO INPUT FLAG DUPLICATES MODULE
+--------------------------------------------------------------------------------
+Selects fields and maps longitudes to [-180:180] reference
+
+
+STEP 9. FLAG DUPLICATES
+--------------------------------------------------------------------------------
+- Get duplicate uid
+- Does something with the id, qcid when "TEST","CONTEST","TESTA-NL"....because of
+the "TEST" status when starting to transmit
+- Does something else to a dck when lat/lon 0 or -180.
+- And more filtering based on idtype and qcid
+...
+
+STEP 10. WRITE DATA, SPLITTING ACCORDING TO TYPES AND QUALITIES,...., O ALGO ASÍ
+--------------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+{
+  "1": "Within 2.8 sigma limits (g - 2.8*s1 <= a1 <= g + 2.8*s5)",
+  "2": "Less than 2.8 sigma lower limit (g - 3.5*s1 <= a1 < g - 2.8*s1)",
+  "3": "Greater than 2.8 sigma upper limit (g + 2.8*s5 < a1 <= g + 3.5*s5)",
+  "4": "Less than 3.5 sigma lower limit (g - 4.5*s1 <= a1 < g - 3.5*s1)",
+  "5": "Greater than 3.5 sigma upper limit (g + 3.5*s5 < a1 <= g + 4.5*s5)",
+  "6": "Less than 4.5 sigma lower limit (a1 < g - 4.5*s1)",
+  "7": "Greater than 4.5 sigma upper limit (a1 > g + 4.5*s5)",
+  "11": "Limits missing (ocean/coastal box); MEDS data correct (SF/PF only)",
+  "12": "Limits missing (ocean/coastal box) ",
+  "13": "Landlocked 2-degree box",
+  "14": "Data unusable (SF, AF, and PF, only; see Table 2)",
+  "15": "Data missing or not computable (see Table 2)"
+}

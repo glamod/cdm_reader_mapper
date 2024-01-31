@@ -1,0 +1,13 @@
+{
+  "0": "0",
+  "1": "1 okta or less, but not zero",
+  "2": "2 oktas",
+  "3": "3 oktas",
+  "4": "4 oktas",
+  "5": "5 oktas",
+  "6": "6 oktas",
+  "7": "7 oktas or more, but not 8 oktas",
+  "8": "8 oktas",
+  "9": "Sky obscured by fog and/or other meteorological phenomena",
+  "/": "Cloud cover is indiscernible for reasons other than fog or other meteorological phenomena, or observation is not made"
+}

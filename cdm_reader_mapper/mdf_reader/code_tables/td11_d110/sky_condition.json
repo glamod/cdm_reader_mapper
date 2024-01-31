@@ -1,0 +1,66 @@
+{
+  "0": {
+    "0": "Clear",
+    "1": "less than 6 tenths of sky covered by low thin clouds at height nn (reported cloud height)",
+    "2": "less than 6 tenths of sky covered by low clouds at height nn (reported cloud height)",
+    "3": "less than 6 tenths of sky covered by low thick clouds at height nn (reported cloud height)",
+    "-": "No clouds visible due to obscuring phenomena"
+  },
+  "J": {
+    " ": "less than 6 tenths covered by high thin clouds"
+  },
+  "2": {
+    "2": "less than 6 tenths of clouds over less than 6 tenths clouds at height nn (reported cloud height)"
+  },
+  "K": {
+    " ": "less than 6 tenths of high clouds",
+    "2": "less than 6 tenths of high clouds, less than 6 tenths of lower clouds at height nn (reported cloud height)"
+  },
+  "L": {
+    " ": "less than 6 tenths of high thick clouds"
+  },
+  "4": {
+    " ": "at least 6 but less than 10 tenths covered by low thin clouds"
+  },
+  "M": {
+    " ": "at least 6 but less than 10 tenths covered by high thin clouds"
+  },
+  "5": {
+    " ": "at least 6 but less than 10 tenths covered by low clouds",
+    "2": "6-9 tenths clouds over less than 6 tenths clouds at height nn (reported cloud height)",
+    "5": "6-9 tenths clouds over less 6-9 tenths lower clouds"
+  },
+  "N": {
+    " ": "at least 6 but less than 10 tenths covered by high clouds",
+    "2": "6-9 tenths high clouds, less than 6 tenths lower clouds at height nn (reported cloud height)",
+    "5": "6-9 tenths high clouds, 6-9 tenths lower clouds"
+  },
+  "6": {
+    " ": "at least 6 but less than 10 tenths covered by low thick clouds"
+  },
+  "O": {
+    " ": "at least 6 but less than 10 tenths covered by high thick clouds"
+  },
+  "7": {
+    " ": "10 tenths covered by low thin clouds"
+  },
+  "P": {
+    " ": "10 tenths covered by high thin clouds"
+  },
+  "8": {
+    " ": "10 tenths covered by low clouds",
+    "2": "10 tenths clouds over less than 6 tenths clouds at height nn (reported cloud height)",
+    "5": "10 tenths clouds over 6-9 tenths lower clouds"
+  },
+  "Q": {
+    " ": "10 tenths covered by high clouds",
+    "2": "10 tenths high clouds, less than 6 tenths lower clouds at height nn (reported cloud height)",
+    "5": "10 tenths high clouds, 6-9 tenths lower clouds"
+  },
+  "9": {
+    " ": "10 tenths covered by low thick clouds"
+  },
+  "R": {
+    " ": "10 tenths covered by high thick clouds"
+  }
+}

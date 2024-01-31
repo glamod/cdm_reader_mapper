@@ -1,0 +1,8 @@
+{
+  "1": "originates from dead reckoning",
+  "2": "originates from true navigation (bearing/distance, celestial)",
+  "3": "Interpolated manually",
+  "4": "Interpolated",
+  "5": "Inserted actual position (ports, islands, etc.)",
+  "6": "Missing"
+}

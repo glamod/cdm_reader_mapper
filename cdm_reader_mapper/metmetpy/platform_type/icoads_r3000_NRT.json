@@ -1,0 +1,42 @@
+{
+  "792": {
+    "method": "function",
+    "function": "deck_792_imma1"
+  },
+  "793": {
+    "method": "fillna",
+    "fill_value": "6"
+  },
+  "794": {
+    "method": "fillna",
+    "fill_value": "22"
+  },
+  "795": {
+    "method": "fillna",
+    "fill_value": "13"
+  },
+  "797": {
+    "method": "fillna",
+    "fill_value": "13"
+  },
+  "798": {
+    "method": "fillna",
+    "fill_value": "22"
+  },
+  "992": {
+    "method": "function",
+    "function": "deck_992_imma1"
+  },
+  "993": {
+    "method": "fillna",
+    "fill_value": "6"
+  },
+  "994": {
+    "method": "fillna",
+    "fill_value": "22"
+  },
+  "995": {
+    "method": "fillna",
+    "fill_value": "13"
+  }
+}

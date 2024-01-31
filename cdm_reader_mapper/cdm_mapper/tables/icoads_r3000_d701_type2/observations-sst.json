@@ -1,0 +1,154 @@
+{
+  "observation_id": {
+    "sections": "c98",
+    "elements": "UID",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "ICOADS-30",
+      "append": "SST",
+      "separator": "-"
+    }
+  },
+  "report_id": {
+    "sections": "c98",
+    "elements": "UID",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "ICOADS-30",
+      "separator": "-"
+    }
+  },
+  "data_policy_licence": {
+    "default": 0
+  },
+  "date_time": {
+    "sections": "core",
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "HR"
+    ],
+    "transform": "datetime_imma1"
+  },
+  "date_time_meaning": {
+    "default": 2
+  },
+  "observation_duration": {
+    "default": 8
+  },
+  "longitude": {
+    "sections": "core",
+    "elements": "LON",
+    "transform": "longitude_360to180",
+    "decimal_places": "decimal_places"
+  },
+  "latitude": {
+    "sections": "core",
+    "elements": "LAT",
+    "decimal_places": "decimal_places"
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "observed_variable": {
+    "default": 95
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "SST",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": "decimal_places_temperature_kelvin"
+  },
+  "value_significance": {
+    "default": 2
+  },
+  "units": {
+    "default": 5
+  },
+  "conversion_flag": {
+    "default": 0
+  },
+  "location_precision": {
+    "sections": "core",
+    "elements": [
+      "LI",
+      "LAT"
+    ],
+    "transform": "location_accuracy",
+    "decimal_places": 0
+  },
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "quality_flag": {
+    "default": 2
+  },
+  "numerical_precision": {},
+  "sensor_automation_status": {
+    "default": 5
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "temp_ind",
+    "code_table": "sst_units",
+    "decimal_places": 0
+  },
+  "original_value": {
+    "sections": "c99_data",
+    "elements": "sea_surface_temperature_one",
+    "decimal_places": "decimal_places"
+  },
+  "conversion_method": {
+    "default": 1
+  },
+  "processing_level": {
+    "default": 3
+  },
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {
+    "sections": [
+      "c1",
+      "c1",
+      "core",
+      "core"
+    ],
+    "elements": [
+      "SID",
+      "DCK",
+      "YR",
+      "MO"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "ICOADS-3-0-0T",
+      "separator": "-",
+      "zfill_col": [
+        0,
+        3
+      ],
+      "zfill": [
+        3,
+        2
+      ]
+    }
+  }
+}

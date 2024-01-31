@@ -1,0 +1,76 @@
+The idea is to have a place where all the "fixing" information is neatly
+collected in such a way that:
+  - We can easily access what corrections are applied to a deck
+  - We can easily apply these corrections to a deck, no matter the data format
+  it comes in
+  - We have a compiled history of the original documentation / ancillary files
+  that result in the applied corrections|replacements
+  - We have a minimum aid to compile ancillary files to replacement strings,
+  including corrections to the ancillary files to create the final replacement
+  strings
+  - We have a set of common functions that can be used to complete different
+  correction steps in different cases.
+
+
+....on encoding and replacement lists:
+The replacement value must be ascii characters only.
+The replacement key should be (for imma1) ascii only, but instances of non ascii
+characters have been found. Dave thinks Liz replaces these by ' ' on reading
+(or maybe reads .Rda files not imma1, which have these already changed?),
+and then applies corrections based on that. So we need to keep this in mind that:
+    Replacement keys need to reflect what's in a data format: ascii, non-ascii
+    or both versions of ID. So we must not force ascii only when generating
+    these lists and have to keep an eye when translating Liz's lists to see
+    which reflect the imma1 original ID and which are an "ascii-reinforced" ID,
+    if any
+
+...some comments:
+  - The correction method is deck and data format dependent: the collection of
+  available deck|format corrections are available in a json file that indicates
+  the tool if a deck|format needs(has implemented) an ID correction.
+  - Deck and data format are the input arguments, together with the data.
+  - We understand that some corrections (ship name replacement) could be
+  potentially common across decks/data formats and so replacement lists are
+  independent on the deck or data format, stored in individual json files that
+  are specified in the deck|format correction method. The json filename
+  can include the deck and format for which was originally generated, but can
+  be used for other cases.
+
+  - This module, so far, will assume the data passed comes from a single deck
+  and, obviously, data format. It can be made deck unaware, but then we would
+  have to pass the deck info location in the DF and filter over deck:
+  could be done, but we don't really need this for C3S processing,
+  so we leave that way initially.
+  - For the ID fixtures, there are two main methods:
+      1. Apply a replacement list from a json file: the deck-format tuple only
+      requires a simple, non dependent, replacement, with the option to fillna.
+      2. Apply a function with all the fixes, rebuilds, replacement the deck-format
+      requires: these may include, but not only, method 1. Also included here
+      when only replacements are required, but these depend on time periods.
+
+WORKFLOW FOR ID CORRECTIONS (ID_FIXTURES)
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+1. Find (deck,data_format) in id_replacements_by_deck-format list.
+2. If deck in list: apply replacement map.
+3. Find any ID with non-ascii character.
+4. If none, check if non-ascii-IDs.json and if filename in file: remove entry.
+5. If, update filename entry in non-ascii-IDs.json. !nopw!: filename_nonascii_ID!
+6. Apply reformat steps to all IDs
+
+
+MINI TOOLS WE MIGHT NEED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+TOOL 1. Tool to replace a single value (including NaN) in a column to another
+--------------------------------------------------------------------------------
+Will take also include performing where other column(s) have a specific value
+status: initial_functions.fill_value. Need to complete tests
+
+
+TOOL 2. Something that removes records and output also removed part
+--------------------------------------------------------------------------------
+Will have to be able to remove based on:
+  - single column: one or multiple values
+  - multiple columns: one or multiple values, combined values
+able to do equal to , greater/smaller than?

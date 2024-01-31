@@ -1,0 +1,17 @@
+{
+  "0": "Unique",
+  "1": "Best duplicate",
+  "2": "Best duplicate with substitution",
+  "3": "Worse duplicate, uncertain: uncertain weather element match with hour cross",
+  "4": "Worse duplicate, uncertain: uncertain weather element match with no cross",
+  "5": "Worse duplicate, uncertain: uncertain weather element match with day cross",
+  "6": "Worse duplicate, uncertain: uncertain time / space with ID mismatch (unused until 1950)",
+  "7": "Worse duplicate, uncertain: certain weather element match with hour cross",
+  "8": "Worse duplicate, certain: certain weather element match with no cross",
+  "9": "Worse duplicate, certain: combined DUPS 4 and 6",
+  "10": "Worse duplicate, certain: combined DUPS 6 and 8",
+  "11": "Worse duplicate, certain: time / space / ID match",
+  "12": "Worse duplicate, certain: combined DUPS 4 and 11",
+  "13": "Worse duplicate, certain: combined DUPS 8 and 11",
+  "14": "Automatic data rejection"
+}

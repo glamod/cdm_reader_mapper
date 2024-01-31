@@ -1,0 +1,9 @@
+{
+  "1": "manned included",
+  "2": "manned omitted (no significant phenomenon to report)",
+  "3": "manned omitted (no observation, data not available)",
+  "4": "automatic included [using WMO Codes 4677 and 4561]",
+  "5": "automatic omitted (no significant phenomenon to report)",
+  "6": "automatic omitted (no observation, data not available)",
+  "7": "automatic included using WMO Codes 4680 and 4531"
+}

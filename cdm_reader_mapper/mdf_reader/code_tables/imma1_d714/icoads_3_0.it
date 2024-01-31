@@ -1,0 +1,12 @@
+[
+{"codes":[0],"description":"tenths degC"},
+{"codes":[1],"description":"half degC"},
+{"codes":[2],"description":"whole degC"},
+{"codes":[3],"description":"whole or tenths degC (mixed precision among temperature fields)"},
+{"codes":[4],"description":"tenths degF"},
+{"codes":[5],"description":"half degF"},
+{"codes":[6],"description":"whole degF"},
+{"codes":[7],"description":"whole or tenths degF (mixed precision among temperature fields)"},
+{"codes":[8],"description":"high resolution data (e.g., hundredths degC)"},
+{"codes":[9],"description":"other"}
+]

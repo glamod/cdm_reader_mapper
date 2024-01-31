@@ -1,0 +1,5 @@
+{
+  "0": "Preliminary (Not yet included in an official ICOADS Release)",
+  "1": "Auxiliary (Records provided in separate data files in addition to ICOADS official Releases and Preliminary data. This also includes new data sources received, but awaiting blending into an official ICOADS Release)",
+  "2": "Full (A record included in an official ICOADS Release)"
+}

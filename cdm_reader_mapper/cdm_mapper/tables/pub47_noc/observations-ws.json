@@ -1,0 +1,24 @@
+{
+  "z_coordinate": {
+    "elements": [
+      "anemometer1_height_above_deck",
+      "anemometer1_height_above_summer_load_line",
+      "visual_observing_height"
+    ],
+    "transform": "select_column"
+  },
+  "observation_height_above_station_surface": {
+    "elements": [
+      "anemometer1_height_above_deck",
+      "anemometer1_height_above_summer_load_line",
+      "visual_observing_height"
+    ],
+    "transform": "select_column"
+  },
+  "sensor_id": {
+    "elements": "anemometer1_parameter"
+  },
+  "sensor_automation_status": {
+    "elements": "automation"
+  }
+}

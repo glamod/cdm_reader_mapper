@@ -1,0 +1,140 @@
+{
+  "observation_id": {
+    "data_type": "varchar"
+  },
+  "report_id": {
+    "data_type": "varchar"
+  },
+  "data_policy_licence": {
+    "data_type": "int"
+  },
+  "date_time": {
+    "data_type": "timestamp with timezone"
+  },
+  "date_time_meaning": {
+    "data_type": "int"
+  },
+  "observation_duration": {
+    "data_type": "int"
+  },
+  "longitude": {
+    "data_type": "numeric"
+  },
+  "latitude": {
+    "data_type": "numeric"
+  },
+  "crs": {
+    "data_type": "int"
+  },
+  "z_coordinate": {
+    "data_type": "numeric"
+  },
+  "z_coordinate_type": {
+    "data_type": "int"
+  },
+  "observation_height_above_station_surface": {
+    "data_type": "numeric"
+  },
+  "observed_variable": {
+    "data_type": "int"
+  },
+  "secondary_variable": {
+    "data_type": "int"
+  },
+  "observation_value": {
+    "data_type": "numeric"
+  },
+  "value_significance": {
+    "data_type": "int"
+  },
+  "secondary_value": {
+    "data_type": "int"
+  },
+  "units": {
+    "data_type": "int"
+  },
+  "code_table": {
+    "data_type": "int"
+  },
+  "conversion_flag": {
+    "data_type": "int"
+  },
+  "location_method": {
+    "data_type": "int"
+  },
+  "location_precision": {
+    "data_type": "numeric"
+  },
+  "z_coordinate_method": {
+    "data_type": "int"
+  },
+  "bbox_min_longitude": {
+    "data_type": "numeric"
+  },
+  "bbox_max_longitude": {
+    "data_type": "numeric"
+  },
+  "bbox_min_latitude": {
+    "data_type": "numeric"
+  },
+  "bbox_max_latitude": {
+    "data_type": "numeric"
+  },
+  "spatial_representativeness": {
+    "data_type": "int"
+  },
+  "quality_flag": {
+    "data_type": "int"
+  },
+  "numerical_precision": {
+    "data_type": "numeric"
+  },
+  "sensor_id": {
+    "data_type": "varchar"
+  },
+  "sensor_automation_status": {
+    "data_type": "int"
+  },
+  "exposure_of_sensor": {
+    "data_type": "int"
+  },
+  "original_precision": {
+    "data_type": "numeric"
+  },
+  "original_units": {
+    "data_type": "int"
+  },
+  "original_code_table": {
+    "data_type": "int"
+  },
+  "original_value": {
+    "data_type": "numeric"
+  },
+  "conversion_method": {
+    "data_type": "int"
+  },
+  "processing_code": {
+    "data_type": "int[]"
+  },
+  "processing_level": {
+    "data_type": "int"
+  },
+  "adjustment_id": {
+    "data_type": "varchar"
+  },
+  "traceability": {
+    "data_type": "int"
+  },
+  "advanced_qc": {
+    "data_type": "int"
+  },
+  "advanced_uncertainty": {
+    "data_type": "int"
+  },
+  "advanced_homogenisation": {
+    "data_type": "int"
+  },
+  "source_id": {
+    "data_type": "varchar"
+  }
+}

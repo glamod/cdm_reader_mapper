@@ -1,0 +1,2414 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_data"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "core": {
+      "header": {
+        "sentinal": null,
+        "length": 108
+      },
+      "elements": {
+        "YR": {
+          "description": "year UTC",
+          "field_length": 4,
+          "column_type": "uint16",
+          "valid_max": 2024,
+          "valid_min": 1600,
+          "units": "year"
+        },
+        "MO": {
+          "description": "month UTC",
+          "field_length": 2,
+          "column_type": "uint8",
+          "valid_max": 12,
+          "valid_min": 1,
+          "units": "month"
+        },
+        "DY": {
+          "description": "day UTC",
+          "field_length": 2,
+          "column_type": "uint8",
+          "valid_max": 31,
+          "valid_min": 1,
+          "units": "day"
+        },
+        "HR": {
+          "description": "hour UTC",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 23.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "decimal_places": 2,
+          "units": "hour"
+        },
+        "LAT": {
+          "description": "latitude",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 90.0,
+          "valid_min": -90.0,
+          "scale": 0.01,
+          "decimal_places": 2,
+          "units": "degrees"
+        },
+        "LON": {
+          "description": "longitude, check/ask two conventions in imma1 doc",
+          "field_length": 6,
+          "column_type": "float32",
+          "valid_max": 359.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "decimal_places": 2,
+          "units": "degrees"
+        },
+        "IM": {
+          "description": "IMMA version",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.IM"
+        },
+        "ATTC": {
+          "description": "attm count",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "TI": {
+          "description": "time indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.TI"
+        },
+        "LI": {
+          "description": "lat/lon indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.LI"
+        },
+        "DS": {
+          "description": "ship course",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.DS"
+        },
+        "VS": {
+          "description": "ship speed",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.VS"
+        },
+        "NID": {
+          "description": "national source indic.",
+          "field_length": 2,
+          "column_type": "str"
+        },
+        "II": {
+          "description": "ID indicator",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.II"
+        },
+        "ID": {
+          "description": "identification/callsign",
+          "field_length": 9,
+          "column_type": "str"
+        },
+        "C1": {
+          "description": "country code",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.C1"
+        },
+        "DI": {
+          "description": "wind direction indic.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.DI"
+        },
+        "D": {
+          "description": "wind direction (true)",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 362,
+          "valid_min": 1,
+          "units": "degrees true"
+        },
+        "WI": {
+          "description": "wind speed indic.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.WI"
+        },
+        "W": {
+          "description": "wind speed",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "metres per second"
+        },
+        "VI": {
+          "description": "visibility indic. ICOADS.C0.VI not found in new set",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.VI"
+        },
+        "VV": {
+          "description": "visibility",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.VV"
+        },
+        "WW": {
+          "description": "present weather",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.WW"
+        },
+        "W1": {
+          "description": "past weather",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.W1"
+        },
+        "SLP": {
+          "description": "sea level pressure",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 1074.6,
+          "valid_min": 870.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "hectopascal"
+        },
+        "A": {
+          "description": "characteristic of PPP",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.A"
+        },
+        "PPP": {
+          "description": "amt. pressure tend.",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 51.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "hectopascal"
+        },
+        "IT": {
+          "description": "indic. for temperatures",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.IT"
+        },
+        "AT": {
+          "description": "air temperature",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "degree Celsius"
+        },
+        "WBTI": {
+          "description": "wet bulb temp. indic.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.WBTI"
+        },
+        "WBT": {
+          "description": "wet-bulb temperature",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "degree Celsius"
+        },
+        "DPTI": {
+          "description": "dew-point temp. indic.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.DPTI"
+        },
+        "DPT": {
+          "description": "dew-point temperature",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "degree Celsius"
+        },
+        "SI": {
+          "description": "SST measurement method, table not like original, nor like in doc",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.SI"
+        },
+        "SST": {
+          "description": "sea surface temperature",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "decimal_places": 1,
+          "units": "degree Celsius"
+        },
+        "N": {
+          "description": "total cloud amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "valid_max": 9,
+          "valid_min": 0,
+          "units": "okta"
+        },
+        "NH": {
+          "description": "lower cloud amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "valid_max": 9,
+          "valid_min": 0,
+          "units": "eighths of cloud"
+        },
+        "CL": {
+          "description": "low cloud type",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C0.CL"
+        },
+        "HI": {
+          "description": "cloud height indic.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.HI"
+        },
+        "H": {
+          "description": "cloud height",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C0.H"
+        },
+        "CM": {
+          "description": "middle cloud type",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C0.CM"
+        },
+        "CH": {
+          "description": "high cloud type",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C0.CH"
+        },
+        "WD": {
+          "description": "wave direction",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.WD"
+        },
+        "WP": {
+          "description": "wave period",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0,
+          "units": "second"
+        },
+        "WH": {
+          "description": "wave height",
+          "field_length": 2,
+          "column_type": "float32",
+          "valid_max": 99.0,
+          "valid_min": 0.0,
+          "scale": 0.5,
+          "decimal_places": 1,
+          "units": "metre"
+        },
+        "SD": {
+          "description": "swell direction",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.SD"
+        },
+        "SP": {
+          "description": "swell period",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0,
+          "units": "second"
+        },
+        "SH": {
+          "description": "swell height",
+          "field_length": 2,
+          "column_type": "float32",
+          "valid_max": 99.0,
+          "valid_min": 0.0,
+          "scale": 0.5,
+          "decimal_places": 1,
+          "units": "metre"
+        }
+      }
+    },
+    "c1": {
+      "header": {
+        "sentinal": " 165",
+        "length": 65
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str"
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 65,
+          "valid_min": 65
+        },
+        "BSI": {
+          "description": "box system indicator. Currently not in use",
+          "field_length": 1,
+          "column_type": "int8"
+        },
+        "B10": {
+          "description": "10 degree box number",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 648,
+          "valid_min": 1
+        },
+        "B1": {
+          "description": "1 degree box number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "DCK": {
+          "description": "deck",
+          "field_length": 3,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.DCK"
+        },
+        "SID": {
+          "description": "source ID",
+          "field_length": 3,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.SID"
+        },
+        "PT": {
+          "description": "platform type",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.PT"
+        },
+        "DUPS": {
+          "description": "dup status",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.DUPS"
+        },
+        "DUPC": {
+          "description": "dup check",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.DUPC"
+        },
+        "TC": {
+          "description": "track check",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.TC"
+        },
+        "PB": {
+          "description": "pressure bias",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.PB"
+        },
+        "WX": {
+          "description": "wave period indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.WX"
+        },
+        "SX": {
+          "description": "swell period indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.WX"
+        },
+        "C2": {
+          "description": "2nd country code",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C0.C1"
+        },
+        "SQZ": {
+          "description": "SST: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 1
+        },
+        "SQA": {
+          "description": "SST: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 21,
+          "valid_min": 1
+        },
+        "AQZ": {
+          "description": "AT: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "AQA": {
+          "description": "AT: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "UQZ": {
+          "description": "U-wind: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "UQA": {
+          "description": "U-wind: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "VQZ": {
+          "description": "V-wind: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "VQA": {
+          "description": "V-wind: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "PQZ": {
+          "description": "SLP: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "PQA": {
+          "description": "SLP: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "DQZ": {
+          "description": "Humidity: z flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "DQA": {
+          "description": "Humidity: alpha flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36"
+        },
+        "ND": {
+          "description": "night / day flag",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.ND"
+        },
+        "SF": {
+          "description": "SST flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "AF": {
+          "description": "AT flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "UF": {
+          "description": "U-wind flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "VF": {
+          "description": "V-wind flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "PF": {
+          "description": "SLP flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "RF": {
+          "description": "RH (and WBT / DPT) flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.TRIM"
+        },
+        "ZNC": {
+          "description": "report-status flag (ship position)",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "WNC": {
+          "description": "wind flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "BNC": {
+          "description": "visibility (VV) flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "XNC": {
+          "description": "present weather (WW) flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "YNC": {
+          "description": "past weather (W1) flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "PNC": {
+          "description": "SLP flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "ANC": {
+          "description": "AT flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "GNC": {
+          "description": "WBT flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "DNC": {
+          "description": "DPT flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "SNC": {
+          "description": "SST flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "CNC": {
+          "description": "cloud flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "ENC": {
+          "description": "wave flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "FNC": {
+          "description": "swell flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "TNC": {
+          "description": "pressure tendency (A and PPP) flag",
+          "field_length": 1,
+          "column_type": "key",
+          "encoding": "base36",
+          "codetable": "ICOADS.C1.NCDC"
+        },
+        "QCE": {
+          "description": "external (e.g. OSD)",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 63,
+          "valid_min": 0
+        },
+        "LZ": {
+          "description": "2x2 landlocked flag",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C1.LZ"
+        },
+        "QCZ": {
+          "description": "source exclusion flags",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 31,
+          "valid_min": 0
+        }
+      }
+    },
+    "c5": {
+      "header": {
+        "sentinal": " 594",
+        "length": 94
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "OS": {
+          "description": "observation source",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.os"
+        },
+        "OP": {
+          "description": "observation platform",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.op"
+        },
+        "FM": {
+          "description": "FM code version",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "icoads_3_0.fm"
+        },
+        "IMMV": {
+          "description": "IMMT version",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "icoads_3_0.immv"
+        },
+        "IX": {
+          "description": "station / weather indic.",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.ix"
+        },
+        "W2": {
+          "description": "2nd past weather",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.pastWeather"
+        },
+        "WMI": {
+          "description": "indicicator for wave measurement",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.wmi"
+        },
+        "SD2": {
+          "description": "direction of secondary swell",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "ICOADS.C5.SD2"
+        },
+        "SP2": {
+          "description": "period of secondary swell",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "ICOADS.C5.SP2"
+        },
+        "SH2": {
+          "description": "height of secondary swell",
+          "field_length": 2,
+          "column_type": "float16",
+          "valid_max": 99.0,
+          "valid_min": 0.0,
+          "scale": 0.5,
+          "precision": "0.1"
+        },
+        "IS": {
+          "description": "ice accretion on ship",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.is"
+        },
+        "ES": {
+          "description": "thickness of ice accretion",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "RS": {
+          "description": "rate of ice accretion",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.rs"
+        },
+        "IC1": {
+          "description": "concentration of sea ice",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C5.IC1"
+        },
+        "IC2": {
+          "description": "stage of development",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C5.IC2"
+        },
+        "IC3": {
+          "description": "ice of land origin",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C5.IC3"
+        },
+        "IC4": {
+          "description": "true bearing of ice edge",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C5.IC4"
+        },
+        "IC5": {
+          "description": "ice situation / trend",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C5.IC5"
+        },
+        "IR": {
+          "description": "indicator for precipation data",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C5.IR"
+        },
+        "RRR": {
+          "description": "amount of precipitation",
+          "field_length": 3,
+          "column_type": "int16",
+          "codetable": "ICOADS.C5.RRR"
+        },
+        "TR": {
+          "description": "duration of period of reference for amount of precipitation",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.tr"
+        },
+        "NU": {
+          "description": "national use",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C5.NU"
+        },
+        "QCI": {
+          "description": "quality control indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicatorGeneral"
+        },
+        "QI1": {
+          "description": "QC indicator for height of clouds",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI2": {
+          "description": "QC indicator for visibility",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI3": {
+          "description": "QC indicator for clouds",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI4": {
+          "description": "QC indicator for wind direction",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI5": {
+          "description": "QC indicator for wind speed",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI6": {
+          "description": "QC indicator for air temperature",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI7": {
+          "description": "QC indicator for dew-point temperature",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI8": {
+          "description": "QC indicator for air pressure",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI9": {
+          "description": "QC indicator for weather",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI10": {
+          "description": "QC indicator for sea surface temperature",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI11": {
+          "description": "QC indicator for period of wind waves of of measured waves",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI12": {
+          "description": "QC indicator for height of wind waves of of measured waves",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI13": {
+          "description": "QC indicator for swell",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI14": {
+          "description": "QC indicator for precipitation",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI15": {
+          "description": "QC indicator for characteristic of pressure tendency",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI16": {
+          "description": "QC indicator for amount of pressure tendency",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI17": {
+          "description": "QC indicator for true direction of ship",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI18": {
+          "description": "QC indicator for ship's average speed",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI19": {
+          "description": "QC indicator for wet-bulb temperature",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI20": {
+          "description": "QC indicator for ship's position",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI21": {
+          "description": "MQCS version",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCversion"
+        },
+        "HDG": {
+          "description": "ships's heading",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 360,
+          "valid_min": 0
+        },
+        "COG": {
+          "description": "course over ground",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 360,
+          "valid_min": 0
+        },
+        "SOG": {
+          "description": "speed over ground",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "SLL": {
+          "description": "max height of cargo above summer load line",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "SLHH": {
+          "description": "departure of summer max load line from sea level",
+          "field_length": 3,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": -99
+        },
+        "RWD": {
+          "description": "relative wind direction",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 360,
+          "valid_min": 1
+        },
+        "RWS": {
+          "description": "relative wind speed",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "QI22": {
+          "description": "QC indicator for ship's heading",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI23": {
+          "description": "QC indicator for course over ground",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI24": {
+          "description": "QC indicator for speed over ground",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI25": {
+          "description": "QC indicator for SLL",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI26": {
+          "description": "see doc",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI27": {
+          "description": "QC indicator for SLHH",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI28": {
+          "description": "QC indicator for relative wind direction",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "QI29": {
+          "description": "QC indicator for relative wind speed",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.MQCIndicator"
+        },
+        "RH": {
+          "description": "relative humidity",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 100.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "RHI": {
+          "description": "relative humidity indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.rhi"
+        },
+        "AWSI": {
+          "description": "AWS indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.awsi"
+        },
+        "IMONO": {
+          "description": "IMO number",
+          "field_length": 7,
+          "column_type": "int32",
+          "valid_max": 9999999.0,
+          "valid_min": 0.0,
+          "scale": 1
+        }
+      }
+    },
+    "c6": {
+      "header": {
+        "sentinal": " 668",
+        "length": 68
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "CCCC": {
+          "description": "collecting center",
+          "field_length": 4,
+          "column_type": "str",
+          "codetable": "ICOADS.C6.CCCC"
+        },
+        "BUID": {
+          "description": "bulletin ID",
+          "field_length": 6,
+          "column_type": "str",
+          "codetable": "ICOADS.C6.BUID"
+        },
+        "FBSRC": {
+          "description": "feedback source",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C6.FBSRC"
+        },
+        "BMP": {
+          "description": "background SLP",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 1074.6,
+          "valid_min": 870.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "BSWU": {
+          "description": "background wind U-component",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "SWU": {
+          "description": "derived wind U-component",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "BSWV": {
+          "description": "background wind V-component",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "SWV": {
+          "description": "derived wind V-component",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "BSAT": {
+          "description": "background air temperature",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.9,
+          "valid_min": -99.9,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "BSRH": {
+          "description": "background relative humidity",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 100.0,
+          "valid_min": 0.0,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "SRH": {
+          "description": "derived relative humidity",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 100.0,
+          "valid_min": 0.0,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "BSST": {
+          "description": "background SST",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": -99.99,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "MST": {
+          "description": "model surface type",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C6.ST"
+        },
+        "BMSH": {
+          "description": "model height of surface",
+          "field_length": 4,
+          "column_type": "int16",
+          "valid_max": 9999,
+          "valid_min": -999
+        },
+        "BY": {
+          "description": "background year",
+          "field_length": 4,
+          "column_type": "int16",
+          "valid_max": 9999,
+          "valid_min": 0
+        },
+        "BM": {
+          "description": "background month",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 12,
+          "valid_min": 1
+        },
+        "BD": {
+          "description": "background day",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 31,
+          "valid_min": 1
+        },
+        "BH": {
+          "description": "background hour",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 23,
+          "valid_min": 0
+        },
+        "BFL": {
+          "description": "background forecast length",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        }
+      }
+    },
+    "c7": {
+      "header": {
+        "sentinal": " 758",
+        "length": 58
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "MDS": {
+          "description": "metadata source",
+          "field_length": 1,
+          "column_type": "str",
+          "valid_max": 1.0,
+          "valid_min": 0.0,
+          "scale": 1.0,
+          "precision": null,
+          "codetable": null
+        },
+        "C1M": {
+          "description": "recruiting country",
+          "field_length": 2,
+          "column_type": "str",
+          "codetable": "icoads_3_0.country"
+        },
+        "OPM": {
+          "description": "type of ship (program)",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.opm"
+        },
+        "KOV": {
+          "description": "kind of vessel",
+          "field_length": 2,
+          "column_type": "str",
+          "codetable": "icoads_3_0.kov"
+        },
+        "COR": {
+          "description": "country of registry",
+          "field_length": 2,
+          "column_type": "str",
+          "codetable": "icoads_3_0.country"
+        },
+        "TOB": {
+          "description": "type of barometer",
+          "field_length": 3,
+          "column_type": "str",
+          "codetable": "icoads_3_0.tob"
+        },
+        "TOT": {
+          "description": "type of thermometer",
+          "field_length": 3,
+          "column_type": "str",
+          "codetable": "icoads_3_0.tot"
+        },
+        "EOT": {
+          "description": "exposure of thermometer",
+          "field_length": 2,
+          "column_type": "str",
+          "codetable": "ICOADS.C7.EOT"
+        },
+        "LOT": {
+          "description": "screen location",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.lot"
+        },
+        "TOH": {
+          "description": "type of hygrometer",
+          "field_length": 1,
+          "column_type": "str",
+          "codetable": "icoads_3_0.toh"
+        },
+        "EOH": {
+          "description": "exposure of hygrometer",
+          "field_length": 2,
+          "column_type": "str",
+          "codetable": "ICOADS.C7.EOH"
+        },
+        "SIM": {
+          "description": "SST measurement method",
+          "field_length": 3,
+          "column_type": "str",
+          "codetable": "icoads_3_0.sstMethod_c7"
+        },
+        "LOV": {
+          "description": "length of vessel",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 999,
+          "valid_min": 0
+        },
+        "DOS": {
+          "description": "depth of SST measurement",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "HOP": {
+          "description": "height of visual observing platform",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 999,
+          "valid_min": 0
+        },
+        "HOT": {
+          "description": "height of thermometer",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 999,
+          "valid_min": 0
+        },
+        "HOB": {
+          "description": "height of barometer",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 999,
+          "valid_min": 0
+        },
+        "HOA": {
+          "description": "height of anemometer",
+          "field_length": 3,
+          "column_type": "int16",
+          "valid_max": 999,
+          "valid_min": 0
+        },
+        "SMF": {
+          "description": "source metadata file",
+          "field_length": 5,
+          "column_type": "int32",
+          "valid_max": 99999,
+          "valid_min": 0,
+          "codetable": "ICOADS.C7.SMF"
+        },
+        "SME": {
+          "description": "source metadata element",
+          "field_length": 5,
+          "column_type": "int32",
+          "valid_max": 99999.0,
+          "valid_min": 0.0,
+          "scale": 1.0,
+          "precision": null,
+          "codetable": null
+        },
+        "SMV": {
+          "description": "source format version",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0,
+          "codetable": "icoads_3_0.smv"
+        }
+      }
+    },
+    "c8": {
+      "header": {
+        "sentinal": " 82U",
+        "length": 102
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int16",
+          "encoding": "base36",
+          "ignore": true
+        },
+        "OTV": {
+          "description": "temperature value",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 38.999,
+          "valid_min": -3.0,
+          "scale": 0.001,
+          "precision": "0.001"
+        },
+        "OTZ": {
+          "description": "temperature depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OSV": {
+          "description": "salinity value",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 40.999,
+          "valid_min": 0.0,
+          "scale": 0.001,
+          "precision": "0.001"
+        },
+        "OSZ": {
+          "description": "salinity depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OOV": {
+          "description": "dissolved oxygen value",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 12.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OOZ": {
+          "description": "dissolved oxygen depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPV": {
+          "description": "phosphate value",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 30.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPZ": {
+          "description": "phosphate depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OSIV": {
+          "description": "silicate value",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 250.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OSIZ": {
+          "description": "silicate depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "ONV": {
+          "description": "nitrate value",
+          "field_length": 5,
+          "column_type": "float32",
+          "valid_max": 500.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "ONZ": {
+          "description": "nitrate depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPHV": {
+          "description": "pH value",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 9.2,
+          "valid_min": 6.2,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPHZ": {
+          "description": "pH depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OCV": {
+          "description": "total chlorophyll value",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 50.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OCZ": {
+          "description": "total chlorophyll depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OAV": {
+          "description": "alkalinity value",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 3.1,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OAZ": {
+          "description": "alkalinity depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPCV": {
+          "description": "partial pressure of carbon dioxide value",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 999.0,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "OPCZ": {
+          "description": "partial pressure of carbon dioxide depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "ODV": {
+          "description": "dissolved inorganic carbon value",
+          "field_length": 2,
+          "column_type": "float32",
+          "valid_max": 4.0,
+          "valid_min": 0.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "ODZ": {
+          "description": "dissolved inorganic carbon depth",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "PUID": {
+          "description": "provider's unique record identification",
+          "field_length": 10,
+          "column_type": "object"
+        }
+      }
+    },
+    "c9": {
+      "header": {
+        "sentinal": " 932",
+        "length": 32
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "CCe": {
+          "description": "change code",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "codetable": "ICOADS.C9.CCe"
+        },
+        "WWe": {
+          "description": "present weather",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.ww"
+        },
+        "Ne": {
+          "description": "total cloud amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C9.N"
+        },
+        "NHe": {
+          "description": "lower cloud amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C9.NH"
+        },
+        "He": {
+          "description": "lower cloud base height",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.h"
+        },
+        "CLe": {
+          "description": "low cloud type",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.cl"
+        },
+        "CMe": {
+          "description": "middle cloud type",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.cm"
+        },
+        "CHe": {
+          "description": "high cloud type",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "icoads_3_0.ch"
+        },
+        "AM": {
+          "description": "middle cloud amount",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 8.0,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "AH": {
+          "description": "high cloud amount",
+          "field_length": 3,
+          "column_type": "float32",
+          "valid_max": 8.0,
+          "valid_min": 0.0,
+          "scale": 0.01,
+          "precision": "0.01"
+        },
+        "UM": {
+          "description": "NOL middle amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "valid_max": 8,
+          "valid_min": 0
+        },
+        "UH": {
+          "description": "NOL high amount",
+          "field_length": 1,
+          "column_type": "int8",
+          "valid_max": 8,
+          "valid_min": 0
+        },
+        "SBI": {
+          "description": "sky-brightness indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C9.SBI"
+        },
+        "SA": {
+          "description": "solar altitude",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 90.0,
+          "valid_min": -90.0,
+          "scale": 0.1,
+          "precision": "0.1"
+        },
+        "RI": {
+          "description": "relative lunar illuminance",
+          "field_length": 4,
+          "column_type": "float32",
+          "valid_max": 1.17,
+          "valid_min": -1.1,
+          "scale": 0.01,
+          "precision": "0.01"
+        }
+      }
+    },
+    "c95": {
+      "header": {
+        "sentinal": "9561",
+        "length": 61
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ICNR": {
+          "description": "input component number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "FNR": {
+          "description": "field number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 1
+        },
+        "DPRO": {
+          "description": "data provider - reanalysis: lead organization",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "ICOADS.C95.DPRO"
+        },
+        "DPRP": {
+          "description": "data provider - reanalysis: project",
+          "field_length": 2,
+          "column_type": "int8",
+          "codetable": "ICOADS.C95.DPRP"
+        },
+        "UFR": {
+          "description": "usage flag - reanalysis",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C95.UFR"
+        },
+        "MFGR": {
+          "description": "model-collocated first guess value",
+          "field_length": 7,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "MFGSR": {
+          "description": "model-collocated first guess",
+          "field_length": 7,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "MAR": {
+          "description": "value or repesentative value",
+          "field_length": 7,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "MASR": {
+          "description": "model-collocated analysis spread",
+          "field_length": 7,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "BCR": {
+          "description": "bias corrected value",
+          "field_length": 7,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": 1.0,
+          "precision": "1"
+        },
+        "ARCR": {
+          "description": "author reference code",
+          "field_length": 4,
+          "column_type": "object",
+          "codetable": "ICOADS.C95.ARCR"
+        },
+        "CDR": {
+          "description": "creation date",
+          "field_length": 8,
+          "column_type": "int32",
+          "valid_max": null,
+          "valid_min": 20140101.0
+        },
+        "ASIR": {
+          "description": "access status indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C95.ASIR"
+        }
+      }
+    },
+    "c96": {
+      "header": {
+        "sentinal": "9653",
+        "length": 53
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ICNI": {
+          "description": "input component number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 1
+        },
+        "FNI": {
+          "description": "field number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 1
+        },
+        "JVAD": {
+          "description": "scaling factor for VAD",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "VAD": {
+          "description": "value added data",
+          "field_length": 6,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null,
+          "codetable": null
+        },
+        "IVAU1": {
+          "description": "type indicator for VAU1",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 1
+        },
+        "JVAU1": {
+          "description": "scaling factor for VAU1",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "VAU1": {
+          "description": "uncertainty of type IVAU1",
+          "field_length": 6,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null
+        },
+        "IVAU2": {
+          "description": "type indicator for VAU2",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "JVAU2": {
+          "description": "scaling factor for VAU2",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "VAU2": {
+          "description": "uncertainty of type IVAU2",
+          "field_length": 6,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null
+        },
+        "IVAU3": {
+          "description": "type indicator for VAU3",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "JVAU3": {
+          "description": "scaling factor for VAU3",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "VAU3": {
+          "description": "uncertainty of type IVAU3",
+          "field_length": 6,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null
+        },
+        "VQC": {
+          "description": "value added QC flag",
+          "field_length": 1,
+          "column_type": "int8",
+          "valid_max": 9,
+          "valid_min": 1
+        },
+        "ARCI": {
+          "description": "auther reference code",
+          "field_length": 4,
+          "column_type": "object",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null,
+          "codetable": null
+        },
+        "CDI": {
+          "description": "creation date",
+          "field_length": 8,
+          "column_type": "int32",
+          "valid_max": null,
+          "valid_min": 20140101.0
+        },
+        "ASII": {
+          "description": "access status indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C96.ASII"
+        }
+      }
+    },
+    "c97": {
+      "header": {
+        "sentinal": "9732",
+        "length": 32
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "ignore": true
+        },
+        "ICNE": {
+          "description": "input component number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 0
+        },
+        "FNE": {
+          "description": "field number",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 99,
+          "valid_min": 1
+        },
+        "CEF": {
+          "description": "corrected / erroneous field flag",
+          "field_length": 1,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null
+        },
+        "ERRD": {
+          "description": "corrected / erroneous field value",
+          "field_length": 10,
+          "column_type": "float32",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null
+        },
+        "ARCE": {
+          "description": "author reference code",
+          "field_length": 4,
+          "column_type": "object",
+          "valid_max": null,
+          "valid_min": null,
+          "scale": null,
+          "precision": null,
+          "codetable": null
+        },
+        "CDE": {
+          "description": "creation date",
+          "field_length": 8,
+          "column_type": "int32",
+          "valid_max": null,
+          "valid_min": 20140101.0
+        },
+        "ASIE": {
+          "description": "access status indicator",
+          "field_length": 1,
+          "column_type": "int8",
+          "codetable": "ICOADS.C97.ASIE"
+        }
+      }
+    },
+    "c98": {
+      "header": {
+        "sentinal": "9815",
+        "length": 15
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str"
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 15,
+          "valid_min": 15
+        },
+        "UID": {
+          "description": "unique report ID",
+          "field_length": 6,
+          "column_type": "str"
+        },
+        "RN1": {
+          "description": "Release no.: primary",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RN2": {
+          "description": "Release no.: secondary",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RN3": {
+          "description": "Release no.: tertiary",
+          "field_length": 1,
+          "column_type": "int8",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RSA": {
+          "description": "Release status indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C98.RSA"
+        },
+        "IRF": {
+          "description": "intermediate reject flag",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C98.IRF"
+        }
+      }
+    },
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int8",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "format": "delimited",
+        "delimiter": "}"
+      },
+      "elements": {
+        "control_No": {
+          "description": "Ship control number",
+          "column_type": "str"
+        },
+        "name": {
+          "description": "Name of ship",
+          "column_type": "str"
+        },
+        "baro_type": {
+          "description": "Barometer type. PENDING KEY TABLE",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BAROT",
+          "LMR6": false
+        },
+        "slp_units": {
+          "description": "Pressure units",
+          "column_type": "str"
+        },
+        "baro_therm_scale": {
+          "description": "Barometer thermometer scale",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "baro_temp": {
+          "description": "Barometer temperature",
+          "column_type": "int64",
+          "scale": 1
+        },
+        "baro_corrections": {
+          "description": "Barometer corrections",
+          "column_type": "str"
+        },
+        "date_barom_corr": {
+          "description": "Date of last barometer correction",
+          "column_type": "str"
+        },
+        "air_temp_units": {
+          "description": "Air thermometer units",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "a_temp_melt_snow": {
+          "description": "Air Temperature melt snow",
+          "column_type": "str"
+        },
+        "sst_units": {
+          "description": "Sea thermometer scale",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "s_temp_melt_snow": {
+          "description": "Sea Temperature melt snow",
+          "column_type": "str"
+        },
+        "weather": {
+          "description": "Weather",
+          "column_type": "str"
+        },
+        "sea_state": {
+          "description": "Sea state",
+          "column_type": "int16",
+          "LMR6": false
+        },
+        "voy_remarks": {
+          "description": "Remarks about the Voyage",
+          "column_type": "str"
+        },
+        "ship_remarks": {
+          "description": "Remarks about the Ship",
+          "column_type": "str"
+        },
+        "baro_place_of_exam": {
+          "description": "Place where the barometer was examined",
+          "column_type": "str"
+        },
+        "baro_port_of_compare": {
+          "description": "Port where barometer readings were compared to other readings made with a good condition barometer",
+          "column_type": "str"
+        },
+        "atemp_place_of_exam": {
+          "description": "Place where the air temperature thermometer was examined",
+          "column_type": "str"
+        },
+        "stemp_place_of_exam": {
+          "description": "Place where the sea temperature thermometer was examined",
+          "column_type": "str"
+        },
+        "voyage_from": {
+          "description": "Voyage from",
+          "column_type": "str"
+        },
+        "voyage_to": {
+          "description": "Voyage to",
+          "column_type": "str"
+        },
+        "air_therm_loc": {
+          "description": "Air thermometer location on the ship",
+          "column_type": "str"
+        },
+        "notes_voyage": {
+          "description": "Registrators notes about the voyage",
+          "column_type": "str"
+        },
+        "notes_ship": {
+          "description": "Registrators notes about the ship",
+          "column_type": "str"
+        },
+        "notes_date": {
+          "description": "Registrators notes about the date",
+          "column_type": "str"
+        },
+        "notes_registrator": {
+          "description": "Registrator of the ship",
+          "column_type": "str"
+        },
+        "ocean_crossed": {
+          "description": "Ocean crossed in the voyage",
+          "column_type": "str"
+        },
+        "extra_data": {
+          "description": "Extra truncated data",
+          "column_type": "str"
+        }
+      }
+    }
+  }
+}

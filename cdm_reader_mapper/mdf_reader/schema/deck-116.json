@@ -1,0 +1,111 @@
+{
+  "header": {
+    "format": "fixed width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "RH": {
+      "description": "Relative humidity",
+      "field_length": 3,
+      "column_type": "int8",
+      "valid_max": 100,
+      "valid_min": 0
+    },
+    "N": {
+      "description": "Total cloud amount",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "what?"
+    },
+    "h": {
+      "description": "Height of low cloud",
+      "field_length": 2,
+      "column_type": "object",
+      "codetable": "cloud_height_low"
+    },
+    "Nh": {
+      "description": "Amount of lower clouds",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "what?"
+    },
+    "AMT SIG": {
+      "description": "Significant cloud amount (tenths)",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "what?"
+    },
+    "AMT": {
+      "description": "Significant cloud amount (eigths)",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_amount_significant_eights"
+    },
+    "TYP": {
+      "description": "Type of significant cloud",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_type_significant"
+    },
+    "HGT SIG": {
+      "description": "Height of significant cloud",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "cloud_height_significant"
+    },
+    "ICE RPT A": {
+      "description": "Kind of ice",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ice_kind"
+    },
+    "ICE RPT B": {
+      "description": "Effect of ice on navigation",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ice_effect"
+    },
+    "ICE RPT C": {
+      "description": "Bearing of ice edge",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ice_edge_bearing"
+    },
+    "ICE RPT D": {
+      "description": "Dtce to ice edge from rptng ship",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ice_edge_distance"
+    },
+    "ICE RPT E": {
+      "description": "Orientation of ice edge",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "ice_edge_orientation"
+    },
+    "B A R": {
+      "description": "Barometer comparison station or data source",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "bar_compare_station"
+    },
+    "WND DIR": {
+      "description": "Wind direction",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "note in Section 1"
+    },
+    "VIS": {
+      "description": "Visibility",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "visibility"
+    },
+    "WX": {
+      "description": "Present weather",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "need to look further"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "0": "No quality control (QC) has been performed on this element",
+  "1": "QC has been performed; element appears to be correct",
+  "2": "QC has been performed; element appears to be inconsistent with other elements",
+  "3": "QC has been performed; element appears to be doubtful",
+  "4": "QC has been performed; element appears to be erroneous",
+  "5": "The value has been changed as a result of QC",
+  "6": "The original flag is set (1) (correct) and the value will be classified by MQCS as inconsistent, dubious, erroneous or missing",
+  "7": "The original flag is set (5) (amended) and the value will be classified by MQCS as inconsistent, dubious, erroneous or missing",
+  "8": "[reserved]",
+  "9": "The value of the element is missing"
+}

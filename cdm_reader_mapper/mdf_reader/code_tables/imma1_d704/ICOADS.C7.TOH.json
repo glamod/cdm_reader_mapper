@@ -1,0 +1,11 @@
+{
+  "NULL": "NULL",
+  "1": "Hygristor",
+  "2": "Chilled Mirror",
+  "3": "Other",
+  "C": "Capacitance",
+  "E": "Electric",
+  "H": "Hair hygrometer",
+  "P": "Psychrometer",
+  "T": "Torsion"
+}

@@ -1,0 +1,96 @@
+{
+  "header": {
+    "format": "fixed width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "CUR SET": {
+      "description": "Current (set)",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "current_set"
+    },
+    "CUR DFT": {
+      "description": "Current (drift)",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "direction_16_of_32"
+    },
+    "W A T": {
+      "description": "Watch",
+      "field_length": 1,
+      "column_type": "int8",
+      "codetable": "probably not: see tape field 10 (core?hour?)"
+    },
+    "BF WD": {
+      "description": "Beaufort wind force",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "wind_force_beaufort"
+    },
+    "PPP": {
+      "description": "Pressure (mmHg)",
+      "field_length": 3,
+      "column_type": "float16",
+      "encoding": "deck_193.higher_order",
+      "scale": 0.1,
+      "offset": 700,
+      "valid_max": 799.9,
+      "valid_min": 700
+    },
+    "V I S": {
+      "description": "Visibility",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "visibility"
+    },
+    "C H": {
+      "description": "Cloud type (high)",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_type_high"
+    },
+    "CLD DIR": {
+      "description": "Cloud direction",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "direction_16_of_32"
+    },
+    "N": {
+      "description": "Total cloud amount",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "cloud_amount_total"
+    },
+    "S E A": {
+      "description": "State of the sea",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "sea_state"
+    },
+    "SWL DIR": {
+      "description": "Direction of swell",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "swell_direction"
+    },
+    "A M T": {
+      "description": "Amount of swell",
+      "field_length": 1,
+      "column_type": "str",
+      "codetable": "swell_amount"
+    },
+    "FOG DUR": {
+      "description": "Duration of fog(min)",
+      "field_length": 2,
+      "column_type": "int16",
+      "scale": 15
+    },
+    "PCP DUR": {
+      "description": "Duration of precipitation",
+      "field_length": 2,
+      "column_type": "str",
+      "codetable": "precipitation_duration"
+    }
+  }
+}

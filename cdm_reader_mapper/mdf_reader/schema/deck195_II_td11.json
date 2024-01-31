@@ -1,0 +1,82 @@
+{
+  "header": {
+    "format": "fixed_width",
+    "encoding": "ascii"
+  },
+  "elements": {
+    "RH": {
+      "description": "Relative humidity",
+      "field_length": 3,
+      "column_type": "int8",
+      "valid_max": 100,
+      "valid_min": 0
+    },
+    "SHIP NO.": {
+      "description": "Ship number",
+      "field_length": 5,
+      "column_type": "int16",
+      "valid_min": 0,
+      "valid_max": 99999
+    },
+    "WX": {
+      "description": "Present weather",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "weather_present"
+    },
+    "CLD TYP I": {
+      "description": "Cloud type",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "cloud_type"
+    },
+    "CLD TYP II": {
+      "description": "Cloud type",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "cloud_type"
+    },
+    "CLD TYP III": {
+      "description": "Cloud type",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "cloud_type"
+    },
+    "SS DIR": {
+      "description": "Sea direction",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "swell_direction"
+    },
+    "S S C": {
+      "description": "Sea/swell combination",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "sea_swell_combination"
+    },
+    "SWL DIR": {
+      "description": "Swell direction",
+      "field_length": 2,
+      "column_type": "key",
+      "codetable": "swell_direction"
+    },
+    "T Y P": {
+      "description": "Type of swell. Not in this period",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "swell_type"
+    },
+    "P R T": {
+      "description": "Port indicator",
+      "field_length": 1,
+      "column_type": "key",
+      "disable_white_strip": true,
+      "codetable": "port_ind"
+    }
+  }
+}
