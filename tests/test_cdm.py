@@ -42,7 +42,7 @@ def test_read_imma1_buoys_supp(plot_validation=False):
 
 
 def test_read_imma1_701_type2():
-    read_ = mdf_reader.read(**test_data.test_069_701, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_069_701)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -52,8 +52,9 @@ def test_read_imma1_701_type2():
         log_level="DEBUG",
     )
 
+
 def test_read_imma1_702():
-    read_ = mdf_reader.read(**test_data.test_096_702, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_096_702)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -62,9 +63,22 @@ def test_read_imma1_702():
         attrs,
         log_level="DEBUG",
     )
-    
+
+
+def test_read_imma1_703():
+    read_ = mdf_reader.read(**test_data.test_144_703)
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+
+
 def test_read_imma1_704():
-    read_ = mdf_reader.read(**test_data.test_125_704, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_125_704)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -74,8 +88,9 @@ def test_read_imma1_704():
         log_level="DEBUG",
     )
 
+
 def test_read_imma1_705():
-    read_ = mdf_reader.read(**test_data.test_085_705, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_085_705)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -84,9 +99,10 @@ def test_read_imma1_705():
         attrs,
         log_level="DEBUG",
     )
-    
+
+
 def test_read_imma1_706():
-    read_ = mdf_reader.read(**test_data.test_084_706, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_084_706)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -95,9 +111,10 @@ def test_read_imma1_706():
         attrs,
         log_level="DEBUG",
     )
-    
+
+
 def test_read_imma1_707():
-    read_ = mdf_reader.read(**test_data.test_098_707, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_098_707)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -106,8 +123,10 @@ def test_read_imma1_707():
         attrs,
         log_level="DEBUG",
     )
+
+
 def test_read_imma1_721():
-    read_ = mdf_reader.read(**test_data.test_125_721, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_125_721)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -116,9 +135,10 @@ def test_read_imma1_721():
         attrs,
         log_level="DEBUG",
     )
-                
+
+
 def test_read_imma1_730():
-    read_ = mdf_reader.read(**test_data.test_133_730, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_133_730)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -128,8 +148,9 @@ def test_read_imma1_730():
         log_level="DEBUG",
     )
 
+
 def test_read_imma1_781():
-    read_ = mdf_reader.read(**test_data.test_143_781, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_143_781)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -138,7 +159,20 @@ def test_read_imma1_781():
         attrs,
         log_level="DEBUG",
     )
-    
+
+
+def test_read_imma1_794():
+    read_ = mdf_reader.read(**test_data.test_103_794)
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_NRT",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+
+
 # B. TESTS TO READ FROM DATA FROM DIFFERENT DATA MODELS WITH
 # BOTH CDM AND CODE MAPPING TABLE SUBSET
 # ----------------------------------------------------------
@@ -147,7 +181,7 @@ def test_read_imma1_781():
 def test_read_imma1_buoys_cdm_subset(
     plot_validation=False,
 ):
-    read_ = mdf_reader.read(**test_data.test_063_714, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_063_714)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
@@ -162,7 +196,7 @@ def test_read_imma1_buoys_cdm_subset(
 def test_read_imma1_buoys_codes_subset(
     plot_validation=False,
 ):
-    read_ = mdf_reader.read(**test_data.test_063_714, out_path=".")
+    read_ = mdf_reader.read(**test_data.test_063_714)
     data = read_.data
     attrs = read_.attrs
     assert cdm_mapper.map_model(
