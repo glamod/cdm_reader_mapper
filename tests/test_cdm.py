@@ -52,7 +52,17 @@ def test_read_imma1_701_type2():
         log_level="DEBUG",
     )
 
-
+def test_read_imma1_702():
+    read_ = mdf_reader.read(**test_data.test_096_702, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d702",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+    
 def test_read_imma1_704():
     read_ = mdf_reader.read(**test_data.test_125_704, out_path=".")
     data = read_.data
@@ -64,7 +74,49 @@ def test_read_imma1_704():
         log_level="DEBUG",
     )
 
-
+def test_read_imma1_705():
+    read_ = mdf_reader.read(**test_data.test_085_705, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d705-707",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+    
+def test_read_imma1_706():
+    read_ = mdf_reader.read(**test_data.test_084_706, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d705-707",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+    
+def test_read_imma1_707():
+    read_ = mdf_reader.read(**test_data.test_098_707, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d705-707",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+def test_read_imma1_721():
+    read_ = mdf_reader.read(**test_data.test_125_721, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d721",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+                
 def test_read_imma1_730():
     read_ = mdf_reader.read(**test_data.test_133_730, out_path=".")
     data = read_.data
@@ -76,7 +128,17 @@ def test_read_imma1_730():
         log_level="DEBUG",
     )
 
-
+def test_read_imma1_781():
+    read_ = mdf_reader.read(**test_data.test_143_781, out_path=".")
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d781",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+    
 # B. TESTS TO READ FROM DATA FROM DIFFERENT DATA MODELS WITH
 # BOTH CDM AND CODE MAPPING TABLE SUBSET
 # ----------------------------------------------------------
