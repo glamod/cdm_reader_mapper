@@ -14,10 +14,10 @@ from cdm_reader_mapper.common import pandas_TextParser_hdlr
 from cdm_reader_mapper.common.local import get_files
 
 from . import properties
-from .data_models import schemas
 from .get_sections import get_sections
 from .import_data import import_data
 from .read_sections import read_sections
+from .schema import schemas
 from .validate import validate
 
 
@@ -329,9 +329,8 @@ def read(
     if not schema:
         return
     if data_model:
-        model_path = f"{properties._base}.data_models.{data_model}"
-        code_tables_path = "{}.{}".format(model_path, "code_tables")
-        code_tables_path = get_files(code_tables_path)
+        model_path = f"{properties._base}.code_tables.{data_model}"
+        code_tables_path = get_files(model_path)
     else:
         code_tables_path = os.path.join(data_model_path, "code_tables")
 

@@ -9,7 +9,8 @@ import numpy as np
 import pandas as pd
 
 from . import properties
-from .data_models import code_tables, schemas
+from .code_tables import code_tables
+from .schema import schemas
 
 
 def validate_numeric(elements, data, schema):

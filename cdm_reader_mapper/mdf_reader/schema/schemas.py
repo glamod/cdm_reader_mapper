@@ -145,13 +145,13 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
             )
             return
         else:
-            schema_path = f"{properties._base}.data_models.{schema_name}"
+            schema_path = f"{properties._base}.schema"
             try:
                 schema_data = get_files(schema_path)
             except ModuleNotFoundError:
                 logging.error(f"Can't find input schema files in {schema_data}")
                 return
-            schema_file = list(schema_data.glob("*.json"))[0]
+            schema_file = list(schema_data.glob(f"{schema_name}.json"))[0]
     else:
         if ext_schema_file is None:
             schema_path = os.path.abspath(ext_schema_path)

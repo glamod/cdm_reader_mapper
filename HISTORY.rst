@@ -11,6 +11,7 @@ HISTORY
 * cdm_reader_mapepr: import common (__init__.py)
 * remove unused modules from metmetpy
 * adding tests to cdm_reader_mapper testing suite
+* cdm_reader_mapper.mdf_reader split data_models into code_tables and schema
 
 0.1.0 (2023-01-16)
 ------------------
