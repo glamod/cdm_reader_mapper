@@ -17,10 +17,12 @@ class test_data:
         self.test_085_705 = self._get_data_dict("085-705_1938-04_subset.imma", "imma1")
         self.test_096_702 = self._get_data_dict("096-702_1873-01_subset.imma", "imma1")
         self.test_098_707 = self._get_data_dict("098-707_1916-04_subset.imma", "imma1")
+        self.test_103_794 = self._get_data_dict("103-794_2021-11_subset.imma", "imma1")
         self.test_125_704 = self._get_data_dict("125-704_1878-10_subset.imma", "imma1")
         self.test_125_721 = self._get_data_dict("125-721_1862-06_subset.imma", "imma1")
         self.test_133_730 = self._get_data_dict("133-730_1776-10_subset.imma", "imma1")
         self.test_143_781 = self._get_data_dict("143-781_1987-09_subset.imma", "imma1")
+        self.test_144_703 = self._get_data_dict("144-703_1979-09_subset.imma", "imma1")
 
     def _get_data_dict(self, data_file, schema):
         return {
