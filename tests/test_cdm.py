@@ -227,9 +227,17 @@ def test_read_imma1_buoys_codes_subset(
 # FROM FILE: WITH AND WITHOUT SUPPLEMENTAL
 def test_read_imma1_buoys_nosupp_chunks():
     chunksize = 10000
-    assert mdf_reader.read(
+    read_ = mdf_reader.read(
         **test_data.test_063_714,
         chunksize=chunksize,
+    )
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d714",
+        data,
+        attrs,
+        log_level="DEBUG",
     )
 
 
