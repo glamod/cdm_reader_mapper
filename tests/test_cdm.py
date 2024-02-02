@@ -162,7 +162,7 @@ def test_read_imma1_781():
         log_level="DEBUG",
     )
 
-    
+
 def test_read_imma1_794():
     read_ = mdf_reader.read(**test_data.test_103_794)
     data = read_.data
@@ -174,6 +174,7 @@ def test_read_imma1_794():
         log_level="DEBUG",
     )
 
+
 def test_read_immt_gcc():
     read_ = mdf_reader.read(**test_data.test_gcc_mix)
     data = read_.data
@@ -184,6 +185,8 @@ def test_read_immt_gcc():
         attrs,
         log_level="DEBUG",
     )
+
+
 # B. TESTS TO READ FROM DATA FROM DIFFERENT DATA MODELS WITH
 # BOTH CDM AND CODE MAPPING TABLE SUBSET
 # ----------------------------------------------------------
@@ -239,7 +242,3 @@ def test_read_imma1_buoys_supp_chunks():
         sections=[supp_section],
         chunksize=chunksize,
     )
-    
-test_read_imma1_701_type2()    
-
-test_read_immt_gcc()
