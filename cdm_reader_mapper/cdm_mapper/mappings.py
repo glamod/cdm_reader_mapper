@@ -55,29 +55,31 @@ k_elements = {
 }
 
 
-def coord_dmh_to_180i(deg, min, hemis):
-    """
-    Convert longitudes' units.
 
-    Converts longitudes from degrees, minutes and hemisphere
-    to decimal degrees between -180 to 180.
-
-    Parameters
-    ----------
-    deg: longitude or latitude in degrees
-    min: logitude or latitude in minutes
-    hemis: Hemisphere W or E
-
-    Returns
-    -------
-    var: longitude in decimal degrees
-    """
-    hemisphere = 1
-    min_df = min / 60
-    if hemis.any() == "W":
-        hemisphere = -1
-    var = np.round((deg + min_df), 2) * hemisphere
-    return var
+#
+#def coord_dmh_to_180i(deg, min, hemis):
+#    """
+#    Convert longitudes' units.
+#
+#    Converts longitudes from degrees, minutes and hemisphere
+#    to decimal degrees between -180 to 180.
+#
+#    Parameters
+#    ----------
+#    deg: longitude or latitude in degrees
+#    min: logitude or latitude in minutes
+#    hemis: Hemisphere W or E
+#
+#    Returns
+#    -------
+#    var: longitude in decimal degrees
+#    """
+#    hemisphere = 1
+#   min_df = min / 60
+#   if hemis.any() == "W":
+#        hemisphere = -1
+#    var = np.round((deg + min_df), 2) * hemisphere
+#    return var
 
 
 def coord_360_to_180i(long3):
@@ -261,27 +263,29 @@ class mapping_functions:
 
         return df_time.time_utc
 
-    def datetime_fix_hour(self, df):
-        """
-        Convert time object to dattime object.
-
-        Converts year, month, day and time indicator to
-        a datetime obj with a 24hrs format '%Y-%m-%d-%H'
-
-        Parameters
-        ----------
-        dates: list of elements from a date array
-
-        Returns
-        -------
-        date: datetime obj
-        """
-        date_format = "%Y-%m-%d-%H"
-        data = pd.to_datetime(
-            df.astype(str).apply("-".join, axis=1).values + "-12",
-            format=date_format,
-            errors="coerce",
-        )
+    # NOT USED
+    #
+    #def datetime_fix_hour(self, df):
+    #    """
+    #    Convert time object to dattime object.
+    #
+    #    Converts year, month, day and time indicator to
+    #    a datetime obj with a 24hrs format '%Y-%m-%d-%H'
+    #
+    #    Parameters
+    #    ----------
+    #    dates: list of elements from a date array
+    #
+    #    Returns
+    #    -------
+    #    date: datetime obj
+    #    """
+    #    date_format = "%Y-%m-%d-%H"
+    #    data = pd.to_datetime(
+    #        df.astype(str).apply("-".join, axis=1).values + "-12",
+    #        format=date_format,
+    #        errors="coerce",
+    #    )
 
         return data
 
@@ -316,9 +320,11 @@ class mapping_functions:
             joint = joint + sep + df.iloc[:, i].astype(str)
         return joint
 
-    def string_opposite(self, ds):
-        """Return string opposite."""
-        return "-" + ds
+    # NOT USED
+    #
+    #def string_opposite(self, ds):
+    #    """Return string opposite."""
+    #    return "-" + ds
 
     def float_opposite(self, ds):
         """Return float opposite."""
@@ -396,10 +402,12 @@ class mapping_functions:
             df = df[:-1]
         return df["string_add"]
 
-    def apply_sign(self, ds):
-        """Apply sign."""
-        ds.iloc[0] = np.where((ds.iloc[0] == 0) | (ds.iloc[0] == 5), 1, -1)
-        return ds
+    # NOT USED
+    #
+    #def apply_sign(self, ds):
+    #    """Apply sign."""
+    #    ds.iloc[0] = np.where((ds.iloc[0] == 0) | (ds.iloc[0] == 5), 1, -1)
+    #    return ds
 
     def temperature_celsius_to_kelvin(self, ds):
         """Convert temperature from degrre Ceslius to Kelvin."""
