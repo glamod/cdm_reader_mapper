@@ -44,9 +44,7 @@ class test_data:
         self.test_143_781 = self._get_data_dict(
             "143-781_1987-09_subset.imma", "imma1_d781"
         )
-        self.test_144_703 = self._get_data_dict(
-            "144-703_1979-09_subset.imma", "imma1"
-        )
+        self.test_144_703 = self._get_data_dict("144-703_1979-09_subset.imma", "imma1")
         self.test_gcc_mix = self._get_data_dict("mix_out_200302.immt", "gcc_immt")
 
     def _get_data_dict(self, data_file, schema):
