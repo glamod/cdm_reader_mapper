@@ -29,6 +29,7 @@ import uuid
 
 import numpy as np
 import pandas as pd
+import swifter  # noqa
 from timezonefinder import TimezoneFinder
 
 icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
@@ -54,10 +55,10 @@ k_elements = {
     "gcc_mapping": 1,
 }
 
-
+tf = TimezoneFinder()
 
 #
-#def coord_dmh_to_180i(deg, min, hemis):
+# def coord_dmh_to_180i(deg, min, hemis):
 #    """
 #    Convert longitudes' units.
 #
@@ -148,9 +149,7 @@ def convert_to_utc_i(date, zone):
 
 def time_zone_i(lat, lon):
     """Return time zone."""
-    tf = TimezoneFinder()
-    zone = tf.timezone_at(lng=lon, lat=lat)
-    return zone
+    return tf.timezone_at(lng=lon, lat=lat)
 
 
 def longitude_360to180_i(lon):
@@ -241,15 +240,14 @@ class mapping_functions:
         df_coords = df.core.iloc[:, 3:5]
 
         # Covert long to -180 to 180 for time zone finding
-        df_coords["lon_converted"] = df_coords.apply(
-            lambda x: coord_360_to_180i(x["LON"]), axis=1
-        )
-        df_coords["time_zone"] = df_coords.apply(
+        df_coords["lon_converted"] = df_coords["LON"].swifter.apply(coord_360_to_180i)
+
+        df_coords["time_zone"] = df_coords.swifter.apply(
             lambda x: time_zone_i(x["LAT"], x["lon_converted"]), axis=1
         )
 
         data = pd.to_datetime(
-            df_dates.iloc[:, 0:5].astype(str).apply("-".join, axis=1).values,
+            df_dates.iloc[:, 0:5].astype(str).swifter.apply("-".join, axis=1).values,
             format=date_format,
             errors="coerce",
         )
@@ -257,35 +255,35 @@ class mapping_functions:
         d = {"Dates": data, "Time_zone": df_coords.time_zone.values}
         df_time = pd.DataFrame(data=d)
 
-        df_time["time_utc"] = df_time.apply(
+        df_time["time_utc"] = df_time.swifter.apply(
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
 
         return df_time.time_utc
 
-    # NOT USED
-    #
-    #def datetime_fix_hour(self, df):
-    #    """
-    #    Convert time object to dattime object.
-    #
-    #    Converts year, month, day and time indicator to
-    #    a datetime obj with a 24hrs format '%Y-%m-%d-%H'
-    #
-    #    Parameters
-    #    ----------
-    #    dates: list of elements from a date array
-    #
-    #    Returns
-    #    -------
-    #    date: datetime obj
-    #    """
-    #    date_format = "%Y-%m-%d-%H"
-    #    data = pd.to_datetime(
-    #        df.astype(str).apply("-".join, axis=1).values + "-12",
-    #        format=date_format,
-    #        errors="coerce",
-    #    )
+        # NOT USED
+        #
+        # def datetime_fix_hour(self, df):
+        #    """
+        #    Convert time object to dattime object.
+        #
+        #    Converts year, month, day and time indicator to
+        #    a datetime obj with a 24hrs format '%Y-%m-%d-%H'
+        #
+        #    Parameters
+        #    ----------
+        #    dates: list of elements from a date array
+        #
+        #    Returns
+        #    -------
+        #    date: datetime obj
+        #    """
+        #    date_format = "%Y-%m-%d-%H"
+        #    data = pd.to_datetime(
+        #        df.astype(str).apply("-".join, axis=1).values + "-12",
+        #        format=date_format,
+        #        errors="coerce",
+        #    )
 
         return data
 
@@ -322,7 +320,7 @@ class mapping_functions:
 
     # NOT USED
     #
-    #def string_opposite(self, ds):
+    # def string_opposite(self, ds):
     #    """Return string opposite."""
     #    return "-" + ds
 
@@ -404,7 +402,7 @@ class mapping_functions:
 
     # NOT USED
     #
-    #def apply_sign(self, ds):
+    # def apply_sign(self, ds):
     #    """Apply sign."""
     #    ds.iloc[0] = np.where((ds.iloc[0] == 0) | (ds.iloc[0] == 5), 1, -1)
     #    return ds
