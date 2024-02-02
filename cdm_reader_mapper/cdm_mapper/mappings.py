@@ -425,6 +425,11 @@ class mapping_functions:
         }
         return ds.map(secs, na_action="ignore")
 
+    def feet_to_m(self, ds, float_type="float32"):
+        """Convert feet into meter."""
+        ds.astype(float_type)
+        return np.round(ds / 3.2808, 2)
+
     def guid(self, df, prepend="", append=""):
         """DOCUMENTATION."""
         df["YR"] = df["YR"].apply(lambda x: f"{x:04d}")

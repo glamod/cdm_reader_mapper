@@ -353,7 +353,6 @@ def read(
     TextParser = import_data(
         source, encoding=encoding, chunksize=chunksize, skiprows=skiprows
     )
-
     # 2.3. Extract, read and validate data in same loop
     logging.info("Extracting and reading sections")
     data, valid = ERV(TextParser, read_sections_list, schema, code_tables_path)
