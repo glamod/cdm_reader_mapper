@@ -35,10 +35,8 @@ from io import StringIO as StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common.converters import converters
-from cdm_reader_mapper.common.decoders import decoders
-
 from . import properties
+from .utils import converters, decoders
 
 
 def extract_fixed_width(section_serie_bf, section_schema):
