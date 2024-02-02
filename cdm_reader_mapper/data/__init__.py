@@ -18,7 +18,7 @@ class test_data:
             "069-701_1845-04_subset.imma", "imma1_d701"
         )
         self.test_084_706 = self._get_data_dict(
-            "084-706_1919-03_subset.imma", "imma1_d706"
+            "084-706_1919-03_subset.imma", "imma1_d705-707"
         )
         self.test_085_705 = self._get_data_dict(
             "085-705_1938-04_subset.imma", "imma1_d705-707"
