@@ -23,57 +23,6 @@ from .. import properties
 # safe casting specified, otherwise converts np.nan to some number depending on dtype.
 
 
-def signed_overpunch_i(x):
-    """DOCUMENTATION."""
-    # Blanks and np.nan as missing data
-    # In TDF-11, mix of overpunch and no overpunch: include integers in dictionary
-    # Define decoding dictionary: should do this smart-like: None where non-existing keys!!!!
-    overpunch_number = {string.digits[i]: str(i) for i in range(0, 10)}
-    overpunch_number.update(
-        {string.ascii_uppercase[i]: str(i + 1) for i in range(0, 9)}
-    )
-    overpunch_number.update(
-        {string.ascii_uppercase[i]: str(i - 8) for i in range(9, 18)}
-    )
-    overpunch_number.update({"{": str(0)})
-    overpunch_number.update({"<": str(0)})
-    overpunch_number.update({"}": str(0)})
-    overpunch_number.update({"!": str(0)})
-    overpunch_factor = {string.digits[i]: 1 for i in range(0, 10)}
-    overpunch_factor.update({string.ascii_uppercase[i]: 1 for i in range(0, 9)})
-    overpunch_factor.update({string.ascii_uppercase[i]: -1 for i in range(9, 18)})
-    overpunch_factor.update({"}": -1})
-    overpunch_factor.update({"!": -1})
-    overpunch_factor.update({"{": 1})
-    overpunch_factor.update({"<": 1})
-    try:
-        n = (
-            "".join(list(map(lambda x: overpunch_number.get(x, np.nan), list(x))))
-            if x == x
-            else np.nan
-        )
-        f = (
-            np.prod(list(map(lambda x: overpunch_factor.get(x, np.nan), list(x))))
-            if x == x
-            else np.nan
-        )
-        converted = f * int(n) if f and n and n == n and f == f else np.nan
-        return converted
-    except Exception as e:
-        print(f"ERROR decoding element: {x}")
-        print(e)
-        print("Conversion sequence:")
-        try:
-            print(f"number base conversion: {n}")
-        except Exception:
-            pass
-        try:
-            print(f"factor conversion: {f}")
-        except Exception:
-            pass
-        return np.nan
-
-
 class df_decoders:
     """DOCUMENTATION."""
 
