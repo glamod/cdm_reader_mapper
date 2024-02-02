@@ -41,12 +41,22 @@ def test_read_imma1_buoys_supp(plot_validation=False):
     assert output
 
 
+def test_read_imma1_701_type1():
+    read_ = mdf_reader.read(**test_data.test_069_701)
+    data = read_.data
+    attrs = read_.attrs
+    assert cdm_mapper.map_model(
+        "icoads_r3000_d701_type1",
+        data,
+        attrs,
+        log_level="DEBUG",
+    )
+
+
 def test_read_imma1_701_type2():
     read_ = mdf_reader.read(**test_data.test_069_701)
     data = read_.data
     attrs = read_.attrs
-    print(data)
-    return
     assert cdm_mapper.map_model(
         "icoads_r3000_d701_type2",
         data,
@@ -250,3 +260,6 @@ def test_read_imma1_buoys_supp_chunks():
         sections=[supp_section],
         chunksize=chunksize,
     )
+
+
+test_read_imma1_701_type1()
