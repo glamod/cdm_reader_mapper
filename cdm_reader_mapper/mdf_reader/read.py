@@ -298,7 +298,7 @@ class MDFFileReader(_FileReader):
         if out_path:
             dump_atts(self.data, self.valid, out_atts, out_path)
 
-        self.out_atts = out_atts
+        self.attrs = out_atts
         return self
 
 
