@@ -74,6 +74,7 @@ class df_converters:
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!
         if data.count() > 0:
+            data = data.str.lstrip()
             data = data.str.replace(" ", "0")
         #  Convert to numeric, then scale (?!) and give it's actual int type
         data = pd.to_numeric(
