@@ -17,6 +17,7 @@ from .. import properties
 from ..schema import schemas
 from . import converters, decoders
 
+
 def convert_float_format(out_dtypes):
     """DOCUMENTATION."""
     out_dtypes_ = {}
@@ -25,7 +26,8 @@ def convert_float_format(out_dtypes):
             v = "float"
         out_dtypes_[k] = v
     return out_dtypes_
-    
+
+
 def validate_arg(arg_name, arg_value, arg_type):
     """Validate input argument is as expected type.
 
@@ -117,7 +119,12 @@ class _FileReader:
         return decoder_func(series)
 
     def _add_field_length(self, element_section, index):
-        return index + element_section["field_length"]
+        if "field_length" in element_section.keys():
+            field_length = element_section["field_length"]
+        else:
+            field_length = properties.MAX_FULL_REPORT_WIDTH
+            self.length = None
+        return index + field_length
 
     def _skip_delimiter(self, line, index, delimiter):
         length = len(line)
@@ -183,6 +190,8 @@ class _FileReader:
             self.field_layout = header.get("field_layout")
             self.delimiter_format = header.get("format")
             disable_read = header.get("disable_read")
+            if disable_read is True:
+                continue
             sections = self.schema["sections"][o]["elements"]
             k = i
             for section in sections.keys():
@@ -195,9 +204,9 @@ class _FileReader:
                     index = (o, section)
 
                 if o in valid:
-                  ignore = sections[section].get("ignore")
+                    ignore = sections[section].get("ignore")
                 else:
-                  ignore = True
+                    ignore = True
                 if isinstance(ignore, str):
                     ignore = eval(ignore)
 
@@ -223,7 +232,7 @@ class _FileReader:
                         names_csv += [index]
                         first_col_skip = i - 1
                         if first_col_name is None:
-                          first_col_name = index
+                            first_col_name = index
 
                     if disable_read is True:
                         dtypes[index] = "object"
@@ -246,6 +255,7 @@ class _FileReader:
                             sections[section].get("column_type")
                         )
                 i = j
+
             if self.length is None:
                 self.length = j - k
             if j - k != self.length:
@@ -381,36 +391,38 @@ class _FileReader:
         return mask
 
     def _dump_atts(self, out_atts, out_path):
-      """Dump attributes to atts.json."""
-      if not isinstance(self.data, pd.io.parsers.TextFileReader):
-        data = [self.data]
-        valid = [self.valid]
-      else:
-        data = pandas_TextParser_hdlr.make_copy(self.data)
-        valid = pandas_TextParser_hdlr.make_copy(self.valid)
-      logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-      for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-        header = False
-        mode = "a"
-        if i == 0:
-            mode = "w"
-            cols = [x for x in data_df]
-            if isinstance(cols[0], tuple):
-                header = [":".join(x) for x in cols]
-                out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
-            else:
-                header = cols
-                out_atts_json = out_atts
-        kwargs = {
-            "header": header,
-            "mode": mode,
-            "encoding": "utf-8",
-            "index": True,
-            "index_label": "index",
-            "escapechar": "\0",
-        }
-        data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-        valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
+        """Dump attributes to atts.json."""
+        if not isinstance(self.data, pd.io.parsers.TextFileReader):
+            data = [self.data]
+            valid = [self.valid]
+        else:
+            data = pandas_TextParser_hdlr.make_copy(self.data)
+            valid = pandas_TextParser_hdlr.make_copy(self.valid)
+        logging.info(f"WRITING DATA TO FILES IN: {out_path}")
+        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
+            header = False
+            mode = "a"
+            if i == 0:
+                mode = "w"
+                cols = [x for x in data_df]
+                if isinstance(cols[0], tuple):
+                    header = [":".join(x) for x in cols]
+                    out_atts_json = {
+                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
+                    }
+                else:
+                    header = cols
+                    out_atts_json = out_atts
+            kwargs = {
+                "header": header,
+                "mode": mode,
+                "encoding": "utf-8",
+                "index": True,
+                "index_label": "index",
+                "escapechar": "\0",
+            }
+            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
+            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
 
-        with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-            json.dump(out_atts_json, fileObj, indent=4)
+            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
+                json.dump(out_atts_json, fileObj, indent=4)

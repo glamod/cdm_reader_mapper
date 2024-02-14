@@ -134,7 +134,7 @@ class MDFFileReader(_FileReader):
                 escapechar="\0",
             )
         return self
-        
+
     def validate_entries(
         self,
     ):
@@ -232,15 +232,15 @@ class MDFFileReader(_FileReader):
         # 2.1. Subset data model sections to requested sections
         encoding = self.schema["header"].get("encoding")
         parsing_order = self.schema["header"].get("parsing_order")
-        #if sections is None:
+        # if sections is None:
         #    sections = [x.get(y) for x in parsing_order for y in x]
         #    read_sections_list = [y for x in sections for y in x]
-        #else:
+        # else:
         #    read_sections_list = sections
         sections_ = [x.get(y) for x in parsing_order for y in x]
         read_sections_list = [y for x in sections_ for y in x]
         if sections is None:
-          sections = read_sections_list
+            sections = read_sections_list
 
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
@@ -292,11 +292,8 @@ class MDFFileReader(_FileReader):
         out_atts = schemas.df_schema(data_columns, self.schema)
 
         # 4. OUTPUT TO FILES IF REQUESTED
-        print(self.data)
         if out_path:
-            print("dump")
             self._dump_atts(out_atts, out_path)
-        print(self.data)
         self.attrs = out_atts
         return self
 
