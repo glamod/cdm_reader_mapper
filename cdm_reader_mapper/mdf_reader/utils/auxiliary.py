@@ -200,6 +200,7 @@ class _FileReader:
         dtypes = {}
         self.delimiters = None
         first_col_skip = 0
+        first_col_name = None
         i = 0
         for o in order:
             header = self.schema["sections"][o]["header"]
@@ -244,6 +245,8 @@ class _FileReader:
                     elif self.mode == "csv":
                         names_csv += [index]
                         first_col_skip = i - 1
+                        if first_col_name is None:
+                          first_col_name = index
 
                     if disable_read is True:
                         dtypes[index] = "object"
@@ -282,7 +285,7 @@ class _FileReader:
             "csv": {
                 "names": names_csv,
                 "delimiter": self.delimiters,
-                "first_col_name": names_csv[0],
+                "first_col_name": first_col_name,
                 "first_col_skip": first_col_skip,
             },
             "concat": {
