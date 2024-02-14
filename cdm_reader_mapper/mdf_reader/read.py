@@ -144,7 +144,7 @@ class MDFFileReader(_FileReader):
         """
         if isinstance(self.data, pd.DataFrame):
             mask = self._create_mask(self.data)
-            self.valid = validate(
+            self.mask = validate(
                 self.data,
                 mask,
                 self.schema,
@@ -164,7 +164,7 @@ class MDFFileReader(_FileReader):
                     index=False,
                 )
             data_buffer.seek(0)
-            self.valid = pd.read_csv(
+            self.mask = pd.read_csv(
                 data_buffer,
                 names=df_.columns,
                 chunksize=self.chunksize,
@@ -281,7 +281,7 @@ class MDFFileReader(_FileReader):
         if validate is True:
             self.validate_entries()
         else:
-            self.valid = pd.DataFrame()
+            self.mask = pd.DataFrame()
         # 3. CREATE OUTPUT DATA ATTRIBUTES
         logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
         data_columns = (

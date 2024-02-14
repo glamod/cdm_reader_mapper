@@ -394,10 +394,10 @@ class _FileReader:
         """Dump attributes to atts.json."""
         if not isinstance(self.data, pd.io.parsers.TextFileReader):
             data = [self.data]
-            valid = [self.valid]
+            valid = [self.mask]
         else:
             data = pandas_TextParser_hdlr.make_copy(self.data)
-            valid = pandas_TextParser_hdlr.make_copy(self.valid)
+            valid = pandas_TextParser_hdlr.make_copy(self.mask)
         logging.info(f"WRITING DATA TO FILES IN: {out_path}")
         for i, (data_df, valid_df) in enumerate(zip(data, valid)):
             header = False
