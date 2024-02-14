@@ -12,18 +12,8 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 from . import properties
 from .schema import schemas
-from .utils.auxiliary import _FileReader, dump_atts, validate_arg, validate_path
+from .utils.auxiliary import _FileReader, validate_arg, validate_path
 from .validate import validate
-
-
-def convert_float_format(out_dtypes):
-    """DOCUMENTATION."""
-    out_dtypes_ = {}
-    for k, v in out_dtypes.items():
-        if "float" in v:
-            v = "float"
-        out_dtypes_[k] = v
-    return out_dtypes_
 
 
 class MDFFileReader(_FileReader):
@@ -129,7 +119,6 @@ class MDFFileReader(_FileReader):
                     escapechar="\0",
                 )
             data_buffer.seek(0)
-            dtype = convert_float_format(dtype)
             date_columns = []
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
@@ -144,7 +133,8 @@ class MDFFileReader(_FileReader):
                 quotechar="\0",
                 escapechar="\0",
             )
-
+        return self
+        
     def validate_entries(
         self,
     ):
@@ -179,6 +169,7 @@ class MDFFileReader(_FileReader):
                 names=df_.columns,
                 chunksize=self.chunksize,
             )
+        return self
 
     def read(
         self,
@@ -241,15 +232,20 @@ class MDFFileReader(_FileReader):
         # 2.1. Subset data model sections to requested sections
         encoding = self.schema["header"].get("encoding")
         parsing_order = self.schema["header"].get("parsing_order")
+        #if sections is None:
+        #    sections = [x.get(y) for x in parsing_order for y in x]
+        #    read_sections_list = [y for x in sections for y in x]
+        #else:
+        #    read_sections_list = sections
+        sections_ = [x.get(y) for x in parsing_order for y in x]
+        read_sections_list = [y for x in sections_ for y in x]
         if sections is None:
-            sections = [x.get(y) for x in parsing_order for y in x]
-            read_sections_list = [y for x in sections for y in x]
-        else:
-            read_sections_list = sections
+          sections = read_sections_list
+
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        self.configurations = self._get_configurations(read_sections_list)
+        self.configurations = self._get_configurations(read_sections_list, sections)
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
         TextParser_fwf = None
@@ -276,6 +272,7 @@ class MDFFileReader(_FileReader):
             axis=1,
             **self.configurations["concat"],
         )
+
         if convert or decode:
             self.convert_and_decode_entries(
                 convert=convert,
@@ -295,9 +292,11 @@ class MDFFileReader(_FileReader):
         out_atts = schemas.df_schema(data_columns, self.schema)
 
         # 4. OUTPUT TO FILES IF REQUESTED
+        print(self.data)
         if out_path:
-            dump_atts(self.data, self.valid, out_atts, out_path)
-
+            print("dump")
+            self._dump_atts(out_atts, out_path)
+        print(self.data)
         self.attrs = out_atts
         return self
 

@@ -17,7 +17,15 @@ from .. import properties
 from ..schema import schemas
 from . import converters, decoders
 
-
+def convert_float_format(out_dtypes):
+    """DOCUMENTATION."""
+    out_dtypes_ = {}
+    for k, v in out_dtypes.items():
+        if "float" in v:
+            v = "float"
+        out_dtypes_[k] = v
+    return out_dtypes_
+    
 def validate_arg(arg_name, arg_value, arg_type):
     """Validate input argument is as expected type.
 
@@ -62,41 +70,6 @@ def validate_path(arg_name, arg_value):
         logging.error(f"{arg_name} could not find path {arg_value}")
         return False
     return True
-
-
-def dump_atts(data, valid, out_atts, out_path):
-    """Dump attributes to atts.json."""
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        data = [data]
-        valid = [valid]
-    else:
-        data = pandas_TextParser_hdlr.make_copy(data)
-    logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-    for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-        header = False
-        mode = "a"
-        if i == 0:
-            mode = "w"
-            cols = [x for x in data_df]
-            if isinstance(cols[0], tuple):
-                header = [":".join(x) for x in cols]
-                out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
-            else:
-                header = cols
-                out_atts_json = out_atts
-        kwargs = {
-            "header": header,
-            "mode": mode,
-            "encoding": "utf-8",
-            "index": True,
-            "index_label": "index",
-            "escapechar": "\0",
-        }
-        data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-        valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
-
-        with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-            json.dump(out_atts_json, fileObj, indent=4)
 
 
 class _FileReader:
@@ -180,6 +153,7 @@ class _FileReader:
     def _get_configurations(
         self,
         order,
+        valid,
     ):
         df = self._read_pandas_fwf(
             encoding=self.schema["header"].get("encoding"),
@@ -220,7 +194,10 @@ class _FileReader:
                 else:
                     index = (o, section)
 
-                ignore = sections[section].get("ignore")
+                if o in valid:
+                  ignore = sections[section].get("ignore")
+                else:
+                  ignore = True
                 if isinstance(ignore, str):
                     ignore = eval(ignore)
 
@@ -276,6 +253,7 @@ class _FileReader:
                     f"Column length does not match with cumulative field_lengths in {sections}."
                 )
                 return
+        self.dtypes = convert_float_format(dtypes)
         return {
             "fwf": {
                 "names": names_fwf,
@@ -289,13 +267,13 @@ class _FileReader:
                 "first_col_skip": first_col_skip,
             },
             "concat": {
-                "dtype": dtypes,
+                "dtype": self.dtypes,
             },
             "convert_decode": {
                 "converter_dict": convert,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decode,
-                "dtype": dtypes,
+                "dtype": self.dtypes,
             },
         }
 
@@ -401,3 +379,38 @@ class _FileReader:
         for section in df.columns:
             mask[section] = True
         return mask
+
+    def _dump_atts(self, out_atts, out_path):
+      """Dump attributes to atts.json."""
+      if not isinstance(self.data, pd.io.parsers.TextFileReader):
+        data = [self.data]
+        valid = [self.valid]
+      else:
+        data = pandas_TextParser_hdlr.make_copy(self.data)
+        valid = pandas_TextParser_hdlr.make_copy(self.valid)
+      logging.info(f"WRITING DATA TO FILES IN: {out_path}")
+      for i, (data_df, valid_df) in enumerate(zip(data, valid)):
+        header = False
+        mode = "a"
+        if i == 0:
+            mode = "w"
+            cols = [x for x in data_df]
+            if isinstance(cols[0], tuple):
+                header = [":".join(x) for x in cols]
+                out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
+            else:
+                header = cols
+                out_atts_json = out_atts
+        kwargs = {
+            "header": header,
+            "mode": mode,
+            "encoding": "utf-8",
+            "index": True,
+            "index_label": "index",
+            "escapechar": "\0",
+        }
+        data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
+        valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
+
+        with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
+            json.dump(out_atts_json, fileObj, indent=4)
