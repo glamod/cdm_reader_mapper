@@ -260,6 +260,3 @@ def test_read_imma1_buoys_supp_chunks():
         sections=[supp_section],
         chunksize=chunksize,
     )
-
-
-test_read_imma1_701_type1()
