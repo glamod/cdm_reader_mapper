@@ -264,14 +264,14 @@ class _FileReader:
                 )
                 return
         dtypes = convert_float_format(dtypes)
-        parse_datetime = []
+        parse_dates = []
         for i, element in enumerate(list(dtypes)):
             if dtypes[element] == "datetime":
-                parse_datetime.append(i)
+                parse_dates.append(i)
                 dtypes[element] = "object"
 
         self.dtypes = dtypes
-        self.parse_datetime = parse_datetime
+        self.parse_dates = parse_dates
         return {
             "fwf": {
                 "names": names_fwf,
