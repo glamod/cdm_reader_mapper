@@ -20,6 +20,7 @@ def test_read_imma1_buoys_supp():
     _testing_suite(
         **test_data.test_063_714,
         sections="c99",
+        suffix="063_714_nosupp",
         mapping=False,
     )
 
@@ -28,7 +29,7 @@ def test_read_imma1_701_type1():
     _testing_suite(
         **test_data.test_069_701,
         cdm_name="icoads_r3000_d701_type1",
-        suffix="069-701_type1_nosupp",
+        suffix="069_701_type1_nosupp",
     )
 
 
@@ -36,7 +37,7 @@ def test_read_imma1_701_type2():
     _testing_suite(
         **test_data.test_069_701,
         cdm_name="icoads_r3000_d701_type2",
-        suffix="069-701_type2_nosupp",
+        suffix="069_701_type2_nosupp",
     )
 
 
@@ -44,7 +45,7 @@ def test_read_imma1_702():
     _testing_suite(
         **test_data.test_096_702,
         cdm_name="icoads_r3000_d702",
-        suffix="096-702_nosupp",
+        suffix="096_702_nosupp",
     )
 
 
@@ -52,7 +53,7 @@ def test_read_imma1_703():
     _testing_suite(
         **test_data.test_144_703,
         cdm_name="icoads_r3000",
-        suffix="144-703_nosupp",
+        suffix="144_703_nosupp",
     )
 
 
@@ -60,7 +61,7 @@ def test_read_imma1_704():
     _testing_suite(
         **test_data.test_125_704,
         cdm_name="icoads_r3000_d704",
-        suffix="125-704_nosupp",
+        suffix="125_704_nosupp",
     )
 
 
@@ -68,7 +69,7 @@ def test_read_imma1_705():
     _testing_suite(
         **test_data.test_085_705,
         cdm_name="icoads_r3000_d705-707",
-        suffix="069-705_nosupp",
+        suffix="069_705_nosupp",
     )
 
 
@@ -76,7 +77,7 @@ def test_read_imma1_706():
     _testing_suite(
         **test_data.test_084_706,
         cdm_name="icoads_r3000_d705-707",
-        suffix="084-706_nosupp",
+        suffix="084_706_nosupp",
     )
 
 
@@ -84,7 +85,7 @@ def test_read_imma1_707():
     _testing_suite(
         **test_data.test_098_707,
         cdm_name="icoads_r3000_d705-707",
-        suffix="098-707_nosupp",
+        suffix="098_707_nosupp",
     )
 
 
@@ -92,7 +93,7 @@ def test_read_imma1_721():
     _testing_suite(
         **test_data.test_125_721,
         cdm_name="icoads_r3000_d721",
-        suffix="125-721_nosupp",
+        suffix="125_721_nosupp",
     )
 
 
@@ -100,7 +101,7 @@ def test_read_imma1_730():
     _testing_suite(
         **test_data.test_133_730,
         cdm_name="icoads_r3000_d730",
-        suffix="133-730_nosupp",
+        suffix="133_730_nosupp",
     )
 
 
@@ -108,7 +109,7 @@ def test_read_imma1_781():
     _testing_suite(
         **test_data.test_143_781,
         cdm_name="icoads_r3000_d781",
-        suffix="069-781_nosupp",
+        suffix="069_781_nosupp",
     )
 
 
@@ -116,7 +117,7 @@ def test_read_imma1_794():
     _testing_suite(
         **test_data.test_103_794,
         cdm_name="icoads_r3000",
-        suffix="103-794_nosupp",
+        suffix="103_794_nosupp",
     )
 
 
@@ -139,7 +140,7 @@ def test_read_imma1_buoys_cdm_subset():
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
         cdm_subset=["header", "observations-sst"],
-        suffix="063-714_cdms",
+        suffix="063_714_cdms",
     )
 
 
@@ -149,7 +150,7 @@ def test_read_imma1_buoys_codes_subset():
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
         codes_subset=["platform_sub_type", "wind_direction"],
-        suffix="063-714_codes",
+        suffix="063_714_codes",
     )
 
 
@@ -161,7 +162,7 @@ def test_read_imma1_buoys_nosupp_chunks():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
-        suffix="063-714_chunk",
+        suffix="063_714_chunk",
         chunksize=10000,
     )
 
@@ -171,6 +172,7 @@ def test_read_imma1_buoys_supp_chunks():
     _testing_suite(
         **test_data.test_063_714,
         sections="c99",
+        suffix="063_714_chunk",
         chunksize=10000,
         mapping=False,
     )
