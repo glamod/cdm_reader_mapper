@@ -2,198 +2,132 @@ from __future__ import annotations
 
 import pytest  # noqa
 
-from cdm_reader_mapper import cdm_mapper, mdf_reader, test_data
+from cdm_reader_mapper import test_data
 
-# A. TESTS TO READ FROM DATA FROM DIFFERENT DATA MODELS WITH AND WITHOUT SUPP
-# -----------------------------------------------------------------------------
+from ._testing_cdm_suite import _testing_suite
 
-
-def test_read_imma1_buoys_nosupp(
-    save_cdm=True,
-):
-    path_ = "."
-    read_ = mdf_reader.read(**test_data.test_063_714, out_path=path_)
-    data = read_.data
-    attrs = read_.attrs
-    output = cdm_mapper.map_model(
-        "icoads_r3000_d714",
-        data,
-        attrs,
-        log_level="DEBUG",
-    )
-    if save_cdm is True:
-        cdm_mapper.cdm_to_ascii(output, suffix="test")
-        cdm_mapper.read_tables(path_)
-    assert output
+# from _testing_cdm_suite import _testing_suite
 
 
-def test_read_imma1_buoys_supp(plot_validation=False):
-    supp_section = "c99"
-    # supp_model = "cisdm_dbo_imma1"
-    output = mdf_reader.read(
+def test_read_imma1_buoys_nosupp():
+    _testing_suite(
         **test_data.test_063_714,
-        sections=[
-            supp_section,
-        ],
+        cdm_name="icoads_r3000_d714",
+        out_path=".",
+        suffix="063-714_nosupp",
     )
-    # if plot_validation:
-    #    cdm.plot_model_validation(output)
-    assert output
+
+
+def test_read_imma1_buoys_supp():
+    _testing_suite(
+        **test_data.test_063_714,
+        sections="c99",
+        mapping=False,
+    )
 
 
 def test_read_imma1_701_type1():
-    read_ = mdf_reader.read(**test_data.test_069_701)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d701_type1",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_069_701,
+        cdm_name="icoads_r3000_d701_type1",
+        suffix="069-701_type1_nosupp",
     )
 
 
 def test_read_imma1_701_type2():
-    read_ = mdf_reader.read(**test_data.test_069_701)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d701_type2",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_069_701,
+        cdm_name="icoads_r3000_d701_type2",
+        suffix="069-701_type2_nosupp",
     )
 
 
 def test_read_imma1_702():
-    read_ = mdf_reader.read(**test_data.test_096_702)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d702",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_096_702,
+        cdm_name="icoads_r3000_d702",
+        suffix="096-702_nosupp",
     )
 
 
 def test_read_imma1_703():
-    read_ = mdf_reader.read(**test_data.test_144_703)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_144_703,
+        cdm_name="icoads_r3000",
+        suffix="144-703_nosupp",
     )
 
 
 def test_read_imma1_704():
-    read_ = mdf_reader.read(**test_data.test_125_704)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d704",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_125_704,
+        cdm_name="icoads_r3000_d704",
+        suffix="125-704_nosupp",
     )
 
 
 def test_read_imma1_705():
-    read_ = mdf_reader.read(**test_data.test_085_705)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d705-707",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_085_705,
+        cdm_name="icoads_r3000_d705-707",
+        suffix="069-705_nosupp",
     )
 
 
 def test_read_imma1_706():
-    read_ = mdf_reader.read(**test_data.test_084_706)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d705-707",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_084_706,
+        cdm_name="icoads_r3000_d705-707",
+        suffix="084-706_nosupp",
     )
 
 
 def test_read_imma1_707():
-    read_ = mdf_reader.read(**test_data.test_098_707)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d705-707",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_098_707,
+        cdm_name="icoads_r3000_d705-707",
+        suffix="098-707_nosupp",
     )
 
 
 def test_read_imma1_721():
-    read_ = mdf_reader.read(**test_data.test_125_721)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d721",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_125_721,
+        cdm_name="icoads_r3000_d721",
+        suffix="125-721_nosupp",
     )
 
 
 def test_read_imma1_730():
-    read_ = mdf_reader.read(**test_data.test_133_730)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d730",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_133_730,
+        cdm_name="icoads_r3000_d730",
+        suffix="133-730_nosupp",
     )
 
 
 def test_read_imma1_781():
-    read_ = mdf_reader.read(**test_data.test_143_781)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d781",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_143_781,
+        cdm_name="icoads_r3000_d781",
+        suffix="069-781_nosupp",
     )
 
 
 def test_read_imma1_794():
-    read_ = mdf_reader.read(**test_data.test_103_794)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_NRT",
-        data,
-        attrs,
-        log_level="DEBUG",
+    _testing_suite(
+        **test_data.test_103_794,
+        cdm_name="icoads_r3000",
+        suffix="103-794_nosupp",
     )
 
 
 def test_read_immt_gcc():
-    read_ = mdf_reader.read(**test_data.test_gcc_mix)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "gcc_mapping",
-        data,
-        attrs,
-        log_level="DEBUG",
+    "NOT WORKING: cdm_mapper in original version"
+    _testing_suite(
+        **test_data.test_gcc_mix,
+        cdm_name="gcc_mapping",
+        suffix="mix_out_nosupp",
     )
 
 
@@ -202,33 +136,22 @@ def test_read_immt_gcc():
 # ----------------------------------------------------------
 
 
-def test_read_imma1_buoys_cdm_subset(
-    plot_validation=False,
-):
-    read_ = mdf_reader.read(**test_data.test_063_714)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d714",
-        data,
-        attrs,
+def test_read_imma1_buoys_cdm_subset():
+    _testing_suite(
+        **test_data.test_063_714,
+        cdm_name="icoads_r3000_d714",
         cdm_subset=["header", "observations-sst"],
-        log_level="DEBUG",
+        suffix="063-714_cdms",
     )
 
 
-def test_read_imma1_buoys_codes_subset(
-    plot_validation=False,
-):
-    read_ = mdf_reader.read(**test_data.test_063_714)
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d714",
-        data,
-        attrs,
+def test_read_imma1_buoys_codes_subset():
+    "NOT WORKING: codes_subset not in map_maodel"
+    _testing_suite(
+        **test_data.test_063_714,
+        cdm_name="icoads_r3000_d714",
         codes_subset=["platform_sub_type", "wind_direction"],
-        log_level="DEBUG",
+        suffix="063-714_codes",
     )
 
 
@@ -236,27 +159,20 @@ def test_read_imma1_buoys_codes_subset(
 # -----------------------------------------------------------------------------
 # FROM FILE: WITH AND WITHOUT SUPPLEMENTAL
 def test_read_imma1_buoys_nosupp_chunks():
-    chunksize = 10000
-    read_ = mdf_reader.read(
+    "NOT WORKING: textfilereader"
+    _testing_suite(
         **test_data.test_063_714,
-        chunksize=chunksize,
-    )
-    data = read_.data
-    attrs = read_.attrs
-    assert cdm_mapper.map_model(
-        "icoads_r3000_d714",
-        data,
-        attrs,
-        log_level="DEBUG",
+        cdm_name="icoads_r3000_d714",
+        suffix="063-714_chunk",
+        chunksize=10000,
     )
 
 
 def test_read_imma1_buoys_supp_chunks():
-    chunksize = 10000
-    supp_section = "c99"
-    # supp_model = "cisdm_dbo_imma1"
-    assert mdf_reader.read(
+    "NOT WORKING: textfilereader"
+    _testing_suite(
         **test_data.test_063_714,
-        sections=[supp_section],
-        chunksize=chunksize,
+        sections="c99",
+        chunksize=10000,
+        mapping=False,
     )
