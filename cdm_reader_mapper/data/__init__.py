@@ -9,7 +9,7 @@ class test_data:
     """CDM test data."""
 
     def __init__(self):
-        self.data_path = os.path.dirname(os.path.abspath(__file__))
+        self._data_path = os.path.dirname(os.path.abspath(__file__))
 
         self.test_063_714 = self._get_data_dict(
             "063-714_2010-07-01_subset.imma", "imma1_d714"
@@ -49,9 +49,12 @@ class test_data:
         )
         self.test_gcc_mix = self._get_data_dict("mix_out_20030201.immt", "gcc_immt")
 
+    def __getitem__(cls, attr):
+        return getattr(cls, attr)
+
     def _get_data_dict(self, data_file, schema):
         return {
-            "source": os.path.join(self.data_path, data_file),
+            "source": os.path.join(self._data_path, data_file),
             "data_model": schema,
         }
 
