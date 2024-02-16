@@ -263,7 +263,15 @@ class _FileReader:
                     f"Column length does not match with cumulative field_lengths in {sections}."
                 )
                 return
-        self.dtypes = convert_float_format(dtypes)
+        dtypes = convert_float_format(dtypes)
+        parse_datetime = []
+        for i, element in enumerate(list(dtypes)):
+            if dtypes[element] == "datetime":
+                parse_datetime.append(i)
+                dtypes[element] = "object"
+
+        self.dtypes = dtypes
+        self.parse_datetime = parse_datetime
         return {
             "fwf": {
                 "names": names_fwf,
