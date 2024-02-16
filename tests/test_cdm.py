@@ -6,15 +6,13 @@ from cdm_reader_mapper import test_data
 
 from ._testing_cdm_suite import _testing_suite
 
-# from _testing_cdm_suite import _testing_suite
-
 
 def test_read_imma1_buoys_nosupp():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
         out_path=".",
-        suffix="063-714_nosupp",
+        suffix="063_714_nosupp",
     )
 
 

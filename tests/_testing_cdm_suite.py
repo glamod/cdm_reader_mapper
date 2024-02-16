@@ -1,6 +1,21 @@
 from __future__ import annotations
 
+import pandas as pd
+
 from cdm_reader_mapper import cdm_mapper, mdf_reader
+from cdm_reader_mapper.cdm_mapper import read_tables
+
+from ._results import result_data
+
+
+def _pandas_read_csv(*args, **kwargs):
+    return pd.read_csv(
+        *args,
+        **kwargs,
+        quotechar="\0",
+        escapechar="\0",
+        delimiter=mdf_reader.properties.internal_delimiter,
+    )
 
 
 def _testing_suite(
@@ -16,6 +31,7 @@ def _testing_suite(
     **kwargs,
 ):
     name_ = source.split("/")[-1].split(".")[0]
+    exp = "expected_" + suffix
     if sections:
         if isinstance(sections, str):
             sections = [sections]
@@ -30,14 +46,22 @@ def _testing_suite(
     attrs = read_.attrs
     mask = read_.mask
     dtypes = read_.dtypes
-    parse_datetime = read_.parse_datetime
+    parse_dates = read_.parse_dates
 
-    # data_ = expected_results[suffix]["data"]
-    # mask_ = expected_results[suffix]["mask"]
+    data_ = _pandas_read_csv(
+        result_data[exp]["data"],
+        names=data.columns,
+        dtype=dtypes,
+        parse_dates=parse_dates,
+    )
 
-    # for index in data.columns:
-    #  pd.testing.assert_series_equal(data[index], data_[index])
-    #  pd.testing.assert_series_equal(mask[index], mask_[index])
+    mask_ = _pandas_read_csv(
+        result_data[exp]["mask"],
+        names=data.columns,
+    )
+
+    pd.testing.assert_frame_equal(data, data_)
+    pd.testing.assert_frame_equal(mask, mask_)
 
     if mapping is False:
         return
@@ -53,8 +77,7 @@ def _testing_suite(
 
     cdm_mapper.cdm_to_ascii(output, suffix=suffix)
     output = cdm_mapper.read_tables(".", tb_id=suffix)
+    output_ = read_tables(result_data[exp]["cdm_table"])
 
-    # output_ = expected_results[suffix]["cdm"]
-
-    # for column in output.columns:
-    #  pd.testing.assert_series_equal(output[column], output_[column])
+    for column in output.columns:
+        pd.testing.assert_series_equal(output[column], output_[column])
