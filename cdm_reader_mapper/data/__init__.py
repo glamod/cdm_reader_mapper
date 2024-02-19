@@ -49,8 +49,12 @@ class test_data:
         )
         self.test_gcc_mix = self._get_data_dict("mix_out_20030201.immt", "gcc_immt")
 
-    def __getitem__(cls, attr):
-        return getattr(cls, attr)
+    def __getitem__(self, attr):
+        """Make class subscriptable."""
+        try:
+            return getattr(self, attr)
+        except AttributeError as err:
+            raise KeyError(attr) from err
 
     def _get_data_dict(self, data_file, schema):
         return {
