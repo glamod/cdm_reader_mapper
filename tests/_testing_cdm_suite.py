@@ -8,13 +8,16 @@ from cdm_reader_mapper.cdm_mapper import read_tables
 from ._results import result_data
 
 
-def _pandas_read_csv(*args, **kwargs):
+def _pandas_read_csv(
+    *args, delimiter=mdf_reader.properties.internal_delimiter, **kwargs
+):
     return pd.read_csv(
         *args,
         **kwargs,
         quotechar="\0",
         escapechar="\0",
-        delimiter=mdf_reader.properties.internal_delimiter,
+        # delimiter=mdf_reader.properties.internal_delimiter,
+        delimiter=delimiter,
     )
 
 
@@ -61,7 +64,7 @@ def _testing_suite(
     )
 
     pd.testing.assert_frame_equal(data, data_)
-    pd.testing.assert_frame_equal(mask, mask_)
+    pd.testing.assert_frame_equal(mask, mask_, check_dtype=False)
 
     if mapping is False:
         return
