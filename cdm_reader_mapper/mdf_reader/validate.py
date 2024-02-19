@@ -19,7 +19,6 @@ def validate_numeric(elements, data, schema):
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
-
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
     ]
@@ -32,7 +31,6 @@ def validate_numeric(elements, data, schema):
         logging.warning(
             "Corresponding upper and/or lower bounds set to +/-inf for validation"
         )
-
     mask[elements] = (
         (data[elements] >= [lower.get(x) for x in elements])
         & (data[elements] <= [upper.get(x) for x in elements])
@@ -42,8 +40,7 @@ def validate_numeric(elements, data, schema):
 
 def validate_str(elements, data, schema):
     """DOCUMENTATION."""
-    mask = pd.DataFrame(index=data.index, data=True, columns=elements)
-    return mask
+    return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
 def validate_codes(elements, data, code_tables_path, schema, supp=False):
@@ -130,7 +127,6 @@ def validate(data, mask0, schema, code_tables_path):
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
-
     # Check input
     if not isinstance(data, pd.DataFrame) or not isinstance(mask0, pd.DataFrame):
         logging.error("Input data and mask must be a pandas data frame object")
@@ -141,6 +137,7 @@ def validate(data, mask0, schema, code_tables_path):
     # of elements included in the input data
     elements = [x for x in data]
     element_atts = schemas.df_schema(elements, schema)
+
     # See what elements we need to validate
     numeric_elements = [
         x
@@ -169,11 +166,8 @@ def validate(data, mask0, schema, code_tables_path):
         validated_columns = list(
             set(numeric_elements + coded_elements + datetime_elements)
         )
-
     mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
 
-    # Validate elements by dtype:
-    # 1. Numeric elements
     mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)
 
     # 2. Table coded elements
@@ -201,6 +195,8 @@ def validate(data, mask0, schema, code_tables_path):
 
     # 4. str elements
     mask[str_elements] = validate_str(str_elements, data, element_atts)
+
+    # 5. Set False values
     mask0_n = mask0[validated_columns].fillna(False)
     mask[validated_columns] = mask[validated_columns].mask(
         ~mask0_n,

@@ -13,7 +13,6 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from . import properties
 from .schema import schemas
 from .utils.auxiliary import _FileReader, validate_arg, validate_path
-from .validate import validate
 
 
 class MDFFileReader(_FileReader):
@@ -98,6 +97,7 @@ class MDFFileReader(_FileReader):
                 converter_kwargs,
                 decoder_dict,
             )
+            self.data = self.data.astype(dtype)
         else:
             data_buffer = StringIO()
             for i, df_ in enumerate(self.data):
@@ -143,19 +143,13 @@ class MDFFileReader(_FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if isinstance(self.data, pd.DataFrame):
-            mask = self._create_mask(self.data)
-            self.mask = validate(
-                self.data,
-                mask,
-                self.schema,
-                self.code_tables_path,
-            )
+            self.mask = self._validate_df(self.data)
+
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
             for i, df_ in enumerate(TextParser_):
-                mask = self._create_mask(df_)
-                mask_ = validate(df_, mask, self.schema, self.code_tables_path)
+                mask_ = self._validate_df(df_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -282,6 +276,7 @@ class MDFFileReader(_FileReader):
             self.validate_entries()
         else:
             self.mask = pd.DataFrame()
+
         # 3. CREATE OUTPUT DATA ATTRIBUTES
         logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
         data_columns = (

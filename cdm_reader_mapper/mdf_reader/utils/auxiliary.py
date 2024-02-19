@@ -8,6 +8,7 @@ import logging
 import os
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
@@ -15,6 +16,7 @@ from cdm_reader_mapper.common.local import get_files
 
 from .. import properties
 from ..schema import schemas
+from ..validate import validate
 from . import converters, decoders
 
 
@@ -182,6 +184,7 @@ class _FileReader:
         self.delimiters = None
         first_col_skip = 0
         first_col_name = None
+        self.missings = []
         i = 0
         for o in order:
             header = self.schema["sections"][o]["header"]
@@ -254,6 +257,8 @@ class _FileReader:
                         decode[index] = decoders.get(sections[section]["encoding"]).get(
                             sections[section].get("column_type")
                         )
+                    if i == j:
+                        self.missings.append(index)
                 i = j
 
             if self.length is None:
@@ -390,12 +395,27 @@ class _FileReader:
                 converter_dict[section],
                 **converter_kwargs[section],
             )
-        return df
+        return df.replace(r"^\s*$", np.nan, regex=True)
 
     def _create_mask(self, df):
-        mask = df.copy()
-        for section in df.columns:
-            mask[section] = True
+        missing = df.isna()
+        valid = df.notna()
+        mask = missing | valid
+        for index in self.missings:
+            mask[index] = np.nan
+        return mask
+
+    def _validate_df(self, df):
+        mask = self._create_mask(df)
+        mask = validate(
+            df,
+            mask,
+            self.schema,
+            self.code_tables_path,
+        )
+        for index in self.missings:
+            if df[index].dtype != object:
+                mask[index] = False
         return mask
 
     def _dump_atts(self, out_atts, out_path):
