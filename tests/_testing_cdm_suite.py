@@ -82,5 +82,9 @@ def _testing_suite(
     output = cdm_mapper.read_tables(".", tb_id=suffix)
     output_ = read_tables(result_data[exp]["cdm_table"])
 
-    for column in output.columns:
-        pd.testing.assert_series_equal(output[column], output_[column])
+    del output[("header", "record_timestamp")]
+    del output[("header", "history")]
+    del output_[("header", "record_timestamp")]
+    del output_[("header", "history")]
+
+    pd.testing.assert_frame_equal(output, output_)
