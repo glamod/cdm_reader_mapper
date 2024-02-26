@@ -16,12 +16,19 @@ from .schema import schemas
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
     # Find thresholds in schema. Flag if not available -> warn
+    # print(elements)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
+    # print(mask[index])
+    # print(lower[index])
+    # print(upper[index])
+    # exit()
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
     ]
+    # print(set_elements)
+    # exit()
     if len([x for x in elements if x not in set_elements]) > 0:
         logging.warning(
             "Data numeric elements with missing upper or lower threshold: {}".format(
@@ -35,6 +42,14 @@ def validate_numeric(elements, data, schema):
         (data[elements] >= [lower.get(x) for x in elements])
         & (data[elements] <= [upper.get(x) for x in elements])
     ) | data[elements].isna()
+    # print(data[index])
+    # print(data[index] >= lower[index])
+    # print(data[index] <= upper[index])
+    # print((data[index] >= lower[index]) & (data[index] <= upper[index]))
+    # print(data[index].isna())
+    # print(((data[index] >= lower[index]) & (data[index] <= upper[index])) | data[index].isna())
+    # print(mask[index])
+    # exit()
     return mask
 
 
@@ -153,6 +168,7 @@ def validate(data, mask0, schema, code_tables_path):
     str_elements = [
         x for x in elements if element_atts.get(x).get("column_type") == "str"
     ]
+
     if any(
         [
             isinstance(x, tuple)

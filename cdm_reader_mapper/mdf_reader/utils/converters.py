@@ -68,20 +68,25 @@ class df_converters:
         """
         scale = scale if scale else self.numeric_scale
         offset = offset if offset else self.numeric_offset
+
         # First do the appropriate managing of white spaces:
         # to the right, they should mean 0!
         data = data.replace(r"^\s*$", np.nan, regex=True)
+
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!
         if data.count() > 0:
-            data = data.str.lstrip()
+            # data = data.str.lstrip()
+            # data = data.str.rstrip()
+            data = data.str.strip()
             data = data.str.replace(" ", "0")
+
         #  Convert to numeric, then scale (?!) and give it's actual int type
         data = pd.to_numeric(
             data, errors="coerce"
         )  # astype fails on strings, to_numeric manages errors....!
-        data = offset + data * scale
 
+        data = offset + data * scale
         return pd.Series(data, dtype=self.dtype)
 
     def object_to_object(self, data, disable_white_strip=False):

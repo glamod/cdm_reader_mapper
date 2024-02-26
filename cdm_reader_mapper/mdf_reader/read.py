@@ -226,11 +226,6 @@ class MDFFileReader(_FileReader):
         # 2.1. Subset data model sections to requested sections
         encoding = self.schema["header"].get("encoding")
         parsing_order = self.schema["header"].get("parsing_order")
-        # if sections is None:
-        #    sections = [x.get(y) for x in parsing_order for y in x]
-        #    read_sections_list = [y for x in sections for y in x]
-        # else:
-        #    read_sections_list = sections
         sections_ = [x.get(y) for x in parsing_order for y in x]
         read_sections_list = [y for x in sections_ for y in x]
         if sections is None:
@@ -272,6 +267,7 @@ class MDFFileReader(_FileReader):
                 convert=convert,
                 decode=decode,
             )
+
         if validate is True:
             self.validate_entries()
         else:
@@ -285,7 +281,7 @@ class MDFFileReader(_FileReader):
             else self.data.orig_options["names"]
         )
         out_atts = schemas.df_schema(data_columns, self.schema)
-
+        self.data = self.data.astype(self.dtypes)
         # 4. OUTPUT TO FILES IF REQUESTED
         if out_path:
             self._dump_atts(out_atts, out_path)

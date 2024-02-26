@@ -200,6 +200,7 @@ class _FileReader:
             for section in sections.keys():
                 self.length = header.get("length")
                 self.mode = "fwf"
+                missing = True
 
                 if len(order) == 1:
                     index = section
@@ -215,17 +216,25 @@ class _FileReader:
 
                 encoding = sections[section].get("encoding")
                 na_values[index] = sections[section].get("missing_value")
+
                 if self.sentinal is not None:
                     j = self._validate_sentinal(i, sections[section])
                 elif delimiter is None:
                     j = self._add_field_length(sections[section], i)
                 else:
                     i, j = self._validate_delimited(i, j, delimiter, sections[section])
+                    missing = False
                     if i is None:
                         logging.error(
                             f"Delimiter is set to {delimiter}. Please specify either format or field_layout in your header schema {header}."
                         )
                         return
+
+                if self.length is None:
+                    self.length = j - k
+                if j - k > self.length:
+                    missing = False
+                    j = k + self.length
 
                 if ignore is not True:
                     if self.mode == "fwf":
@@ -257,17 +266,11 @@ class _FileReader:
                         decode[index] = decoders.get(sections[section]["encoding"]).get(
                             sections[section].get("column_type")
                         )
-                    if i == j:
+                    if i == j and missing is True:
                         self.missings.append(index)
+
                 i = j
 
-            if self.length is None:
-                self.length = j - k
-            if j - k != self.length:
-                logging.error(
-                    f"Column length does not match with cumulative field_lengths in {sections}."
-                )
-                return
         dtypes = convert_float_format(dtypes)
         parse_dates = []
         for i, element in enumerate(list(dtypes)):
@@ -277,6 +280,7 @@ class _FileReader:
 
         self.dtypes = dtypes
         self.parse_dates = parse_dates
+        self.na_values = na_values
         return {
             "fwf": {
                 "names": names_fwf,
@@ -304,6 +308,8 @@ class _FileReader:
         self,
         **kwargs,
     ):
+        print(kwargs)
+        exit()
         return pd.read_fwf(
             self.source,
             header=None,
@@ -384,12 +390,14 @@ class _FileReader:
         converter_kwargs,
         decoder_dict,
     ):
+        self.missing = df.isna()
         for section in converter_dict.keys():
             if section in decoder_dict.keys():
                 df[section] = self._decode_entries(
                     df[section],
                     decoder_dict[section],
                 )
+
             df[section] = self._convert_entries(
                 df[section],
                 converter_dict[section],
@@ -413,9 +421,6 @@ class _FileReader:
             self.schema,
             self.code_tables_path,
         )
-        for index in self.missings:
-            if df[index].dtype != object:
-                mask[index] = False
         return mask
 
     def _dump_atts(self, out_atts, out_path):
