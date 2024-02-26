@@ -255,6 +255,7 @@ class MDFFileReader(_FileReader):
                 **self.configurations["csv"],
                 **kwargs,
             )
+
         self.data = self._concat_dataframes(
             [TextParser_fwf, TextParser_csv],
             chunksize=chunksize,
@@ -262,6 +263,9 @@ class MDFFileReader(_FileReader):
             **self.configurations["concat"],
         )
 
+        # for index in self.missings:
+        #  self.data[index] = np.nan
+        #  self.data[index] = self.data[index].astype(self.dtypes[index])
         if convert or decode:
             self.convert_and_decode_entries(
                 convert=convert,
@@ -282,6 +286,7 @@ class MDFFileReader(_FileReader):
         )
         out_atts = schemas.df_schema(data_columns, self.schema)
         self.data = self.data.astype(self.dtypes)
+
         # 4. OUTPUT TO FILES IF REQUESTED
         if out_path:
             self._dump_atts(out_atts, out_path)

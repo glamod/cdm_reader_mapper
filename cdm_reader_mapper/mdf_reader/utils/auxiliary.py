@@ -164,6 +164,8 @@ class _FileReader:
         order,
         valid,
     ):
+        self.missings = []
+
         df = self._read_pandas_fwf(
             encoding=self.schema["header"].get("encoding"),
             widths=[properties.MAX_FULL_REPORT_WIDTH],
@@ -184,11 +186,12 @@ class _FileReader:
         self.delimiters = None
         first_col_skip = 0
         first_col_name = None
-        self.missings = []
+
         i = 0
         for o in order:
             header = self.schema["sections"][o]["header"]
             self.sentinal = header.get("sentinal")
+            self.sentinal_length = header.get("sentinal_length")
             delimiter = header.get("delimiter")
             self.field_layout = header.get("field_layout")
             self.delimiter_format = header.get("format")
@@ -268,7 +271,6 @@ class _FileReader:
                         )
                     if i == j and missing is True:
                         self.missings.append(index)
-
                 i = j
 
         dtypes = convert_float_format(dtypes)
@@ -308,15 +310,13 @@ class _FileReader:
         self,
         **kwargs,
     ):
-        print(kwargs)
-        exit()
         return pd.read_fwf(
             self.source,
             header=None,
-            delimiter="\t",
             quotechar="\0",
             escapechar="\0",
             dtype=object,
+            skip_blank_lines=False,
             **kwargs,
         )
 
@@ -337,6 +337,7 @@ class _FileReader:
             quotechar="\0",
             escapechar="\0",
             dtype=object,
+            skip_blank_lines=False,
             converters={first_col_name: skip_first_col},
             **kwargs,
         )
@@ -403,12 +404,13 @@ class _FileReader:
                 converter_dict[section],
                 **converter_kwargs[section],
             )
-        return df.replace(r"^\s*$", np.nan, regex=True)
+        return df
 
     def _create_mask(self, df):
-        missing = df.isna()
+        if not hasattr(self, "missing"):
+            self.missing = df.isna()
         valid = df.notna()
-        mask = missing | valid
+        mask = self.missing | valid
         for index in self.missings:
             mask[index] = np.nan
         return mask
