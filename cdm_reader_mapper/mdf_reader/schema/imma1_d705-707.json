@@ -2280,7 +2280,7 @@
       "header": {
         "sentinal": "",
         "field_layout": "fixed_width",
-        "length": 108
+        "length": 93
       },
       "elements": {
         "Form_type": {

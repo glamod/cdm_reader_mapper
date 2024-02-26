@@ -2288,7 +2288,7 @@
       "header": {
         "sentinal": "1",
         "field_layout": "fixed_width",
-        "length": 118
+        "length": 117
       },
       "elements": {
         "sentinal": {
