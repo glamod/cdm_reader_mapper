@@ -44,7 +44,7 @@ def read_table(table_path):
         Code table
 
     """
-    with open(table_path) as fileObj:
+    with open(table_path, encoding="utf-8") as fileObj:
         table = json.load(fileObj)
     # Add keys for nested code tables
     keys_path = ".".join([".".join(table_path.split(".")[:-1]), "keys"])
