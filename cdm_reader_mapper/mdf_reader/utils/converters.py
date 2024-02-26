@@ -76,8 +76,6 @@ class df_converters:
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!
         if data.count() > 0:
-            # data = data.str.lstrip()
-            # data = data.str.rstrip()
             data = data.str.strip()
             data = data.str.replace(" ", "0")
 
