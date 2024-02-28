@@ -35,12 +35,6 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 Installation
 ------------
 
-You can install the package directly with pip:
-
-.. code-block:: console
-
-     pip install cdm
-
 If you want to contribute, I recommend cloning the repository and installing the package in development mode, e.g.
 
 .. code-block:: console
