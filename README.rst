@@ -49,7 +49,7 @@ This will install the package but you can still edit it and you don't need the p
 Logging
 -------
 
-By default, :code:`cdm_reader_mapper` outputs logging information to :code:`STDOUT`. To tell :code:`cdm_reader_mapper` to output logs to a file, set the :code:`CDM_LOG_FILE` environment variable **before** loading :code:`cdm_reader_mapper`.
+By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdout`. To tell :code:`cdm_reader_mapper` to output logs to a file, set the :code:`CDM_LOG_FILE` environment variable **before** loading :code:`cdm_reader_mapper`.
 
 .. code-block:: python
 
