@@ -56,7 +56,7 @@ By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdo
    import os
    os.environ['CDM_LOG_FILE'] = 'log_file.log'
 
-   import cdm_reader_mapper as cmd
+   import cdm_reader_mapper as cdm
 
 This will set the file :code:`log_file.log` as the output for all logging information from :code:`cdm_reader_mapper`, including the initial logging on loading of the package.
 
