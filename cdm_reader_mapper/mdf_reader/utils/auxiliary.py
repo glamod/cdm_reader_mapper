@@ -186,7 +186,7 @@ class _FileReader:
         self.delimiters = None
         first_col_skip = 0
         first_col_name = None
-
+        self.disable_reads = []
         i = 0
         for o in order:
             header = self.schema["sections"][o]["header"]
@@ -197,6 +197,9 @@ class _FileReader:
             self.delimiter_format = header.get("format")
             disable_read = header.get("disable_read")
             if disable_read is True:
+                names_fwf += [o]
+                lengths += [(i, properties.MAX_FULL_REPORT_WIDTH)]
+                self.disable_reads += [o]
                 continue
             sections = self.schema["sections"][o]["elements"]
             k = i
@@ -422,6 +425,7 @@ class _FileReader:
             mask,
             self.schema,
             self.code_tables_path,
+            disables=self.disable_reads,
         )
         return mask
 
