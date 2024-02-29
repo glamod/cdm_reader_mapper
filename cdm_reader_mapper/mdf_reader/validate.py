@@ -134,7 +134,7 @@ def validate_codes(elements, data, code_tables_path, schema, supp=False):
     return mask
 
 
-def validate(data, mask0, schema, code_tables_path):
+def validate(data, mask0, schema, code_tables_path, disables):
     """DOCUMENTATION."""
     logging.basicConfig(
         format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
@@ -150,7 +150,7 @@ def validate(data, mask0, schema, code_tables_path):
     # Get the data elements from the input data: might be just a subset of
     # data model and flatten the schema to get a simple and sequential list
     # of elements included in the input data
-    elements = [x for x in data]
+    elements = [x for x in data if x not in disables]
     element_atts = schemas.df_schema(elements, schema)
 
     # See what elements we need to validate
@@ -218,4 +218,5 @@ def validate(data, mask0, schema, code_tables_path):
         ~mask0_n,
         False,
     )
+    mask[disables] = np.nan
     return mask
