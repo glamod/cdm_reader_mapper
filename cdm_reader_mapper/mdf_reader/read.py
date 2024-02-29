@@ -285,7 +285,6 @@ class MDFFileReader(_FileReader):
             else self.data.orig_options["names"]
         )
         out_atts = schemas.df_schema(data_columns, self.schema)
-        self.data = self.data.astype(self.dtypes)
 
         # 4. OUTPUT TO FILES IF REQUESTED
         if out_path:
