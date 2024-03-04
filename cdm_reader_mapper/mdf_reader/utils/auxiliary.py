@@ -388,7 +388,7 @@ class _FileReader:
     ):
         def skip_first_col(col):
             return col[first_col_skip:]
-        print(delimiter)
+
         return pd.read_csv(
             self.source,
             header=None,

@@ -33,6 +33,7 @@ def _map_to_df(m, x):
             v = m[x_]
             if isinstance(v, dict):
                 m = v
+                continue
             else:
                 return v
         return
