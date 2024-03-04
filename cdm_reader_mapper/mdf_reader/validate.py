@@ -16,19 +16,12 @@ from .schema import schemas
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
     # Find thresholds in schema. Flag if not available -> warn
-    # print(elements)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
-    # print(mask[index])
-    # print(lower[index])
-    # print(upper[index])
-    # exit()
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
     ]
-    # print(set_elements)
-    # exit()
     if len([x for x in elements if x not in set_elements]) > 0:
         logging.warning(
             "Data numeric elements with missing upper or lower threshold: {}".format(
@@ -42,14 +35,6 @@ def validate_numeric(elements, data, schema):
         (data[elements] >= [lower.get(x) for x in elements])
         & (data[elements] <= [upper.get(x) for x in elements])
     ) | data[elements].isna()
-    # print(data[index])
-    # print(data[index] >= lower[index])
-    # print(data[index] <= upper[index])
-    # print((data[index] >= lower[index]) & (data[index] <= upper[index]))
-    # print(data[index].isna())
-    # print(((data[index] >= lower[index]) & (data[index] <= upper[index])) | data[index].isna())
-    # print(mask[index])
-    # exit()
     return mask
 
 
@@ -61,76 +46,73 @@ def validate_str(elements, data, schema):
 def validate_codes(elements, data, code_tables_path, schema, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    if os.path.isdir(code_tables_path):
-        for element in elements:
-            code_table = schema.get(element).get("codetable")
-            if not code_table:
-                logging.error(f"Code table not defined for element {element}")
-                logging.warning("Element mask set to False")
-            else:
-                code_table_path = os.path.join(code_tables_path, code_table + ".json")
-                # Eval elements: if ._yyyy, ._xxx in name: pd.DateTimeIndex().xxxx is the element to pass
-                # Additionally, on doing this, should make sure that element is a datetime type:
-                if os.path.isfile(code_table_path):
-                    try:
-                        table = code_tables.read_table(code_table_path)
-                        if supp:
-                            key_elements = (
-                                [element[1]]
-                                if not table.get("_keys")
-                                else list(table["_keys"].get(element[1]))
-                            )
-                        else:
-                            key_elements = (
-                                [element]
-                                if not table.get("_keys")
-                                else list(table["_keys"].get(element))
-                            )
-                        if supp:
-                            key_elements = [(element[0], x) for x in key_elements]
-                        else:
-                            key_elements = [
-                                (properties.dummy_level, x)
-                                if not isinstance(x, tuple)
-                                else x
-                                for x in key_elements
-                            ]
-                        dtypes = {
-                            x: properties.pandas_dtypes.get(
-                                schema.get(x).get("column_type")
-                            )
-                            for x in key_elements
-                        }
-                        table_keys = code_tables.table_keys(table)
-                        table_keys_str = [
-                            "∿".join(x) if isinstance(x, list) else x
-                            for x in table_keys
-                        ]
-                        validation_df = data[key_elements]
-                        imask = pd.Series(index=data.index, data=True)
-                        val = validation_df.notna()
-                        val = val.all(axis=1)
-                        masked = np.where(val)
-                        masked = masked[0]
-                        value = validation_df.iloc[masked, :]
-                        value = value.astype(dtypes).astype("str")
-                        value = value.apply("~".join, axis=1)
-                        value = value.isin(table_keys_str)
-                        if masked.size != 0:
-                            imask.iloc[masked] = value
-                        mask[element] = imask
-                    except Exception as e:
-                        logging.error(f"Error validating coded element {element}:")
-                        logging.error(f"Error is {e}:")
-                        logging.warning("Element mask set to False")
-                else:
-                    logging.error(f"Error validating coded element {element}:")
-                    logging.error(f"Code table file {code_table_path} not found")
-                    logging.warning("Element mask set to False")
-                    continue
-    else:
+    if not os.path.isdir(code_tables_path):
         logging.error(f"Code tables path {code_tables_path} not found")
         logging.warning("All coded elements set to False")
+        return mask
+
+    for element in elements:
+        code_table = schema.get(element).get("codetable")
+        if not code_table:
+            logging.error(f"Code table not defined for element {element}")
+            logging.warning("Element mask set to False")
+            continue
+
+        code_table_path = os.path.join(code_tables_path, code_table + ".json")
+        # Eval elements: if ._yyyy, ._xxx in name: pd.DateTimeIndex().xxxx is the element to pass
+        # Additionally, on doing this, should make sure that element is a datetime type:
+        if not os.path.isfile(code_table_path):
+            logging.error(f"Error validating coded element {element}:")
+            logging.error(f"Code table file {code_table_path} not found")
+            logging.warning("Element mask set to False")
+            continue
+        try:
+            table = code_tables.read_table(code_table_path)
+            if supp:
+                key_elements = (
+                    [element[1]]
+                    if not table.get("_keys")
+                    else list(table["_keys"].get(element[1]))
+                )
+            else:
+                key_elements = (
+                    [element]
+                    if not table.get("_keys")
+                    else list(table["_keys"].get(element))
+                )
+            if supp:
+                key_elements = [(element[0], x) for x in key_elements]
+            else:
+                key_elements = [
+                    (properties.dummy_level, x) if not isinstance(x, tuple) else x
+                    for x in key_elements
+                ]
+            dtypes = {
+                x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
+                for x in key_elements
+            }
+            table_keys = code_tables.table_keys(table)
+            table_keys_str = [
+                "∿".join(x) if isinstance(x, list) else x for x in table_keys
+            ]
+            validation_df = data[key_elements]
+            imask = pd.Series(index=data.index, data=True)
+            val = validation_df.notna()
+            val = val.all(axis=1)
+            masked = np.where(val)
+            masked = masked[0]
+            value = validation_df.iloc[masked, :]
+            value = value.astype(dtypes).astype("str")
+            value = value.apply("~".join, axis=1)
+            value = value.isin(table_keys_str)
+            if masked.size != 0:
+                imask.iloc[masked] = value
+            mask[element] = imask
+        except Exception as e:
+            logging.error(f"Error validating coded element {element}:")
+            logging.error(f"Error is {e}:")
+            logging.warning("Element mask set to False")
+
     return mask
 
 
