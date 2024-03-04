@@ -57,19 +57,12 @@ def test_read_imma1_703():
     )
 
 
-# def test_read_imma1_704():
-#    _testing_suite(
-#        **test_data.test_125_704,
-#        cdm_name="icoads_r3000_d704",
-#        suffix="125_704_nosupp",
-#    )
-#
-# cdm_mapper
-# DataFrame.iloc[:, 19] (column name="('header', 'station_speed')") values are different (100.0 %)
-# [index]: [0, 1, 2, 3, 4]
-# [left]:  [null, null, null, null, null]
-# [right]: [4.1, 4.1, 4.1, 4.1, 4.1]
-# At positional index 0, first diff: null != 4.1
+def test_read_imma1_704():
+    _testing_suite(
+        **test_data.test_125_704,
+        cdm_name="icoads_r3000_d704",
+        suffix="125_704_nosupp",
+    )
 
 
 def test_read_imma1_705():
@@ -112,19 +105,12 @@ def test_read_imma1_730():
     )
 
 
-# def test_read_imma1_781():
-#    _testing_suite(
-#        **test_data.test_143_781,
-#        cdm_name="icoads_r3000_d781",
-#        suffix="143_781_nosupp",
-#    )
-#
-# cdm_mapper
-# DataFrame.iloc[:, 19] (column name="('header', 'station_speed')") values are different (100.0 %)
-# [index]: [0, 1]
-# [left]:  [null, null]
-# [right]: [6.7, 6.7]
-# At positional index 0, first diff: null != 6.7
+def test_read_imma1_781():
+    _testing_suite(
+        **test_data.test_143_781,
+        cdm_name="icoads_r3000_d781",
+        suffix="143_781_nosupp",
+    )
 
 
 def test_read_imma1_794():

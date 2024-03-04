@@ -4,10 +4,10 @@ import os
 
 import pandas as pd
 
-from ._results import result_data
-
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
+
+from ._results import result_data
 
 
 def _pandas_read_csv(
