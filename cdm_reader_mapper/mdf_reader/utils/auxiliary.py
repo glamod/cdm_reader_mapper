@@ -204,7 +204,7 @@ class Configurator:
         na_values = {}
         kwargs = {}
         dtypes = {}
-        delimiters = []
+        self.delimiters = None
         first_col_skip = 0
         first_col_name = None
         disable_reads = []
@@ -277,7 +277,7 @@ class Configurator:
             },
             "csv": {
                 "names": names_csv,
-                "delimiter": delimiters,
+                "delimiter": self.delimiters,
                 "first_col_name": first_col_name,
                 "first_col_skip": first_col_skip,
             },
@@ -296,7 +296,7 @@ class Configurator:
                 "parse_dates": parse_dates,
                 "missings": missings,
                 "na_values": na_values,
-                "delimiters": delimiters,
+                "delimiters": self.delimiters,
             },
         }
 
@@ -389,7 +389,7 @@ class _FileReader:
     ):
         def skip_first_col(col):
             return col[first_col_skip:]
-
+        print(delimiter)
         return pd.read_csv(
             self.source,
             header=None,
