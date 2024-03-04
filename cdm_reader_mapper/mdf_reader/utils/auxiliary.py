@@ -102,15 +102,15 @@ class Configurator:
         self.schema = schema
         self.str_line = df.iloc[0].values[0]
 
-    def _add_field_length(self, element_section, index):
-        if "field_length" in element_section.keys():
-            field_length = element_section["field_length"]
+    def _add_field_length(self, index):
+        if "field_length" in self.sections_dict.keys():
+            field_length = self.sections_dict["field_length"]
         else:
             field_length = properties.MAX_FULL_REPORT_WIDTH
             self.length = None
         return index + field_length
 
-    def _validate_sentinal(self, i, section):
+    def _validate_sentinal(self, i):
         slen = len(self.sentinal)
         str_start = self.str_line[i : i + slen]
         if str_start != self.sentinal:
@@ -118,25 +118,24 @@ class Configurator:
             return i
         else:
             self.sentinal = None
-            return self._add_field_length(section, i)
+            return self._add_field_length(i)
 
-    def _validate_delimited(self, i, j, delimiter, section):
-        i = self._skip_delimiter(self.str_line, i, delimiter)
+    def _validate_delimited(self, i, j):
+        i = self._skip_delimiter(self.str_line, i)
         if self.delimiter_format == "delimited":
-            self.delimiters = delimiter
             self.mode = "csv"
             return i, j
         elif self.field_layout == "fixed_width":
-            j = self._add_field_length(section, i)
+            j = self._add_field_length(i)
             return i, j
         return None, None
 
-    def _skip_delimiter(self, line, index, delimiter):
+    def _skip_delimiter(self, line, index):
         length = len(line)
         while True:
             if index == length:
                 break
-            if line[index] == delimiter:
+            if line[index] == self.delimiter:
                 index += 1
             break
         return index
@@ -158,11 +157,11 @@ class Configurator:
 
     def _get_borders(self, i, j):
         if self.sentinal is not None:
-            j = self._validate_sentinal(i, self.sections_dict)
+            j = self._validate_sentinal(i)
         elif self.delimiter is None:
-            j = self._add_field_length(self.sections_dict, i)
+            j = self._add_field_length(i)
         else:
-            i, j = self._validate_delimited(i, j, self.delimiter, self.sections_dict)
+            i, j = self._validate_delimited(i, j)
             self.missing = False
         return i, j
 
@@ -204,7 +203,7 @@ class Configurator:
         na_values = {}
         kwargs = {}
         dtypes = {}
-        self.delimiters = None
+        self.delimiter = None
         first_col_skip = 0
         first_col_name = None
         disable_reads = []
@@ -277,7 +276,7 @@ class Configurator:
             },
             "csv": {
                 "names": names_csv,
-                "delimiter": self.delimiters,
+                "delimiter": self.delimiter,
                 "first_col_name": first_col_name,
                 "first_col_skip": first_col_skip,
             },
@@ -296,7 +295,7 @@ class Configurator:
                 "parse_dates": parse_dates,
                 "missings": missings,
                 "na_values": na_values,
-                "delimiters": self.delimiters,
+                "delimiters": self.delimiter,
             },
         }
 
