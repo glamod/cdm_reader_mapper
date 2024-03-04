@@ -30,6 +30,17 @@ def convert_float_format(out_dtypes):
     return out_dtypes_
 
 
+def convert_dtypes(dtypes):
+    """DOCUMENTATION."""
+    dtypes = convert_float_format(dtypes)
+    parse_dates = []
+    for i, element in enumerate(list(dtypes)):
+        if dtypes[element] == "datetime":
+            parse_dates.append(i)
+            dtypes[element] = "object"
+    return dtypes, parse_dates
+
+
 def validate_arg(arg_name, arg_value, arg_type):
     """Validate input argument is as expected type.
 
@@ -76,6 +87,220 @@ def validate_path(arg_name, arg_value):
     return True
 
 
+class Configurator:
+    """Class for configurating MDF reader information."""
+
+    def __init__(
+        self,
+        df,
+        schema={},
+        order=[],
+        valid=[],
+    ):
+        self.order = order
+        self.valid = valid
+        self.schema = schema
+        self.str_line = df.iloc[0].values[0]
+
+    def _add_field_length(self, element_section, index):
+        if "field_length" in element_section.keys():
+            field_length = element_section["field_length"]
+        else:
+            field_length = properties.MAX_FULL_REPORT_WIDTH
+            self.length = None
+        return index + field_length
+
+    def _validate_sentinal(self, i, section):
+        slen = len(self.sentinal)
+        str_start = self.str_line[i : i + slen]
+        if str_start != self.sentinal:
+            self.length = 0
+            return i
+        else:
+            self.sentinal = None
+            return self._add_field_length(section, i)
+
+    def _validate_delimited(self, i, j, delimiter, section):
+        i = self._skip_delimiter(self.str_line, i, delimiter)
+        if self.delimiter_format == "delimited":
+            self.delimiters = delimiter
+            self.mode = "csv"
+            return i, j
+        elif self.field_layout == "fixed_width":
+            j = self._add_field_length(section, i)
+            return i, j
+        return None, None
+
+    def _skip_delimiter(self, line, index, delimiter):
+        length = len(line)
+        while True:
+            if index == length:
+                break
+            if line[index] == delimiter:
+                index += 1
+            break
+        return index
+
+    def _get_index(self, section):
+        if len(self.order) == 1:
+            return section
+        else:
+            return (self.order, section)
+
+    def _get_ignore(self):
+        if self.order in self.valid:
+            ignore = self.sections_dict.get("ignore")
+        else:
+            ignore = True
+        if isinstance(ignore, str):
+            ignore = eval(ignore)
+        return ignore
+
+    def _get_borders(self, i, j):
+        if self.sentinal is not None:
+            j = self._validate_sentinal(i, self.sections_dict)
+        elif self.delimiter is None:
+            j = self._add_field_length(self.sections_dict, i)
+        else:
+            i, j = self._validate_delimited(i, j, self.delimiter, self.sections_dict)
+            self.missing = False
+        return i, j
+
+    def _adjust_right_borders(self, j, k):
+        if self.length is None:
+            self.length = j - k
+        if j - k > self.length:
+            self.missing = False
+            j = k + self.length
+        return j, k
+
+    def _get_dtypes(self):
+        return properties.pandas_dtypes.get(self.sections_dict.get("column_type"))
+
+    def _get_converters(self):
+        return converters.get(self.sections_dict.get("column_type"))
+
+    def _get_conv_kwargs(self):
+        return {
+            converter_arg: self.sections_dict.get(converter_arg)
+            for converter_arg in properties.data_type_conversion_args.get(
+                self.sections_dict.get("column_type")
+            )
+        }
+
+    def _get_decoders(self):
+        return decoders.get(self.sections_dict["encoding"]).get(
+            self.sections_dict.get("column_type")
+        )
+
+    def build(self):
+        """Build configuration dictionary."""
+        missings = []
+        names_fwf = []
+        names_csv = []
+        lengths = []
+        convert = {}
+        decode = {}
+        na_values = {}
+        kwargs = {}
+        dtypes = {}
+        delimiters = []
+        first_col_skip = 0
+        first_col_name = None
+        disable_reads = []
+        i = 0
+        j = 0
+        for order in self.order:
+            self.order = order
+            header = self.schema["sections"][order]["header"]
+            self.sentinal = header.get("sentinal")
+            self.sentinal_length = header.get("sentinal_length")
+            self.delimiter = header.get("delimiter")
+            self.field_layout = header.get("field_layout")
+            self.delimiter_format = header.get("format")
+            disable_read = header.get("disable_read")
+            if disable_read is True:
+                names_fwf += [order]
+                lengths += [(i, properties.MAX_FULL_REPORT_WIDTH)]
+                disable_reads += [order]
+                continue
+            sections = self.schema["sections"][order]["elements"]
+            k = i
+            for section in sections.keys():
+                self.length = header.get("length")
+                self.mode = "fwf"
+                self.missing = True
+                self.sections_dict = sections[section]
+                index = self._get_index(section)
+                ignore = self._get_ignore()
+
+                encoding = sections[section].get("encoding")
+                na_values[index] = sections[section].get("missing_value")
+
+                i, j = self._get_borders(i, j)
+
+                if i is None:
+                    logging.error(
+                        f"Delimiter is set to {self.delimiter}. Please specify either format or field_layout in your header schema {header}."
+                    )
+                    return
+
+                j, k = self._adjust_right_borders(j, k)
+
+                if ignore is not True:
+                    if self.mode == "fwf":
+                        names_fwf += [index]
+                        lengths += [(i, j)]
+                    elif self.mode == "csv":
+                        names_csv += [index]
+                        first_col_skip = i - 1
+                        if first_col_name is None:
+                            first_col_name = index
+
+                    dtypes[index] = self._get_dtypes()
+                    convert[index] = self._get_converters()
+                    kwargs[index] = self._get_conv_kwargs()
+                    if encoding is not None:
+                        decode[index] = self._get_decoders()
+
+                if i == j and self.missing is True:
+                    missings.append(index)
+                i = j
+
+        dtypes, parse_dates = convert_dtypes(dtypes)
+
+        return {
+            "fwf": {
+                "names": names_fwf,
+                "colspecs": lengths,
+                "na_values": na_values,
+            },
+            "csv": {
+                "names": names_csv,
+                "delimiter": delimiters,
+                "first_col_name": first_col_name,
+                "first_col_skip": first_col_skip,
+            },
+            "concat": {
+                "dtype": dtypes,
+            },
+            "convert_decode": {
+                "converter_dict": convert,
+                "converter_kwargs": kwargs,
+                "decoder_dict": decode,
+                "dtype": dtypes,
+            },
+            "self": {
+                "dtypes": dtypes,
+                "disable_reads": disable_reads,
+                "parse_dates": parse_dates,
+                "missings": missings,
+                "na_values": na_values,
+                "delimiters": delimiters,
+            },
+        }
+
+
 class _FileReader:
     def __init__(
         self,
@@ -120,194 +345,26 @@ class _FileReader:
     def _decode_entries(self, series, decoder_func):
         return decoder_func(series)
 
-    def _add_field_length(self, element_section, index):
-        if "field_length" in element_section.keys():
-            field_length = element_section["field_length"]
-        else:
-            field_length = properties.MAX_FULL_REPORT_WIDTH
-            self.length = None
-        return index + field_length
-
-    def _skip_delimiter(self, line, index, delimiter):
-        length = len(line)
-        while True:
-            if index == length:
-                break
-            if line[index] == delimiter:
-                index += 1
-            break
-        return index
-
-    def _validate_sentinal(self, i, section):
-        slen = len(self.sentinal)
-        str_start = self.str_line[i : i + slen]
-        if str_start != self.sentinal:
-            self.length = 0
-            return i
-        else:
-            self.sentinal = None
-            return self._add_field_length(section, i)
-
-    def _validate_delimited(self, i, j, delimiter, section):
-        i = self._skip_delimiter(self.str_line, i, delimiter)
-        if self.delimiter_format == "delimited":
-            self.delimiters = delimiter
-            self.mode = "csv"
-            return i, j
-        elif self.field_layout == "fixed_width":
-            j = self._add_field_length(section, i)
-            return i, j
-        return None, None
-
     def _get_configurations(
         self,
         order,
         valid,
     ):
-        self.missings = []
-
         df = self._read_pandas_fwf(
             encoding=self.schema["header"].get("encoding"),
             widths=[properties.MAX_FULL_REPORT_WIDTH],
             skiprows=self.skiprows,
             nrows=1,
         )
-        self.str_line = df.iloc[0].values[0]
-        del df
+        config_dict = Configurator(
+            df, schema=self.schema, order=order, valid=valid
+        ).build()
 
-        names_fwf = []
-        names_csv = []
-        lengths = []
-        convert = {}
-        decode = {}
-        na_values = {}
-        kwargs = {}
-        dtypes = {}
-        self.delimiters = None
-        first_col_skip = 0
-        first_col_name = None
-        self.disable_reads = []
-        i = 0
-        for o in order:
-            header = self.schema["sections"][o]["header"]
-            self.sentinal = header.get("sentinal")
-            self.sentinal_length = header.get("sentinal_length")
-            delimiter = header.get("delimiter")
-            self.field_layout = header.get("field_layout")
-            self.delimiter_format = header.get("format")
-            disable_read = header.get("disable_read")
-            if disable_read is True:
-                names_fwf += [o]
-                lengths += [(i, properties.MAX_FULL_REPORT_WIDTH)]
-                self.disable_reads += [o]
-                continue
-            sections = self.schema["sections"][o]["elements"]
-            k = i
-            for section in sections.keys():
-                self.length = header.get("length")
-                self.mode = "fwf"
-                missing = True
+        for attr, val in config_dict["self"].items():
+            setattr(self, attr, val)
+        del config_dict["self"]
 
-                if len(order) == 1:
-                    index = section
-                else:
-                    index = (o, section)
-
-                if o in valid:
-                    ignore = sections[section].get("ignore")
-                else:
-                    ignore = True
-                if isinstance(ignore, str):
-                    ignore = eval(ignore)
-
-                encoding = sections[section].get("encoding")
-                na_values[index] = sections[section].get("missing_value")
-
-                if self.sentinal is not None:
-                    j = self._validate_sentinal(i, sections[section])
-                elif delimiter is None:
-                    j = self._add_field_length(sections[section], i)
-                else:
-                    i, j = self._validate_delimited(i, j, delimiter, sections[section])
-                    missing = False
-                    if i is None:
-                        logging.error(
-                            f"Delimiter is set to {delimiter}. Please specify either format or field_layout in your header schema {header}."
-                        )
-                        return
-
-                if self.length is None:
-                    self.length = j - k
-                if j - k > self.length:
-                    missing = False
-                    j = k + self.length
-
-                if ignore is not True:
-                    if self.mode == "fwf":
-                        names_fwf += [index]
-                        lengths += [(i, j)]
-                    elif self.mode == "csv":
-                        names_csv += [index]
-                        first_col_skip = i - 1
-                        if first_col_name is None:
-                            first_col_name = index
-
-                    if disable_read is True:
-                        dtypes[index] = "object"
-                    else:
-                        dtypes[index] = properties.pandas_dtypes.get(
-                            sections[section].get("column_type")
-                        )
-
-                    convert[index] = converters.get(
-                        sections[section].get("column_type")
-                    )
-                    kwargs[index] = {
-                        converter_arg: sections[section].get(converter_arg)
-                        for converter_arg in properties.data_type_conversion_args.get(
-                            sections[section].get("column_type")
-                        )
-                    }
-                    if encoding is not None:
-                        decode[index] = decoders.get(sections[section]["encoding"]).get(
-                            sections[section].get("column_type")
-                        )
-                    if i == j and missing is True:
-                        self.missings.append(index)
-                i = j
-
-        dtypes = convert_float_format(dtypes)
-        parse_dates = []
-        for i, element in enumerate(list(dtypes)):
-            if dtypes[element] == "datetime":
-                parse_dates.append(i)
-                dtypes[element] = "object"
-
-        self.dtypes = dtypes
-        self.parse_dates = parse_dates
-        self.na_values = na_values
-        return {
-            "fwf": {
-                "names": names_fwf,
-                "colspecs": lengths,
-                "na_values": na_values,
-            },
-            "csv": {
-                "names": names_csv,
-                "delimiter": self.delimiters,
-                "first_col_name": first_col_name,
-                "first_col_skip": first_col_skip,
-            },
-            "concat": {
-                "dtype": self.dtypes,
-            },
-            "convert_decode": {
-                "converter_dict": convert,
-                "converter_kwargs": kwargs,
-                "decoder_dict": decode,
-                "dtype": self.dtypes,
-            },
-        }
+        return config_dict
 
     def _read_pandas_fwf(
         self,
@@ -414,8 +471,7 @@ class _FileReader:
             self.missing = df.isna()
         valid = df.notna()
         mask = self.missing | valid
-        for index in self.missings:
-            mask[index] = np.nan
+        mask[self.missings] = np.nan
         return mask
 
     def _validate_df(self, df):
