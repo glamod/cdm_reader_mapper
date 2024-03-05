@@ -58,7 +58,7 @@ Several data models have been added to the tool including the IMMA schema:
    contributing
    authors
    api
-   history
+   changes
 
 
 About
