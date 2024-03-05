@@ -15,6 +15,7 @@ dependencies:
     #documentation
     - ipython
     - nbsphinx
+    - pandoc
     - sphinx
     - sphinx-autodoc-typehints
     - sphinx-codeautolink
