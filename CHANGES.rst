@@ -9,19 +9,23 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and J
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
-* move converters and decoders from `common` to `mdf_reader/utils` (:pull:`3`)
-* delete redundant functions from `cdm_reader_mapper.common`
-* `cdm_reader_mapper`: import common (__init__.py)
-* remove unused modules from `metmetpy`
-* `cdm_reader_mapper.mdf_reader` split data_models into code_tables and schema
+* move converters and decoders from ``common`` to ``mdf_reader/utils`` (:pull:`3`)
+* delete redundant functions from ``cdm_reader_mapper.common``
+* ``cdm_reader_mapper``: import common (__init__.py)
+* remove unused modules from ``metmetpy``
+* ``cdm_reader_mapper.mdf_reader`` split data_models into code_tables and schema
 * logging: Allow for use of log file (:pull:`6`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
 * adding tests to cdm_reader_mapper testing suite (:pull:`2`)
+* adding testing result data (:pull:`4`)
 * use slugify insted of unidecde for licening reasons
 * remove pip install instruction (:pull:`2`)
-* `HISTORY.rst` has been renamed `CHANGES.rst`, to follow `xclim`-like conventions (:pull:`7`).
+* ``HISTORY.rst`` has been renamed ``CHANGES.rst``, to follow `xclim`-like conventions (:pull:`7`).
+* speed up mapping functions with `swifter` (:pull:`4`)
+* ``mdf_reader``: adding auxiliary functions and classes (:pull:`4`)
+
 
 0.1.0 (2023-01-16)
 ------------------
@@ -34,6 +38,6 @@ Breaking changes
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* make use of pre-commit
-* prepare for pandas>=2.1.0
+* make use of ``pre-commit``
+* prepare for ``pandas>=2.1.0``
 * use ``setuptools_scm`` for automatic updating of version numbers
