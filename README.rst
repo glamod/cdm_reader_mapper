@@ -46,14 +46,29 @@ If you want to contribute, I recommend cloning the repository and installing the
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
 
+Logging
+-------
+
+By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdout`. To tell :code:`cdm_reader_mapper` to output logs to a file, set the :code:`CDM_LOG_FILE` environment variable **before** loading :code:`cdm_reader_mapper`.
+
+.. code-block:: python
+
+   import os
+   os.environ['CDM_LOG_FILE'] = 'log_file.log'
+
+   import cdm_reader_mapper as cdm
+
+This will set the file :code:`log_file.log` as the output for all logging information from :code:`cdm_reader_mapper`, including the initial logging on loading of the package.
+
+
 Run a test
 ----------
 
 Read imma data with the `cdm.read()` and copy the data attributes:
 
-.. code-block:: console
+.. code-block:: python
 
-    import cdm
+    import cdm_reader_mapper as cdm
 
     data = cdm.tests.read_imma1_buoys_nosupp()
 
@@ -65,7 +80,7 @@ Read imma data with the `cdm.read()` and copy the data attributes:
 
 Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):
 
-.. code-block:: console
+.. code-block:: python
 
     name_of_model = 'icoads_r3000_d704'
 

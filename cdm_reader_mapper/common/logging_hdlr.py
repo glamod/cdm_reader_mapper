@@ -9,9 +9,11 @@ Created on Wed Apr  3 08:45:03 2019
 from __future__ import annotations
 
 import logging
+import os
+LOG_FN = os.getenv('CDM_LOG_FILE', None)
 
 
-def init_logger(module, level="INFO", fn=None):
+def init_logger(module, level="INFO", fn=LOG_FN):
     """Initialize logger."""
     from importlib import reload
 
