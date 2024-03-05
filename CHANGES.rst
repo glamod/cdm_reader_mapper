@@ -26,6 +26,10 @@ Internal changes
 * speed up mapping functions with `swifter` (:pull:`4`)
 * ``mdf_reader``: adding auxiliary functions and classes (:pull:`4`)
 
+Bug fixes
+^^^^^^^^^
+* Fixed an issue with missing ``conda`` dependencies in the ``cdm_reader_mapper`` documentation (:pull:`14`)
+
 
 0.1.0 (2023-01-16)
 ------------------
