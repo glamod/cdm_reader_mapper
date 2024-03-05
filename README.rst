@@ -53,10 +53,11 @@ By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdo
 
 .. code-block:: python
 
-   import os
-   os.environ['CDM_LOG_FILE'] = 'log_file.log'
+    import os
 
-   import cdm_reader_mapper as cdm
+    os.environ["CDM_LOG_FILE"] = "log_file.log"
+
+    import cdm_reader_mapper as cdm
 
 This will set the file :code:`log_file.log` as the output for all logging information from :code:`cdm_reader_mapper`, including the initial logging on loading of the package.
 
@@ -72,7 +73,7 @@ Read imma data with the `cdm.read()` and copy the data attributes:
 
     data = cdm.tests.read_imma1_buoys_nosupp()
 
-    imma_data = cdm.read(filepath, data_model = 'imma1',sections = ['core','c1','c98'])
+    imma_data = cdm.read(filepath, data_model="imma1", sections=["core", "c1", "c98"])
 
     data_raw = imma_data.data.copy()
 
@@ -82,14 +83,14 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
 
 .. code-block:: python
 
-    name_of_model = 'icoads_r3000_d704'
+    name_of_model = "icoads_r3000_d704"
 
     cdm_dict = cdm.map_model(
-                        name_of_model,
-                        data_raw,
-                        attributes,
-                        cdm_subset = None,
-                        log_level = 'DEBUG',
+        name_of_model,
+        data_raw,
+        attributes,
+        cdm_subset=None,
+        log_level="DEBUG",
     )
 
 

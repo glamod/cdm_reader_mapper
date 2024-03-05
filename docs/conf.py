@@ -60,7 +60,12 @@ extensions = [
 extlinks = {
     "issue": ("https://github.com/glamod/cdm_reader_mapper/issues/%s", "#%s"),
     "pull": ("https://github.com/glamod/cdm_reader_mapper/pull/%s", "#%s"),
+    "user": ("https://github.com/%s", "@%s"),
 }
+
+nbsphinx_execute = "never"
+nbsphinx_allow_errors = False
+
 
 autodoc_typehints = "description"
 autodoc_typehints_format = "fully-qualified"

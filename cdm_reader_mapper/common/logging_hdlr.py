@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import logging
 import os
-LOG_FN = os.getenv('CDM_LOG_FILE', None)
+
+LOG_FN = os.getenv("CDM_LOG_FILE", None)
 
 
 def init_logger(module, level="INFO", fn=LOG_FN):
