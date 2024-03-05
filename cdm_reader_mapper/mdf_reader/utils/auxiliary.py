@@ -107,7 +107,6 @@ class Configurator:
             field_length = self.sections_dict["field_length"]
         else:
             field_length = properties.MAX_FULL_REPORT_WIDTH
-            self.length = None
         return index + field_length
 
     def _validate_sentinal(self, i):
