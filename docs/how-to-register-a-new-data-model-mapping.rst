@@ -16,7 +16,7 @@ This is a summary of the steps needed to add an imodel to the mapping tool:
 
 1. Copy the template mapping structure in the mappings library directory (``~/cdm-mapper/lib/mappings/template``) to the same folder and re-name it according to the ``imodel`` that you are going to add:
 
-.. figure:: _static/images/imodel_dir.png
+.. figure:: _static/imodel_dir.png
     :width: 100%
 
     Directory structure of an imodel, showing the ``icoads_r3000`` .imma data model as an example.
