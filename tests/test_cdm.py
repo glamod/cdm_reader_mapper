@@ -25,20 +25,20 @@ def test_read_imma1_buoys_supp():
     )
 
 
-# def test_read_imma1_701_type1():
-#    _testing_suite(
-#        **test_data.test_069_701,
-#        cdm_name="icoads_r3000_d701_type1",
-#        suffix="069_701_type1_nosupp",
-#    )
+def test_read_imma1_701_type1():
+   _testing_suite(
+       **test_data.test_069_701,
+       cdm_name="icoads_r3000_d701_type1",
+       suffix="069_701_type1_nosupp",
+   )
 
 
-# def test_read_imma1_701_type2():
-#    _testing_suite(
-#        **test_data.test_069_701,
-#        cdm_name="icoads_r3000_d701_type2",
-#        suffix="069_701_type2_nosupp",
-#    )
+def test_read_imma1_701_type2():
+   _testing_suite(
+       **test_data.test_069_701,
+       cdm_name="icoads_r3000_d701_type2",
+       suffix="069_701_type2_nosupp",
+   )
 
 
 def test_read_imma1_702():
