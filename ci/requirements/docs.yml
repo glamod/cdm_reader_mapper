@@ -28,3 +28,4 @@ dependencies:
       - timezonefinder
       - python-slugify
       - textdistance
+      - swifter
