@@ -68,12 +68,12 @@ def _testing_suite(
       deck=deck,
     )
 
-    #data = validate_datetime.validate(
-    #  data=data,
-    #  data_model=dm,
-    #  dck=deck,
-    #)
-    
+    val_dt = validate_datetime.validate(
+      data=data,
+      data_model=dm,
+      dck=deck,
+    )
+
     data = correct_pt.correct(
       data,
       dataset=ds,
@@ -81,12 +81,12 @@ def _testing_suite(
       deck=deck,
     )
 
-    #data = validate_id.validate(
-    #  data=data,
-    #  dataset=ds,
-    #  data_model=dm,
-    #  dck=deck,
-    #)
+    val_id = validate_id.validate(
+      data=data,
+      dataset=ds,
+      data_model=dm,
+      dck=deck,
+    )
 
     if not isinstance(data, pd.DataFrame):
         data = data.read()
@@ -109,8 +109,13 @@ def _testing_suite(
         names=data.columns,
     )
 
+    val_dt_ = pd.Series([True]*len(val_dt))
+    val_id_ = pd.Series([True]*len(val_id), name=val_id.name)
+    
     pd.testing.assert_frame_equal(data, data_, check_dtype=False)
     pd.testing.assert_frame_equal(mask, mask_, check_dtype=False)
+    pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
+    pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
         return
