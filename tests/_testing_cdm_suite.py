@@ -18,15 +18,26 @@ from ._results import result_data
 
 
 def _pandas_read_csv(
-    *args, delimiter=mdf_reader.properties.internal_delimiter, **kwargs
+    *args, 
+    delimiter=mdf_reader.properties.internal_delimiter, 
+    squeeze=False,
+    name=False,
+    **kwargs
 ):
-    return pd.read_csv(
+    df = pd.read_csv(
         *args,
         **kwargs,
         quotechar="\0",
         escapechar="\0",
         delimiter=delimiter,
     )
+    if squeeze is True:
+      df = df.squeeze()
+      
+    if name is not False:
+      df.name = name
+      
+    return df
 
 
 def _testing_suite(
@@ -61,7 +72,16 @@ def _testing_suite(
     mask = read_.mask
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
-    
+
+    if not isinstance(data, pd.DataFrame):
+        data = data.read()
+    if not isinstance(mask, pd.DataFrame):
+        mask = mask.read()
+        
+    result_data_file = result_data[exp]["data"]
+    if not os.path.isfile(result_data_file):
+        return        
+            
     data = correct_datetime.correct(
       data=data,
       data_model=dm,
@@ -88,15 +108,6 @@ def _testing_suite(
       dck=deck,
     )
 
-    if not isinstance(data, pd.DataFrame):
-        data = data.read()
-    if not isinstance(mask, pd.DataFrame):
-        mask = mask.read()
-
-    result_data_file = result_data[exp]["data"]
-    if not os.path.isfile(result_data_file):
-        return
-
     data_ = _pandas_read_csv(
         result_data_file,
         names=data.columns,
@@ -109,13 +120,26 @@ def _testing_suite(
         names=data.columns,
     )
 
-    val_dt_ = pd.Series([True]*len(val_dt))
-    val_id_ = pd.Series([True]*len(val_id), name=val_id.name)
-    
     pd.testing.assert_frame_equal(data, data_, check_dtype=False)
     pd.testing.assert_frame_equal(mask, mask_, check_dtype=False)
-    pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
-    pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
+    
+    if val_dt is not None:
+        val_dt_ = _pandas_read_csv(
+          result_data[exp]["vadt"],
+          header=None,
+          squeeze=True,
+          name=None,
+        )  
+        pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
+        
+    if val_id is not None:
+        val_id_ = _pandas_read_csv(
+          result_data[exp]["vaid"],
+          header=None,
+          squeeze=True,
+          name=val_id.name,
+        )
+        pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
         return

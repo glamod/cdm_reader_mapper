@@ -60,14 +60,22 @@ class result_data:
         path = self._data_path / suffix
         data = pd.DataFrame()
         mask = pd.DataFrame()
+        vaid = pd.DataFrame()
+        vadt = pd.DataFrame() 
         for data in path.glob("data_*.csv"):
             break
         for mask in path.glob("mask_*.csv"):
             break
+        for vaid in path.glob("vaid_*.csv"):
+            break
+        for vadt in path.glob("vadt_*.csv"):
+            break        
         return {
             "data": data,
             "mask": mask,
             "cdm_table": path,
+            "vaid": vaid,
+            "vadt": vadt,
         }
 
 

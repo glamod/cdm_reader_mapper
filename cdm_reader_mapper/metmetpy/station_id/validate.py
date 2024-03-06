@@ -69,8 +69,10 @@ def validate(data, dataset, data_model, dck, sid=None, blank=False, log_level="I
     idSeries = data[id_col]
 
     for data_model_file in _files.glob(f"{dataset}.json"):
-        break
-    if not os.path.isfile(data_model_file):
+        break 
+    try:
+        data_model_file
+    except UnboundLocalError:
         logger.error(f'Input dataset "{dataset}" has no ID deck library')
         return
 

@@ -31,7 +31,7 @@ def test_read_imma1_701_type1():
         cdm_name="icoads_r3000_d701_type1",
         suffix="069_701_type1_nosupp",
     )
-
+#test_read_imma1_701_type1()
 
 def test_read_imma1_701_type2():
     _testing_suite(
@@ -119,7 +119,7 @@ def test_read_imma1_794():
         cdm_name="icoads_r3000",
         suffix="103_794_nosupp",
     )
-
+#test_read_imma1_794()
 
 # def test_read_immt_gcc():
 #    "NOT WORKING: cdm_mapper in original version"
@@ -165,7 +165,7 @@ def test_read_imma1_buoys_nosupp_chunks():
         suffix="063_714_nosupp",
         chunksize=10000,
     )
-
+#test_read_imma1_buoys_nosupp_chunks()
 
 def test_read_imma1_buoys_supp_chunks():
     _testing_suite(
@@ -175,3 +175,4 @@ def test_read_imma1_buoys_supp_chunks():
         chunksize=10000,
         mapping=False,
     )
+#test_read_imma1_buoys_supp_chunks()
