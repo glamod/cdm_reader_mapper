@@ -6,8 +6,15 @@ import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.metmetpy import (
+    correct_datetime,
+    correct_pt,
+    validate_datetime,
+    validate_id,
+)
 
 from ._results import result_data
+#from _results import result_data
 
 
 def _pandas_read_csv(
@@ -25,6 +32,9 @@ def _pandas_read_csv(
 def _testing_suite(
     source=None,
     data_model=None,
+    dm=None,
+    ds=None,
+    deck=None,
     sections=None,
     cdm_name=None,
     cdm_subset=None,
@@ -51,6 +61,32 @@ def _testing_suite(
     mask = read_.mask
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
+    
+    data = correct_datetime.correct(
+      data=data,
+      data_model=dm,
+      deck=deck,
+    )
+
+    #data = validate_datetime.validate(
+    #  data=data,
+    #  data_model=dm,
+    #  dck=deck,
+    #)
+    
+    data = correct_pt.correct(
+      data,
+      dataset=ds,
+      data_model=dm,
+      deck=deck,
+    )
+
+    #data = validate_id.validate(
+    #  data=data,
+    #  dataset=ds,
+    #  data_model=dm,
+    #  dck=deck,
+    #)
 
     if not isinstance(data, pd.DataFrame):
         data = data.read()
