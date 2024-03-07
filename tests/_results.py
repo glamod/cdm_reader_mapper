@@ -1,14 +1,11 @@
 """cdm_reader_mapper testing suite result files."""
 from __future__ import annotations
 
-from glob import glob
 from pathlib import Path
 
 import pandas as pd
-import pytest
 
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.local import get_files
 
 _base = Path(__file__).parent
 
