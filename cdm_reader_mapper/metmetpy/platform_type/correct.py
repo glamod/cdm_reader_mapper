@@ -45,7 +45,7 @@ from io import StringIO
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.local import get_files
+from cdm_reader_mapper.common.getting_files import get_files
 
 from .. import properties
 from . import gdac_r0000, icoads_r3000, icoads_r3000_NRT

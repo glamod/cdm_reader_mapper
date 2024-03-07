@@ -13,7 +13,7 @@ import json
 import logging
 import os
 
-from cdm_reader_mapper.common.local import get_files
+from cdm_reader_mapper.common.getting_files import get_files
 
 from .. import properties
 
