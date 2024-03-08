@@ -49,9 +49,15 @@ class result_data:
         self.expected_125_721_nosupp = self._get_data_dict("125-721_nosupp")
         self.expected_133_730_nosupp = self._get_data_dict("133-730_nosupp")
         self.expected_144_703_nosupp = self._get_data_dict("144-703_nosupp")
+        self.expected_091_201_nosupp = self._get_data_dict("091-201_nosupp")
+        self.expected_077_892_nosupp = self._get_data_dict("077-892_nosupp")
+        self.expected_147_700_nosupp = self._get_data_dict("147-700_nosupp")
+        self.expected_103_792_nosupp = self._get_data_dict("103-792_nosupp")
+        self.expected_114_992_nosupp = self._get_data_dict("114-992_nosupp")        
         self.expected_063_714_c99 = self._get_data_dict("063-714_c99")
         self.expected_063_714_cdms = self._get_data_dict("063-714_cdms")
         self.expected_063_714_chunk = self._get_data_dict("063-714_chunk")
+        
 
     def __getitem__(cls, attr):
         return getattr(cls, attr)
