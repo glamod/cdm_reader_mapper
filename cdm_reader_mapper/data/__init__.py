@@ -47,6 +47,21 @@ class test_data:
         self.test_144_703 = self._get_data_dict(
             "144-703_1979-09-01_subset.imma", "imma1", "703", "imma1", "icoads_r3000",
         )
+        self.test_091_201 = self._get_data_dict(
+            "091-201_1913-11-01_subset.imma", "imma1", "201", "imma1", "icoads_r3000",
+        )
+        self.test_077_892 = self._get_data_dict(
+            "077-892_1996-02-01_subset.imma", "imma1", "892", "imma1", "icoads_r3000",
+        )
+        self.test_147_700 = self._get_data_dict(
+            "147-700_2002-08-01_subset.imma", "imma1", "700", "imma1", "icoads_r3000",
+        )
+        self.test_103_792 = self._get_data_dict(
+            "103-792_2017-02-01_subset.imma", "imma1_nodt", "792", "imma1", "icoads_r3000_NRT",
+        )
+        self.test_114_992 = self._get_data_dict(
+            "114-992_2016-01-01_subset.imma", "imma1_nodt", "792", "imma1", "icoads_r3000_NRT",
+        )
         self.test_gcc_mix = self._get_data_dict("mix_out_20030201.immt", "gcc_immt", "???", "immt", "gdac_r0000",)
 
     def __getitem__(self, attr):
