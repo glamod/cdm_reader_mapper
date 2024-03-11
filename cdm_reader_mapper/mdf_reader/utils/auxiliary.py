@@ -374,14 +374,25 @@ class _FileReader:
         )
         missings = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
         return missings.notna()
-
+        
+    def _read_pandas(self, **kwargs):
+        return pd.read_fwf(
+          self.source,
+          header=None,
+          quotechar="\0",
+          escapechar="\0",
+          dtype=object,
+          skip_blank_lines=False,
+          **kwargs,
+        )
+        
     def _open_data(
         self,
         order,
         valid,
         chunksize,
     ):
-        TextParser = self._read_pandas_fwf(
+        TextParser = self._read_pandas(
             encoding=self.schema["header"].get("encoding"),
             widths=[properties.MAX_FULL_REPORT_WIDTH],
             skiprows=self.skiprows,
