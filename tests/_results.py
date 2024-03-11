@@ -53,11 +53,10 @@ class result_data:
         self.expected_077_892_nosupp = self._get_data_dict("077-892_nosupp")
         self.expected_147_700_nosupp = self._get_data_dict("147-700_nosupp")
         self.expected_103_792_nosupp = self._get_data_dict("103-792_nosupp")
-        self.expected_114_992_nosupp = self._get_data_dict("114-992_nosupp")        
+        self.expected_114_992_nosupp = self._get_data_dict("114-992_nosupp")
         self.expected_063_714_c99 = self._get_data_dict("063-714_c99")
         self.expected_063_714_cdms = self._get_data_dict("063-714_cdms")
         self.expected_063_714_chunk = self._get_data_dict("063-714_chunk")
-        
 
     def __getitem__(cls, attr):
         return getattr(cls, attr)
@@ -67,7 +66,7 @@ class result_data:
         data = pd.DataFrame()
         mask = pd.DataFrame()
         vaid = pd.DataFrame()
-        vadt = pd.DataFrame() 
+        vadt = pd.DataFrame()
         for data in path.glob("data_*.csv"):
             break
         for mask in path.glob("mask_*.csv"):
@@ -75,7 +74,7 @@ class result_data:
         for vaid in path.glob("vaid_*.csv"):
             break
         for vadt in path.glob("vadt_*.csv"):
-            break        
+            break
         return {
             "data": data,
             "mask": mask,

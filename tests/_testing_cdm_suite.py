@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 import pandas as pd
+from _results import result_data
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
@@ -13,16 +14,13 @@ from cdm_reader_mapper.metmetpy import (
     validate_id,
 )
 
-from ._results import result_data
-#from _results import result_data
-
 
 def _pandas_read_csv(
-    *args, 
-    delimiter=mdf_reader.properties.internal_delimiter, 
+    *args,
+    delimiter=mdf_reader.properties.internal_delimiter,
     squeeze=False,
     name=False,
-    **kwargs
+    **kwargs,
 ):
     df = pd.read_csv(
         *args,
@@ -32,11 +30,11 @@ def _pandas_read_csv(
         delimiter=delimiter,
     )
     if squeeze is True:
-      df = df.squeeze()
-      
+        df = df.squeeze()
+
     if name is not False:
-      df.name = name
-      
+        df.name = name
+
     return df
 
 
@@ -77,35 +75,35 @@ def _testing_suite(
         data = data.read()
     if not isinstance(mask, pd.DataFrame):
         mask = mask.read()
-        
+
     result_data_file = result_data[exp]["data"]
     if not os.path.isfile(result_data_file):
-        return        
-            
+        return
+
     data = correct_datetime.correct(
-      data=data,
-      data_model=dm,
-      deck=deck,
+        data=data,
+        data_model=dm,
+        deck=deck,
     )
 
     val_dt = validate_datetime.validate(
-      data=data,
-      data_model=dm,
-      dck=deck,
+        data=data,
+        data_model=dm,
+        dck=deck,
     )
 
     data = correct_pt.correct(
-      data,
-      dataset=ds,
-      data_model=dm,
-      deck=deck,
+        data,
+        dataset=ds,
+        data_model=dm,
+        deck=deck,
     )
 
     val_id = validate_id.validate(
-      data=data,
-      dataset=ds,
-      data_model=dm,
-      dck=deck,
+        data=data,
+        dataset=ds,
+        data_model=dm,
+        dck=deck,
     )
 
     data_ = _pandas_read_csv(
@@ -120,24 +118,24 @@ def _testing_suite(
         names=data.columns,
     )
 
-    pd.testing.assert_frame_equal(data, data_, check_dtype=False)
+    pd.testing.assert_frame_equal(data, data_)
     pd.testing.assert_frame_equal(mask, mask_, check_dtype=False)
-    
+
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(
-          result_data[exp]["vadt"],
-          header=None,
-          squeeze=True,
-          name=None,
-        )  
+            result_data[exp]["vadt"],
+            header=None,
+            squeeze=True,
+            name=None,
+        )
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
-        
+
     if val_id is not None:
         val_id_ = _pandas_read_csv(
-          result_data[exp]["vaid"],
-          header=None,
-          squeeze=True,
-          name=val_id.name,
+            result_data[exp]["vaid"],
+            header=None,
+            squeeze=True,
+            name=val_id.name,
         )
         pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 

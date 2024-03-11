@@ -5,7 +5,7 @@ import pytest  # noqa
 from cdm_reader_mapper import test_data
 
 from ._testing_cdm_suite import _testing_suite
-#from _testing_cdm_suite import _testing_suite
+
 
 def test_read_imma1_buoys_nosupp():
     _testing_suite(
@@ -15,7 +15,7 @@ def test_read_imma1_buoys_nosupp():
         suffix="063_714_nosupp",
     )
 
-#test_read_imma1_buoys_nosupp()
+
 def test_read_imma1_buoys_supp():
     _testing_suite(
         **test_data.test_063_714,
@@ -31,7 +31,7 @@ def test_read_imma1_701_type1():
         cdm_name="icoads_r3000_d701_type1",
         suffix="069_701_type1_nosupp",
     )
-#test_read_imma1_701_type1()
+
 
 def test_read_imma1_701_type2():
     _testing_suite(
@@ -119,7 +119,47 @@ def test_read_imma1_794():
         cdm_name="icoads_r3000",
         suffix="103_794_nosupp",
     )
-#test_read_imma1_794()
+
+
+def test_read_imma1_201():
+    _testing_suite(
+        **test_data.test_091_201,
+        cdm_name="icoads_r3000",
+        suffix="091_201_nosupp",
+    )
+
+
+def test_read_imma1_892():
+    _testing_suite(
+        **test_data.test_077_892,
+        cdm_name="icoads_r3000",
+        suffix="077_892_nosupp",
+    )
+
+
+def test_read_imma1_700():
+    _testing_suite(
+        **test_data.test_147_700,
+        cdm_name="icoads_r3000",
+        suffix="147_700_nosupp",
+    )
+
+
+def test_read_imma1_792():
+    _testing_suite(
+        **test_data.test_103_792,
+        cdm_name="icoads_r3000",
+        suffix="103_792_nosupp",
+    )
+
+
+def test_read_imma1_992():
+    _testing_suite(
+        **test_data.test_114_992,
+        cdm_name="icoads_r3000",
+        suffix="114_992_nosupp",
+    )
+
 
 # def test_read_immt_gcc():
 #    "NOT WORKING: cdm_mapper in original version"
@@ -165,7 +205,7 @@ def test_read_imma1_buoys_nosupp_chunks():
         suffix="063_714_nosupp",
         chunksize=10000,
     )
-#test_read_imma1_buoys_nosupp_chunks()
+
 
 def test_read_imma1_buoys_supp_chunks():
     _testing_suite(
@@ -175,4 +215,3 @@ def test_read_imma1_buoys_supp_chunks():
         chunksize=10000,
         mapping=False,
     )
-#test_read_imma1_buoys_supp_chunks()
