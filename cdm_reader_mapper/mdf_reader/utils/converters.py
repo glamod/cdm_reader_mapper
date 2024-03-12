@@ -75,6 +75,7 @@ class df_converters:
 
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!
+
         if data.count() > 0:
             data = data.str.strip()
             data = data.str.replace(" ", "0")
@@ -91,19 +92,17 @@ class df_converters:
         """DOCUMENTATION."""
         # With strip() an empty element after stripping, is just an empty element, no NaN...
         if not disable_white_strip:
-            return data.str.strip()
+            data = data.str.strip()
         else:
             if disable_white_strip == "l":
-                return data.str.rstrip()
+                data = data.str.rstrip()
             elif disable_white_strip == "r":
-                return data.str.lstrip()
-            else:
-                return data
+                data = data.str.lstrip()
+        return data
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
-        data = pd.to_datetime(data, format=datetime_format, errors="coerce")
-        return data
+        return pd.to_datetime(data, format=datetime_format, errors="coerce")
 
 
 converters = dict()

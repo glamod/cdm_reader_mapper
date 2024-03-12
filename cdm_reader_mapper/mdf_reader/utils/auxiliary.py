@@ -8,7 +8,6 @@ import logging
 import os
 from io import StringIO
 
-import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
@@ -92,15 +91,18 @@ class Configurator:
 
     def __init__(
         self,
-        df,
+        df=pd.DataFrame(),
         schema={},
         order=[],
         valid=[],
     ):
-        self.order = order
+        self.orders = order
         self.valid = valid
         self.schema = schema
-        self.str_line = df.iloc[0].values[0]
+        if len(df) > 0:
+            self.str_line = df.iloc[0]
+        else:
+            self.str_line = ""
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
@@ -122,7 +124,7 @@ class Configurator:
     def _validate_delimited(self, i, j):
         i = self._skip_delimiter(self.str_line, i)
         if self.delimiter_format == "delimited":
-            self.mode = "csv"
+            j = self._next_delimiter(self.str_line, i)
             return i, j
         elif self.field_layout == "fixed_width":
             j = self._add_field_length(i)
@@ -137,6 +139,15 @@ class Configurator:
             if line[index] == self.delimiter:
                 index += 1
             break
+        return index
+
+    def _next_delimiter(self, line, index):
+        while True:
+            if index == len(line):
+                break
+            if line[index] == self.delimiter:
+                break
+            index += 1
         return index
 
     def _get_index(self, section):
@@ -191,24 +202,64 @@ class Configurator:
             self.sections_dict.get("column_type")
         )
 
-    def build(self):
+    def _convert_entries(self, series, converter_func, **kwargs):
+        return converter_func(series, **kwargs)
+
+    def _decode_entries(self, series, decoder_func):
+        return decoder_func(series)
+
+    def get_configuration(self):
+        """Get ICOADS data model specific information."""
+        disable_reads = []
+        dtypes = {}
+        convert = {}
+        kwargs = {}
+        decode = {}
+        for order in self.orders:
+            self.order = order
+            header = self.schema["sections"][order]["header"]
+            disable_read = header.get("disable_read")
+            if disable_read is True:
+                disable_reads.append(order)
+                continue
+
+            sections = self.schema["sections"][order]["elements"]
+            for section in sections.keys():
+                self.sections_dict = sections[section]
+                encoding = sections[section].get("encoding")
+                index = self._get_index(section)
+                ignore = self._get_ignore()
+                if ignore is not True:
+                    dtypes[index] = self._get_dtypes()
+                    convert[index] = self._get_converters()
+                    kwargs[index] = self._get_conv_kwargs()
+                    if encoding is not None:
+                        decode[index] = self._get_decoders()
+
+        dtypes, parse_dates = convert_dtypes(dtypes)
+        return {
+            "convert_decode": {
+                "converter_dict": convert,
+                "converter_kwargs": kwargs,
+                "decoder_dict": decode,
+                "dtype": dtypes,
+            },
+            "self": {
+                "dtypes": dtypes,
+                "disable_reads": disable_reads,
+                "parse_dates": parse_dates,
+            },
+        }
+
+    def open_file(self):
         """Build configuration dictionary."""
         missings = []
-        names_fwf = []
-        names_csv = []
-        lengths = []
-        convert = {}
-        decode = {}
-        na_values = {}
-        kwargs = {}
-        dtypes = {}
         self.delimiter = None
-        first_col_skip = 0
-        first_col_name = None
-        disable_reads = []
         i = 0
         j = 0
-        for order in self.order:
+        data_dict = {}
+        dtypes = {}
+        for order in self.orders:
             self.order = order
             header = self.schema["sections"][order]["header"]
             self.sentinal = header.get("sentinal")
@@ -218,22 +269,17 @@ class Configurator:
             self.delimiter_format = header.get("format")
             disable_read = header.get("disable_read")
             if disable_read is True:
-                names_fwf += [order]
-                lengths += [(i, properties.MAX_FULL_REPORT_WIDTH)]
-                disable_reads += [order]
+                data_dict[order] = self.str_line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
             sections = self.schema["sections"][order]["elements"]
             k = i
             for section in sections.keys():
                 self.length = header.get("length")
-                self.mode = "fwf"
                 self.missing = True
                 self.sections_dict = sections[section]
                 index = self._get_index(section)
                 ignore = self._get_ignore()
-
-                encoding = sections[section].get("encoding")
-                na_values[index] = sections[section].get("missing_value")
+                na_value = sections[section].get("missing_value")
 
                 i, j = self._get_borders(i, j)
 
@@ -246,57 +292,22 @@ class Configurator:
                 j, k = self._adjust_right_borders(j, k)
 
                 if ignore is not True:
-                    if self.mode == "fwf":
-                        names_fwf += [index]
-                        lengths += [(i, j)]
-                    elif self.mode == "csv":
-                        names_csv += [index]
-                        first_col_skip = i - 1
-                        if first_col_name is None:
-                            first_col_name = index
-
+                    data_dict[index] = self.str_line[i:j]
                     dtypes[index] = self._get_dtypes()
-                    convert[index] = self._get_converters()
-                    kwargs[index] = self._get_conv_kwargs()
-                    if encoding is not None:
-                        decode[index] = self._get_decoders()
+
+                    if not data_dict[index].strip():
+                        data_dict[index] = None
+                    if data_dict[index] == na_value:
+                        data_dict[index] = None
 
                 if i == j and self.missing is True:
                     missings.append(index)
+
                 i = j
 
-        dtypes, parse_dates = convert_dtypes(dtypes)
-
-        return {
-            "fwf": {
-                "names": names_fwf,
-                "colspecs": lengths,
-                "na_values": na_values,
-            },
-            "csv": {
-                "names": names_csv,
-                "delimiter": self.delimiter,
-                "first_col_name": first_col_name,
-                "first_col_skip": first_col_skip,
-            },
-            "concat": {
-                "dtype": dtypes,
-            },
-            "convert_decode": {
-                "converter_dict": convert,
-                "converter_kwargs": kwargs,
-                "decoder_dict": decode,
-                "dtype": dtypes,
-            },
-            "self": {
-                "dtypes": dtypes,
-                "disable_reads": disable_reads,
-                "parse_dates": parse_dates,
-                "missings": missings,
-                "na_values": na_values,
-                "delimiters": self.delimiter,
-            },
-        }
+        df = pd.Series(data_dict)
+        df["missings"] = missings
+        return df
 
 
 class _FileReader:
@@ -343,31 +354,28 @@ class _FileReader:
     def _decode_entries(self, series, decoder_func):
         return decoder_func(series)
 
-    def _get_configurations(
-        self,
-        order,
-        valid,
-    ):
-        df = self._read_pandas_fwf(
-            encoding=self.schema["header"].get("encoding"),
-            widths=[properties.MAX_FULL_REPORT_WIDTH],
-            skiprows=self.skiprows,
-            nrows=1,
-        )
+    def _get_configurations(self, order, valid):
         config_dict = Configurator(
-            df, schema=self.schema, order=order, valid=valid
-        ).build()
-
+            schema=self.schema, order=order, valid=valid
+        ).get_configuration()
         for attr, val in config_dict["self"].items():
             setattr(self, attr, val)
         del config_dict["self"]
-
         return config_dict
 
-    def _read_pandas_fwf(
-        self,
-        **kwargs,
-    ):
+    def _set_missing_values(self, df, ref):
+        explode_ = df.explode("missings")
+        explode_["index"] = explode_.index
+        explode_["values"] = True
+        pivots_ = explode_.pivot_table(
+            columns="missings",
+            index="index",
+            values="values",
+        )
+        missings = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
+        return missings.notna()
+
+    def _read_pandas(self, **kwargs):
         return pd.read_fwf(
             self.source,
             header=None,
@@ -378,69 +386,79 @@ class _FileReader:
             **kwargs,
         )
 
-    def _read_pandas_csv(
+    def _read_sections(
         self,
-        delimiter=";",
-        first_col_skip=0,
-        first_col_name=None,
-        **kwargs,
+        TextParser,
+        order,
+        valid,
     ):
-        def skip_first_col(col):
-            return col[first_col_skip:]
+        df = TextParser.apply(
+            lambda x: Configurator(
+                df=x, schema=self.schema, order=order, valid=valid
+            ).open_file(),
+            axis=1,
+        )
+        missings_ = df["missings"]
+        del df["missings"]
+        missings = self._set_missing_values(pd.DataFrame(missings_), df)
+        return df, missings
 
-        return pd.read_csv(
-            self.source,
-            header=None,
-            delimiter=delimiter,
-            quotechar="\0",
-            escapechar="\0",
-            dtype=object,
-            skip_blank_lines=False,
-            converters={first_col_name: skip_first_col},
-            **kwargs,
+    def _open_data(
+        self,
+        order,
+        valid,
+        chunksize,
+    ):
+        TextParser = self._read_pandas(
+            encoding=self.schema["header"].get("encoding"),
+            widths=[properties.MAX_FULL_REPORT_WIDTH],
+            skiprows=self.skiprows,
+            chunksize=chunksize,
         )
 
-    def _concat_dataframes(
-        self,
-        series,
-        chunksize=None,
-        dtype=None,
-        **kwargs,
-    ):
-        if series[0] is None:
-            return series[1]
-
-        if series[1] is None:
-            return series[0]
-
-        if isinstance(series[0], pd.DataFrame):
-            return pd.concat(series, **kwargs)
-
-        data_buffer = StringIO()
-
-        for df1, df2 in zip(*series):
-            df = pd.concat([df1, df2], **kwargs)
-            df.to_csv(
+        if isinstance(TextParser, pd.DataFrame):
+            df, self.missings = self._read_sections(TextParser, order, valid)
+            return df
+        else:
+            data_buffer = StringIO()
+            missings_buffer = StringIO()
+            for i, df_ in enumerate(TextParser):
+                df, missings = self._read_sections(df_, order, valid)
+                missings.to_csv(
+                    missings_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                )
+                df.to_csv(
+                    data_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+            missings_buffer.seek(0)
+            self.missings = pd.read_csv(
+                missings_buffer,
+                names=missings.columns,
+                chunksize=None,
+            )
+            data_buffer.seek(0)
+            return pd.read_csv(
                 data_buffer,
-                header=False,
-                mode="a",
-                encoding="utf-8",
-                index=False,
-                quoting=csv.QUOTE_NONE,
-                sep=properties.internal_delimiter,
+                names=df.columns,
+                chunksize=self.chunksize,
+                dtype=object,
+                parse_dates=self.parse_dates,
+                delimiter=properties.internal_delimiter,
                 quotechar="\0",
                 escapechar="\0",
             )
-        data_buffer.seek(0)
-        return pd.read_csv(
-            data_buffer,
-            names=df.columns,
-            chunksize=chunksize,
-            delimiter=properties.internal_delimiter,
-            quotechar="\0",
-            escapechar="\0",
-            dtype=object,
-        )
 
     def _convert_and_decode_df(
         self,
@@ -467,21 +485,21 @@ class _FileReader:
     def _create_mask(self, df):
         if not hasattr(self, "missing"):
             self.missing = df.isna()
-        valid = df.notna()
-        mask = self.missing | valid
-        mask[self.missings] = np.nan
+        if not hasattr(self, "valid"):
+            self.valid = df.notna()
+        mask = self.missing | self.valid
+        mask[self.missings] = None
         return mask
 
     def _validate_df(self, df):
         mask = self._create_mask(df)
-        mask = validate(
+        return validate(
             df,
             mask,
             self.schema,
             self.code_tables_path,
             disables=self.disable_reads,
         )
-        return mask
 
     def _dump_atts(self, out_atts, out_path):
         """Dump attributes to atts.json."""

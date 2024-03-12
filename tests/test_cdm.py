@@ -121,6 +121,46 @@ def test_read_imma1_794():
     )
 
 
+def test_read_imma1_201():
+    _testing_suite(
+        **test_data.test_091_201,
+        cdm_name="icoads_r3000",
+        suffix="091_201_nosupp",
+    )
+
+
+def test_read_imma1_892():
+    _testing_suite(
+        **test_data.test_077_892,
+        cdm_name="icoads_r3000",
+        suffix="077_892_nosupp",
+    )
+
+
+def test_read_imma1_700():
+    _testing_suite(
+        **test_data.test_147_700,
+        cdm_name="icoads_r3000",
+        suffix="147_700_nosupp",
+    )
+
+
+def test_read_imma1_792():
+    _testing_suite(
+        **test_data.test_103_792,
+        cdm_name="icoads_r3000",
+        suffix="103_792_nosupp",
+    )
+
+
+def test_read_imma1_992():
+    _testing_suite(
+        **test_data.test_114_992,
+        cdm_name="icoads_r3000",
+        suffix="114_992_nosupp",
+    )
+
+
 # def test_read_immt_gcc():
 #    "NOT WORKING: cdm_mapper in original version"
 #    _testing_suite(

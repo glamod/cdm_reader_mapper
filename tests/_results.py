@@ -49,6 +49,11 @@ class result_data:
         self.expected_125_721_nosupp = self._get_data_dict("125-721_nosupp")
         self.expected_133_730_nosupp = self._get_data_dict("133-730_nosupp")
         self.expected_144_703_nosupp = self._get_data_dict("144-703_nosupp")
+        self.expected_091_201_nosupp = self._get_data_dict("091-201_nosupp")
+        self.expected_077_892_nosupp = self._get_data_dict("077-892_nosupp")
+        self.expected_147_700_nosupp = self._get_data_dict("147-700_nosupp")
+        self.expected_103_792_nosupp = self._get_data_dict("103-792_nosupp")
+        self.expected_114_992_nosupp = self._get_data_dict("114-992_nosupp")
         self.expected_063_714_c99 = self._get_data_dict("063-714_c99")
         self.expected_063_714_cdms = self._get_data_dict("063-714_cdms")
         self.expected_063_714_chunk = self._get_data_dict("063-714_chunk")
@@ -60,14 +65,22 @@ class result_data:
         path = self._data_path / suffix
         data = pd.DataFrame()
         mask = pd.DataFrame()
+        vaid = pd.DataFrame()
+        vadt = pd.DataFrame()
         for data in path.glob("data_*.csv"):
             break
         for mask in path.glob("mask_*.csv"):
+            break
+        for vaid in path.glob("vaid_*.csv"):
+            break
+        for vadt in path.glob("vadt_*.csv"):
             break
         return {
             "data": data,
             "mask": mask,
             "cdm_table": path,
+            "vaid": vaid,
+            "vadt": vadt,
         }
 
 
