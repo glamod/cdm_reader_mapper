@@ -385,7 +385,18 @@ class _FileReader:
           skip_blank_lines=False,
           **kwargs,
         )
-        
+    def _read_sections(
+        self, 
+        TextParser,
+        order,
+        valid,
+    ):
+        df = TextParser.apply(lambda x: Configurator(df=x, schema=self.schema, order=order, valid=valid).open_file(), axis=1)
+        missings_ = df["missings"]
+        del df["missings"]
+        missings = self._set_missing_values(pd.DataFrame(missings_), df)
+        return df, missings 
+            
     def _open_data(
         self,
         order,
@@ -400,29 +411,13 @@ class _FileReader:
         )
 
         if isinstance(TextParser, pd.DataFrame):
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_file(),
-                axis=1,
-            )
-            missings = df["missings"]
-            del df["missings"]
-            self.missings = self._set_missing_values(pd.DataFrame(missings), df)
+            df, self.missings = self._read_sections(TextParser, order, valid)
             return df
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df = df_.apply(
-                    lambda x: Configurator(
-                        x, schema=self.schema, order=order, valid=valid
-                    ).open_file(),
-                    axis=1,
-                )
-                missings = df["missings"]
-                del df["missings"]
-                missings = self._set_missing_values(pd.DataFrame(missings), df)
+                df, missings = self._read_sections(df_, order, valid)
                 missings.to_csv(
                     missings_buffer,
                     header=False,
@@ -452,7 +447,7 @@ class _FileReader:
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
-                dtype=self.dtypes,
+                dtype=object,
                 parse_dates=self.parse_dates,
                 delimiter=properties.internal_delimiter,
                 quotechar="\0",
