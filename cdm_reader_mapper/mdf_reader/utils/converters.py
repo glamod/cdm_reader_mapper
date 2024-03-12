@@ -102,8 +102,7 @@ class df_converters:
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
-        data = pd.to_datetime(data, format=datetime_format, errors="coerce")
-        return data
+        return pd.to_datetime(data, format=datetime_format, errors="coerce")
 
 
 converters = dict()
