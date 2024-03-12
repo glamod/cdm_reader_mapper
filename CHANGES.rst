@@ -18,13 +18,14 @@ Breaking changes
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* adding tests to cdm_reader_mapper testing suite (:pull:`2`)
+* adding tests to cdm_reader_mapper testing suite (:pull:`2`, :pull:`20`)
 * adding testing result data (:pull:`4`)
 * use slugify insted of unidecde for licening reasons
 * remove pip install instruction (:pull:`2`)
 * ``HISTORY.rst`` has been renamed ``CHANGES.rst``, to follow `xclim`-like conventions (:pull:`7`).
 * speed up mapping functions with `swifter` (:pull:`4`)
 * ``mdf_reader``: adding auxiliary functions and classes (:pull:`4`)
+* ``mdf_reader``: read tables line-by-line (:pull:`20`)
 
 Bug fixes
 ^^^^^^^^^
