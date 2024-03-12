@@ -4,16 +4,17 @@ import os
 
 import pandas as pd
 
-from ._results import result_data
-
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
     correct_pt,
     validate_datetime,
     validate_id,
 )
+
+from ._results import result_data
 
 
 def _pandas_read_csv(
@@ -77,25 +78,10 @@ def _testing_suite(
     if not os.path.isfile(result_data_file):
         return
 
-    if not isinstance(data, pd.DataFrame):
-        data_pd = data.read()
-    else:
-        data_pd = data.copy()
-    if not isinstance(mask, pd.DataFrame):
-        mask_pd = mask.read()
-    else:
-        mask_pd = mask.copy()
-
     data = correct_datetime.correct(
         data=data,
         data_model=dm,
         deck=deck,
-    )
-
-    val_dt = validate_datetime.validate(
-        data=data_pd,
-        data_model=dm,
-        dck=deck,
     )
 
     data = correct_pt.correct(
@@ -103,6 +89,21 @@ def _testing_suite(
         dataset=ds,
         data_model=dm,
         deck=deck,
+    )
+
+    if not isinstance(data, pd.DataFrame):
+        data_pd = make_copy(data).read()
+    else:
+        data_pd = data.copy()
+    if not isinstance(mask, pd.DataFrame):
+        mask_pd = make_copy(mask).read()
+    else:
+        mask_pd = mask.copy()
+
+    val_dt = validate_datetime.validate(
+        data=data_pd,
+        data_model=dm,
+        dck=deck,
     )
 
     val_id = validate_id.validate(
