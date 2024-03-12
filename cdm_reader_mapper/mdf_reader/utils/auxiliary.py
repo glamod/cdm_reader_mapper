@@ -374,29 +374,35 @@ class _FileReader:
         )
         missings = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
         return missings.notna()
-        
+
     def _read_pandas(self, **kwargs):
         return pd.read_fwf(
-          self.source,
-          header=None,
-          quotechar="\0",
-          escapechar="\0",
-          dtype=object,
-          skip_blank_lines=False,
-          **kwargs,
+            self.source,
+            header=None,
+            quotechar="\0",
+            escapechar="\0",
+            dtype=object,
+            skip_blank_lines=False,
+            **kwargs,
         )
+
     def _read_sections(
-        self, 
+        self,
         TextParser,
         order,
         valid,
     ):
-        df = TextParser.apply(lambda x: Configurator(df=x, schema=self.schema, order=order, valid=valid).open_file(), axis=1)
+        df = TextParser.apply(
+            lambda x: Configurator(
+                df=x, schema=self.schema, order=order, valid=valid
+            ).open_file(),
+            axis=1,
+        )
         missings_ = df["missings"]
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
-        return df, missings 
-            
+        return df, missings
+
     def _open_data(
         self,
         order,
