@@ -103,5 +103,4 @@ def deck_992_imma1(data):
         data.loc[data[pt_col][loc], pt_col] = buoys
     except KeyError:
         pass
-
     return data
