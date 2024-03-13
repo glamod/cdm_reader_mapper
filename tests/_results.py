@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.common.getting_files import load_file
 
 _base = Path(__file__).parent
 
@@ -59,25 +60,25 @@ class result_data:
         return getattr(cls, attr)
 
     def _get_data_dict(self, suffix):
-        path = self._data_path / suffix
-        data = pd.DataFrame()
-        mask = pd.DataFrame()
-        vaid = pd.DataFrame()
-        vadt = pd.DataFrame()
-        for data in path.glob("data_*.csv"):
-            break
-        for mask in path.glob("mask_*.csv"):
-            break
-        for vaid in path.glob("vaid_*.csv"):
-            break
-        for vadt in path.glob("vadt_*.csv"):
-            break
+        # path = self._data_path / suffix
+        # data = pd.DataFrame()
+        # mask = pd.DataFrame()
+        # vaid = pd.DataFrame()
+        # vadt = pd.DataFrame()
+        # for data in path.glob("data_*.csv"):
+        #    break
+        # for mask in path.glob("mask_*.csv"):
+        #    break
+        # for vaid in path.glob("vaid_*.csv"):
+        #    break
+        # for vadt in path.glob("vadt_*.csv"):
+        #    break
         return {
-            "data": data,
-            "mask": mask,
-            "cdm_table": path,
-            "vaid": vaid,
-            "vadt": vadt,
+            "data": load_file("fimma1{suffix}"),
+            "mask": load_file(mask),
+            # "cdm_table": path,
+            "vaid": load_file(vaid),
+            "vadt": load(vadt),
         }
 
 
