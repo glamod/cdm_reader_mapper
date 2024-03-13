@@ -15,10 +15,11 @@ Breaking changes
 * remove unused modules from ``metmetpy``
 * ``cdm_reader_mapper.mdf_reader`` split data_models into code_tables and schema
 * logging: Allow for use of log file (:pull:`6`)
+* cannot use as command-line tool anymore (pull:`20`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* adding tests to cdm_reader_mapper testing suite (:pull:`2`, :pull:`20`)
+* adding tests to cdm_reader_mapper testing suite (:pull:`2`, :pull:`20`, pull:`22`)
 * adding testing result data (:pull:`4`)
 * use slugify insted of unidecde for licening reasons
 * remove pip install instruction (:pull:`2`)
