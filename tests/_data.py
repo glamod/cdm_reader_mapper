@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import pytest  # noqa
 
-from cdm_reader_mapper import mdf_reader, test_data
+from cdm_reader_mapper import mdf_reader
+
+from . import test_data
 
 
 def _read_data(**kwargs):

@@ -128,13 +128,13 @@ class test_data:
             "imma1",
             "icoads_r3000_NRT",
         )
-        self.test_gcc_mix = self._get_data_dict(
-            "mix_out_20030201.immt",
-            "gcc_immt",
-            "???",
-            "immt",
-            "gdac_r0000",
-        )
+        # self.test_gcc_mix = self._get_data_dict(
+        #    "mix_out_20030201.immt",
+        #    "gcc_immt",
+        #    "???",
+        #    "immt",
+        #    "gdac_r0000",
+        # )
 
     def __getitem__(self, attr):
         """Make class subscriptable."""
@@ -145,12 +145,9 @@ class test_data:
 
     def _get_data_dict(self, data_file, schema, deck, dm, ds):
         return {
-            "source": load_file(data_file_),
+            "source": load_file(f"{dm}_d{deck}/input/{data_file}"),
             "data_model": schema,
             "dm": dm,
             "ds": ds,
             "deck": deck,
         }
-
-
-test_data = test_data()

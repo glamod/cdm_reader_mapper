@@ -4,6 +4,9 @@ import os
 
 import pandas as pd
 
+# from ._results import result_data
+from _results import result_data
+
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
@@ -13,8 +16,6 @@ from cdm_reader_mapper.metmetpy import (
     validate_datetime,
     validate_id,
 )
-
-from ._results import result_data
 
 
 def _pandas_read_csv(
@@ -55,12 +56,7 @@ def _testing_suite(
     out_path=None,
     **kwargs,
 ):
-    name_ = source.split("/")[-1].split(".")[0]
     exp = "expected_" + suffix
-    if sections:
-        if isinstance(sections, str):
-            sections = [sections]
-        name_ = name_ + "_" + "_".join(sections)
     read_ = mdf_reader.read(
         source=source,
         data_model=data_model,
@@ -75,6 +71,7 @@ def _testing_suite(
     columns = read_.columns
 
     result_data_file = result_data[exp]["data"]
+    print(result_data_file)
     if not os.path.isfile(result_data_file):
         return
 

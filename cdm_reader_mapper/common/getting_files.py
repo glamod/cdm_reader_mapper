@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 import warnings
-
 from pathlib import Path
 from urllib.request import urlretrieve
+
 from platformdirs import user_cache_dir
 
 try:
@@ -26,20 +27,24 @@ def _file_md5_checksum(f_name):
 
 def _get_remote_file(lfile, url, name):
     url = "/".join((url, name.as_posix()))
-    lfile.mkdir(exist_ok=True, parents=True)
+    lfile.parent.mkdir(exist_ok=True, parents=True)
+    msg = f"Attempting to fetch remote file: {name.as_posix()}"
+    logging.info(msg)
     return urlretrieve(url, lfile)
+
 
 def _check_md5s(f, md5, mode="error"):
     msg = f"{f.as_posix()} and md5 checksum do not match."
     md5_ = _file_md5_checksum(f)
     if md5_.strip() != md5.strip():
-      f.unlink()
-      if mode == "error":
-        raise OSError(msg)
-      elif mode == "warning":
-        warnings.warn(msg)
-        return
+        f.unlink()
+        if mode == "error":
+            raise OSError(msg)
+        elif mode == "warning":
+            warnings.warn(msg)
+            return
     return True
+
 
 def _get_file(
     name: Path,
@@ -52,21 +57,22 @@ def _get_file(
     local_file = cache_dir / name
     md5_name = name.with_suffix(f"{suffix}.md5")
     md5_file = cache_dir / md5_name
-    
-    _get_remote_file(md5_file, url, md5_name)    
+
+    _get_remote_file(md5_file, url, md5_name)
     with open(md5_file) as f:
-        remote_md5 = f.read()   
-         
+        remote_md5 = f.read()
+
     if not local_file.is_file():
         _get_remote_file(local_file, url, name)
-        local_md5 = _file_md5_checksum(local_file)
-        _check_md5s(local_file, remote_md5)       
+        _check_md5s(local_file, remote_md5)
     else:
         if not _check_md5s(local_file, remote_md5, mode="warning"):
-          _get_remote_file(local_file, url, name)
-          _check_md5s(local_file, remote_md5)          
+            _get_remote_file(local_file, url, name)
+            _check_md5s(local_file, remote_md5)
 
+    md5_file.unlink()
     return local_file
+
 
 # idea copied from xclim that it raven that it borrowed from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
@@ -78,7 +84,7 @@ def load_file(
     cache_dir: Path = _default_cache_dir_,
 ):
     """Load file from the online Github-like repository.
-    
+
     Parameters
     ----------
     name : str or os.PathLike
@@ -91,7 +97,7 @@ def load_file(
         The directory in which to search for and write cached data.
     cache : bool
         If True, then cache data locally for use on subsequent calls.
-        
+
     Returns
     -------
     Path
@@ -100,7 +106,7 @@ def load_file(
         name = Path(name)
 
     name = name.with_suffix(suffix)
-    
+
     if not github_url.lower().startswith("http"):
         raise ValueError(f"GitHub URL not safe: '{github_url}'.")
         return
