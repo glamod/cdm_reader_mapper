@@ -224,7 +224,6 @@ class MDFFileReader(_FileReader):
         # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
         # 2.1. Subset data model sections to requested sections
-        encoding = self.schema["header"].get("encoding")
         parsing_order = self.schema["header"].get("parsing_order")
         sections_ = [x.get(y) for x in parsing_order for y in x]
         read_sections_list = [y for x in sections_ for y in x]
@@ -234,38 +233,13 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
+        # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
-        # 2.3. Extract, read and validate data in same loop
-        logging.info("Extracting and reading sections")
-        TextParser_fwf = None
-        if self.configurations["fwf"]["names"]:
-            TextParser_fwf = self._read_pandas_fwf(
-                skiprows=skiprows,
-                encoding=encoding,
-                chunksize=chunksize,
-                **self.configurations["fwf"],
-                **kwargs,
-            )
-        TextParser_csv = None
-        if self.configurations["csv"]["names"]:
-            TextParser_csv = self._read_pandas_csv(
-                skiprows=skiprows,
-                encoding=encoding,
-                chunksize=chunksize,
-                **self.configurations["csv"],
-                **kwargs,
-            )
+        self.data = self._open_data(read_sections_list, sections, chunksize=chunksize)
 
-        self.data = self._concat_dataframes(
-            [TextParser_fwf, TextParser_csv],
-            chunksize=chunksize,
-            axis=1,
-            **self.configurations["concat"],
-        )
+        ## 2.3. Extract, read and validate data in same loop
+        # logging.info("Extracting and reading sections")
 
-        # for index in self.missings:
-        #  self.data[index] = np.nan
-        #  self.data[index] = self.data[index].astype(self.dtypes[index])
         if convert or decode:
             self.convert_and_decode_entries(
                 convert=convert,

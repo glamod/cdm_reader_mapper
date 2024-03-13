@@ -32,7 +32,7 @@ read_params = [
 
 
 def make_copy(OParser):
-    """Make a copy of a pands TextParser object."""
+    """Make a copy of a pandas TextParser object."""
     try:
         f = OParser.handles.handle
         NewRef = StringIO(f.getvalue())

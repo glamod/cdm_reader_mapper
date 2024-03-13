@@ -35,8 +35,8 @@ from io import StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
+from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common.local import get_files
 
 from .. import properties
 from . import correction_functions
@@ -102,9 +102,9 @@ def correct(data, data_model, deck, log_level="INFO"):
         ]
         read_dict = {x: data.orig_options.get(x) for x in read_params}
         buffer = StringIO()
-        for df in data:
+        data_ = pandas_TextParser_hdlr.make_copy(data)
+        for df in data_:
             df = correct_it(df, data_model, deck, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
-
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)

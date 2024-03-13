@@ -22,6 +22,7 @@ def validate_numeric(elements, data, schema):
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
     ]
+
     if len([x for x in elements if x not in set_elements]) > 0:
         logging.warning(
             "Data numeric elements with missing upper or lower threshold: {}".format(
@@ -164,6 +165,7 @@ def validate(data, mask0, schema, code_tables_path, disables):
         validated_columns = list(
             set(numeric_elements + coded_elements + datetime_elements)
         )
+
     mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
 
     mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)

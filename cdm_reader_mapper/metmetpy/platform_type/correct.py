@@ -66,7 +66,6 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     deck_fix = fix_methods.get(deck)
-
     if not deck_fix:
         logger.info(
             f"No platform type fixes to apply to deck {deck} \

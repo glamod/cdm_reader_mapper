@@ -6,25 +6,46 @@ import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.metmetpy import (
+    correct_datetime,
+    correct_pt,
+    validate_datetime,
+    validate_id,
+)
 
 from ._results import result_data
 
 
 def _pandas_read_csv(
-    *args, delimiter=mdf_reader.properties.internal_delimiter, **kwargs
+    *args,
+    delimiter=mdf_reader.properties.internal_delimiter,
+    squeeze=False,
+    name=False,
+    **kwargs,
 ):
-    return pd.read_csv(
+    df = pd.read_csv(
         *args,
         **kwargs,
         quotechar="\0",
         escapechar="\0",
         delimiter=delimiter,
     )
+    if squeeze is True:
+        df = df.squeeze()
+
+    if name is not False:
+        df.name = name
+
+    return df
 
 
 def _testing_suite(
     source=None,
     data_model=None,
+    dm=None,
+    ds=None,
+    deck=None,
     sections=None,
     cdm_name=None,
     cdm_subset=None,
@@ -51,30 +72,79 @@ def _testing_suite(
     mask = read_.mask
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
-
-    if not isinstance(data, pd.DataFrame):
-        data = data.read()
-    if not isinstance(mask, pd.DataFrame):
-        mask = mask.read()
+    columns = read_.columns
 
     result_data_file = result_data[exp]["data"]
     if not os.path.isfile(result_data_file):
         return
 
+    data = correct_datetime.correct(
+        data=data,
+        data_model=dm,
+        deck=deck,
+    )
+
+    data = correct_pt.correct(
+        data,
+        dataset=ds,
+        data_model=dm,
+        deck=deck,
+    )
+
+    if not isinstance(data, pd.DataFrame):
+        data_pd = make_copy(data).read()
+    else:
+        data_pd = data.copy()
+    if not isinstance(mask, pd.DataFrame):
+        mask_pd = make_copy(mask).read()
+    else:
+        mask_pd = mask.copy()
+
+    val_dt = validate_datetime.validate(
+        data=data_pd,
+        data_model=dm,
+        dck=deck,
+    )
+
+    val_id = validate_id.validate(
+        data=data_pd,
+        dataset=ds,
+        data_model=dm,
+        dck=deck,
+    )
+
     data_ = _pandas_read_csv(
         result_data_file,
-        names=data.columns,
+        names=columns,
         dtype=dtypes,
         parse_dates=parse_dates,
     )
 
     mask_ = _pandas_read_csv(
         result_data[exp]["mask"],
-        names=data.columns,
+        names=columns,
     )
 
-    pd.testing.assert_frame_equal(data, data_, check_dtype=False)
-    pd.testing.assert_frame_equal(mask, mask_, check_dtype=False)
+    pd.testing.assert_frame_equal(data_pd, data_)
+    pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
+
+    if val_dt is not None:
+        val_dt_ = _pandas_read_csv(
+            result_data[exp]["vadt"],
+            header=None,
+            squeeze=True,
+            name=None,
+        )
+        pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
+
+    if val_id is not None:
+        val_id_ = _pandas_read_csv(
+            result_data[exp]["vaid"],
+            header=None,
+            squeeze=True,
+            name=val_id.name,
+        )
+        pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
         return

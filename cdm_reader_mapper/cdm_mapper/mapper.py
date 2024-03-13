@@ -82,7 +82,6 @@ def _write_csv_files(
     logger.debug(f"Table: {table}")
     for cdm_key, imapping in mapping.items():
         logger.debug(f"\tElement: {cdm_key}")
-
         isEmpty = False
         elements = imapping.get("elements")
         transform = imapping.get("transform")
@@ -154,7 +153,9 @@ def _write_csv_files(
                 table_df_i[cdm_key] = default
 
         if fill_value is not None:
-            table_df_i[cdm_key].fillna(value=fill_value, inplace=True)
+            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(
+                value=fill_value
+            )  # , inplace=True)
 
         cdm_tables = _decimal_places(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
@@ -397,7 +398,7 @@ def map_model(
         return
 
     # Map thing:
-    data_cdm = _map(
+    return _map(
         imodel,
         data,
         data_atts,
@@ -405,5 +406,3 @@ def map_model(
         codes_subset=codes_subset,
         log_level=log_level,
     )
-
-    return data_cdm
