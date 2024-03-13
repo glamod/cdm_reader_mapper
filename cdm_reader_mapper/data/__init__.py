@@ -126,7 +126,7 @@ class test_data:
         self.test_114_992 = self._get_data_dict(
             "114-992_2016-01-01_subset.imma",
             "imma1_nodt",
-            "792",
+            "992",
             "imma1",
             "icoads_r3000_NRT",
         )

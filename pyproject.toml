@@ -29,9 +29,6 @@ classifiers = [
 ]
 dynamic = ["version", "dependencies"]
 
-[project.scripts]
-mdf_reader = "cdm_reader_mapper.cli:main"
-
 [project.urls]
 "Homepage" = "https://cdm-reader-mapper.readthedocs.io"
 "Source" = "https://github.com/glamod/cdm_reader_mapper"

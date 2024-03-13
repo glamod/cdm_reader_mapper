@@ -401,6 +401,7 @@ class _FileReader:
         missings_ = df["missings"]
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
+        self.columns = df.columns
         return df, missings
 
     def _open_data(
