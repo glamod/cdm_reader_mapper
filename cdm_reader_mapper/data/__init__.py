@@ -199,8 +199,14 @@ class test_data:
             raise KeyError(attr) from err
 
     def _get_data_dict(self, data_file, schema, deck, dm, ds):
+        try:
+            source = load_file(f"{dm}_d{deck}/input/{data_file}")
+        except:
+            source = "source"
+            print("Fetching remote file not working")
         return {
-            "source": load_file(f"{dm}_d{deck}/input/{data_file}"),
+            #"source": load_file(f"{dm}_d{deck}/input/{data_file}"),
+            "source" = source,
             "data_model": schema,
             "dm": dm,
             "ds": ds,
