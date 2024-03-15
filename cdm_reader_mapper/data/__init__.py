@@ -9,7 +9,7 @@ class test_data:
     """CDM test data."""
 
     def __init__(self):
-        pass
+        self.name = "CDM reader mapper input testing data."
 
     @property
     def test_063_714(self):
@@ -198,16 +198,16 @@ class test_data:
             "icoads_r3000_NRT",
         )
 
-    @property
-    def test_gcc_mix(self):
-        """IMMAT deck ??? test data."""
-        return self._get_data_dict(
-            "mix_out_20030201.immt",
-            "gcc_immt",
-            "???",
-            "immt",
-            "gdac_r0000",
-        )
+    # @property
+    # def test_gcc_mix(self):
+    #    """IMMAT deck ??? test data."""
+    #    return self._get_data_dict(
+    #        "mix_out_20030201.immt",
+    #        "gcc_immt",
+    #        "???",
+    #        "immt",
+    #        "gdac_r0000",
+    #    )
 
     def __getitem__(self, attr):
         """Make class subscriptable."""
