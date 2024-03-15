@@ -9,7 +9,6 @@ Created on Wed Jul  3 09:48:18 2019
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 
 
 def count_by_cat_i(serie):

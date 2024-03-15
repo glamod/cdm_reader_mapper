@@ -3,7 +3,7 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM) 
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
 header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 

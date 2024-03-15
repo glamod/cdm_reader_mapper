@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import csv
 import logging
 from io import StringIO as StringIO
 
 import pandas as pd
 
-from . import properties
 from .schema import schemas
 from .utils.auxiliary import _FileReader, validate_arg, validate_path
 
@@ -81,10 +79,10 @@ class MDFFileReader(_FileReader):
 
         dtype = self.configurations["convert_decode"]["dtype"]
         self.data = self._convert_and_decode_df(
-          self.data,
-          converter_dict,
-          converter_kwargs,
-          decoder_dict,
+            self.data,
+            converter_dict,
+            converter_kwargs,
+            decoder_dict,
         )
         self.data = self.data.astype(dtype)
         return self

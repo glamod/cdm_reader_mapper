@@ -40,9 +40,6 @@ from __future__ import annotations
 
 import json
 import os
-from io import StringIO
-
-import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.getting_files import get_files
@@ -117,5 +114,5 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
         return
 
     return correct_it(
-      data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
+        data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
     )

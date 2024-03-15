@@ -2,17 +2,14 @@
 
 from __future__ import annotations
 
-import csv
 import json
 import logging
 import os
-from io import StringIO
 
 import pandas as pd
 
 from cdm_reader_mapper.common.getting_files import get_files
 
-from .. import properties
 from ..schema import schemas
 from ..validate import validate
 from . import converters, decoders
