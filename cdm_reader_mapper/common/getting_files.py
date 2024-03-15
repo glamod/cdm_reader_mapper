@@ -79,7 +79,6 @@ def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
     branch: str = "main",
-    suffix: str = ".imma",
     cache: bool = True,
     cache_dir: Path = _default_cache_dir_,
 ):
@@ -105,6 +104,7 @@ def load_file(
     if isinstance(name, str):
         name = Path(name)
 
+    suffix = name.suffix
     name = name.with_suffix(suffix)
 
     if not github_url.lower().startswith("http"):
