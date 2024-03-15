@@ -46,7 +46,6 @@ class MDFFileReader(_FileReader):
         converter_dict=None,
         converter_kwargs=None,
         decoder_dict=None,
-        dtype=None,
     ):
         """Convert and decode data entries by using a pre-defined data model.
 
@@ -67,10 +66,6 @@ class MDFFileReader(_FileReader):
         decoder_dict: dict, optional
           Functions for decoding values in specific columns.
           If None use information from a pre-defined data model.
-        dtype: dtype or dict of {Hashable: dtype}, optional
-          Data type(s) to apply to either the whole dataset or individual columns.
-          If None use information from a pre-defined data model.
-          Use only if data is read with chunksizes.
         """
         if converter_dict is None:
             converter_dict = self.configurations["convert_decode"]["converter_dict"]
@@ -78,14 +73,13 @@ class MDFFileReader(_FileReader):
             converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if dtype is None:
-            dtype = self.configurations["convert_decode"]["dtype"]
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
         if decode is not True:
             decoder_dict = {}
 
+        dtype = self.configurations["convert_decode"]["dtype"]
         self.data = self._convert_and_decode_df(
           self.data,
           converter_dict,
@@ -107,7 +101,6 @@ class MDFFileReader(_FileReader):
 
     def read(
         self,
-        chunksize=None,
         sections=None,
         skiprows=0,
         out_path=None,
@@ -123,8 +116,6 @@ class MDFFileReader(_FileReader):
 
         Parameters
         ----------
-        chunksize : int, optional
-          Number of reports per chunk.
         sections : list, optional
           List with subset of data model sections to output, optional
           If None read pre-defined data model sections.
@@ -151,14 +142,11 @@ class MDFFileReader(_FileReader):
         # 0. VALIDATE INPUT
         if not validate_arg("sections", sections, list):
             return
-        if not validate_arg("chunksize", chunksize, int):
-            return
         if not validate_arg("skiprows", skiprows, int):
             return
         if not validate_path("out_path", out_path):
             return
 
-        self.chunksize = chunksize
         self.skiprows = skiprows
 
         # 2. READ AND VALIDATE DATA
@@ -175,7 +163,7 @@ class MDFFileReader(_FileReader):
         logging.info("Getting data string from source...")
         # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data = self._open_data(read_sections_list, sections, chunksize=chunksize)
+        self.data = self._open_data(read_sections_list, sections)
 
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")

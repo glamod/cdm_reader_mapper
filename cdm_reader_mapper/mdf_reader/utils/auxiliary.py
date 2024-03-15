@@ -412,9 +412,7 @@ class _FileReader:
             encoding=self.schema["header"].get("encoding"),
             widths=[properties.MAX_FULL_REPORT_WIDTH],
             skiprows=self.skiprows,
-            chunksize=chunksize,
         )
-
         df, self.missings = self._read_sections(TextParser, order, valid)
         return df
 
