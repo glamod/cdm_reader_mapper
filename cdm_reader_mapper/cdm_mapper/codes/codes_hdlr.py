@@ -14,7 +14,7 @@ import os
 from copy import deepcopy
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.local import get_files
+from cdm_reader_mapper.common.getting_files import get_files
 
 from ..properties import _base
 

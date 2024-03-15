@@ -55,12 +55,10 @@ def _testing_suite(
     out_path=None,
     **kwargs,
 ):
-    name_ = source.split("/")[-1].split(".")[0]
     exp = "expected_" + suffix
-    if sections:
-        if isinstance(sections, str):
-            sections = [sections]
-        name_ = name_ + "_" + "_".join(sections)
+    splitted = suffix.split("_")
+    tb_id = splitted[0] + "-" + "_".join(splitted[1:])
+
     read_ = mdf_reader.read(
         source=source,
         data_model=data_model,
@@ -74,7 +72,8 @@ def _testing_suite(
     parse_dates = read_.parse_dates
     columns = read_.columns
 
-    result_data_file = result_data[exp]["data"]
+    expected_data = result_data[exp]
+    result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return
 
@@ -121,7 +120,7 @@ def _testing_suite(
     )
 
     mask_ = _pandas_read_csv(
-        result_data[exp]["mask"],
+        expected_data["mask"],
         names=columns,
     )
 
@@ -130,7 +129,7 @@ def _testing_suite(
 
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(
-            result_data[exp]["vadt"],
+            expected_data["vadt"],
             header=None,
             squeeze=True,
             name=None,
@@ -139,7 +138,7 @@ def _testing_suite(
 
     if val_id is not None:
         val_id_ = _pandas_read_csv(
-            result_data[exp]["vaid"],
+            expected_data["vaid"],
             header=None,
             squeeze=True,
             name=val_id.name,
@@ -165,9 +164,11 @@ def _testing_suite(
                 if att in codes_subset:
                     col_subset.append((key, att))
 
-    cdm_mapper.cdm_to_ascii(output, suffix=suffix)
-    output = read_tables(".", tb_id=suffix, cdm_subset=cdm_subset)
-    output_ = read_tables(result_data[exp]["cdm_table"], cdm_subset=cdm_subset)
+    cdm_mapper.cdm_to_ascii(output, suffix=tb_id)
+    output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
+    output_ = read_tables(
+        expected_data["cdm_table"], tb_id=tb_id + "*", cdm_subset=cdm_subset
+    )
 
     del output[("header", "record_timestamp")]
     del output[("header", "history")]

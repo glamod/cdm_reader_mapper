@@ -1,14 +1,25 @@
 """cdm_reader_mapper testing suite result files."""
 from __future__ import annotations
 
-from glob import glob
+import os
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 
 import pandas as pd
-import pytest
 
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.local import get_files
+from cdm_reader_mapper.common.getting_files import load_file
+
+cdm_tables = [
+    "header-{}.psv",
+    "observations-at-{}.psv",
+    "observations-dpt-{}.psv",
+    "observations-slp-{}.psv",
+    "observations-sst-{}.psv",
+    "observations-wbt-{}.psv",
+    "observations-wd-{}.psv",
+    "observations-ws-{}.psv",
+]
 
 _base = Path(__file__).parent
 
@@ -34,53 +45,178 @@ class result_data:
     "Expected results for cdm_reader_mapper testing suite"
 
     def __init__(self):
-        self._data_path = _base / "results"
+        self.name = "CDM reader mapper result testing data."
 
-        self.expected_063_714_nosupp = self._get_data_dict("063-714_nosupp")
-        self.expected_069_701_type1_nosupp = self._get_data_dict("069-701_type1_nosupp")
-        self.expected_069_701_type2_nosupp = self._get_data_dict("069-701_type2_nosupp")
-        self.expected_085_705_nosupp = self._get_data_dict("085-705_nosupp")
-        self.expected_143_781_nosupp = self._get_data_dict("143-781_nosupp")
-        self.expected_084_706_nosupp = self._get_data_dict("084-706_nosupp")
-        self.expected_096_702_nosupp = self._get_data_dict("096-702_nosupp")
-        self.expected_098_707_nosupp = self._get_data_dict("098-707_nosupp")
-        self.expected_103_794_nosupp = self._get_data_dict("103-794_nosupp")
-        self.expected_125_704_nosupp = self._get_data_dict("125-704_nosupp")
-        self.expected_125_721_nosupp = self._get_data_dict("125-721_nosupp")
-        self.expected_133_730_nosupp = self._get_data_dict("133-730_nosupp")
-        self.expected_144_703_nosupp = self._get_data_dict("144-703_nosupp")
-        self.expected_091_201_nosupp = self._get_data_dict("091-201_nosupp")
-        self.expected_077_892_nosupp = self._get_data_dict("077-892_nosupp")
-        self.expected_147_700_nosupp = self._get_data_dict("147-700_nosupp")
-        self.expected_103_792_nosupp = self._get_data_dict("103-792_nosupp")
-        self.expected_114_992_nosupp = self._get_data_dict("114-992_nosupp")
-        self.expected_063_714_c99 = self._get_data_dict("063-714_c99")
-        self.expected_063_714_cdms = self._get_data_dict("063-714_cdms")
-        self.expected_063_714_chunk = self._get_data_dict("063-714_chunk")
+    @property
+    def expected_063_714(self):
+        return self._get_data_dict(
+            "063-714_2010-07-01_subset",
+            "714",
+            "imma1",
+        )
+
+    @property
+    def expected_069_701_type1(self):
+        return self._get_data_dict(
+            "069-701_type1_1845-04-01_subset",
+            "701",
+            "imma1",
+        )
+
+    @property
+    def expected_069_701_type2(self):
+        return self._get_data_dict(
+            "069-701_type2_1845-04-01_subset",
+            "701",
+            "imma1",
+        )
+
+    @property
+    def expected_085_705(self):
+        return self._get_data_dict(
+            "085-705_1938-04-01_subset",
+            "705",
+            "imma1",
+        )
+
+    @property
+    def expected_143_781(self):
+        return self._get_data_dict(
+            "143-781_1987-09-01_subset",
+            "781",
+            "imma1",
+        )
+
+    @property
+    def expected_084_706(self):
+        return self._get_data_dict(
+            "084-706_1919-03-01_subset",
+            "706",
+            "imma1",
+        )
+
+    @property
+    def expected_096_702(self):
+        return self._get_data_dict(
+            "096-702_1873-01-01_subset",
+            "702",
+            "imma1",
+        )
+
+    @property
+    def expected_098_707(self):
+        return self._get_data_dict(
+            "098-707_1916-04-01_subset",
+            "707",
+            "imma1",
+        )
+
+    @property
+    def expected_103_794(self):
+        return self._get_data_dict(
+            "103-794_2021-11-01_subset",
+            "794",
+            "imma1",
+        )
+
+    @property
+    def expected_125_704(self):
+        return self._get_data_dict(
+            "125-704_1878-10-01_subset",
+            "704",
+            "imma1",
+        )
+
+    @property
+    def expected_125_721(self):
+        return self._get_data_dict(
+            "125-721_1862-06-01_subset",
+            "721",
+            "imma1",
+        )
+
+    @property
+    def expected_133_730(self):
+        return self._get_data_dict(
+            "133-730_1776-10-01_subset",
+            "730",
+            "imma1",
+        )
+
+    @property
+    def expected_144_703(self):
+        return self._get_data_dict(
+            "144-703_1979-09-01_subset",
+            "703",
+            "imma1",
+        )
+
+    @property
+    def expected_091_201(self):
+        return self._get_data_dict(
+            "091-201_1913-11-01_subset",
+            "201",
+            "imma1",
+        )
+
+    @property
+    def expected_077_892(self):
+        return self._get_data_dict(
+            "077-892_1996-02-01_subset",
+            "892",
+            "imma1",
+        )
+
+    @property
+    def expected_147_700(self):
+        return self._get_data_dict(
+            "147-700_2002-08-01_subset",
+            "700",
+            "imma1",
+        )
+
+    @property
+    def expected_103_792(self):
+        return self._get_data_dict(
+            "103-792_2017-02-01_subset",
+            "792",
+            "imma1",
+        )
+
+    @property
+    def expected_114_992(self):
+        return self._get_data_dict(
+            "114-992_2016-01-01_subset",
+            "992",
+            "imma1",
+        )
 
     def __getitem__(cls, attr):
         return getattr(cls, attr)
 
-    def _get_data_dict(self, suffix):
-        path = self._data_path / suffix
-        data = pd.DataFrame()
-        mask = pd.DataFrame()
-        vaid = pd.DataFrame()
-        vadt = pd.DataFrame()
-        for data in path.glob("data_*.csv"):
-            break
-        for mask in path.glob("mask_*.csv"):
-            break
-        for vaid in path.glob("vaid_*.csv"):
-            break
-        for vadt in path.glob("vadt_*.csv"):
-            break
+    def _load_file(self, ifile):
+        try:
+            return load_file(ifile)
+        except HTTPError:
+            return pd.DataFrame()
+
+    def _get_data_dict(self, data_file, deck, dm):
+        drs = f"{dm}_d{deck}"
+        for cdm_table in cdm_tables:
+            name = cdm_table.format(data_file)
+            path = load_file(os.path.join(drs, "cdm_tables", name)).parent
+
+        data = f"data_{data_file}.csv"
+        mask = f"mask_{data_file}.csv"
+        vaid = f"vaid_{data_file}.csv"
+        vadt = f"vadt_{data_file}.csv"
+
         return {
-            "data": data,
-            "mask": mask,
+            "data": self._load_file(os.path.join(drs, "output", data)),
+            "mask": self._load_file(os.path.join(drs, "output", mask)),
             "cdm_table": path,
-            "vaid": vaid,
-            "vadt": vadt,
+            "vaid": self._load_file(os.path.join(drs, "validation", vaid)),
+            "vadt": self._load_file(os.path.join(drs, "validation", vadt)),
         }
 
 

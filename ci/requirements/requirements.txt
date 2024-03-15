@@ -10,3 +10,4 @@ timezonefinder
 python-slugify
 textdistance
 swifter
+platformdirs
