@@ -3,8 +3,8 @@
 Changelog
 =========
 
-0.2.0 (unpublished)
--------------------
+0.2.0 (2023-03-15)
+------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 Breaking changes
