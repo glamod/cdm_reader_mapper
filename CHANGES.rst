@@ -16,6 +16,7 @@ Breaking changes
 * ``cdm_reader_mapper.mdf_reader`` split data_models into code_tables and schema
 * logging: Allow for use of log file (:pull:`6`)
 * cannot use as command-line tool anymore (:pull:`22`)
+* outsource input and result data to `cdm-testdata` (:issue:`16`, :pull:`21`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
