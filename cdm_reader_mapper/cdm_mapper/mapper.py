@@ -3,9 +3,8 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
-the C3S Climate Data Store Common Data Model (CDM) header and observational
-tables using the mapping information available in the tool's mapping library
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM) 
+header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 
 @author: iregon
@@ -17,7 +16,7 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
 from .codes.codes_hdlr import codes_hdlr
@@ -190,7 +189,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     """
     Map to the C3S Climate Data Store Common Data Model (CDM).
 
-    Maps a pandas DataFrame (or pd.io.parsers.TextFileReader) to the C3S Climate Data Store Common Data Model (CDM)
+    Maps a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
     header and observational tables using mapping information from the input data model (imodel).
 
     Parameters
@@ -201,7 +200,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
             2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1's core and attachments
                to CDM in a specific way. e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000_d704``
     data: input data to map
-        e.g. a pandas.Dataframe or io.parsers.TextFileReader objects or in-memory text streams (io.StringIO object).
+        e.g. a pandas.Dataframe.
     data_atts:
         dictionary with the {element_name:element_attributes} of the data. Type: string.
     cdm_subset: subset of CDM model tables to map.
@@ -350,7 +349,7 @@ def map_model(
       2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
       CDM in a specific way.
       e.g. ``cdm/library/mappings/icoads_r3000_d704``
-    data: pd.DataFrame, pd.parser.TextFileReader or io.String
+    data: pd.DataFrame
       input data to map.
     data_atts: dict
       dictionary with the {element_name:element_attributes} of the data.
@@ -386,13 +385,6 @@ def map_model(
             return
         else:
             data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-
     else:
         logger.error("Input data type " f"{type(data)}" " not supported")
         return

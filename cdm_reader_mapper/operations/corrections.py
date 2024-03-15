@@ -16,8 +16,6 @@ import numpy as np
 import pandas as pd
 from textdistance import levenshtein
 
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
-
 
 # %% extract NOC_corrections/duplicates
 def gen_files(data, dataset, correction_path, yr, mo):
@@ -70,7 +68,6 @@ def gen_files(data, dataset, correction_path, yr, mo):
     if not df.empty:
         dup, dup_f = get_dup(data, dataset)
         if os.path.exists(fn):
-            print(fn)
             df1 = pd.read_csv(
                 fn,
                 delimiter="|",
@@ -227,23 +224,6 @@ def corrections(data, dataset, correction_path, yr, mo):
     if isinstance(data, pd.DataFrame):
         gen_files(data.copy(), dataset, correction_path, yr, mo)
         return
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        # read_params = [
-        #    "chunksize",
-        #    "names",
-        #    "dtype",
-        #    "parse_dates",
-        #    "date_parser",
-        #    "infer_datetime_format",
-        # ]
-        # read_dict = {x: data.orig_options.get(x) for x in read_params}
-        buffer = StringIO()
-        data_copy = pandas_TextParser_hdlr.make_copy(data)
-        for dt in data_copy:
-            gen_files(dt, dataset, correction_path, yr, mo)
-        buffer.seek(0)
-        data_copy.close()
-        data = pandas_TextParser_hdlr.restore(data)
 
 
 def split_list(n):

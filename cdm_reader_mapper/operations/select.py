@@ -12,7 +12,6 @@ from io import StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
 # Need to define a general thing for the parser() functions, like we did with
 # the dataframe_apply_index(), because they are all the same but for the
@@ -21,7 +20,7 @@ from cdm_reader_mapper.common import pandas_TextParser_hdlr
 #    The index of the resulting dataframe(s) is reinitialized here, it does not
 #    inherit from parent df
 #
-#    data is a dataframe or a TextFileReader
+#    data is a dataframe
 
 
 def dataframe_apply_index(
@@ -114,12 +113,7 @@ def select_true(data, mask, col, out_rejected=False, in_index=False):
 
         return output
 
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(
-            data, mask[col], out_rejected=out_rejected, in_index=in_index
-        )
-    else:
-        output = parser(data, mask, col, out_rejected=out_rejected, in_index=in_index)
+    output = parser(data, mask, col, out_rejected=out_rejected, in_index=in_index)
 
     if len(output) > 1:
         return output
@@ -202,12 +196,8 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
 
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(
-            data, col, values, out_rejected=out_rejected, in_index=in_index
-        )
-    else:
-        output = parser(data, col, values, out_rejected=out_rejected, in_index=in_index)
+    
+    output = parser(data, col, values, out_rejected=out_rejected, in_index=in_index)
 
     if len(output) > 1:
         return output
@@ -255,10 +245,7 @@ def select_from_index(data, index, out_rejected=False):
             output.append(pd.read_csv(out_buffer, **read_dict))
         return output
 
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(data, index, out_rejected=out_rejected)
-    else:
-        output = parser(data, index, out_rejected=out_rejected)
+    output = parser(data, index, out_rejected=out_rejected)
 
     if len(output) > 1:
         return output

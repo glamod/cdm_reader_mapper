@@ -10,7 +10,6 @@ from io import StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
 from cdm_reader_mapper.common.getting_files import get_files
 
 from .. import properties
@@ -408,7 +407,6 @@ class _FileReader:
         self,
         order,
         valid,
-        chunksize,
     ):
         TextParser = self._read_pandas(
             encoding=self.schema["header"].get("encoding"),
@@ -417,49 +415,8 @@ class _FileReader:
             chunksize=chunksize,
         )
 
-        if isinstance(TextParser, pd.DataFrame):
-            df, self.missings = self._read_sections(TextParser, order, valid)
-            return df
-        else:
-            data_buffer = StringIO()
-            missings_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df, missings = self._read_sections(df_, order, valid)
-                missings.to_csv(
-                    missings_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            missings_buffer.seek(0)
-            self.missings = pd.read_csv(
-                missings_buffer,
-                names=missings.columns,
-                chunksize=None,
-            )
-            data_buffer.seek(0)
-            return pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
+        df, self.missings = self._read_sections(TextParser, order, valid)
+        return df
 
     def _convert_and_decode_df(
         self,
@@ -504,12 +461,8 @@ class _FileReader:
 
     def _dump_atts(self, out_atts, out_path):
         """Dump attributes to atts.json."""
-        if not isinstance(self.data, pd.io.parsers.TextFileReader):
-            data = [self.data]
-            valid = [self.mask]
-        else:
-            data = pandas_TextParser_hdlr.make_copy(self.data)
-            valid = pandas_TextParser_hdlr.make_copy(self.mask)
+        data = [self.data]
+        valid = [self.mask]
         logging.info(f"WRITING DATA TO FILES IN: {out_path}")
         for i, (data_df, valid_df) in enumerate(zip(data, valid)):
             header = False

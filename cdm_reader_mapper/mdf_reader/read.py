@@ -8,8 +8,6 @@ from io import StringIO as StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-
 from . import properties
 from .schema import schemas
 from .utils.auxiliary import _FileReader, validate_arg, validate_path
@@ -30,14 +28,12 @@ class MDFFileReader(_FileReader):
 
     Attributes
     ----------
-    data : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data
+    data : pd.DataFrame
+        a pandas.DataFrame with the output data
     attrs : dict
         a dictionary with the output data elements attributes
-    mask : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data validation mask
+    mask : pd.DataFrame
+        a pandas.DataFrame with the output data validation mask
     """
 
     def __init__(self, *args, **kwargs):
@@ -90,49 +86,13 @@ class MDFFileReader(_FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        if isinstance(self.data, pd.DataFrame):
-            self.data = self._convert_and_decode_df(
-                self.data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-            )
-            self.data = self.data.astype(dtype)
-        else:
-            data_buffer = StringIO()
-            for i, df_ in enumerate(self.data):
-                df = self._convert_and_decode_df(
-                    df_,
-                    converter_dict,
-                    converter_kwargs,
-                    decoder_dict,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            data_buffer.seek(0)
-            date_columns = []
-            for i, element in enumerate(list(dtype)):
-                if dtype.get(element) == "datetime":
-                    date_columns.append(i)
-            self.data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=dtype,
-                parse_dates=date_columns,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
+        self.data = self._convert_and_decode_df(
+          self.data,
+          converter_dict,
+          converter_kwargs,
+          decoder_dict,
+        )
+        self.data = self.data.astype(dtype)
         return self
 
     def validate_entries(
@@ -142,27 +102,7 @@ class MDFFileReader(_FileReader):
 
         Fill attribute `valid` with boolean mask.
         """
-        if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data)
-
-        else:
-            data_buffer = StringIO()
-            TextParser_ = make_copy(self.data)
-            for i, df_ in enumerate(TextParser_):
-                mask_ = self._validate_df(df_)
-                mask_.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-            data_buffer.seek(0)
-            self.mask = pd.read_csv(
-                data_buffer,
-                names=df_.columns,
-                chunksize=self.chunksize,
-            )
+        self.mask = self._validate_df(self.data)
         return self
 
     def read(
@@ -231,7 +171,7 @@ class MDFFileReader(_FileReader):
             sections = read_sections_list
 
         # 2.2 Homogeneize input data to an iterable with dataframes:
-        # a list with a single dataframe or a pd.io.parsers.TextFileReader
+        # a list with a single dataframe
         logging.info("Getting data string from source...")
         # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)

@@ -116,27 +116,6 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
         )
         return
 
-    if isinstance(data, pd.DataFrame):
-        data = correct_it(
-            data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
-        )
-        return data
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data.orig_options.get(x) for x in read_params}
-        buffer = StringIO()
-        for df in data:
-            df = correct_it(
-                df, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
-            )
-            df.to_csv(buffer, header=False, index=False, mode="a")
-
-        buffer.seek(0)
-        return pd.read_csv(buffer, **read_dict)
+    return correct_it(
+      data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
+    )
