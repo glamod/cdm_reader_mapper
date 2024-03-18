@@ -5,6 +5,7 @@ from . import cdm_mapper  # noqa
 from . import common  # noqa
 from . import mdf_reader  # noqa
 from . import metmetpy  # noqa
+from . import netcdf_reader  # noqa
 from . import operations  # noqa
 from .data import test_data  # noqa
 
