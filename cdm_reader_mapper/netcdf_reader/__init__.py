@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-from .read import read ## noqa
+from .read import read  # # noqa
