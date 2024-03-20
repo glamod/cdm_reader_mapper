@@ -26,7 +26,25 @@ supported_data_models = [
     "imma1_nodt",
     "td11",
     "td11_d110",
+    "c_raid",
 ]
+
+open_file = {
+    "gcc_immt": "pandas",
+    "imma1": "pandas",
+    "imma1_d701": "pandas",
+    "imma1_d702": "pandas",
+    "imma1_d704": "pandas",
+    "imma1_d705-707": "pandas",
+    "imma1_d714": "pandas",
+    "imma1_d721": "pandas",
+    "imma1_d730": "pandas",
+    "imma1_d781": "pandas",
+    "imma1_nodt": "pandas",
+    "td11": "pandas",
+    "td11_d110": "pandas",
+    "c_raid": "netcdf",
+}
 
 pandas_dtypes = {}
 for dtype in object_types:

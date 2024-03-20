@@ -19,6 +19,7 @@ def validate_numeric(elements, data, schema):
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
+
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
     ]
