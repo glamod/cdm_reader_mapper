@@ -12,5 +12,5 @@
   "E": "GLONASS accuracy (better than 10 m)",
   "F": "GALILEO accuracy (better than 10 m)",
   "H": "GNSS accuracy (better than 10 m)",
-  "U": "Estimated position. An estimated accuracy may be in AXES_ERROR_ELLIPSE_",
+  "U": "Estimated position. An estimated accuracy may be in AXES_ERROR_ELLIPSE_"
 }

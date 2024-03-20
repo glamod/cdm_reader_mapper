@@ -12,5 +12,5 @@
   "QCP$": "Test performed",
   "SV": "Set a value",
   "TE": "Time error. Profile date/time has been erroneously encoded. Corrected if possible.",
-  "UP": "Station passed through the update program",
+  "UP": "Station passed through the update program"
 }

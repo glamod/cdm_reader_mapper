@@ -7,5 +7,5 @@
   "ARUP": "Real-time data have been archived locally and sent to GDACs",
   "ARDU": "Delayed data have been archived locally and sent to GDACs",
   "RFMT": "Reformat software to convert hexadecimal format reported by the buoy to our standard format",
-  "COOA": "e",Coriolis objective analysis performed
+  "COOA": "Coriolis objective analysis performed"
 }

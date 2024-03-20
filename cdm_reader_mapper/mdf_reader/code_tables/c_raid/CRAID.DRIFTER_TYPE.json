@@ -22,5 +22,5 @@
   "SVPIBWHI": "SVPI with barometer, wind and hull humidity sensor",
   "SVPIHI": "SVPI with hull humidity sensor",
   "SVPISHI": "SVPI with salinity and hull humidity sensor",
-  "SVPIVHI": "SVPI with wave and hull humidity sensor",
+  "SVPIVHI": "SVPI with wave and hull humidity sensor"
 }
