@@ -201,7 +201,7 @@ class result_data:
             return pd.DataFrame()
 
     def _get_data_dict(self, data_file, deck, dm):
-        drs = f"{dm}_d{deck}"
+        drs = f"{dm}_{deck}"
         for cdm_table in cdm_tables:
             name = cdm_table.format(data_file)
             path = load_file(os.path.join(drs, "cdm_tables", name)).parent
