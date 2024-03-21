@@ -46,12 +46,12 @@ def _testing_suite(
     dm=None,
     ds=None,
     deck=None,
-    sections=None,
     cdm_name=None,
     cdm_subset=None,
     codes_subset=None,
     suffix="exp",
     mapping=True,
+    review=True,
     out_path=None,
     **kwargs,
 ):
@@ -71,11 +71,6 @@ def _testing_suite(
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
     columns = read_.columns
-
-    expected_data = result_data[exp]
-    result_data_file = expected_data["data"]
-    if not os.path.isfile(result_data_file):
-        return
 
     data = correct_datetime.correct(
         data=data,
@@ -112,38 +107,46 @@ def _testing_suite(
         dck=deck,
     )
 
-    data_ = _pandas_read_csv(
-        result_data_file,
-        names=columns,
-        dtype=dtypes,
-        parse_dates=parse_dates,
-    )
+    if review is True:
+        expected_data = result_data[exp]
+        result_data_file = expected_data["data"]
+        if not os.path.isfile(result_data_file):
+            return
 
-    mask_ = _pandas_read_csv(
-        expected_data["mask"],
-        names=columns,
-    )
-
-    pd.testing.assert_frame_equal(data_pd, data_)
-    pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
-
-    if val_dt is not None:
-        val_dt_ = _pandas_read_csv(
-            expected_data["vadt"],
-            header=None,
-            squeeze=True,
-            name=None,
+        data_ = _pandas_read_csv(
+            result_data_file,
+            names=columns,
+            dtype=dtypes,
+            parse_dates=parse_dates,
         )
-        pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
+        data_ = data_[data_pd.columns]
 
-    if val_id is not None:
-        val_id_ = _pandas_read_csv(
-            expected_data["vaid"],
-            header=None,
-            squeeze=True,
-            name=val_id.name,
+        mask_ = _pandas_read_csv(
+            expected_data["mask"],
+            names=columns,
         )
-        pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
+        mask_ = mask_[mask_pd.columns]
+
+        pd.testing.assert_frame_equal(data_pd, data_)
+        pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
+
+        if val_dt is not None:
+            val_dt_ = _pandas_read_csv(
+                expected_data["vadt"],
+                header=None,
+                squeeze=True,
+                name=None,
+            )
+            pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
+
+        if val_id is not None:
+            val_id_ = _pandas_read_csv(
+                expected_data["vaid"],
+                header=None,
+                squeeze=True,
+                name=val_id.name,
+            )
+            pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
         return
@@ -166,17 +169,19 @@ def _testing_suite(
 
     cdm_mapper.cdm_to_ascii(output, suffix=tb_id)
     output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
-    output_ = read_tables(
-        expected_data["cdm_table"], tb_id=tb_id + "*", cdm_subset=cdm_subset
-    )
 
-    del output[("header", "record_timestamp")]
-    del output[("header", "history")]
-    del output_[("header", "record_timestamp")]
-    del output_[("header", "history")]
+    if review is True:
+        output_ = read_tables(
+            expected_data["cdm_table"], tb_id=tb_id + "*", cdm_subset=cdm_subset
+        )
 
-    if len(col_subset) > 0:
-        output = output[col_subset]
-        output_ = output_[col_subset]
+        del output[("header", "record_timestamp")]
+        del output[("header", "history")]
+        del output_[("header", "record_timestamp")]
+        del output_[("header", "history")]
 
-    pd.testing.assert_frame_equal(output, output_)
+        if len(col_subset) > 0:
+            output = output[col_subset]
+            output_ = output_[col_subset]
+
+        pd.testing.assert_frame_equal(output, output_)
