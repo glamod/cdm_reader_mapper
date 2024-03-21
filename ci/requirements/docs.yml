@@ -5,7 +5,7 @@ channels:
     - nodefaults
 
 dependencies:
-    #cdm_reader_mapepr
+    #cdm_reader_mapper
     - python>=3.10
     - pandas
     - matplotlib
