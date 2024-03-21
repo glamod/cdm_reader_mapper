@@ -83,29 +83,6 @@ def _read_schema(schema, schema_file=""):
     else:
         logging.error("Multile reports per line data model: not yet supported")
         return
-        # 1X: MULTIPLE REPORTS PER RECORD
-        # !!!! NEED TO ADD SECTION LENS TO THE REPORT'S SECTION'S HEADER!!!
-        # CAN INFER FROM ELEMENTS LENGHT AND ADD, OR MAKE AS REQUIREMENT TO BE GIVEN
-        # global name_report_section
-        # Have to assess how the section splitting works when x sequential
-        # sections are declared, and only x-y are met.
-        # if not schema['header'].get('reports_per_line'):
-        #    schema['header']['reports_per_line'] = 24
-        # if not schema.get('sections'):
-        #    schema['sections'] = dict()
-        #    schema['header']['parsing_order'] = [{'s':[]}]
-        #    for i in range(1,schema['header']['reports_per_line'] + 1):
-        #        schema['sections'].update({str(i):{'header':{},'elements':deepcopy(schema.get('elements'))}})
-        # else:
-        #    name_report_section = list(schema['sections'].keys())[-1]
-        #    schema['header']['name_report_section'] == name_report_section
-        #    schema['header']['parsing_order'] = [{'s':list(schema['sections'].keys())[:-1]}]
-        #    for i in range(1,schema['header']['reports_per_line'] + 1):
-        #        schema['sections'].update({str(i):schema['sections'].get(name_report_section)})
-        #    schema['sections'].pop(name_report_section,None)
-        # for i in range(1,schema['header']['reports_per_line'] + 1):
-        #    schema['header']['parsing_order'][0]['s'].append(str(i))
-        # return schema
 
 
 def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
@@ -213,9 +190,7 @@ def df_schema(df_columns, schema):
     flat_schema = dict()
     # Flatten main model schema
     for section in schema.get("sections"):
-        if section == properties.dummy_level:
-            flat_schema.update(schema["sections"].get(section).get("elements"))
-        elif schema["sections"].get(section).get("header").get("disable_read"):
+        if schema["sections"].get(section).get("header").get("disable_read"):
             flat_schema.update({(section, section): {"column_type": "object"}})
         else:
             flat_schema.update(
