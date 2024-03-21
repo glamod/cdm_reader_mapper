@@ -198,16 +198,27 @@ class test_data:
             "icoads_r3000_NRT",
         )
 
-    # @property
-    # def test_gcc_mix(self):
-    #    """IMMAT deck ??? test data."""
-    #    return self._get_data_dict(
-    #        "mix_out_20030201.immt",
-    #        "gcc_immt",
-    #        "???",
-    #        "immt",
-    #        "gdac_r0000",
-    #    )
+    @property
+    def test_gcc_mix(self):
+        """IMMAT deck ??? test data."""
+        return self._get_data_dict(
+            "mix_out_20030201.immt",
+            "gcc_immt",
+            "gcc",
+            "immt",
+            "gdac_r0000",
+        )
+
+    @property
+    def test_craid_1010001(self):
+        """C-RAID 1010001 test data."""
+        return self._get_data_dict(
+            "1010001.nc",
+            "c_raid",
+            "raid",
+            "c",
+            "c_raid",
+        )
 
     def __getitem__(self, attr):
         """Make class subscriptable."""
@@ -218,7 +229,7 @@ class test_data:
 
     def _get_data_dict(self, data_file, schema, deck, dm, ds):
         return {
-            "source": load_file(f"{dm}_d{deck}/input/{data_file}"),
+            "source": load_file(f"{dm}_{deck}/input/{data_file}"),
             "data_model": schema,
             "dm": dm,
             "ds": ds,
