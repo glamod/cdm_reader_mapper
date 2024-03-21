@@ -122,9 +122,9 @@ def _write_csv_files(
             trans = getattr(imodel_functions, transform)
             logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
             logger.debug(f"\tidata_i Index: {idata.index}")
-            logger.debug(f"\tnotna_idx: {notna_idx}")
 
             if elements:
+                logger.debug(f"\tnotna_idx: {notna_idx}")
                 table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
             else:
                 table_df_i[cdm_key] = trans(**kwargs)
