@@ -107,7 +107,7 @@ class Configurator:
         if len(df) > 0:
             self.str_line = df.iloc[0]
         else:
-         self.str_line = ""
+            self.str_line = ""
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
