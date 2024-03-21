@@ -39,7 +39,6 @@ invocation) logging an error.
 from __future__ import annotations
 
 import json
-import os
 from io import StringIO
 
 import pandas as pd
@@ -73,6 +72,12 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
         )
         return data
 
+    pt_col = [col for col in pt_col if col in data.columns]
+    if not pt_col:
+        data_columns = list(data.columns)
+        logger.info(f"No platform type found. Selected columns are {data_columns}")
+        return data
+
     #    Find fix method
     if deck_fix.get("method") == "fillna":
         fillvalue = deck_fix.get("fill_value")
@@ -98,13 +103,13 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
-    for fix_file in _files.glob(f"{dataset}.json"):
-        break
-    if not os.path.isfile(fix_file):
-        logger.error(f"Dataset {dataset} not included in platform library")
-        return
+    fix_file = _files.glob(f"{dataset}.json")
+    fix_file = [f for f in fix_file]
+    if not fix_file:
+        logger.warning(f"Dataset {dataset} not included in platform library")
+        return data
     else:
-        with open(fix_file) as fileObj:
+        with open(fix_file[0]) as fileObj:
             fix_methods = json.load(fileObj)
 
     pt_col = properties.metadata_datamodels["platform"].get(data_model)

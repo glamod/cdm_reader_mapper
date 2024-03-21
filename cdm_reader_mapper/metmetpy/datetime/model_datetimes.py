@@ -79,7 +79,12 @@ def imma1(data, conversion):
     dd_col = properties.metadata_datamodels.get("day").get("imma1")
     hr_col = properties.metadata_datamodels.get("hour").get("imma1")
     datetime_cols = [yr_col, mo_col, dd_col, hr_col]
+    datetime_cols = [dt_ for dt_ in datetime_cols if dt_ in data.columns]
 
+    if not datetime_cols:
+        return pd.Series()
+    elif len(datetime_cols) == 1:
+        datetime_cols = datetime_cols[0]
     if conversion == "to_datetime":
         return to_datetime(data)
     elif conversion == "from_datetime":

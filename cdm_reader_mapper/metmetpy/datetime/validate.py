@@ -57,5 +57,9 @@ def validate(data, data_model, dck, log_level="INFO"):
             f'Data model "{data_model}" datetime conversor not defined in model_datetimes module "{data_model}"'
         )
         return
-    else:
-        return data_model_datetime.notna()
+    elif len(data_model_datetime) == 0:
+        data_columns = list(data.columns)
+        logger.info(
+            f"No columns found for datetime conversion. Selected columns are {data_columns}"
+        )
+    return data_model_datetime.notna()

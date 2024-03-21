@@ -64,6 +64,17 @@ def validate(data, dataset, data_model, dck, sid=None, blank=False, log_level="I
                      properties file"
         )
         return
+    elif not isinstance(id_col, list):
+        id_col = [id_col]
+
+    id_col = [col for col in id_col if col in data.columns]
+
+    if not id_col:
+        data_columns = list(data.columns)
+        logger.info(f"No ID columns found. Selected columns are {data_columns}")
+        return
+    elif len(id_col) == 1:
+        id_col = id_col[0]
 
     idSeries = data[id_col]
 
