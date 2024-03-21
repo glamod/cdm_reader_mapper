@@ -9,6 +9,9 @@ dependencies:
     - dask
     - matplotlib
     - xarray
+    - bottleneck
+    - netcdf4
+    - h5netcdf
     - datashader
     # for testing
     - pytest

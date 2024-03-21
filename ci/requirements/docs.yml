@@ -11,6 +11,9 @@ dependencies:
     - matplotlib
     - datashader
     - xarray
+    - dask
+    - netcdf4
+    - h5netcdf
 
     #documentation
     - ipython
