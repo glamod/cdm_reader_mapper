@@ -71,12 +71,16 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
                     data from dataset {dataset}"
         )
         return data
+    elif not isinstance(pt_col, list):
+        pt_col = [pt_col]
 
     pt_col = [col for col in pt_col if col in data.columns]
     if not pt_col:
         data_columns = list(data.columns)
         logger.info(f"No platform type found. Selected columns are {data_columns}")
         return data
+    elif len(pt_col) == 1:
+        pt_col = pt_col[0]
 
     #    Find fix method
     if deck_fix.get("method") == "fillna":
