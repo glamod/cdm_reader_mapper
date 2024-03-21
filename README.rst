@@ -11,7 +11,9 @@ Common Data Model reader and mapper: ``cdm`` toolbox
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |fossa|                 |
+| Coding Standards           | |black| |ruff| |pre-commit|                         |
++                            +                                                     +                               
+|                            | |fossa| |codefactor|                                |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
 +----------------------------+-----------------------------------------------------+
@@ -118,6 +120,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
         :target: https://github.com/psf/black
         :alt: Python Black
+
+.. |codefactor| image:: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper/badge
+		:target: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper
+		:alt: CodeFactor
 
 .. |coveralls| image:: https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg
 	      :target: https://codecov.io/gh/glamod/cdm_reader_mapper
