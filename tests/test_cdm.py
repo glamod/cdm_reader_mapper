@@ -22,6 +22,7 @@ def test_read_imma1_buoys_supp():
         sections=["c99"],
         suffix="063_714",
         mapping=False,
+        review=False,
     )
 
 
@@ -170,6 +171,9 @@ def test_read_immt_gcc():
     )
 
 
+test_read_immt_gcc()
+
+
 def test_read_craid_1010001():
     _testing_suite(
         **test_data.test_craid_1010001,
@@ -222,4 +226,5 @@ def test_read_imma1_buoys_supp_chunks():
         suffix="063_714",
         chunksize=10000,
         mapping=False,
+        review=False,
     )
