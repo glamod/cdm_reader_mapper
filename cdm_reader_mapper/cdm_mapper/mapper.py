@@ -146,7 +146,7 @@ def _write_csv_files(
             )
         elif elements and not isEmpty:
             table_df_i[cdm_key] = to_map
-        elif default is not None:  # (vakue = 0 evals to False!!)
+        elif default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
             else:
