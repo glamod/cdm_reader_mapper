@@ -202,7 +202,7 @@ class test_data:
     def test_gcc_mix(self):
         """IMMAT deck ??? test data."""
         return self._get_data_dict(
-            "mix_out_20030201.immt",
+            "mix-out_20030201.immt",
             "gcc_immt",
             "gcc",
             "immt",

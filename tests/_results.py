@@ -191,6 +191,14 @@ class result_data:
             "imma1",
         )
 
+    @property
+    def expected_mix_out(self):
+        return self._get_data_dict(
+            "mix-out_20030201",
+            "gcc",
+            "immt",
+        )
+
     def __getitem__(cls, attr):
         return getattr(cls, attr)
 
