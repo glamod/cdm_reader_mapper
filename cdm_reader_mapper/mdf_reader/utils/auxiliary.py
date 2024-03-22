@@ -156,7 +156,7 @@ class Configurator:
         return index
 
     def _get_index(self, section):
-        if len(self.order) == 1:
+        if len(self.orders) == 1:
             return section
         else:
             return (self.order, section)

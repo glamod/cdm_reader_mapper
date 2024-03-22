@@ -185,21 +185,28 @@ def df_schema(df_columns, schema):
         for element in list(schema):
             if element not in columns:
                 schema.pop(element)
-        return
+
+    def get_index(idx, lst, section):
+        if len(lst) == 1:
+            return idx
+        return (section, idx)
 
     flat_schema = dict()
-    # Flatten main model schema
     for section in schema.get("sections"):
         if schema["sections"].get(section).get("header").get("disable_read"):
-            flat_schema.update({(section, section): {"column_type": "object"}})
+            flat_schema.update({section: {"column_type": "object"}})
         else:
             flat_schema.update(
                 {
-                    (section, x): schema["sections"].get(section).get("elements").get(x)
+                    get_index(x, list(schema.get("sections")), section): schema[
+                        "sections"
+                    ]
+                    .get(section)
+                    .get("elements")
+                    .get(x)
                     for x in schema["sections"].get(section).get("elements")
                 }
             )
 
     clean_schema(df_columns, flat_schema)
-
     return flat_schema
