@@ -40,6 +40,18 @@ def _pandas_read_csv(
     return df
 
 
+def _read_result_data(data_file, columns, **kwargs):
+    columns_ = _pandas_read_csv(data_file, nrows=0).columns
+    columns_ = [eval(col) for col in columns_]
+    data_ = _pandas_read_csv(
+        data_file,
+        names=columns_,
+        skiprows=1,
+        **kwargs,
+    )
+    return data_[columns]
+
+
 def _testing_suite(
     source=None,
     data_model=None,
@@ -113,19 +125,10 @@ def _testing_suite(
         if not os.path.isfile(result_data_file):
             return
 
-        data_ = _pandas_read_csv(
-            result_data_file,
-            names=columns,
-            dtype=dtypes,
-            parse_dates=parse_dates,
+        data_ = _read_result_data(
+            result_data_file, columns, dtype=dtypes, parse_dates=parse_dates
         )
-        data_ = data_[data_pd.columns]
-
-        mask_ = _pandas_read_csv(
-            expected_data["mask"],
-            names=columns,
-        )
-        mask_ = mask_[mask_pd.columns]
+        mask_ = _read_result_data(expected_data["mask"], columns)
 
         pd.testing.assert_frame_equal(data_pd, data_)
         pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)

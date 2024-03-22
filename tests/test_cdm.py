@@ -19,10 +19,9 @@ def test_read_imma1_buoys_nosupp():
 def test_read_imma1_buoys_supp():
     _testing_suite(
         **test_data.test_063_714,
-        sections=["c99"],
+        sections=["core", "c99"],
         suffix="063_714",
         mapping=False,
-        review=False,
     )
 
 
@@ -219,9 +218,8 @@ def test_read_imma1_buoys_nosupp_chunks():
 def test_read_imma1_buoys_supp_chunks():
     _testing_suite(
         **test_data.test_063_714,
-        sections="c99",
+        sections=["c99"],
         suffix="063_714",
         chunksize=10000,
         mapping=False,
-        review=False,
     )
