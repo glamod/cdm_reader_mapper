@@ -62,4 +62,5 @@ def validate(data, data_model, dck, log_level="INFO"):
         logger.info(
             f"No columns found for datetime conversion. Selected columns are {data_columns}"
         )
+        return
     return data_model_datetime.notna()
