@@ -40,9 +40,20 @@ def _pandas_read_csv(
     return df
 
 
+def _evaluate_columns(columns):
+    columns_ = []
+    for col in columns:
+        try:
+            col = eval(col)
+        except NameError:
+            pass
+        columns_.append(col)
+    return columns_
+
+
 def _read_result_data(data_file, columns, **kwargs):
     columns_ = _pandas_read_csv(data_file, nrows=0).columns
-    columns_ = [eval(col) for col in columns_]
+    columns_ = _evaluate_columns(columns_)
     data_ = _pandas_read_csv(
         data_file,
         names=columns_,
@@ -174,8 +185,9 @@ def _testing_suite(
     output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
 
     if review is True:
+        print(expected_data["cdm_table"])
         output_ = read_tables(
-            expected_data["cdm_table"], tb_id=tb_id + "*", cdm_subset=cdm_subset
+            expected_data["cdm_table"], tb_id=f"{tb_id}*", cdm_subset=cdm_subset
         )
 
         del output[("header", "record_timestamp")]

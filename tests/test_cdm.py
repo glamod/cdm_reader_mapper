@@ -165,8 +165,7 @@ def test_read_immt_gcc():
     _testing_suite(
         **test_data.test_gcc_mix,
         cdm_name="gcc_mapping",
-        suffix="mix_out_nosupp",
-        review=False,
+        suffix="mix_out",
     )
 
 
