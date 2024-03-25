@@ -571,7 +571,7 @@ class _FileReader:
         if not hasattr(self, "valid"):
             self.valid = df.notna()
         mask = self.missing | self.valid
-        mask[self.missings] = None
+        mask[self.missings] = False
         return mask
 
     def _validate_df(self, df):
