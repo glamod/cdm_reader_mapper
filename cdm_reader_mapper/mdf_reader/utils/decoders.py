@@ -89,8 +89,9 @@ class df_decoders:
     def base36(self, data):
         """DOCUMENTATION."""
         # Caution: int(str(np.nan),36) ==> 30191
-        data = data.replace(" ", np.nan, regex=True)
-
+        data = data.apply(
+            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+        )        
         data = [str(int(str(i), 36)) if i == i and i else np.nan for i in data]
 
         return pd.Series(data, dtype=self.dtype)
