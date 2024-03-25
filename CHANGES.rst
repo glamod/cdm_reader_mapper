@@ -9,8 +9,8 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
 New features and enchancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`) 
-* adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`) 
+* ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`)
+* adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -24,7 +24,7 @@ Internal changes
 Bug fixes
 ^^^^^^^^^^
 * ``cdm_mapper``: set debugging logger into if statement (:pull:`24`)
-* ``cdm_mapper``: do not use code table ``qc_flag`` with ``report_id`` (:pull:`24`) 
+* ``cdm_mapper``: do not use code table ``qc_flag`` with ``report_id`` (:pull:`24`)
 
 
 0.2.0 (2023-03-15)
