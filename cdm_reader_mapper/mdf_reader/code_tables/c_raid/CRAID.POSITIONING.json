@@ -1,0 +1,9 @@
+{
+  "ARGOS": "ARGOS positioning system",
+  "GPS": "GPS positioning system",
+  "IRIDIUM": "Iridium positioning system",
+  "BEIDOU": "Beidou navigation satellite system",
+  "GLONASS": "GLONASS navigation satellite system",
+  "GALILEO": "Galileo navigation satellite system",
+  "GNSS": "Global Navigation Satellite System"
+}

@@ -6,6 +6,8 @@ datashader
 msgpack
 requests
 xarray
+netcdf4
+h5netcdf
 timezonefinder
 python-slugify
 textdistance

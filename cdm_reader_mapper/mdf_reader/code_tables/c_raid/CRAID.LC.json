@@ -1,0 +1,16 @@
+{
+  "0": "Argos accuracy estimation over 1500m radius",
+  "1": "Argos accuracy estimation better than 1500m radius",
+  "2": "Argos accuracy estimation better than 500 m radius",
+  "3": "Argos accuracy estimation better than 250 m radius",
+  "A": "Argos no accuracy estimation (3 messages received)",
+  "B": "Argos no accuracy estimation (1 or 2 messages received)",
+  "Z": "Argos invalid location",
+  "G": "GPS positioning accuracy (better than 10 m)",
+  "I": "Iridium accuracy (better than 5 km)",
+  "D": "Beidou accuracy (better than 10 m)",
+  "E": "GLONASS accuracy (better than 10 m)",
+  "F": "GALILEO accuracy (better than 10 m)",
+  "H": "GNSS accuracy (better than 10 m)",
+  "U": "Estimated position. An estimated accuracy may be in AXES_ERROR_ELLIPSE_"
+}

@@ -1,0 +1,21 @@
+{
+  "BATTERY": {
+    "longname": "Battery voltage",
+    "unit": "Volts"
+  },
+  "BATTERY_COUNT": {
+    "longname": "Battery voltage",
+    "unit": "count"
+  },
+  "DROGUE": {
+    "longname": "Drogue detection sensor"
+  },
+  "DROGUE_COUNT": {
+    "longname": "Drogue detection sensor",
+    "unit": "count"
+  },
+  "MSG_REDUNDANCY": {
+    "longname": "Redundancy of received message",
+    "unit": "count"
+  }
+}

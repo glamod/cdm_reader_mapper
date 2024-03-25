@@ -122,9 +122,9 @@ def _write_csv_files(
             trans = getattr(imodel_functions, transform)
             logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
             logger.debug(f"\tidata_i Index: {idata.index}")
-            logger.debug(f"\tnotna_idx: {notna_idx}")
 
             if elements:
+                logger.debug(f"\tnotna_idx: {notna_idx}")
                 table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
             else:
                 table_df_i[cdm_key] = trans(**kwargs)
@@ -146,7 +146,7 @@ def _write_csv_files(
             )
         elif elements and not isEmpty:
             table_df_i[cdm_key] = to_map
-        elif default is not None:  # (vakue = 0 evals to False!!)
+        elif default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
             else:

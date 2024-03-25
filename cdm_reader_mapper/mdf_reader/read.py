@@ -235,8 +235,13 @@ class MDFFileReader(_FileReader):
         logging.info("Getting data string from source...")
         # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data = self._open_data(read_sections_list, sections, chunksize=chunksize)
-
+        self.data = self._open_data(
+            read_sections_list,
+            sections,
+            open_with=properties.open_file[self.imodel],
+            chunksize=chunksize,
+        )
+        # return self
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 

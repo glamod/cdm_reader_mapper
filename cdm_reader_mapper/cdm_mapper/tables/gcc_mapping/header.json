@@ -106,8 +106,7 @@
   "profile_id": {},
   "events_at_station": {},
   "report_quality": {
-    "elements": "QCI",
-    "code_table": "qc_flag"
+    "elements": "QCI"
   },
   "duplicate_status": {
     "default": 4
