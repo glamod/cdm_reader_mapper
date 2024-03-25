@@ -23,7 +23,12 @@
   },
   "date_time": {
     "sections": "",
-    "elements": ["", "", "", ""],
+    "elements": [
+      "",
+      "",
+      "",
+      ""
+    ],
     "transform": "datetime_imma1"
   },
   "date_time_meaning": {
@@ -72,7 +77,10 @@
   },
   "location_precision": {
     "sections": "",
-    "elements": ["", ""],
+    "elements": [
+      "",
+      ""
+    ],
     "transform": "location_accuracy",
     "decimal_places": 0
   },
@@ -117,8 +125,18 @@
     "default": 0
   },
   "source_id": {
-    "sections": ["", "", "", ""],
-    "elements": ["", "", "", ""],
+    "sections": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "elements": [
+      "",
+      "",
+      "",
+      ""
+    ],
     "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",

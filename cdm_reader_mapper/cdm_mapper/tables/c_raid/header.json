@@ -1,7 +1,7 @@
 {
   "report_id": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_characteristics",
+    "elements": "DRIFTER_NUMBER",
     "transform": "string_add",
     "kwargs": {
       "prepend": "C-RAID",
@@ -28,12 +28,12 @@
     "default": 2
   },
   "platform_type": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_characteristics",
+    "elements": "PLATFORM_FAMILY",
     "code_table": "platform_type"
   },
   "platform_sub_type": {
-    "sections": "",
+    "sections": "drifter",
     "elements": "",
     "code_table": "platform_sub_type"
   },
@@ -63,7 +63,10 @@
   },
   "location_accuracy": {
     "sections": "",
-    "elements": ["", ""],
+    "elements": [
+      "",
+      ""
+    ],
     "transform": "location_accuracy",
     "decimal_places": 0
   },
@@ -75,7 +78,10 @@
   },
   "station_speed": {
     "sections": "",
-    "elements": ["", ""],
+    "elements": [
+      "",
+      ""
+    ],
     "code_table": "ship_speed_ms",
     "decimal_places": 1
   },
@@ -98,7 +104,12 @@
   },
   "report_timestamp": {
     "sections": "",
-    "elements": ["YR", "MO", "DY", "HR"],
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "HR"
+    ],
     "transform": "datetime_imma1"
   },
   "report_duration": {
@@ -130,8 +141,18 @@
     "transform": "lineage"
   },
   "source_id": {
-    "sections": ["", "", "", ""],
-    "elements": ["", "", "", ""],
+    "sections": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "elements": [
+      "",
+      "",
+      "",
+      ""
+    ],
     "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",
