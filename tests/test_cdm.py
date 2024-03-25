@@ -6,8 +6,6 @@ from cdm_reader_mapper import test_data
 
 from ._testing_cdm_suite import _testing_suite
 
-# from _testing_cdm_suite import _testing_suite
-
 
 def test_read_imma1_buoys_nosupp():
     _testing_suite(
@@ -193,27 +191,4 @@ def test_read_imma1_buoys_codes_subset():
         cdm_name="icoads_r3000_d714",
         codes_subset=["platform_sub_type", "wind_direction"],
         suffix="063_714",
-    )
-
-
-# C. TESTS TO TEST CHUNKING
-# -----------------------------------------------------------------------------
-# FROM FILE: WITH AND WITHOUT SUPPLEMENTAL
-def test_read_imma1_buoys_nosupp_chunks():
-    "NOT WORKING: textfilereader"
-    _testing_suite(
-        **test_data.test_063_714,
-        cdm_name="icoads_r3000_d714",
-        suffix="063_714",
-        chunksize=10000,
-    )
-
-
-def test_read_imma1_buoys_supp_chunks():
-    _testing_suite(
-        **test_data.test_063_714,
-        sections="c99",
-        suffix="063_714",
-        chunksize=10000,
-        mapping=False,
     )
