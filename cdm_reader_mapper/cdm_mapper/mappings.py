@@ -201,7 +201,7 @@ class mapping_functions:
         hours, minutes = np.vectorize(self.datetime_decimalhour_to_HM)(
             df.iloc[:, -1].values
         )
-        df.drop(df.columns[len(df.columns) - 1], axis=1, inplace=True)
+        df = df.drop(df.columns[len(df.columns) - 1], axis=1)
         df["H"] = hours
         df["M"] = minutes
         # VALUES!!!!

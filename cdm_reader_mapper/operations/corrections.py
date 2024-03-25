@@ -300,7 +300,7 @@ def get_dup(data, dataset):
     df_dup = df.copy()
     df_dup["flag"] = 0
     # first flag pos & time
-    df_dup.sort_values(by=["LON", "LAT", "DY", "HR"], inplace=True)
+    df_dup = df_dup.sort_values(by=["LON", "LAT", "DY", "HR"])
     tmp_id = pd.DataFrame()
     tmp_id["ID"] = df_dup["ID"].copy()
     tmp_id["ID_s"] = df_dup["ID"].shift().astype(str)
@@ -322,8 +322,6 @@ def get_dup(data, dataset):
         & (tmp_uid["distance"] <= tol["UID"])
     )
     df_dup["flag"][loc] = 1
-    # nodup = pd.DataFrame({"UID": df_dup["UID"].loc[df_dup["flag"] == 0],
-    #                       "UID_d":'{}', "flag": 1}, index=None)
     dup_flag = pd.DataFrame({"UID": df["UID"].copy(), "dup_flag": 0, "flag": 1})
     dup_flag["dup_flag"][loc] = 1
     #   %%
@@ -343,10 +341,8 @@ def get_dup(data, dataset):
         nlst = [x for x in lst[pv:] if x < index]
         pv += len(nlst)
         nlst.insert(0, nlst[0] - 1)
-        # nodup.drop(nodup.index[nlst[0]-1], inplace=True)
         # choose the first duplicate to keep #!THiS SHOULD IMPROVE
         dup_flag["dup_flag"][nlst[0]] = 3
-        # print(nlst)
         # generate all combinations of consecutive values and add to df
         for fe in nlst:
             r_nlst = list(nlst)
@@ -356,8 +352,4 @@ def get_dup(data, dataset):
                 {"UID": df["UID"].loc[fe], "UID_d": tmp, "flag": 1},
                 ignore_index=True,
             )
-            # print("add for len= {}".format(len(r_nlst)))
-    # dup_out = dup_out.append(nodup, ignore_index=True)
-    # dup_out["flag"] = dup_out["flag"].astype("Int64")
-    # print(dup_out)
     return dup_out, dup_flag
