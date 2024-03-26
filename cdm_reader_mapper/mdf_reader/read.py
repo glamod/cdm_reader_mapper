@@ -270,7 +270,7 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        self.data = self.data.where(data_pd.notnull(), np.nan)
+        self.data = self.data.where(self.data.notnull(), np.nan)
         return self
 
 
