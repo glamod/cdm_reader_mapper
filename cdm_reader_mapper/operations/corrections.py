@@ -70,7 +70,6 @@ def gen_files(data, dataset, correction_path, yr, mo):
     if not df.empty:
         dup, dup_f = get_dup(data, dataset)
         if os.path.exists(fn):
-            print(fn)
             df1 = pd.read_csv(
                 fn,
                 delimiter="|",
@@ -251,6 +250,13 @@ def split_list(n):
     return [(x + 1) for x, y in zip(n, n[1:]) if y - x != 1]
 
 
+def convert_longitude(lon):
+    """Convert longitude to -180 to 180."""
+    if lon > 180:
+        return -180 + math.fmod(lon, 180)
+    return lon
+
+
 def get_dup(data, dataset):
     """
     Check for duplicates.
@@ -286,15 +292,12 @@ def get_dup(data, dataset):
             "DY": data[("core", "DY")],
             "HR": data[("core", "HR")],
         }
-    )  # .iloc[:200]
+    )
     df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
     # round lon, lat to one digit
     df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float).round(1)
     # convet longitdute to -180-180
-    df["LON"][df["LON"] > 180] = -180 + df["LON"][df["LON"] > 180].apply(
-        lambda x: math.fmod(x, 180)
-    )
-    # set tolerance for duplicate identification
+    df["LON"] = df["LON"].apply(convert_longitude)
     tol = pd.Series([2, 0, 0.05, 0.05, 0, 0])
     tol.index = ["UID", "ID", "LON", "LAT", "DY", "HR"]
     df_dup = df.copy()
@@ -321,9 +324,9 @@ def get_dup(data, dataset):
         & (tmp_id["distance"] <= tol["ID"])
         & (tmp_uid["distance"] <= tol["UID"])
     )
-    df_dup["flag"][loc] = 1
+    df_dup["flag"] = df_dup["flag"].where(~loc, 1)
     dup_flag = pd.DataFrame({"UID": df["UID"].copy(), "dup_flag": 0, "flag": 1})
-    dup_flag["dup_flag"][loc] = 1
+    dup_flag["dup_flag"] = dup_flag["dup_flag"].where(~loc, 1)
     #   %%
     dup_list = (
         df_dup.sort_values(by=["LON", "LAT", "DY", "HR"])
