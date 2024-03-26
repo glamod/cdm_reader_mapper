@@ -9,8 +9,8 @@ import os
 from copy import deepcopy
 from io import StringIO
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
