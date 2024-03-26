@@ -10,6 +10,7 @@ from copy import deepcopy
 from io import StringIO
 
 import pandas as pd
+import numpy as np
 import xarray as xr
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
@@ -476,6 +477,7 @@ class _FileReader:
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
         self.columns = df.columns
+        df = df.where(df.notnull(), np.nan)
         return df, missings
 
     def _open_data(

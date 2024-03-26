@@ -7,7 +7,6 @@ import logging
 from io import StringIO as StringIO
 
 import pandas as pd
-import numpy as np
 
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
@@ -270,7 +269,6 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        self.data = self.data.where(self.data.notnull(), np.nan)
         return self
 
 
