@@ -153,9 +153,7 @@ def _write_csv_files(
                 table_df_i[cdm_key] = default
 
         if fill_value is not None:
-            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(
-                value=fill_value
-            )  # , inplace=True)
+            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
         cdm_tables = _decimal_places(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
@@ -181,7 +179,7 @@ def _write_csv_files(
         }
     )
     if "observation_value" in table_df_i:
-        table_df_i.dropna(subset=["observation_value"], inplace=True)
+        table_df_i = table_df_i.dropna(subset=["observation_value"])
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
     return cdm_tables
 

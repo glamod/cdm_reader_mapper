@@ -8,14 +8,16 @@ from cdm_reader_mapper.operations import corrections, inspect, replace, select
 from ._data import attrs_df, attrs_pa, data_df, data_pa, mask_df, mask_pa
 from ._results import correction_df, table_df
 
+# from _data import attrs_df, attrs_pa, data_df, data_pa, mask_df, mask_pa
+# from _results import correction_df, table_df
+
 
 def test_select_true_pandas():
-    mask_df["global_mask"] = mask_df.all(axis=1)
-    select.select_true(data_df, mask_df, "global_mask", out_rejected=True)
+    select.select_true(data_df, mask_df, out_rejected=True)
 
 
 def test_select_true_parser():
-    select.select_true(data_pa, mask_pa, "c99", out_rejected=True)
+    select.select_true(data_pa, mask_pa, out_rejected=True)
 
 
 def test_select_from_list_pandas():
@@ -56,6 +58,9 @@ def test_corrections_pandas():
     corrections.corrections(
         data_df, dataset="test_data", correction_path=".", yr="2010", mo="07"
     )
+
+
+# test_corrections_pandas()
 
 
 def test_corrections_parser():

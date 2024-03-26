@@ -71,7 +71,10 @@ class df_converters:
 
         # First do the appropriate managing of white spaces:
         # to the right, they should mean 0!
-        data = data.replace(r"^\s*$", np.nan, regex=True)
+        data = data.apply(
+            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+        )
+        # data = data.replace(r"^\s*$", np.nan, regex=True)
 
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!

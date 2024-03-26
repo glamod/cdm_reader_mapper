@@ -188,7 +188,7 @@ def read_tables(
         if indexing is False:
             return dfi
 
-        dfi.set_index("report_id", inplace=True, drop=False)
+        dfi = dfi.set_index("report_id", drop=False)
         dfi.columns = pd.MultiIndex.from_product([[tb], dfi.columns])
         df_list.append(dfi)
 
@@ -197,5 +197,5 @@ def read_tables(
         return
 
     merged = pd.concat(df_list, axis=1, join="outer")
-    merged.reset_index(drop=True, inplace=True)
+    merged = merged.reset_index(drop=True)
     return merged

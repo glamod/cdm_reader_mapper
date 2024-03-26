@@ -47,7 +47,7 @@
   "primary_station_id_scheme": {
     "sections": "core",
     "elements": "II",
-    "fill_value": 8,
+    "fill_value": "8",
     "code_table": "primary_station_id_scheme"
   },
   "longitude": {
