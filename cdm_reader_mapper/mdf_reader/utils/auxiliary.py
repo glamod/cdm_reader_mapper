@@ -398,9 +398,6 @@ class _FileReader:
                 if data_var not in ds.data_vars:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
-                self.schema["sections"][section]["elements"][data_var][
-                    "column_type"
-                ] = dtypes[data_var]
                 for attr, value in elements[data_var].items():
                     if value == "__from_file__":
                         if attr in ds[data_var].attrs:
@@ -552,6 +549,8 @@ class _FileReader:
     ):
         self.missing = df.isna()
         for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
             if section in decoder_dict.keys():
                 df[section] = self._decode_entries(
                     df[section],
