@@ -1,8 +1,14 @@
 {
   "report_id": {
-    "sections": "drifter_characteristics",
-    "elements": "DRIFTER_NUMBER",
-    "transform": "string_add",
+    "sections": [
+      "general",
+      "drifter_characteristics"
+    ],
+    "elements": [
+      "FORMAT_VERSION",
+      "DRIFTER_NUMBER"
+    ],
+    "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",
       "separator": "-"
@@ -16,11 +22,6 @@
       11
     ]
   },
-  "observing_programme": {
-    "sections": "",
-    "elements": "",
-    "transform": "observing_programme"
-  },
   "report_type": {
     "default": 0
   },
@@ -33,41 +34,35 @@
     "code_table": "platform_type"
   },
   "platform_sub_type": {
-    "sections": "drifter",
-    "elements": "",
+    "sections": "drifter_characteristics",
+    "elements": "DRIFTER_TYPE",
     "code_table": "platform_sub_type"
   },
   "primary_station_id": {
-    "sections": "",
-    "elements": ""
+    "sections": "drifter_deployment",
+    "elements": "DEPLOYMENT_REFERENCE_STATION_ID"
   },
   "station_record_number": {
     "default": 1
   },
   "primary_station_id_scheme": {
-    "sections": "",
-    "elements": "",
     "fill_value": 8,
     "code_table": "primary_station_id_scheme"
   },
   "longitude": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_measurements",
+    "elements": "LONGITUDE",
     "transform": "longitude_360to180",
     "decimal_places": "decimal_places"
   },
   "latitude": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_measurements",
+    "elements": "LATITUDE",
     "decimal_places": "decimal_places"
   },
   "location_accuracy": {
-    "sections": "",
-    "elements": [
-      "",
-      ""
-    ],
-    "transform": "location_accuracy",
+    "sections": "drifter_measurements",
+    "elements": "POSITION_ACCURACY",
     "decimal_places": 0
   },
   "location_quality": {
@@ -103,23 +98,11 @@
     "default": 2
   },
   "report_timestamp": {
-    "sections": "",
-    "elements": [
-      "YR",
-      "MO",
-      "DY",
-      "HR"
-    ],
-    "transform": "datetime_imma1"
+    "sections": "drifter_measurements",
+    "elements": "JULD"
   },
   "report_duration": {
     "default": 11
-  },
-  "report_time_accuracy": {
-    "sections": "",
-    "elements": "",
-    "transform": "time_accuracy",
-    "decimal_places": 0
   },
   "report_time_quality": {
     "default": 2
@@ -136,23 +119,13 @@
     "transform": "datetime_utcnow"
   },
   "history": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_history",
+    "elements": "HISTORY_INSTITUTION",
     "transform": "lineage"
   },
   "source_id": {
-    "sections": [
-      "",
-      "",
-      "",
-      ""
-    ],
-    "elements": [
-      "",
-      "",
-      "",
-      ""
-    ],
+    "sections": "global_attributes",
+    "elements": "source",
     "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",
