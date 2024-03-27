@@ -101,7 +101,7 @@ def print_datetime(data, null_label):
         if pd.isna(x):
             return null_label
         if isinstance(x, str):
-            return str
+            return x
         return x.strftime("%Y-%m-%d %H:%M:%S")
 
     return data.apply(lambda x: _return_str(x, null_label))
