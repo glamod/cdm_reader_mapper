@@ -90,7 +90,6 @@ def _write_csv_files(
         default = imapping.get("default")
         fill_value = imapping.get("fill_value")
         decimal_places = imapping.get("decimal_places")
-
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
@@ -122,7 +121,6 @@ def _write_csv_files(
             trans = getattr(imodel_functions, transform)
             logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
             logger.debug(f"\tidata_i Index: {idata.index}")
-
             if elements:
                 logger.debug(f"\tnotna_idx: {notna_idx}")
                 table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
@@ -158,6 +156,7 @@ def _write_csv_files(
         cdm_tables = _decimal_places(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
         )
+
     # think that NaN also casts floats to float64....!keep floats of lower precision to its original one
     # will convert all NaN to object type!
     # but also some numerics with values, like imma observation-value (temperatures),
@@ -295,7 +294,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 for k, v in out_dtypes[table].items()
             }
         )
-
     # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
@@ -330,7 +328,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
-
     return cdm_tables
 
 

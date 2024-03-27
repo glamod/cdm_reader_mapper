@@ -209,16 +209,19 @@ class mapping_functions:
         df["H"] = hours
         df["M"] = minutes
         # VALUES!!!!
-        data = pd.to_datetime(
+        return pd.to_datetime(
             df.astype(str).apply("-".join, axis=1).values,
             format=date_format,
             errors="coerce",
         )
-        return data
 
     def datetime_utcnow(self):
         """Get actual UTC time."""
         return datetime.datetime.utcnow()
+
+    def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f"):
+        """Convert string to datetime object."""
+        return pd.to_datetime(df.values, format=format, errors="coerce")
 
     def datetime_to_cdm_time(self, df):
         """
