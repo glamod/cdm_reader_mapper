@@ -1,5 +1,7 @@
 """Common Data Model (CDM) reader and mapper common properties."""
 
+from __future__ import annotations
+
 numpy_integers = [
     "int8",
     "int16",

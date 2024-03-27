@@ -90,14 +90,17 @@ class MDFFileReader(_FileReader):
         if decode is not True:
             decoder_dict = {}
 
+        dtypes = {k: v for k, v in dtype.keys() if k in self.data.columns}
+
         if isinstance(self.data, pd.DataFrame):
-            self.data = self._convert_and_decode_df(
+            data = self._convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
                 decoder_dict,
             )
-            self.data = self.data.astype(dtype)
+
+            self.data = data.astype(dtypes)
         else:
             data_buffer = StringIO()
             for i, df_ in enumerate(self.data):

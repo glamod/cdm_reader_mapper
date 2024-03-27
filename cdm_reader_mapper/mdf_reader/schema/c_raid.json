@@ -30,83 +30,109 @@
       },
       "elements": {
         "title": {
-          "description": "A succinct description of what is in the dataset."
+          "description": "A succinct description of what is in the dataset.",
+          "column_type": "str"
         },
         "institution": {
-          "description": "Specifies where the original data was produced."
+          "description": "Specifies where the original data was produced.",
+          "column_type": "str"
         },
         "source": {
-          "description": "The method of production of the original data. If it was model-generated, source should name the model and its version, as specifically as could be useful. If it is observational, source should characterize it (e.g., 'surface observation' or 'radiosonde')."
+          "description": "The method of production of the original data. If it was model-generated, source should name the model and its version, as specifically as could be useful. If it is observational, source should characterize it (e.g., 'surface observation' or 'radiosonde').",
+          "column_type": "str"
         },
         "history": {
-          "description": "Provides an audit trail for modifications to the original data. Well-behaved generic NetCDF filters will automatically append their name and the parameters with which they were invoked to the global history attribute of an input NetCDF file. We recommend that each line begin with a timestamp indicating the date and time of day that the program was executed."
+          "description": "Provides an audit trail for modifications to the original data. Well-behaved generic NetCDF filters will automatically append their name and the parameters with which they were invoked to the global history attribute of an input NetCDF file. We recommend that each line begin with a timestamp indicating the date and time of day that the program was executed.",
+          "column_type": "str"
         },
         "data_mode": {
           "description": "Indicates if the file contains real-time, delayed mode or mixed data.",
+          "column_type": "str",
           "codetable": "CRAID.MODES"
         },
         "references": {
-          "description": "Published or web-based references that describe the data or methods used to produce it."
+          "description": "Published or web-based references that describe the data or methods used to produce it.",
+          "column_type": "str"
         },
         "comment": {
-          "description": "Miscellaneous information about the data or methods used to produce it."
+          "description": "Miscellaneous information about the data or methods used to produce it.",
+          "column_type": "str"
         },
         "user_manual_version": {
-          "description": "The version number of the user manual"
+          "description": "The version number of the user manual",
+          "column_type": "str"
         },
         "Conventions": {
-          "description": "The conventions supported by this file, blank separated"
+          "description": "The conventions supported by this file, blank separated",
+          "column_type": "str"
         },
         "netcdf_version": {
-          "description": "Netcdf version used for the data file."
+          "description": "Netcdf version used for the data file.",
+          "column_type": "str"
         },
         "doi": {
-          "description": "List of Data Object Identifiers (DOI) related to this data file (blank separated)."
+          "description": "List of Data Object Identifiers (DOI) related to this data file (blank separated).",
+          "column_type": "str"
         },
         "citation": {
-          "description": "The citation to be used in publications using the data file."
+          "description": "The citation to be used in publications using the data file.",
+          "column_type": "str"
         },
         "qc_manual": {
-          "description": "ntains the name of the manual that describes the quality control procedure."
+          "description": "ntains the name of the manual that describes the quality control procedure.",
+          "column_type": "str"
         },
         "time_coverage_start": {
-          "description": "Start date of the data in UTC. See note on time format below."
+          "description": "Start date of the data in UTC. See note on time format below.",
+          "column_type": "datetime"
         },
         "time_coverage_end": {
-          "description": "Final date of the data in UTC. See note on time format below."
+          "description": "Final date of the data in UTC. See note on time format below.",
+          "column_type": "datetime"
         },
         "geospatial_lat_min": {
-          "description": "Southernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file."
+          "description": "Southernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lat_max": {
-          "description": "Northernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file."
+          "description": "Northernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lon_min": {
-          "description": "Westernmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file."
+          "description": "Westernmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lon_max": {
-          "description": "Easternmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file."
+          "description": "Easternmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lat_start": {
-          "description": "First valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file."
+          "description": "First valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lat_end": {
-          "description": "Last valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file."
+          "description": "Last valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lon_start": {
-          "description": "First valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file."
+          "description": "First valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float32"
         },
         "geospatial_lon_end": {
-          "description": "Last valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file."
+          "description": "Last valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float32"
         },
         "drogue_off_time": {
-          "description": "Drogue off date in UTC. See note on time format below."
+          "description": "Drogue off date in UTC. See note on time format below.",
+          "column_type": "datetime"
         },
         "drogue_off_latitude": {
-          "description": "Drogue off latitude, a value between -90 and 90 decimal degrees."
+          "description": "Drogue off latitude, a value between -90 and 90 decimal degrees.",
+          "column_type": "float32"
         },
         "drogue_off_longitude": {
-          "description": "Drogue off longitude, a value between -180 and 180 decimal degrees."
+          "description": "Drogue off longitude, a value between -180 and 180 decimal degrees.",
+          "column_type": "float32"
         }
       }
     },
@@ -116,46 +142,60 @@
       },
       "elements": {
         "N_TIME": {
-          "description": "Number of time steps."
+          "description": "Number of time steps.",
+          "column_type": "uint8"
         },
         "N_LEVEL<N>": {
-          "description": "Maximum number of parameter measurements that can be simultaneously sampled by a sensor."
+          "description": "Maximum number of parameter measurements that can be simultaneously sampled by a sensor.",
+          "column_type": "uint8"
         },
         "STRING<N>": {
-          "description": "String dimensions."
+          "description": "String dimensions.",
+          "column_type": "uint8"
         },
         "DATE_TIME": {
-          "description": "This dimension is the length of an ASCII date and time value. DATE_TIME convention is: YYYYMMDDHHMISS"
+          "description": "This dimension is the length of an ASCII date and time value. DATE_TIME convention is: YYYYMMDDHHMISS",
+          "column_type": "uint8"
         },
         "DATE": {
-          "description": "This dimension is the length of an ASCII date value. DATE convention is: YYYYMMDD"
+          "description": "This dimension is the length of an ASCII date value. DATE convention is: YYYYMMDD",
+          "column_type": "uint8"
         },
         "N_TRANS_SYSTEM": {
-          "description": "Number of transmission systems."
+          "description": "Number of transmission systems.",
+          "column_type": "uint8"
         },
         "N_POSITIONING_SYSTEM": {
-          "description": "Number of positioning systems."
+          "description": "Number of positioning systems.",
+          "column_type": "uint8"
         },
         "N_LAUNCH_CONFIG_PARAM": {
-          "description": "Number of pre-deployment or launch configuration parameters."
+          "description": "Number of pre-deployment or launch configuration parameters.",
+          "column_type": "uint8"
         },
         "N_CONFIG_PARAM": {
-          "description": "Number of configuration parameters."
+          "description": "Number of configuration parameters.",
+          "column_type": "uint8"
         },
         "N_MISSION": {
-          "description": "Number of missions."
+          "description": "Number of missions.",
+          "column_type": "uint8"
         },
         "N_SENSOR": {
-          "description": "Number of sensors mounted on the drifter and used to measure the parameters."
+          "description": "Number of sensors mounted on the drifter and used to measure the parameters.",
+          "column_type": "uint8"
         },
         "N_PARAM": {
-          "description": "Number of parameters measured by the drifter or calculated from transmitted parameters."
+          "description": "Number of parameters measured by the drifter or calculated from transmitted parameters.",
+          "column_type": "uint8"
         },
         "N_HISTORY": {
-          "description": "Number of history records."
+          "description": "Number of history records.",
+          "column_type": "uint8"
         },
         "N_GREYLIST": {
-          "description": "Number of greylist records."
+          "description": "Number of greylist records.",
+          "column_type": "uint8"
         }
       }
     },
@@ -164,19 +204,24 @@
       "elements": {
         "DATA_TYPE": {
           "description": "This field contains the type of data contained in the file. The list of acceptable data types is in the Reference Table 1. Example : 'C-RAID drifter time-series data'",
+          "column_type": "str",
           "codetable": "CRAID.DATA_TYPES"
         },
         "FORMAT_VERSION": {
-          "description": "File format version."
+          "description": "File format version.",
+          "column_type": "str"
         },
         "REFERENCE_DATE_TIME": {
-          "description": "Date of reference for Julian days. The recommended reference date time is '19500101000000' : January 1st 1950 00:00:00"
+          "description": "Date of reference for Julian days. The recommended reference date time is '19500101000000' : January 1st 1950 00:00:00",
+          "column_type": "datetime"
         },
         "DATE_CREATION": {
-          "description": "Date and time (UTC) of creation of this file. Format : YYYYMMDDHHMISS. Example : 20011229161700 : December 29th 2001 16:17:00"
+          "description": "Date and time (UTC) of creation of this file. Format : YYYYMMDDHHMISS. Example : 20011229161700 : December 29th 2001 16:17:00",
+          "column_type": "datetime"
         },
         "DATE_UPDATE": {
-          "description": "Date and time (UTC) of update of this file. Format : YYYYMMDDHHMISS. Example : 20011230090500 : December 30th 2001 09:05:00"
+          "description": "Date and time (UTC) of update of this file. Format : YYYYMMDDHHMISS. Example : 20011230090500 : December 30th 2001 09:05:00",
+          "column_type": "datetime"
         }
       }
     },
@@ -184,38 +229,49 @@
       "header": {},
       "elements": {
         "PI_NAME": {
-          "description": "Name of the principal investigator in charge of the drifter. Example: TBD."
+          "description": "Name of the principal investigator in charge of the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "PI_EMAIL": {
-          "description": "Email address of the principal investigator in charge of the drifter. Example: TBD."
+          "description": "Email address of the principal investigator in charge of the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "INSTITUTION": {
-          "description": "Preferably institution of the principal investigator in charge of the drifter. Example: TBD."
+          "description": "Preferably institution of the principal investigator in charge of the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "INSTITUTION_REFERENCES": {
-          "description": "References to preferably institution of the principal investigator in charge of the drifter, the place to find all information on the data file (web-base, i.e. give URLs). Example: 'http://www.nocs.uk'."
+          "description": "References to preferably institution of the principal investigator in charge of the drifter, the place to find all information on the data file (web-base, i.e. give URLs). Example: 'http://www.nocs.uk'.",
+          "column_type": "str"
         },
         "PROJECT_NAME": {
-          "description": "Name of the project which operates the drifter. Example: TBD."
+          "description": "Name of the project which operates the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "DRIFTER_OWNER": {
-          "description": "The owner of the drifter (may be different from the data centre and operating institution). Example: TBD."
+          "description": "The owner of the drifter (may be different from the data centre and operating institution). Example: TBD.",
+          "column_type": "str"
         },
         "OPERATING_INSTITUTION": {
-          "description": "The operating institution of the drifter (may be different from the drifter owner and data centre). Example: TBD."
+          "description": "The operating institution of the drifter (may be different from the drifter owner and data centre). Example: TBD.",
+          "column_type": "str"
         },
         "OPERATING_COUNTRY": {
-          "description": "The operating country of the drifter. Example: TBD."
+          "description": "The operating country of the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "AUTHORS": {
-          "description": "List of relevant persons involved in the creation of the data file (comma separated). Example: TBD."
+          "description": "List of relevant persons involved in the creation of the data file (comma separated). Example: TBD.",
+          "column_type": "str"
         },
         "DATA_CENTRE": {
           "description": "Code of the data centre in charge of the float data management. The data centre codes are described in the Reference Table 4. Example: 'IF' for Ifremer.",
+          "column_type": "str",
           "codetable": "CRAID.DAC"
         },
         "DAC_FORMAT_ID": {
-          "description": "Format numbers used by individual DACs to describe each drifter type. Example: TBD."
+          "description": "Format numbers used by individual DACs to describe each drifter type. Example: TBD.",
+          "column_type": "str"
         }
       }
     },
@@ -224,114 +280,149 @@
       "elements": {
         "PLATFORM_FAMILY": {
           "description": "Category of instrument. See Reference Table 19. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.PLATFORM"
         },
         "DRIFTER_TYPE": {
           "description": "Type of drifter. See Reference Table 20. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.DRIFTER_TYPE"
         },
         "DRIFTER_MAKER": {
           "description": "Name of the drifter manufacturer. See Reference Table 21. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.DRIFTER_MAKER"
         },
         "DRIFTER_MANUFACTURE_DATE": {
-          "description": "Date of the drifter manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001."
+          "description": "Date of the drifter manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001.",
+          "column_type": "datetime"
         },
         "DRIFTER_SERIAL_NO": {
-          "description": "This field should contain only the serial number of the drifter. Example: TBD."
+          "description": "This field should contain only the serial number of the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "DRIFTER_NUMBER": {
-          "description": "C-RAID drifter unique identifier. Example: '1190171'"
+          "description": "C-RAID drifter unique identifier. Example: '1190171'",
+          "column_type": "int32"
         },
         "DRIFTER_DAC_NUMBER": {
-          "description": "DAC drifter unique identifier. Example: '9706311'"
+          "description": "DAC drifter unique identifier. Example: '9706311'",
+          "column_type": "int32"
         },
         "DRIFTER_WMO_NUMBER": {
-          "description": "WMO drifter identifier. WMO is the World Meteorological Organization. This platform number is unique. Example: '3200552'"
+          "description": "WMO drifter identifier. WMO is the World Meteorological Organization. This platform number is unique. Example: '3200552'",
+          "column_type": "int32"
         },
         "WMO_INST_TYPE": {
-          "description": "Instrument type from WMO code table 1770. A subset of WMO table 1770 is documented in the Reference Table 8. Example: TBD."
+          "description": "Instrument type from WMO code table 1770. A subset of WMO table 1770 is documented in the Reference Table 8. Example: TBD.",
+          "column_type": "str"
         },
         "PTT": {
-          "description": "Transmission identifier of the drifter. Example: '11195'"
+          "description": "Transmission identifier of the drifter. Example: '11195'",
+          "column_type": "int32"
         },
         "TRANS_SYSTEM": {
           "description": "Name of the telecommunication system from Reference Table 10. Example: 'ARGOS'",
+          "column_type": "str",
           "codetable": "CRAID.TRANSMISSION"
         },
         "TRANS_SYSTEM_ID": {
-          "description": "Program identifier of the telecommunication subscription. DACS can use N/A or alternative of their choice when not applicable. Example: '221' is a program number for all the beacons of an Argos customer."
+          "description": "Program identifier of the telecommunication subscription. DACS can use N/A or alternative of their choice when not applicable. Example: '221' is a program number for all the beacons of an Argos customer.",
+          "column_type": "int32"
         },
         "TRANS_SYSTEM_FORMAT": {
-          "description": "Binary format used to relay the data to shore. This entry may point to a table where each entry links to external documents (with DOIs). For example, for Iridium SBD data formats for drifters, there is this document: doi: 10.5281/zenodo.1305119. A similar document for ARGOS drifter data formats would be ideal."
+          "description": "Binary format used to relay the data to shore. This entry may point to a table where each entry links to external documents (with DOIs). For example, for Iridium SBD data formats for drifters, there is this document: doi: 10.5281/zenodo.1305119. A similar document for ARGOS drifter data formats would be ideal.",
+          "column_type": "int32"
         },
         "POSITIONING_SYSTEM": {
           "description": "Position system from Reference Table 9. Example: 'ARGOS'",
+          "column_type": "str",
           "codetable": "CRAID.POSITIONING"
         },
         "CONTROLLER_BOARD_TYPE": {
-          "description": "Describes the type of controller board. Example: TBD."
+          "description": "Describes the type of controller board. Example: TBD.",
+          "column_type": "str"
         },
         "CONTROLLER_BOARD_SERIAL_NO": {
-          "description": "The serial number for the primary controller board. Example: TBD."
+          "description": "The serial number for the primary controller board. Example: TBD.",
+          "column_type": "str"
         },
         "FIRMWARE_VERSION": {
-          "description": "The drifter firmware version. This is specified as per the format on the manufacturer's manual. Example: TBD."
+          "description": "The drifter firmware version. This is specified as per the format on the manufacturer's manual. Example: TBD.",
+          "column_type": "str"
         },
         "FLOAT_DIAMETER": {
-          "description": "Diameter of the float."
+          "description": "Diameter of the float.",
+          "column_type": "float32"
         },
         "SUBSURFACE_FLOAT_PRESENCE": {
-          "description": "Is the drifter equipped with a subsurface float? Example: TBD."
+          "description": "Is the drifter equipped with a subsurface float? Example: TBD.",
+          "column_type": "str"
         },
         "DROGUE_TYPE": {
-          "description": "The type of the drogue. Example: TBD."
+          "description": "The type of the drogue. Example: TBD.",
+          "column_type": "str"
         },
         "DROGUE_DIAMETER": {
-          "description": "Diameter of the drogue."
+          "description": "Diameter of the drogue.",
+          "column_type": "float32"
         },
         "DROGUE_LENGTH": {
-          "description": "Length of the drogue."
+          "description": "Length of the drogue.",
+          "column_type": "float32"
         },
         "DROGUE_CENTER_DEPTH": {
-          "description": "Depth of the center of the drogue."
+          "description": "Depth of the center of the drogue.",
+          "column_type": "float32"
         },
         "DRAG_AREA_ABOVE_DROGUE": {
-          "description": "Drag area of all drifter components except the drogue."
+          "description": "Drag area of all drifter components except the drogue.",
+          "column_type": "float32"
         },
         "DRAG_AREA_OF_DROGUE": {
-          "description": "Drag area of the drogue."
+          "description": "Drag area of the drogue.",
+          "column_type": "float32"
         },
         "DRAG_AREA_RATIO": {
-          "description": "Ratio of the drogue cross-sectional area to the area of all other Components."
+          "description": "Ratio of the drogue cross-sectional area to the area of all other Components.",
+          "column_type": "float32"
         },
         "DROGUE_DETECTION_METHOD": {
           "description": "Method used to detect drogue presence. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.DROGUE_DETECTION_METHOD"
         },
         "DROGUE_BALLAST": {
-          "description": "Weight of the drogue ballast."
+          "description": "Weight of the drogue ballast.",
+          "column_type": "float32"
         },
         "BATTERY_TYPE": {
-          "description": "Describes the type of battery packs in the drifter. Example: 'Alkaline', 'Lithium' or 'Alkaline and Lithium'"
+          "description": "Describes the type of battery packs in the drifter. Example: 'Alkaline', 'Lithium' or 'Alkaline and Lithium'",
+          "column_type": "str"
         },
         "BATTERY_PACKS": {
-          "description": "Describes the configuration of battery packs in the drifter, number and type. Example: '4DD Li + 1C Alk'"
+          "description": "Describes the configuration of battery packs in the drifter, number and type. Example: '4DD Li + 1C Alk'",
+          "column_type": "str"
         },
         "BATTERY_CAPACITY": {
-          "description": "Capacity of the battery at drifter deployment."
+          "description": "Capacity of the battery at drifter deployment.",
+          "column_type": "float32"
         },
         "SPECIAL_FEATURES": {
-          "description": "Additional float features can be specified here such as algorithms used by the drifter. Example: TBD."
+          "description": "Additional float features can be specified here such as algorithms used by the drifter. Example: TBD.",
+          "column_type": "str"
         },
         "DRIFTER_MANUAL_VERSION": {
-          "description": "The version date or number for the manual for each drifter. Example: TBD."
+          "description": "The version date or number for the manual for each drifter. Example: TBD.",
+          "column_type": "str"
         },
         "ANOMALY": {
-          "description": "This field describes any anomaly or problem the drifter may have had. Example: TBD."
+          "description": "This field describes any anomaly or problem the drifter may have had. Example: TBD.",
+          "column_type": "str"
         },
         "CUSTOMISATION": {
-          "description": "Free form field to record changes made to the drifter after manufacture and before deployment, i.e. this could be the customisation institution plus a list of modifications. Example: TBD."
+          "description": "Free form field to record changes made to the drifter after manufacture and before deployment, i.e. this could be the customisation institution plus a list of modifications. Example: TBD.",
+          "column_type": "str"
         }
       }
     },
@@ -339,75 +430,97 @@
       "header": {},
       "elements": {
         "LAUNCH_DATE": {
-          "description": "Date and time (UTC) of launch of the drifter. Format : YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00."
+          "description": "Date and time (UTC) of launch of the drifter. Format : YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00.",
+          "column_type": "datetime"
         },
         "LAUNCH_LATITUDE": {
-          "description": "Latitude of the drifter launch. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N"
+          "description": "Latitude of the drifter launch. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
+          "column_type": "float64"
         },
         "LAUNCH_LONGITUDE": {
-          "description": "Longitude of the drifter launch. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E"
+          "description": "Longitude of the drifter launch. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E",
+          "column_type": "float64"
         },
         "LAUNCH_QC": {
           "description": "Quality flag on drifter launch date, time and location. The flag scale is described in the Reference Table 2. Example: 1 (launch time and location seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "STARTUP_DATE": {
-          "description": "Date and time (UTC) of the activation of the drifter before or just after deployment. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05 :00."
+          "description": "Date and time (UTC) of the activation of the drifter before or just after deployment. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05 :00.",
+          "column_type": "datetime"
         },
         "STARTUP_DATE_QC": {
           "description": "Quality flag on startup date. The flag scale is described in the Reference Table 2. Example: 1 (startup date seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "DEPLOYMENT_PLATFORM": {
-          "description": "Identifier of the deployment platform, i.e. vessel or ship name. Example: 'L ATALANTE'."
+          "description": "Identifier of the deployment platform, i.e. vessel or ship name. Example: 'L ATALANTE'.",
+          "column_type": "str"
         },
         "DEPLOYMENT_CRUISE_ID": {
-          "description": "Identification number or reference number of the cruise used to deploy the platform. Example: 'POMME2'."
+          "description": "Identification number or reference number of the cruise used to deploy the platform. Example: 'POMME2'.",
+          "column_type": "str"
         },
         "DEPLOYMENT_REFERENCE_STATION_ID": {
-          "description": "Identifier or reference number of co-located CTD or XBT stations used to verify the drifter measurements. Example: 58776, 58777"
+          "description": "Identifier or reference number of co-located CTD or XBT stations used to verify the drifter measurements. Example: 58776, 58777",
+          "column_type": "int32"
         },
         "DEPLOYMENT_OPERATOR": {
-          "description": "Name of the person in charge of the drifter deployment."
+          "description": "Name of the person in charge of the drifter deployment.",
+          "column_type": "str"
         },
         "DEPLOYMENT_BATTERY_VOLTAGE": {
-          "description": "Battery voltage at deployment."
+          "description": "Battery voltage at deployment.",
+          "column_type": "float32"
         },
         "DROGUE_OFF_DATE": {
-          "description": "Date (UTC) of the loss of the drogue. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00"
+          "description": "Date (UTC) of the loss of the drogue. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
+          "column_type": "datetime"
         },
         "DROGUE_OFF_LATITUDE": {
-          "description": "Latitude of the loss of the drogue. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N"
+          "description": "Latitude of the loss of the drogue. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
+          "column_type": "float64"
         },
         "DROGUE_OFF_LONGITUDE": {
-          "description": "Longitude of the loss of the drogue. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E"
+          "description": "Longitude of the loss of the drogue. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E",
+          "column_type": "float64"
         },
         "DROGUE_OFF_QC": {
           "description": "Quality flag on drogue loss date, time and location. The flag scale is described in the Reference Table 2. Example: 1 (drogue loss time and location seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "END_MISSION_DATE": {
-          "description": "Date (UTC) of the end of mission of the drifter. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00"
+          "description": "Date (UTC) of the end of mission of the drifter. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
+          "column_type": "datetime"
         },
         "END_MISSION_LATITUDE": {
-          "description": "Latitude at end of the mission. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N"
+          "description": "Latitude at end of the mission. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
+          "column_type": "float64"
         },
         "END_MISSION_LONGITUDE": {
-          "description": "Longitude at end of the mission. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E"
+          "description": "Longitude at end of the mission. Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E",
+          "column_type": "float64"
         },
         "END_MISSION_QC": {
           "description": "Quality flag on end mission date, time and location. The flag scale is described in the Reference Table 2. Example: 1 (launch time and location seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "END_MISSION_STATUS": {
           "description": "Status of the end of the float's deployment. See Reference Table 16. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.END_MISSION"
         },
         "ODDS_AGROUND": {
-          "description": "Probability that the drifter ran aground."
+          "description": "Probability that the drifter ran aground.",
+          "column_type": "float32"
         },
         "ODDS_PICKUP": {
-          "description": "Probability that the drifter was picked up."
+          "description": "Probability that the drifter was picked up.",
+          "column_type": "float32"
         }
       }
     },
@@ -415,22 +528,28 @@
       "header": {},
       "elements": {
         "LAUNCH_CONFIG_PARAMETER_NAME": {
-          "description": "Name of the configuration parameter; pre-deployment or launch settings. See Reference Table 13 for standard configuration parameter names. Example: TBD."
+          "description": "Name of the configuration parameter; pre-deployment or launch settings. See Reference Table 13 for standard configuration parameter names. Example: TBD.",
+          "column_type": "str"
         },
         "LAUNCH_CONFIG_PARAMETER_VALUE": {
-          "description": "Value of the configuration parameter; either pre-deployment or launch settings. Example: TBD."
+          "description": "Value of the configuration parameter; either pre-deployment or launch settings. Example: TBD.",
+          "column_type": "str"
         },
         "CONFIG_PARAMETER_NAME": {
-          "description": "Name of the configuration parameter; mission settings. See Reference Table 13 for standard configuration parameter names. Example: TBD."
+          "description": "Name of the configuration parameter; mission settings. See Reference Table 13 for standard configuration parameter names. Example: TBD.",
+          "column_type": "str"
         },
         "CONFIG_PARAMETER_VALUE": {
-          "description": "Value of the configuration parameter; mission settings. Example: TBD."
+          "description": "Value of the configuration parameter; mission settings. Example: TBD.",
+          "column_type": "float32"
         },
         "CONFIG_MISSION_NUMBER": {
-          "description": "Unique number of the mission to which the measurement belongs."
+          "description": "Unique number of the mission to which the measurement belongs.",
+          "column_type": "float64"
         },
         "CONFIG_MISSION_COMMENT": {
-          "description": "Comment on this configuration mission. Example: TBD."
+          "description": "Comment on this configuration mission. Example: TBD.",
+          "column_type": "str"
         }
       }
     },
@@ -438,46 +557,60 @@
       "header": {},
       "elements": {
         "SENSOR": {
-          "description": "Names of the sensors mounted on the drifter. See Reference Table 22. Example: TBD."
+          "description": "Names of the sensors mounted on the drifter. See Reference Table 22. Example: TBD.",
+          "column_type": "str"
         },
         "SENSOR_MAKER": {
-          "description": "Name of the manufacturer of the sensor. See Reference Table 23. Example: TBD."
+          "description": "Name of the manufacturer of the sensor. See Reference Table 23. Example: TBD.",
+          "column_type": "str"
         },
         "SENSOR_MANUFACTURE_DATE": {
-          "description": "Date of the sensor manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001."
+          "description": "Date of the sensor manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001.",
+          "column_type": "datetime"
         },
         "SENSOR_MODEL": {
-          "description": "Model of sensor. See Reference Table 24. Example: TBD."
+          "description": "Model of sensor. See Reference Table 24. Example: TBD.",
+          "column_type": "str"
         },
         "SENSOR_SERIAL_NO": {
-          "description": "Serial number of the sensor. Example: TBD."
+          "description": "Serial number of the sensor. Example: TBD.",
+          "column_type": "str"
         },
         "SENSOR_NB_LEVEL": {
-          "description": "Number of measurements levels of the sensor. Example: TBD."
+          "description": "Number of measurements levels of the sensor. Example: TBD.",
+          "column_type": "float64"
         },
         "SENSOR_LEVEL_DEPTH": {
-          "description": "Theoretical depth of sensor measurements. Example: TBD."
+          "description": "Theoretical depth of sensor measurements. Example: TBD.",
+          "column_type": "float32"
         },
         "SENSOR_INITIAL_END_DATE": {
-          "description": "Date (UTC) of end of useful mission for the sensor, according to the initial platform operators. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00"
+          "description": "Date (UTC) of end of useful mission for the sensor, according to the initial platform operators. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
+          "column_type": "datetime"
         },
         "PARAMETER": {
-          "description": "Names of the parameters measured by drifter sensors or derived from drifter measurements. The parameter names are listed in Reference Table 3. Examples: TBD."
+          "description": "Names of the parameters measured by drifter sensors or derived from drifter measurements. The parameter names are listed in Reference Table 3. Examples: TBD.",
+          "column_type": "str"
         },
         "PARAMETER_SENSOR": {
-          "description": "Names of the sensors that measured the drifter parameters. See Reference Table 22. Example: TBD."
+          "description": "Names of the sensors that measured the drifter parameters. See Reference Table 22. Example: TBD.",
+          "column_type": "str"
         },
         "PARAMETER_UNITS": {
-          "description": "Units of accuracy and resolution of the parameter. Example: TBD."
+          "description": "Units of accuracy and resolution of the parameter. Example: TBD.",
+          "column_type": "str"
         },
         "PARAMETER_ACCURACY": {
-          "description": "Accuracy of the parameter. Example: TBD."
+          "description": "Accuracy of the parameter. Example: TBD.",
+          "column_type": "str"
         },
         "PARAMETER_RESOLUTION": {
-          "description": "Resolution of the parameter returned by the sensor (note that this is not necessarily equivalent to the resolution of the parameter returned by the drifter through telemetry). Example: TBD."
+          "description": "Resolution of the parameter returned by the sensor (note that this is not necessarily equivalent to the resolution of the parameter returned by the drifter through telemetry). Example: TBD.",
+          "column_type": "str"
         },
         "PARAMETER_DATA_STATE_INDICATOR": {
           "description": "Degree of processing the parameter data has passed through. The parameter data state indicator is described in the Reference Table 6.",
+          "column_type": "str",
           "codetable": "CRAID.DATA_STATE"
         }
       }
@@ -486,40 +619,52 @@
       "header": {},
       "elements": {
         "PREDEPLOYMENT_CALIB_EQUATION": {
-          "description": "Predeployment calibration equation for this parameter. Example: 'Tc = a1 * T + a0'."
+          "description": "Predeployment calibration equation for this parameter. Example: 'Tc = a1 * T + a0'.",
+          "column_type": "str"
         },
         "PREDEPLOYMENT_CALIB_COEFFICIENT": {
-          "description": "Predeployment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'."
+          "description": "Predeployment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
+          "column_type": "str"
         },
         "PREDEPLOYMENT_CALIB_COMMENT": {
-          "description": "Comments applying to this parameter predeployment calibration. Example: TBD."
+          "description": "Comments applying to this parameter predeployment calibration. Example: TBD.",
+          "column_type": "str"
         },
         "PREDEPLOYMENT_CALIB_DATE": {
-          "description": "Date of the pre-deployment calibration. Example: '20011217161700' for November 17th 2001 16:17:00."
+          "description": "Date of the pre-deployment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
+          "column_type": "str"
         },
         "REAL_TIME_ADJUSTMENT_CALIB_EQUATION": {
-          "description": "Real-time adjustment calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'."
+          "description": "Real-time adjustment calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'.",
+          "column_type": "str"
         },
         "REAL_TIME_ADJUSTMENT_CALIB_COEFFICIENT": {
-          "description": "Real-time adjustment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'."
+          "description": "Real-time adjustment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
+          "column_type": "str"
         },
         "REAL_TIME_ADJUSTMENT_CALIB_COMMENT": {
-          "description": "Comment about this real-time adjustment calibration Example: TBD."
+          "description": "Comment about this real-time adjustment calibration Example: TBD.",
+          "column_type": "str"
         },
         "REAL_TIME_ADJUSTMENT_CALIB_DATE": {
-          "description": "Date of the real-time adjustment calibration. Example: '20011217161700' for November 17th 2001 16:17:00."
+          "description": "Date of the real-time adjustment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
+          "column_type": "str"
         },
         "SCIENTIFIC_CALIB_EQUATION": {
-          "description": "Scientific calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'."
+          "description": "Scientific calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'.",
+          "column_type": "str"
         },
         "SCIENTIFIC_CALIB_COEFFICIENT": {
-          "description": "Scientific calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'."
+          "description": "Scientific calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
+          "column_type": "str"
         },
         "SCIENTIFIC_CALIB_COMMENT": {
-          "description": "Comment about this scientific calibration Example: TBD."
+          "description": "Comment about this scientific calibration Example: TBD.",
+          "column_type": "str"
         },
         "SCIENTIFIC_CALIB_DATE": {
-          "description": "Date of the scientific calibration. Example: '20011217161700' for November 17th 2001 16:17:00."
+          "description": "Date of the scientific calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
+          "column_type": "str"
         }
       }
     },
@@ -527,61 +672,78 @@
       "header": {},
       "elements": {
         "JULD": {
-          "description": "Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. JULD(N_TIME) should be filled and its values should be unique within the file. Example: 18833.8013889885 for July 25th 2001 19:14:00"
+          "description": "Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. JULD(N_TIME) should be filled and its values should be unique within the file. Example: 18833.8013889885 for July 25th 2001 19:14:00",
+          "column_type": "datetime"
         },
         "JULD_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.v",
+          "column_type": "uint8",
           "codetable": "CRAID.JULD"
         },
         "JULD_QC": {
           "description": "Quality flag on JULD date and time. The flag scale is described in the Reference Table 2. Example: 1 (date and time seem correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "JULD_ADJUSTED": {
-          "description": "Adjusted Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. The date may be adjusted due to float clock drift or expert review. Example: 18833.8013889885 for July 25th 2001 19:14:00"
+          "description": "Adjusted Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. The date may be adjusted due to float clock drift or expert review. Example: 18833.8013889885 for July 25th 2001 19:14:00",
+          "column_type": "datetime"
         },
         "JULD_ADJUSTED_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.",
+          "column_type": "uint8",
           "codetable": "CRAID.JULD"
         },
         "JULD_ADJUSTED_QC": {
           "description": "Quality flag on JULD_ADJUSTED date and time. The flag scale is described in the Reference Table 2. Example: 1 (date and time seem correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "JULD_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag. This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag. This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "LATITUDE": {
-          "description": "Latitude of the location (or measurement). Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N."
+          "description": "Latitude of the location (or measurement). Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N.",
+          "column_type": "float64"
         },
         "LONGITUDE": {
-          "description": "Longitude of the location (or measurement). Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E."
+          "description": "Longitude of the location (or measurement). Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E.",
+          "column_type": "float64"
         },
         "POSITION_ACCURACY": {
           "description": "Position accuracy received from the positioning system. The location classes from Argos are described in the Reference Table 5. A 'G' indicates the GPS positioning system. Examples: '3' for a latitude an longitude accuracy < 250 m. 'G' for GPS accuracy.",
+          "column_type": "str",
           "codetable": "CRAID.LC"
         },
         "POSITION_QC": {
           "description": "Quality flag on position. The flag on position is set according to (JULD, LATITUDE, LONGITUDE) quality. The flag scale is described in the Reference Table 2. Example: 1 (position seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "POSITION_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag. This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag. This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "AXES_ERROR_ELLIPSE_MAJOR": {
-          "description": "Major axis of error ellipse reported by the positioning system."
+          "description": "Major axis of error ellipse reported by the positioning system.",
+          "column_type": "float32"
         },
         "AXES_ERROR_ELLIPSE_MINOR": {
-          "description": "Minor axis of error ellipse reported by the positioning system."
+          "description": "Minor axis of error ellipse reported by the positioning system.",
+          "column_type": "float32"
         },
         "AXES_ERROR_ELLIPSE_ANGLE": {
-          "description": "Angle of error ellipse reported by the positioning system."
+          "description": "Angle of error ellipse reported by the positioning system.",
+          "column_type": "float32"
         },
         "SATELLITE_NAME": {
-          "description": "Satellite name from positioning system."
+          "description": "Satellite name from positioning system.",
+          "column_type": "str"
         },
         "ATMS": {
           "description": "ATMS contains the original values of a parameter 'air pressure'",
+          "column_type": "float32",
           "long_name": "Air pressure",
           "standard_name": "air_pressure",
           "unit": "hPa",
@@ -590,10 +752,12 @@
         },
         "ATMS_QC": {
           "description": "Quality flag applied on each ATMS values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATMS_ADJUSTED": {
           "description": "ATMS_ADJUSTED contains the adjusted values derived from the original values of the parameter 'air pressure'.",
+          "column_type": "float32",
           "long_name": "Air pressure",
           "standard_name": "air_pressure",
           "unit": "hPa",
@@ -602,16 +766,20 @@
         },
         "ATMS_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATMS_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATMS_ADJUSTED_ERROR": {
-          "description": "ATMS_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure': these fields are specified in the columns of the Reference Table 3. ATMS_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "ATMS_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure': these fields are specified in the columns of the Reference Table 3. ATMS_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "ATMS_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in ATMS_QC or ATMS_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in ATMS_QC or ATMS_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "ATMS_COUNT": {
           "description": "ATMS_COUNT contains the original values of a parameter 'air pressure'",
+          "column_type": "float32",
           "long_name": "Air pressure",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -619,10 +787,12 @@
         },
         "ATMS_COUNT_QC": {
           "description": "Quality flag applied on each ATMS_COUNT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATMS_COUNT_ADJUSTED": {
           "description": "ATMS_COUNT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'air pressure'.",
+          "column_type": "float32",
           "long_name": "Air pressure",
           "unit": "hPa",
           "valid_min": "__from_file__",
@@ -630,16 +800,20 @@
         },
         "ATMS_COUNT_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATMS_COUNT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATMS_COUNT_ADJUSTED_ERROR": {
-          "description": "ATMS_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure': these fields are specified in the columns of the Reference Table 3. ATMS_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "ATMS_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure': these fields are specified in the columns of the Reference Table 3. ATMS_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "ATMS_COUNT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in ATMS_QC or ATMS_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in ATMS_QC or ATMS_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "SST": {
           "description": "SST contains the original values of a parameter 'sea surface temperature'",
+          "column_type": "float32",
           "long_name": "Sea surface temperature",
           "standard_name": "sea_surface_temperature",
           "unit": "degree_Celsius",
@@ -648,10 +822,12 @@
         },
         "SST_QC": {
           "description": "Quality flag applied on each SST values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "SST_ADJUSTED": {
           "description": "SST_ADJUSTED contains the adjusted values derived from the original values of the parameter 'sea surface temperature'.",
+          "column_type": "float32",
           "long_name": "Sea surface temperature",
           "standard_name": "sea_surface_temperature",
           "unit": "degree_Celsius",
@@ -660,16 +836,20 @@
         },
         "SST_ADJUSTED_QC": {
           "description": "Quality flag applied on each SST_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "SST_ADJUSTED_ERROR": {
-          "description": "SST_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'sea surface temperature': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "SST_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'sea surface temperature': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "SST_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in SST_QC or SST_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in SST_QC or SST_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "SST_COUNT": {
           "description": "SST_COUNT contains the original values of a parameter 'sea surface temperature'",
+          "column_type": "float32",
           "long_name": "Sea surface temperature",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -677,10 +857,12 @@
         },
         "SST_COUNT_QC": {
           "description": "Quality flag applied on each SST_COUNT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "SST_COUNT_ADJUSTED": {
           "description": "SST_COUNT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'sea surface temperature'.",
+          "column_type": "float32",
           "long_name": "Sea surface temperature",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -688,16 +870,20 @@
         },
         "SST_COUNT_ADJUSTED_QC": {
           "description": "Quality flag applied on each SST_COUNT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "SST_COUNT_ADJUSTED_ERROR": {
-          "description": "SST_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'sea surface temperature': these fields are specified in the columns of the Reference Table 3. SST_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "SST_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'sea surface temperature': these fields are specified in the columns of the Reference Table 3. SST_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "SST_COUNT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in SST_QC or SST_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in SST_QC or SST_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "AIR_TEMP": {
           "description": "AIR_TEMP contains the original values of a parameter 'air temperature'",
+          "column_type": "float32",
           "long_name": "Air temperature",
           "standard_name": "air_temperature",
           "unit": "degree_Celsius",
@@ -706,10 +892,12 @@
         },
         "AIR_TEMP_QC": {
           "description": "Quality flag applied on each AIR_TEMP values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "AIR_TEMP_ADJUSTED": {
           "description": "AIR_TEMP_ADJUSTED contains the adjusted values derived from the original values of the parameter 'air temperature'.",
+          "column_type": "float32",
           "long_name": "Air temperature",
           "standard_name": "air_temperature",
           "unit": "degree_Celsius",
@@ -718,16 +906,20 @@
         },
         "AIR_TEMP_ADJUSTED_QC": {
           "description": "Quality flag applied on each AIR_TEMP_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "AIR_TEMP_ADJUSTED_ERROR": {
-          "description": "AIR_TEMP_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air temperature': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "AIR_TEMP_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air temperature': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "AIR_TEMP_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in AIR_TEMP_QC or AIR_TEMP_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in AIR_TEMP_QC or AIR_TEMP_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "ATPT": {
           "description": "ATPT contains the original values of a parameter 'air pressure tendency'",
+          "column_type": "float32",
           "long_name": "Air pressure tendency",
           "unit": "hPa",
           "valid_min": "__from_file__",
@@ -735,10 +927,12 @@
         },
         "ATPT_QC": {
           "description": "Quality flag applied on each ATPT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATPT_ADJUSTED": {
           "description": "ATPT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'air pressure tendency'.",
+          "column_type": "float32",
           "long_name": "Air pressure tendency",
           "unit": "hPa",
           "valid_min": "__from_file__",
@@ -746,16 +940,20 @@
         },
         "ATPT_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATPT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATPT_ADJUSTED_ERROR": {
-          "description": "ATPT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure tendency': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "ATPT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure tendency': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "ATPT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in ATPT_QC or ATPT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in ATPT_QC or ATPT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "ATPT_COUNT": {
           "description": "ATPT_COUNT contains the original values of a parameter 'air pressure tendency'",
+          "column_type": "float32",
           "long_name": "Air pressure tendency",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -763,10 +961,12 @@
         },
         "ATPT_COUNT_QC": {
           "description": "Quality flag applied on each ATPT_COUNT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATPT_COUNT_ADJUSTED": {
           "description": "ATPT_COUNT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'air pressure tendency'.",
+          "column_type": "float32",
           "long_name": "Air pressure tendency",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -774,16 +974,20 @@
         },
         "ATPT_COUNT_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATPT_COUNT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "ATPT_COUNT_ADJUSTED_ERROR": {
-          "description": "ATPT_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure tendency': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "ATPT_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'air pressure tendency': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "ATPT_COUNT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in ATPT_QC or ATPT_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in ATPT_QC or ATPT_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "BATTERY": {
           "description": "BATTERY contains the original values of a parameter 'battery voltage'",
+          "column_type": "float32",
           "long_name": "Battery voltage",
           "unit": "Volts",
           "valid_min": "__from_file__",
@@ -791,10 +995,12 @@
         },
         "BATTERY_QC": {
           "description": "Quality flag applied on each ATPT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "BATTERY_ADJUSTED": {
           "description": "BATTERY_ADJUSTED contains the adjusted values derived from the original values of the parameter 'battery voltage'.",
+          "column_type": "float32",
           "long_name": "Battery voltage",
           "unit": "Volts",
           "valid_min": "__from_file__",
@@ -802,16 +1008,20 @@
         },
         "BATTERY_ADJUSTED_QC": {
           "description": "Quality flag applied on each BATTERY_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "BATTERY_ADJUSTED_ERROR": {
-          "description": "BATTERY_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'battery voltage': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "BATTERY_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'battery voltage': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "BATTERY_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in BATTERY_QC or BATTERY_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in BATTERY_QC or BATTERY_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "BATTERY_COUNT": {
           "description": "BATTERY_COUNT contains the original values of a parameter 'battery voltage'",
+          "column_type": "float32",
           "long_name": "Battery voltage",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -819,10 +1029,12 @@
         },
         "BATTERY_COUNT_QC": {
           "description": "Quality flag applied on each BATTERY_COUNT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "BATTERY_COUNT_ADJUSTED": {
           "description": "BATTERY_COUNT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'battery voltage'.",
+          "column_type": "float32",
           "long_name": "Battery voltage",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -830,42 +1042,52 @@
         },
         "BATTERY_COUNT_ADJUSTED_QC": {
           "description": "Quality flag applied on each BATTERY_COUNT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "BATTERY_COUNT_ADJUSTED_ERROR": {
-          "description": "BATTERY_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'battery voltage': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "BATTERY_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'battery voltage': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "BATTERY_COUNT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in BATTERY_QC or BATTERY_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in BATTERY_QC or BATTERY_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "DROGUE": {
           "description": "DROGUE contains the original values of a parameter 'drogue detection sensor'",
+          "column_type": "float32",
           "long_name": "Drogue detection sensor",
           "valid_min": "__from_file__",
           "valid_max": "__from_file__"
         },
         "DROGUE_QC": {
           "description": "Quality flag applied on each DROGUE values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "DROGUE_ADJUSTED": {
           "description": "DROGUE_ADJUSTED contains the adjusted values derived from the original values of the parameter 'drogue detection sensor'.",
+          "column_type": "float32",
           "long_name": "Drogue detection sensor",
           "valid_min": "__from_file__",
           "valid_max": "__from_file__"
         },
         "DROGUE_ADJUSTED_QC": {
-          "description": "Quality flag applied on each DROGUE_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "description": "Quality flag applied on each DROGUE_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjstment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "DROGUE_ADJUSTED_ERROR": {
-          "description": "DROGUE_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'drogue detection sensor': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "DROGUE_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'drogue detection sensor': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "DROGUE_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in DROGUE_QC or DROGUE_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in DROGUE_QC or DROGUE_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "DROGUE_COUNT": {
           "description": "DROGUE_COUNT contains the original values of a parameter 'drogue detection sensor'",
+          "column_type": "float32",
           "long_name": "Drogue detection sensor",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -873,10 +1095,12 @@
         },
         "DROGUE_COUNT_QC": {
           "description": "Quality flag applied on each DROGUE_COUNT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "DROGUE_COUNT_ADJUSTED": {
           "description": "DROGUE_COUNT_ADJUSTED contains the adjusted values derived from the original values of the parameter 'drogue detection sensor'.",
+          "column_type": "float32",
           "long_name": "Drogue detection sensor",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -884,16 +1108,20 @@
         },
         "DROGUE_COUNT_ADJUSTED_QC": {
           "description": "Quality flag applied on each DROGUE_COUNT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "DROGUE_COUNT_ADJUSTED_ERROR": {
-          "description": "DROGUE_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'drogue detection sensor': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "DROGUE_COUNT_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'drogue detection sensor': these fields are specified in the columns of the Reference Table 3. ATPT_COUNT_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "DROGUE_COUNT_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in DROGUE_QC or DROGUE_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in DROGUE_QC or DROGUE_COUNT_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "MSG_REDUNDANCY": {
           "description": "MSG_REDUNDANCY contains the original values of a parameter 'redundancy of received message'",
+          "column_type": "float32",
           "long_name": "Redundancy of received message",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -901,10 +1129,12 @@
         },
         "MSG_REDUNDANCY_QC": {
           "description": "Quality flag applied on each MSG_REDUNDANCY values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "MSG_REDUNDANCY_ADJUSTED": {
           "description": "MSG_REDUNDANCY_ADJUSTED contains the adjusted values derived from the original values of the parameter 'redundancy of received message'.",
+          "column_type": "float32",
           "long_name": "Redundancy of received message",
           "unit": "count",
           "valid_min": "__from_file__",
@@ -912,26 +1142,33 @@
         },
         "MSG_REDUNDANCY_ADJUSTED_QC": {
           "description": "Quality flag applied on each MSG_REDUNDANCY_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
+          "column_type": "float32",
           "codetable": "CRAID.QC"
         },
         "MSG_REDUNDANCY_ADJUSTED_ERROR": {
-          "description": "MSG_REDUNDANCY_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'redundancy of received message': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted."
+          "description": "MSG_REDUNDANCY_ADJUSTED_ERROR contains the error on the adjusted values of the parameter 'redundancy of received message': these fields are specified in the columns of the Reference Table 3. SST_ADJUSTED_ERROR is mandatory for adjustable parameters. When no adjustment is performed, the FillValue is inserted.",
+          "column_type": "float32"
         },
         "MSG_REDUNDANCY_QC_FAILED": {
-          "description": "Number of the QC test that set the QC failed flag (in MSG_REDUNDANCY_QC or MSG_REDUNDANCY_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD."
+          "description": "Number of the QC test that set the QC failed flag (in MSG_REDUNDANCY_QC or MSG_REDUNDANCY_ADJUSTED_QC depending of the PARAMETER_DATA_MODE). This information also concerns QC = 2 flags; if QC = 1, the FillValue is inserted. Example: TBD.",
+          "column_type": "float64"
         },
         "PARAMETER_DATA_MODE": {
-          "description": "Describe the data mode of the individual parameter: R: real time data; D: delayed mode data; A: real time data with adjusted values"
+          "description": "Describe the data mode of the individual parameter: R: real time data; D: delayed mode data; A: real time data with adjusted values",
+          "column_type": "str"
         },
         "CONFIG_MISSION_NUMBER_INDEX": {
-          "description": "Unique number of the mission to which this measurement belongs."
+          "description": "Unique number of the mission to which this measurement belongs.",
+          "column_type": "float64"
         },
         "GROUNDED": {
           "description": "GROUNDED indicates the best estimate of whether the drogue touched the ground for that location. The conventions are described in Reference Table 18. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.GROUNDED"
         },
         "DATA_STATUS": {
           "description": "Status flag on the data associated to the current timestamp. The flag scale is described in Reference Table 17. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.DATA."
         }
       }
@@ -940,20 +1177,25 @@
       "header": {},
       "elements": {
         "GREYLIST_PARAMETER": {
-          "description": "Name of the parameter concerned by the greylist information. Example: 'SST'. If parameter = 'MISSION', all the parameters (geophysical and location) are affected by the given QC."
+          "description": "Name of the parameter concerned by the greylist information. Example: 'SST'. If parameter = 'MISSION', all the parameters (geophysical and location) are affected by the given QC.",
+          "column_type": "str"
         },
         "GREYLIST_START_DATE": {
-          "description": "Start date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57."
+          "description": "Start date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57.",
+          "column_type": "str"
         },
         "GREYLIST_END_DATE": {
-          "description": "End date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57."
+          "description": "End date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57.",
+          "column_type": "str"
         },
         "GREYLIST_FLAG": {
           "description": "Quality flag applied on parameter QC values. Example: '1' (value seems correct).",
+          "column_type": "str",
           "codetable": "CRAID.QC"
         },
         "GREYLIST_COMMENT": {
-          "description": "Comment on this greylist information. Example: 'sensor biased'."
+          "description": "Comment on this greylist information. Example: 'sensor biased'.",
+          "column_type": "str"
         }
       }
     },
@@ -962,42 +1204,54 @@
       "elements": {
         "HISTORY_INSTITUTION": {
           "description": "Institution that performed the action. Institution codes are described in Reference Table 4. Example: 'IF' for Ifremer.",
+          "column_type": "str",
           "codetable": "CRAID.DAC"
         },
         "HISTORY_STEP": {
           "description": "Code of the step in data processing for this history record. The step codes are described in Reference Table 12. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.STEPS"
         },
         "HISTORY_SOFTWARE": {
-          "description": "Name of the software that performed the action. This code is institution dependent. Example: TBD."
+          "description": "Name of the software that performed the action. This code is institution dependent. Example: TBD.",
+          "column_type": "str"
         },
         "HISTORY_SOFTWARE_RELEASE": {
-          "description": "Version of the software. This name is institution dependent. Example: '1.0'."
+          "description": "Version of the software. This name is institution dependent. Example: '1.0'.",
+          "column_type": "str"
         },
         "HISTORY_REFERENCE": {
-          "description": "Code of the reference database used for quality control in conjunction with the software. This code is institution dependent. Example: TBD."
+          "description": "Code of the reference database used for quality control in conjunction with the software. This code is institution dependent. Example: TBD.",
+          "column_type": "str"
         },
         "HISTORY_DATE": {
-          "description": "Date of the action. Example: '20011217160057' for December 17th 2001 16:00:57."
+          "description": "Date of the action. Example: '20011217160057' for December 17th 2001 16:00:57.",
+          "column_type": "datetime"
         },
         "HISTORY_ACTION": {
           "description": "Name of the action. The action codes are described in Reference Table 7. Example: TBD.",
+          "column_type": "str",
           "codetable": "CRAID.HISTORY"
         },
         "HISTORY_PARAMETER": {
-          "description": "Name of the parameter on which the action is performed. Example: 'PSAL'."
+          "description": "Name of the parameter on which the action is performed. Example: 'PSAL'.",
+          "column_type": "str"
         },
         "HISTORY_PREVIOUS_VALUE": {
-          "description": "Parameter or flag of the previous value before action. Example: '2' (probably good) for a flag that was changed to '1' (good)."
+          "description": "Parameter or flag of the previous value before action. Example: '2' (probably good) for a flag that was changed to '1' (good).",
+          "column_type": "float32"
         },
         "HISTORY_START_TIME_INDEX": {
-          "description": "Start time index the action is applied to. Example: 100"
+          "description": "Start time index the action is applied to. Example: 100",
+          "column_type": "float64"
         },
         "HISTORY_STOP_TIME_INDEX": {
-          "description": "Stop time index the action is applied to. Example: 150"
+          "description": "Stop time index the action is applied to. Example: 150",
+          "column_type": "float64"
         },
         "HISTORY_QCTEST": {
-          "description": "This field records the tests performed when ACTION is set to QCP$ (QC performed), the test failed when ACTION is set to QCF$ (QC failed). The QCTEST codes are described in Reference Table 11. Example: '0A' (in hexadecimal form)"
+          "description": "This field records the tests performed when ACTION is set to QCP$ (QC performed), the test failed when ACTION is set to QCF$ (QC failed). The QCTEST codes are described in Reference Table 11. Example: '0A' (in hexadecimal form)",
+          "column_type": "str"
         }
       }
     }
