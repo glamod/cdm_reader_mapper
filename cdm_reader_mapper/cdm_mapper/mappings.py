@@ -45,6 +45,7 @@ imodel_lineages = {
     "icoads_r3000_d730": icoads_lineage,
     "icoads_r3000_d781": icoads_lineage,
     "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
+    "c_raid": " . Initial conversion from C-RAID",
 }
 
 c2k_methods = {
@@ -176,6 +177,9 @@ def location_accuracy_i(li, lat):
 
 def string_add_i(a, b, c, sep):
     """Add string."""
+    a = str(a)
+    b = str(b)
+    c = str(c)
     if b:
         return sep.join(filter(None, [a, b, c]))
     else:
