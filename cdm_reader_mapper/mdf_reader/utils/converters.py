@@ -7,28 +7,6 @@ import pandas as pd
 
 from .. import properties
 
-# 1. dtype must be defined in dtype_properties.data_types
-# >>> if not np.dtype('int8'):
-# ...     print('No data type')
-# ...
-# >>> if not np.dtype('int786'):
-# ...     print('No data type')
-# ...
-# Traceback (most recent call last):
-#  File "<stdin>", line 1, in <module>
-# TypeError: data type "int786" not understood
-#
-#   Watch this, for my objects I want to catch both empty and blank strings as missing
-#   empty_string = ''
-#   blank_string = '     '
-#   len(empty_string) == 0
-#   len(blank_string) != 0
-#   len(empty_string) == len(blank_string.lstrip()) == 0
-#   So, we'll eval: len(value.lstrip())
-#
-# return data.astype(self.dtype, casting = 'safe')
-# safe casting specifies, otherwise converts np.nan to some real number depending on dtype.
-
 
 class df_converters:
     """Class for converting pandas DataFrame."""
@@ -37,6 +15,26 @@ class df_converters:
         self.dtype = dtype
         self.numeric_scale = 1.0 if self.dtype in properties.numpy_floats else 1
         self.numeric_offset = 0.0 if self.dtype in properties.numpy_floats else 0
+
+    def decode(self, data):
+        """Decode object type elements of a pandas series to UTF-8."""
+        return data.str.decode("utf-8")
+
+    def to_numeric(self, data):
+        """Convert object type elements of a pandas series to numeric type."""
+        data = data.replace(r"^\s*$", np.nan, regex=True)
+
+        # str method fails if all nan, pd.Series.replace method is not the same
+        # as pd.Series.str.replace!
+        if data.count() > 0:
+            data = self.decode(data)
+            data = data.str.strip()
+            data = data.str.replace(" ", "0")
+
+        #  Convert to numeric, then scale (?!) and give it's actual int type
+        return pd.to_numeric(
+            data, errors="coerce"
+        )  # astype fails on strings, to_numeric manages errors....!
 
     def object_to_numeric(self, data, scale=None, offset=None):
         """
@@ -68,22 +66,10 @@ class df_converters:
         """
         scale = scale if scale else self.numeric_scale
         offset = offset if offset else self.numeric_offset
-
+        if data.dtype == "object":
+            data = self.to_numeric(data)
         # First do the appropriate managing of white spaces:
         # to the right, they should mean 0!
-        data = data.replace(r"^\s*$", np.nan, regex=True)
-
-        # str method fails if all nan, pd.Series.replace method is not the same
-        # as pd.Series.str.replace!
-
-        if data.count() > 0:
-            data = data.str.strip()
-            data = data.str.replace(" ", "0")
-
-        #  Convert to numeric, then scale (?!) and give it's actual int type
-        data = pd.to_numeric(
-            data, errors="coerce"
-        )  # astype fails on strings, to_numeric manages errors....!
 
         data = offset + data * scale
         return pd.Series(data, dtype=self.dtype)
@@ -91,6 +77,10 @@ class df_converters:
     def object_to_object(self, data, disable_white_strip=False):
         """DOCUMENTATION."""
         # With strip() an empty element after stripping, is just an empty element, no NaN...
+        if data.dtype != "object":
+            return data.fillna("")
+
+        data = self.decode(data)
         if not disable_white_strip:
             data = data.str.strip()
         else:
@@ -102,6 +92,9 @@ class df_converters:
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
+        if data.dtype != "object":
+            return data
+        data = data.str.decode("utf-8")
         return pd.to_datetime(data, format=datetime_format, errors="coerce")
 
 
