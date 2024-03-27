@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 numpy_integers = [
     "int8",
     "int16",

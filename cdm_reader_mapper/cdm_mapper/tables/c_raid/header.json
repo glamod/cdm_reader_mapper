@@ -99,7 +99,8 @@
   },
   "report_timestamp": {
     "sections": "drifter_measurements",
-    "elements": "JULD"
+    "elements": "JULD",
+    "transform": "datetime_craid"
   },
   "report_duration": {
     "default": 11
