@@ -153,9 +153,7 @@ def _write_csv_files(
                 table_df_i[cdm_key] = default
 
         if fill_value is not None:
-            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(
-                value=fill_value
-            )  # , inplace=True)
+            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
         cdm_tables = _decimal_places(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
