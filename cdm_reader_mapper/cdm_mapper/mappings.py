@@ -45,7 +45,7 @@ imodel_lineages = {
     "icoads_r3000_d730": icoads_lineage,
     "icoads_r3000_d781": icoads_lineage,
     "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
-    "c_raid": " . Initial conversion from C-RAID",
+    "c_raid": ". Initial conversion from C-RAID",
 }
 
 c2k_methods = {
@@ -175,11 +175,18 @@ def location_accuracy_i(li, lat):
     return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
 
 
+def convert_to_str(a):
+    """Convert to string."""
+    if a:
+        a = str(a)
+    return a
+
+
 def string_add_i(a, b, c, sep):
     """Add string."""
-    a = str(a)
-    b = str(b)
-    c = str(c)
+    a = convert_to_str(a)
+    b = convert_to_str(b)
+    c = convert_to_str(c)
     if b:
         return sep.join(filter(None, [a, b, c]))
     else:
