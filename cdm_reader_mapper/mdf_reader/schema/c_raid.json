@@ -25,9 +25,7 @@
   },
   "sections": {
     "global_attributes": {
-      "header": {
-        "disable_read": true
-      },
+      "header": {},
       "elements": {
         "title": {
           "description": "A succinct description of what is in the dataset.",

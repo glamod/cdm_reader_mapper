@@ -339,7 +339,6 @@ class Configurator:
                         data_dict[index] = self.df[section]
                     except KeyError:
                         missings.append(index)
-
         df = pd.Series(data_dict)
         df["missings"] = missings
         return df
@@ -395,7 +394,9 @@ class _FileReader:
         for section in sections.keys():
             elements = sections[section]["elements"]
             for data_var in elements.keys():
-                if data_var not in ds.data_vars:
+                not_in_data_vars = data_var not in ds.data_vars
+                not_in_glb_attrs = data_var not in ds.attrs
+                if not_in_data_vars and not_in_glb_attrs:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
                 for attr, value in elements[data_var].items():
