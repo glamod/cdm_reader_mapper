@@ -29,12 +29,10 @@
     "default": 2
   },
   "platform_type": {
-    "sections": "drifter_characteristics",
-    "elements": "PLATFORM_FAMILY"
+    "default": 5
   },
   "platform_sub_type": {
-    "sections": "drifter_characteristics",
-    "elements": "DRIFTER_TYPE"
+    "default": 69
   },
   "primary_station_id": {
     "sections": "drifter_deployment",
