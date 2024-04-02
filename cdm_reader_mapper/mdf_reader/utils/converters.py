@@ -18,7 +18,10 @@ class df_converters:
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
-        return data.str.decode("utf-8")
+        decoded = data.str.decode("utf-8")
+        if decoded.dtype != "object":
+            return data
+        return decoded
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
@@ -79,7 +82,6 @@ class df_converters:
         # With strip() an empty element after stripping, is just an empty element, no NaN...
         if data.dtype != "object":
             return data.fillna("")
-
         data = self.decode(data)
         if not disable_white_strip:
             data = data.str.strip()
