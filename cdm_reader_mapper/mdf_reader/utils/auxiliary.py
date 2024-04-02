@@ -383,6 +383,11 @@ class _FileReader:
             self.code_tables_path = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
 
+    def _adjust_dtype(self, dtype, df):
+        if not isinstance(dtype, dict):
+            return dtype
+        return {k: v for k, v in dtype.items() if k in df.columns}
+
     def _convert_entries(self, series, converter_func, **kwargs):
         return converter_func(series, **kwargs)
 

@@ -91,13 +91,13 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
+            dtype = self._adjust_dtype(dtype, self.data)
             data = self._convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
                 decoder_dict,
             )
-
             self.data = data.astype(dtype)
         else:
             data_buffer = StringIO()
@@ -124,6 +124,7 @@ class MDFFileReader(_FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
+            dtype = self._adjust_dtype(dtype, df)
             self.data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
