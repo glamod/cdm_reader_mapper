@@ -172,7 +172,6 @@ def test_read_immt_gcc():
 def test_read_craid_1010001():
     _testing_suite(
         **test_data.test_craid_1010001,
-        mapping=False,
         review=False,
     )
 
