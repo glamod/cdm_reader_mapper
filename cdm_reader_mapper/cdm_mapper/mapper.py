@@ -25,6 +25,24 @@ from .mappings import mapping_functions
 from .tables.tables_hdlr import tables_hdlr
 
 
+def drop_duplicates(df):
+    """Drop duplicates from list."""
+
+    def list_to_tuple(v):
+        if isinstance(v, list):
+            v = tuple(v)
+        return v
+
+    def tuple_to_list(v):
+        if isinstance(v, tuple):
+            v = list(v)
+        return v
+
+    df = df.applymap(list_to_tuple)
+    df = df.drop_duplicates(ignore_index=True)
+    return df.applymap(tuple_to_list)
+
+
 def _map_to_df(m, x):
     if not isinstance(m, dict):
         return
@@ -179,6 +197,8 @@ def _write_csv_files(
     )
     if "observation_value" in table_df_i:
         table_df_i.dropna(subset=["observation_value"], inplace=True)
+
+    table_df_i = drop_duplicates(table_df_i)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
     return cdm_tables
 
