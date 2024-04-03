@@ -185,7 +185,6 @@ def _testing_suite(
     output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
 
     if review is True:
-        print(expected_data["cdm_table"])
         output_ = read_tables(
             expected_data["cdm_table"], tb_id=f"{tb_id}*", cdm_subset=cdm_subset
         )
