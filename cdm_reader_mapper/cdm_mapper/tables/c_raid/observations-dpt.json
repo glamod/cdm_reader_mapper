@@ -62,7 +62,7 @@
     "default": 0
   },
   "observed_variable": {
-    "default": 95
+    "default": 36
   },
   "observation_value": {
     "sections": "drifter_measurements",
