@@ -312,18 +312,20 @@ class mapping_functions:
         else:
             k_element = 0
         origin_decimals = self.atts.get(element[k_element]).get("decimal_places")
-        if origin_decimals <= 2:
+        if origin_decimals is None:
             return 2
-        else:
-            return origin_decimals
+        elif origin_decimals <= 2:
+            return 2
+        return origin_decimals
 
     def decimal_places_pressure_pascal(self, element):
         """Return pressure decimal places."""
         origin_decimals = self.atts.get(element[0]).get("decimal_places")
-        if origin_decimals > 2:
+        if origin_decimals is None:
+            return 2
+        elif origin_decimals > 2:
             return origin_decimals - 2
-        else:
-            return 0
+        return 0
 
     def df_col_join(self, df, sep):
         """Join pandas Dataframe."""
