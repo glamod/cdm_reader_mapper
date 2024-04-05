@@ -1,19 +1,15 @@
-====================================================
-Common Data Model reader and mapper: ``cdm`` toolbox
-====================================================
+==================================================================
+Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
+==================================================================
 
 +----------------------------+-----------------------------------------------------+
-| Versions                   | |pypi| |versions|                                   |
-+                            +                                                     +
-|                            | |tag| |release|                                     |
+| Versions                   | |pypi| |versions| |tag| |release|                   |
 +----------------------------+-----------------------------------------------------+
 | Documentation and Support  | |docs|                                              |
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit|                         |
-+                            +                                                     +
-|                            | |fossa| |codefactor|                                |
+| Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
 +----------------------------+-----------------------------------------------------+
@@ -38,7 +34,7 @@ Note
 -----
 
 The ``cdm_reader_mapper`` toolbox is currently **NOT** working with ``python 3.11.9``.
-For more information see ``dask`` `Issue #11038`_ and `PR #11035`.
+For more information see ``dask`` `Issue #11038`_ and `PR #11035`_.
 This issue should be fixed within a newer release.
 
 Installation
