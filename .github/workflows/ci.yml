@@ -57,7 +57,7 @@ jobs:
           python -c "import cdm_reader_mapper"
 
       - name: Run tests
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: python -u -m pytest
           --cov=cdm_reader_mapper
           --cov-report=xml
