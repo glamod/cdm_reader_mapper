@@ -9,7 +9,9 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
+| Coding Standards           | |black| |ruff| |pre-commit|                         |
++                            +                                                     +
+|                            | |fossa| |codefactor|                                |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
 +----------------------------+-----------------------------------------------------+

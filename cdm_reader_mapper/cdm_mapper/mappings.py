@@ -100,9 +100,7 @@ def coord_360_to_180i(long3):
     -------
     long1: longitude in decimal degrees
     """
-    long1 = (long3 + 180) % 360 - 180
-
-    return long1
+    return (long3 + 180.0) % 360.0 - 180.0
 
 
 def coord_dmh_to_90i(deg, min, hemis):
@@ -126,8 +124,7 @@ def coord_dmh_to_90i(deg, min, hemis):
     min_df = min / 60
     if hemis == "S":
         hemisphere = -1
-    var = np.round((deg + min_df), 2) * hemisphere
-    return var
+    return np.round((deg + min_df), 2) * hemisphere
 
 
 def convert_to_utc_i(date, zone):
@@ -178,8 +175,6 @@ def string_add_i(a, b, c, sep):
     """Add string."""
     if b:
         return sep.join(filter(None, [a, b, c]))
-    else:
-        return
 
 
 class mapping_functions:
@@ -201,16 +196,15 @@ class mapping_functions:
         hours, minutes = np.vectorize(self.datetime_decimalhour_to_HM)(
             df.iloc[:, -1].values
         )
-        df.drop(df.columns[len(df.columns) - 1], axis=1, inplace=True)
+        df = df.drop(df.columns[len(df.columns) - 1], axis=1)
         df["H"] = hours
         df["M"] = minutes
         # VALUES!!!!
-        data = pd.to_datetime(
+        return pd.to_datetime(
             df.astype(str).apply("-".join, axis=1).values,
             format=date_format,
             errors="coerce",
         )
-        return data
 
     def datetime_utcnow(self):
         """Get actual UTC time."""
@@ -240,7 +234,11 @@ class mapping_functions:
         df_coords = df.core.iloc[:, 3:5]
 
         # Covert long to -180 to 180 for time zone finding
-        df_coords["lon_converted"] = df_coords["LON"].swifter.apply(coord_360_to_180i)
+        df_coords["LON"] = df_coords["LON"].astype(float)
+        df_coords["LAT"] = df_coords["LAT"].astype(float)
+        df_coords["lon_converted"] = coord_360_to_180i(
+            df_coords["LON"]
+        )  # df_coords["LON"].swifter.apply(coord_360_to_180i)
 
         df_coords["time_zone"] = df_coords.swifter.apply(
             lambda x: time_zone_i(x["LAT"], x["lon_converted"]), axis=1
@@ -255,11 +253,9 @@ class mapping_functions:
         d = {"Dates": data, "Time_zone": df_coords.time_zone.values}
         df_time = pd.DataFrame(data=d)
 
-        df_time["time_utc"] = df_time.swifter.apply(
+        return df_time.swifter.apply(
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
-
-        return df_time.time_utc
 
         # NOT USED
         #
@@ -355,15 +351,13 @@ class mapping_functions:
 
     def longitude_360to180(self, ds):
         """Convert longitudes within -180 and 180 degrees."""
-        lon = np.vectorize(longitude_360to180_i)(ds)
-        return lon
+        return np.vectorize(longitude_360to180_i)(ds)
 
     def location_accuracy(self, df):  # (li_core,lat_core) math.radians(lat_core)
         """Calculate location accuracy."""
-        la = np.vectorize(location_accuracy_i, otypes="f")(
+        return np.vectorize(location_accuracy_i, otypes="f")(
             df.iloc[:, 0], df.iloc[:, 1]
         )  # last minute tweak so that is does no fail on nans!
-        return la
 
     def observing_programme(self, ds):
         """Map observing programme."""
@@ -378,8 +372,7 @@ class mapping_functions:
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
                 ds.iloc[:, col] = ds.iloc[:, col].astype(str).str.zfill(width)
-        ds["string_add"] = np.vectorize(string_add_i)(prepend, ds, append, separator)
-        return ds["string_add"]
+        return np.vectorize(string_add_i)(prepend, ds, append, separator)
 
     def string_join_add(
         self, df, prepend=None, append=None, separator="", zfill_col=None, zfill=None
