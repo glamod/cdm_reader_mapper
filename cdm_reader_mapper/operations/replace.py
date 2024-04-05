@@ -50,8 +50,8 @@ def replace_columns(
         pivot_l = pivot_c
         pivot_r = pivot_c
     # Now index on pivot
-    df_l.set_index(pivot_l, inplace=True, drop=False)
-    df_r.set_index(pivot_r, inplace=True, drop=False)
+    df_l = df_l.set_index(pivot_l, drop=False)
+    df_r = df_r.set_index(pivot_r, drop=False)
 
     if not rep_c and not rep_map:
         logger.error(
@@ -73,5 +73,5 @@ def replace_columns(
     # And merge all data from right into left
     df_l.update(df_r_l)
     # Return with index reset to default
-    df_l.reset_index(drop=True, inplace=True)
+    df_l = df_l.reset_index(drop=True)
     return df_l

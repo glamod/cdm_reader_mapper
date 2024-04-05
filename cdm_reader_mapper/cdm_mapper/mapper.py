@@ -198,7 +198,7 @@ def _write_csv_files(
         }
     )
     if "observation_value" in table_df_i:
-        table_df_i.dropna(subset=["observation_value"], inplace=True)
+        table_df_i = table_df_i.dropna(subset=["observation_value"])
 
     table_df_i = drop_duplicates(table_df_i)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")

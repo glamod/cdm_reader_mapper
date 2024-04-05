@@ -9,6 +9,7 @@ import os
 from copy import deepcopy
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -479,6 +480,7 @@ class _FileReader:
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
         self.columns = df.columns
+        df = df.where(df.notnull(), np.nan)
         return df, missings
 
     def _open_data(
@@ -576,7 +578,7 @@ class _FileReader:
         if not hasattr(self, "valid"):
             self.valid = df.notna()
         mask = self.missing | self.valid
-        mask[self.missings] = None
+        mask[self.missings] = False
         return mask
 
     def _validate_df(self, df):

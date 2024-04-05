@@ -267,7 +267,7 @@ def table_to_ascii(
 
     empty_table = False
     if "observation_value" in table:
-        table.dropna(subset=["observation_value"], inplace=True)
+        table = table.dropna(subset=["observation_value"])
         empty_table = True if len(table) == 0 else False
     elif "observation_value" in table_atts.keys():
         empty_table = True
@@ -291,7 +291,6 @@ def table_to_ascii(
                     kwargs = {x: table_atts.get(iele).get(x) for x in iprinter_kwargs}
                 else:
                     kwargs = {}
-                # table[iele].fillna(null_label, inplace=True)
                 ascii_table[iele] = printers.get(itype)(
                     table[iele], null_label, **kwargs
                 )
