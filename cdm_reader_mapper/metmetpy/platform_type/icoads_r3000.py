@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import re
 
-import numpy as np
-
 from .. import properties
 
 
@@ -27,13 +25,12 @@ def deck_700_imma1(data):
     sid_col = properties.metadata_datamodels.get("source").get("imma1")
     pt_col = properties.metadata_datamodels.get("platform").get("imma1")
 
-    data[pt_col].iloc[np.where(data[pt_col].isna())] = drifters
+    data[pt_col] = data[pt_col].fillna(drifters)
     loc = (
         (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
     )
 
-    data[pt_col].loc[loc] = buoys
-
+    data[pt_col] = data[pt_col].where(~loc, buoys)
     return data
 
 
@@ -51,7 +48,5 @@ def deck_892_imma1(data):
     loc = (
         (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
     )
-
-    data[pt_col].loc[loc] = buoys
-
+    data[pt_col] = data[pt_col].where(~loc, buoys)
     return data
