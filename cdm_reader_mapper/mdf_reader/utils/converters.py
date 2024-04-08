@@ -25,7 +25,9 @@ class df_converters:
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
-        data = data.replace(r"^\s*$", np.nan, regex=True)
+        data = data.apply(
+            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+        )
 
         # str method fails if all nan, pd.Series.replace method is not the same
         # as pd.Series.str.replace!
@@ -71,25 +73,6 @@ class df_converters:
         offset = offset if offset else self.numeric_offset
         if data.dtype == "object":
             data = self.to_numeric(data)
-        # First do the appropriate managing of white spaces:
-        # to the right, they should mean 0!
-
-        data = data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
-        )
-        # data = data.replace(r"^\s*$", np.nan, regex=True)
-
-        # str method fails if all nan, pd.Series.replace method is not the same
-        # as pd.Series.str.replace!
-
-        if data.count() > 0:
-            data = data.str.strip()
-            data = data.str.replace(" ", "0")
-
-        #  Convert to numeric, then scale (?!) and give it's actual int type
-        data = pd.to_numeric(
-            data, errors="coerce"
-        )  # astype fails on strings, to_numeric manages errors....!
 
         data = offset + data * scale
         return pd.Series(data, dtype=self.dtype)
