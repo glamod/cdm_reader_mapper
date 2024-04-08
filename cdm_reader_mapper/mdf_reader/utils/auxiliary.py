@@ -229,7 +229,6 @@ class Configurator:
             if disable_read is True:
                 disable_reads.append(order)
                 continue
-
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
                 self.sections_dict = sections[section]
@@ -340,6 +339,7 @@ class Configurator:
                         data_dict[index] = self.df[section]
                     except KeyError:
                         missings.append(index)
+
         df = pd.Series(data_dict)
         df["missings"] = missings
         return df
@@ -402,7 +402,8 @@ class _FileReader:
             for data_var in elements.keys():
                 not_in_data_vars = data_var not in ds.data_vars
                 not_in_glb_attrs = data_var not in ds.attrs
-                if not_in_data_vars and not_in_glb_attrs:
+                not_in_data_dims = data_var not in ds.dims
+                if not_in_data_vars and not_in_glb_attrs and not_in_data_dims:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
                 for attr, value in elements[data_var].items():
