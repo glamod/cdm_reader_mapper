@@ -82,11 +82,13 @@
         },
         "time_coverage_start": {
           "description": "Start date of the data in UTC. See note on time format below.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "time_coverage_end": {
           "description": "Final date of the data in UTC. See note on time format below.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "geospatial_lat_min": {
           "description": "Southernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
@@ -122,7 +124,8 @@
         },
         "drogue_off_time": {
           "description": "Drogue off date in UTC. See note on time format below.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "drogue_off_latitude": {
           "description": "Drogue off latitude, a value between -90 and 90 decimal degrees.",
@@ -135,9 +138,7 @@
       }
     },
     "dimensions": {
-      "header": {
-        "disable_read": true
-      },
+      "header": {},
       "elements": {
         "N_TIME": {
           "description": "Number of time steps.",
@@ -211,15 +212,18 @@
         },
         "REFERENCE_DATE_TIME": {
           "description": "Date of reference for Julian days. The recommended reference date time is '19500101000000' : January 1st 1950 00:00:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "DATE_CREATION": {
           "description": "Date and time (UTC) of creation of this file. Format : YYYYMMDDHHMISS. Example : 20011229161700 : December 29th 2001 16:17:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "DATE_UPDATE": {
           "description": "Date and time (UTC) of update of this file. Format : YYYYMMDDHHMISS. Example : 20011230090500 : December 30th 2001 09:05:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         }
       }
     },
@@ -293,7 +297,8 @@
         },
         "DRIFTER_MANUFACTURE_DATE": {
           "description": "Date of the drifter manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "DRIFTER_SERIAL_NO": {
           "description": "This field should contain only the serial number of the drifter. Example: TBD.",
@@ -429,7 +434,8 @@
       "elements": {
         "LAUNCH_DATE": {
           "description": "Date and time (UTC) of launch of the drifter. Format : YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "LAUNCH_LATITUDE": {
           "description": "Latitude of the drifter launch. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -446,7 +452,8 @@
         },
         "STARTUP_DATE": {
           "description": "Date and time (UTC) of the activation of the drifter before or just after deployment. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05 :00.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "STARTUP_DATE_QC": {
           "description": "Quality flag on startup date. The flag scale is described in the Reference Table 2. Example: 1 (startup date seems correct).",
@@ -475,7 +482,8 @@
         },
         "DROGUE_OFF_DATE": {
           "description": "Date (UTC) of the loss of the drogue. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "DROGUE_OFF_LATITUDE": {
           "description": "Latitude of the loss of the drogue. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -492,7 +500,8 @@
         },
         "END_MISSION_DATE": {
           "description": "Date (UTC) of the end of mission of the drifter. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "END_MISSION_LATITUDE": {
           "description": "Latitude at end of the mission. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -564,7 +573,8 @@
         },
         "SENSOR_MANUFACTURE_DATE": {
           "description": "Date of the sensor manufacture. Format : YYYYMMDD. Example: '20011230' for December 30th 2001.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "SENSOR_MODEL": {
           "description": "Model of sensor. See Reference Table 24. Example: TBD.",
@@ -584,7 +594,8 @@
         },
         "SENSOR_INITIAL_END_DATE": {
           "description": "Date (UTC) of end of useful mission for the sensor, according to the initial platform operators. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "PARAMETER": {
           "description": "Names of the parameters measured by drifter sensors or derived from drifter measurements. The parameter names are listed in Reference Table 3. Examples: TBD.",
@@ -671,7 +682,8 @@
       "elements": {
         "JULD": {
           "description": "Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. JULD(N_TIME) should be filled and its values should be unique within the file. Example: 18833.8013889885 for July 25th 2001 19:14:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "JULD_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.v",
@@ -685,7 +697,8 @@
         },
         "JULD_ADJUSTED": {
           "description": "Adjusted Julian day of the location (or measurement). The integer part represents the day, the decimal part represents the time of the measurement. Date and time are in universal time coordinates. The Julian day is relative to REFERENCE_DATE_TIME. The date may be adjusted due to float clock drift or expert review. Example: 18833.8013889885 for July 25th 2001 19:14:00",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "JULD_ADJUSTED_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.",
@@ -1224,7 +1237,8 @@
         },
         "HISTORY_DATE": {
           "description": "Date of the action. Example: '20011217160057' for December 17th 2001 16:00:57.",
-          "column_type": "datetime"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d"
         },
         "HISTORY_ACTION": {
           "description": "Name of the action. The action codes are described in Reference Table 7. Example: TBD.",
