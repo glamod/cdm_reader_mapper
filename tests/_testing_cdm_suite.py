@@ -80,7 +80,10 @@ def _testing_suite(
 ):
     exp = "expected_" + suffix
     splitted = suffix.split("_")
-    tb_id = splitted[0] + "-" + "_".join(splitted[1:])
+    if len(splitted) > 1:
+        tb_id = splitted[0] + "-" + "_".join(splitted[1:])
+    else:
+        tb_id = splitted[0]
 
     read_ = mdf_reader.read(
         source=source,
@@ -129,7 +132,6 @@ def _testing_suite(
         data_model=dm,
         dck=deck,
     )
-
     if review is True:
         expected_data = result_data[exp]
         result_data_file = expected_data["data"]
