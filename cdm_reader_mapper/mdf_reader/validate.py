@@ -197,5 +197,6 @@ def validate(data, mask0, schema, code_tables_path, disables):
         ~mask0_n,
         False,
     )
-    df_disable = pd.DataFrame(index=mask.index, data=np.nan, columns=disables)
-    return pd.concat([mask, df_disable], axis=1)
+    for column in disables:
+        mask[column] = np.nan
+    return mask
