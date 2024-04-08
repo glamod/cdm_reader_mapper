@@ -39,9 +39,9 @@ def drop_duplicates(df):
         return v
 
     dtypes = df.dtypes
-    df = df.applymap(list_to_tuple)
+    df = df.map(list_to_tuple)
     df = df.drop_duplicates(ignore_index=True)
-    df = df.applymap(tuple_to_list)
+    df = df.map(tuple_to_list)
     return df.astype(dtypes)
 
 

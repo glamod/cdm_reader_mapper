@@ -405,7 +405,9 @@ class mapping_functions:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        df["string_add"] = np.vectorize(string_add_i)(prepend, joint, append, separator)
+        df["string_add"] = np.vectorize(string_add_i)(
+            prepend, joint, append, sep=separator
+        )
         if duplicated:
             df = df[:-1]
         return df["string_add"]
