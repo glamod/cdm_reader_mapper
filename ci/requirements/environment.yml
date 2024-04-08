@@ -13,6 +13,7 @@ dependencies:
     - netcdf4
     - h5netcdf
     - datashader
+    - pyarrow
     # https://github.com/openforcefield/openff-nagl/issues/106
     - snappy<1.2
     # for testing
@@ -28,4 +29,3 @@ dependencies:
       - textdistance
       - swifter
       - platformdirs
-      - pyarrow
