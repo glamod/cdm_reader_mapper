@@ -7,7 +7,7 @@ channels:
 dependencies:
     - pandas
     - dask
-    - dask-dataframe
+    - dask[dataframe]
     - matplotlib
     - xarray
     - bottleneck
