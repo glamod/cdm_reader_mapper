@@ -2,11 +2,13 @@
   "observation_id": {
     "sections": [
       "general",
-      "drifter_characteristics"
+      "drifter_characteristics",
+      "dimensions"
     ],
     "elements": [
       "FORMAT_VERSION",
-      "DRIFTER_NUMBER"
+      "DRIFTER_NUMBER",
+      "N_TIME"
     ],
     "transform": "string_join_add",
     "kwargs": {
@@ -18,11 +20,13 @@
   "report_id": {
     "sections": [
       "general",
-      "drifter_characteristics"
+      "drifter_characteristics",
+      "dimensions"
     ],
     "elements": [
       "FORMAT_VERSION",
-      "DRIFTER_NUMBER"
+      "DRIFTER_NUMBER",
+      "N_TIME"
     ],
     "transform": "string_join_add",
     "kwargs": {
@@ -125,7 +129,12 @@
     "default": 0
   },
   "source_id": {
-    "sections": "global_attributes",
-    "elements": "source"
+    "sections": "general",
+    "elements": "FORMAT_VERSION",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "C-RAID",
+      "separator": "-"
+    }
   }
 }
