@@ -13,7 +13,6 @@ dependencies:
     - netcdf4
     - h5netcdf
     - datashader
-    - pyarrow
     # for testing
     - pytest
     - pytest-cov
@@ -27,3 +26,4 @@ dependencies:
       - textdistance
       - swifter
       - platformdirs
+      - pyarrow
