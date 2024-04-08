@@ -173,6 +173,7 @@ def test_read_craid_1010001():
     _testing_suite(
         **test_data.test_craid_1010001,
         cdm_name="c_raid",
+        suffix="craid",
         review=False,
     )
 
