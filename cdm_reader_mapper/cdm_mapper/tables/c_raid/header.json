@@ -2,11 +2,13 @@
   "report_id": {
     "sections": [
       "general",
-      "drifter_characteristics"
+      "drifter_characteristics",
+      "dimensions"
     ],
     "elements": [
       "FORMAT_VERSION",
-      "DRIFTER_NUMBER"
+      "DRIFTER_NUMBER",
+      "N_TIME"
     ],
     "transform": "string_join_add",
     "kwargs": {
@@ -35,14 +37,14 @@
     "default": 69
   },
   "primary_station_id": {
-    "sections": "drifter_deployment",
-    "elements": "DEPLOYMENT_REFERENCE_STATION_ID"
+    "sections": "drifter_characteristics",
+    "elements": "DRIFTER_WMO_NUMBER"
   },
   "station_record_number": {
     "default": 1
   },
   "primary_station_id_scheme": {
-    "fill_value": 8
+    "fill_value": "8"
   },
   "longitude": {
     "sections": "drifter_measurements",
@@ -58,23 +60,26 @@
   "location_accuracy": {
     "sections": "drifter_measurements",
     "elements": "POSITION_ACCURACY",
+    "code_table": "location_accuracy",
     "decimal_places": 0
   },
+  "location_method": {
+    "sections": "drifter_measurements",
+    "elements": "POSITION_ACCURACY",
+    "code_table": "location_method"
+  },
   "location_quality": {
-    "default": 3
+    "sections": "drifter_measurements",
+    "elements": "POSITION_QC"
   },
   "crs": {
     "default": 0
   },
   "height_of_station_above_local_ground": {
-    "sections": "drifter_sensor",
-    "elements": "SENSOR_LEVEL_DEPTH",
-    "transform": "float_opposite"
+    "default": 0
   },
   "height_of_station_above_sea_level": {
-    "sections": "drifter_sensor",
-    "elements": "SENSOR_LEVEL_DEPTH",
-    "transform": "float_opposite"
+    "default": 0
   },
   "report_meaning_of_timestamp": {
     "default": 2
@@ -85,10 +90,15 @@
     "transform": "datetime_craid"
   },
   "report_duration": {
-    "default": 11
+    "default": 0
+  },
+  "report_time_accuracy": {
+    "default": 1
   },
   "report_time_quality": {
-    "default": 2
+    "sections": "drifter_measurements",
+    "elements": "JULD_QC",
+    "code_table": "report_time_quality"
   },
   "duplicate_status": {
     "default": 4
@@ -102,7 +112,12 @@
     "transform": "lineage"
   },
   "source_id": {
-    "sections": "global_attributes",
-    "elements": "source"
+    "sections": "general",
+    "elements": "FORMAT_VERSION",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "C-RAID",
+      "separator": "-"
+    }
   }
 }
