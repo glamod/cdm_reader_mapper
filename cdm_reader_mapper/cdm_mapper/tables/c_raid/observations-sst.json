@@ -65,6 +65,10 @@
   "z_coordinate_type": {
     "default": 0
   },
+  "observation_height_above_station_surface": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_LEVEL_DEPTH"
+  },
   "observed_variable": {
     "default": 95
   },
@@ -92,11 +96,17 @@
     "default": 3
   },
   "quality_flag": {
-    "default": 2
+    "sections": "drifter_measurements",
+    "elements": "SST_QC",
+    "code_table": "qc_flag"
   },
   "numerical_precision": {},
   "sensor_automation_status": {
     "default": 5
+  },
+  "sensor_id": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_SERIAL_NO"
   },
   "exposure_of_sensor": {
     "default": 3
