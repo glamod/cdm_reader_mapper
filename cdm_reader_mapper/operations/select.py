@@ -65,55 +65,7 @@ def select_true(data, mask, out_rejected=False, in_index=False):
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, mask_parser, out_rejected=False, in_index=False):
-        mask_cp = pandas_TextParser_hdlr.make_copy(mask_parser)
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
-        in_buffer = StringIO()
-        if out_rejected:
-            out_buffer = StringIO()
-        if in_index:
-            index = []
-        idx_in_offset = 0
-        idx_out_offset = 0
-        for df, mask_df in zip(data_parser, mask_cp):
-            o = dataframe(
-                df,
-                mask_df,
-                out_rejected=out_rejected,
-                in_index=in_index,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
-            )
-            o[0].to_csv(in_buffer, header=False, index=False, mode="a")
-            if out_rejected:
-                o[1].to_csv(out_buffer, header=False, index=False, mode="a")
-                idx_out_offset += len(o[1])
-            if in_index and not out_rejected:
-                index.extend(o[1])
-            if in_index and out_rejected:
-                index.extend(o[2])
-            idx_in_offset += len(o[0])
-
-        mask_cp.close()
-        in_buffer.seek(0)
-        output = [pd.read_csv(in_buffer, **read_dict)]
-        if out_rejected:
-            out_buffer.seek(0)
-            output.append(pd.read_csv(out_buffer, **read_dict))
-        if in_index:
-            output.append(index)
-
-        return output
-
-    output = parser(data, mask, col, out_rejected=out_rejected, in_index=in_index)
+    output = dataframe(data, mask, out_rejected=out_rejected, in_index=in_index)
 
     if len(output) > 1:
         return output
