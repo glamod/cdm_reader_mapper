@@ -31,8 +31,6 @@ from __future__ import annotations
 
 import json
 
-from io import StringIO
-
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.getting_files import get_files
 

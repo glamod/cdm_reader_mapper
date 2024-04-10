@@ -5,9 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-
 from copy import deepcopy
-from io import StringIO
 
 import numpy as np
 import pandas as pd
@@ -15,6 +13,7 @@ import xarray as xr
 
 from cdm_reader_mapper.common.getting_files import get_files
 
+from .. import properties
 from ..schema import schemas
 from ..validate import validate
 from . import converters, decoders
@@ -496,7 +495,7 @@ class _FileReader:
             )
 
         df, self.missings = self._read_sections(
-          TextParser, order, valid, open_with=open_with
+            TextParser, order, valid, open_with=open_with
         )
         return df
 
