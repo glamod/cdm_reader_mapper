@@ -1,0 +1,9 @@
+{
+  "0": "Drifter still reporting as of last update",
+  "1": "Drifter ran aground",
+  "2": "Drifter was picked up",
+  "3": "Drifter quit transmitting",
+  "4": "Unreliable transmissions at end of trajectory",
+  "5": "Bad battery voltage",
+  "6": "Place in inactive status while transmitting good position"
+}

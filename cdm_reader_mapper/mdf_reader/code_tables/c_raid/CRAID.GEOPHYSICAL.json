@@ -1,0 +1,33 @@
+{
+  "ATMS": {
+    "longname": "Air pressure",
+    "standard_name": "air_pressure",
+    "unit": "hPa"
+  },
+  "ATMS_COUNT": {
+    "longname": "Air pressure",
+    "unit": "count"
+  },
+  "SST": {
+    "longname": "Sea surface temperature",
+    "standard_name": "sea_surface_temperature",
+    "unit": "degree_Celsius"
+  },
+  "SST_COUNT": {
+    "longname": "Sea surface temperature",
+    "unit": "count"
+  },
+  "AIR_TEMP": {
+    "longname": "Air temperature",
+    "standard_name": "Air temperature",
+    "unit": "degree_Celsius"
+  },
+  "ATPT": {
+    "longname": "Air pressure tendency",
+    "unit": "hPa"
+  },
+  "ATPT_COUNT": {
+    "longname": "Air pressure tendency",
+    "unit": "count"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "0": "Data are the raw output from instruments, without calibration, and not necessarily converted to engineering units. These data are rarely exchanged",
+  "1": "Data have been converted to values independent of detailed instrument knowledge. Automated calibrations may have been done. Data may not have full geospatial and temporal referencing, but have sufficient information to uniquely reference the data to the point of measurement.",
+  "2": "Data have complete geospatial and temporal references. Information may have been compressed (e.g. subsampled, averaged, etc.) but no assumptions of scales of variability or thermodynamic relationships have been used in the processing.",
+  "3": "The data have been processed with assumptions about the scales of variability or thermodynamic relationships. The data are normally reduced to regular space, time intervals with enhanced signal to noise."
+}

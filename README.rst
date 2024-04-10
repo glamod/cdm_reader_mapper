@@ -1,24 +1,22 @@
-====================================================
-Common Data Model reader and mapper: ``cdm`` toolbox
-====================================================
+==================================================================
+Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
+==================================================================
 
 +----------------------------+-----------------------------------------------------+
-| Versions                   | |pypi| |versions|                                   |
-+                            +                                                     +
-|                            | |tag| |release|                                     |
+| Versions                   | |pypi| |versions| |tag| |release|                   |
 +----------------------------+-----------------------------------------------------+
 | Documentation and Support  | |docs|                                              |
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |fossa|                 |
+| Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
 +----------------------------+-----------------------------------------------------+
 | Funding                    | |funding|                                           |
 +----------------------------+-----------------------------------------------------+
 
-The ``cdm`` toolbox is a python_ tool designed for both:
+The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 
 * to read data files compliant with a user specified `data model`_
 * map observed variables and its associated metadata from a `data
@@ -31,6 +29,13 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 * Reports that have a coherent internal structure and can be modelised.
 * Reports that have a fixed width or field delimited types
 * Reports that can be organized in sections, in which case each section can be of different types (fixed width of delimited)
+
+Note
+-----
+
+The ``cdm_reader_mapper`` toolbox is currently **NOT** working with ``python 3.11.9``.
+For more information see ``dask`` `Issue #11038`_ and `PR #11035`_.
+This issue should be fixed within a newer release.
 
 Installation
 ------------
@@ -111,6 +116,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 
 .. _python: https://www.python.org
 
+.. _Issue #11038: https://github.com/dask/dask/issues/11038
+
+.. _PR #11035: https://github.com/dask/dask/pull/11035
+
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
         :alt: Build Status
@@ -118,6 +127,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
         :target: https://github.com/psf/black
         :alt: Python Black
+
+.. |codefactor| image:: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper/badge
+		:target: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper
+		:alt: CodeFactor
 
 .. |coveralls| image:: https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg
 	      :target: https://codecov.io/gh/glamod/cdm_reader_mapper

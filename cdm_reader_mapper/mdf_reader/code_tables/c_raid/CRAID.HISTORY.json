@@ -1,0 +1,16 @@
+{
+  "CF": "Change a quality flag",
+  "CR": "Create record",
+  "CV": "Change value",
+  "DC": "Station was checked by duplicate checking software",
+  "ED": "Edit a parameter value",
+  "IP": "This history group operates on the complete input record",
+  "NG": "No good trace",
+  "PE": "Position error. Profile position has been erroneously encoded. Corrected if possible.",
+  "QC": "Quality Control",
+  "QCF$": "Tests failed",
+  "QCP$": "Test performed",
+  "SV": "Set a value",
+  "TE": "Time error. Profile date/time has been erroneously encoded. Corrected if possible.",
+  "UP": "Station passed through the update program"
+}

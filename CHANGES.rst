@@ -3,6 +3,33 @@
 Changelog
 =========
 
+0.3.0 (unpublished)
+-------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+New features and enchancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`)
+* adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+* adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* do not diferentiate between tuple and single column names (:pull: `24`)
+* ``metmetpy``: Do not raise erros if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
+* get rid of warnings (:issue: `9`, :pull: `27`)
+* adding python 3.12 to testing suite (:pull: `29`)
+* set time out for testing suite to 10 minutes (:pull: `29`)
+
+Bug fixes
+^^^^^^^^^^
+* ``cdm_mapper``: set debugging logger into if statement (:pull:`24`)
+* ``cdm_mapper``: do not use code table ``qc_flag`` with ``report_id`` (:pull:`24`)
+
+
 0.2.0 (2023-03-15)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)

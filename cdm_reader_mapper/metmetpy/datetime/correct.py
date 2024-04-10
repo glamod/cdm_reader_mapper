@@ -30,7 +30,8 @@ invocation) logging an error.
 from __future__ import annotations
 
 import json
-import os
+
+from io import StringIO
 
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.getting_files import get_files
@@ -47,12 +48,12 @@ def correct_it(data, data_model, deck, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     # 1. Optional deck specific corrections
-    for correction_method_file in _files.glob(f"{data_model}.json"):
-        break
-    if not os.path.isfile(correction_method_file):
+    correction_method_file = _files.glob(f"{data_model}.json")
+    correction_method_file = [f for f in correction_method_file]
+    if not correction_method_file:
         logger.info(f"No datetime corrections {data_model}")
     else:
-        with open(correction_method_file) as fileObj:
+        with open(correction_method_file[0]) as fileObj:
             correction_method = json.load(fileObj)
         datetime_correction = correction_method.get(deck, {}).get("function")
         if not datetime_correction:
@@ -76,14 +77,15 @@ def correct_it(data, data_model, deck, log_level="INFO"):
 def correct(data, data_model, deck, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    for replacements_method_file in _files.glob(f"{data_model}.json"):
-        break
-    if not os.path.isfile(replacements_method_file):
+    replacements_method_file = _files.glob(f"{data_model}.json")
+    replacements_method_file = [f for f in replacements_method_file]
+    if not replacements_method_file:
         logger.warning(f"Data model {data_model} has no replacements in library")
         logger.warning(
             "Module will proceed with no attempt to apply id\
                        replacements".format()
         )
+        return data
 
     data = correct_it(data, data_model, deck, log_level="INFO")
     return data

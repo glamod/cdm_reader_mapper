@@ -1,0 +1,11 @@
+{
+  "ARFM": "Convert raw data from telecommunications system to a processing format",
+  "ARGQ": "Automatic QC of data reported in real-time has been performed",
+  "IGO3": "Checking for duplicates has been performed",
+  "ARSQ": "Delayed mode QC has been performed",
+  "ARCA": "Calibration has been performed",
+  "ARUP": "Real-time data have been archived locally and sent to GDACs",
+  "ARDU": "Delayed data have been archived locally and sent to GDACs",
+  "RFMT": "Reformat software to convert hexadecimal format reported by the buoy to our standard format",
+  "COOA": "Coriolis objective analysis performed"
+}

@@ -19,7 +19,7 @@ def test_read_imma1_buoys_nosupp():
 def test_read_imma1_buoys_supp():
     _testing_suite(
         **test_data.test_063_714,
-        sections="c99",
+        sections=["core", "c99"],
         suffix="063_714",
         mapping=False,
     )
@@ -161,13 +161,20 @@ def test_read_imma1_992():
     )
 
 
-# def test_read_immt_gcc():
-#    "NOT WORKING: cdm_mapper in original version"
-#    _testing_suite(
-#        **test_data.test_gcc_mix,
-#        cdm_name="gcc_mapping",
-#        suffix="mix_out_nosupp",
-#    )
+def test_read_immt_gcc():
+    _testing_suite(
+        **test_data.test_gcc_mix,
+        cdm_name="gcc_mapping",
+        suffix="mix_out",
+    )
+
+
+def test_read_craid_1010001():
+    _testing_suite(
+        **test_data.test_craid_1010001,
+        mapping=False,
+        review=False,
+    )
 
 
 # B. TESTS TO READ FROM DATA FROM DIFFERENT DATA MODELS WITH

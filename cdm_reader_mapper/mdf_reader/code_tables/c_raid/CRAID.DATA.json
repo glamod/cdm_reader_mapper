@@ -1,0 +1,5 @@
+{
+  "0": "Data have been generated from original (Argos or Iridium) data transmitted by the drifter.",
+  "1": "Data come from already decoded data provided by drifter institution or PI.",
+  "2": "Data have been generated from original (Argos or Iridium) data transmitted by the drifter and some minor information have been recovered from already decoded data provided by drifter institution or PI."
+}

@@ -1,0 +1,6 @@
+{
+  "Y": "Yes, the drogue touched the ground",
+  "B": "Yes, the drogue touched the ground after bathymetry check with an outside database",
+  "N": "No, the drogue did not touch the ground",
+  "U": "Unknown"
+}

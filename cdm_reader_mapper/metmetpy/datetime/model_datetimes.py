@@ -39,28 +39,29 @@ def imma1(data, conversion):
         not_na = dt_data.notna().all(axis=1)
         date_format = "%Y-%m-%d-%H-%M"
         empty = True if len(not_na.loc[not_na]) == 0 else False
-        if not empty:
-            hours, minutes = np.vectorize(datetime_decimalhour_to_HM)(
-                dt_data.iloc[np.where(not_na)[0], -1].values
-            )
-        dt_data.drop(dt_data.columns[len(dt_data.columns) - 1], axis=1, inplace=True)
-        if not empty:
-            dt_data.loc[not_na, "H"] = hours
-            dt_data.loc[not_na, "M"] = minutes
+
         dt_series = pd.Series(data=pd.NaT, index=data.index)
-        # The following astype chain to make sure when promotion of column from int
-        # to float in the event of missing data (NaN) is reverted before conversion
-        # to string   !!!!!
-        if not empty:
-            dt_series.loc[not_na] = pd.to_datetime(
-                dt_data.loc[not_na, :]
-                .astype(int)
-                .astype(str)
-                .apply("-".join, axis=1)
-                .values,
-                format=date_format,
-                errors="coerce",
-            )
+        if empty:
+            return dt_series
+
+        hours, minutes = np.vectorize(datetime_decimalhour_to_HM)(
+            dt_data.iloc[np.where(not_na)[0], -1].values
+        )
+        columns = dt_data.columns
+        index = len(dt_data.columns) - 1
+        col_idx = columns[index]
+        dt_data = dt_data.drop(col_idx, axis=1)
+        dt_data.loc[not_na, "H"] = hours
+        dt_data.loc[not_na, "M"] = minutes
+        dt_series.loc[not_na] = pd.to_datetime(
+            dt_data.loc[not_na, :]
+            .astype(int)
+            .astype(str)
+            .apply("-".join, axis=1)
+            .values,
+            format=date_format,
+            errors="coerce",
+        )
         return dt_series
 
     def from_datetime(ds):
@@ -79,7 +80,12 @@ def imma1(data, conversion):
     dd_col = properties.metadata_datamodels.get("day").get("imma1")
     hr_col = properties.metadata_datamodels.get("hour").get("imma1")
     datetime_cols = [yr_col, mo_col, dd_col, hr_col]
+    datetime_cols = [dt_ for dt_ in datetime_cols if dt_ in data.columns]
 
+    if not datetime_cols:
+        return pd.Series()
+    elif len(datetime_cols) == 1:
+        datetime_cols = datetime_cols[0]
     if conversion == "to_datetime":
         return to_datetime(data)
     elif conversion == "from_datetime":

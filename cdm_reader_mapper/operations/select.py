@@ -45,7 +45,7 @@ def dataframe_apply_index(
     return output
 
 
-def select_true(data, mask, col, out_rejected=False, in_index=False):
+def select_true(data, mask, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 
     #   mask is a the full df/parser of which we only use col
@@ -54,7 +54,8 @@ def select_true(data, mask, col, out_rejected=False, in_index=False):
     ):
         # get the index values and pass to the general function
         # If a mask is empty, assume True (...)
-        index = mask[mask.fillna(True)].index
+        global_mask = mask.all(axis=1)
+        index = global_mask[global_mask.fillna(True)].index
         return dataframe_apply_index(
             df,
             index,
@@ -64,7 +65,7 @@ def select_true(data, mask, col, out_rejected=False, in_index=False):
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, mask_parser, col, out_rejected=False, in_index=False):
+    def parser(data_parser, mask_parser, out_rejected=False, in_index=False):
         mask_cp = pandas_TextParser_hdlr.make_copy(mask_parser)
         read_params = [
             "chunksize",
@@ -85,7 +86,7 @@ def select_true(data, mask, col, out_rejected=False, in_index=False):
         for df, mask_df in zip(data_parser, mask_cp):
             o = dataframe(
                 df,
-                mask_df[col],
+                mask_df,
                 out_rejected=out_rejected,
                 in_index=in_index,
                 idx_in_offset=idx_in_offset,

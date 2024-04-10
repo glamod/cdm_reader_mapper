@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         # Bookend python versions
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -57,7 +57,7 @@ jobs:
           python -c "import cdm_reader_mapper"
 
       - name: Run tests
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: python -u -m pytest
           --cov=cdm_reader_mapper
           --cov-report=xml
