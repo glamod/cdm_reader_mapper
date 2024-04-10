@@ -13,4 +13,3 @@ def _read_data(**kwargs):
 
 data_dict = test_data.test_063_714
 data_df, attrs_df, mask_df = _read_data(**data_dict)
-data_pa, attrs_pa, mask_pa = _read_data(chunksize=10000, **data_dict)
