@@ -2,11 +2,13 @@
   "observation_id": {
     "sections": [
       "general",
-      "drifter_characteristics"
+      "drifter_characteristics",
+      "dimensions"
     ],
     "elements": [
       "FORMAT_VERSION",
-      "DRIFTER_NUMBER"
+      "DRIFTER_NUMBER",
+      "N_TIME"
     ],
     "transform": "string_join_add",
     "kwargs": {
@@ -18,11 +20,13 @@
   "report_id": {
     "sections": [
       "general",
-      "drifter_characteristics"
+      "drifter_characteristics",
+      "dimensions"
     ],
     "elements": [
       "FORMAT_VERSION",
-      "DRIFTER_NUMBER"
+      "DRIFTER_NUMBER",
+      "N_TIME"
     ],
     "transform": "string_join_add",
     "kwargs": {
@@ -31,7 +35,7 @@
     }
   },
   "data_policy_licence": {
-    "default": 0
+    "default": 5
   },
   "date_time": {
     "sections": "drifter_measurements",
@@ -39,7 +43,7 @@
     "transform": "datetime_craid"
   },
   "date_time_meaning": {
-    "default": 2
+    "default": 5
   },
   "observation_duration": {
     "default": 8
@@ -61,20 +65,19 @@
   "z_coordinate_type": {
     "default": 0
   },
+  "observation_height_above_station_surface": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_LEVEL_DEPTH"
+  },
   "observed_variable": {
     "default": 107
   },
-  "observation_value": {
-    "sections": "drifter_measurements",
-    "elements": "WS_ADJUSTED",
-    "transform": "temperature_celsius_to_kelvin",
-    "decimal_places": "decimal_places_temperature_kelvin"
-  },
+  "observation_value": {},
   "value_significance": {
     "default": 2
   },
   "units": {
-    "default": 5
+    "default": 731
   },
   "conversion_flag": {
     "default": 0
@@ -87,25 +90,21 @@
   "spatial_representativeness": {
     "default": 3
   },
-  "quality_flag": {
-    "default": 2
-  },
+  "quality_flag": {},
   "numerical_precision": {},
   "sensor_automation_status": {
     "default": 5
+  },
+  "sensor_id": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_SERIAL_NO"
   },
   "exposure_of_sensor": {
     "default": 3
   },
   "original_precision": {},
-  "original_units": {
-    "default": 60
-  },
-  "original_value": {
-    "sections": "drifter_measurements",
-    "elements": "WS",
-    "decimal_places": "decimal_places"
-  },
+  "original_units": {},
+  "original_value": {},
   "conversion_method": {
     "default": 1
   },
@@ -125,7 +124,12 @@
     "default": 0
   },
   "source_id": {
-    "sections": "global_attributes",
-    "elements": "source"
+    "sections": "general",
+    "elements": "FORMAT_VERSION",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "C-RAID",
+      "separator": "-"
+    }
   }
 }
