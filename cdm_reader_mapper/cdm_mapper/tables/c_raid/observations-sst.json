@@ -35,7 +35,7 @@
     }
   },
   "data_policy_licence": {
-    "default": 0
+    "default": 5
   },
   "date_time": {
     "sections": "drifter_measurements",
@@ -43,7 +43,7 @@
     "transform": "datetime_craid"
   },
   "date_time_meaning": {
-    "default": 2
+    "default": 5
   },
   "observation_duration": {
     "default": 8
