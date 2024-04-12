@@ -213,7 +213,7 @@ class test_data:
     def test_craid_1010001(self):
         """C-RAID 1010001 test data."""
         return self._get_data_dict(
-            "1010001_197906.nc",
+            "1010001_198010.nc",
             "c_raid",
             "raid",
             "c",
