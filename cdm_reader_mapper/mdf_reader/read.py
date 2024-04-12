@@ -235,7 +235,6 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
         self.data = self._open_data(
             read_sections_list,
@@ -243,7 +242,7 @@ class MDFFileReader(_FileReader):
             open_with=properties.open_file[self.imodel],
             chunksize=chunksize,
         )
-        # return self
+
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
