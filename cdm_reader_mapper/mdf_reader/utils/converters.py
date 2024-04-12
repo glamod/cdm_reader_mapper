@@ -81,7 +81,7 @@ class df_converters:
         """DOCUMENTATION."""
         # With strip() an empty element after stripping, is just an empty element, no NaN...
         if data.dtype != "object":
-            return data.fillna("")
+            return data
         data = self.decode(data)
         if not disable_white_strip:
             data = data.str.strip()
@@ -90,7 +90,9 @@ class df_converters:
                 data = data.str.rstrip()
             elif disable_white_strip == "r":
                 data = data.str.lstrip()
-        return data
+        return data.apply(
+            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+        )
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
