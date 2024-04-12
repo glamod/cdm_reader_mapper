@@ -40,7 +40,7 @@ def convert_dtypes(dtypes):
     parse_dates = []
     for i, element in enumerate(list(dtypes)):
         if dtypes[element] == "datetime":
-            parse_dates.append(i)
+            parse_dates.append(element)
             dtypes[element] = "object"
     return dtypes, parse_dates
 
@@ -452,9 +452,9 @@ class _FileReader:
     def _read_netcdf(self, **kwargs):
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
-        self.dtypes = ds.dtypes
         df = ds.to_dataframe().reset_index()
-        return df.assign(**ds.attrs)
+        attrs = {k: v.replace("\n", "; ") for k, v in ds.attrs.items()}
+        return df.assign(**attrs)
 
     def _read_sections(
         self,
