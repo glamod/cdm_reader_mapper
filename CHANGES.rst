@@ -14,7 +14,7 @@ New features and enchancements
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
-* adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`)
+* adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`, :pull:`28`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
