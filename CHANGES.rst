@@ -18,11 +18,11 @@ Breaking changes
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* do not diferentiate between tuple and single column names (:pull: `24`)
+* do not diferentiate between tuple and single column names (:pull:`24`)
 * ``metmetpy``: Do not raise erros if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
-* get rid of warnings (:issue: `9`, :pull: `27`)
-* adding python 3.12 to testing suite (:pull: `29`)
-* set time out for testing suite to 10 minutes (:pull: `29`)
+* get rid of warnings (:issue:`9`, :pull:`27`)
+* adding python 3.12 to testing suite (:pull:`29`)
+* set time out for testing suite to 10 minutes (:pull:`29`)
 
 Bug fixes
 ^^^^^^^^^^
