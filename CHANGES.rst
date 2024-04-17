@@ -9,12 +9,17 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
 New features and enchancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`)
-* adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`)
+* ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`, :pull:`28`)
+* adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`, :pull:`28`)
+* ``cdm_mapper``: adding C-RAID mapping and code tables (:issue:`13`, :pull:`28`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`, :pull:`28`)
+* ``cdm_mapper.map_model``: drop dulicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
+* add to requirements: 
+  * pyarrow (see: https://github.com/pandas-dev/pandas/issues/54466)
+  * snappy<1.2 (see: https://github.com/openforcefield/openff-nagl/issues/106)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
