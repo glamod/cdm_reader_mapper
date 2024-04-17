@@ -78,8 +78,7 @@ def _get_file(
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
-    # branch: str = "main",
-    branch: str = "buoy_tests",
+    branch: str = "main",
     cache: bool = True,
     cache_dir: Path = _default_cache_dir_,
 ):
