@@ -100,7 +100,7 @@
   },
   "quality_flag": {
     "sections": "drifter_measurements",
-    "elements": "ATMS_QC",
+    "elements": "ATMS_ADJUSTED_QC",
     "code_table": "qc_flag"
   },
   "numerical_precision": {},
@@ -120,7 +120,7 @@
   },
   "original_value": {
     "sections": "drifter_measurements",
-    "elements": "ATMS",
+    "elements": "ATMS_ADJUSTED",
     "decimal_places": "decimal_places"
   },
   "conversion_method": {
