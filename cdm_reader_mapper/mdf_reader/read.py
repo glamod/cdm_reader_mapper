@@ -91,13 +91,14 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
-            self.data = self._convert_and_decode_df(
+            dtype = self._adjust_dtype(dtype, self.data)
+            data = self._convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
                 decoder_dict,
             )
-            self.data = self.data.astype(dtype)
+            self.data = data.astype(dtype)
         else:
             data_buffer = StringIO()
             for i, df_ in enumerate(self.data):
@@ -123,6 +124,7 @@ class MDFFileReader(_FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
+            dtype = self._adjust_dtype(dtype, df)
             self.data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
@@ -233,7 +235,6 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
         self.data = self._open_data(
             read_sections_list,
@@ -241,7 +242,7 @@ class MDFFileReader(_FileReader):
             open_with=properties.open_file[self.imodel],
             chunksize=chunksize,
         )
-        # return self
+
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 

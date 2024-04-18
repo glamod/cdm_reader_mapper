@@ -1,8 +1,16 @@
 {
   "observation_id": {
-    "sections": "",
-    "elements": "",
-    "transform": "string_add",
+    "sections": [
+      "general",
+      "drifter_characteristics",
+      "dimensions"
+    ],
+    "elements": [
+      "FORMAT_VERSION",
+      "DRIFTER_NUMBER",
+      "N_TIME"
+    ],
+    "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",
       "append": "WD",
@@ -10,42 +18,45 @@
     }
   },
   "report_id": {
-    "sections": "",
-    "elements": "",
-    "transform": "string_add",
+    "sections": [
+      "general",
+      "drifter_characteristics",
+      "dimensions"
+    ],
+    "elements": [
+      "FORMAT_VERSION",
+      "DRIFTER_NUMBER",
+      "N_TIME"
+    ],
+    "transform": "string_join_add",
     "kwargs": {
       "prepend": "C-RAID",
       "separator": "-"
     }
   },
   "data_policy_licence": {
-    "default": 0
+    "default": 5
   },
   "date_time": {
-    "sections": "",
-    "elements": [
-      "",
-      "",
-      "",
-      ""
-    ],
-    "transform": "datetime_imma1"
+    "sections": "drifter_measurements",
+    "elements": "JULD",
+    "transform": "datetime_craid"
   },
   "date_time_meaning": {
-    "default": 2
+    "default": 5
   },
   "observation_duration": {
     "default": 8
   },
   "longitude": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_measurements",
+    "elements": "LONGITUDE",
     "transform": "longitude_360to180",
     "decimal_places": "decimal_places"
   },
   "latitude": {
-    "sections": "",
-    "elements": "",
+    "sections": "drifter_measurements",
+    "elements": "LATITUDE",
     "decimal_places": "decimal_places"
   },
   "crs": {
@@ -54,18 +65,14 @@
   "z_coordinate_type": {
     "default": 0
   },
+  "observation_height_above_station_surface": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_LEVEL_DEPTH"
+  },
   "observed_variable": {
     "default": 106
   },
-  "observation_value": {
-    "sections": "",
-    "elements": "",
-    "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
-    "decimal_places": 0
-  },
+  "observation_value": {},
   "value_significance": {
     "default": 2
   },
@@ -73,42 +80,33 @@
     "default": 320
   },
   "conversion_flag": {
-    "default": 2
+    "default": 0
   },
   "location_precision": {
-    "sections": "",
-    "elements": [
-      "",
-      ""
-    ],
-    "transform": "location_accuracy",
+    "sections": "drifter_measurements",
+    "elements": "POSITION_ACCURACY",
     "decimal_places": 0
   },
   "spatial_representativeness": {
     "default": 3
   },
-  "quality_flag": {
-    "default": 2
-  },
+  "quality_flag": {},
   "numerical_precision": {},
   "sensor_automation_status": {
     "default": 5
+  },
+  "sensor_id": {
+    "sections": "drifter_sensor",
+    "elements": "SENSOR_SERIAL_NO"
   },
   "exposure_of_sensor": {
     "default": 3
   },
   "original_precision": {},
-  "original_units": {
-    "default": 320
-  },
-  "original_value": {
-    "sections": "",
-    "elements": "",
-    "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
-    "decimal_places": 0
+  "original_units": {},
+  "original_value": {},
+  "conversion_method": {
+    "default": 1
   },
   "processing_level": {
     "default": 3
@@ -126,30 +124,12 @@
     "default": 0
   },
   "source_id": {
-    "sections": [
-      "",
-      "",
-      "",
-      ""
-    ],
-    "elements": [
-      "",
-      "",
-      "",
-      ""
-    ],
-    "transform": "string_join_add",
+    "sections": "general",
+    "elements": "FORMAT_VERSION",
+    "transform": "string_add",
     "kwargs": {
       "prepend": "C-RAID",
-      "separator": "-",
-      "zfill_col": [
-        0,
-        3
-      ],
-      "zfill": [
-        3,
-        2
-      ]
+      "separator": "-"
     }
   }
 }

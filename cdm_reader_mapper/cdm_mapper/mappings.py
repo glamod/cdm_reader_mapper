@@ -45,6 +45,7 @@ imodel_lineages = {
     "icoads_r3000_d730": icoads_lineage,
     "icoads_r3000_d781": icoads_lineage,
     "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
+    "c_raid": ". Initial conversion from C-RAID",
 }
 
 c2k_methods = {
@@ -171,8 +172,18 @@ def location_accuracy_i(li, lat):
     return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
 
 
+def convert_to_str(a):
+    """Convert to string."""
+    if a:
+        a = str(a)
+    return a
+
+
 def string_add_i(a, b, c, sep):
     """Add string."""
+    a = convert_to_str(a)
+    b = convert_to_str(b)
+    c = convert_to_str(c)
     if b:
         return sep.join(filter(None, [a, b, c]))
 
@@ -209,6 +220,10 @@ class mapping_functions:
     def datetime_utcnow(self):
         """Get actual UTC time."""
         return datetime.datetime.utcnow()
+
+    def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f"):
+        """Convert string to datetime object."""
+        return pd.to_datetime(df.values, format=format, errors="coerce")
 
     def datetime_to_cdm_time(self, df):
         """
@@ -294,18 +309,20 @@ class mapping_functions:
         else:
             k_element = 0
         origin_decimals = self.atts.get(element[k_element]).get("decimal_places")
-        if origin_decimals <= 2:
+        if origin_decimals is None:
             return 2
-        else:
-            return origin_decimals
+        elif origin_decimals <= 2:
+            return 2
+        return origin_decimals
 
     def decimal_places_pressure_pascal(self, element):
         """Return pressure decimal places."""
         origin_decimals = self.atts.get(element[0]).get("decimal_places")
-        if origin_decimals > 2:
+        if origin_decimals is None:
+            return 2
+        elif origin_decimals > 2:
             return origin_decimals - 2
-        else:
-            return 0
+        return 0
 
     def df_col_join(self, df, sep):
         """Join pandas Dataframe."""
@@ -388,7 +405,9 @@ class mapping_functions:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        df["string_add"] = np.vectorize(string_add_i)(prepend, joint, append, separator)
+        df["string_add"] = np.vectorize(string_add_i)(
+            prepend, joint, append, sep=separator
+        )
         if duplicated:
             df = df[:-1]
         return df["string_add"]

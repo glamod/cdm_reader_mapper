@@ -50,6 +50,7 @@ pandas_dtypes = {}
 for dtype in object_types:
     pandas_dtypes[dtype] = "object"
 pandas_dtypes.update({x: x for x in numeric_types})
+pandas_dtypes["datetime"] = "datetime"
 
 # ....and how they are managed
 data_type_conversion_args = {}

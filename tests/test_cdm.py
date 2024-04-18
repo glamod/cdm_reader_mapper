@@ -169,11 +169,11 @@ def test_read_immt_gcc():
     )
 
 
-def test_read_craid_1010001():
+def test_read_craid_1260810():
     _testing_suite(
-        **test_data.test_craid_1010001,
-        mapping=False,
-        review=False,
+        **test_data.test_craid_1260810,
+        cdm_name="c_raid",
+        suffix="craid",
     )
 
 

@@ -210,10 +210,10 @@ class test_data:
         )
 
     @property
-    def test_craid_1010001(self):
-        """C-RAID 1010001 test data."""
+    def test_craid_1260810(self):
+        """C-RAID 1260810 test data."""
         return self._get_data_dict(
-            "1010001.nc",
+            "1260810_20041220.nc",
             "c_raid",
             "raid",
             "c",

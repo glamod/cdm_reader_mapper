@@ -199,6 +199,14 @@ class result_data:
             "immt",
         )
 
+    @property
+    def expected_craid(self):
+        return self._get_data_dict(
+            "craid",
+            "raid",
+            "c",
+        )
+
     def __getitem__(cls, attr):
         return getattr(cls, attr)
 
@@ -210,14 +218,15 @@ class result_data:
 
     def _get_data_dict(self, data_file, deck, dm):
         drs = f"{dm}_{deck}"
-        for cdm_table in cdm_tables:
-            name = cdm_table.format(data_file)
-            path = load_file(os.path.join(drs, "cdm_tables", name)).parent
 
         data = f"data_{data_file}.csv"
         mask = f"mask_{data_file}.csv"
         vaid = f"vaid_{data_file}.csv"
         vadt = f"vadt_{data_file}.csv"
+
+        for cdm_table in cdm_tables:
+            name = cdm_table.format(data_file)
+            path = load_file(os.path.join(drs, "cdm_tables", name)).parent
 
         return {
             "data": self._load_file(os.path.join(drs, "output", data)),
