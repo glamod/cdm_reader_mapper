@@ -105,10 +105,10 @@ class Configurator:
         self.orders = order
         self.valid = valid
         self.schema = schema
-        if len(df) > 0:
-            self.str_line = df.iloc[0]
-        else:
-            self.str_line = ""
+        self.str_line = ""
+        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
+            if len(df) > 0:
+                self.str_line = df.iloc[0]
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
@@ -322,12 +322,15 @@ class Configurator:
     def open_netcdf(self):
         """Open netCDF to pd.Series."""
         missings = []
-        data_dict = {}
+        attrs = {}
+        renames = {}
+        disables = []
         for order in self.orders:
             self.order = order
             header = self.schema["sections"][order]["header"]
             disable_read = header.get("disable_read")
             if disable_read is True:
+                disables.append(order)
                 continue
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
@@ -335,13 +338,22 @@ class Configurator:
                 index = self._get_index(section)
                 ignore = self._get_ignore()
                 if ignore is not True:
-                    try:
-                        data_dict[index] = self.df[section]
-                    except KeyError:
+                    if section in self.df.data_vars:
+                        renames[section] = index
+                    elif section in self.df.dims:
+                        renames[section] = index
+                    elif section in self.df.attrs:
+                        attrs[index] = self.df.attrs[index]
+                    else:
                         missings.append(index)
 
-        df = pd.Series(data_dict)
-        df["missings"] = missings
+        df = self.df[renames.keys()].to_dataframe().reset_index()
+        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
+        df = df.rename(columns=renames)
+        df = df.assign(**attrs)
+        for column in disables:
+            df[column] = np.nan
+        df["missings"] = [missings] * len(df)
         return df
 
 
@@ -452,9 +464,7 @@ class _FileReader:
     def _read_netcdf(self, **kwargs):
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
-        df = ds.to_dataframe().reset_index()
-        attrs = {k: v.replace("\n", "; ") for k, v in ds.attrs.items()}
-        return df.assign(**attrs)
+        return ds.squeeze()
 
     def _read_sections(
         self,
@@ -471,12 +481,10 @@ class _FileReader:
                 axis=1,
             )
         elif open_with == "netcdf":
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_netcdf(),
-                axis=1,
-            )
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_netcdf()
+
         missings_ = df["missings"]
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
@@ -501,7 +509,7 @@ class _FileReader:
                 chunksize=chunksize,
             )
 
-        if isinstance(TextParser, pd.DataFrame):
+        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
             df, self.missings = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )

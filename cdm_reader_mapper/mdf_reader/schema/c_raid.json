@@ -25,7 +25,9 @@
   },
   "sections": {
     "global_attributes": {
-      "header": {},
+      "header": {
+        "disable_read": true
+      },
       "elements": {
         "title": {
           "description": "A succinct description of what is in the dataset.",
@@ -142,59 +144,72 @@
       "elements": {
         "N_TIME": {
           "description": "Number of time steps.",
-          "column_type": "uint8"
+          "column_type": "uint64"
         },
         "N_LEVEL<N>": {
           "description": "Maximum number of parameter measurements that can be simultaneously sampled by a sensor.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "STRING<N>": {
           "description": "String dimensions.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "DATE_TIME": {
           "description": "This dimension is the length of an ASCII date and time value. DATE_TIME convention is: YYYYMMDDHHMISS",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "DATE": {
           "description": "This dimension is the length of an ASCII date value. DATE convention is: YYYYMMDD",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_TRANS_SYSTEM": {
           "description": "Number of transmission systems.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_POSITIONING_SYSTEM": {
           "description": "Number of positioning systems.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_LAUNCH_CONFIG_PARAM": {
           "description": "Number of pre-deployment or launch configuration parameters.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_CONFIG_PARAM": {
           "description": "Number of configuration parameters.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_MISSION": {
           "description": "Number of missions.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_SENSOR": {
           "description": "Number of sensors mounted on the drifter and used to measure the parameters.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_PARAM": {
           "description": "Number of parameters measured by the drifter or calculated from transmitted parameters.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_HISTORY": {
           "description": "Number of history records.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         },
         "N_GREYLIST": {
           "description": "Number of greylist records.",
-          "column_type": "uint8"
+          "column_type": "uint64",
+          "ignore": true
         }
       }
     },
@@ -204,7 +219,8 @@
         "DATA_TYPE": {
           "description": "This field contains the type of data contained in the file. The list of acceptable data types is in the Reference Table 1. Example : 'C-RAID drifter time-series data'",
           "column_type": "str",
-          "codetable": "CRAID.DATA_TYPES"
+          "codetable": "CRAID.DATA_TYPES",
+          "ignore": true
         },
         "FORMAT_VERSION": {
           "description": "File format version.",
@@ -213,22 +229,27 @@
         "REFERENCE_DATE_TIME": {
           "description": "Date of reference for Julian days. The recommended reference date time is '19500101000000' : January 1st 1950 00:00:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d",
+          "ignore": true
         },
         "DATE_CREATION": {
           "description": "Date and time (UTC) of creation of this file. Format : YYYYMMDDHHMISS. Example : 20011229161700 : December 29th 2001 16:17:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d",
+          "ignore": true
         },
         "DATE_UPDATE": {
           "description": "Date and time (UTC) of update of this file. Format : YYYYMMDDHHMISS. Example : 20011230090500 : December 30th 2001 09:05:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d",
+          "ignore": true
         }
       }
     },
     "drifter_institution": {
-      "header": {},
+      "header": {
+        "disable_read": true
+      },
       "elements": {
         "PI_NAME": {
           "description": "Name of the principal investigator in charge of the drifter. Example: TBD.",
@@ -532,7 +553,9 @@
       }
     },
     "drifter_configuration": {
-      "header": {},
+      "header": {
+        "disable_read": true
+      },
       "elements": {
         "LAUNCH_CONFIG_PARAMETER_NAME": {
           "description": "Name of the configuration parameter; pre-deployment or launch settings. See Reference Table 13 for standard configuration parameter names. Example: TBD.",
@@ -599,28 +622,34 @@
         },
         "PARAMETER": {
           "description": "Names of the parameters measured by drifter sensors or derived from drifter measurements. The parameter names are listed in Reference Table 3. Examples: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PARAMETER_SENSOR": {
           "description": "Names of the sensors that measured the drifter parameters. See Reference Table 22. Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PARAMETER_UNITS": {
           "description": "Units of accuracy and resolution of the parameter. Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PARAMETER_ACCURACY": {
           "description": "Accuracy of the parameter. Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PARAMETER_RESOLUTION": {
           "description": "Resolution of the parameter returned by the sensor (note that this is not necessarily equivalent to the resolution of the parameter returned by the drifter through telemetry). Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PARAMETER_DATA_STATE_INDICATOR": {
           "description": "Degree of processing the parameter data has passed through. The parameter data state indicator is described in the Reference Table 6.",
           "column_type": "str",
-          "codetable": "CRAID.DATA_STATE"
+          "codetable": "CRAID.DATA_STATE",
+          "ignore": true
         }
       }
     },
@@ -629,51 +658,63 @@
       "elements": {
         "PREDEPLOYMENT_CALIB_EQUATION": {
           "description": "Predeployment calibration equation for this parameter. Example: 'Tc = a1 * T + a0'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PREDEPLOYMENT_CALIB_COEFFICIENT": {
           "description": "Predeployment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PREDEPLOYMENT_CALIB_COMMENT": {
           "description": "Comments applying to this parameter predeployment calibration. Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "PREDEPLOYMENT_CALIB_DATE": {
           "description": "Date of the pre-deployment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "REAL_TIME_ADJUSTMENT_CALIB_EQUATION": {
           "description": "Real-time adjustment calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "REAL_TIME_ADJUSTMENT_CALIB_COEFFICIENT": {
           "description": "Real-time adjustment calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "REAL_TIME_ADJUSTMENT_CALIB_COMMENT": {
           "description": "Comment about this real-time adjustment calibration Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "REAL_TIME_ADJUSTMENT_CALIB_DATE": {
           "description": "Date of the real-time adjustment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "SCIENTIFIC_CALIB_EQUATION": {
           "description": "Scientific calibration equation applied to the parameter. Example: 'Tc = a1 * T + a0'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "SCIENTIFIC_CALIB_COEFFICIENT": {
           "description": "Scientific calibration coefficients for this equation. Example: 'a1=0.99997 , a0=0.0021'.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "SCIENTIFIC_CALIB_COMMENT": {
           "description": "Comment about this scientific calibration Example: TBD.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "SCIENTIFIC_CALIB_DATE": {
           "description": "Date of the scientific calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         }
       }
     },
@@ -1166,7 +1207,8 @@
         },
         "PARAMETER_DATA_MODE": {
           "description": "Describe the data mode of the individual parameter: R: real time data; D: delayed mode data; A: real time data with adjusted values",
-          "column_type": "str"
+          "column_type": "str",
+          "ignore": true
         },
         "CONFIG_MISSION_NUMBER_INDEX": {
           "description": "Unique number of the mission to which this measurement belongs.",
@@ -1185,7 +1227,9 @@
       }
     },
     "drifter_greylist": {
-      "header": {},
+      "header": {
+        "disable_read": true
+      },
       "elements": {
         "GREYLIST_PARAMETER": {
           "description": "Name of the parameter concerned by the greylist information. Example: 'SST'. If parameter = 'MISSION', all the parameters (geophysical and location) are affected by the given QC.",
@@ -1211,7 +1255,9 @@
       }
     },
     "drifter_history": {
-      "header": {},
+      "header": {
+        "disable_read": true
+      },
       "elements": {
         "HISTORY_INSTITUTION": {
           "description": "Institution that performed the action. Institution codes are described in Reference Table 4. Example: 'IF' for Ifremer.",
