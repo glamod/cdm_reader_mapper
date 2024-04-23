@@ -67,7 +67,7 @@ Ready to contribute? Here's how to set up ``cdm_reader_mapper`` for local develo
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
     $ mkvirtualenv cdm_reader_mapper
-    $ cd mdf_reader
+    $ cd cdm_reader_mapper
     $ pip install -e . develop
 
 4. Create a branch for local development::
