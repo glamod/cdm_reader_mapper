@@ -33,6 +33,7 @@ Bug fixes
 ^^^^^^^^^^
 * ``cdm_mapper``: set debugging logger into if statement (:pull:`24`)
 * ``cdm_mapper``: do not use code table ``qc_flag`` with ``report_id`` (:pull:`24`)
+* ``metmetpy``: fixing ICOADS 30000 NRT functions for ``pandas>=2.2.0`` (:pull:`31`)
 
 
 0.2.0 (2023-03-15)
