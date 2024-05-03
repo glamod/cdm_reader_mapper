@@ -12,6 +12,7 @@ New features and enchancements
 * ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`, :pull:`28`)
 * adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`, :pull:`28`)
 * ``cdm_mapper``: adding C-RAID mapping and code tables (:issue:`13`, :pull:`28`)
+* ``cdm_mapper``: add ``load_tables`` to ``__init.py__`` (:pull:`32`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -34,6 +35,7 @@ Bug fixes
 * ``cdm_mapper``: set debugging logger into if statement (:pull:`24`)
 * ``cdm_mapper``: do not use code table ``qc_flag`` with ``report_id`` (:pull:`24`)
 * ``metmetpy``: fixing ICOADS 30000 NRT functions for ``pandas>=2.2.0`` (:pull:`31`)
+* ``cdm_mapper.read_tables``: if table not available return empty ``pd.DataFrame`` (:pull:`32`)
 
 
 0.2.0 (2023-03-15)
