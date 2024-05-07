@@ -128,8 +128,8 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
         :target: https://github.com/psf/black
         :alt: Python Black
 
-.. |codefactor| image:: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper/badge
-		:target: https://www.codefactor.io/repository/github/ludwiglierhammer/cdm_reader_mapper
+.. |codefactor| image:: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge
+		:target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
 		:alt: CodeFactor
 
 .. |coveralls| image:: https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg
