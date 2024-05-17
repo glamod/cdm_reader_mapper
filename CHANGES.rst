@@ -3,8 +3,8 @@
 Changelog
 =========
 
-0.3.0 (unpublished)
--------------------
+0.3.0 (2024-05-17)
+------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
 
 New features and enchancements
@@ -37,7 +37,7 @@ Bug fixes
 * ``cdm_mapper.read_tables``: if table not available return empty ``pd.DataFrame`` (:pull:`32`)
 
 
-0.2.0 (2023-03-15)
+0.2.0 (2024-03-15)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
@@ -68,7 +68,7 @@ Bug fixes
 * Fixed an issue with missing ``conda`` dependencies in the ``cdm_reader_mapper`` documentation (:pull:`14`)
 
 
-0.1.0 (2023-01-16)
+0.1.0 (2024-01-16)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
