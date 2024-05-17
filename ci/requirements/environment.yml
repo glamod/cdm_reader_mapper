@@ -15,7 +15,6 @@ dependencies:
     - datashader
     - pyarrow
     # https://github.com/openforcefield/openff-nagl/issues/106
-    - snappy<1.2
     # for testing
     - pytest
     - pytest-cov

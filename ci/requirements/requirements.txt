@@ -14,4 +14,3 @@ textdistance
 swifter
 platformdirs
 pyarrow
-snappy<1.2
