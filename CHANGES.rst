@@ -5,7 +5,7 @@ Changelog
 
 0.3.0 (unpublished)
 -------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
 
 New features and enchancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -18,9 +18,8 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`, :pull:`28`)
 * ``cdm_mapper.map_model``: drop dulicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
-* add to requirements:
-  * pyarrow (see: https://github.com/pandas-dev/pandas/issues/54466)
-  * snappy<1.2 (see: https://github.com/openforcefield/openff-nagl/issues/106)
+* add pyarrow (see: https://github.com/pandas-dev/pandas/issues/54466) to requirements
+* solving pyarrow-snappy issue (see: openforcefield/openff-nagl#106) (:issue:`33`, :pull:`28`, :pull:`34`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
