@@ -510,13 +510,11 @@ class _FileReader:
             )
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            print("DF")
             df, self.missings = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )
             return df, df.isna()
         else:
-            print("TFR")
             data_buffer = StringIO()
             missings_buffer = StringIO()
             isna_buffer = StringIO()
