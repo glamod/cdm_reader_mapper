@@ -210,7 +210,7 @@ def test_read_imma1_buoys_nosupp_chunks():
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
         suffix="063_714",
-        chunksize=10000,
+        chunksize=3,
     )
 
 
@@ -219,6 +219,6 @@ def test_read_imma1_buoys_supp_chunks():
         **test_data.test_063_714,
         sections=["c99"],
         suffix="063_714",
-        chunksize=10000,
+        chunksize=3,
         mapping=False,
     )
