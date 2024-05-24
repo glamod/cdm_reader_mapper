@@ -270,10 +270,10 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        #testmask = make_copy(self.mask)
-        #for i, mask_ in enumerate(testmask):
+        # testmask = make_copy(self.mask)
+        # for i, mask_ in enumerate(testmask):
         #  print(mask_)
-        #exit()
+        # exit()
         return self
 
 
