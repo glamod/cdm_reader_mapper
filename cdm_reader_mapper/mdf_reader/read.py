@@ -145,7 +145,7 @@ class MDFFileReader(_FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data)
+            self.mask = self._validate_df(self.data, isna=self.isna)
 
         else:
             data_buffer = StringIO()
