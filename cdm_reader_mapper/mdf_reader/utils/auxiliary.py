@@ -510,12 +510,13 @@ class _FileReader:
             )
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            data, self.missings = self._read_sections(
+            print("DF")
+            df, self.missings = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )
-            isna = data.isna()
-            return data, isna
+            return df, df.isna()
         else:
+            print("TFR")
             data_buffer = StringIO()
             missings_buffer = StringIO()
             isna_buffer = StringIO()
@@ -531,19 +532,18 @@ class _FileReader:
                     encoding="utf-8",
                     index=False,
                 )
-                df.to_csv(
-                    data_buffer,
+                df_isna.to_csv(
+                    isna_buffer,
                     header=False,
                     mode="a",
-                    encoding="utf-8",
                     index=False,
                     quoting=csv.QUOTE_NONE,
                     sep=properties.internal_delimiter,
                     quotechar="\0",
                     escapechar="\0",
                 )
-                df_isna.to_csv(
-                    isna_buffer,
+                df.to_csv(
+                    data_buffer,
                     header=False,
                     mode="a",
                     encoding="utf-8",
@@ -604,16 +604,17 @@ class _FileReader:
             )
         return df
 
-    def _create_mask(self, df, isna):
-        if not isinstance(isna, pd.DataFrame):
+    def _create_mask(self, df, isna, missings=[]):
+        if isna is None:
             isna = df.isna()
         valid = df.notna()
         mask = isna | valid
-        mask[isna] = False
+        if len(missings) > 0:
+            mask[missings] = False
         return mask
 
     def _validate_df(self, df, isna=None):
-        mask = self._create_mask(df, isna)
+        mask = self._create_mask(df, isna, missings=self.missings)
         return validate(
             df,
             mask,

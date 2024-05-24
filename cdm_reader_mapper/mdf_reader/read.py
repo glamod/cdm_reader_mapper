@@ -145,12 +145,13 @@ class MDFFileReader(_FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data, isna=self.isna)
+            self.mask = self._validate_df(self.data)
+
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
-            TextParser_isna = make_copy(self.isna)
-            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna)):
+            TextParser_isna_ = make_copy(self.isna)
+            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
                 mask_ = self._validate_df(df_, isna=isna_)
                 mask_.to_csv(
                     data_buffer,
@@ -270,10 +271,6 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        # testmask = make_copy(self.mask)
-        # for i, mask_ in enumerate(testmask):
-        #  print(mask_)
-        # exit()
         return self
 
 
