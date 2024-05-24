@@ -101,7 +101,8 @@ class MDFFileReader(_FileReader):
             self.data = data.astype(dtype)
         else:
             data_buffer = StringIO()
-            for i, df_ in enumerate(self.data):
+            TextParser = make_copy(self.data)
+            for i, df_ in enumerate(TextParser):
                 df = self._convert_and_decode_df(
                     df_,
                     converter_dict,
@@ -119,12 +120,12 @@ class MDFFileReader(_FileReader):
                     quotechar="\0",
                     escapechar="\0",
                 )
-            data_buffer.seek(0)
             date_columns = []
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
             dtype = self._adjust_dtype(dtype, df)
+            data_buffer.seek(0)
             self.data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
@@ -243,7 +244,6 @@ class MDFFileReader(_FileReader):
             open_with=properties.open_file[self.imodel],
             chunksize=chunksize,
         )
-
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
