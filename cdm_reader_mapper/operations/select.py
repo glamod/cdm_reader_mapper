@@ -141,7 +141,6 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
     ):
         # get the index values and pass to the general function
         in_df = df.loc[df[col].isin(values)]
-        # in_df = df.loc[df[col].isin([int(i) for i in values])]
         index = list(in_df.index)
         return dataframe_apply_index(
             df,

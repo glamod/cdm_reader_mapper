@@ -513,20 +513,32 @@ class _FileReader:
             df, self.missings = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )
-            return df
+            return df, df.isna()
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()
+            isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
                 df, missings = self._read_sections(
                     df_, order, valid, open_with=open_with
                 )
+                df_isna = df.isna()
                 missings.to_csv(
                     missings_buffer,
                     header=False,
                     mode="a",
                     encoding="utf-8",
                     index=False,
+                )
+                df_isna.to_csv(
+                    isna_buffer,
+                    header=False,
+                    mode="a",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
                 )
                 df.to_csv(
                     data_buffer,
@@ -546,7 +558,7 @@ class _FileReader:
                 chunksize=None,
             )
             data_buffer.seek(0)
-            return pd.read_csv(
+            data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
@@ -556,6 +568,16 @@ class _FileReader:
                 quotechar="\0",
                 escapechar="\0",
             )
+            isna_buffer.seek(0)
+            isna = pd.read_csv(
+                isna_buffer,
+                names=df.columns,
+                chunksize=self.chunksize,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
+            return data, isna
 
     def _convert_and_decode_df(
         self,
@@ -564,34 +586,37 @@ class _FileReader:
         converter_kwargs,
         decoder_dict,
     ):
-        self.missing = df.isna()
         for section in converter_dict.keys():
             if section not in df.columns:
                 continue
             if section in decoder_dict.keys():
-                df[section] = self._decode_entries(
+                decoded = self._decode_entries(
                     df[section],
                     decoder_dict[section],
                 )
+                decoded.index = df[section].index
+                df[section] = decoded
 
-            df[section] = self._convert_entries(
+            converted = self._convert_entries(
                 df[section],
                 converter_dict[section],
                 **converter_kwargs[section],
             )
+            converted.index = df[section].index
+            df[section] = converted
         return df
 
-    def _create_mask(self, df):
-        if not hasattr(self, "missing"):
-            self.missing = df.isna()
-        if not hasattr(self, "valid"):
-            self.valid = df.notna()
-        mask = self.missing | self.valid
-        mask[self.missings] = False
+    def _create_mask(self, df, isna, missings=[]):
+        if isna is None:
+            isna = df.isna()
+        valid = df.notna()
+        mask = isna | valid
+        if len(missings) > 0:
+            mask[missings] = False
         return mask
 
-    def _validate_df(self, df):
-        mask = self._create_mask(df)
+    def _validate_df(self, df, isna=None):
+        mask = self._create_mask(df, isna, missings=self.missings)
         return validate(
             df,
             mask,

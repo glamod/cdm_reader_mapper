@@ -101,7 +101,8 @@ class MDFFileReader(_FileReader):
             self.data = data.astype(dtype)
         else:
             data_buffer = StringIO()
-            for i, df_ in enumerate(self.data):
+            TextParser = make_copy(self.data)
+            for i, df_ in enumerate(TextParser):
                 df = self._convert_and_decode_df(
                     df_,
                     converter_dict,
@@ -119,12 +120,12 @@ class MDFFileReader(_FileReader):
                     quotechar="\0",
                     escapechar="\0",
                 )
-            data_buffer.seek(0)
             date_columns = []
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
             dtype = self._adjust_dtype(dtype, df)
+            data_buffer.seek(0)
             self.data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
@@ -145,13 +146,14 @@ class MDFFileReader(_FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data)
+            self.mask = self._validate_df(self.data, isna=self.isna)
 
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
-            for i, df_ in enumerate(TextParser_):
-                mask_ = self._validate_df(df_)
+            TextParser_isna_ = make_copy(self.isna)
+            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
+                mask_ = self._validate_df(df_, isna=isna_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -236,13 +238,12 @@ class MDFFileReader(_FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data = self._open_data(
+        self.data, self.isna = self._open_data(
             read_sections_list,
             sections,
             open_with=properties.open_file[self.imodel],
             chunksize=chunksize,
         )
-
         ## 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 

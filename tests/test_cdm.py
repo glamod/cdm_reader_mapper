@@ -192,7 +192,6 @@ def test_read_imma1_buoys_cdm_subset():
 
 
 def test_read_imma1_buoys_codes_subset():
-    "NOT WORKING: codes_subset not in map_model"
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -205,12 +204,11 @@ def test_read_imma1_buoys_codes_subset():
 # -----------------------------------------------------------------------------
 # FROM FILE: WITH AND WITHOUT SUPPLEMENTAL
 def test_read_imma1_buoys_nosupp_chunks():
-    "NOT WORKING: textfilereader"
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
         suffix="063_714",
-        chunksize=10000,
+        chunksize=3,
     )
 
 
@@ -219,6 +217,6 @@ def test_read_imma1_buoys_supp_chunks():
         **test_data.test_063_714,
         sections=["c99"],
         suffix="063_714",
-        chunksize=10000,
+        chunksize=3,
         mapping=False,
     )

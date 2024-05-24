@@ -60,9 +60,6 @@ def test_corrections_pandas():
     )
 
 
-# test_corrections_pandas()
-
-
 def test_corrections_parser():
     corrections.corrections(
         data_pa, dataset="test_data", correction_path=".", yr="2010", mo="07"
