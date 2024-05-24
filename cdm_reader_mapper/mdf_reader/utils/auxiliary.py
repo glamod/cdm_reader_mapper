@@ -590,16 +590,20 @@ class _FileReader:
             if section not in df.columns:
                 continue
             if section in decoder_dict.keys():
-                df[section] = self._decode_entries(
+                decoded = self._decode_entries(
                     df[section],
                     decoder_dict[section],
                 )
+                decoded.index = df[section].index
+                df[section] = decoded
 
-            df[section] = self._convert_entries(
+            converted = self._convert_entries(
                 df[section],
                 converter_dict[section],
                 **converter_kwargs[section],
             )
+            converted.index = df[section].index
+            df[section] = converted
         return df
 
     def _create_mask(self, df, isna, missings=[]):
