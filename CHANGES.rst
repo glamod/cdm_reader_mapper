@@ -3,6 +3,19 @@
 Changelog
 =========
 
+0.4.0 (unpublished)
+-------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+* set chunksize from 10000 to 3 in testing suite (:pull:`35`)
+
+Bug fixes
+^^^^^^^^^
+* indexing working with user-given chunksize (:pull:`35`)
+
+
 0.3.0 (2024-05-17)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
