@@ -71,7 +71,8 @@
     "decimal_places": 0
   },
   "location_quality": {
-    "default": 3
+    "section": "c1",
+    "elements": "LZ"
   },
   "crs": {
     "default": 0
