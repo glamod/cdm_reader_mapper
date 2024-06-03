@@ -2,19 +2,21 @@
 Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
-+----------------------------+-----------------------------------------------------+
-| Versions                   | |pypi| |versions| |tag| |release|                   |
-+----------------------------+-----------------------------------------------------+
-| Documentation and Support  | |docs|                                              |
-+----------------------------+-----------------------------------------------------+
-| Open Source                | |license| |zenodo|                                  |
-+----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
-+----------------------------+-----------------------------------------------------+
-| Development Status         | |status| |build| |coveralls|                        |
-+----------------------------+-----------------------------------------------------+
-| Funding                    | |funding|                                           |
-+----------------------------+-----------------------------------------------------+
++------------------------------+-----------------------------------------------------+
+| Versions                     | |pypi| |versions| |tag| |release|                   |
++------------------------------+-----------------------------------------------------+
+| Documentation and Support    | |docs|                                              |
++------------------------------+-----------------------------------------------------+
+| Open Source                  | |license| |zenodo|                                  |
++------------------------------+-----------------------------------------------------+
+| Coding Standards             | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
++------------------------------+-----------------------------------------------------+
+| Development Status           | |status| |build| |coveralls|                        |
++------------------------------+-----------------------------------------------------+
+| Acknoledgements              | |c3s| |noc| |ukmas|                                 |
++------------------------------+-----------------------------------------------------+
+| Funding and Acknowledgements | |c3s| |noc| |ukmas|                                 |
++------------------------------+-----------------------------------------------------+
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 
@@ -128,6 +130,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
         :target: https://github.com/psf/black
         :alt: Python Black
 
+.. |c3s| image:: https://img.shields.io/badge/Powered%20by-Copernicus%20Climate%20Change%20Service-blue.svg
+        :target: https://climate.copernicus.eu/
+        :alt: Funding
+
 .. |codefactor| image:: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge
 		:target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
 		:alt: CodeFactor
@@ -144,13 +150,13 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
         :target: https://app.fossa.com/projects/git%2Bgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
         :alt: FOSSA
 
-.. |funding| image:: https://img.shields.io/badge/Powered%20by-Copernicus-blue.svg
-        :target: https://climate.copernicus.eu/
-        :alt: Funding
-
 .. |license| image:: https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
+
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-blue.svg
+        :target: https://noc.ac.uk/
+        :alt: NOC
 
 .. |pre-commit| image:: https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg
         :target: https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main
@@ -175,6 +181,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. |tag| image:: https://img.shields.io/github/v/tag/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/tags
         :alt: Tag
+
+.. |ukmas| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-blue.svg
+        :target: https://noc.ac.uk/
+        :alt: UKMAS
 
 .. |versions| image:: https://img.shields.io/pypi/pyversions/cdm_reader_mapper.svg
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
