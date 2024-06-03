@@ -20,19 +20,19 @@ Contributors
 
 * Tina Leiding <tina.leiding@dwd.de> `@TinaLeiding <https://github.com/TinaLeiding>`_
 
-* Richard Cornes <richard.cornes@noc.ac.uk> `@`_
+* Richard Cornes <richard.cornes@noc.ac.uk>
 
-* Elizabeth Kent <eck@noc.ac.uk> `@`_
+* Elizabeth Kent <eck@noc.ac.uk>
 
 Previous Contributors
 ---------------------
 
-* David Berry <dyb@noc.ac.uk> `@`_
+* David Berry
 
-* Stavroula Biri <> `@`_
+* Stavroula Biri
 
-* Irene Perez Gonzales <> `@`_
+* Irene Perez Gonzales
 
-* Beatriz Recinos <> `@`_
+* Beatriz Recinos
 
-* Andreas Wernecke <> `@`_
+* Andreas Wernecke
