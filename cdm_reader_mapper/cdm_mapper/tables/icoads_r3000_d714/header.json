@@ -75,7 +75,8 @@
   },
   "location_quality": {
     "section": "c1",
-    "elements": "LZ"
+    "elements": "LZ",
+    "code_table": "location_quality"
   },
   "crs": {
     "default": 0
