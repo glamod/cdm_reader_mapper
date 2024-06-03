@@ -71,7 +71,7 @@
     "decimal_places": 0
   },
   "location_quality": {
-    "section": "c1",
+    "sections": "c1",
     "elements": "LZ",
     "fill_value": "0",
     "code_table": "location_quality"
