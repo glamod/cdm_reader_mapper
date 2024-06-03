@@ -13,8 +13,6 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +------------------------------+-----------------------------------------------------+
 | Development Status           | |status| |build| |coveralls|                        |
 +------------------------------+-----------------------------------------------------+
-| Acknoledgements              | |c3s| |noc| |ukmas|                                 |
-+------------------------------+-----------------------------------------------------+
 | Funding and Acknowledgements | |c3s| |noc| |ukmas|                                 |
 +------------------------------+-----------------------------------------------------+
 
@@ -154,7 +152,7 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
 
-.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-blue.svg
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-yellow.svg
         :target: https://noc.ac.uk/
         :alt: NOC
 
@@ -182,7 +180,7 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
         :target: https://github.com/glamod/cdm_reader_mapper/tags
         :alt: Tag
 
-.. |ukmas| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-blue.svg
+.. |ukmas| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-yellow.svg
         :target: https://noc.ac.uk/
         :alt: UKMAS
 
