@@ -18,39 +18,6 @@ from cdm_reader_mapper.common.getting_files import get_files
 
 from ..properties import _base
 
-# def dict_depth(d):
-#    return max(dict_depth(v) if isinstance(v, dict) else 0 for v in d.values()) + 1
-
-# class smart_dict(dict):
-#    # Gets items from nested dictionaries:
-#    # For simple dictionaries:
-#    #   smart_dict(dict)[key]
-#    # For nested dictionaries up to n levels
-#    #   Get first level: can declare key as single element or in list:
-#    #     smart_dict(dict)[[key]], smart_dict(dict)[key]
-#    #   Sucessive levels: keys in list from outer to inner, up to desired level:
-#    #     smart_dict(dict)[[key1, key2,key3]]
-#    #     smart_dict(dict)[[key1, key2,key3,..keyn]]
-#    # Returns None if key or combination not found
-#    def __init__(self, *args, **kwargs):
-#        dict.__init__(self, *args, **kwargs)
-#        self.__dict__ = self
-#        self.__depth__ = dict_depth(self.__dict__)
-#        self.__getstr__ = ["dict.get(self,key[0],None)"]
-#        if self.__depth__ > 1:
-#            for d in range(2, self.__depth__ + 1):
-#                self.__getstr__.append(
-#                    self.__getstr__[d - 2].replace("None", "{}")
-#                    + ".get(key["
-#                    + str(d - 1)
-#                    + "],None)"
-#                )
-#
-#    def __getitem__(self, key):
-#        key = key if isinstance(key, list) else [key]
-#        val = eval(self.__getstr__[len(key) - 1])
-#        return val
-
 
 class codes_hdlr:
     """Class for readinf CDM mapper code tables."""
