@@ -18,7 +18,7 @@ Contributors
 
 * Axel Andersson <axel.andersson@dwd.de> `@aanders <https://github.com/aanderss>`_
 
-* Tina Leiding <tina.leiding@dwd.de> `@`_
+* Tina Leiding <tina.leiding@dwd.de> `@TinaLeiding <https://github.com/TinaLeiding>`_
 
 * Richard Cornes <richard.cornes@noc.ac.uk> `@`_
 
