@@ -80,6 +80,7 @@
   "location_quality": {
     "section": "c1",
     "elements": "LZ",
+    "fill_value": "0",
     "code_table": "location_quality"
   },
   "crs": {
