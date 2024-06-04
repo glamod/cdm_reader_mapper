@@ -11,6 +11,10 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
 
+Internal changes
+^^^^^^^^^^^^^^^^
+* replace deprecated ``datetime.datetime.utcnow()`` with ``datetime.datetime.now(datetime.UTC)`` (see: https://github.com/python/cpython/issues/103857) (:pull:`39`)
+
 Bug fixes
 ^^^^^^^^^
 * indexing working with user-given chunksize (:pull:`35`)
