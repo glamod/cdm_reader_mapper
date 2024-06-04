@@ -14,6 +14,7 @@ Breaking changes
 Internal changes
 ^^^^^^^^^^^^^^^^
 * replace deprecated ``datetime.datetime.utcnow()`` with ``datetime.datetime.now(datetime.UTC)`` (see: https://github.com/python/cpython/issues/103857) (:pull:`39`)
+* make use of ``cdm-testdata`` release ``v2024.06.03`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.03
 
 Bug fixes
 ^^^^^^^^^
