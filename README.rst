@@ -99,12 +99,20 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
     )
 
 
-For more details on how to use the ``reader`` tool see the following `jupyter notebooks`_.
-For more details on how to use the ``mapper`` tool see the following `jupyter notebook`_.
+For more details on how to use the ``mdf_reader`` tool see the following `jupyter notebooks`_.
+For more details on how to use the ``cdm_mapper`` tool see the following `jupyter notebook`_.
 
 For a detailed guide on how to build a cdm and write the output of the `cdm.map_model()` function in ascii see the `user guide`_.
 
+Credits
+-------
+
+*cdm_reader_mapper* development is funded through Copernicus Climate Change Service C3S_.
+Furthermore, acknowledments go to National Oceaography Centre NOC_ and UK Marine and Climate Advisory Service UKMCAS_.
+
 .. hyperlinks
+
+.. _C3S: https://climate.copernicus.eu
 
 .. _C3S CDS Common Data Model: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
 
@@ -114,11 +122,15 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 
 .. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
+.. _NOC: https://noc.ac.uk/
+
 .. _python: https://www.python.org
 
 .. _Issue #11038: https://github.com/dask/dask/issues/11038
 
 .. _PR #11035: https://github.com/dask/dask/pull/11035
+
+.. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
 
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
