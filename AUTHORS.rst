@@ -22,7 +22,7 @@ Contributors
 
 * Richard Cornes <richard.cornes@noc.ac.uk>
 
-* Elizabeth Kent <eck@noc.ac.uk> `@lizkent https://github.com/lizkent`
+* Elizabeth Kent <eck@noc.ac.uk> `@lizkent <https://github.com/lizkent>`_
 
 Previous Contributors
 ---------------------
