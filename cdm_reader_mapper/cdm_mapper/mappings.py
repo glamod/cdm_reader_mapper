@@ -165,7 +165,7 @@ class mapping_functions:
     def __init__(self, imodel, atts):
         self.imodel = imodel
         self.atts = atts
-        self.utc = datetime.UTC
+        self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_HM(self, ds):
         """Convert dateimt object to hours and minutes."""

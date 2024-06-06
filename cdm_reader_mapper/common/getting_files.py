@@ -45,11 +45,13 @@ def _check_md5s(f, md5, mode="error"):
             return
     return True
 
+
 def _with_md5_suffix(
-    name: Path, 
+    name: Path,
     suffix: str,
 ):
     return name.with_suffix(f"{suffix}.md5")
+
 
 def _get_file(
     name: Path,
@@ -63,7 +65,7 @@ def _get_file(
     if within_drs is False:
         local_name = Path(name.name)
     else:
-        local_name =  name
+        local_name = name
 
     local_file = cache_dir / local_name
     md5_file = cache_dir / _with_md5_suffix(local_name, suffix)
@@ -119,7 +121,7 @@ def load_file(
         name = Path(name)
 
     if isinstance(cache_dir, str):
-        cache_dir = Path(cache_dir) 
+        cache_dir = Path(cache_dir)
 
     suffix = name.suffix
     name = name.with_suffix(suffix)

@@ -116,7 +116,7 @@ def test_read_imma1_781():
 def test_read_imma1_794():
     _testing_suite(
         **test_data.test_103_794,
-        cdm_name="icoads_r3000_NRT",
+        cdm_name="icoads_r3000",
         suffix="103_794",
     )
 
@@ -148,7 +148,7 @@ def test_read_imma1_700():
 def test_read_imma1_792():
     _testing_suite(
         **test_data.test_103_792,
-        cdm_name="icoads_r3000_NRT",
+        cdm_name="icoads_r3000",
         suffix="103_792",
     )
 
@@ -156,7 +156,7 @@ def test_read_imma1_792():
 def test_read_imma1_992():
     _testing_suite(
         **test_data.test_114_992,
-        cdm_name="icoads_r3000_NRT",
+        cdm_name="icoads_r3000",
         suffix="114_992",
     )
 
