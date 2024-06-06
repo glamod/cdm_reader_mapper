@@ -7,9 +7,20 @@ Changelog
 -------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
+* ``cdm_mapper``: read header column ``location_quality`` from ``(c1, LZ)`` and set fill_value to ``0`` (:issue:`36`, :pull:`37`)
+* ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* replace deprecated ``datetime.datetime.utcnow()`` with ``datetime.datetime.now(datetime.UTC)`` (see: https://github.com/python/cpython/issues/103857) (:pull:`39`, :pull:`43`)
+* make use of ``cdm-testdata`` release ``v2024.06.03`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.03
 
 Bug fixes
 ^^^^^^^^^
@@ -20,8 +31,8 @@ Bug fixes
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
 
-New features and enchancements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`, :pull:`28`)
 * adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`, :pull:`28`)
 * ``cdm_mapper``: adding C-RAID mapping and code tables (:issue:`13`, :pull:`28`)

@@ -78,7 +78,10 @@
     "decimal_places": 0
   },
   "location_quality": {
-    "default": 3
+    "sections": "c1",
+    "elements": "LZ",
+    "fill_value": "0",
+    "code_table": "location_quality"
   },
   "crs": {
     "default": 0
