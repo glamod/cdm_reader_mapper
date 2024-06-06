@@ -85,7 +85,7 @@ class test_data:
             "imma1_nodt",
             "794",
             "imma1",
-            "icoads_r3000_NRT",
+            "icoads_r3000",
         )
 
     @property
@@ -184,7 +184,7 @@ class test_data:
             "imma1_nodt",
             "792",
             "imma1",
-            "icoads_r3000_NRT",
+            "icoads_r3000",
         )
 
     @property
@@ -195,7 +195,7 @@ class test_data:
             "imma1_nodt",
             "992",
             "imma1",
-            "icoads_r3000_NRT",
+            "icoads_r3000",
         )
 
     @property
