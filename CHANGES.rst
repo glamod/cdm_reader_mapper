@@ -7,6 +7,10 @@ Changelog
 -------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
@@ -25,8 +29,8 @@ Bug fixes
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
 
-New features and enchancements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``mdf_reader``: read C-RAID netCDF buoy data (:issue:`13`, :pull:`24`, :pull:`28`)
 * adding both GCC IMMT and C-RAID netCDF data to ``test_data`` (:pull:`24`, :pull:`28`)
 * ``cdm_mapper``: adding C-RAID mapping and code tables (:issue:`13`, :pull:`28`)
