@@ -14,6 +14,8 @@ New features and enhancements
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
+* ``cdm_mapper``: read header column ``location_quality`` from ``(c1, LZ)`` and set fill_value to ``0`` (:issue:`36`, :pull:`37`)
+* ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
