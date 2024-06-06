@@ -390,8 +390,7 @@ class _FileReader:
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(schema_name=data_model)
         else:
-            self.code_tables_path = os.path.join(
-                data_model_path, "code_tables")
+            self.code_tables_path = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(ext_schema_path=data_model_path)
