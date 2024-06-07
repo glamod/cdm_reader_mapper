@@ -229,7 +229,7 @@ class test_data:
 
     def _get_data_dict(self, data_file, schema, deck, dm, ds):
         return {
-            "source": load_file(f"{dm}_{deck}/input/{data_file}", clear_cache=True),
+            "source": load_file(f"{dm}_{deck}/input/{data_file}"),
             "data_model": schema,
             "dm": dm,
             "ds": ds,
