@@ -103,7 +103,7 @@ def _get_file(
     return local_file
 
 
-# idea copied from xclim that it raven that it borrowed from xclim that borrowed it from xarray that was borrowed from Seaborn
+# idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
