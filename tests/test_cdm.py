@@ -7,7 +7,7 @@ from cdm_reader_mapper import test_data
 from ._testing_cdm_suite import _testing_suite
 
 
-def test_read_imma1_buoys_nosupp():
+def test_read_imma1_714():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -16,7 +16,7 @@ def test_read_imma1_buoys_nosupp():
     )
 
 
-def test_read_imma1_buoys_supp():
+def test_read_imma1_714_supp():
     _testing_suite(
         **test_data.test_063_714,
         sections=["core", "c99"],
@@ -182,7 +182,7 @@ def test_read_craid_1260810():
 # ----------------------------------------------------------
 
 
-def test_read_imma1_buoys_cdm_subset():
+def test_read_imma1_714_cdm_subset():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -191,7 +191,7 @@ def test_read_imma1_buoys_cdm_subset():
     )
 
 
-def test_read_imma1_buoys_codes_subset():
+def test_read_imma1_714_codes_subset():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -203,7 +203,7 @@ def test_read_imma1_buoys_codes_subset():
 # C. TESTS TO TEST CHUNKING
 # -----------------------------------------------------------------------------
 # FROM FILE: WITH AND WITHOUT SUPPLEMENTAL
-def test_read_imma1_buoys_nosupp_chunks():
+def test_read_imma1_714_nosupp_chunks():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -212,7 +212,7 @@ def test_read_imma1_buoys_nosupp_chunks():
     )
 
 
-def test_read_imma1_buoys_supp_chunks():
+def test_read_imma1_714_supp_chunks():
     _testing_suite(
         **test_data.test_063_714,
         sections=["c99"],
