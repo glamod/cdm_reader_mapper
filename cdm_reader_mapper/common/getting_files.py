@@ -55,6 +55,9 @@ def _with_md5_suffix(
 
 def _rm_tree(path: Path):
     # https://stackoverflow.com/questions/50186904/pathlib-recursively-remove-directory
+    if not path.is_dir():
+        logging.warning(f"Could not clear cache. Directory {path.name} does not exist.")
+        return
     for child in path.iterdir():
         if child.is_file():
             child.unlink()
