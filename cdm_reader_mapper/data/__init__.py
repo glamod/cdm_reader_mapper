@@ -81,7 +81,7 @@ class test_data:
     def test_103_794(self):
         """IMMA1 deck 794 test data."""
         return self._get_data_dict(
-            "103-794_2021-11-01_subset.imma",
+            "103-794_2022-11-01_subset.imma",
             "imma1_nodt",
             "794",
             "imma1",
@@ -180,7 +180,7 @@ class test_data:
     def test_103_792(self):
         """IMMA1 deck 792 test data."""
         return self._get_data_dict(
-            "103-792_2017-02-01_subset.imma",
+            "103-792_2022-02-01_subset.imma",
             "imma1_nodt",
             "792",
             "imma1",
@@ -191,7 +191,7 @@ class test_data:
     def test_114_992(self):
         """IMMA1 deck 992 test data."""
         return self._get_data_dict(
-            "114-992_2016-01-01_subset.imma",
+            "114-992_2022-01-01_subset.imma",
             "imma1_nodt",
             "992",
             "imma1",

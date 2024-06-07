@@ -10,6 +10,7 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
+* ``common.getting_files.load_file``: optionally, clear cache directory (:pull:`45`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -20,7 +21,7 @@ Breaking changes
 Internal changes
 ^^^^^^^^^^^^^^^^
 * replace deprecated ``datetime.datetime.utcnow()`` with ``datetime.datetime.now(datetime.UTC)`` (see: https://github.com/python/cpython/issues/103857) (:pull:`39`, :pull:`43`)
-* make use of ``cdm-testdata`` release ``v2024.06.03`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.03
+* make use of ``cdm-testdata`` release ``v2024.06.07`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07 (:issue:`44`, :pull:`45`)
 
 Bug fixes
 ^^^^^^^^^

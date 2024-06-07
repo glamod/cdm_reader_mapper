@@ -53,14 +53,30 @@ def _with_md5_suffix(
     return name.with_suffix(f"{suffix}.md5")
 
 
+def _rm_tree(path: Path):
+    # https://stackoverflow.com/questions/50186904/pathlib-recursively-remove-directory
+    if not path.is_dir():
+        logging.warning(f"Could not clear cache. Directory {path.name} does not exist.")
+        return
+    for child in path.iterdir():
+        if child.is_file():
+            child.unlink()
+        else:
+            _rm_tree(child)
+    path.rmdir()
+
+
 def _get_file(
     name: Path,
     suffix: str,
     url: str,
     cache_dir: Path,
+    clear_cache: bool,
     within_drs: bool,
 ):
     cache_dir = cache_dir.absolute()
+    if clear_cache is True:
+        _rm_tree(cache_dir)
     cache_dir.mkdir(exist_ok=True, parents=True)
     if within_drs is False:
         local_name = Path(name.name)
@@ -87,13 +103,14 @@ def _get_file(
     return local_file
 
 
-# idea copied from xclim that it raven that it borrowed from xclim that borrowed it from xarray that was borrowed from Seaborn
+# idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
     branch: str = "main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
+    clear_cache: bool = False,
     within_drs: bool = True,
 ):
     """Load file from the online Github-like repository.
@@ -110,6 +127,8 @@ def load_file(
         The directory in which to search for and write cached data.
     cache : bool
         If True, then cache data locally for use on subsequent calls.
+    clear_cache: bool
+        If True, clear cache directory.
     within_drs: bool
         If True, then download data within data reference syntax.
 
@@ -137,6 +156,7 @@ def load_file(
         suffix=suffix,
         url=url,
         cache_dir=cache_dir,
+        clear_cache=clear_cache,
         within_drs=within_drs,
     )
 
