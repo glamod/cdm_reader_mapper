@@ -114,7 +114,7 @@ class result_data:
     @property
     def expected_103_794(self):
         return self._get_data_dict(
-            "103-794_2021-11-01_subset",
+            "103-794_2022-11-01_subset",
             "794",
             "imma1",
         )
@@ -178,7 +178,7 @@ class result_data:
     @property
     def expected_103_792(self):
         return self._get_data_dict(
-            "103-792_2017-02-01_subset",
+            "103-792_2022-02-01_subset",
             "792",
             "imma1",
         )
@@ -186,7 +186,7 @@ class result_data:
     @property
     def expected_114_992(self):
         return self._get_data_dict(
-            "114-992_2016-01-01_subset",
+            "114-992_2022-01-01_subset",
             "992",
             "imma1",
         )
