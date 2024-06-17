@@ -241,7 +241,8 @@ class MDFFileReader(_FileReader):
         self.data, self.isna = self._open_data(
             read_sections_list,
             sections,
-            open_with=properties.open_file[self.imodel],
+            # INFO: Set default as "pandas" to account for custom schema
+            open_with=properties.open_file.get(self.imodel, "pandas"),
             chunksize=chunksize,
         )
         ## 2.3. Extract, read and validate data in same loop
@@ -299,7 +300,10 @@ def read(
     data_model : str, optional
         Name of internally available data model
     data_model_path : str, optional
-        Path to external data model
+        Path to external data model. Expected file structure:
+            name_of_model/
+                name_of_model.json
+                code_tables/
 
     Returns
     -------

@@ -5,7 +5,7 @@ Changelog
 
 0.4.0 (unpublished)
 -------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -26,11 +26,13 @@ Internal changes
 Bug fixes
 ^^^^^^^^^
 * indexing working with user-given chunksize (:pull:`35`)
+* fix reading of custom schema in ``mdf_reader.read`` (:pull:`40`)
+* ensure ``format`` schema field for delimited files is passed correctly, avoiding ``"...Please specify either format or field_layout in your header schema..."`` error (:pull:`40`)
 
 
 0.3.0 (2024-05-17)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
