@@ -1,5 +1,6 @@
 {
   "title": "cdm_reader_mapper: Common Data Model reader and mapper toolbox",
+  "description": "The cdm_reader_mapper toolbox is a python tool designed for both reading data files compliant with a user specified data model and mapping observed variables and their associated metadata from a data model or models combination to the C3S CDS Common data model format.  \n \ncdm_reader_mapper development is funded through Copernicus Climate Change Service. \nFurthermore, acknowledgments go to National Oceanography Centre and UK Marine and Climate Advisory Service.",
   "creators": [
     {
       "name": "Lierhammer, Ludwig",
