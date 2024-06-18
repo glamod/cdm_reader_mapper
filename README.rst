@@ -7,7 +7,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+-----------------------------------------------------+
 | Documentation and Support  | |docs|                                              |
 +----------------------------+-----------------------------------------------------+
-| Open Source                | |license| |zenodo|                                  |
+| Open Source                | |license| |zenodo| |fair-software|                  |
 +----------------------------+-----------------------------------------------------+
 | Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
 +----------------------------+-----------------------------------------------------+
@@ -138,6 +138,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. |docs| image:: https://readthedocs.org/projects/cdm_reader_mapper/badge/?version=latest
         :target: https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
+
+.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8B-orange
+   	:target: https://fair-software.eu
+	:alt: FAIR-software
 
 .. |fossa| image:: https://app.fossa.com/api/projects/git%2Bgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
         :target: https://app.fossa.com/projects/git%2Bgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
