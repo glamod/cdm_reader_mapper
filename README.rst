@@ -19,8 +19,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 
 * to read data files compliant with a user specified `data model`_
-* map observed variables and its associated metadata from a `data
-model`_or models combination to the `C3S CDS Common Data Model`_ (CDM) format
+* map observed variables and its associated metadata from a `data model`_ or models combination to the `C3S CDS Common Data Model`_ (CDM) format
 
 It was developed to read the IMMA_ (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of:
 
