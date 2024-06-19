@@ -110,9 +110,13 @@ If you're interested in participating in the development of `cdm_reader_mapper` 
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
-
+Credits
+-------
+``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_). Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMAS_).
 
 .. hyperlinks
+
+.. _C3S: https://climate.copernicus.eu/
 
 .. _C3S CDS Common Data Model: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
 
@@ -124,6 +128,8 @@ If you would like to contribute code or documentation (which is greatly apprecia
 
 .. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
+.. _NOC: https://noc.ac.uk/
+
 .. _python: https://www.python.org
 
 .. _Issue #11038: https://github.com/dask/dask/issues/11038
@@ -131,6 +137,8 @@ If you would like to contribute code or documentation (which is greatly apprecia
 .. _issue tracker: https://github.com/glamod/cdm_reader_mapper/issues
 
 .. _PR #11035: https://github.com/dask/dask/pull/11035
+
+.. _UKMAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
 
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
