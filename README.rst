@@ -103,9 +103,20 @@ For more details on how to use the ``mapper`` tool see the following `jupyter no
 
 For a detailed guide on how to build a cdm and write the output of the `cdm.map_model()` function in ascii see the `user guide`_.
 
+Contributing to cdm_reader_mapper
+---------------------------------
+
+If you're interested in participating in the development of `cdm_reader_mapper` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
+
+If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
+
+
+
 .. hyperlinks
 
 .. _C3S CDS Common Data Model: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
+
+.. _Contributing Guidelines: https://github.com/glamod/cdm_reader_mapper/blob/main/CONTRIBUTING.rst
 
 .. _data model: https://cds.climate.copernicus.eu/toolbox/doc/how-to/15_how_to_understand_the_common_data_model/15_how_to_understand_the_common_data_model.html
 
@@ -116,6 +127,8 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. _python: https://www.python.org
 
 .. _Issue #11038: https://github.com/dask/dask/issues/11038
+
+.. _issue tracker: https://github.com/glamod/cdm_reader_mapper/issues
 
 .. _PR #11035: https://github.com/dask/dask/pull/11035
 
