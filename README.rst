@@ -160,7 +160,7 @@ Credits
         :target: https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8B-orange
+.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow
    	:target: https://fair-software.eu
 	:alt: FAIR-software
 
