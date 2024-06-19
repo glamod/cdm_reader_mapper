@@ -2,6 +2,9 @@ name: fair-software
 
 on: push
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: "fair-software"
