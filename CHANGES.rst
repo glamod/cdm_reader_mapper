@@ -5,7 +5,7 @@ Changelog
 
 0.4.0 (unpublished)
 -------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -22,15 +22,19 @@ Internal changes
 ^^^^^^^^^^^^^^^^
 * replace deprecated ``datetime.datetime.utcnow()`` with ``datetime.datetime.now(datetime.UTC)`` (see: https://github.com/python/cpython/issues/103857) (:pull:`39`, :pull:`43`)
 * make use of ``cdm-testdata`` release ``v2024.06.07`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07 (:issue:`44`, :pull:`45`)
+* migration to ``setup-micromamba``: https://github.com/mamba-org/provision-with-micromamba#migration-to-setup-micromamba (:pull:`48`)
+* update actions to use Node.js 20: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions (:pull:`48`)
 
 Bug fixes
 ^^^^^^^^^
 * indexing working with user-given chunksize (:pull:`35`)
+* fix reading of custom schema in ``mdf_reader.read`` (:pull:`40`)
+* ensure ``format`` schema field for delimited files is passed correctly, avoiding ``"...Please specify either format or field_layout in your header schema..."`` error (:pull:`40`)
 
 
 0.3.0 (2024-05-17)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`, :user:`jtsiddons`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

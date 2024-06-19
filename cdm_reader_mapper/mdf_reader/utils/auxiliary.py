@@ -383,18 +383,17 @@ class _FileReader:
         # Schema reader will return empty if cannot read schema or is not valid
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
-        logging.info("READING DATA MODEL SCHEMA FILE...")
-        self.schema = schemas.read_schema(schema_name=data_model)
-        if not self.schema:
-            return
-
         if self.data_model:
             model_path = f"{properties._base}.code_tables.{self.data_model}"
             self.code_tables_path = get_files(model_path)
             self.imodel = data_model
+            logging.info("READING DATA MODEL SCHEMA FILE...")
+            self.schema = schemas.read_schema(schema_name=data_model)
         else:
             self.code_tables_path = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
+            logging.info("READING DATA MODEL SCHEMA FILE...")
+            self.schema = schemas.read_schema(ext_schema_path=data_model_path)
 
     def _adjust_dtype(self, dtype, df):
         if not isinstance(dtype, dict):
