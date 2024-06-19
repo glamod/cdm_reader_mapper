@@ -7,7 +7,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+-----------------------------------------------------+
 | Documentation and Support  | |docs|                                              |
 +----------------------------+-----------------------------------------------------+
-| Open Source                | |license| |zenodo| |fair-software|                  |
+| Open Source                | |license| |zenodo| |fair-software| |ossf|           |
 +----------------------------+-----------------------------------------------------+
 | Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
 +----------------------------+-----------------------------------------------------+
@@ -154,6 +154,10 @@ For a detailed guide on how to build a cdm and write the output of the `cdm.map_
 .. |license| image:: https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
+
+.. |ossf| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
+        :target: https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper
+        :alt: OpenSSF Scorecard
 
 .. |pre-commit| image:: https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg
         :target: https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main
