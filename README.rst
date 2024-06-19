@@ -112,7 +112,10 @@ If you would like to contribute code or documentation (which is greatly apprecia
 
 Credits
 -------
-``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_). Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMAS_).
+
+``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_). 
+
+Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMCAS_).
 
 .. hyperlinks
 
@@ -138,7 +141,7 @@ Credits
 
 .. _PR #11035: https://github.com/dask/dask/pull/11035
 
-.. _UKMAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
+.. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
 
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
