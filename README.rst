@@ -2,19 +2,19 @@
 Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
-+----------------------------+-----------------------------------------------------+
-| Versions                   | |pypi| |versions| |tag| |release|                   |
-+----------------------------+-----------------------------------------------------+
-| Documentation and Support  | |docs|                                              |
-+----------------------------+-----------------------------------------------------+
-| Open Source                | |license| |zenodo| |fair-software| |ossf|           |
-+----------------------------+-----------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |fossa| |codefactor|    |
-+----------------------------+-----------------------------------------------------+
-| Development Status         | |status| |build| |coveralls|                        |
-+----------------------------+-----------------------------------------------------+
-| Funding                    | |funding|                                           |
-+----------------------------+-----------------------------------------------------+
++----------------------------+----------------------------------------------------------------+
+| Versions                   | |pypi| |versions| |tag| |release|                              |
++----------------------------+----------------------------------------------------------------+
+| Documentation and Support  | |docs|                                                         |
++----------------------------+----------------------------------------------------------------+
+| Open Source                | |license| |zenodo| |fair-software| |ossf|                      |
++----------------------------+----------------------------------------------------------------+
+| Coding Standards           | |black| |ruff| |pre-commit| |security| |fossa| |codefactor|    |
++----------------------------+----------------------------------------------------------------+
+| Development Status         | |status| |build| |coveralls|                                   |
++----------------------------+----------------------------------------------------------------+
+| Funding                    | |funding|                                                      |
++----------------------------+----------------------------------------------------------------+
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 
@@ -183,6 +183,10 @@ If you would like to contribute code or documentation (which is greatly apprecia
 .. |ruff| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
         :target: https://github.com/astral-sh/ruff
         :alt: Ruff
+
+.. |security| image:: https://www.bestpractices.dev/projects/9135/badge
+	:target: https://www.bestpractices.dev/projects/9135
+	:alt: OpenSSf Best Practices
 
 .. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
         :target: https://www.repostatus.org/#wip
