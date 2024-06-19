@@ -192,8 +192,8 @@ Credits
         :target: https://github.com/astral-sh/ruff
         :alt: Ruff
 
-.. |security| image:: https://www.bestpractices.dev/projects/9135/badge
-	:target: https://www.bestpractices.dev/projects/9135
+.. |security| image:: https://bestpractices.coreinfrastructure.org/projects/9135/badge
+	:target: https://bestpractices.coreinfrastructure.org/projects/9135
 	:alt: OpenSSf Best Practices
 
 .. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
