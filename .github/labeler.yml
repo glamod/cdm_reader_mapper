@@ -7,22 +7,14 @@
 #
 # copied from https://github.com/Ouranosinc/xclim/blob/main/.github/labeler.yml
 
-'API':
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'cdm_reader_mapper/cli.py'
-
 'CI':
   - changed-files:
     - any-glob-to-any-file:
-      - '.editorconfig'
       - '.pre-commit-config.yaml'
       - '.readthedocs.yml'
       - '.yamllint.yml'
       - '.github/workflows/*'
       - 'docs/Makefile'
-      - 'pylintrc'
-      - 'tox.ini'
       - 'Makefile'
 
 'docs':
@@ -32,28 +24,42 @@
       - 'docs/**/*'
       - 'AUTHORS.rst'
       - 'CONTRIBUTING.rst'
-      - 'CODE_OF_CONDUCT.md'
-      - 'DISCUSSION_TEMPLATE/**/*'
-      - 'ISSUE_TEMPLATE/**/*'
-      - 'ISSUE_TEMPLATE.md'
-      - 'PULL_REQUEST_TEMPLATE.md'
       - 'README.rst'
 
-'indicators':
+'cdm_mapper':
   - changed-files:
     - any-glob-to-any-file:
-      - 'xclim/indicators/**/*'
-      - 'xclim/indices/**/_*.py'
-      - 'xclim/data/**/*.json'
-      - 'xclim/data/**/*.yml'
+      - 'cdm_reader_mapper/cdm_mapper/*.py'
+      - 'cdm_reader_mapper/cdm_mapper/**/*.py
+      - 'cdm_reader_mapper/cdm_mapper/codes/**/*.json'
+      - 'cdm_reader_mapper/cdm_mapper/tables/**/*.json'
+
+'common':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'cdm_reader_mapper/common/*.py'
+
+'mdf_reader':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'cdm_reader_mapper/mdf_reader/*.py'
+      - 'cdm_reader_mapper/mdf_reader/**/*.py
+      - 'cdm_reader_mapper/mdf_reader/code_tables/**/*.json
+      - 'cdm_reader_mapper/mdf_reader/schema/**/*.json
+      - 'cdm_reader_mapper/mdf_reader/utils/*.py
+
+'metmetpy':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'cdm_reader_mapper/metmetpy/properties.py'
+      - 'cdm_reader_mapper/metmetpy/**/*.py'
+
+'operations':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'cdm_reader_mapper/operations/*.py'
 
 'information':
   - changed-files:
     - any-glob-to-any-file:
       - 'CONTRIBUTING.rst'
-
-'sdba':
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'xclim/sdba/**/*'
-      - 'tests/test_sdba/*.py'
