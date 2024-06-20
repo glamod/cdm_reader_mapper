@@ -508,7 +508,6 @@ class _FileReader:
         )
         return df
 
-
     def _convert_and_decode_df(
         self,
         df,
