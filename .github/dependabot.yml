@@ -7,7 +7,7 @@ updates:
       time: '12:00'
     open-pull-requests-limit: 10
 
-  - package-exosystem: pip
+  - package-ecosystem: pip
     directory: /
     schedule:
       interval: daily
