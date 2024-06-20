@@ -113,7 +113,7 @@ If you would like to contribute code or documentation (which is greatly apprecia
 Credits
 -------
 
-``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_). 
+``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_).
 
 Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMCAS_).
 
