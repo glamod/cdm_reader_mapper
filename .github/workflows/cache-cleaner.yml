@@ -1,4 +1,5 @@
 # Example taken from https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#managing-caches
+# Copied from https://github.com/Ouranosinc/xclim
 name: Cleanup Caches on PR Merge
 on:
   pull_request:
