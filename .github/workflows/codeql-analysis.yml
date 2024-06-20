@@ -1,0 +1,59 @@
+name: CodeQL Scan
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - CHANGES.rst
+      - Makefile
+      - pyproject.toml
+      - cdm_reader_mapper/__init__.py
+      - docs/**.ipynb
+      - docs/**.py
+      - docs/**.rst
+      - .github/**.yml
+      - .pre-commit-config.yaml
+  schedule:
+    - cron: '30 23 * * 5'
+
+permissions:  # added using https://github.com/step-security/secure-repo
+  actions: read
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - 'python'
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
+            uploads.github.com:443
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@1245696032ecf7d39f87d54daa406e22ddf769a8
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@1245696032ecf7d39f87d54daa406e22ddf769a8
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@1245696032ecf7d39f87d54daa406e22ddf769a8
