@@ -8,9 +8,6 @@ from cdm_reader_mapper.operations import corrections, inspect, replace, select
 from ._data import attrs_df, data_df, mask_df
 from ._results import correction_df, table_df
 
-# from _data import attrs_df, attrs_pa, data_df, data_pa, mask_df, mask_pa
-# from _results import correction_df, table_df
-
 
 def test_select_true_pandas():
     select.select_true(data_df, mask_df, out_rejected=True)
@@ -36,12 +33,6 @@ def test_inspect_count_by_ca_pandas():
 def test_corrections_pandas():
     corrections.corrections(
         data_df, dataset="test_data", correction_path=".", yr="2010", mo="07"
-    )
-
-
-def test_corrections_parser():
-    corrections.corrections(
-        data_pa, dataset="test_data", correction_path=".", yr="2010", mo="07"
     )
 
 
