@@ -50,7 +50,9 @@ def print_integer(data, null_label):
     def _return_str(x, null_label):
         if pd.isna(x):
             return null_label
-        return str(int(x))
+        return str(
+            int(float(x))
+        )  # ValueError: invalid literal for int() with base 10: '5.0'
 
     return data.apply(lambda x: _return_str(x, null_label))
 
@@ -99,6 +101,8 @@ def print_datetime(data, null_label):
     def _return_str(x, null_label):
         if pd.isna(x):
             return null_label
+        if isinstance(x, str):
+            return x
         return x.strftime("%Y-%m-%d %H:%M:%S")
 
     return data.apply(lambda x: _return_str(x, null_label))

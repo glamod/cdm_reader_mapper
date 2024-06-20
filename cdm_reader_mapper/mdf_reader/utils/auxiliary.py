@@ -37,7 +37,7 @@ def convert_dtypes(dtypes):
     parse_dates = []
     for i, element in enumerate(list(dtypes)):
         if dtypes[element] == "datetime":
-            parse_dates.append(i)
+            parse_dates.append(element)
             dtypes[element] = "object"
     return dtypes, parse_dates
 
@@ -102,10 +102,10 @@ class Configurator:
         self.orders = order
         self.valid = valid
         self.schema = schema
-        if len(df) > 0:
-            self.str_line = df.iloc[0]
-        else:
-            self.str_line = ""
+        self.str_line = ""
+        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
+            if len(df) > 0:
+                self.str_line = df.iloc[0]
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
@@ -226,7 +226,6 @@ class Configurator:
             if disable_read is True:
                 disable_reads.append(order)
                 continue
-
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
                 self.sections_dict = sections[section]
@@ -320,12 +319,15 @@ class Configurator:
     def open_netcdf(self):
         """Open netCDF to pd.Series."""
         missings = []
-        data_dict = {}
+        attrs = {}
+        renames = {}
+        disables = []
         for order in self.orders:
             self.order = order
             header = self.schema["sections"][order]["header"]
             disable_read = header.get("disable_read")
             if disable_read is True:
+                disables.append(order)
                 continue
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
@@ -333,13 +335,22 @@ class Configurator:
                 index = self._get_index(section)
                 ignore = self._get_ignore()
                 if ignore is not True:
-                    try:
-                        data_dict[index] = self.df[section]
-                    except KeyError:
+                    if section in self.df.data_vars:
+                        renames[section] = index
+                    elif section in self.df.dims:
+                        renames[section] = index
+                    elif section in self.df.attrs:
+                        attrs[index] = self.df.attrs[index]
+                    else:
                         missings.append(index)
 
-        df = pd.Series(data_dict)
-        df["missings"] = missings
+        df = self.df[renames.keys()].to_dataframe().reset_index()
+        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
+        df = df.rename(columns=renames)
+        df = df.assign(**attrs)
+        for column in disables:
+            df[column] = np.nan
+        df["missings"] = [missings] * len(df)
         return df
 
 
@@ -369,18 +380,22 @@ class _FileReader:
         # Schema reader will return empty if cannot read schema or is not valid
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
-        logging.info("READING DATA MODEL SCHEMA FILE...")
-        self.schema = schemas.read_schema(schema_name=data_model)
-        if not self.schema:
-            return
-
         if self.data_model:
             model_path = f"{properties._base}.code_tables.{self.data_model}"
             self.code_tables_path = get_files(model_path)
             self.imodel = data_model
+            logging.info("READING DATA MODEL SCHEMA FILE...")
+            self.schema = schemas.read_schema(schema_name=data_model)
         else:
             self.code_tables_path = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
+            logging.info("READING DATA MODEL SCHEMA FILE...")
+            self.schema = schemas.read_schema(ext_schema_path=data_model_path)
+
+    def _adjust_dtype(self, dtype, df):
+        if not isinstance(dtype, dict):
+            return dtype
+        return {k: v for k, v in dtype.items() if k in df.columns}
 
     def _convert_entries(self, series, converter_func, **kwargs):
         return converter_func(series, **kwargs)
@@ -393,12 +408,12 @@ class _FileReader:
         for section in sections.keys():
             elements = sections[section]["elements"]
             for data_var in elements.keys():
-                if data_var not in ds.data_vars:
+                not_in_data_vars = data_var not in ds.data_vars
+                not_in_glb_attrs = data_var not in ds.attrs
+                not_in_data_dims = data_var not in ds.dims
+                if not_in_data_vars and not_in_glb_attrs and not_in_data_dims:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
-                self.schema["sections"][section]["elements"][data_var][
-                    "column_type"
-                ] = dtypes[data_var]
                 for attr, value in elements[data_var].items():
                     if value == "__from_file__":
                         if attr in ds[data_var].attrs:
@@ -445,9 +460,7 @@ class _FileReader:
     def _read_netcdf(self, **kwargs):
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
-        self.dtypes = ds.dtypes
-        df = ds.to_dataframe().reset_index()
-        return df.assign(**ds.attrs)
+        return ds.squeeze()
 
     def _read_sections(
         self,
@@ -464,12 +477,10 @@ class _FileReader:
                 axis=1,
             )
         elif open_with == "netcdf":
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_netcdf(),
-                axis=1,
-            )
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_netcdf()
+
         missings_ = df["missings"]
         del df["missings"]
         missings = self._set_missing_values(pd.DataFrame(missings_), df)
@@ -497,6 +508,7 @@ class _FileReader:
         )
         return df
 
+
     def _convert_and_decode_df(
         self,
         df,
@@ -504,32 +516,37 @@ class _FileReader:
         converter_kwargs,
         decoder_dict,
     ):
-        self.missing = df.isna()
         for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
             if section in decoder_dict.keys():
-                df[section] = self._decode_entries(
+                decoded = self._decode_entries(
                     df[section],
                     decoder_dict[section],
                 )
+                decoded.index = df[section].index
+                df[section] = decoded
 
-            df[section] = self._convert_entries(
+            converted = self._convert_entries(
                 df[section],
                 converter_dict[section],
                 **converter_kwargs[section],
             )
+            converted.index = df[section].index
+            df[section] = converted
         return df
 
-    def _create_mask(self, df):
-        if not hasattr(self, "missing"):
-            self.missing = df.isna()
-        if not hasattr(self, "valid"):
-            self.valid = df.notna()
-        mask = self.missing | self.valid
-        mask[self.missings] = False
+    def _create_mask(self, df, isna, missings=[]):
+        if isna is None:
+            isna = df.isna()
+        valid = df.notna()
+        mask = isna | valid
+        if len(missings) > 0:
+            mask[missings] = False
         return mask
 
-    def _validate_df(self, df):
-        mask = self._create_mask(df)
+    def _validate_df(self, df, isna=None):
+        mask = self._create_mask(df, isna, missings=self.missings)
         return validate(
             df,
             mask,

@@ -14,7 +14,8 @@ dependencies:
     - dask
     - netcdf4
     - h5netcdf
-
+    - pyarrow
+    # https://github.com/openforcefield/openff-nagl/issues/106
     #documentation
     - ipython
     - nbsphinx

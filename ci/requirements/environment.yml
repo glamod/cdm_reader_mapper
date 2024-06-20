@@ -13,6 +13,8 @@ dependencies:
     - netcdf4
     - h5netcdf
     - datashader
+    - pyarrow
+    # https://github.com/openforcefield/openff-nagl/issues/106
     # for testing
     - pytest
     - pytest-cov

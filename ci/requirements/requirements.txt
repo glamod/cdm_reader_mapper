@@ -13,3 +13,4 @@ python-slugify
 textdistance
 swifter
 platformdirs
+pyarrow

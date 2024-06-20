@@ -83,14 +83,6 @@ def validate_codes(elements, data, code_tables_path, schema, supp=False):
                     else list(table["_keys"].get(element))
                 )
 
-            # if supp:
-            #    key_elements = [(element[0], x) for x in key_elements]
-            # else:
-            #    key_elements = [
-            #        (properties.dummy_level, x) if not isinstance(x, tuple) else x
-            #        for x in key_elements
-            #    ]
-
             dtypes = {
                 x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
                 for x in key_elements
@@ -205,5 +197,6 @@ def validate(data, mask0, schema, code_tables_path, disables):
         ~mask0_n,
         False,
     )
-    mask[disables] = np.nan
+    for column in disables:
+        mask[column] = np.nan
     return mask

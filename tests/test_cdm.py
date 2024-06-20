@@ -7,7 +7,7 @@ from cdm_reader_mapper import test_data
 from ._testing_cdm_suite import _testing_suite
 
 
-def test_read_imma1_buoys_nosupp():
+def test_read_imma1_714():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -16,7 +16,7 @@ def test_read_imma1_buoys_nosupp():
     )
 
 
-def test_read_imma1_buoys_supp():
+def test_read_imma1_714_supp():
     _testing_suite(
         **test_data.test_063_714,
         sections=["core", "c99"],
@@ -116,7 +116,7 @@ def test_read_imma1_781():
 def test_read_imma1_794():
     _testing_suite(
         **test_data.test_103_794,
-        cdm_name="icoads_r3000",
+        cdm_name="icoads_r3000_NRT",
         suffix="103_794",
     )
 
@@ -148,7 +148,7 @@ def test_read_imma1_700():
 def test_read_imma1_792():
     _testing_suite(
         **test_data.test_103_792,
-        cdm_name="icoads_r3000",
+        cdm_name="icoads_r3000_NRT",
         suffix="103_792",
     )
 
@@ -156,7 +156,7 @@ def test_read_imma1_792():
 def test_read_imma1_992():
     _testing_suite(
         **test_data.test_114_992,
-        cdm_name="icoads_r3000",
+        cdm_name="icoads_r3000_NRT",
         suffix="114_992",
     )
 
@@ -169,11 +169,11 @@ def test_read_immt_gcc():
     )
 
 
-def test_read_craid_1010001():
+def test_read_craid_1260810():
     _testing_suite(
-        **test_data.test_craid_1010001,
-        mapping=False,
-        review=False,
+        **test_data.test_craid_1260810,
+        cdm_name="c_raid",
+        suffix="craid",
     )
 
 
@@ -182,7 +182,7 @@ def test_read_craid_1010001():
 # ----------------------------------------------------------
 
 
-def test_read_imma1_buoys_cdm_subset():
+def test_read_imma1_714_cdm_subset():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",
@@ -191,8 +191,7 @@ def test_read_imma1_buoys_cdm_subset():
     )
 
 
-def test_read_imma1_buoys_codes_subset():
-    "NOT WORKING: codes_subset not in map_model"
+def test_read_imma1_714_codes_subset():
     _testing_suite(
         **test_data.test_063_714,
         cdm_name="icoads_r3000_d714",

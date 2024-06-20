@@ -160,9 +160,7 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogeneize input data to an iterable with dataframes:
         # a list with a single dataframe
         logging.info("Getting data string from source...")
-        # self.configurations = self._get_configurations(read_sections_list, sections)
         self.configurations = self._get_configurations(read_sections_list, sections)
-
         self.data = self._open_data(
             read_sections_list,
             sections,
@@ -224,7 +222,10 @@ def read(
     data_model : str, optional
         Name of internally available data model
     data_model_path : str, optional
-        Path to external data model
+        Path to external data model. Expected file structure:
+            name_of_model/
+                name_of_model.json
+                code_tables/
 
     Returns
     -------

@@ -45,6 +45,7 @@ imodel_lineages = {
     "icoads_r3000_d730": icoads_lineage,
     "icoads_r3000_d781": icoads_lineage,
     "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
+    "c_raid": ". Initial conversion from C-RAID",
 }
 
 c2k_methods = {
@@ -56,31 +57,6 @@ k_elements = {
 }
 
 tf = TimezoneFinder()
-
-#
-# def coord_dmh_to_180i(deg, min, hemis):
-#    """
-#    Convert longitudes' units.
-#
-#    Converts longitudes from degrees, minutes and hemisphere
-#    to decimal degrees between -180 to 180.
-#
-#    Parameters
-#    ----------
-#    deg: longitude or latitude in degrees
-#    min: logitude or latitude in minutes
-#    hemis: Hemisphere W or E
-#
-#    Returns
-#    -------
-#    var: longitude in decimal degrees
-#    """
-#    hemisphere = 1
-#   min_df = min / 60
-#   if hemis.any() == "W":
-#        hemisphere = -1
-#    var = np.round((deg + min_df), 2) * hemisphere
-#    return var
 
 
 def coord_360_to_180i(long3):
@@ -159,10 +135,6 @@ def longitude_360to180_i(lon):
 
 def location_accuracy_i(li, lat):
     """Calculate location accuracy."""
-    #    math.sqrt(111**2)=111.0
-    #    math.sqrt(2*111**2)=156.97770542341354
-    #   Previous implementation:
-    #    degrees = {0: .1,1: 1,2: fmiss,3: fmiss,4: 1/60,5: 1/3600,imiss: fmiss}
     degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
     deg_km = 111
     accuracy = degrees.get(int(li), np.nan) * math.sqrt(
@@ -171,8 +143,18 @@ def location_accuracy_i(li, lat):
     return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
 
 
+def convert_to_str(a):
+    """Convert to string."""
+    if a:
+        a = str(a)
+    return a
+
+
 def string_add_i(a, b, c, sep):
     """Add string."""
+    a = convert_to_str(a)
+    b = convert_to_str(b)
+    c = convert_to_str(c)
     if b:
         return sep.join(filter(None, [a, b, c]))
 
@@ -183,6 +165,7 @@ class mapping_functions:
     def __init__(self, imodel, atts):
         self.imodel = imodel
         self.atts = atts
+        self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_HM(self, ds):
         """Convert dateimt object to hours and minutes."""
@@ -208,7 +191,11 @@ class mapping_functions:
 
     def datetime_utcnow(self):
         """Get actual UTC time."""
-        return datetime.datetime.utcnow()
+        return datetime.datetime.now(self.utc)
+
+    def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f"):
+        """Convert string to datetime object."""
+        return pd.to_datetime(df.values, format=format, errors="coerce")
 
     def datetime_to_cdm_time(self, df):
         """
@@ -257,32 +244,6 @@ class mapping_functions:
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
 
-        # NOT USED
-        #
-        # def datetime_fix_hour(self, df):
-        #    """
-        #    Convert time object to dattime object.
-        #
-        #    Converts year, month, day and time indicator to
-        #    a datetime obj with a 24hrs format '%Y-%m-%d-%H'
-        #
-        #    Parameters
-        #    ----------
-        #    dates: list of elements from a date array
-        #
-        #    Returns
-        #    -------
-        #    date: datetime obj
-        #    """
-        #    date_format = "%Y-%m-%d-%H"
-        #    data = pd.to_datetime(
-        #        df.astype(str).apply("-".join, axis=1).values + "-12",
-        #        format=date_format,
-        #        errors="coerce",
-        #    )
-
-        return data
-
     def decimal_places(self, element):
         """Return decimal places."""
         return self.atts.get(element[0]).get("decimal_places")
@@ -294,18 +255,20 @@ class mapping_functions:
         else:
             k_element = 0
         origin_decimals = self.atts.get(element[k_element]).get("decimal_places")
-        if origin_decimals <= 2:
+        if origin_decimals is None:
             return 2
-        else:
-            return origin_decimals
+        elif origin_decimals <= 2:
+            return 2
+        return origin_decimals
 
     def decimal_places_pressure_pascal(self, element):
         """Return pressure decimal places."""
         origin_decimals = self.atts.get(element[0]).get("decimal_places")
-        if origin_decimals > 2:
+        if origin_decimals is None:
+            return 2
+        elif origin_decimals > 2:
             return origin_decimals - 2
-        else:
-            return 0
+        return 0
 
     def df_col_join(self, df, sep):
         """Join pandas Dataframe."""
@@ -313,12 +276,6 @@ class mapping_functions:
         for i in range(1, len(df.columns)):
             joint = joint + sep + df.iloc[:, i].astype(str)
         return joint
-
-    # NOT USED
-    #
-    # def string_opposite(self, ds):
-    #    """Return string opposite."""
-    #    return "-" + ds
 
     def float_opposite(self, ds):
         """Return float opposite."""
@@ -344,7 +301,7 @@ class mapping_functions:
 
     def lineage(self, ds):
         """Get lineage."""
-        strf = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
         if self.imodel in imodel_lineages.keys():
             strf = strf + imodel_lineages[self.imodel]
         return strf
@@ -388,17 +345,12 @@ class mapping_functions:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        df["string_add"] = np.vectorize(string_add_i)(prepend, joint, append, separator)
+        df["string_add"] = np.vectorize(string_add_i)(
+            prepend, joint, append, sep=separator
+        )
         if duplicated:
             df = df[:-1]
         return df["string_add"]
-
-    # NOT USED
-    #
-    # def apply_sign(self, ds):
-    #    """Apply sign."""
-    #    ds.iloc[0] = np.where((ds.iloc[0] == 0) | (ds.iloc[0] == 5), 1, -1)
-    #    return ds
 
     def temperature_celsius_to_kelvin(self, ds):
         """Convert temperature from degrre Ceslius to Kelvin."""

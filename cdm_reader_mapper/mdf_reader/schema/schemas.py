@@ -52,6 +52,10 @@ def _read_schema(schema, schema_file=""):
                 "field_layout"
             ] = schema["header"].get("field_layout")
             schema["header"].pop("field_layout", None)
+            schema["sections"][properties.dummy_level]["header"]["format"] = schema[
+                "header"
+            ].get("format")
+            schema["header"].pop("format", None)
         # 3.3. Make parsing order explicit
         if not schema["header"].get("parsing_order"):  # assume sequential
             schema["header"]["parsing_order"] = [{"s": list(schema["sections"].keys())}]
