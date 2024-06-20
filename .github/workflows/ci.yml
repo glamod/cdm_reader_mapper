@@ -29,7 +29,7 @@ jobs:
         # Bookend python versions
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags.
       - name: Set environment variables
@@ -67,7 +67,7 @@ jobs:
           --junitxml=test-results/${{ runner.os }}-${{ matrix.python-version }}.xml
 
       - name: Upload code coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           file: ./coverage.xml
           flags: unittests
