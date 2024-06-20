@@ -5,7 +5,7 @@
 #   we refer here to CI as the 'meta' configuration files for managing the code and integrations with the repository,
 #   not configurations related to the deployment process itself.
 #
-# copied from https://github.com/Ouranosinc/xclim/blob/main/.github/labeler.yml
+# idea from https://github.com/Ouranosinc/xclim/blob/main/.github/labeler.yml
 
 'CI':
   - changed-files:
@@ -30,7 +30,7 @@
   - changed-files:
     - any-glob-to-any-file:
       - 'cdm_reader_mapper/cdm_mapper/*.py'
-      - 'cdm_reader_mapper/cdm_mapper/**/*.py
+      - 'cdm_reader_mapper/cdm_mapper/**/*.py'
       - 'cdm_reader_mapper/cdm_mapper/codes/**/*.json'
       - 'cdm_reader_mapper/cdm_mapper/tables/**/*.json'
 
@@ -43,10 +43,10 @@
   - changed-files:
     - any-glob-to-any-file:
       - 'cdm_reader_mapper/mdf_reader/*.py'
-      - 'cdm_reader_mapper/mdf_reader/**/*.py
-      - 'cdm_reader_mapper/mdf_reader/code_tables/**/*.json
-      - 'cdm_reader_mapper/mdf_reader/schema/**/*.json
-      - 'cdm_reader_mapper/mdf_reader/utils/*.py
+      - 'cdm_reader_mapper/mdf_reader/**/*.py'
+      - 'cdm_reader_mapper/mdf_reader/code_tables/**/*.json'
+      - 'cdm_reader_mapper/mdf_reader/schema/**/*.json'
+      - 'cdm_reader_mapper/mdf_reader/utils/*.py'
 
 'metmetpy':
   - changed-files:
