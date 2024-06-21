@@ -220,9 +220,8 @@ def corrections(data, dataset, correction_path, yr, mo):
         "timestamp",
     ]:
         os.makedirs(os.path.join(correction_path, f), exist_ok=True)
-    if isinstance(data, pd.DataFrame):
-        gen_files(data.copy(), dataset, correction_path, yr, mo)
-        return
+
+    gen_files(data.copy(), dataset, correction_path, yr, mo)
 
 
 def split_list(n):
