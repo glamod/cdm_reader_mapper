@@ -562,20 +562,18 @@ class _FileReader:
         cols = [x for x in data_df]
         if isinstance(cols[0], tuple):
             header = [":".join(x) for x in cols]
-            out_atts_json = {
-                ":".join(x): out_atts.get(x) for x in out_atts.keys()
-            }
+            out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
         else:
             header = cols
             out_atts_json = out_atts
-    
+
         kwargs = {
-                "header": False,
-                "mode": "w",
-                "encoding": "utf-8",
-                "index": True,
-                "index_label": "index",
-                "escapechar": "\0",
+            "header": False,
+            "mode": "w",
+            "encoding": "utf-8",
+            "index": True,
+            "index_label": "index",
+            "escapechar": "\0",
         }
         data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
         valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)

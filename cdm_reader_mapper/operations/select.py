@@ -8,7 +8,6 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-
 # Need to define a general thing for the parser() functions, like we did with
 # the dataframe_apply_index(), because they are all the same but for the
 # selection applied!!!!!
@@ -92,10 +91,7 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
 
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
-    return dataframe(
-            data, col, values, out_rejected=out_rejected, in_index=in_index
-    )
-
+    return dataframe(data, col, values, out_rejected=out_rejected, in_index=in_index)
 
 
 def select_from_index(data, index, out_rejected=False):

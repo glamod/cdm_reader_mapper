@@ -81,10 +81,10 @@ class MDFFileReader(_FileReader):
         dtype = self.configurations["convert_decode"]["dtype"]
         dtype = self._adjust_dtype(dtype, self.data)
         data = self._convert_and_decode_df(
-                self.data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
+            self.data,
+            converter_dict,
+            converter_kwargs,
+            decoder_dict,
         )
         self.data = data.astype(dtype)
         return self
