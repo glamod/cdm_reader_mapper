@@ -79,13 +79,14 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         dtype = self.configurations["convert_decode"]["dtype"]
-        self.data = self._convert_and_decode_df(
-            self.data,
-            converter_dict,
-            converter_kwargs,
-            decoder_dict,
+        dtype = self._adjust_dtype(dtype, self.data)
+        data = self._convert_and_decode_df(
+                self.data,
+                converter_dict,
+                converter_kwargs,
+                decoder_dict,
         )
-        self.data = self.data.astype(dtype)
+        self.data = data.astype(dtype)
         return self
 
     def validate_entries(
@@ -95,7 +96,7 @@ class MDFFileReader(_FileReader):
 
         Fill attribute `valid` with boolean mask.
         """
-        self.mask = self._validate_df(self.data)
+        self.mask = self._validate_df(self.data, isna=self.isna)
         return self
 
     def read(
@@ -161,10 +162,11 @@ class MDFFileReader(_FileReader):
         # a list with a single dataframe
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data = self._open_data(
+        self.data, self.isna = self._open_data(
             read_sections_list,
             sections,
-            open_with=properties.open_file[self.imodel],
+            # INFO: Set default as "pandas" to account for custom schema
+            open_with=properties.open_file.get(self.imodel, "pandas"),
         )
 
         ## 2.3. Extract, read and validate data in same loop
