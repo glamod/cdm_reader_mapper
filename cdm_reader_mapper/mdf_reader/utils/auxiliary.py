@@ -568,7 +568,7 @@ class _FileReader:
             out_atts_json = out_atts
 
         kwargs = {
-            "header": False,
+            "header": header,
             "mode": "w",
             "encoding": "utf-8",
             "index": True,
