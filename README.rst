@@ -29,12 +29,6 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 * Reports that have a fixed width or field delimited types
 * Reports that can be organized in sections, in which case each section can be of different types (fixed width of delimited)
 
-Note
------
-
-The ``cdm_reader_mapper`` toolbox is currently **NOT** working with ``python 3.11.9``.
-For more information see ``dask`` `Issue #11038`_ and `PR #11035`_.
-This issue should be fixed within a newer release.
 
 Installation
 ------------
