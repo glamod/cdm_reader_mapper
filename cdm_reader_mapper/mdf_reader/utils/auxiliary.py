@@ -506,7 +506,7 @@ class _FileReader:
         df, self.missings = self._read_sections(
             TextParser, order, valid, open_with=open_with
         )
-        return df
+        return df, df.isna()
 
     def _convert_and_decode_df(
         self,
@@ -556,33 +556,29 @@ class _FileReader:
 
     def _dump_atts(self, out_atts, out_path):
         """Dump attributes to atts.json."""
-        data = [self.data]
-        valid = [self.mask]
+        data_df = self.data.copy()
+        valid_df = self.mask.copy()
         logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-            header = False
-            mode = "a"
-            if i == 0:
-                mode = "w"
-                cols = [x for x in data_df]
-                if isinstance(cols[0], tuple):
-                    header = [":".join(x) for x in cols]
-                    out_atts_json = {
-                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
-                    }
-                else:
-                    header = cols
-                    out_atts_json = out_atts
-            kwargs = {
-                "header": header,
-                "mode": mode,
+        cols = [x for x in data_df]
+        if isinstance(cols[0], tuple):
+            header = [":".join(x) for x in cols]
+            out_atts_json = {
+                ":".join(x): out_atts.get(x) for x in out_atts.keys()
+            }
+        else:
+            header = cols
+            out_atts_json = out_atts
+    
+        kwargs = {
+                "header": False,
+                "mode": "w",
                 "encoding": "utf-8",
                 "index": True,
                 "index_label": "index",
                 "escapechar": "\0",
-            }
-            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
+        }
+        data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
+        valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
 
-            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-                json.dump(out_atts_json, fileObj, indent=4)
+        with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
+            json.dump(out_atts_json, fileObj, indent=4)
