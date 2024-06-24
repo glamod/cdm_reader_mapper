@@ -179,7 +179,6 @@ class MDFFileReader(_FileReader):
         decode=True,
         converter_dict=None,
         converter_kwargs=None,
-        decoder_kwargs=None,
         validate=True,
         **kwargs,
     ):
@@ -205,9 +204,6 @@ class MDFFileReader(_FileReader):
           If None use information from a pre-defined data model.
         converter_kwargs: dict of {Hashable: kwargs}, optional
           Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        decoder_dict: dict, optional
-          Functions for decoding values in specific columns.
           If None use information from a pre-defined data model.
         validate: bool, default: True
           Validate data entries by using a pre-defined data model.

@@ -231,7 +231,6 @@ def table_to_ascii(
     null_label="null",
     cdm_complete=True,
     filename=None,
-    full_table=True,
     log_level="INFO",
 ):
     """
@@ -256,8 +255,6 @@ def table_to_ascii(
         default is ``True``
     filename:
         the name of the file to stored the data
-    full_table:
-        if we export a single table
     log_level:
         level of logging information to be saved
 

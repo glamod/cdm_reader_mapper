@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 
 import pandas as pd
 
