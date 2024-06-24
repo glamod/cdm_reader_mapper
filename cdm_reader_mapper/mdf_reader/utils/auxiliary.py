@@ -483,6 +483,8 @@ class _FileReader:
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
+        else:
+            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         missings_ = df["missings"]
         del df["missings"]
@@ -507,6 +509,8 @@ class _FileReader:
                 skiprows=self.skiprows,
                 chunksize=chunksize,
             )
+        else:
+            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
             df, self.missings = self._read_sections(
@@ -636,6 +640,7 @@ class _FileReader:
         for i, (data_df, valid_df) in enumerate(zip(data, valid)):
             header = False
             mode = "a"
+            out_atts_json = {}
             if i == 0:
                 mode = "w"
                 cols = [x for x in data_df]

@@ -127,6 +127,7 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
             return
         else:
             schema_path = f"{properties._base}.schema"
+            schema_data = None
             try:
                 schema_data = get_files(schema_path)
             except ModuleNotFoundError:
