@@ -81,8 +81,7 @@ def select_true(data, mask, out_rejected=False, in_index=False):
         in_buffer = StringIO()
         if out_rejected:
             out_buffer = StringIO()
-        if in_index:
-            index = []
+        index = []
         idx_in_offset = 0
         idx_out_offset = 0
         for df, mask_df in zip(data_parser, mask_cp):
@@ -164,8 +163,7 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
         in_buffer = StringIO()
         if out_rejected:
             out_buffer = StringIO()
-        if in_index:
-            index = []
+        index = []
         idx_in_offset = 0
         idx_out_offset = 0
         for df in data_parser:
