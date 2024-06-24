@@ -56,7 +56,7 @@ repos:
   - repo: https://github.com/jendrikseipp/vulture
     rev: 'v2.11'
     hooks:
-      - id: vulture        
+      - id: vulture
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.7.1
     hooks:
@@ -82,7 +82,7 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
-        additional_dependencies: [ 'tomli' ]        
+        additional_dependencies: [ 'tomli' ]
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.1
     hooks:
