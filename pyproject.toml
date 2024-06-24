@@ -147,3 +147,11 @@ fallback_version = "999"
 write_to = "cdm_reader_mapper/_version.py"
 write_to_template = '__version__ = "{version}"'
 tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
+
+[tool.vulture]
+exclude = []
+ignore_decorators = ["@pytest.fixture"]
+ignore_names = []
+min_confidence = 90
+paths = ["cdm_reader_mapper", "tests"]
+sort_by_size = true
