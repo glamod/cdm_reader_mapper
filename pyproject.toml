@@ -46,6 +46,9 @@ target-version = [
   "py312"
 ]
 
+[tool.codespell]
+ignore-words-list = "BU,OT,rime,Nam,Fram,sentinal,ND,BUID,SME,ASII,TE,ANTARTIC,ARCHITEC,MISTIC,DESPATCH,EMPRESS,INDEPEND,DONN,LIGHTNIN,MESSENGE,SAPHIRE,THOS,GAGE,LEW"
+
 [tool.coverage.run]
 relative_files = true
 omit = ["tests/*.py"]
