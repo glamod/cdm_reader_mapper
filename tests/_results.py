@@ -207,8 +207,8 @@ class result_data:
             "c",
         )
 
-    def __getitem__(cls, attr):
-        return getattr(cls, attr)
+    def __getitem__(self, attr):
+        return getattr(self, attr)
 
     def _load_file(self, ifile):
         try:
