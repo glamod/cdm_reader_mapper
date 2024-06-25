@@ -85,7 +85,7 @@ def _read_schema(schema, schema_file=""):
                     )
         return schema
     else:
-        logging.error("Multile reports per line data model: not yet supported")
+        logging.error("Multiple reports per line data model: not yet supported")
         return
 
 
@@ -151,7 +151,7 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
         schema = json.load(fileObj)
 
     # 3. Expand schema
-    # Fill in the initial schema to "full complexity": to homogeneize schema,
+    # Fill in the initial schema to "full complexity": to homogenize schema,
     # explicitly add info that is implicit to given situations/data models
 
     # One report per record: make sure later changes are reflected in MULTIPLE

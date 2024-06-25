@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cdm_reader_mapper"
-description = "Comman Data Model reader and mapper toolbox"
+description = "Common Data Model reader and mapper toolbox"
 authors = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"}
 ]

@@ -22,7 +22,7 @@ been white space stripped. Care must be taken that the way a data model
 is read before input to this module, is coherent to the way patterns are
 defined for that data model.
 
-NaN: wil validate to true if blank pattern ('^$') in list, otherwise to False.
+NaN: will validate to true if blank pattern ('^$') in list, otherwise to False.
 
 If patterns:{} for dck (empty but defined in data model file),
 will warn and validate all to True, with NaN to False

@@ -230,7 +230,7 @@ class MDFFileReader(_FileReader):
         if sections is None:
             sections = read_sections_list
 
-        # 2.2 Homogeneize input data to an iterable with dataframes:
+        # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
