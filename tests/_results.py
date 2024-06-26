@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 
 import pandas as pd
 
@@ -207,8 +207,8 @@ class result_data:
             "c",
         )
 
-    def __getitem__(cls, attr):
-        return getattr(cls, attr)
+    def __getitem__(self, attr):
+        return getattr(self, attr)
 
     def _load_file(self, ifile):
         try:

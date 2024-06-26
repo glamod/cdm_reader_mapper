@@ -147,7 +147,7 @@ def print_integer_array(data, null_label):
     return data.apply(print_integer_array_i, null_label=null_label)
 
 
-# TODO: tell this to dave and delete them... put error messages in fuctions above
+# TODO: tell this to dave and delete them... put error messages in functions above
 def print_float_array(data, null_label, decimal_places=None):
     """Print a series of float objects as array."""
     return "float array not defined in printers"
@@ -231,7 +231,6 @@ def table_to_ascii(
     null_label="null",
     cdm_complete=True,
     filename=None,
-    full_table=True,
     log_level="INFO",
 ):
     """
@@ -256,8 +255,6 @@ def table_to_ascii(
         default is ``True``
     filename:
         the name of the file to stored the data
-    full_table:
-        if we export a single table
     log_level:
         level of logging information to be saved
 
