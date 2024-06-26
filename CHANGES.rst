@@ -24,6 +24,8 @@ Internal changes
 * make use of ``cdm-testdata`` release ``v2024.06.07`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07 (:issue:`44`, :pull:`45`)
 * migration to ``setup-micromamba``: https://github.com/mamba-org/provision-with-micromamba#migration-to-setup-micromamba (:pull:`48`)
 * update actions to use Node.js 20: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions (:pull:`48`)
+* ``mdf_reader.auxiliary.utils``: rename ``missings`` to ``missing_values`` (:pull:`56`)
+* add ``pre-commit`` hooks: ``codespell``, ``pylint`` and ``vulture`` (:pull:`56`)
 
 Bug fixes
 ^^^^^^^^^
