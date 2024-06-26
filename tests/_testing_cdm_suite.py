@@ -133,7 +133,7 @@ def _testing_suite(
         dck=deck,
     )
 
-    expected_data = result_data.get(exp)
+    expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return
