@@ -265,7 +265,7 @@ class Configurator:
 
     def open_pandas(self):
         """Open TextParser to pd.DataSeries."""
-        missings = []
+        missing_values = []
         self.delimiter = None
         i = 0
         j = 0
@@ -311,17 +311,17 @@ class Configurator:
                         data_dict[index] = None
 
                 if i == j and self.missing is True:
-                    missings.append(index)
+                    missing_values.append(index)
 
                 i = j
 
         df = pd.Series(data_dict)
-        df["missings"] = missings
+        df["missing_values"] = missing_values
         return df
 
     def open_netcdf(self):
         """Open netCDF to pd.Series."""
-        missings = []
+        missing_values = []
         attrs = {}
         renames = {}
         disables = []
@@ -345,7 +345,7 @@ class Configurator:
                     elif section in self.df.attrs:
                         attrs[index] = self.df.attrs[index]
                     else:
-                        missings.append(index)
+                        missing_values.append(index)
 
         df = self.df[renames.keys()].to_dataframe().reset_index()
         attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
@@ -353,7 +353,7 @@ class Configurator:
         df = df.assign(**attrs)
         for column in disables:
             df[column] = np.nan
-        df["missings"] = [missings] * len(df)
+        df["missings_value"] = [missing_values] * len(df)
         return df
 
 
@@ -438,16 +438,16 @@ class _FileReader:
         return config_dict
 
     def _set_missing_values(self, df, ref):
-        explode_ = df.explode("missings")
+        explode_ = df.explode("missing_values")
         explode_["index"] = explode_.index
         explode_["values"] = True
         pivots_ = explode_.pivot_table(
-            columns="missings",
+            columns="missing_values",
             index="index",
             values="values",
         )
-        missings = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
-        return missings.notna()
+        missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
+        return missing_values.notna()
 
     def _read_pandas(self, **kwargs):
         return pd.read_fwf(
@@ -486,12 +486,12 @@ class _FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        missings_ = df["missings"]
-        del df["missings"]
-        missings = self._set_missing_values(pd.DataFrame(missings_), df)
+        missing_values_ = df["missing_values"]
+        del df["missing_values"]
+        missing_values = self._set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
         df = df.where(df.notnull(), np.nan)
-        return df, missings
+        return df, missing_values
 
     def _open_data(
         self,
@@ -513,7 +513,7 @@ class _FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missings = self._read_sections(
+            df, self.missing_values = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )
             return df, df.isna()
@@ -522,11 +522,11 @@ class _FileReader:
             missings_buffer = StringIO()
             isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df, missings = self._read_sections(
+                df, missing_values = self._read_sections(
                     df_, order, valid, open_with=open_with
                 )
                 df_isna = df.isna()
-                missings.to_csv(
+                missing_values.to_csv(
                     missings_buffer,
                     header=False,
                     mode="a",
@@ -555,9 +555,9 @@ class _FileReader:
                     escapechar="\0",
                 )
             missings_buffer.seek(0)
-            self.missings = pd.read_csv(
+            self.missing_values = pd.read_csv(
                 missings_buffer,
-                names=missings.columns,
+                names=missing_values.columns,
                 chunksize=None,
             )
             data_buffer.seek(0)
@@ -609,17 +609,17 @@ class _FileReader:
             df[section] = converted
         return df
 
-    def _create_mask(self, df, isna, missings=[]):
+    def _create_mask(self, df, isna, missing_values=[]):
         if isna is None:
             isna = df.isna()
         valid = df.notna()
         mask = isna | valid
-        if len(missings) > 0:
-            mask[missings] = False
+        if len(missing_values) > 0:
+            mask[missing_values] = False
         return mask
 
     def _validate_df(self, df, isna=None):
-        mask = self._create_mask(df, isna, missings=self.missings)
+        mask = self._create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             df,
             mask,
