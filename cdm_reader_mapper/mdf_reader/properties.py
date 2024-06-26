@@ -69,6 +69,6 @@ MAX_FULL_REPORT_WIDTH = 100000
 # This is a delimiter internally used when writing to buffers
 # It is the Unicode Character 'END OF TEXT'
 # It is supposed to be safe because we don;t expect it in a string
-# It's UTF-8 encoding lenght is not > 1, so it is supported by pandas 'c'
+# It's UTF-8 encoding length is not > 1, so it is supported by pandas 'c'
 # engine, which is faster than the python engine.
 internal_delimiter = "\u0003"

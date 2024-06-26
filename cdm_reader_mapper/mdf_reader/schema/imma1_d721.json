@@ -2088,7 +2088,7 @@
           "valid_min": 1
         },
         "ARCI": {
-          "description": "auther reference code",
+          "description": "author reference code",
           "field_length": 4,
           "column_type": "object",
           "valid_max": null,

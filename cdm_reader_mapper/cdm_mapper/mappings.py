@@ -89,7 +89,7 @@ def coord_dmh_to_90i(deg, min, hemis):
     Parameters
     ----------
     deg: longitude or latitude in degrees
-    min: logitude or latitude in minutes
+    min: longitude or latitude in minutes
     hemis: Hemisphere N or S
 
     Returns
@@ -220,7 +220,7 @@ class mapping_functions:
         df_dates["M"] = 0
         df_coords = df.core.iloc[:, 3:5]
 
-        # Covert long to -180 to 180 for time zone finding
+        # Convert long to -180 to 180 for time zone finding
         df_coords["LON"] = df_coords["LON"].astype(float)
         df_coords["LAT"] = df_coords["LAT"].astype(float)
         df_coords["lon_converted"] = coord_360_to_180i(

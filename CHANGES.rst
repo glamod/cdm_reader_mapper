@@ -46,14 +46,14 @@ New features and enhancements
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`, :pull:`28`)
-* ``cdm_mapper.map_model``: drop dulicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
+* ``cdm_mapper.map_model``: drop duplicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
 * add pyarrow (see: https://github.com/pandas-dev/pandas/issues/54466) to requirements
 * solving pyarrow-snappy issue (see: openforcefield/openff-nagl#106) (:issue:`33`, :pull:`28`, :pull:`34`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* do not diferentiate between tuple and single column names (:pull:`24`)
-* ``metmetpy``: Do not raise erros if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
+* do not differentiate between tuple and single column names (:pull:`24`)
+* ``metmetpy``: Do not raise errors if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
 * get rid of warnings (:issue:`9`, :pull:`27`)
 * adding python 3.12 to testing suite (:pull:`29`)
 * set time out for testing suite to 10 minutes (:pull:`29`)
@@ -85,7 +85,7 @@ Internal changes
 ^^^^^^^^^^^^^^^^
 * adding tests to cdm_reader_mapper testing suite (:issue:`12`, :pull:`2`, :pull:`20`, :pull:`22`)
 * adding testing result data (:pull:`4`)
-* use slugify insted of unidecde for licening reasons
+* use slugify instead of unidecde for licening reasons
 * remove pip install instruction (:pull:`2`)
 * ``HISTORY.rst`` has been renamed ``CHANGES.rst``, to follow `xclim`-like conventions (:pull:`7`).
 * speed up mapping functions with `swifter` (:pull:`4`)
