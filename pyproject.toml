@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cdm_reader_mapper"
-description = "Comman Data Model reader and mapper toolbox"
+description = "Common Data Model reader and mapper toolbox"
 authors = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"}
 ]
@@ -45,6 +45,10 @@ target-version = [
   "py311",
   "py312"
 ]
+
+[tool.codespell]
+ignore-words-list = "BU,OT,rime,Nam,Fram,sentinal,ND,BUID,SME,ASII,TE,ANTARTIC,ARCHITEC,MISTIC,DESPATCH,EMPRESS,INDEPEND,DONN,LIGHTNIN,MESSENGE,SAPHIRE,THOS,GAGE,LEW,FALS,FALSO,ACHIN,CORSE,GRAT,FROWARD,JAQUES,FOUNDLAND,ROUGE,WIGHT,FIALS,PARIA,SINGEL,MONSERRAT,PIDGEON,vaid,TRU"
+skip = "cdm_reader_mapper/mdf_reader/code_tables/*/ICOADS.*.json"
 
 [tool.coverage.run]
 relative_files = true
@@ -147,3 +151,11 @@ fallback_version = "999"
 write_to = "cdm_reader_mapper/_version.py"
 write_to_template = '__version__ = "{version}"'
 tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
+
+[tool.vulture]
+exclude = []
+ignore_decorators = ["@pytest.fixture"]
+ignore_names = []
+min_confidence = 90
+paths = ["cdm_reader_mapper", "tests"]
+sort_by_size = true
