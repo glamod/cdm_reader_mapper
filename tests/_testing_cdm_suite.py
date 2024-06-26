@@ -78,11 +78,11 @@ def _testing_suite(
     **kwargs,
 ):
     exp = "expected_" + suffix
-    splitted = suffix.split("_")
-    if len(splitted) > 1:
-        tb_id = splitted[0] + "-" + "_".join(splitted[1:])
+    split = suffix.split("_")
+    if len(split) > 1:
+        tb_id = split[0] + "-" + "_".join(split[1:])
     else:
-        tb_id = splitted[0]
+        tb_id = split[0]
 
     read_ = mdf_reader.read(
         source=source,
@@ -126,7 +126,7 @@ def _testing_suite(
         dck=deck,
     )
 
-    expected_data = result_data[exp]
+    expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return

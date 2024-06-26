@@ -108,7 +108,6 @@ class MDFFileReader(_FileReader):
         decode=True,
         converter_dict=None,
         converter_kwargs=None,
-        decoder_kwargs=None,
         validate=True,
         **kwargs,
     ):
@@ -133,9 +132,6 @@ class MDFFileReader(_FileReader):
         converter_kwargs: dict of {Hashable: kwargs}, optional
           Key-word arguments for converting values in specific columns.
           If None use information from a pre-defined data model.
-        decoder_dict: dict, optional
-          Functions for decoding values in specific columns.
-          If None use information from a pre-defined data model.
         validate: bool, default: True
           Validate data entries by using a pre-defined data model.
         """
@@ -158,8 +154,9 @@ class MDFFileReader(_FileReader):
         if sections is None:
             sections = read_sections_list
 
-        # 2.2 Homogeneize input data to an iterable with dataframes:
-        # a list with a single dataframe
+        # 2.2 Homogenize input data to an iterable with dataframes:
+        # a list with a single dataframe or a pd.io.parsers.TextFileReader
+
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
         self.data, self.isna = self._open_data(

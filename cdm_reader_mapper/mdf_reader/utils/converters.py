@@ -61,7 +61,7 @@ class df_converters:
         scale : numeric, optional
             Scale to apply after conversion to numeric
         offset : numeric, optional
-            Offset to apply after converion to numeric
+            Offset to apply after conversion to numeric
 
         Returns
         -------

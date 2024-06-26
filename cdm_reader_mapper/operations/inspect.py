@@ -11,9 +11,9 @@ from __future__ import annotations
 import numpy as np
 
 
-def count_by_cat_i(serie):
+def count_by_cat_i(series):
     """Count unique values."""
-    counts = serie.value_counts(dropna=False)
+    counts = series.value_counts(dropna=False)
     counts.index.fillna(str(np.nan))
     return counts.to_dict()
 

@@ -2094,7 +2094,7 @@
           "valid_min": 1
         },
         "ARCI": {
-          "description": "auther reference code",
+          "description": "author reference code",
           "field_length": 4,
           "column_type": "object",
           "valid_max": null,
@@ -2520,7 +2520,7 @@
           "LMR6": false
         },
         "frame": {
-          "description": "Frame number at the top of each frame from which the daily inforation was extracted",
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
           "field_length": 4,
           "column_type": "str",
           "LMR6": false
@@ -2620,7 +2620,7 @@
           "LMR6": true
         },
         "current_speed": {
-          "description": "Current speed in the past 24 hours. To knots hundreths",
+          "description": "Current speed in the past 24 hours. To knots hundredths",
           "field_length": 4,
           "column_type": "float16",
           "scale": 0.01,
@@ -2665,7 +2665,7 @@
           "LMR6": false
         },
         "frame": {
-          "description": "Frame number at the top of each frame from which the daily inforation was extracted",
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
           "field_length": 4,
           "column_type": "str",
           "LMR6": false
@@ -2851,7 +2851,7 @@
           "LMR6": false
         },
         "frame": {
-          "description": "Frame number at the top of each frame from which the daily inforation was extracted",
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
           "field_length": 4,
           "column_type": "str",
           "LMR6": false

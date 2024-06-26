@@ -147,7 +147,6 @@ def load_file(
 
     if not github_url.lower().startswith("http"):
         raise ValueError(f"GitHub URL not safe: '{github_url}'.")
-        return
 
     url = "/".join((github_url, "raw", branch))
 

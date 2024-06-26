@@ -63,7 +63,6 @@ def select_true(data, mask, out_rejected=False, in_index=False):
 
     return dataframe(data, mask, out_rejected=out_rejected, in_index=in_index)
 
-
 def select_from_list(data, selection, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 

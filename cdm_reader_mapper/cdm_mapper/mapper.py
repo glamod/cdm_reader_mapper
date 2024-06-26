@@ -225,7 +225,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     cdm_subset: subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel. Type: list.
     codes_subset: subset of code mapping tables to map.
-        Defaults to tthe full set of code mapping tables. defined for the imodel. Type: list.
+        Defaults to the full set of code mapping tables. defined for the imodel. Type: list.
     log_level: level of logging information to save.
         Defaults to ‘DEBUG’. Type: string.
 
@@ -335,7 +335,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
         logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Colums: {date_columns[table]}"
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
         )
         logger.debug(
             f"\tParse datetime by reader; out_dtype-keys: {out_dtypes[table].keys()}; out dtypes: {out_dtypes[table]}"
@@ -393,7 +393,7 @@ def map_model(
         return
 
     # Check input data type and content (empty?)
-    # Make sure data is an iterable: this is to homogeneize how we handle
+    # Make sure data is an iterable: this is to homogenize how we handle
     # dataframes and textreaders
     if isinstance(data, pd.DataFrame):
         logger.debug("Input data is a pd.DataFrame")

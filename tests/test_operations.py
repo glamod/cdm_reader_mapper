@@ -6,6 +6,7 @@ import pytest  # noqa
 from cdm_reader_mapper.operations import corrections, inspect, replace, select
 
 from ._data import attrs_df, data_df, mask_df
+
 from ._results import correction_df, table_df
 
 

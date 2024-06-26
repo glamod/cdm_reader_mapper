@@ -11,5 +11,5 @@ def _read_data(**kwargs):
     return read_.data, read_.attrs, read_.mask
 
 
-data_dict = test_data.test_063_714
+data_dict = dict(test_data.test_063_714)
 data_df, attrs_df, mask_df = _read_data(**data_dict)
