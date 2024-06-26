@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from io import StringIO as StringIO
 
 import pandas as pd
 
@@ -28,11 +27,11 @@ class MDFFileReader(_FileReader):
     Attributes
     ----------
     data : pd.DataFrame
-        a pandas.DataFrame with the output data
+        a pd.DataFrame with the output data
     attrs : dict
         a dictionary with the output data elements attributes
     mask : pd.DataFrame
-        a pandas.DataFrame with the output data validation mask
+        a pd.DataFrame with the output data validation mask
     """
 
     def __init__(self, *args, **kwargs):
@@ -155,7 +154,7 @@ class MDFFileReader(_FileReader):
             sections = read_sections_list
 
         # 2.2 Homogenize input data to an iterable with dataframes:
-        # a list with a single dataframe or a pd.io.parsers.TextFileReader
+        # a list with a single dataframe
 
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
