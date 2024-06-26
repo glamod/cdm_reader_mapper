@@ -147,7 +147,7 @@ def test_read_imma1_700():
 
 def test_read_imma1_792():
     _testing_suite(
-        **dict(test_data.test_103_7929),
+        **dict(test_data.test_103_792),
         cdm_name="icoads_r3000_NRT",
         suffix="103_792",
     )
