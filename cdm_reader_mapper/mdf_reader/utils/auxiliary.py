@@ -502,7 +502,7 @@ class _FileReader:
             TextParser = self._read_netcdf()
         elif open_with == "pandas":
             TextParser = self._read_pandas(
-                encoding=self.schema["header"].get("encoding"),
+                encoding=self.schema["header"].get("encoding", "utf-8"),
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
             )
