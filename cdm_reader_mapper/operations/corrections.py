@@ -296,7 +296,7 @@ def get_dup(data, dataset):
     df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
     # round lon, lat to one digit
     df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float).round(1)
-    # convet longitdute to -180-180
+    # convert longitdute to -180-180
     df["LON"] = df["LON"].apply(convert_longitude)
     tol = pd.Series([2, 0, 0.05, 0.05, 0, 0])
     tol.index = ["UID", "ID", "LON", "LAT", "DY", "HR"]

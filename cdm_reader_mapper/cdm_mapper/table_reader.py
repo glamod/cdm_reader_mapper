@@ -123,7 +123,7 @@ def read_tables(
         logger.error(f"Data path not found {tb_path}: ")
         return pd.DataFrame()
 
-    # See if theres anything at all:
+    # See if there's anything at all:
     files = glob.glob(os.path.join(tb_path, f"*{tb_id}*.{extension}"))
     if len(files) == 0:
         logger.error(f"No files found matching pattern {tb_id}")
