@@ -353,7 +353,7 @@ class Configurator:
         df = df.assign(**attrs)
         for column in disables:
             df[column] = np.nan
-        df["missings_value"] = [missing_values] * len(df)
+        df["missing_values"] = [missing_values] * len(df)
         return df
 
 
