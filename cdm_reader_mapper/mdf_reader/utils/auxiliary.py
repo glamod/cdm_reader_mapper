@@ -446,7 +446,9 @@ class _FileReader:
             index="index",
             values="values",
         )
-        missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
+        missing_values = pd.DataFrame(
+            data=pivots_, columns=ref.columns, index=ref.index
+        )
         return missing_values.notna()
 
     def _read_pandas(self, **kwargs):
