@@ -37,7 +37,7 @@ STEP 2. DATA FILTERING BASED ON PT, ID
 2.2. Discarding records based on ID:
 -----------------------------------
 - ID missing
-- ID == "PLAT","BUOY","RIGG","BOUY"? again?
+- ID == "PLAT","BUOY","RIGG","BUOY"? again?
 - ID contains "PLAT","RIGG"
 
 2.3. Discarding records based on MD values combination:
@@ -66,7 +66,7 @@ Some examples:
 
 STEP 4. CORRECT IDS: SUBROUTINE correct_ids.R
 --------------------------------------------------------------------------------
-Whats the actual difference in concept with reformat_ids above?
+What's the actual difference in concept with reformat_ids above?
 For given decks and time periods (see if need monthly precision
  or just yearly)
 
@@ -80,7 +80,7 @@ Some examples:
   - deck 701, 1663-1863: build from external file, plus further corrections on
   that
   - deck 701, 1663-1863, missing ID: strange or missing ID plus depends on year.
-  - deck 721, 1851,1868: replacements like deck 702 above, plus assignement if
+  - deck 721, 1851,1868: replacements like deck 702 above, plus assignment if
   missing depending on year and year-month
   - deck 701,721: add deck number to ID (d701, d721)
   - deck 705-707, 1910-1946: build from external file
@@ -106,7 +106,7 @@ Then length of ID is checked to assign inidital idtOK and idttype.
 Then classification (idtOK) in periods and deck and sid dependent:
   - Check against specific formats (i.e. NNCCc, CCNcc,...)
   - Against list of formats
-  - Combination of one of the above and someting, like a character....
+  - Combination of one of the above and something, like a character....
   - Allows specific names no matter their NCc like format (non deck,date dependent)
   - And a couple of things more...
 

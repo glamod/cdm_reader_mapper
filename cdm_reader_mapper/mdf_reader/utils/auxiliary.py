@@ -53,7 +53,7 @@ def validate_arg(arg_name, arg_value, arg_type):
     arg_name : str
         Name of the argument
     arg_value : arg_type
-        Value fo the argument
+        Value of the argument
     arg_type : type
         Type of the argument
 
@@ -76,7 +76,7 @@ def validate_path(arg_name, arg_value):
     Parameters
     ----------
     arg_name : str
-        Name of the arguemnt
+        Name of the argument
     arg_value : str
         Value of the argument
 
@@ -92,7 +92,7 @@ def validate_path(arg_name, arg_value):
 
 
 class Configurator:
-    """Class for configurating MDF reader information."""
+    """Class for configuring MDF reader information."""
 
     def __init__(
         self,
