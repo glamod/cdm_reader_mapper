@@ -103,9 +103,8 @@ class Configurator:
         self.valid = valid
         self.schema = schema
         self.str_line = ""
-        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
-            if len(df) > 0:
-                self.str_line = df.iloc[0]
+        if len(df) > 0 and hasattr(df, "iloc"):
+            self.str_line = df.iloc[0]
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
