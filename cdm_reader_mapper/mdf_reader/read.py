@@ -155,7 +155,6 @@ class MDFFileReader(_FileReader):
 
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe
-
         logging.info("Getting data string from source...")
         self.configurations = self._get_configurations(read_sections_list, sections)
         self.data, self.isna = self._open_data(
@@ -166,8 +165,7 @@ class MDFFileReader(_FileReader):
         )
 
         ## 2.3. Extract, read and validate data in same loop
-        # logging.info("Extracting and reading sections")
-
+        logging.info("Extracting and reading sections")
         if convert or decode:
             self.convert_and_decode_entries(
                 convert=convert,
