@@ -16,6 +16,19 @@ permissions:
   pull-requests: read
 
 jobs:
+  build:
+    name: License Scanning
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v4
+
+      - name: Run FOSSA scan and upload build data
+        uses: fossa-contrib/fossa-action@v3
+        with:
+          fossa-api-key: abcdefghijklmnopqrstuvwxyz
+
   test:
     name: py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
