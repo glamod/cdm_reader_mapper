@@ -181,16 +181,14 @@ def _write_csv_files(
         {
             i: table_df_i[i].dtype
             for i in table_df_i
-            if table_df_i[i].dtype == "float"
-            and out_dtypes[table].get(i) == "float"
+            if table_df_i[i].dtype == "float" and out_dtypes[table].get(i) == "float"
         }
     )
     out_dtypes[table].update(
         {
             i: table_df_i[i].dtype
             for i in table_df_i
-            if table_df_i[i].dtype == "object"
-            and out_dtypes[table].get(i) != "float"
+            if table_df_i[i].dtype == "object" and out_dtypes[table].get(i) != "float"
         }
     )
     if "observation_value" in table_df_i:
