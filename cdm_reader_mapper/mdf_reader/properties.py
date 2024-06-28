@@ -7,7 +7,6 @@ from ..properties import (  # noqa
     numpy_floats,
     numpy_integers,
     object_types,
-    pandas_nan_integers,
 )
 
 _base = "cdm_reader_mapper.mdf_reader"
