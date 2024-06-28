@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-numpy_integers = "int"
-numpy_floats = "float"
-
-numeric_types = [numpy_integers, numpy_floats]
+numeric_types = ["int", "float"]
 
 object_types = ["str", "object", "key", "datetime"]
 

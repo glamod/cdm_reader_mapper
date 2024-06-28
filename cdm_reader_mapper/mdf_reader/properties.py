@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from ..properties import (  # noqa
     numeric_types,
-    numpy_floats,
-    numpy_integers,
     object_types,
 )
 
