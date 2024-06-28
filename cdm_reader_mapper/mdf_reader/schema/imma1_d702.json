@@ -2308,7 +2308,7 @@
         },
         "baro_temp": {
           "description": "Barometer temperature",
-          "column_type": "int64",
+          "column_type": "int",
           "scale": 1
         },
         "baro_corrections": {
