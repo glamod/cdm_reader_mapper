@@ -295,9 +295,9 @@ class mapping_functions:
         """Multiply with scale factor."""
         return ds * factor
 
-    def integer_to_float(self, ds, float_type="float32"):
+    def integer_to_float(self, ds):
         """Convert integer to float."""
-        return ds.astype(float_type)
+        return ds.astype(float)
 
     def lineage(self, ds):
         """Get lineage."""
@@ -376,9 +376,9 @@ class mapping_functions:
         }
         return ds.map(secs, na_action="ignore")
 
-    def feet_to_m(self, ds, float_type="float32"):
+    def feet_to_m(self, ds):
         """Convert feet into meter."""
-        ds.astype(float_type)
+        ds.astype(float)
         return np.round(ds / 3.2808, 2)
 
     def guid(self, df, prepend="", append=""):
