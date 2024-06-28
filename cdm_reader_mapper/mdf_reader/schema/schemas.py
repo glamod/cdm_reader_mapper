@@ -76,12 +76,8 @@ def _read_schema(schema, schema_file=""):
                     schema["sections"][section]["elements"][element].get("column_type")
                     in properties.numpy_integers
                 ):
-                    np_integer = schema["sections"][section]["elements"][element].get(
-                        "column_type"
-                    )
-                    pd_integer = properties.pandas_nan_integers.get(np_integer)
                     schema["sections"][section]["elements"][element].update(
-                        {"column_type": pd_integer}
+                        {"column_type": "int"}
                     )
         return schema
     else:
