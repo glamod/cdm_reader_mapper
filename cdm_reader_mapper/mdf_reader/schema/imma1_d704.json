@@ -2350,13 +2350,13 @@
         "vessel_length": {
           "description": "Length of vessel in feet rounded to nearest whole foot",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "vessel_beam": {
           "description": "Width of vessel in feet rounded to nearest whole foot",
           "field_length": 2,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "commander": {
@@ -2382,13 +2382,13 @@
         "hold_depth": {
           "description": "Rounded to the nearest whole foot",
           "field_length": 2,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "tonnage": {
           "description": "Rounded to nearest whole ton",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "baro_type": {
@@ -2401,7 +2401,7 @@
         "baro_height": {
           "description": "Barometer height above sea level in feet",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": false
         },
         "baro_cdate": {
@@ -2528,17 +2528,17 @@
         "year": {
           "description": "As indicated in the form",
           "field_length": 4,
-          "column_type": "Int16"
+          "column_type": "int"
         },
         "month": {
           "description": "As indicated in the form",
           "field_length": 2,
-          "column_type": "Int8"
+          "column_type": "int"
         },
         "day": {
           "description": "As indicated in the form",
           "field_length": 2,
-          "column_type": "Int8"
+          "column_type": "int"
         },
         "distance": {
           "description": "Distance run by log since prededing run by log noon. Knots to tenths (tenth position blank if not reported)",
@@ -2550,13 +2550,13 @@
         "lat_deg_an": {
           "description": "latitude by account at noon, degrees",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_min_an": {
           "description": "latitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_hemis_an": {
@@ -2568,13 +2568,13 @@
         "lon_deg_an": {
           "description": "longitude by account at noon, degrees",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_min_an": {
           "description": "longitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_hemis_an": {
@@ -2586,13 +2586,13 @@
         "lat_deg_on": {
           "description": "latitude by observation at noon, degrees",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_min_on": {
           "description": "latitude by observation at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_hemis_on": {
@@ -2604,13 +2604,13 @@
         "lon_deg_of": {
           "description": "longitude by chronometer from forenoon observation, degrees",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_min_of": {
           "description": "longitude by chronometer from forenoon observation, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_hemis_of": {
@@ -2673,19 +2673,19 @@
         "year": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "time_ind": {
@@ -2698,7 +2698,7 @@
         "hour": {
           "description": "Hour, right justified, zero filled",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "ship_speed": {
@@ -2724,7 +2724,7 @@
         "compass_correction": {
           "description": "Correction in points or degrees, as indicated in compass_ind. LMR6 false? see ref Jackson et. al. 2000 in translation info",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": false
         },
         "ship_course_true": {
@@ -2809,7 +2809,7 @@
         "sky_clear": {
           "description": "Clear sky in tenths",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "sea_state": {
@@ -2859,19 +2859,19 @@
         "year": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "time_ind": {
@@ -2884,7 +2884,7 @@
         "hour": {
           "description": "Hour, right justified, zero filled",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "ship_speed": {
@@ -2994,7 +2994,7 @@
         "sky_clear": {
           "description": "Clear sky in tenths",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "sea_state": {

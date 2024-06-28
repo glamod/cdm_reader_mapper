@@ -2288,52 +2288,52 @@
         "reel_number": {
           "description": "The microfilm reel number",
           "field_length": 2,
-          "column_type": "Int16"
+          "column_type": "int"
         },
         "frame_number": {
           "description": "The number found at the top of the microfilm frame where the voyage begins. The frame number was kept until the voyage is complete, even if the voyage covered several sequential frames.",
           "field_length": 4,
-          "column_type": "Int16"
+          "column_type": "int"
         },
         "voyage_sequence": {
           "description": "Unique number identifying each voyage",
           "field_length": 1,
-          "column_type": "Int16"
+          "column_type": "int"
         },
         "year": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "hour": {
           "description": "Hours of ship position, converted to 24-hour clock (00-23)",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_deg_an": {
           "description": "latitude by account at noon, degrees",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_min_an": {
           "description": "latitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_hemis_an": {
@@ -2345,13 +2345,13 @@
         "lon_deg_an": {
           "description": "longitude by account at noon, degrees",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_min_an": {
           "description": "longitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_hemis_an": {
@@ -2382,7 +2382,7 @@
         "min_drift_coord": {
           "description": "Minutes of latitude or longitude of current drift over a given time period.",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "period_drift": {
@@ -2391,7 +2391,7 @@
           "valid_max": 24,
           "valid_min": 1,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "mag_var_ind": {
@@ -2413,7 +2413,7 @@
           "valid_max": 23,
           "valid_min": 0,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "baro_pressure_one": {
@@ -2453,7 +2453,7 @@
           "valid_max": 24,
           "valid_min": 1,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "air_temperature_one": {
@@ -2480,7 +2480,7 @@
           "valid_max": 24,
           "valid_min": 1,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "air_temperature_two": {
@@ -2501,7 +2501,7 @@
           "valid_max": 24,
           "valid_min": 1,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "air_temperature_three": {
@@ -2618,7 +2618,7 @@
         "sky_clear": {
           "description": "Portion of clear sky",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "valid_max": 10,
           "valid_min": 0,
           "LMR6": true
@@ -2629,7 +2629,7 @@
           "valid_max": 24,
           "valid_min": 1,
           "units": "hours",
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "weather_indic": {

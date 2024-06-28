@@ -2324,37 +2324,37 @@
         "voyage_begin_month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_begin_day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_begin_year": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_end_month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_end_day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_end_year": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "page_number": {
@@ -2393,25 +2393,25 @@
         "year": {
           "description": "Year of the observational record",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "hour": {
           "description": "As entered in the logbook, generally 01-12 although some may use 24hrs representation (0-23, where 0 is midnight)",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "hour_ind": {
@@ -2430,13 +2430,13 @@
         "lat_deg_an": {
           "description": "latitude by account at noon, degrees",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_min_an": {
           "description": "latitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_hemis_an": {
@@ -2448,13 +2448,13 @@
         "lon_deg_an": {
           "description": "longitude by account at noon, degrees",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_min_an": {
           "description": "longitude by account at noon, minutes",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_hemis_an": {

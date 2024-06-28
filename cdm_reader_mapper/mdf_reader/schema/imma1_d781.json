@@ -2293,31 +2293,31 @@
         "year": {
           "description": "Year GMT",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "month": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "day": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "hour": {
           "description": "Hour (0-23, where 0 is midnight)",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_deg_an": {
           "description": "latitude by account at noon, degrees",
           "field_length": 2,
-          "column_type": "Int8",
+          "column_type": "int",
           "LMR6": true
         },
         "lat_min_an": {
@@ -2339,7 +2339,7 @@
         "lon_deg_an": {
           "description": "longitude by account at noon, degrees",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "lon_min_an": {
@@ -2361,7 +2361,7 @@
         "voyage_dir": {
           "description": "Voyage direction. 0-360, 888 is unknown and 999 missing",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": true
         },
         "voyage_speed": {
@@ -2415,7 +2415,7 @@
         "cloud_height": {
           "description": "Cloud Height, 8888 is Unknown.",
           "field_length": 4,
-          "column_type": "Int16",
+          "column_type": "int",
           "valid_min": 0,
           "valid_max": 9000,
           "missing_value": 9999,
@@ -2438,14 +2438,14 @@
         "past_weather": {
           "description": "Past Weather.",
           "field_length": 1,
-          "column_type": "Int8",
+          "column_type": "int",
           "valid_min": 0,
           "valid_max": 9
         },
         "past_weather_second": {
           "description": "Past Weather Second.",
           "field_length": 1,
-          "column_type": "Int8",
+          "column_type": "int",
           "valid_min": 0,
           "valid_max": 9
         },
@@ -2462,7 +2462,7 @@
         "swell_dir": {
           "description": "Swell direction 0 - 359, 361 for calm and 362 for variable",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "swell_height": {
@@ -2482,7 +2482,7 @@
         "wind_dir": {
           "description": "Wind direction 0 - 359, 361 for calm and 362 for variable",
           "field_length": 3,
-          "column_type": "Int16",
+          "column_type": "int",
           "LMR6": false
         },
         "wind_speed": {
