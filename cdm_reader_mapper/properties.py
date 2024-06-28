@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-numeric_types = ["int", "float"]
+numeric_types = ["Int64", "int", "float"]
 
 object_types = ["str", "object", "key", "datetime"]
 

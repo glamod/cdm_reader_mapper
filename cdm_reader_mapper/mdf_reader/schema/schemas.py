@@ -76,7 +76,7 @@ def _read_schema(schema, schema_file=""):
                     schema["sections"][section]["elements"][element].get("column_type") == "int"
                 ):
                     schema["sections"][section]["elements"][element].update(
-                        {"column_type": "int"}
+                        {"column_type": "Int64"}
                     )
         return schema
     else:
