@@ -177,10 +177,6 @@ def _write_csv_files(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
         )
 
-    # think that NaN also casts floats to float64....!keep floats of lower precision to its original one
-    # will convert all NaN to object type!
-    # but also some numerics with values, like imma observation-value (temperatures),
-    # are being returned as objects!!! pero esto qué es?
     out_dtypes[table].update(
         {
             i: table_df_i[i].dtype
