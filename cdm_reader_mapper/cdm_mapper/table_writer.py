@@ -189,7 +189,8 @@ def print_integer_array_i(row, null_label=None):
     """
     row = row if not isinstance(row, str) else eval(row)
     row = row if isinstance(row, list) else [row]
-    string = ",".join(filter(bool, [str(int(x)) for x in row if np.isfinite(x)]))
+    str_row = [str(int(x)) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
     if len(string) > 0:
         return "{" + string + "}"
     return null_label
@@ -210,7 +211,8 @@ def print_varchar_array_i(row, null_label=None):
     """
     row = row if not isinstance(row, str) else eval(row)
     row = row if isinstance(row, list) else [row]
-    string = ",".join(filter(bool, row))
+    str_row = [str(x) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
     if len(string) > 0:
         return "{" + string + "}"
     return null_label
