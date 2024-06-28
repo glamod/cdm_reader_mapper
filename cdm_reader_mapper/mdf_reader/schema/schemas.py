@@ -73,7 +73,8 @@ def _read_schema(schema, schema_file=""):
                 )
             for element in schema["sections"][section]["elements"].keys():
                 if (
-                    schema["sections"][section]["elements"][element].get("column_type") == "int"
+                    schema["sections"][section]["elements"][element].get("column_type")
+                    == "int"
                 ):
                     schema["sections"][section]["elements"][element].update(
                         {"column_type": "int"}
