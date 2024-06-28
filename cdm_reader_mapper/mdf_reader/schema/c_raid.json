@@ -144,71 +144,71 @@
       "elements": {
         "N_TIME": {
           "description": "Number of time steps.",
-          "column_type": "uint64"
+          "column_type": "int64"
         },
         "N_LEVEL<N>": {
           "description": "Maximum number of parameter measurements that can be simultaneously sampled by a sensor.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "STRING<N>": {
           "description": "String dimensions.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "DATE_TIME": {
           "description": "This dimension is the length of an ASCII date and time value. DATE_TIME convention is: YYYYMMDDHHMISS",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "DATE": {
           "description": "This dimension is the length of an ASCII date value. DATE convention is: YYYYMMDD",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_TRANS_SYSTEM": {
           "description": "Number of transmission systems.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_POSITIONING_SYSTEM": {
           "description": "Number of positioning systems.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_LAUNCH_CONFIG_PARAM": {
           "description": "Number of pre-deployment or launch configuration parameters.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_CONFIG_PARAM": {
           "description": "Number of configuration parameters.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_MISSION": {
           "description": "Number of missions.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_SENSOR": {
           "description": "Number of sensors mounted on the drifter and used to measure the parameters.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_PARAM": {
           "description": "Number of parameters measured by the drifter or calculated from transmitted parameters.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_HISTORY": {
           "description": "Number of history records.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         },
         "N_GREYLIST": {
           "description": "Number of greylist records.",
-          "column_type": "uint64",
+          "column_type": "int64",
           "ignore": true
         }
       }
@@ -728,7 +728,7 @@
         },
         "JULD_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.v",
-          "column_type": "uint",
+          "column_type": "int",
           "codetable": "CRAID.JULD"
         },
         "JULD_QC": {
@@ -743,7 +743,7 @@
         },
         "JULD_ADJUSTED_STATUS": {
           "description": "Status flag on JULD date and time. The flag scale is described in Reference Table 15. Example: '2': Value is transmitted by the drifter.",
-          "column_type": "uint",
+          "column_type": "int",
           "codetable": "CRAID.JULD"
         },
         "JULD_ADJUSTED_QC": {

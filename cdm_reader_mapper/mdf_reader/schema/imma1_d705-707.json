@@ -38,7 +38,7 @@
         "YR": {
           "description": "year UTC",
           "field_length": 4,
-          "column_type": "uint",
+          "column_type": "int",
           "valid_max": 2024,
           "valid_min": 1600,
           "units": "year"
@@ -46,7 +46,7 @@
         "MO": {
           "description": "month UTC",
           "field_length": 2,
-          "column_type": "uint",
+          "column_type": "int",
           "valid_max": 12,
           "valid_min": 1,
           "units": "month"
@@ -54,7 +54,7 @@
         "DY": {
           "description": "day UTC",
           "field_length": 2,
-          "column_type": "uint",
+          "column_type": "int",
           "valid_max": 31,
           "valid_min": 1,
           "units": "day"
