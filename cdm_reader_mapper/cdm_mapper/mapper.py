@@ -271,6 +271,10 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     cdm_tables = {
         k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
     }
+    date_columns = {}
+    for table, values in imodel_maps.items():
+        date_columns[table] = [i for i,x in enumerate(list(values)) if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")]
+        
     # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
@@ -289,10 +293,14 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
 
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
+        logger.debug(
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+        )      
         cdm_tables[table]["buffer"].seek(0)
         cdm_tables[table]["data"] = pd.read_csv(
             cdm_tables[table]["buffer"],
             names=imodel_maps[table].keys(),
+            parse_dates=date_columns[table],
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
