@@ -94,7 +94,6 @@ def _write_csv_files(
     imodel_functions,
     imodel_code_tables,
     cdm_tables,
-    out_dtypes,
 ):
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
@@ -177,20 +176,6 @@ def _write_csv_files(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
         )
 
-    out_dtypes[table].update(
-        {
-            i: table_df_i[i].dtype
-            for i in table_df_i
-            if table_df_i[i].dtype == "float" and out_dtypes[table].get(i) == "float"
-        }
-    )
-    out_dtypes[table].update(
-        {
-            i: table_df_i[i].dtype
-            for i in table_df_i
-            if table_df_i[i].dtype == "object" and out_dtypes[table].get(i) != "float"
-        }
-    )
     if "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
@@ -286,30 +271,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     cdm_tables = {
         k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
     }
-    # Create pandas data types for buffer reading from CDM table definition pseudo-sql dtypes
-    # Also keep track of datetime columns for reader to parse
-    date_columns = {x: [] for x in imodel_maps.keys()}
-    out_dtypes = {x: {} for x in imodel_maps.keys()}
-    for table in out_dtypes:
-        out_dtypes[table].update(
-            {
-                x: cdm_atts.get(table, {}).get(x, {}).get("data_type")
-                for x in imodel_maps[table].keys()
-            }
-        )
-        date_columns[table].extend(
-            [
-                i
-                for i, x in enumerate(list(out_dtypes[table].keys()))
-                if "timestamp" in out_dtypes[table].get(x)
-            ]
-        )
-        out_dtypes[table].update(
-            {
-                k: properties.pandas_dtypes.get("from_sql").get(v, "object")
-                for k, v in out_dtypes[table].items()
-            }
-        )
     # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
@@ -324,23 +285,14 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 imodel_functions,
                 imodel_code_tables,
                 cdm_tables,
-                out_dtypes,
             )
 
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
-        logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
-        )
-        logger.debug(
-            f"\tParse datetime by reader; out_dtype-keys: {out_dtypes[table].keys()}; out dtypes: {out_dtypes[table]}"
-        )
         cdm_tables[table]["buffer"].seek(0)
         cdm_tables[table]["data"] = pd.read_csv(
             cdm_tables[table]["buffer"],
-            names=out_dtypes[table].keys(),
-            dtype=out_dtypes[table],
-            parse_dates=date_columns[table],
+            names=imodel_maps[table].keys(),
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
