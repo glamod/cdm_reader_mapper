@@ -25,7 +25,7 @@
     "LAT": {
       "description": "Latitude (all south)",
       "field_length": 3,
-      "column_type": "float16",
+      "column_type": "float",
       "scale": 0.1,
       "valid_min": 0.0,
       "valid_max": 90.0,
@@ -35,7 +35,7 @@
     "LON": {
       "description": "Longitude (no hundreds)",
       "field_length": 3,
-      "column_type": "float16",
+      "column_type": "float",
       "scale": 0.1,
       "valid_min": 0.0,
       "valid_max": 99.9,
@@ -45,7 +45,7 @@
     "PRS": {
       "description": "Pressure (mb no thousands nor hundreds)",
       "field_length": 3,
-      "column_type": "float16",
+      "column_type": "float",
       "scale": 0.1,
       "valid_min": 0.0,
       "valid_max": 99.9,
@@ -55,7 +55,7 @@
     "DRY BLB": {
       "description": "Air temperature (F<0: F + 100)",
       "field_length": 2,
-      "column_type": "int16",
+      "column_type": "int",
       "valid_min": 0,
       "valid_max": 99,
       "units": "F"
@@ -63,7 +63,7 @@
     "SEA TMP": {
       "description": "Sea temperature (F<0: F + 100)",
       "field_length": 2,
-      "column_type": "int16",
+      "column_type": "int",
       "valid_min": 0,
       "valid_max": 99,
       "units": "F"
@@ -71,7 +71,7 @@
     "DEW PT.": {
       "description": "Dew point temperature (F<0: F + 100)",
       "field_length": 2,
-      "column_type": "int16",
+      "column_type": "int",
       "valid_min": 0,
       "valid_max": 99,
       "units": "F"
