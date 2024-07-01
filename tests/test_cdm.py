@@ -104,7 +104,7 @@ def test_read_data(
     dname, cdm_name, cdm_subset, codes_subset, suffix, out_path, mapping, mdf_kwargs
 ):
     _testing_suite(
-        **dict(test_data[f"test_{dname}"]),
+        **dict(getattr(test_data, f"test_{dname}")),
         cdm_name=cdm_name,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
