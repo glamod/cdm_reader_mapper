@@ -26,6 +26,7 @@ Internal changes
 * update actions to use Node.js 20: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions (:pull:`48`)
 * ``mdf_reader.auxiliary.utils``: rename variable for missing values to ``missing_values`` (:pull:`56`)
 * add ``pre-commit`` hooks: ``codespell``, ``pylint`` and ``vulture`` (:pull:`56`)
+* use ``pytest.parametrize`` for testing suite (:pull:`61`)
 
 Bug fixes
 ^^^^^^^^^
