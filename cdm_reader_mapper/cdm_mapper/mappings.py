@@ -169,8 +169,10 @@ class mapping_functions:
 
     def datetime_decimalhour_to_HM(self, ds):
         """Convert dateimt object to hours and minutes."""
-        hours = int(math.floor(ds))
-        minutes = int(math.floor(60.0 * math.fmod(ds, 1)))
+        timedelta = datetime.timedelta(hours=ds)
+        seconds = timedelta.total_seconds()
+        hours = int(seconds / 3600)
+        minutes = int(seconds / 60) % 60
         return hours, minutes
 
     def datetime_imma1(self, df):  # TZ awareness?
