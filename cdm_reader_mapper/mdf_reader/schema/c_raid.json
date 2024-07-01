@@ -800,7 +800,8 @@
           "standard_name": "air_pressure",
           "unit": "hPa",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 1
         },
         "ATMS_QC": {
           "description": "Quality flag applied on each ATMS values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
@@ -814,7 +815,8 @@
           "standard_name": "air_pressure",
           "unit": "hPa",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 1
         },
         "ATMS_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATMS_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
@@ -870,7 +872,8 @@
           "standard_name": "sea_surface_temperature",
           "unit": "degree_Celsius",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 2
         },
         "SST_QC": {
           "description": "Quality flag applied on each SST values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
@@ -884,7 +887,8 @@
           "standard_name": "sea_surface_temperature",
           "unit": "degree_Celsius",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 2
         },
         "SST_ADJUSTED_QC": {
           "description": "Quality flag applied on each SST_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
@@ -940,7 +944,8 @@
           "standard_name": "air_temperature",
           "unit": "degree_Celsius",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 2
         },
         "AIR_TEMP_QC": {
           "description": "Quality flag applied on each AIR_TEMP values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
@@ -954,7 +959,8 @@
           "standard_name": "air_temperature",
           "unit": "degree_Celsius",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 2
         },
         "AIR_TEMP_ADJUSTED_QC": {
           "description": "Quality flag applied on each AIR_TEMP_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
@@ -975,7 +981,8 @@
           "long_name": "Air pressure tendency",
           "unit": "hPa",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 1
         },
         "ATPT_QC": {
           "description": "Quality flag applied on each ATPT values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
@@ -988,7 +995,8 @@
           "long_name": "Air pressure tendency",
           "unit": "hPa",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 1
         },
         "ATPT_ADJUSTED_QC": {
           "description": "Quality flag applied on each ATPT_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjustment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
