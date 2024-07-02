@@ -1,4 +1,5 @@
 """Common Data Model (CDM) reader and mapper package."""
+
 from __future__ import annotations
 
 from . import cdm_mapper  # noqa

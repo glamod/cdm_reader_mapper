@@ -36,6 +36,7 @@ invocation) logging an error.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import json

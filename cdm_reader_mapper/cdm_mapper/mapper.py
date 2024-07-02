@@ -10,6 +10,7 @@ for the input data model.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 from io import StringIO
