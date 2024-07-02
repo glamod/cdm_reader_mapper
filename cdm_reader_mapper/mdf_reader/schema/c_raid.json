@@ -389,11 +389,13 @@
         },
         "DROGUE_DIAMETER": {
           "description": "Diameter of the drogue.",
-          "column_type": "float"
+          "column_type": "float",
+          "decimal_places": 2
         },
         "DROGUE_LENGTH": {
           "description": "Length of the drogue.",
-          "column_type": "float"
+          "column_type": "float",
+          "decimal_places": 1
         },
         "DROGUE_CENTER_DEPTH": {
           "description": "Depth of the center of the drogue.",
@@ -401,15 +403,18 @@
         },
         "DRAG_AREA_ABOVE_DROGUE": {
           "description": "Drag area of all drifter components except the drogue.",
-          "column_type": "float"
+          "column_type": "float",
+          "decimal_places": 2
         },
         "DRAG_AREA_OF_DROGUE": {
           "description": "Drag area of the drogue.",
-          "column_type": "float"
+          "column_type": "float",
+          "decimal_places": 2
         },
         "DRAG_AREA_RATIO": {
           "description": "Ratio of the drogue cross-sectional area to the area of all other Components.",
-          "column_type": "float"
+          "column_type": "float",
+          "decimal_places": 2
         },
         "DROGUE_DETECTION_METHOD": {
           "description": "Method used to detect drogue presence. Example: TBD.",
@@ -757,7 +762,7 @@
         },
         "LATITUDE": {
           "description": "Latitude of the location (or measurement). Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N.",
-          "column_type": "float"
+          "column_type": "float",
         },
         "LONGITUDE": {
           "description": "Longitude of the location (or measurement). Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E.",
@@ -1118,7 +1123,8 @@
           "column_type": "float",
           "long_name": "Drogue detection sensor",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places": 5
         },
         "DROGUE_QC": {
           "description": "Quality flag applied on each DROGUE values. The flag scale is specified in Reference Table 2. Example: 1 (value seems correct).",
@@ -1130,7 +1136,8 @@
           "column_type": "float",
           "long_name": "Drogue detection sensor",
           "valid_min": "__from_file__",
-          "valid_max": "__from_file__"
+          "valid_max": "__from_file__",
+          "decimal_places" 5
         },
         "DROGUE_ADJUSTED_QC": {
           "description": "Quality flag applied on each DROGUE_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjstment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
