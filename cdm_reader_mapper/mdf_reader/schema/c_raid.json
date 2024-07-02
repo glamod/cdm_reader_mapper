@@ -762,7 +762,7 @@
         },
         "LATITUDE": {
           "description": "Latitude of the location (or measurement). Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N.",
-          "column_type": "float",
+          "column_type": "float"
         },
         "LONGITUDE": {
           "description": "Longitude of the location (or measurement). Unit: decimal degree east. Example: 16.7222 for 16 43 19.92 E.",
@@ -1137,7 +1137,7 @@
           "long_name": "Drogue detection sensor",
           "valid_min": "__from_file__",
           "valid_max": "__from_file__",
-          "decimal_places" 5
+          "decimal_places": 5
         },
         "DROGUE_ADJUSTED_QC": {
           "description": "Quality flag applied on each DROGUE_ADJUSTED values. The flag scale is specified in Reference Table 2. When no adjstment is performed, the FillValue is inserted. Example: 1 (value seems correct).",
