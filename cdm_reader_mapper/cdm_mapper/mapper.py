@@ -9,6 +9,7 @@ for the input data model.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import numpy as np
