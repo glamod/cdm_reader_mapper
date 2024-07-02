@@ -17,7 +17,6 @@ Replacement arguments:
 @author: iregon
 """
 
-
 from __future__ import annotations
 
 import pandas as pd
