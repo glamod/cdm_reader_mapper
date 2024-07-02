@@ -229,19 +229,19 @@
         "REFERENCE_DATE_TIME": {
           "description": "Date of reference for Julian days. The recommended reference date time is '19500101000000' : January 1st 1950 00:00:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d",
+          "datetime_format": "%Y%m%d%H%M%S",
           "ignore": true
         },
         "DATE_CREATION": {
           "description": "Date and time (UTC) of creation of this file. Format : YYYYMMDDHHMISS. Example : 20011229161700 : December 29th 2001 16:17:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d",
+          "datetime_format": "%Y%m%d%H%M%S",
           "ignore": true
         },
         "DATE_UPDATE": {
           "description": "Date and time (UTC) of update of this file. Format : YYYYMMDDHHMISS. Example : 20011230090500 : December 30th 2001 09:05:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d",
+          "datetime_format": "%Y%m%d%H%M%S",
           "ignore": true
         }
       }
@@ -461,7 +461,7 @@
         "LAUNCH_DATE": {
           "description": "Date and time (UTC) of launch of the drifter. Format : YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00.",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "LAUNCH_LATITUDE": {
           "description": "Latitude of the drifter launch. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -479,7 +479,7 @@
         "STARTUP_DATE": {
           "description": "Date and time (UTC) of the activation of the drifter before or just after deployment. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05 :00.",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "STARTUP_DATE_QC": {
           "description": "Quality flag on startup date. The flag scale is described in the Reference Table 2. Example: 1 (startup date seems correct).",
@@ -509,7 +509,7 @@
         "DROGUE_OFF_DATE": {
           "description": "Date (UTC) of the loss of the drogue. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "DROGUE_OFF_LATITUDE": {
           "description": "Latitude of the loss of the drogue. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -527,7 +527,7 @@
         "END_MISSION_DATE": {
           "description": "Date (UTC) of the end of mission of the drifter. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "END_MISSION_LATITUDE": {
           "description": "Latitude at end of the mission. Unit: decimal degree north. Example: 44.4991 for 44 29 56.76 N",
@@ -623,7 +623,7 @@
         "SENSOR_INITIAL_END_DATE": {
           "description": "Date (UTC) of end of useful mission for the sensor, according to the initial platform operators. Format: YYYYMMDDHHMISS. Example: '20011230090500' for December 30th 2001 09:05:00",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "PARAMETER": {
           "description": "Names of the parameters measured by drifter sensors or derived from drifter measurements. The parameter names are listed in Reference Table 3. Examples: TBD.",
@@ -678,7 +678,8 @@
         },
         "PREDEPLOYMENT_CALIB_DATE": {
           "description": "Date of the pre-deployment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str",
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d%H%M%S",
           "ignore": true
         },
         "REAL_TIME_ADJUSTMENT_CALIB_EQUATION": {
@@ -698,7 +699,8 @@
         },
         "REAL_TIME_ADJUSTMENT_CALIB_DATE": {
           "description": "Date of the real-time adjustment calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str",
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d%H%M%S%Y%m%d%H%M%S",
           "ignore": true
         },
         "SCIENTIFIC_CALIB_EQUATION": {
@@ -718,7 +720,8 @@
         },
         "SCIENTIFIC_CALIB_DATE": {
           "description": "Date of the scientific calibration. Example: '20011217161700' for November 17th 2001 16:17:00.",
-          "column_type": "str",
+          "column_type": "datetime",
+          "datetim_format": "%Y%m%d%H%M%S",
           "ignore": true
         }
       }
@@ -1252,11 +1255,13 @@
         },
         "GREYLIST_START_DATE": {
           "description": "Start date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57.",
-          "column_type": "str"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "GREYLIST_END_DATE": {
           "description": "End date that concerns the greylist information. Example: '20011217160057' for December 17th 2001 16:00:57.",
-          "column_type": "str"
+          "column_type": "datetime",
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "GREYLIST_FLAG": {
           "description": "Quality flag applied on parameter QC values. Example: '1' (value seems correct).",
@@ -1299,7 +1304,7 @@
         "HISTORY_DATE": {
           "description": "Date of the action. Example: '20011217160057' for December 17th 2001 16:00:57.",
           "column_type": "datetime",
-          "datetime_format": "%Y%m%d"
+          "datetime_format": "%Y%m%d%H%M%S"
         },
         "HISTORY_ACTION": {
           "description": "Name of the action. The action codes are described in Reference Table 7. Example: TBD.",
