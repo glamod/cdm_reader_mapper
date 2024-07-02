@@ -6,7 +6,6 @@ Created on Thu May  5 14:04:37 2022
 @author: sbiri
 """
 
-
 from __future__ import annotations
 
 import numpy as np

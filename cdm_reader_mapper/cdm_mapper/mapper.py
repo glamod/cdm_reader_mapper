@@ -3,21 +3,19 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
-the C3S Climate Data Store Common Data Model (CDM) header and observational
-tables using the mapping information available in the tool's mapping library
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
+header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 
 @author: iregon
 """
-from __future__ import annotations
 
-from io import StringIO
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
 from .codes.codes_hdlr import codes_hdlr
@@ -69,37 +67,32 @@ def _mapping_type(elements, data_atts):
     return m_type
 
 
-def _decimal_places(
-    cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
-):
+def _decimal_places(atts, decimal_places, cdm_key, imodel_functions, elements):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
-            cdm_tables[table]["atts"][cdm_key].update(
-                {"decimal_places": decimal_places}
-            )
+            atts[cdm_key].update({"decimal_places": decimal_places})
         else:
-            cdm_tables[table]["atts"][cdm_key].update(
+            atts[cdm_key].update(
                 {"decimal_places": getattr(imodel_functions, decimal_places)(elements)}
             )
-    return cdm_tables
+    return atts
 
 
 def _write_csv_files(
     idata,
     mapping,
     logger,
-    table,
     cols,
     data_atts,
     imodel_functions,
     imodel_code_tables,
-    cdm_tables,
+    atts,
     out_dtypes,
 ):
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
     )  # We cannot predifine column based dtypes here!
-    logger.debug(f"Table: {table}")
+    # logger.debug(f"Table: {table}")
     for cdm_key, imapping in mapping.items():
         logger.debug(f"\tElement: {cdm_key}")
         isEmpty = False
@@ -173,43 +166,43 @@ def _write_csv_files(
         if fill_value is not None:
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
-        cdm_tables = _decimal_places(
-            cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
+        atts = _decimal_places(
+            atts, decimal_places, cdm_key, imodel_functions, elements
         )
 
     # think that NaN also casts floats to float64....!keep floats of lower precision to its original one
     # will convert all NaN to object type!
     # but also some numerics with values, like imma observation-value (temperatures),
     # are being returned as objects!!! pero esto qué es?
-    out_dtypes[table].update(
+    out_dtypes.update(
         {
             i: table_df_i[i].dtype
             for i in table_df_i
             if table_df_i[i].dtype in properties.numpy_floats
-            and out_dtypes[table].get(i) not in properties.numpy_floats
+            and out_dtypes.get(i) not in properties.numpy_floats
         }
     )
-    out_dtypes[table].update(
+    out_dtypes.update(
         {
             i: table_df_i[i].dtype
             for i in table_df_i
             if table_df_i[i].dtype == "object"
-            and out_dtypes[table].get(i) not in properties.numpy_floats
+            and out_dtypes.get(i) not in properties.numpy_floats
         }
     )
     if "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
     table_df_i = drop_duplicates(table_df_i)
-    table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
-    return cdm_tables
+    table_df_i = table_df_i.astype(dtype=out_dtypes)
+    return table_df_i, atts
 
 
 def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """
     Map to the C3S Climate Data Store Common Data Model (CDM).
 
-    Maps a pandas DataFrame (or pd.io.parsers.TextFileReader) to the C3S Climate Data Store Common Data Model (CDM)
+    Maps a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
     header and observational tables using mapping information from the input data model (imodel).
 
     Parameters
@@ -220,7 +213,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
             2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1's core and attachments
                to CDM in a specific way. e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000_d704``
     data: input data to map
-        e.g. a pandas.Dataframe or io.parsers.TextFileReader objects or in-memory text streams (io.StringIO object).
+        e.g. a pandas.Dataframe.
     data_atts:
         dictionary with the {element_name:element_attributes} of the data. Type: string.
     cdm_subset: subset of CDM model tables to map.
@@ -289,9 +282,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
             )
             return
     # Initialize dictionary to store temporal tables (buffer) and table attributes
-    cdm_tables = {
-        k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
-    }
+    cdm_tables = {k: {"atts": cdm_atts.get(k)} for k in imodel_maps.keys()}
     # Create pandas data types for buffer reading from CDM table definition pseudo-sql dtypes
     # Also keep track of datetime columns for reader to parse
     date_columns = {x: [] for x in imodel_maps.keys()}
@@ -316,40 +307,22 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 for k, v in out_dtypes[table].items()
             }
         )
+
     # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
         for table, mapping in imodel_maps.items():
-            cdm_tables = _write_csv_files(
+            cdm_tables[table]["data"], cdm_tables[table]["atts"] = _write_csv_files(
                 idata,
                 mapping,
                 logger,
-                table,
                 cols,
                 data_atts,
                 imodel_functions,
                 imodel_code_tables,
-                cdm_tables,
-                out_dtypes,
+                cdm_tables[table]["atts"],
+                out_dtypes[table],
             )
-
-    for table in cdm_tables.keys():
-        # Convert dtime to object to be parsed by the reader
-        logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
-        )
-        logger.debug(
-            f"\tParse datetime by reader; out_dtype-keys: {out_dtypes[table].keys()}; out dtypes: {out_dtypes[table]}"
-        )
-        cdm_tables[table]["buffer"].seek(0)
-        cdm_tables[table]["data"] = pd.read_csv(
-            cdm_tables[table]["buffer"],
-            names=out_dtypes[table].keys(),
-            dtype=out_dtypes[table],
-            parse_dates=date_columns[table],
-        )
-        cdm_tables[table]["buffer"].close()
-        cdm_tables[table].pop("buffer")
     return cdm_tables
 
 
@@ -367,7 +340,7 @@ def map_model(
       2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
       CDM in a specific way.
       e.g. ``cdm/library/mappings/icoads_r3000_d704``
-    data: pd.DataFrame, pd.parser.TextFileReader or io.String
+    data: pd.DataFrame
       input data to map.
     data_atts: dict
       dictionary with the {element_name:element_attributes} of the data.
@@ -397,19 +370,12 @@ def map_model(
     # Make sure data is an iterable: this is to homogenize how we handle
     # dataframes and textreaders
     if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
+        # logger.debug("Input data is a pd.DataFrame")
         if len(data) == 0:
             logger.error("Input data is empty")
             return
         else:
             data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-
     else:
         logger.error("Input data type " f"{type(data)}" " not supported")
         return

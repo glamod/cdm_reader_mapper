@@ -4,8 +4,7 @@ Write Common Data Model (CDM) mapping tables.
 Created on Thu Apr 11 13:45:38 2019
 
 Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files,
-The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame
-(or pd.io.parsers.TextFileReader).
+The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame.
 
 This module uses a set of printer functions to "print" element values to a
 string object before exporting them to a final ascii file.
@@ -187,14 +186,10 @@ def print_integer_array_i(row, null_label=None):
     -------
     data: int
     """
-    if row == row:
-        row = eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, [str(int(x)) for x in row if np.isfinite(x)]))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
+    row = row if isinstance(row, list) else [row]
+    string = ",".join(filter(bool, [str(int(x)) for x in row if np.isfinite(x)]))
+    if len(string) > 0:
+        return "{" + string + "}"
     else:
         return null_label
 
@@ -212,14 +207,11 @@ def print_varchar_array_i(row, null_label=None):
     -------
     data: varchar
     """
-    if row == row:
-        row = eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, row))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
+    row = eval(row)
+    row = row if isinstance(row, list) else [row]
+    string = ",".join(filter(bool, row))
+    if len(string) > 0:
+        return "{" + string + "}"
     else:
         return null_label
 
@@ -237,8 +229,7 @@ def table_to_ascii(
     Export a cdm table to an ascii file.
 
     Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
 
     Parameters
     ----------
@@ -331,8 +322,7 @@ def cdm_to_ascii(
 
     Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)
     format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
 
     Parameters
     ----------
