@@ -6,6 +6,7 @@ Common Data Model (CMD) tables within the cdm tool.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import datetime

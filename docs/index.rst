@@ -55,10 +55,11 @@ Several data models have been added to the tool including the IMMA schema:
    cdm-tables-mapping-files-and-descriptors.rst
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
+   api
    contributing
    authors
-   api
    changes
+   security
 
 
 About

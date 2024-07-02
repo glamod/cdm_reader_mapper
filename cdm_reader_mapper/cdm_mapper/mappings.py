@@ -21,6 +21,7 @@ Auxiliary functions can be used and defined in or outside class mapping_function
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import datetime

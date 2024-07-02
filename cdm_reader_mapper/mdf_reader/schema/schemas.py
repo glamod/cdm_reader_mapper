@@ -48,9 +48,9 @@ def _read_schema(schema, schema_file=""):
                 "header"
             ].get("delimiter")
             schema["header"].pop("delimiter", None)
-            schema["sections"][properties.dummy_level]["header"][
-                "field_layout"
-            ] = schema["header"].get("field_layout")
+            schema["sections"][properties.dummy_level]["header"]["field_layout"] = (
+                schema["header"].get("field_layout")
+            )
             schema["header"].pop("field_layout", None)
             schema["sections"][properties.dummy_level]["header"]["format"] = schema[
                 "header"
