@@ -66,9 +66,6 @@
   "observation_value": {
     "elements": "dd",
     "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
     "decimal_places": 0
   },
   "value_significance": {
@@ -110,9 +107,6 @@
   "original_value": {
     "elements": "dd",
     "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
     "decimal_places": 0
   },
   "conversion_method": {},

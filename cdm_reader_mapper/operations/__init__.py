@@ -1,4 +1,5 @@
 """Common Data Model (CDM) pandas operators."""
+
 from __future__ import annotations
 
 from . import corrections  # noqa

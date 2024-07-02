@@ -37,14 +37,14 @@
         "MAR SQ": {
           "description": "Marsden 10 degree square",
           "field_length": 3,
-          "column_type": "int16",
+          "column_type": "int",
           "valid_max": 936,
           "valid_min": 1
         },
         "SUB SQ": {
           "description": "Marsden 1 degree sub-square",
           "field_length": 2,
-          "column_type": "int8",
+          "column_type": "int",
           "valid_max": 99,
           "valid_min": 0
         },
@@ -57,7 +57,7 @@
         "LAT": {
           "description": "Latitude",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "valid_max": 90.0,
           "valid_min": 0.0,
           "scale": 0.1,
@@ -67,7 +67,7 @@
         "LONG": {
           "description": "Longitude",
           "field_length": 4,
-          "column_type": "float16",
+          "column_type": "float",
           "valid_max": 180.0,
           "valid_min": 0.0,
           "scale": 0.1,
@@ -77,7 +77,7 @@
         "YEAR": {
           "description": "Year",
           "field_length": 4,
-          "column_type": "int16",
+          "column_type": "int",
           "valid_max": 1999,
           "valid_min": 1800,
           "units": "a"
@@ -85,7 +85,7 @@
         "MO": {
           "description": "Month",
           "field_length": 2,
-          "column_type": "int8",
+          "column_type": "int",
           "valid_max": 12,
           "valid_min": 1,
           "units": "mon"
@@ -93,7 +93,7 @@
         "DA": {
           "description": "Day",
           "field_length": 2,
-          "column_type": "int8",
+          "column_type": "int",
           "valid_max": 31,
           "valid_min": 1,
           "units": "d"
@@ -101,7 +101,7 @@
         "HR": {
           "description": "Hour GMT",
           "field_length": 2,
-          "column_type": "int8",
+          "column_type": "int",
           "valid_max": 23,
           "valid_min": 0,
           "units": "h"
@@ -129,7 +129,7 @@
         "WIND SPD": {
           "description": "Wind speed",
           "field_length": 3,
-          "column_type": "int16",
+          "column_type": "int",
           "valid_min": 0,
           "valid_max": 199,
           "units": "knots"
@@ -162,7 +162,7 @@
         "PRESS": {
           "description": "Sea level pressure",
           "field_length": 5,
-          "column_type": "float16",
+          "column_type": "float",
           "valid_max": 1070.0,
           "valid_min": 890.0,
           "scale": 0.1,
@@ -178,7 +178,7 @@
         "AIR TMP": {
           "description": "Air temperature",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "encoding": "signed_overpunch",
           "valid_max": 99.9,
           "valid_min": -99.9,
@@ -188,7 +188,7 @@
         "WET BLB": {
           "description": "Wet bulb temperature",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "encoding": "signed_overpunch",
           "valid_max": 99.9,
           "valid_min": -99.9,
@@ -199,7 +199,7 @@
         "DEW PT": {
           "description": "Dew point temperature",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "encoding": "signed_overpunch",
           "valid_max": 99.9,
           "valid_min": -99.9,
@@ -210,7 +210,7 @@
         "SEA TMP": {
           "description": "Sea surface temperature",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "encoding": "signed_overpunch",
           "valid_max": 99.9,
           "valid_min": -99.9,
@@ -221,7 +221,7 @@
         "A-S DIFF": {
           "description": "Air-sea temperature difference",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "encoding": "signed_overpunch",
           "valid_max": 99.9,
           "valid_min": -99.9,
@@ -359,7 +359,7 @@
         "A D D": {
           "description": "Additional data indicator",
           "field_length": 1,
-          "column_type": "int8",
+          "column_type": "int",
           "ignore": true
         },
         "I C E": {
@@ -371,7 +371,7 @@
         "ICE THK": {
           "description": "Thickness of ice in centimetres",
           "field_length": 2,
-          "column_type": "int8",
+          "column_type": "int",
           "valid_max": 99,
           "valid_min": 0,
           "units": "cm"
@@ -399,7 +399,7 @@
         "A D D": {
           "description": "Additional data indicator",
           "field_length": 1,
-          "column_type": "int8",
+          "column_type": "int",
           "ignore": true
         },
         "D I R": {
@@ -423,7 +423,7 @@
         "ppp": {
           "description": "Amount of pressure change (3h, tenths of millibars)",
           "field_length": 3,
-          "column_type": "float16",
+          "column_type": "float",
           "valid_max": 29.9,
           "valid_min": 0.0,
           "scale": 0.1,
@@ -441,7 +441,7 @@
         "A D D": {
           "description": "Additional data indicator",
           "field_length": 1,
-          "column_type": "int8",
+          "column_type": "int",
           "ignore": true
         },
         "SIG N": {

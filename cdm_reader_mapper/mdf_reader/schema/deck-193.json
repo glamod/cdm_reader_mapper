@@ -19,7 +19,7 @@
     "W A T": {
       "description": "Watch",
       "field_length": 1,
-      "column_type": "int8",
+      "column_type": "int",
       "codetable": "probably not: see tape field 10 (core?hour?)"
     },
     "BF WD": {
@@ -31,7 +31,7 @@
     "PPP": {
       "description": "Pressure (mmHg)",
       "field_length": 3,
-      "column_type": "float16",
+      "column_type": "float",
       "encoding": "deck_193.higher_order",
       "scale": 0.1,
       "offset": 700,
@@ -83,7 +83,7 @@
     "FOG DUR": {
       "description": "Duration of fog(min)",
       "field_length": 2,
-      "column_type": "int16",
+      "column_type": "int",
       "scale": 15
     },
     "PCP DUR": {

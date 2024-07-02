@@ -11,7 +11,7 @@
     },
     "record": {
       "description": "Record number for call",
-      "column_type": "int8"
+      "column_type": "int"
     },
     "name": {
       "description": "Name of ship",
@@ -20,7 +20,7 @@
     },
     "freq": {
       "description": "Freq mapped to report duration from CDM (e.g. 8 obs per day mapped to 3 hour duration)",
-      "column_type": "int8",
+      "column_type": "int",
       "missing_value": "MSNG"
     },
     "vsslM": {
@@ -30,12 +30,12 @@
     },
     "vssl": {
       "description": "Type of ship mapped to platform_sub_type from CDM",
-      "column_type": "int8",
+      "column_type": "int",
       "missing_value": "MSNG"
     },
     "atm": {
       "description": "Automation status for ship, mapped to automation from CDM",
-      "column_type": "int8"
+      "column_type": "int"
     },
     "rcnty": {
       "description": "Recruiting country for ship",
@@ -57,37 +57,37 @@
     },
     "thmH1": {
       "description": "Thermometer height",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "platH": {
       "description": "Platform height",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "brmH1": {
       "description": "Barometer height",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "anmH": {
       "description": "Anemometer height",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "anHL1": {
       "description": "Anemometer height above max load line",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "wwH": {
       "description": "Wind wave observing height",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "sstD1": {
       "description": "Depth of SST sensor",
-      "column_type": "float16",
+      "column_type": "float",
       "units": "m"
     },
     "th1": {

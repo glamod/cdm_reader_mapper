@@ -48,9 +48,9 @@ def _read_schema(schema, schema_file=""):
                 "header"
             ].get("delimiter")
             schema["header"].pop("delimiter", None)
-            schema["sections"][properties.dummy_level]["header"][
-                "field_layout"
-            ] = schema["header"].get("field_layout")
+            schema["sections"][properties.dummy_level]["header"]["field_layout"] = (
+                schema["header"].get("field_layout")
+            )
             schema["header"].pop("field_layout", None)
             schema["sections"][properties.dummy_level]["header"]["format"] = schema[
                 "header"
@@ -74,14 +74,10 @@ def _read_schema(schema, schema_file=""):
             for element in schema["sections"][section]["elements"].keys():
                 if (
                     schema["sections"][section]["elements"][element].get("column_type")
-                    in properties.numpy_integers
+                    == "int"
                 ):
-                    np_integer = schema["sections"][section]["elements"][element].get(
-                        "column_type"
-                    )
-                    pd_integer = properties.pandas_nan_integers.get(np_integer)
                     schema["sections"][section]["elements"][element].update(
-                        {"column_type": pd_integer}
+                        {"column_type": "Int64"}
                     )
         return schema
     else:
