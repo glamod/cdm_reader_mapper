@@ -1,4 +1,5 @@
 """cdm_reader_mapper testing suite result files."""
+
 from __future__ import annotations
 
 import pytest  # noqa
