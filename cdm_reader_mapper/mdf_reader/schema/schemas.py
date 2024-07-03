@@ -46,7 +46,7 @@ def _read_schema(schema, schema_file=""):
             logging.error(
                 f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema_file}"
             )
-            return        
+            return
         schema["header"] = dict()
 
     if schema["header"].get("multiple_reports_per_line"):
