@@ -102,10 +102,12 @@ def _read_schema(schema, schema_file=""):
             column_type = schema["sections"][section]["elements"][element].get(
                 "column_type"
             )
-            schema["sections"][section]["elements"][element]["column_type"] = convert_dtype_to_default(
-                column_type,
-                section,
-                element,
+            schema["sections"][section]["elements"][element]["column_type"] = (
+                convert_dtype_to_default(
+                    column_type,
+                    section,
+                    element,
+                )
             )
     return schema
 
