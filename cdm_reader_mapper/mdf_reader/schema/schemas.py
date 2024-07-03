@@ -72,18 +72,24 @@ def _read_schema(schema, schema_file=""):
                     "delimited" if delimiter else "fixed_width"
                 )
             for element in schema["sections"][section]["elements"].keys():
-                if (
-                    schema["sections"][section]["elements"][element].get("column_type")
-                    == "int"
-                ):
-                    schema["sections"][section]["elements"][element].update(
-                        {"column_type": "Int64"}
-                    )
+                column_type = schema["sections"][section]["elements"][element].get("column_type")
+                if column_type is None:
+                    continue
+                elif column_type.lower() == "float":
+                    continue
+                elif column_type.lower() == "int":
+                    column_type = properties.pandas_int
+                elif "float" in column_type.lower():
+                    logging.warning(f"Set column type of ({section}, {element}) from deprecated {column_type} to float.")
+                    column_type = "float"
+                elif "int" in column_type.lower():
+                    logging.warning(f"Set column type of ({section}, {element}) from deprecated {column_type} to int.")
+                    column_type = properties.pandas_int
+                schema["sections"][section]["elements"][element]["column_type"] = column_type
         return schema
     else:
         logging.error("Multiple reports per line data model: not yet supported")
         return
-
 
 def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
     """
