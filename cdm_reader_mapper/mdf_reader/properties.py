@@ -46,6 +46,8 @@ for dtype in object_types:
 pandas_dtypes.update({x: x for x in numeric_types})
 pandas_dtypes["datetime"] = "datetime"
 
+pandas_int = "Int64"
+
 # ....and how they are managed
 data_type_conversion_args = {}
 for dtype in numeric_types:
