@@ -128,14 +128,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = [
-  "--verbose",
-  "--color=yes",
-  "--numprocesses=0",
-  "--maxprocesses=8",
-  "--dist=worksteal"
-]
-norecursedirs = ["docs/notebooks/*", "example_notebooks/*"]
+norecursedirs = ["docs/example_notebooks/*", "example_notebooks/*"]
 filterwarnings = ["ignore::UserWarning"]
 testpaths = "tests tests"
 usefixtures = "xdoctest_namespace"

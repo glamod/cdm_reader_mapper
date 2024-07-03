@@ -44,10 +44,10 @@ def _evaluate_columns(columns):
     columns_ = []
     for col in columns:
         try:
-            col = eval(col)
+            col_ = ast.literal_eval(col)
         except NameError:
-            pass
-        columns_.append(col)
+            col_ = col
+        columns_.append(col_)
     return columns_
 
 
@@ -60,7 +60,6 @@ def _read_result_data(data_file, columns, **kwargs):
         skiprows=1,
         **kwargs,
     )
-    df = data_[columns]
     return data_[columns]
 
 
