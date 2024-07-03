@@ -127,17 +127,9 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
-norecursedirs = ["docs/example_notebooks/*", "example_notebooks/*"]
-filterwarnings = ["ignore::UserWarning"]
-testpaths = "tests tests"
-usefixtures = "xdoctest_namespace"
-doctest_optionflags = ["NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL", "NUMBER", "ELLIPSIS"]
-markers = [
-  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-  "requires_docs: mark tests that can only be run with documentation present (deselect with '-m \"not requires_docs\"')",
-  "requires_internet: mark tests that require internet access (deselect with '-m \"not requires_internet\"')"
-]
+[tool.pytest]
+python_files = "test_*.py"
+testpaths = ["./tests"]
 
 [tool.ruff]
 src = ["xclim"]
