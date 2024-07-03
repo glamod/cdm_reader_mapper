@@ -58,7 +58,6 @@ data_type_conversion_args["key"] = ["disable_white_strip"]
 data_type_conversion_args["datetime"] = ["datetime_format"]
 
 # Misc ------------------------------------------------------------------------
-tol = 1e-10
 dummy_level = "_SECTION_"
 # Length of reports in initial read
 MAX_FULL_REPORT_WIDTH = 100000
