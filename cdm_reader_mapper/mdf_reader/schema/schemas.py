@@ -42,13 +42,12 @@ def convert_dtype_to_default(dtype, section, element):
 def _read_schema(schema, schema_file=""):
     """DOCUMENTATION."""
     if not schema["header"]:
+        if not schema["sections"]:
+            logging.error(
+                f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema_file}"
+            )
+            return        
         schema["header"] = dict()
-
-    if not schema["sections"]:
-        logging.error(
-            f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema_file}"
-        )
-        return
 
     if schema["header"].get("multiple_reports_per_line"):
         logging.error("Multiple reports per line data model: not yet supported")
