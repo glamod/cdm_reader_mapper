@@ -47,8 +47,6 @@ def _evaluate_columns(columns):
         print(col)
         try:
             columns_.append(ast.literal_eval(col))
-        except NameError:
-            columns_.append(col)
         except ValueError:
             columns_.append(col)
     return columns_
