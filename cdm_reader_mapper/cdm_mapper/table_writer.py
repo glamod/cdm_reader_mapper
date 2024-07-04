@@ -22,6 +22,7 @@ of the imodel, the number of decimal places used comes from a default tool defin
 
 from __future__ import annotations
 
+import ast
 import os
 
 import numpy as np
@@ -187,7 +188,7 @@ def print_integer_array_i(row, null_label=None):
     -------
     data: int
     """
-    row = row if not isinstance(row, str) else eval(row)
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
     row = row if isinstance(row, list) else [row]
     str_row = [str(int(x)) for x in row if np.isfinite(x)]
     string = ",".join(filter(bool, str_row))
@@ -195,7 +196,7 @@ def print_integer_array_i(row, null_label=None):
         return "{" + string + "}"
     return null_label
 
-
+  
 def print_varchar_array_i(row, null_label=None):
     """
     NEED DOCUMENTATION.
@@ -209,7 +210,7 @@ def print_varchar_array_i(row, null_label=None):
     -------
     data: varchar
     """
-    row = row if not isinstance(row, str) else eval(row)
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
     row = row if isinstance(row, list) else [row]
     str_row = [str(x) for x in row if np.isfinite(x)]
     string = ",".join(filter(bool, str_row))
@@ -217,7 +218,7 @@ def print_varchar_array_i(row, null_label=None):
         return "{" + string + "}"
     return null_label
 
-
+  
 def table_to_ascii(
     table,
     table_atts,

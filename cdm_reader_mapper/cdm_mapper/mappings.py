@@ -168,7 +168,7 @@ class mapping_functions:
         self.atts = atts
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_HM(self, ds):
+    def datetime_decimalhour_to_hm(self, ds):
         """Convert dateimt object to hours and minutes."""
         timedelta = datetime.timedelta(hours=ds)
         seconds = timedelta.total_seconds()
@@ -179,7 +179,7 @@ class mapping_functions:
     def datetime_imma1(self, df):  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
-        hours, minutes = np.vectorize(self.datetime_decimalhour_to_HM)(
+        hours, minutes = np.vectorize(self.datetime_decimalhour_to_hm)(
             df.iloc[:, -1].values
         )
         df = df.drop(df.columns[len(df.columns) - 1], axis=1)

@@ -154,7 +154,7 @@ def _write_csv_files(
             try:
                 to_map = to_map.to_frame()
             except Exception:
-                pass
+                logger.warning(f"Could not convert {to_map} to frame.")
 
             to_map_str = to_map.astype(str)
 

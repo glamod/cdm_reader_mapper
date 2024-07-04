@@ -13,7 +13,7 @@ import re
 from .. import properties
 
 
-def isNum(X):
+def is_num(X):
     """DOCUMENTATION."""
     try:
         a = X.isnumeric()
@@ -54,7 +54,7 @@ def deck_792_imma1(data):
     try:
         data.loc[data[pt_col][loc], pt_col] = buoys
     except KeyError:
-        pass
+        print("Data stays untouched.")
 
     return data
 

@@ -242,7 +242,7 @@ class MDFFileReader(_FileReader):
             chunksize=chunksize,
         )
 
-        ## 2.3. Extract, read and validate data in same loop
+        # 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
         if convert or decode:

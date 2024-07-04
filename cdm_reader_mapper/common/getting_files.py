@@ -20,7 +20,7 @@ _default_cache_dir_ = Path(user_cache_dir("cdm-testdata", ".cache"))
 
 
 def _file_md5_checksum(f_name):
-    hash_md5 = hashlib.md5()  # nosec
+    hash_md5 = hashlib.md5()  # noqa: S324
     with open(f_name, "rb") as f:
         hash_md5.update(f.read())
     return hash_md5.hexdigest()
@@ -31,7 +31,7 @@ def _get_remote_file(lfile, url, name):
     lfile.parent.mkdir(exist_ok=True, parents=True)
     msg = f"Attempting to fetch remote file: {name.as_posix()}"
     logging.info(msg)
-    return urlretrieve(url, lfile)
+    return urlretrieve(url, lfile)  # noqa: S310
 
 
 def _check_md5s(f, md5, mode="error"):
