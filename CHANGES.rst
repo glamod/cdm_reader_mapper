@@ -18,7 +18,7 @@ Breaking changes
 * ``cdm_mapper``: read header column ``location_quality`` from ``(c1, LZ)`` and set fill_value to ``0`` (:issue:`36`, :pull:`37`)
 * ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
 * reading C-RAID data: set decimal places according to input file data precision (:pull:`60`)
-* always convert data types of both ``int`` and ``float`` in schemas into default data types (:issue:`59`, :pull:`60`) 
+* always convert data types of both ``int`` and ``float`` in schemas into default data types (:issue:`59`, :pull:`60`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
