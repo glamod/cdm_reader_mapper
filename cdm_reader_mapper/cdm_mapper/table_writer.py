@@ -196,7 +196,7 @@ def print_integer_array_i(row, null_label=None):
         return "{" + string + "}"
     return null_label
 
-  
+
 def print_varchar_array_i(row, null_label=None):
     """
     NEED DOCUMENTATION.
@@ -218,7 +218,7 @@ def print_varchar_array_i(row, null_label=None):
         return "{" + string + "}"
     return null_label
 
-  
+
 def table_to_ascii(
     table,
     table_atts,
