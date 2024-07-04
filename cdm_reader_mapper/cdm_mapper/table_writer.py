@@ -208,7 +208,7 @@ def print_varchar_array_i(row, null_label=None):
     -------
     data: varchar
     """
-    row = eval(row)
+    row = ast.literal_eval(row)
     row = row if isinstance(row, list) else [row]
     string = ",".join(filter(bool, row))
     if len(string) > 0:
