@@ -12,6 +12,8 @@ for the input data model.
 
 from __future__ import annotations
 
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
@@ -147,7 +149,7 @@ def _write_csv_files(
             try:
                 to_map = to_map.to_frame()
             except Exception:
-                pass
+                logger.warning(f"Could not convert {to_map} to frame.")
 
             to_map_str = to_map.astype(str)
 

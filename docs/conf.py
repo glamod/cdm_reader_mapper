@@ -15,7 +15,6 @@ from __future__ import annotations
 import os
 import sys
 import warnings
-from subprocess import call
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -238,9 +237,6 @@ htmlhelp_basename = "cdm-reader-mapperdoc"
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
-
-# list conda packages
-call("conda list", shell=True)
 
 # disable warnings
 warnings.filterwarnings("ignore")

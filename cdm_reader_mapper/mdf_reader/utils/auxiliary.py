@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import logging
 import os
@@ -164,7 +165,7 @@ class Configurator:
         else:
             ignore = True
         if isinstance(ignore, str):
-            ignore = eval(ignore)
+            ignore = ast.literal_eval(ignore)
         return ignore
 
     def _get_borders(self, i, j):

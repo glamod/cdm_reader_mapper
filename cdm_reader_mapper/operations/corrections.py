@@ -40,7 +40,7 @@ def gen_files(data, dataset, correction_path, yr, mo):
             "LAT": data[("core", "LAT")],
         }
     )
-    df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
+    df["UID"] = df["UID"].apply(lambda x: f"{prepend + x}")
     hours = np.round(data[("core", "HR")], decimals=0).astype("Int64")
     minutes = np.round(60 * np.fmod(data[("core", "HR")], 1)).astype("Int64")
     df["TM"] = pd.to_datetime(
@@ -273,7 +273,7 @@ def get_dup(data, dataset):
             "HR": data[("core", "HR")],
         }
     )
-    df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
+    df["UID"] = df["UID"].apply(lambda x: f"{prepend + x}")
     # round lon, lat to one digit
     df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float).round(1)
     # convert longitdute to -180-180
