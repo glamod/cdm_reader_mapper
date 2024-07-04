@@ -44,11 +44,13 @@ def _pandas_read_csv(
 def _evaluate_columns(columns):
     columns_ = []
     for col in columns:
+        print(col)
         try:
-            col_ = ast.literal_eval(col)
+            columns_.append(ast.literal_eval(col))
         except NameError:
-            col_ = col
-        columns_.append(col_)
+            colums_.append(col)
+        except ValueError:
+            columns_.append(col)
     return columns_
 
 
