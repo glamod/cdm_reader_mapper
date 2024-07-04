@@ -53,11 +53,11 @@ def signed_overpunch_i(x):
         try:
             print(f"number base conversion: {n}")
         except Exception:
-            pass
+            print("number base conversion not defined")
         try:
             print(f"factor conversion: {f}")
         except Exception:
-            pass
+            print("factor conversion not defined")
         return np.nan
 
 

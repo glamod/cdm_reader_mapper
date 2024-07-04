@@ -1,4 +1,5 @@
 """Cliamte Data Model (CDM) mapper package."""
+
 from __future__ import annotations
 
 from .mapper import map_model  # noqa

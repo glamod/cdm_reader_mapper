@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pandas as pd
 import pytest  # noqa
 
 from cdm_reader_mapper.operations import corrections, inspect, replace, select

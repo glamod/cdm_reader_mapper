@@ -23,7 +23,7 @@ from .. import properties
 
 
 # ---------------- General purpose functions ----------------------------------
-def datetime_decimalhour_to_HM(ds):
+def datetime_decimalhour_to_hm(ds):
     """DOCUMENTATiON."""
     hours = int(math.floor(ds))
     minutes = int(math.floor(60.0 * math.fmod(ds, 1)))
@@ -44,7 +44,7 @@ def imma1(data, conversion):
         if empty:
             return dt_series
 
-        hours, minutes = np.vectorize(datetime_decimalhour_to_HM)(
+        hours, minutes = np.vectorize(datetime_decimalhour_to_hm)(
             dt_data.iloc[np.where(not_na)[0], -1].values
         )
         columns = dt_data.columns

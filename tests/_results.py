@@ -1,4 +1,5 @@
 """cdm_reader_mapper testing suite result files."""
+
 from __future__ import annotations
 
 import os
@@ -42,7 +43,7 @@ table_df.set_index("report_id", inplace=True, drop=False)
 
 
 class result_data:
-    "Expected results for cdm_reader_mapper testing suite"
+    """Expected results for cdm_reader_mapper testing suite"""
 
     def __init__(self):
         self.name = "CDM reader mapper result testing data."
