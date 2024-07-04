@@ -8,6 +8,12 @@
       "orcid": "0000-0002-7207-0003"
     },
     {
+      "name": "Siddons, Joseph",
+      "affiliation": "National Oceanography Centre, Southampton, United Kingdom"
+    }
+  ],
+  "contributors": [
+    {
       "name": "Andersson, Axel",
       "affiliation": "Deutscher Wetterdienst, Hamburg, Germany",
       "orcid": "0000-0002-6956-0298"
@@ -24,10 +30,6 @@
       "name": "Kent, Elizabeth",
       "affiliation": "National Oceanography Centre, Southampton, United Kingdom",
       "orcid": "0000-0002-6209-4247"
-    },
-    {
-      "name": "Siddons, Joseph",
-      "affiliation": "National Oceanography Centre, Southampton, United Kingdom"
     }
   ],
   "keywords": [
