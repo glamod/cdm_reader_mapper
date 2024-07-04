@@ -148,7 +148,7 @@ def get_nested(table, *args):
     for i, x in enumerate(z):
         nested_get_str += ".get(z[" + str(i) + "])"
     try:
-        return eval(nested_get_str)
+        return ast.literal_eval(nested_get_str)
     except Exception:
         return None
 
@@ -167,6 +167,6 @@ def table_value_from_keys(table, df):
                 ",df[" + str(x) + "].astype(str)"
             )  # have to do likewise in not DataFrame!!!
         calling_str += ")"
-        return eval(calling_str)
+        return ast.literal_eval(calling_str)
     else:
         return v_nested_get(table, df)

@@ -241,7 +241,7 @@ class MDFFileReader(_FileReader):
             open_with=properties.open_file.get(self.imodel, "pandas"),
             chunksize=chunksize,
         )
-        ## 2.3. Extract, read and validate data in same loop
+        # 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
         if convert or decode:

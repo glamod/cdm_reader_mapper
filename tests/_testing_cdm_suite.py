@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 
 import pandas as pd
@@ -43,11 +44,11 @@ def _pandas_read_csv(
 def _evaluate_columns(columns):
     columns_ = []
     for col in columns:
+        print(col)
         try:
-            col = eval(col)
-        except NameError:
-            pass
-        columns_.append(col)
+            columns_.append(ast.literal_eval(col))
+        except ValueError:
+            columns_.append(col)
     return columns_
 
 
@@ -60,7 +61,6 @@ def _read_result_data(data_file, columns, **kwargs):
         skiprows=1,
         **kwargs,
     )
-    df = data_[columns]
     return data_[columns]
 
 
