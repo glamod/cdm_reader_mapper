@@ -27,6 +27,7 @@ Internal changes
 * ``mdf_reader.auxiliary.utils``: rename variable for missing values to ``missing_values`` (:pull:`56`)
 * add ``pre-commit`` hooks: ``codespell``, ``pylint`` and ``vulture`` (:pull:`56`)
 * use ``pytest.parametrize`` for testing suite (:pull:`61`)
+* use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`) 
 
 Bug fixes
 ^^^^^^^^^
