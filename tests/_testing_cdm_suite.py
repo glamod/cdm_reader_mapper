@@ -44,7 +44,6 @@ def _pandas_read_csv(
 def _evaluate_columns(columns):
     columns_ = []
     for col in columns:
-        print(col)
         try:
             columns_.append(ast.literal_eval(col))
         except ValueError:
