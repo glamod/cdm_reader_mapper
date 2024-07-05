@@ -60,16 +60,6 @@ def _map_to_df(m, x):
         return
 
 
-def _mapping_type(elements, data_atts):
-    m_type = {}
-    for element in elements:
-        from_atts = properties.pandas_dtypes["from_atts"]
-        d_type = data_atts.get(element)
-        column_type = d_type.get("column_type")
-        m_type[element] = from_atts[column_type]
-    return m_type
-
-
 def _decimal_places(
     cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
 ):
@@ -122,10 +112,9 @@ def _write_csv_files(
                     )
                 )
                 continue
-            to_map_types = _mapping_type(elements, data_atts)
             notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
-            to_map = idata[elements].iloc[notna_idx_idx].astype(to_map_types)
+            to_map = idata[elements].iloc[notna_idx_idx]
             # notna_idx = notna_idx_idx + idata.index[0]  # to account for parsers #original
             notna_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
