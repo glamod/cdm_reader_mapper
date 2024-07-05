@@ -41,12 +41,12 @@
     "sections": "core",
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "latitude": {
     "sections": "core",
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "crs": {
     "default": 0
@@ -104,7 +104,7 @@
   "original_value": {
     "sections": "core",
     "elements": "SLP",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "conversion_method": {
     "default": 7

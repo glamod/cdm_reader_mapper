@@ -61,7 +61,6 @@
           "valid_max": 23.99,
           "valid_min": 0.0,
           "scale": 0.01,
-          "decimal_places": 2,
           "units": "hour"
         },
         "LAT": {
@@ -71,7 +70,6 @@
           "valid_max": 90.0,
           "valid_min": -90.0,
           "scale": 0.01,
-          "decimal_places": 2,
           "units": "degrees"
         },
         "LON": {
@@ -81,7 +79,6 @@
           "valid_max": 359.99,
           "valid_min": 0.0,
           "scale": 0.01,
-          "decimal_places": 2,
           "units": "degrees"
         },
         "IM": {
@@ -171,7 +168,6 @@
           "valid_max": 99.9,
           "valid_min": 0.0,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "metres per second"
         },
         "VI": {
@@ -205,7 +201,6 @@
           "valid_max": 1074.6,
           "valid_min": 870.0,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "hectopascal"
         },
         "A": {
@@ -237,7 +232,6 @@
           "valid_max": 99.9,
           "valid_min": -99.9,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "degree Celsius"
         },
         "WBTI": {
@@ -253,7 +247,6 @@
           "valid_max": 99.9,
           "valid_min": -99.9,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "degree Celsius"
         },
         "DPTI": {
@@ -269,7 +262,6 @@
           "valid_max": 99.9,
           "valid_min": -99.9,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "degree Celsius"
         },
         "SI": {
@@ -285,7 +277,6 @@
           "valid_max": 99.9,
           "valid_min": -99.9,
           "scale": 0.1,
-          "decimal_places": 1,
           "units": "degree Celsius"
         },
         "N": {

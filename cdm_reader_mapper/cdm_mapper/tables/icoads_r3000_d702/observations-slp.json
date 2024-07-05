@@ -41,12 +41,12 @@
     "sections": "core",
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "latitude": {
     "sections": "core",
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "crs": {
     "default": 0
@@ -64,7 +64,7 @@
     "kwargs": {
       "factor": 100
     },
-    "decimal_places": "decimal_places_pressure_pascal"
+    "decimal_places": 1
   },
   "value_significance": {
     "default": 2

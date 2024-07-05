@@ -45,11 +45,11 @@
   "longitude": {
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "latitude": {
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "location_accuracy": {},
   "location_method": {},

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for f in $(ls)
+do
+    sed -i "s/int/int/g" $f
+done

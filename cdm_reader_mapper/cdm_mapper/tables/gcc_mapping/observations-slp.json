@@ -45,11 +45,11 @@
   "longitude": {
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "latitude": {
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "crs": {
     "default": 0
@@ -109,7 +109,7 @@
   "original_code_table": {},
   "original_value": {
     "elements": "PPPP",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "conversion_method": {
     "default": 7

@@ -56,7 +56,6 @@
       "valid_max": 90.0,
       "valid_min": -90.0,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degrees"
     },
     "LON": {
@@ -66,7 +65,6 @@
       "valid_max": 359.99,
       "valid_min": 0.0,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degrees"
     },
     "HI": {
@@ -111,7 +109,6 @@
       "column_type": "float32",
       "valid_max": 99.9,
       "valid_min": 0.0,
-      "decimal_places": 1,
       "units": "knots or meters per second"
     },
     "SN": {
@@ -127,7 +124,6 @@
       "valid_max": 99.9,
       "valid_min": -99.9,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degree Celsius"
     },
     "ST": {
@@ -143,7 +139,6 @@
       "valid_max": 99.9,
       "valid_min": -99.9,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degree Celsius"
     },
     "SS": {
@@ -158,7 +153,6 @@
       "valid_max": 100.0,
       "valid_min": 0.0,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "hectopascal"
     },
     "WW": {
@@ -216,7 +210,6 @@
       "valid_max": 99.9,
       "valid_min": -99.9,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degree Celsius"
     },
     "SSTI": {
@@ -364,7 +357,6 @@
       "valid_max": 99.9,
       "valid_min": -99.9,
       "scale": 0.1,
-      "decimal_places": 1,
       "units": "degree Celsius"
     },
     "A": {
