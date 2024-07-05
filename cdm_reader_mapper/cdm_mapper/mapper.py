@@ -70,9 +70,7 @@ def _mapping_type(elements, data_atts):
     return m_type
 
 
-def _decimal_places(
-    cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
-):
+def _decimal_places(cdm_tables, decimal_places, cdm_key, table, imodel_functions):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
             cdm_tables[table]["atts"][cdm_key].update(
@@ -80,7 +78,7 @@ def _decimal_places(
             )
         else:
             cdm_tables[table]["atts"][cdm_key].update(
-                {"decimal_places": getattr(imodel_functions, decimal_places)(elements)}
+                {"decimal_places": getattr(imodel_functions, decimal_places)()}
             )
     return cdm_tables
 
@@ -175,7 +173,11 @@ def _write_csv_files(
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
         cdm_tables = _decimal_places(
-            cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
+            cdm_tables,
+            decimal_places,
+            cdm_key,
+            table,
+            imodel_functions,
         )
 
     # think that NaN also casts floats to float64....!keep floats of lower precision to its original one
@@ -249,13 +251,14 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     tables_imodel = tables_hdlr()
     # Get imodel mapping pack
     # Read mappings to CDM from imodel
+    # try:
     try:
         # Read mappings to CDM from imodel
         imodel_maps = tables_imodel.load_tables_maps(imodel, cdm_subset=cdm_subset)
         if len(imodel_maps) < 1:
             logger.error(f"No mapping codes found for model {imodel}")
             return
-        imodel_functions = mapping_functions(imodel, data_atts)
+        imodel_functions = mapping_functions(imodel)
         imodel_code_tables = codes_imodel.load_code_tables_maps(
             codes_subset=codes_subset
         )
