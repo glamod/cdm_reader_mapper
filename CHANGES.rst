@@ -28,6 +28,7 @@ Internal changes
 * add ``pre-commit`` hooks: ``codespell``, ``pylint`` and ``vulture`` (:pull:`56`)
 * use ``pytest.parametrize`` for testing suite (:pull:`61`)
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
+* remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
 
 Bug fixes
 ^^^^^^^^^
