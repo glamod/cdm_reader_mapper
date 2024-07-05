@@ -69,7 +69,7 @@
       "WBT"
     ],
     "transform": "temperature_celsius_to_kelvin",
-    "decimal_places": "decimal_places_temperature_kelvin"
+    "decimal_places": 2
   },
   "value_significance": {
     "default": 12

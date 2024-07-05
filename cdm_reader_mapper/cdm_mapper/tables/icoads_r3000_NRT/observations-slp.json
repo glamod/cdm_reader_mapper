@@ -64,7 +64,7 @@
     "kwargs": {
       "factor": 100
     },
-    "decimal_places": "decimal_places_pressure_pascal"
+    "decimal_places": 0
   },
   "value_significance": {
     "default": 2

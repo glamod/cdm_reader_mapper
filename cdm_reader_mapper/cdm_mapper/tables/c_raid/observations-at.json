@@ -52,12 +52,12 @@
     "sections": "drifter_measurements",
     "elements": "LONGITUDE",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": "default_decimal_places"
   },
   "latitude": {
     "sections": "drifter_measurements",
     "elements": "LATITUDE",
-    "decimal_places": "decimal_places"
+    "decimal_places": "default_decimal_places"
   },
   "crs": {
     "default": 0
@@ -76,7 +76,7 @@
     "sections": "drifter_measurements",
     "elements": "AIR_TEMP_ADJUSTED",
     "transform": "temperature_celsius_to_kelvin",
-    "decimal_places": "decimal_places_temperature_kelvin"
+    "decimal_places": 2
   },
   "value_significance": {
     "default": 2

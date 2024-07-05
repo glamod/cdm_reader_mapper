@@ -76,7 +76,7 @@
     "kwargs": {
       "factor": 100
     },
-    "decimal_places": 1
+    "decimal_places": 0
   },
   "value_significance": {
     "default": 2
