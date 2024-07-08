@@ -61,7 +61,11 @@ def _map_to_df(m, x):
 
 
 def _decimal_places(
-    cdm_tables, decimal_places, cdm_key, table, imodel_functions,
+    cdm_tables,
+    decimal_places,
+    cdm_key,
+    table,
+    imodel_functions,
 ):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
