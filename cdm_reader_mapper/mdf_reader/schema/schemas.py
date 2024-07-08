@@ -18,6 +18,27 @@ from cdm_reader_mapper.common.getting_files import get_files
 from .. import properties
 
 
+def convert_dtype_to_default(dtype, section, element):
+    """Convert data type to defaults (int, float)."""
+    if dtype is None:
+        return
+    elif dtype == "float":
+        return dtype
+    elif dtype == "int":
+        return properties.pandas_int
+    elif "float" in dtype.lower():
+        logging.warning(
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to float."
+        )
+        return "float"
+    elif "int" in dtype.lower():
+        logging.warning(
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to int."
+        )
+        return properties.pandas_int
+    return dtype
+
+
 def _read_schema(schema, schema_file=""):
     """DOCUMENTATION."""
     if not schema["header"]:
@@ -28,65 +49,66 @@ def _read_schema(schema, schema_file=""):
             return
         schema["header"] = dict()
 
-    if not schema["header"].get("multiple_reports_per_line"):
-        # 3.2. Make no section formats be internally treated as 1 section format
-        if not schema.get("sections"):
-            if not schema.get("elements"):
-                logging.error(
-                    f"Data elements not defined in data model schema file {schema_file} under key 'elements' "
-                )
-                return
-            schema["sections"] = {
-                properties.dummy_level: {
-                    "header": {},
-                    "elements": schema.get("elements"),
-                }
-            }
-            schema["header"]["parsing_order"] = [{"s": [properties.dummy_level]}]
-            schema.pop("elements", None)
-            schema["sections"][properties.dummy_level]["header"]["delimiter"] = schema[
-                "header"
-            ].get("delimiter")
-            schema["header"].pop("delimiter", None)
-            schema["sections"][properties.dummy_level]["header"]["field_layout"] = (
-                schema["header"].get("field_layout")
-            )
-            schema["header"].pop("field_layout", None)
-            schema["sections"][properties.dummy_level]["header"]["format"] = schema[
-                "header"
-            ].get("format")
-            schema["header"].pop("format", None)
-        # 3.3. Make parsing order explicit
-        if not schema["header"].get("parsing_order"):  # assume sequential
-            schema["header"]["parsing_order"] = [{"s": list(schema["sections"].keys())}]
-        # 3.4. Make disable_read and field_layout explicit: this is ruled by delimiter being set,
-        # unless explicitly set
-        for section in schema["sections"].keys():
-            if schema["sections"][section]["header"].get("disable_read"):
-                continue
-            else:
-                schema["sections"][section]["header"]["disable_read"] = False
-            if not schema["sections"][section]["header"].get("field_layout"):
-                delimiter = schema["sections"][section]["header"].get("delimiter")
-                schema["sections"][section]["header"]["field_layout"] = (
-                    "delimited" if delimiter else "fixed_width"
-                )
-            for element in schema["sections"][section]["elements"].keys():
-                if (
-                    schema["sections"][section]["elements"][element].get("column_type")
-                    in properties.numpy_integers
-                ):
-                    np_integer = schema["sections"][section]["elements"][element].get(
-                        "column_type"
-                    )
-                    pd_integer = properties.pandas_nan_integers.get(np_integer)
-                    schema["sections"][section]["elements"][element].update(
-                        {"column_type": pd_integer}
-                    )
-        return schema
-    else:
+    if schema["header"].get("multiple_reports_per_line"):
         logging.error("Multiple reports per line data model: not yet supported")
         return
+
+    # 3.2. Make no section formats be internally treated as 1 section format
+    if not schema.get("sections"):
+        if not schema.get("elements"):
+            logging.error(
+                f"Data elements not defined in data model schema file {schema_file} under key 'elements' "
+            )
+            return
+        schema["sections"] = {
+            properties.dummy_level: {
+                "header": {},
+                "elements": schema.get("elements"),
+            }
+        }
+        schema["header"]["parsing_order"] = [{"s": [properties.dummy_level]}]
+        schema.pop("elements", None)
+        schema["sections"][properties.dummy_level]["header"]["delimiter"] = schema[
+            "header"
+        ].get("delimiter")
+        schema["header"].pop("delimiter", None)
+        schema["sections"][properties.dummy_level]["header"]["field_layout"] = schema[
+            "header"
+        ].get("field_layout")
+        schema["header"].pop("field_layout", None)
+        schema["sections"][properties.dummy_level]["header"]["format"] = schema[
+            "header"
+        ].get("format")
+        schema["header"].pop("format", None)
+
+    # 3.3. Make parsing order explicit
+    if not schema["header"].get("parsing_order"):  # assume sequential
+        schema["header"]["parsing_order"] = [{"s": list(schema["sections"].keys())}]
+
+    # 3.4. Make disable_read and field_layout explicit: this is ruled by delimiter being set,
+    # unless explicitly set
+    for section in schema["sections"].keys():
+        if schema["sections"][section]["header"].get("disable_read"):
+            continue
+        else:
+            schema["sections"][section]["header"]["disable_read"] = False
+        if not schema["sections"][section]["header"].get("field_layout"):
+            delimiter = schema["sections"][section]["header"].get("delimiter")
+            schema["sections"][section]["header"]["field_layout"] = (
+                "delimited" if delimiter else "fixed_width"
+            )
+        for element in schema["sections"][section]["elements"].keys():
+            column_type = schema["sections"][section]["elements"][element].get(
+                "column_type"
+            )
+            schema["sections"][section]["elements"][element]["column_type"] = (
+                convert_dtype_to_default(
+                    column_type,
+                    section,
+                    element,
+                )
+            )
+    return schema
 
 
 def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
