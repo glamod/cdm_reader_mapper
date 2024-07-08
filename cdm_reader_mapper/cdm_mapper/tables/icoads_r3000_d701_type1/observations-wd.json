@@ -62,9 +62,6 @@
     "sections": "core",
     "elements": "D",
     "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
     "decimal_places": 0
   },
   "value_significance": {
@@ -106,9 +103,6 @@
     "sections": "core",
     "elements": "D",
     "transform": "integer_to_float",
-    "kwargs": {
-      "float_type": "float16"
-    },
     "decimal_places": 0
   },
   "processing_level": {

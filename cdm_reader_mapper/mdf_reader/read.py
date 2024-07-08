@@ -165,6 +165,8 @@ class MDFFileReader(_FileReader):
         )
 
         # 2.3. Extract, read and validate data in same loop
+        logging.info("Extracting and reading sections")
+        # 2.3. Extract, read and validate data in same loop
         if convert or decode:
             self.convert_and_decode_entries(
                 convert=convert,
