@@ -188,16 +188,13 @@ def print_integer_array_i(row, null_label=None):
     -------
     data: int
     """
-    if row == row:
-        row = ast.literal_eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, [str(int(x)) for x in row if np.isfinite(x)]))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
-    else:
-        return null_label
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(int(x)) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
 
 
 def print_varchar_array_i(row, null_label=None):
@@ -213,16 +210,13 @@ def print_varchar_array_i(row, null_label=None):
     -------
     data: varchar
     """
-    if row == row:
-        row = ast.literal_eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, row))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
-    else:
-        return null_label
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(x) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
 
 
 def table_to_ascii(

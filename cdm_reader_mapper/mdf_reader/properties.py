@@ -2,13 +2,7 @@
 
 from __future__ import annotations
 
-from ..properties import (  # noqa
-    numeric_types,
-    numpy_floats,
-    numpy_integers,
-    object_types,
-    pandas_nan_integers,
-)
+from ..properties import numeric_types, object_types  # noqa
 
 _base = "cdm_reader_mapper.mdf_reader"
 
@@ -52,6 +46,8 @@ for dtype in object_types:
 pandas_dtypes.update({x: x for x in numeric_types})
 pandas_dtypes["datetime"] = "datetime"
 
+pandas_int = "Int64"
+
 # ....and how they are managed
 data_type_conversion_args = {}
 for dtype in numeric_types:
@@ -62,7 +58,6 @@ data_type_conversion_args["key"] = ["disable_white_strip"]
 data_type_conversion_args["datetime"] = ["datetime_format"]
 
 # Misc ------------------------------------------------------------------------
-tol = 1e-10
 dummy_level = "_SECTION_"
 # Length of reports in initial read
 MAX_FULL_REPORT_WIDTH = 100000
