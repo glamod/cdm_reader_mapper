@@ -100,7 +100,7 @@
   "original_value": {
     "sections": "c99_data",
     "elements": "wind_speed",
-    "decimal_places": 2
+    "decimal_places": 1
   },
   "processing_level": {
     "default": 3
