@@ -7,7 +7,7 @@
     "RH": {
       "description": "Relative humidity",
       "field_length": 3,
-      "column_type": "int8",
+      "column_type": "int",
       "valid_max": 100,
       "valid_min": 0
     },
