@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 
 import pandas as pd
@@ -43,11 +44,11 @@ def _pandas_read_csv(
 def _evaluate_columns(columns):
     columns_ = []
     for col in columns:
+        print(col)
         try:
-            col = eval(col)
-        except NameError:
-            pass
-        columns_.append(col)
+            columns_.append(ast.literal_eval(col))
+        except ValueError:
+            columns_.append(col)
     return columns_
 
 
@@ -60,7 +61,6 @@ def _read_result_data(data_file, columns, **kwargs):
         skiprows=1,
         **kwargs,
     )
-    df = data_[columns]
     return data_[columns]
 
 
@@ -79,11 +79,11 @@ def _testing_suite(
     **kwargs,
 ):
     exp = "expected_" + suffix
-    splitted = suffix.split("_")
-    if len(splitted) > 1:
-        tb_id = splitted[0] + "-" + "_".join(splitted[1:])
+    split = suffix.split("_")
+    if len(split) > 1:
+        tb_id = split[0] + "-" + "_".join(split[1:])
     else:
-        tb_id = splitted[0]
+        tb_id = split[0]
 
     read_ = mdf_reader.read(
         source=source,
@@ -133,7 +133,7 @@ def _testing_suite(
         dck=deck,
     )
 
-    expected_data = result_data[exp]
+    expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return

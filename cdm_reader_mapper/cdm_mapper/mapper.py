@@ -10,6 +10,7 @@ for the input data model.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 from io import StringIO
@@ -59,16 +60,6 @@ def _map_to_df(m, x):
         return
 
 
-def _mapping_type(elements, data_atts):
-    m_type = {}
-    for element in elements:
-        from_atts = properties.pandas_dtypes["from_atts"]
-        d_type = data_atts.get(element)
-        column_type = d_type.get("column_type")
-        m_type[element] = from_atts[column_type]
-    return m_type
-
-
 def _decimal_places(
     cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
 ):
@@ -94,7 +85,6 @@ def _write_csv_files(
     imodel_functions,
     imodel_code_tables,
     cdm_tables,
-    out_dtypes,
 ):
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
@@ -122,10 +112,9 @@ def _write_csv_files(
                     )
                 )
                 continue
-            to_map_types = _mapping_type(elements, data_atts)
             notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
-            to_map = idata[elements].iloc[notna_idx_idx].astype(to_map_types)
+            to_map = idata[elements].iloc[notna_idx_idx]
             # notna_idx = notna_idx_idx + idata.index[0]  # to account for parsers #original
             notna_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
@@ -154,7 +143,7 @@ def _write_csv_files(
             try:
                 to_map = to_map.to_frame()
             except Exception:
-                pass
+                logger.warning(f"Could not convert {to_map} to frame.")
 
             to_map_str = to_map.astype(str)
 
@@ -177,26 +166,6 @@ def _write_csv_files(
             cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
         )
 
-    # think that NaN also casts floats to float64....!keep floats of lower precision to its original one
-    # will convert all NaN to object type!
-    # but also some numerics with values, like imma observation-value (temperatures),
-    # are being returned as objects!!! pero esto qué es?
-    out_dtypes[table].update(
-        {
-            i: table_df_i[i].dtype
-            for i in table_df_i
-            if table_df_i[i].dtype in properties.numpy_floats
-            and out_dtypes[table].get(i) not in properties.numpy_floats
-        }
-    )
-    out_dtypes[table].update(
-        {
-            i: table_df_i[i].dtype
-            for i in table_df_i
-            if table_df_i[i].dtype == "object"
-            and out_dtypes[table].get(i) not in properties.numpy_floats
-        }
-    )
     if "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
@@ -226,7 +195,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     cdm_subset: subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel. Type: list.
     codes_subset: subset of code mapping tables to map.
-        Defaults to tthe full set of code mapping tables. defined for the imodel. Type: list.
+        Defaults to the full set of code mapping tables. defined for the imodel. Type: list.
     log_level: level of logging information to save.
         Defaults to ‘DEBUG’. Type: string.
 
@@ -292,30 +261,14 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     cdm_tables = {
         k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
     }
-    # Create pandas data types for buffer reading from CDM table definition pseudo-sql dtypes
-    # Also keep track of datetime columns for reader to parse
-    date_columns = {x: [] for x in imodel_maps.keys()}
-    out_dtypes = {x: {} for x in imodel_maps.keys()}
-    for table in out_dtypes:
-        out_dtypes[table].update(
-            {
-                x: cdm_atts.get(table, {}).get(x, {}).get("data_type")
-                for x in imodel_maps[table].keys()
-            }
-        )
-        date_columns[table].extend(
-            [
-                i
-                for i, x in enumerate(list(out_dtypes[table].keys()))
-                if "timestamp" in out_dtypes[table].get(x)
-            ]
-        )
-        out_dtypes[table].update(
-            {
-                k: properties.pandas_dtypes.get("from_sql").get(v, "object")
-                for k, v in out_dtypes[table].items()
-            }
-        )
+    date_columns = {}
+    for table, values in imodel_maps.items():
+        date_columns[table] = [
+            i
+            for i, x in enumerate(list(values))
+            if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
+        ]
+
     # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
@@ -330,22 +283,17 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 imodel_functions,
                 imodel_code_tables,
                 cdm_tables,
-                out_dtypes,
             )
 
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
         logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Colums: {date_columns[table]}"
-        )
-        logger.debug(
-            f"\tParse datetime by reader; out_dtype-keys: {out_dtypes[table].keys()}; out dtypes: {out_dtypes[table]}"
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
         )
         cdm_tables[table]["buffer"].seek(0)
         cdm_tables[table]["data"] = pd.read_csv(
             cdm_tables[table]["buffer"],
-            names=out_dtypes[table].keys(),
-            dtype=out_dtypes[table],
+            names=imodel_maps[table].keys(),
             parse_dates=date_columns[table],
         )
         cdm_tables[table]["buffer"].close()
@@ -394,7 +342,7 @@ def map_model(
         return
 
     # Check input data type and content (empty?)
-    # Make sure data is an iterable: this is to homogeneize how we handle
+    # Make sure data is an iterable: this is to homogenize how we handle
     # dataframes and textreaders
     if isinstance(data, pd.DataFrame):
         logger.debug("Input data is a pd.DataFrame")

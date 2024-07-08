@@ -13,8 +13,8 @@ class df_converters:
 
     def __init__(self, dtype):
         self.dtype = dtype
-        self.numeric_scale = 1.0 if self.dtype in properties.numpy_floats else 1
-        self.numeric_offset = 0.0 if self.dtype in properties.numpy_floats else 0
+        self.numeric_scale = 1.0 if self.dtype == "float" else 1
+        self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
@@ -61,7 +61,7 @@ class df_converters:
         scale : numeric, optional
             Scale to apply after conversion to numeric
         offset : numeric, optional
-            Offset to apply after converion to numeric
+            Offset to apply after conversion to numeric
 
         Returns
         -------

@@ -27,7 +27,7 @@ def dck_201_imma1(data):
     if len(data.loc[loc]) > 0:
         datetime_ = model_datetimes.to_datetime(data, "imma1")
         datetime_[loc] = datetime_[loc] + pd.DateOffset(days=-1)
-        data[datetime_cols] = model_datetimes.from_datetime(datetime_)
+        data[datetime_cols] = model_datetimes.from_datetime(datetime_, "imma1")
         return data
     else:
         return data
