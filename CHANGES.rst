@@ -31,7 +31,6 @@ Internal changes
 * use ``pytest.parametrize`` for testing suite (:pull:`61`)
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
-* ``cdm_mapper.mapper``: do not write data into a ``StringIO`` buffer and read it back before writing tables on disk (:pull:`60`)
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 
 Bug fixes
