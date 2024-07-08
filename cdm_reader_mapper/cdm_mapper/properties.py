@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, numpy_floats, object_types  # noqa
+from ..properties import numeric_types, object_types  # noqa
 
 _base = "cdm_reader_mapper.cdm_mapper"
 
@@ -34,16 +34,11 @@ cdm_tables = [
     "observations-slp",
 ]
 
-pandas_dtypes = {}
-pandas_dtypes["from_atts"] = {}
-for dtype in object_types:
-    pandas_dtypes["from_atts"][dtype] = "object"
-pandas_dtypes["from_atts"].update({x: x for x in numeric_types})
-
 # ...from CDM table definitions psuedo-sql(...) --------------------------------
+pandas_dtypes = {}
 pandas_dtypes["from_sql"] = {}
 pandas_dtypes["from_sql"]["timestamp with timezone"] = "object"
-pandas_dtypes["from_sql"]["numeric"] = "float64"
+pandas_dtypes["from_sql"]["numeric"] = "float"
 pandas_dtypes["from_sql"]["int"] = "int"
 
 # Some defaults ---------------------------------------------------------------
