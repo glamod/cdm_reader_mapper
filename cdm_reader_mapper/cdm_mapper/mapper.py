@@ -59,6 +59,7 @@ def _map_to_df(m, x):
                 return v
         return
 
+
 def _decimal_places(
     cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
 ):
