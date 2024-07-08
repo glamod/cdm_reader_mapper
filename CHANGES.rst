@@ -17,6 +17,8 @@ Breaking changes
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
 * ``cdm_mapper``: read header column ``location_quality`` from ``(c1, LZ)`` and set fill_value to ``0`` (:issue:`36`, :pull:`37`)
 * ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
+* reading C-RAID data: set decimal places according to input file data precision (:pull:`60`)
+* always convert data types of both ``int`` and ``float`` in schemas into default data types (:issue:`59`, :pull:`60`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -24,12 +26,21 @@ Internal changes
 * make use of ``cdm-testdata`` release ``v2024.06.07`` https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07 (:issue:`44`, :pull:`45`)
 * migration to ``setup-micromamba``: https://github.com/mamba-org/provision-with-micromamba#migration-to-setup-micromamba (:pull:`48`)
 * update actions to use Node.js 20: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions (:pull:`48`)
+* ``mdf_reader.auxiliary.utils``: rename variable for missing values to ``missing_values`` (:pull:`56`)
+* add ``pre-commit`` hooks: ``codespell``, ``pylint`` and ``vulture`` (:pull:`56`)
+* use ``pytest.parametrize`` for testing suite (:pull:`61`)
+* use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
+* remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
+* ``cdm_mapper.mapper``: do not write data into a ``StringIO`` buffer and read it back before writing tables on disk (:pull:`60`)
+* ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 
 Bug fixes
 ^^^^^^^^^
 * indexing working with user-given chunksize (:pull:`35`)
 * fix reading of custom schema in ``mdf_reader.read`` (:pull:`40`)
 * ensure ``format`` schema field for delimited files is passed correctly, avoiding ``"...Please specify either format or field_layout in your header schema..."`` error (:pull:`40`)
+* there is a loss of data precision due to data type conversion. Hence, use default data types of both ``int`` and ``float`` (:issue:`59`, :pull:`60`)
+* reading C-RAID data: adjust datetime formats to read dates into ``MDFFileReader`` (:pull:`60`)
 
 
 0.3.0 (2024-05-17)
@@ -46,14 +57,14 @@ New features and enhancements
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * adding tests for IMMT and C-Raid data (:issue:`26`, :pull:`24`, :pull:`28`)
-* ``cdm_mapper.map_model``: drop dulicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
+* ``cdm_mapper.map_model``: drop duplicated lines in pd.DataFrame before writing CDM table on disk (:pull:`28`)
 * add pyarrow (see: https://github.com/pandas-dev/pandas/issues/54466) to requirements
 * solving pyarrow-snappy issue (see: openforcefield/openff-nagl#106) (:issue:`33`, :pull:`28`, :pull:`34`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* do not diferentiate between tuple and single column names (:pull:`24`)
-* ``metmetpy``: Do not raise erros if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
+* do not differentiate between tuple and single column names (:pull:`24`)
+* ``metmetpy``: Do not raise errors if ``validate_datetime``, ``correct_datetime``, ``correct_pt`` and/or ``validate_id`` do not find any entries (:pull:`24`)
 * get rid of warnings (:issue:`9`, :pull:`27`)
 * adding python 3.12 to testing suite (:pull:`29`)
 * set time out for testing suite to 10 minutes (:pull:`29`)
@@ -85,7 +96,7 @@ Internal changes
 ^^^^^^^^^^^^^^^^
 * adding tests to cdm_reader_mapper testing suite (:issue:`12`, :pull:`2`, :pull:`20`, :pull:`22`)
 * adding testing result data (:pull:`4`)
-* use slugify insted of unidecde for licening reasons
+* use slugify instead of unidecde for licening reasons
 * remove pip install instruction (:pull:`2`)
 * ``HISTORY.rst`` has been renamed ``CHANGES.rst``, to follow `xclim`-like conventions (:pull:`7`).
 * speed up mapping functions with `swifter` (:pull:`4`)

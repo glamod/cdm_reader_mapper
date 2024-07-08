@@ -5,6 +5,7 @@ Created on Tue Jun 21 15:32:29 2022
 
 @author: sbiri
 """
+
 from __future__ import annotations
 
 import logging
@@ -42,7 +43,7 @@ def gen_files(data, dataset, correction_path, yr, mo):
             "LAT": data[("core", "LAT")],
         }
     )
-    df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
+    df["UID"] = df["UID"].apply(lambda x: f"{prepend + x}")
     hours = np.round(data[("core", "HR")], decimals=0).astype("Int64")
     minutes = np.round(60 * np.fmod(data[("core", "HR")], 1)).astype("Int64")
     df["TM"] = pd.to_datetime(
@@ -293,10 +294,10 @@ def get_dup(data, dataset):
             "HR": data[("core", "HR")],
         }
     )
-    df["UID"] = df["UID"].apply(lambda x: f"{prepend+x}")
+    df["UID"] = df["UID"].apply(lambda x: f"{prepend + x}")
     # round lon, lat to one digit
     df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float).round(1)
-    # convet longitdute to -180-180
+    # convert longitdute to -180-180
     df["LON"] = df["LON"].apply(convert_longitude)
     tol = pd.Series([2, 0, 0.05, 0.05, 0, 0])
     tol.index = ["UID", "ID", "LON", "LAT", "DY", "HR"]

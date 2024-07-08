@@ -5,7 +5,7 @@ Created on Tue Jun 25 09:00:19 2019
 
 Corrects the platform type field of data from a given data model. To account
 for dataframes stored in TextParsers and for eventual use of data columns other
-than those to be fixed (depedencies) in this or other metmetpy modules,
+than those to be fixed (dependencies) in this or other metmetpy modules,
 the input and output are the full data set.
 
 Correction to apply is data model and deck specific and is registered in
@@ -36,6 +36,7 @@ invocation) logging an error.
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import json

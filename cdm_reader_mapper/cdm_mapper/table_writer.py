@@ -22,6 +22,7 @@ of the imodel, the number of decimal places used comes from a default tool defin
 
 from __future__ import annotations
 
+import ast
 import os
 
 import numpy as np
@@ -147,7 +148,7 @@ def print_integer_array(data, null_label):
     return data.apply(print_integer_array_i, null_label=null_label)
 
 
-# TODO: tell this to dave and delete them... put error messages in fuctions above
+# TODO: tell this to dave and delete them... put error messages in functions above
 def print_float_array(data, null_label, decimal_places=None):
     """Print a series of float objects as array."""
     return "float array not defined in printers"
@@ -187,16 +188,13 @@ def print_integer_array_i(row, null_label=None):
     -------
     data: int
     """
-    if row == row:
-        row = eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, [str(int(x)) for x in row if np.isfinite(x)]))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
-    else:
-        return null_label
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(int(x)) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
 
 
 def print_varchar_array_i(row, null_label=None):
@@ -212,16 +210,13 @@ def print_varchar_array_i(row, null_label=None):
     -------
     data: varchar
     """
-    if row == row:
-        row = eval(row)
-        row = row if isinstance(row, list) else [row]
-        string = ",".join(filter(bool, row))
-        if len(string) > 0:
-            return "{" + string + "}"
-        else:
-            return null_label
-    else:
-        return null_label
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(x) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
 
 
 def table_to_ascii(
@@ -231,7 +226,6 @@ def table_to_ascii(
     null_label="null",
     cdm_complete=True,
     filename=None,
-    full_table=True,
     log_level="INFO",
 ):
     """
@@ -256,8 +250,6 @@ def table_to_ascii(
         default is ``True``
     filename:
         the name of the file to stored the data
-    full_table:
-        if we export a single table
     log_level:
         level of logging information to be saved
 

@@ -1,4 +1,5 @@
 """Common Data Model (CDM) reader and mapper package."""
+
 from __future__ import annotations
 
 from . import cdm_mapper  # noqa
@@ -11,12 +12,12 @@ from .data import test_data  # noqa
 
 def _get_version():
     """Test."""
-    __version__ = "unknown"
     try:
         from ._version import __version__
+
+        return __version__
     except ImportError:
-        pass
-    return __version__
+        return "unknown"
 
 
 __author__ = """Ludwig Lierhammer"""

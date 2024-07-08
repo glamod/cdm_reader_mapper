@@ -45,7 +45,7 @@ _files = get_files(_base)
 
 
 def correct_it(data, data_model, deck, log_level="INFO"):
-    """DOCUMENTAION."""
+    """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     # 1. Optional deck specific corrections

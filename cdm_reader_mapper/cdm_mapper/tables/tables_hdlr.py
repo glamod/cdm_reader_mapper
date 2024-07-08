@@ -108,7 +108,7 @@ class tables_hdlr:
         return tables
 
 
-### cdm elements dtypes
+# cdm elements dtypes
 # Mail sent may 7th to Dave. Are the types there real SQL types, or just approximations?
 # Numeric type in table definition not useful here to define floats with a specific precision
 # We should be able to use those definitions. Keep in mind that arrays are object type in pandas!
@@ -149,7 +149,7 @@ def from_glamod(
 
     gitlinkroot = gitlinkroot.replace("blob/", "")
     gitlinkroot = gitlinkroot.replace("https://", "https://raw.")
-    response = requests.get(os.path.join(gitlinkroot, table_filename))
+    response = requests.get(os.path.join(gitlinkroot, table_filename), timeout=100)
     field_separator = "\t"
     lines = list(
         csv.reader(

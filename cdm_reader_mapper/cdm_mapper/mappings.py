@@ -21,6 +21,7 @@ Auxiliary functions can be used and defined in or outside class mapping_function
 
 @author: iregon
 """
+
 from __future__ import annotations
 
 import datetime
@@ -89,7 +90,7 @@ def coord_dmh_to_90i(deg, min, hemis):
     Parameters
     ----------
     deg: longitude or latitude in degrees
-    min: logitude or latitude in minutes
+    min: longitude or latitude in minutes
     hemis: Hemisphere N or S
 
     Returns
@@ -167,16 +168,18 @@ class mapping_functions:
         self.atts = atts
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_HM(self, ds):
+    def datetime_decimalhour_to_hm(self, ds):
         """Convert dateimt object to hours and minutes."""
-        hours = int(math.floor(ds))
-        minutes = int(math.floor(60.0 * math.fmod(ds, 1)))
+        timedelta = datetime.timedelta(hours=ds)
+        seconds = timedelta.total_seconds()
+        hours = int(seconds / 3600)
+        minutes = int(seconds / 60) % 60
         return hours, minutes
 
     def datetime_imma1(self, df):  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
-        hours, minutes = np.vectorize(self.datetime_decimalhour_to_HM)(
+        hours, minutes = np.vectorize(self.datetime_decimalhour_to_hm)(
             df.iloc[:, -1].values
         )
         df = df.drop(df.columns[len(df.columns) - 1], axis=1)
@@ -220,7 +223,7 @@ class mapping_functions:
         df_dates["M"] = 0
         df_coords = df.core.iloc[:, 3:5]
 
-        # Covert long to -180 to 180 for time zone finding
+        # Convert long to -180 to 180 for time zone finding
         df_coords["LON"] = df_coords["LON"].astype(float)
         df_coords["LAT"] = df_coords["LAT"].astype(float)
         df_coords["lon_converted"] = coord_360_to_180i(
@@ -295,9 +298,9 @@ class mapping_functions:
         """Multiply with scale factor."""
         return ds * factor
 
-    def integer_to_float(self, ds, float_type="float32"):
+    def integer_to_float(self, ds):
         """Convert integer to float."""
-        return ds.astype(float_type)
+        return ds.astype(float)
 
     def lineage(self, ds):
         """Get lineage."""
@@ -376,9 +379,9 @@ class mapping_functions:
         }
         return ds.map(secs, na_action="ignore")
 
-    def feet_to_m(self, ds, float_type="float32"):
+    def feet_to_m(self, ds):
         """Convert feet into meter."""
-        ds.astype(float_type)
+        ds.astype(float)
         return np.round(ds / 3.2808, 2)
 
     def guid(self, df, prepend="", append=""):
