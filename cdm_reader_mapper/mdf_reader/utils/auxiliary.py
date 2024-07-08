@@ -23,21 +23,8 @@ from ..validate import validate
 from . import converters, decoders
 
 
-def convert_float_format(out_dtypes):
-    """DOCUMENTATION."""
-    out_dtypes_ = {}
-    for k, v in out_dtypes.items():
-        if v is None:
-            pass
-        elif "float" in v:
-            v = "float"
-        out_dtypes_[k] = v
-    return out_dtypes_
-
-
 def convert_dtypes(dtypes):
     """DOCUMENTATION."""
-    dtypes = convert_float_format(dtypes)
     parse_dates = []
     for i, element in enumerate(list(dtypes)):
         if dtypes[element] == "datetime":

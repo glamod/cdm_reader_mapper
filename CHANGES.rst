@@ -17,6 +17,8 @@ Breaking changes
 * set chunksize from 10000 to 3 in testing suite (:pull:`35`)
 * ``cdm_mapper``: read header column ``location_quality`` from ``(c1, LZ)`` and set fill_value to ``0`` (:issue:`36`, :pull:`37`)
 * ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
+* reading C-RAID data: set decimal places according to input file data precision (:pull:`60`)
+* always convert data types of both ``int`` and ``float`` in schemas into default data types (:issue:`59`, :pull:`60`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -29,12 +31,16 @@ Internal changes
 * use ``pytest.parametrize`` for testing suite (:pull:`61`)
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
+* ``cdm_mapper.mapper``: do not write data into a ``StringIO`` buffer and read it back before writing tables on disk (:pull:`60`)
+* ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 
 Bug fixes
 ^^^^^^^^^
 * indexing working with user-given chunksize (:pull:`35`)
 * fix reading of custom schema in ``mdf_reader.read`` (:pull:`40`)
 * ensure ``format`` schema field for delimited files is passed correctly, avoiding ``"...Please specify either format or field_layout in your header schema..."`` error (:pull:`40`)
+* there is a loss of data precision due to data type conversion. Hence, use default data types of both ``int`` and ``float`` (:issue:`59`, :pull:`60`)
+* reading C-RAID data: adjust datetime formats to read dates into ``MDFFileReader`` (:pull:`60`)
 
 
 0.3.0 (2024-05-17)
