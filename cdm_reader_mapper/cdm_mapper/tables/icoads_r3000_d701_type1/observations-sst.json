@@ -105,7 +105,7 @@
   "original_value": {
     "sections": "c99_data",
     "elements": "sea_surface_temperature_one",
-    "decimal_places": "default_decimal_places"
+    "decimal_places": 0
   },
   "conversion_method": {
     "default": 1
