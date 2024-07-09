@@ -91,7 +91,6 @@ def _testing_suite(
         **kwargs,
     )
     data = read_.data
-    attrs = read_.attrs
     mask = read_.mask
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
