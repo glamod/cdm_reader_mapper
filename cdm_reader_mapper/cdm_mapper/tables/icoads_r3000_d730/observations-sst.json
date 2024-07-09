@@ -104,7 +104,7 @@
   "original_value": {
     "sections": "c99_data",
     "elements": "SST",
-    "decimal_places": "default_decimal_places"
+    "decimal_places": 2
   },
   "conversion_method": {
     "default": 1
