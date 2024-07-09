@@ -305,9 +305,7 @@ def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
     return cdm_tables
 
 
-def map_model(
-    imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"
-):
+def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
