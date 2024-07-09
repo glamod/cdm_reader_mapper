@@ -172,7 +172,6 @@ def _testing_suite(
     output = cdm_mapper.map_model(
         cdm_name,
         data,
-        attrs,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",

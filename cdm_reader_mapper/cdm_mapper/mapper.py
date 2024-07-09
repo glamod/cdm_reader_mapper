@@ -85,7 +85,6 @@ def _write_csv_files(
     logger,
     table,
     cols,
-    data_atts,
     imodel_functions,
     imodel_code_tables,
     cdm_tables,
@@ -182,7 +181,7 @@ def _write_csv_files(
     return cdm_tables
 
 
-def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level="INFO"):
+def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """
     Map to the C3S Climate Data Store Common Data Model (CDM).
 
@@ -198,8 +197,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                to CDM in a specific way. e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000_d704``
     data: input data to map
         e.g. a pandas.Dataframe or io.parsers.TextFileReader objects or in-memory text streams (io.StringIO object).
-    data_atts:
-        dictionary with the {element_name:element_attributes} of the data. Type: string.
     cdm_subset: subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel. Type: list.
     codes_subset: subset of code mapping tables to map.
@@ -225,7 +222,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     tables_imodel = tables_hdlr()
     # Get imodel mapping pack
     # Read mappings to CDM from imodel
-    # try:
     try:
         # Read mappings to CDM from imodel
         imodel_maps = tables_imodel.load_tables_maps(imodel, cdm_subset=cdm_subset)
@@ -288,7 +284,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 logger,
                 table,
                 cols,
-                data_atts,
                 imodel_functions,
                 imodel_code_tables,
                 cdm_tables,
@@ -311,7 +306,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
 
 
 def map_model(
-    imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level="INFO"
+    imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"
 ):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
@@ -326,8 +321,6 @@ def map_model(
       e.g. ``cdm/library/mappings/icoads_r3000_d704``
     data: pd.DataFrame, pd.parser.TextFileReader or io.String
       input data to map.
-    data_atts: dict
-      dictionary with the {element_name:element_attributes} of the data.
       Type: string.
     cdm_subset: list, optional
       subset of CDM model tables to map.
@@ -375,7 +368,6 @@ def map_model(
     return _map(
         imodel,
         data,
-        data_atts,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level=log_level,
