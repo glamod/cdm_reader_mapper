@@ -34,7 +34,7 @@ Internal changes
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
-* ``cdm_mapper`` does not need any attribute information from ``mdf_reader`` (:issue:`66`, :pull:`67`) 
+* ``cdm_mapper`` does not need any attribute information from ``mdf_reader`` (:issue:`66`, :pull:`67`)
 
 Bug fixes
 ^^^^^^^^^
