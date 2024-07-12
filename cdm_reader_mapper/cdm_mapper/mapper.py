@@ -57,9 +57,7 @@ def _map_to_df(m, x):
         return
 
 
-def _decimal_places(
-    cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
-):
+def _decimal_places(atts, decimal_places, cdm_key, imodel_functions, elements):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
             atts[cdm_key].update({"decimal_places": decimal_places})
@@ -164,7 +162,6 @@ def _write_csv_files(
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
     table_df_i = drop_duplicates(table_df_i)
-    table_df_i = table_df_i.astype(dtype=out_dtypes)
     return table_df_i, atts
 
 
