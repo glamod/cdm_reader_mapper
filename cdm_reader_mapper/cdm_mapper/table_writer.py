@@ -76,7 +76,7 @@ def print_float(data, null_label, decimal_places=None):
     def _return_str(x, null_label, format_float):
         if pd.isna(x):
             return null_label
-        return format_float.format(x)
+        return format_float.format(float(x))
 
     if decimal_places is None:
         decimal_places = properties.default_decimal_places
@@ -124,6 +124,8 @@ def print_varchar(data, null_label):
     """
 
     def _return_str(x, null_label):
+        if isinstance(x, list):
+            return str(x)
         if pd.isna(x):
             return null_label
         return str(x)
