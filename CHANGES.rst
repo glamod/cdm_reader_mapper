@@ -19,6 +19,8 @@ Breaking changes
 * ``cdm_mapper``: set default value of header column ``report_quality`` to ``2`` (:issue:`36`, :pull:`37`)
 * reading C-RAID data: set decimal places according to input file data precision (:pull:`60`)
 * always convert data types of both ``int`` and ``float`` in schemas into default data types (:issue:`59`, :pull:`60`)
+* ``cdm_mapper.map_model``: call function without input parameter ``data_atts`` (:issue:`66`, :pull:`67`)
+* ``decimal_places`` information is moved from ``mdf_reader.schema`` to ``cdm_mapper.tables``; ``decimal_places`` in  user-given schemas will be ignored (:issue:`66`, :pull:`67`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -32,6 +34,7 @@ Internal changes
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
+* ``cdm_mapper`` does not need any attribute information from ``mdf_reader`` (:issue:`66`, :pull:`67`) 
 
 Bug fixes
 ^^^^^^^^^
