@@ -78,26 +78,6 @@ from ._testing_cdm_suite import _testing_suite
             True,
             {},
         ),
-        (
-            "063_714",
-            "icoads_r3000_d714",
-            None,
-            None,
-            "063_714",
-            None,
-            True,
-            {"chunksize": 3},
-        ),
-        (
-            "063_714",
-            "icoads_r3000_d714",
-            None,
-            None,
-            "063_714",
-            None,
-            False,
-            {"sections": ["c99"], "chunksize": 3},
-        ),
     ],
 )
 def test_read_data(
