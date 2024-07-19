@@ -33,6 +33,8 @@ import pandas as pd
 import swifter  # noqa
 from timezonefinder import TimezoneFinder
 
+from . import properties
+
 icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
 imodel_lineages = {
     "icoads_r3000": icoads_lineage,
@@ -163,9 +165,8 @@ def string_add_i(a, b, c, sep):
 class mapping_functions:
     """Class for mapping Common Data Model (CDM)."""
 
-    def __init__(self, imodel, atts):
+    def __init__(self, imodel):
         self.imodel = imodel
-        self.atts = atts
         self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_hm(self, ds):
@@ -247,31 +248,9 @@ class mapping_functions:
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
 
-    def decimal_places(self, element):
-        """Return decimal places."""
-        return self.atts.get(element[0]).get("decimal_places")
-
-    def decimal_places_temperature_kelvin(self, element):
-        """Return temperature decimal places."""
-        if self.imodel in k_elements.keys():
-            k_element = k_elements[self.imodel]
-        else:
-            k_element = 0
-        origin_decimals = self.atts.get(element[k_element]).get("decimal_places")
-        if origin_decimals is None:
-            return 2
-        elif origin_decimals <= 2:
-            return 2
-        return origin_decimals
-
-    def decimal_places_pressure_pascal(self, element):
-        """Return pressure decimal places."""
-        origin_decimals = self.atts.get(element[0]).get("decimal_places")
-        if origin_decimals is None:
-            return 2
-        elif origin_decimals > 2:
-            return origin_decimals - 2
-        return 0
+    def default_decimal_places(self):
+        """Return default number of decimal places."""
+        return properties.default_decimal_places
 
     def df_col_join(self, df, sep):
         """Join pandas Dataframe."""

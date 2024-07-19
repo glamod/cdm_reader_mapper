@@ -50,12 +50,12 @@
     "sections": "drifter_measurements",
     "elements": "LONGITUDE",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": "default_decimal_places"
   },
   "latitude": {
     "sections": "drifter_measurements",
     "elements": "LATITUDE",
-    "decimal_places": "decimal_places"
+    "decimal_places": "default_decimal_places"
   },
   "location_accuracy": {
     "sections": "drifter_measurements",
@@ -76,10 +76,12 @@
     "default": 0
   },
   "height_of_station_above_local_ground": {
-    "default": 0
+    "default": 0,
+    "decimal_places": 1
   },
   "height_of_station_above_sea_level": {
-    "default": 0
+    "default": 0,
+    "decimal_places": 1
   },
   "report_meaning_of_timestamp": {
     "default": 2
@@ -93,7 +95,8 @@
     "default": 0
   },
   "report_time_accuracy": {
-    "default": 1
+    "default": 1,
+    "decimal_places": 0
   },
   "report_time_quality": {
     "sections": "drifter_measurements",
