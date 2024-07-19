@@ -54,12 +54,12 @@
     "sections": "core",
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "latitude": {
     "sections": "core",
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "location_accuracy": {
     "sections": "core",

@@ -41,12 +41,12 @@
     "sections": "core",
     "elements": "LON",
     "transform": "longitude_360to180",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "latitude": {
     "sections": "core",
     "elements": "LAT",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "crs": {
     "default": 0
@@ -61,7 +61,7 @@
     "sections": "core",
     "elements": "AT",
     "transform": "temperature_celsius_to_kelvin",
-    "decimal_places": "decimal_places_temperature_kelvin"
+    "decimal_places": 2
   },
   "value_significance": {
     "default": 2
@@ -101,7 +101,7 @@
   "original_value": {
     "sections": "c99_data",
     "elements": "air_temp",
-    "decimal_places": "decimal_places"
+    "decimal_places": 1
   },
   "conversion_method": {
     "default": 1

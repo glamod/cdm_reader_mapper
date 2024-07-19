@@ -61,7 +61,11 @@ def _map_to_df(m, x):
 
 
 def _decimal_places(
-    cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
+    cdm_tables,
+    decimal_places,
+    cdm_key,
+    table,
+    imodel_functions,
 ):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
@@ -70,7 +74,7 @@ def _decimal_places(
             )
         else:
             cdm_tables[table]["atts"][cdm_key].update(
-                {"decimal_places": getattr(imodel_functions, decimal_places)(elements)}
+                {"decimal_places": getattr(imodel_functions, decimal_places)()}
             )
     return cdm_tables
 
@@ -81,7 +85,6 @@ def _write_csv_files(
     logger,
     table,
     cols,
-    data_atts,
     imodel_functions,
     imodel_code_tables,
     cdm_tables,
@@ -163,7 +166,11 @@ def _write_csv_files(
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
         cdm_tables = _decimal_places(
-            cdm_tables, decimal_places, cdm_key, table, imodel_functions, elements
+            cdm_tables,
+            decimal_places,
+            cdm_key,
+            table,
+            imodel_functions,
         )
 
     if "observation_value" in table_df_i:
@@ -174,7 +181,7 @@ def _write_csv_files(
     return cdm_tables
 
 
-def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level="INFO"):
+def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """
     Map to the C3S Climate Data Store Common Data Model (CDM).
 
@@ -190,8 +197,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                to CDM in a specific way. e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000_d704``
     data: input data to map
         e.g. a pandas.Dataframe or io.parsers.TextFileReader objects or in-memory text streams (io.StringIO object).
-    data_atts:
-        dictionary with the {element_name:element_attributes} of the data. Type: string.
     cdm_subset: subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel. Type: list.
     codes_subset: subset of code mapping tables to map.
@@ -223,7 +228,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
         if len(imodel_maps) < 1:
             logger.error(f"No mapping codes found for model {imodel}")
             return
-        imodel_functions = mapping_functions(imodel, data_atts)
+        imodel_functions = mapping_functions(imodel)
         imodel_code_tables = codes_imodel.load_code_tables_maps(
             codes_subset=codes_subset
         )
@@ -279,7 +284,6 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
                 logger,
                 table,
                 cols,
-                data_atts,
                 imodel_functions,
                 imodel_code_tables,
                 cdm_tables,
@@ -301,9 +305,7 @@ def _map(imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level=
     return cdm_tables
 
 
-def map_model(
-    imodel, data, data_atts, cdm_subset=None, codes_subset=None, log_level="INFO"
-):
+def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
@@ -317,8 +319,6 @@ def map_model(
       e.g. ``cdm/library/mappings/icoads_r3000_d704``
     data: pd.DataFrame, pd.parser.TextFileReader or io.String
       input data to map.
-    data_atts: dict
-      dictionary with the {element_name:element_attributes} of the data.
       Type: string.
     cdm_subset: list, optional
       subset of CDM model tables to map.
@@ -366,7 +366,6 @@ def map_model(
     return _map(
         imodel,
         data,
-        data_atts,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level=log_level,
