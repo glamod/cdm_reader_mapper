@@ -41,12 +41,12 @@
     "sections": "c99",
     "elements": "Lon",
     "transform": "float_opposite",
-    "decimal_places": "decimal_places"
+    "decimal_places": 4
   },
   "latitude": {
     "sections": "c99",
     "elements": "Lat",
-    "decimal_places": "decimal_places"
+    "decimal_places": 4
   },
   "crs": {
     "default": 0
@@ -60,7 +60,7 @@
   "observation_value": {
     "sections": "c99",
     "elements": "WDir",
-    "decimal_places": "decimal_places"
+    "decimal_places": 2
   },
   "value_significance": {
     "default": 2
@@ -103,7 +103,7 @@
   "original_value": {
     "sections": "c99",
     "elements": "WDir",
-    "decimal_places": 0
+    "decimal_places": 2
   },
   "processing_level": {
     "default": 3
