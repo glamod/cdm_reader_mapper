@@ -90,7 +90,6 @@ def _testing_suite(
         **kwargs,
     )
     data = read_.data
-    attrs = read_.attrs
     mask = read_.mask
     dtypes = read_.dtypes
     parse_dates = read_.parse_dates
@@ -165,7 +164,6 @@ def _testing_suite(
     output = cdm_mapper.map_model(
         cdm_name,
         data,
-        attrs,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",

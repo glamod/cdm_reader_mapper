@@ -29,8 +29,6 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from . import properties
-
 module_path = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -58,7 +56,7 @@ def print_integer(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def print_float(data, null_label, decimal_places=None):
+def print_float(data, null_label, decimal_places):
     """
     Print all elements that have 'float' as type attribute.
 
@@ -77,9 +75,6 @@ def print_float(data, null_label, decimal_places=None):
         if pd.isna(x):
             return null_label
         return format_float.format(float(x))
-
-    if decimal_places is None:
-        decimal_places = properties.default_decimal_places
 
     format_float = "{:." + str(decimal_places) + "f}"
     return data.apply(lambda x: _return_str(x, null_label, format_float))
