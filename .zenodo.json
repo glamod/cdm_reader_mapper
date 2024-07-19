@@ -1,0 +1,48 @@
+{
+  "title": "cdm_reader_mapper: Common Data Model reader and mapper toolbox",
+  "description": "The cdm_reader_mapper toolbox is a python tool designed for both reading data files compliant with a user specified data model and mapping observed variables and their associated metadata from a data model or models combination to the C3S CDS Common data model format.  \n \ncdm_reader_mapper development is funded through Copernicus Climate Change Service. \nFurthermore, acknowledgments go to National Oceanography Centre and UK Marine and Climate Advisory Service.",
+  "creators": [
+    {
+      "name": "Lierhammer, Ludwig",
+      "affiliation": "Deutscher Wetterdienst, Hamburg, Germany",
+      "orcid": "0000-0002-7207-0003"
+    },
+    {
+      "name": "Siddons, Joseph",
+      "affiliation": "National Oceanography Centre, Southampton, United Kingdom",
+      "orcid": "0009-0003-5558-2327"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Andersson, Axel",
+      "affiliation": "Deutscher Wetterdienst, Hamburg, Germany",
+      "orcid": "0000-0002-6956-0298"
+    },
+    {
+      "name": "Leiding, Tina",
+      "affiliation": "Deutscher Wetterdienst, Hamburg, Germany"
+    },
+    {
+      "name": "Cornes, Richard",
+      "affiliation": "National Oceanography Centre, Southampton, United Kingdom",
+      "orcid": "0000-0002-7688-4485"
+    },
+    {
+      "name": "Kent, Elizabeth",
+      "affiliation": "National Oceanography Centre, Southampton, United Kingdom",
+      "orcid": "0000-0002-6209-4247"
+    }
+  ],
+  "keywords": [
+    "observations",
+    "ship",
+    "buoys",
+    "climatology",
+    "climate change"
+  ],
+  "license": "MIT",
+  "language": "eng",
+  "upload_type": "software",
+  "access_right": "open"
+}
