@@ -35,6 +35,7 @@ Internal changes
 * use ``ast.literal_eval`` instead of ``eval`` (:pull:`64`)
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
+* add FOSSA license scanning to github workflows (:pull:`80`)
 
 Bug fixes
 ^^^^^^^^^
