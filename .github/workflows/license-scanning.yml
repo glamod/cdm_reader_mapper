@@ -1,4 +1,4 @@
-name: license-scanning
+name: License Scanning
 
 on:
   push:
@@ -24,4 +24,4 @@ jobs:
       - name: Run FOSSA scan and upload build data
         uses: fossa-contrib/fossa-action@cdc5065bcdee31a32e47d4585df72d66e8e941c2  # v3.0.0
         with:
-          fossa-api-key: abcdefghijklmnopqrstuvwxyz
+          fossa-api-key: 690f949bc80562e7ebb609849f0b60ac
