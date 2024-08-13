@@ -165,8 +165,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
    	:target: https://fair-software.eu
 	:alt: FAIR-software
 
-.. |fossa| image:: https://app.fossa.com/api/projects/git%2Bgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
-        :target: https://app.fossa.com/projects/git%2Bgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
+.. |fossa| image:: https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
+        :target: https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
         :alt: FOSSA
 
 .. |license| image:: https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg
