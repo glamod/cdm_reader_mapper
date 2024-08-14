@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import pytest  # noqa
 
-from cdm_reader_mapper.operations import corrections, inspect, replace, select
+from cdm_reader_mapper.operations import (
+    corrections,
+    duplicates,
+    inspect,
+    replace,
+    select,
+)
 
 from ._data import data_df, data_pa, mask_df, mask_pa
 from ._results import correction_df, table_df
@@ -69,3 +75,11 @@ def test_replace():
         pivot_c="report_id",
         rep_c=["primary_station_id", "primary_station_id.isChange"],
     )
+
+
+def test_duplicates_pandas():
+    duplicates.duplicate_check(data_df, "test_columns")
+
+
+def test_dupicates_parser():
+    duplicates.duplicate_check(data_pa, ["test_columns"])
