@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from io import StringIO
+
+import pandas as pd
 import reportlinkage
 
 
@@ -19,7 +22,7 @@ def duplicate_check(data, columns):
 
     # index is a list of integer positions to select from data
     def dataframe(df, columns):
-        return dataframe_apply_index(
+        return dataframe_apply_check(
             df,
             columns,
         )
