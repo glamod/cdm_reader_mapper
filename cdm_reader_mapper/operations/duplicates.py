@@ -63,5 +63,3 @@ def duplicate_check(data, columns):
         return output
     else:
         return output[0]
-    for column in columns:
-        return
