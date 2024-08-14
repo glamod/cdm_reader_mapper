@@ -4,17 +4,19 @@ from __future__ import annotations
 
 import reportlinkage
 
+
 def dataframe_apply_check(df, columns):
     """DOCUMENTATION:"""
     indexer = reportlinkage.Index()
     indexer.full()
     return indexer
 
+
 def duplicate_check(data, columns):
     """DOCUMENTATION."""
     if not isinstance(columns, list):
         columns = [columns]
-        
+
     # index is a list of integer positions to select from data
     def dataframe(df, columns):
         return dataframe_apply_index(
@@ -57,10 +59,6 @@ def duplicate_check(data, columns):
     if len(output) > 1:
         return output
     else:
-        return output[0]        
+        return output[0]
     for column in columns:
         return
-        
-    
-    
-    
