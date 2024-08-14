@@ -5,12 +5,12 @@ from __future__ import annotations
 from io import StringIO
 
 import pandas as pd
-import reportlinkage
+import recordlinkage
 
 
 def dataframe_apply_check(df, columns):
     """DOCUMENTATION:"""
-    indexer = reportlinkage.Index()
+    indexer = recordlinkage.Index()
     indexer.full()
     return indexer
 
