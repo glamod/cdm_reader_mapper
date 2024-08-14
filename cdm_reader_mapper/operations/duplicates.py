@@ -12,7 +12,7 @@ def dataframe_apply_check(df, columns):
     """DOCUMENTATION:"""
     indexer = recordlinkage.Index()
     indexer.full()
-    return indexer
+    return df
 
 
 def duplicate_check(data, columns):
