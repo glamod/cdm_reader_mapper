@@ -5,28 +5,40 @@ from __future__ import annotations
 from io import StringIO
 
 import pandas as pd
-import recordlinkage
+import recordlinkage as rl
 
 
-def dataframe_apply_check(df, columns):
-    """DOCUMENTATION:"""
-    indexer = recordlinkage.Index()
-    indexer.full()
+def set_compare(compare_dict):
+    """DOCUMENTATION."""
+    for column, c_dict in comapre_dict.items():
+        break
+    
+    return
+
+def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
+    """DOCUMENTATION."""
+    indexer = getattr(rl.index, method)(**method_kwargs)
+    pairs = indexer.index(df)
+    set_compare(compare_kwargs)
+    comparer = rl.Compare()
+    compared = comparer.compute(pairs, df)
     return df
 
 
-def duplicate_check(data, columns):
+def duplicate_check(
+    data, 
+    method="SortedNeighbourhood", 
+    method_kwargs={}, 
+    compare_kwargs={},
+):
     """DOCUMENTATION."""
-    if not isinstance(columns, list):
-        columns = [columns]
-
-    def dataframe(df, columns):
+    def dataframe(df, method):
         return dataframe_apply_check(
             df,
-            columns,
+            method,
         )
 
-    def parser(data_parser, columns):
+    def parser(data_parser, method):
         read_params = [
             "chunksize",
             "names",
@@ -39,7 +51,7 @@ def duplicate_check(data, columns):
         in_buffer = StringIO()
 
         for df in data_parser:
-            o = dataframe(df, columns)
+            o = dataframe(df, method, method_kwargs, compare_kwargs)
             o.to_csv(in_buffer, header=False, index=False, mode="a")
 
         in_buffer.seek(0)
@@ -47,9 +59,9 @@ def duplicate_check(data, columns):
         return output
 
     if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(data, columns)
+        output = dataframe(data, method, method_kwargs, compare_kwargs)
     else:
-        output = parser(data, columns)
+        output = parser(data, method, method_kwargs, compare_kwargs)
 
     if len(output) > 1:
         return output
