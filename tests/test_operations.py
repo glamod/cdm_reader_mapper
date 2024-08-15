@@ -79,26 +79,49 @@ def test_replace():
 
 def test_duplicates_pandas():
     duplicates.duplicate_check(
-      table_df,
-      method_kwargs={"left_on": "report_timestamp", "window": 5,  "block_on": ["report_id"]},
-      compare_kwargs={
-        "report_id": {"methodr": "exact"},
-        "primary_station_id": {"method": "exact"},
-        "longitude": {"method": "numeric", "kwargs": {"method": "gauss", "offset": 0.0}},
-        "latitude": {"method": "numeric", "kwargs": {"method": "gauss", "offset": 0.0}},
-        "report_timestamp": {"method": "exact"},
-        "source_record_id": {"method": "exact"},
-    },       
+        table_df,
+        method_kwargs={
+            "left_on": "report_timestamp",
+            "window": 5,
+            "block_on": ["report_id"],
+        },
+        compare_kwargs={
+            "report_id": {"methodr": "exact"},
+            "primary_station_id": {"method": "exact"},
+            "longitude": {
+                "method": "numeric",
+                "kwargs": {"method": "gauss", "offset": 0.0},
+            },
+            "latitude": {
+                "method": "numeric",
+                "kwargs": {"method": "gauss", "offset": 0.0},
+            },
+            "report_timestamp": {"method": "exact"},
+            "source_record_id": {"method": "exact"},
+        },
     )
 
 
 def test_dupicates_parser():
-    duplicates.duplicate_check(table_pa,     method_kwargs={"left_on": "report_timestamp", "window": 5,  "block_on": ["report_id"]},
-    compare_kwargs={
-        "report_id": {"methodr": "exact"},
-        "primary_station_id": {"method": "exact"},
-        "longitude": {"method": "numeric", "kwargs": {"method": "gauss", "offset": 0.0}},
-        "latitude": {"method": "numeric", "kwargs": {"method": "gauss", "offset": 0.0}},
-        "report_timestamp": {"method": "exact"},
-        "source_record_id": {"method": "exact"},
-    },)
+    duplicates.duplicate_check(
+        table_pa,
+        method_kwargs={
+            "left_on": "report_timestamp",
+            "window": 5,
+            "block_on": ["report_id"],
+        },
+        compare_kwargs={
+            "report_id": {"methodr": "exact"},
+            "primary_station_id": {"method": "exact"},
+            "longitude": {
+                "method": "numeric",
+                "kwargs": {"method": "gauss", "offset": 0.0},
+            },
+            "latitude": {
+                "method": "numeric",
+                "kwargs": {"method": "gauss", "offset": 0.0},
+            },
+            "report_timestamp": {"method": "exact"},
+            "source_record_id": {"method": "exact"},
+        },
+    )
