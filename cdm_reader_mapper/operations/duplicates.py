@@ -21,9 +21,9 @@ def set_comparer(compare_dict):
         except KeyError:
             kwargs = {}
         getattr(comparer, method)(
-            column, 
-            column, 
-            label=column, 
+            column,
+            column,
+            label=column,
             **kwargs,
         )
     return comparer
