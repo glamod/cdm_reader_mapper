@@ -8,20 +8,21 @@ import pandas as pd
 import recordlinkage as rl
 
 
-def set_compare(compare_dict):
+def set_comparer(compare_dict):
     """DOCUMENTATION."""
-    for column, c_dict in comapre_dict.items():
-        break
-
-    return
+    comparer = rl.Compare()
+    for column, c_dict in compare_dict.items():
+        method = c_dict["method"]
+        kwargs = c_dict["kwargs"]
+        getattr(comparer, method)(column, column, label=f"-{column}-", **kwargs)
+    return comparer
 
 
 def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
     """DOCUMENTATION."""
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(df)
-    set_compare(compare_kwargs)
-    comparer = rl.Compare()
+    comparer = set_comparer(compare_kwargs)
     compared = comparer.compute(pairs, df)
     return df
 
