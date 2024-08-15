@@ -12,9 +12,20 @@ def set_comparer(compare_dict):
     """DOCUMENTATION."""
     comparer = rl.Compare()
     for column, c_dict in compare_dict.items():
-        method = c_dict["method"]
-        kwargs = c_dict["kwargs"]
-        getattr(comparer, method)(column, column, label=f"-{column}-", **kwargs)
+        try:
+            method = c_dict["method"]
+        except KeyError:
+            continue
+        try:
+            kwargs = c_dict["kwargs"]
+        except KeyError:
+            kwargs = {}
+        getattr(comparer, method)(
+            column, 
+            column, 
+            label=column, 
+            **kwargs,
+        )
     return comparer
 
 
@@ -23,8 +34,7 @@ def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(df)
     comparer = set_comparer(compare_kwargs)
-    compared = comparer.compute(pairs, df)
-    return compared
+    return comparer.compute(pairs, df)
 
 
 def duplicate_check(
@@ -39,6 +49,8 @@ def duplicate_check(
         return dataframe_apply_check(
             df,
             method,
+            method_kwargs,
+            compare_kwargs,
         )
 
     def parser(data_parser, method, method_kwargs, compare_kwargs):
@@ -65,7 +77,7 @@ def duplicate_check(
         output = dataframe(data, method, method_kwargs, compare_kwargs)
     else:
         output = parser(data, method, method_kwargs, compare_kwargs)
-
+    return output
     if len(output) > 1:
         return output
     else:
