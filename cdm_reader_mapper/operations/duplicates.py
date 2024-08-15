@@ -15,7 +15,7 @@ def set_comparer(compare_dict):
         try:
             method = c_dict["method"]
         except KeyError:
-            continue
+            raise KeyError("compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found")
         try:
             kwargs = c_dict["kwargs"]
         except KeyError:
@@ -78,7 +78,3 @@ def duplicate_check(
     else:
         output = parser(data, method, method_kwargs, compare_kwargs)
     return output
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
