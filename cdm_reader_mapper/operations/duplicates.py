@@ -12,8 +12,9 @@ def set_compare(compare_dict):
     """DOCUMENTATION."""
     for column, c_dict in comapre_dict.items():
         break
-    
+
     return
+
 
 def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
     """DOCUMENTATION."""
@@ -26,12 +27,13 @@ def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
 
 
 def duplicate_check(
-    data, 
-    method="SortedNeighbourhood", 
-    method_kwargs={}, 
+    data,
+    method="SortedNeighbourhood",
+    method_kwargs={},
     compare_kwargs={},
 ):
     """DOCUMENTATION."""
+
     def dataframe(df, method):
         return dataframe_apply_check(
             df,
