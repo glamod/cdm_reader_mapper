@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from io import StringIO
-
-import pandas as pd
 import recordlinkage as rl
 
 
@@ -31,14 +28,6 @@ def set_comparer(compare_dict):
     return comparer
 
 
-def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
-    """DOCUMENTATION."""
-    indexer = getattr(rl.index, method)(**method_kwargs)
-    pairs = indexer.index(df)
-    comparer = set_comparer(compare_kwargs)
-    return comparer.compute(pairs, df)
-
-
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -46,37 +35,7 @@ def duplicate_check(
     compare_kwargs={},
 ):
     """DOCUMENTATION."""
-
-    def dataframe(df, method, method_kwargs, compare_kwargs):
-        return dataframe_apply_check(
-            df,
-            method,
-            method_kwargs,
-            compare_kwargs,
-        )
-
-    def parser(data_parser, method, method_kwargs, compare_kwargs):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
-        in_buffer = StringIO()
-
-        for df in data_parser:
-            o = dataframe(df, method, method_kwargs, compare_kwargs)
-            o.to_csv(in_buffer, header=False, index=False, mode="a")
-
-        in_buffer.seek(0)
-        output = [pd.read_csv(in_buffer, **read_dict)]
-        return output
-
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(data, method, method_kwargs, compare_kwargs)
-    else:
-        output = parser(data, method, method_kwargs, compare_kwargs)
-    return output
+    indexer = getattr(rl.index, method)(**method_kwargs)
+    pairs = indexer.index(data)
+    comparer = set_comparer(compare_kwargs)
+    return comparer.compute(pairs, data)
