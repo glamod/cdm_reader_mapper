@@ -34,13 +34,13 @@ def duplicate_check(
 ):
     """DOCUMENTATION."""
 
-    def dataframe(df, method):
+    def dataframe(df, method, method_kwargs, compare_kwargs):
         return dataframe_apply_check(
             df,
             method,
         )
 
-    def parser(data_parser, method):
+    def parser(data_parser, method, method_kwargs, compare_kwargs):
         read_params = [
             "chunksize",
             "names",
