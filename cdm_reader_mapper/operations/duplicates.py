@@ -24,7 +24,7 @@ def dataframe_apply_check(df, method, method_kwargs, compare_kwargs):
     pairs = indexer.index(df)
     comparer = set_comparer(compare_kwargs)
     compared = comparer.compute(pairs, df)
-    return df
+    return compared
 
 
 def duplicate_check(
