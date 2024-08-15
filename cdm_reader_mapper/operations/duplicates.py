@@ -15,7 +15,9 @@ def set_comparer(compare_dict):
         try:
             method = c_dict["method"]
         except KeyError:
-            raise KeyError("compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found")
+            raise KeyError(
+                "compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found"
+            )
         try:
             kwargs = c_dict["kwargs"]
         except KeyError:
