@@ -14,16 +14,17 @@ _compare_kwargs = {
     "report_id": {"method": "exact"},
     "primary_station_id": {"method": "exact"},
     "longitude": {
-                "method": "numeric",
-                "kwargs": {"method": "gauss", "offset": 0.0},
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.0},
     },
     "latitude": {
-                "method": "numeric",
-                "kwargs": {"method": "gauss", "offset": 0.0},
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.0},
     },
-            "report_timestamp": {"method": "exact"},
-            "source_record_id": {"method": "exact"},
+    "report_timestamp": {"method": "exact"},
+    "source_record_id": {"method": "exact"},
 }
+
 
 def set_comparer(compare_dict):
     """DOCUMENTATION."""
