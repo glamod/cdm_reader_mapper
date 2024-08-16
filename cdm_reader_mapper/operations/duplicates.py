@@ -36,8 +36,11 @@ def duplicate_check(
     method="SortedNeighbourhood",
     method_kwargs={},
     compare_kwargs={},
+    table_name=None,
 ):
     """DOCUMENTATION."""
+    if table_name:
+        data = data[table_name]
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(data)
     comparer = set_comparer(compare_kwargs)
