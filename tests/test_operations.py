@@ -80,7 +80,7 @@ def test_replace():
 
 def test_duplicates_pandas():
     expected_data = result_data.expected_103_792
-    data_path = expected_data["cdm_table"]
+    data_path = expected_data.get("cdm_table")
     df = read_tables(
         data_path,
         tb_id="103-792*",
