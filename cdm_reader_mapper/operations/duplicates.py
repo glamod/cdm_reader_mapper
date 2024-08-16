@@ -8,6 +8,7 @@ import recordlinkage as rl
 def set_comparer(compare_dict):
     """DOCUMENTATION."""
     comparer = rl.Compare()
+    setattr(comparer, "conversion", {})
     for column, c_dict in compare_dict.items():
         try:
             method = c_dict["method"]
@@ -25,6 +26,8 @@ def set_comparer(compare_dict):
             label=column,
             **kwargs,
         )
+        if method == "numeric":
+            comparer.conversion[column] = float
     return comparer
 
 
@@ -38,4 +41,5 @@ def duplicate_check(
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(data)
     comparer = set_comparer(compare_kwargs)
+    data = data.astype(comparer.conversion)
     return comparer.compute(pairs, data)
