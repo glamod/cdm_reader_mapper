@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest  # noqa
 
+from cdm_reader_mapper.cdm_mapper import read_tables
 from cdm_reader_mapper.operations import (
     corrections,
     duplicates,
@@ -11,7 +12,7 @@ from cdm_reader_mapper.operations import (
 )
 
 from ._data import data_df, data_pa, mask_df, mask_pa
-from ._results import correction_df, table_df
+from ._results import correction_df, result_data, table_df
 
 
 def test_select_true_pandas():
@@ -78,15 +79,22 @@ def test_replace():
 
 
 def test_duplicates_pandas():
+    expected_data = result_data.expected_103_792
+    data_path = expected_data["cdm_table"]
+    df = read_tables(
+        data_path,
+        tb_id="103-792*",
+        cdm_subset="header",
+    )
     duplicates.duplicate_check(
-        table_df,
+        df,
         method_kwargs={
             "left_on": "report_timestamp",
             "window": 5,
             "block_on": ["report_id"],
         },
         compare_kwargs={
-            "report_id": {"methodr": "exact"},
+            "report_id": {"method": "exact"},
             "primary_station_id": {"method": "exact"},
             "longitude": {
                 "method": "numeric",
