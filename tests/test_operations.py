@@ -30,9 +30,9 @@ def _manipulate_df(df):
     df.loc[9, "report_id"] = "ICOADS-302-N688D"
     df.loc[10] = df.loc[3]
     df.loc[10, "latitude"] = 9.10
-    df.loc[10, "longitude"] = 68.00    
+    df.loc[10, "longitude"] = 68.00
     return df
-    
+
 
 def test_select_true_pandas():
     select.select_true(data_df, mask_df, out_rejected=True)
