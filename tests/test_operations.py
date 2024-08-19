@@ -86,4 +86,5 @@ def test_duplicates_pandas():
         tb_id="103-792*",
         cdm_subset="header",
     )
-    duplicates.duplicate_check(df)
+    DupDetect = duplicates.duplicate_check(df)
+    DupDetect.remove_duplicates()
