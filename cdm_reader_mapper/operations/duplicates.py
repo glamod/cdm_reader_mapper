@@ -48,6 +48,47 @@ _compare_kwargs = {
 }
 
 
+class DupDetect:
+    """DOCUMENTATION."""
+
+    def __init__(self, data, compared):
+        self.data = data
+        self.compared = compared
+
+    def _get_limit(self, limit):
+        if limit == "default":
+            limit = 0.75
+        return limit
+
+    def total_score(self):
+        """DOCUMENTATION."""
+        pcmax = self.compared.shape[1]
+        self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
+
+    def get_matches(self, limit="default"):
+        """DOCUMENTATION."""
+        self.limit = self._get_limit(limit)
+        self.matches = self.compared[self.score >= self.limit]
+
+    def delete_matches(self, keep="first"):
+        """DOCUMENTATION."""
+        if keep == "first":
+            keep = 0
+        elif keep == "last":
+            keep = -1
+        elif not isinstance(keep, int):
+            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+        self.result = self.data.copy()
+        for index in self.matches.index:
+            self.result = self.result.drop(index[keep])
+
+    def remove_duplicates(self, keep="first", limit="default"):
+        """DOCUMENTATION."""
+        self.total_score()
+        self.get_matches(limit)
+        self.delete_matches(keep)
+
+
 def set_comparer(compare_dict):
     """DOCUMENTATION."""
     comparer = rl.Compare()
@@ -89,8 +130,10 @@ def duplicate_check(
         method_kwargs = _method_kwargs[cdm_name]
     if not compare_kwargs:
         compare_kwargs = _compare_kwargs[cdm_name]
+
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(data)
     comparer = set_comparer(compare_kwargs)
     data = data.astype(comparer.conversion)
-    return comparer.compute(pairs, data)
+    compared = comparer.compute(pairs, data)
+    return DupDetect(data, compared)
