@@ -15,6 +15,25 @@ from ._data import data_df, data_pa, mask_df, mask_pa
 from ._results import correction_df, result_data, table_df
 
 
+def _manipulate_df(df):
+    df.loc[5] = df.loc[4]
+    df.loc[5, "report_id"] = "ICOADS-302-N688EY"
+    df.loc[5, "source_record_id"] = "N688EY"
+    df.loc[6] = df.loc[4]
+    df.loc[6, "latitude"] = -65.80
+    df.loc[6, "longitude"] = 21.20
+    df.loc[7] = df.loc[0]
+    df.loc[7, "source_record_id"] = "N688DP"
+    df.loc[8] = df.loc[1]
+    df.loc[8, "report_timestamp"] = "2022-02-02 00:00:00"
+    df.loc[9] = df.loc[2]
+    df.loc[9, "report_id"] = "ICOADS-302-N688D"
+    df.loc[10] = df.loc[3]
+    df.loc[10, "latitude"] = 9.10
+    df.loc[10, "longitude"] = 68.00    
+    return df
+    
+
 def test_select_true_pandas():
     select.select_true(data_df, mask_df, out_rejected=True)
 
@@ -86,5 +105,6 @@ def test_duplicates_pandas():
         tb_id="103-792*",
         cdm_subset="header",
     )
+    df = _manipulate_df(df)
     DupDetect = duplicates.duplicate_check(df)
     DupDetect.remove_duplicates()
