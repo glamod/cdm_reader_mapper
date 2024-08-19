@@ -27,7 +27,7 @@ def _manipulate_df(df):
     df.loc[8] = df.loc[1]
     df.loc[8, "report_timestamp"] = "2022-02-02 00:00:00"
     df.loc[9] = df.loc[2]
-    df.loc[9, "report_id"] = "ICOADS-302-N688D"
+    df.loc[9, "report_id"] = "ICOADS-302-N688DW"
     df.loc[10] = df.loc[3]
     df.loc[10, "latitude"] = 9.10
     df.loc[10, "longitude"] = 68.00
