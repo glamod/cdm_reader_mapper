@@ -65,10 +65,15 @@ class DupDetect:
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
 
-    def get_matches(self, limit="default"):
+    def get_matches(
+        self, limit="default", must_equals=["report_timestamp", "report_id"]
+    ):
         """DOCUMENTATION."""
         self.limit = self._get_limit(limit)
-        self.matches = self.compared[self.score >= self.limit]
+        cond = self.score >= self.limit
+        for must in must_equals:
+            cond = cond & (self.compared[must])
+        self.matches = self.compared[cond]
 
     def delete_matches(self, keep="first"):
         """DOCUMENTATION."""
@@ -82,10 +87,15 @@ class DupDetect:
         for index in self.matches.index:
             self.result = self.result.drop(index[keep])
 
-    def remove_duplicates(self, keep="first", limit="default"):
+    def remove_duplicates(
+        self,
+        keep="first",
+        limit="default",
+        must_equals=["report_timestamp", "report_id"],
+    ):
         """DOCUMENTATION."""
         self.total_score()
-        self.get_matches(limit)
+        self.get_matches(limit, must_equals)
         self.delete_matches(keep)
 
 
@@ -118,8 +128,8 @@ def set_comparer(compare_dict):
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
-    method_kwargs={},
-    compare_kwargs={},
+    method_kwargs=None,
+    compare_kwargs=None,
     cdm_name="header",
     table_name=None,
 ):
