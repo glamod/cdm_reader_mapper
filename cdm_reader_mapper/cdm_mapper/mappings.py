@@ -281,6 +281,18 @@ class mapping_functions:
         """Convert integer to float."""
         return ds.astype(float)
 
+
+    def icoads_wd_conversion(self, ds):
+        """Convert ICOADS WD."""
+        ds = ds.mask(ds == 361, 0)
+        ds = ds.mask(ds == 362, np.nan)
+        return ds
+
+    def icoads_wd_integer_to_float(self, ds):
+        """Convert ICOADS WD integer to float."""
+        ds = self.icoads_wd_conversion(ds)
+        return self.integer_to_float(ds)
+
     def lineage(self, ds):
         """Get lineage."""
         strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
