@@ -13,7 +13,7 @@ _method_kwargs = {
     "observations": {
         "left_on": "observation_id",
         "window": 5,
-        "block_on": ["report_id"],
+        "block_on": ["date_time"],
     },
 }
 
@@ -43,6 +43,7 @@ _compare_kwargs = {
             "method": "numeric",
             "kwargs": {"method": "gauss", "offset": 0.0},
         },
+        "date_time": {"method": "exact"},
         "source_id": {"method": "exact"},
     },
 }
@@ -76,6 +77,7 @@ class DupDetect:
         """DOCUMENTATION."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
+        return self
 
     def get_matches(self, limit="default", equal_musts=None):
         """DOCUMENTATION."""
@@ -86,6 +88,7 @@ class DupDetect:
         for must in equal_musts:
             cond = cond & (self.compared[must])
         self.matches = self.compared[cond]
+        return self
 
     def delete_matches(self, keep="first"):
         """DOCUMENTATION."""
@@ -98,12 +101,14 @@ class DupDetect:
         self.result = self.data.copy()
         for index in self.matches.index:
             self.result = self.result.drop(index[keep])
+        return self
 
     def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
         """DOCUMENTATION."""
         self.total_score()
         self.get_matches(limit, equal_musts=equal_musts)
         self.delete_matches(keep)
+        return self
 
 
 def set_comparer(compare_dict):

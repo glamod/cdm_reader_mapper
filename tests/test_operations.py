@@ -43,7 +43,7 @@ def _manipulate_observations(df):
     df.loc[5] = df.loc[1]
     df.loc[5, "source_id"] = "ICOADS-3-0-2T-103-792-2022-3"
     df.loc[6] = df.loc[1]
-    df.loc[6, "report_timestamp"] = "2022-02-02 00:00:00"
+    df.loc[6, "date_time"] = "2022-02-02 00:00:00"
     df.loc[7] = df.loc[2]
     df.loc[7, "observation_id"] = "ICOADS-302-N688DW-SST"
     df.loc[8] = df.loc[2]
@@ -125,7 +125,7 @@ def test_duplicates_header():
     )
     df = _manipulate_header(df)
     DupDetect = duplicates.duplicate_check(df)
-    DupDetect.remove_duplicates()
+    return DupDetect.remove_duplicates()
 
 
 def test_duplicates_observations():
@@ -136,6 +136,6 @@ def test_duplicates_observations():
         tb_id="103-792*",
         cdm_subset="observations-sst",
     )
-    df = _manipulate_header(df)
-    DupDetect = duplicates.duplicate_check(df)
-    DupDetect.remove_duplicates()
+    df = _manipulate_observations(df)
+    DupDetect = duplicates.duplicate_check(df, cdm_name="observations")
+    return DupDetect.remove_duplicates()
