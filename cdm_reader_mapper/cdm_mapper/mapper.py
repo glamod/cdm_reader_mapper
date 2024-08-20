@@ -138,7 +138,7 @@ def _write_csv_files(
                 table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
             else:
                 table_df_i[cdm_key] = trans(**kwargs)
-        elif code_table and not isEmpty:
+        if code_table and not isEmpty:
             # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
             # Approach that does not work when it is not nested...so just try and assume not nested if fails
             # Prepare code_table
@@ -154,9 +154,9 @@ def _write_csv_files(
             table_df_i[cdm_key] = to_map_str.apply(
                 lambda x: _map_to_df(table_map, x), axis=1
             )
-        elif elements and not isEmpty:
+        if elements and not isEmpty:
             table_df_i[cdm_key] = to_map
-        elif default is not None:  # (value = 0 evals to False!!)
+        if default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
             else:
