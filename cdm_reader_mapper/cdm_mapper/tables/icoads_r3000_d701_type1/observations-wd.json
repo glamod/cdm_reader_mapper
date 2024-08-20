@@ -61,8 +61,7 @@
   "observation_value": {
     "sections": "core",
     "elements": "D",
-    "transform": "integer_to_float",
-    "code_table": "icoads_wind_direction",
+    "transform": "icoads_wd_integer_to_float",
     "decimal_places": 0
   },
   "value_significance": {

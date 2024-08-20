@@ -60,7 +60,7 @@
   "observation_value": {
     "sections": "c99",
     "elements": "WDir",
-    "code_table": "icoads_wind_direction",
+    "transform": "icoads_wd_conversion",
     "decimal_places": 2
   },
   "value_significance": {
