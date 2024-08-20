@@ -140,10 +140,8 @@ def _write_csv_files(
             to_map_str = to_map.astype(str)
 
             to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
-            to_map = to_map_str.apply(
-                lambda x: _map_to_df(table_map, x), axis=1
-            )
-            
+            to_map = to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+
         if transform and not isEmpty:
             logger.debug(f"\ttransform: {transform}")
             logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
@@ -159,8 +157,8 @@ def _write_csv_files(
             elements = None
 
         if not isEmpty:
-            table_df_i[cdm_key] = to_map    
-                      
+            table_df_i[cdm_key] = to_map
+
         if default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
