@@ -145,6 +145,8 @@ def _write_csv_files(
             # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
             # Approach that does not work when it is not nested...so just try and assume not nested if fails
             # Prepare code_table
+            if code_table == "icoads_wind_direction":
+                exit()
             table_map = imodel_code_tables.get(code_table)
             try:
                 to_map = to_map.to_frame()
