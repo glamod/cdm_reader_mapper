@@ -103,6 +103,7 @@ def _write_csv_files(
         default = imapping.get("default")
         fill_value = imapping.get("fill_value")
         decimal_places = imapping.get("decimal_places")
+
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
@@ -138,6 +139,8 @@ def _write_csv_files(
                 table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
             else:
                 table_df_i[cdm_key] = trans(**kwargs)
+            elements = None
+
         if code_table and not isEmpty:
             # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
             # Approach that does not work when it is not nested...so just try and assume not nested if fails
@@ -154,8 +157,11 @@ def _write_csv_files(
             table_df_i[cdm_key] = to_map_str.apply(
                 lambda x: _map_to_df(table_map, x), axis=1
             )
+            elements = None
+
         if elements and not isEmpty:
             table_df_i[cdm_key] = to_map
+            
         if default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
