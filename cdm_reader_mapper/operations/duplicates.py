@@ -51,27 +51,39 @@ _compare_kwargs = {
 class DupDetect:
     """DOCUMENTATION."""
 
-    def __init__(self, data, compared):
+    def __init__(self, data, compared, method_kwargs, compare_kwargs):
         self.data = data
         self.compared = compared
+        self.method_kwargs = method_kwargs
+        self.compare_kwargs = compare_kwargs
 
     def _get_limit(self, limit):
         if limit == "default":
             limit = 0.75
         return limit
 
+    def _get_equal_musts(self):
+        equal_musts = []
+        for value in self.method_kwargs.values():
+            if not isinstance(value, list):
+                value = [value]
+            for v in value:
+                if v in self.data.columns:
+                    equal_musts.append(v)
+        return equal_musts
+
     def total_score(self):
         """DOCUMENTATION."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
 
-    def get_matches(
-        self, limit="default", must_equals=["report_timestamp", "report_id"]
-    ):
+    def get_matches(self, limit="default", equal_musts=None):
         """DOCUMENTATION."""
         self.limit = self._get_limit(limit)
         cond = self.score >= self.limit
-        for must in must_equals:
+        if equal_musts is None:
+            equal_musts = self._get_equal_musts()
+        for must in equal_musts:
             cond = cond & (self.compared[must])
         self.matches = self.compared[cond]
 
@@ -87,15 +99,10 @@ class DupDetect:
         for index in self.matches.index:
             self.result = self.result.drop(index[keep])
 
-    def remove_duplicates(
-        self,
-        keep="first",
-        limit="default",
-        must_equals=["report_timestamp", "report_id"],
-    ):
+    def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
         """DOCUMENTATION."""
         self.total_score()
-        self.get_matches(limit, must_equals)
+        self.get_matches(limit, equal_musts=equal_musts)
         self.delete_matches(keep)
 
 
@@ -146,4 +153,4 @@ def duplicate_check(
     comparer = set_comparer(compare_kwargs)
     data = data.astype(comparer.conversion)
     compared = comparer.compute(pairs, data)
-    return DupDetect(data, compared)
+    return DupDetect(data, compared, method_kwargs, compare_kwargs)
