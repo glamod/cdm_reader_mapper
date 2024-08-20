@@ -10,7 +10,7 @@ _method_kwargs = {
         "window": 5,
         "block_on": ["report_id"],
     },
-    "observation": {
+    "observations": {
         "left_on": "observation_id",
         "window": 5,
         "block_on": ["report_id"],
@@ -32,7 +32,7 @@ _compare_kwargs = {
         "report_timestamp": {"method": "exact"},
         "source_record_id": {"method": "exact"},
     },
-    "observation": {
+    "observations": {
         "observation_id": {"method": "exact"},
         "report_id": {"method": "exact"},
         "longitude": {
