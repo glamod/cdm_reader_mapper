@@ -61,6 +61,7 @@
     "sections": "core",
     "elements": "D",
     "transform": "integer_to_float",
+    "code_table": "icoads_wind_direction",
     "decimal_places": 0
   },
   "value_significance": {
