@@ -127,7 +127,19 @@ def _write_csv_files(
             if len(to_map) == 0:
                 isEmpty = True
 
-        if code_table and not isEmpty:
+        if transform and not isEmpty:
+            logger.debug(f"\ttransform: {transform}")
+            logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+
+            trans = getattr(imodel_functions, transform)
+            logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
+            logger.debug(f"\tidata_i Index: {idata.index}")
+            if elements:
+                logger.debug(f"\tnotna_idx: {notna_idx}")
+                table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
+            else:
+                table_df_i[cdm_key] = trans(**kwargs)
+        elif code_table and not isEmpty:
             # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
             # Approach that does not work when it is not nested...so just try and assume not nested if fails
             # Prepare code_table
@@ -140,26 +152,12 @@ def _write_csv_files(
             to_map_str = to_map.astype(str)
 
             to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
-            to_map = to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
-
-        if transform and not isEmpty:
-            logger.debug(f"\ttransform: {transform}")
-            logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
-
-            trans = getattr(imodel_functions, transform)
-            logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
-            logger.debug(f"\tidata_i Index: {idata.index}")
-            if elements:
-                logger.debug(f"\tnotna_idx: {notna_idx}")
-                to_map = trans(to_map, **kwargs)
-            else:
-                to_map = trans(**kwargs)
-            elements = None
-
-        if not isEmpty:
+            table_df_i[cdm_key] = to_map_str.apply(
+                lambda x: _map_to_df(table_map, x), axis=1
+            )
+        elif elements and not isEmpty:
             table_df_i[cdm_key] = to_map
-
-        if default is not None:  # (value = 0 evals to False!!)
+        elif default is not None:  # (value = 0 evals to False!!)
             if isinstance(default, list):
                 table_df_i[cdm_key] = [default] * len(table_df_i.index)
             else:
