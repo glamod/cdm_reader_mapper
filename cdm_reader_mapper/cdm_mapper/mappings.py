@@ -281,7 +281,6 @@ class mapping_functions:
         """Convert integer to float."""
         return ds.astype(float)
 
-
     def icoads_wd_conversion(self, ds):
         """Convert ICOADS WD."""
         ds = ds.mask(ds == 361, 0)
