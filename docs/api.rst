@@ -20,3 +20,30 @@ This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
 .. autofunction:: cdm_reader_mapper.cdm_mapper.table_to_ascii
    :noindex:
+
+.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime
+   :noindex:
+
+.. autofunction:: cdm_reader_mapper.metmetpy.validate_datetime
+   :noindex:
+
+.. autofunction:: cdm_reader_mapper.metmetpy.correct_pt
+   :noindex:     
+   
+.. autofunction:: cdm_reader_mapper.metmetpy.validate_id
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.operations.corrections
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.operations.inspect
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.operations.replace
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.common.load_file
+   :noindex:   
