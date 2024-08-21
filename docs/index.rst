@@ -6,7 +6,7 @@
 Marine data file reader toolbox documentation
 ---------------------------------------------
 
-The **cdm** toolbox is a python3_ tool designed for both
+The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
 
 * to read data files compliant with a user specified data model.
 * to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool
@@ -31,11 +31,7 @@ This tool outputs a python object with the following attributes:
 
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
-Several data models have been added to the tool including the IMMA schema:
-
-.. code-block:: console
-
-    from mdf_reader-data_models.library import imma1
+Several data models have been added to the tool including the IMMA schema.
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
