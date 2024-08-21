@@ -50,11 +50,26 @@ _compare_kwargs = {
 
 
 class DupDetect:
-    """DOCUMENTATION."""
+    """Class for duplicate check.
 
-    def __init__(self, data, compared, method_kwargs, compare_kwargs):
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Original dataset
+    compared: pd.DataFrame
+        Dataset after duplicate check.
+    method: str
+        Duplicate check method for recordlinkage.
+    method_kwargs: dict
+        Keyword arguments for recordlinkage duplicate check.
+    compare_kwargs: dict
+        Keyword arguments for recordlinkage.Compare object.
+    """
+
+    def __init__(self, data, compared, method, method_kwargs, compare_kwargs):
         self.data = data
         self.compared = compared
+        self.method = method
         self.method_kwargs = method_kwargs
         self.compare_kwargs = compare_kwargs
 
@@ -74,24 +89,42 @@ class DupDetect:
         return equal_musts
 
     def total_score(self):
-        """DOCUMENTATION."""
+        """Get total score of duplicate check."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
         return self
 
     def get_matches(self, limit="default", equal_musts=None):
-        """DOCUMENTATION."""
+        """Get duplicate matches.
+
+        Parameters
+        ----------
+        limit: float, optional
+            Limit of total score that as to be exceeded to be declared as a duplicate.
+            Default: .75
+        equal_musts: str or list, optional
+            Hashable of column name(s) that must totally be equal to be declared as a duplicate.
+            Default: All column names found in method_kwargs.
+        """
         self.limit = self._get_limit(limit)
         cond = self.score >= self.limit
         if equal_musts is None:
             equal_musts = self._get_equal_musts()
+        if isinstance(equal_musts, str):
+            equal_musts = [equal_musts]
         for must in equal_musts:
             cond = cond & (self.compared[must])
         self.matches = self.compared[cond]
         return self
 
     def delete_matches(self, keep="first"):
-        """DOCUMENTATION."""
+        """Get result data set with deleted matches.
+
+        Parameters
+        ----------
+        keep: str, ["first", "last"]
+            Which entry shpould be kept in result dataset.
+        """
         if keep == "first":
             keep = 0
         elif keep == "last":
@@ -104,7 +137,19 @@ class DupDetect:
         return self
 
     def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
-        """DOCUMENTATION."""
+        """Remove duplicates from dataset.
+
+        Parameters
+        ----------
+        keep: str, ["first", "last"]
+            Which entry shpould be kept in result dataset.
+        limit: float, optional
+            Limit of total score that as to be exceeded to be declared as a duplicate.
+            Default: .75
+        equal_musts: str or list, optional
+            Hashable of column name(s) that must totally be equal to be declared as a duplicate.
+            Default: All column names found in method_kwargs.
+        """
         self.total_score()
         self.get_matches(limit, equal_musts=equal_musts)
         self.delete_matches(keep)
@@ -112,7 +157,18 @@ class DupDetect:
 
 
 def set_comparer(compare_dict):
-    """DOCUMENTATION."""
+    """Set recordlinkage Comparer.
+
+    Parameters
+    ----------
+    compare_dict: dict
+        Keyword arguments for recordlinkage.Compare object.
+
+    Returns
+    -------
+    recordlinkage.Compare object:
+        recordlinkage.Compare object with added methods.
+    """
     comparer = rl.Compare()
     setattr(comparer, "conversion", {})
     for column, c_dict in compare_dict.items():
@@ -145,7 +201,31 @@ def duplicate_check(
     cdm_name="header",
     table_name=None,
 ):
-    """DOCUMENTATION."""
+    """Duplicate check.
+
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Dataset for duplicate check.
+    method: str
+        Duplicate check method for recordlinkage.
+        Default: SortedNeighbourhood
+    method_kwargs: dict, optional
+        Keyword arguments for recordlinkage duplicate check.
+        Default: _method_kwargs[cdm_name]
+    compare_kwargs: dict, optional
+        Keyword arguments for recordlinkage.Compare object.
+        Default: _compare_kwargs[cdm_name]
+    cdm_name: str, ["header", "observations"]
+        Name of CDM table.
+        Use only if at least one of method_kwargs or compare_kwargs is None.
+    table_name: str
+        Name of the CDM table to be selected from data.
+
+    Returns
+    -------
+        DupDetect object
+    """
     if table_name:
         data = data[table_name]
     if not method_kwargs:
@@ -158,4 +238,4 @@ def duplicate_check(
     comparer = set_comparer(compare_kwargs)
     data = data.astype(comparer.conversion)
     compared = comparer.compute(pairs, data)
-    return DupDetect(data, compared, method_kwargs, compare_kwargs)
+    return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
