@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-Tool overview
-=============
+Tool overview (mdf_reader)
+==========================
 
 In the tool's context, a data model is the combination of a **schema file** with information on the file format and its contents and, optionally, the data model contains a set of code tables with ``key:value`` pairs, to translate encoded information in some data elements:
 
