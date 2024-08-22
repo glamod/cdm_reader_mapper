@@ -3,23 +3,25 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-Marine data file reader toolbox documentation
----------------------------------------------
+Marine data file reader-mapper toolbox documentation
+----------------------------------------------------
 
 The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
 
-* to read data files compliant with a user specified data model.
-* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool
+* to read data files compliant with a user specified data model (**mdf_reader**).
+* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool (**cdm_mapper**)
 
 It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format.
 
 The tool has been further enhanced to account for any marine meteorological data format, provided that this data meets the following specifications:
 
 -	Data is stored in a human-readable manner: ASCII_.
+- Data is stored in a Network Common Data Foramt: NetCDF_.
 -	Data is organized in single line reports (e.g. rows of observations separated by a delimiter like .csv).
 -	Reports have a coherent internal structure that can be modelized.
 -	Reports are fixed width or field delimited types.
 -	Reports can be organized in sections, in which case each section can be of different types (fixed width of delimited).
+
 
 The **mdf_reader** uses the information provided in a `data model`_ to read meteorological data into a python pandas.DataFrame_, with the column names and data types set according to each data element’s description specified in the data model or **schema**. In addition to reading, the **mdf_reader** validates data elements against the **schema** provided.
 
@@ -42,7 +44,8 @@ Several data models have been added to the tool including the IMMA schema.
 
    About <readme>
    tool-set-up
-   tool-overview
+   tool-overview_reader
+   tool-overview_mapper
    getting-started
    data-models
    how-to-build-a-data-model

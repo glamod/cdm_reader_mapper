@@ -28,6 +28,8 @@
 
 .. _Missing data casting rules and indexing: https://pandas.pydata.org/pandas-docs/stable/user_guide/missing_data.html
 
+.. _NetCDF: https://www.unidata.ucar.edu/software/netcdf
+
 .. _pandas.DataFrame: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
 
 .. _pandas.to_datetime: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_datetime.html
