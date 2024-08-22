@@ -16,7 +16,7 @@ It was developed with the initial idea of reading data from the International Co
 The tool has been further enhanced to account for any marine meteorological data format, provided that this data meets the following specifications:
 
 -	Data is stored in a human-readable manner: ASCII_.
-- Data is stored in a Network Common Data Foramt: NetCDF_.
+- Data is stored in a Network Common Data Format: NetCDF_.
 -	Data is organized in single line reports (e.g. rows of observations separated by a delimiter like .csv).
 -	Reports have a coherent internal structure that can be modelized.
 -	Reports are fixed width or field delimited types.
