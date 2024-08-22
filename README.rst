@@ -109,7 +109,7 @@ Credits
 
 ``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_).
 
-Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMCAS_).
+Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
 .. hyperlinks
 
