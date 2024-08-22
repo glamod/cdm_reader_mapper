@@ -20,7 +20,7 @@ The main steps to create a data model (or schema) for the mdf_reader are:
 
 2. Create a valid **schema** file:
 
-To create the schema file, two important aspects of the schema need to be clear beforehand; i) the order and field lengths of each element in the data input string, ii) do the information in the data input needs to be organised into sections, like ICOADS ``.imma`` data format. 
+To create the schema file, two important aspects of the schema need to be clear beforehand; i) the order and field lengths of each element in the data input string, ii) do the information in the data input needs to be organised into sections, like ICOADS ``.imma`` data format.
 
 These templates have been created to ease the generation of new valid schema files, these templates cover from a basic schema format to a more complex one:
 
