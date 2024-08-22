@@ -6,11 +6,8 @@ Tool overview (cdm_mapper)
 
     Simplified workflow of the main function in the tool
 
-Input data
-==========
-
-``imodel``
-----------
+Input data: ``imodel`` and ``pandas.DataFrame``
+-----------------------------------------------
 
 An ``imodel`` consist of a collection of `.json` files (or `python dictionaries <https://realpython.com/python-dicts/>`_) and python functions (``imodel.py``) that specify how a given `pandas.DataFrame <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ containing marine meteorological data, should be organise and map to the `CDM <https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf>`_ format.
 
@@ -24,9 +21,6 @@ The `CDM <https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_
 
 4. ``__init__.py``: python file required to access subpackages and class functions inside ``imodel.py``.
 
-``pandas.Dataframe``
---------------------
-
 The data to map must have the following structure:
 
 1.	Be a `pandas.DataFrame <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ (DF) with the data values organised into sections and/or columns.
@@ -35,7 +29,7 @@ The data to map must have the following structure:
 .. note:: The cdm-mapper relies on the output of the `mdf_reader <https://mdf-reader.readthedocs.io/en/mdf_reader/index.html>`_ toolbox. Please read more on the mdf_reader documentation page to understand the structure of the ``pandas.Dataframe`` or **schema** containing the meteorological data to map.
 
 Output data
-===========
+-----------
 
 The output of the main mapper function is a python `dictionary <https://realpython.com/python-dicts/>`_ with the ``{cdm_table_name : cdm_table_object}`` pairs of data, that can be afterwards printed to an ascii file. Each file or python dictionary contains one of the CDM tables for which a mapping has been defined in the ``imodel``. Optionally, the intermediate mapped python object can also be accessed.
 
