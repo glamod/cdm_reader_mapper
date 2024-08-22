@@ -21,29 +21,26 @@ This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 .. autofunction:: cdm_reader_mapper.cdm_mapper.table_to_ascii
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime
+.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime.correct
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.metmetpy.validate_datetime
+.. autofunction:: cdm_reader_mapper.metmetpy.validate_datetime.validate
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_pt
+.. autofunction:: cdm_reader_mapper.metmetpy.correct_pt.correct
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.metmetpy.validate_id
+.. autofunction:: cdm_reader_mapper.metmetpy.validate_id.validate
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.operations.corrections
+.. autofunction:: cdm_reader_mapper.operations.corrections.corrections
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.operations.inspect
+.. autofunction:: cdm_reader_mapper.operations.corrections.get_dup
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.operations.replace
+.. autofunction:: cdm_reader_mapper.operations.inspect.count_by_cat
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime
-   :noindex:
-
-.. autofunction:: cdm_reader_mapper.common.load_file
+.. autofunction:: cdm_reader_mapper.operations.replace.replace_columns
    :noindex:
