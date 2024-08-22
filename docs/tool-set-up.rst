@@ -6,7 +6,7 @@
 Tool set up
 ===========
 
-The **cdm**  toolbox is a pure Python package, but it has a few dependencies that rely in a specific python and module version.
+The **cdm_reader_mapper**  toolbox is a pure Python package, but it has a few dependencies that rely in a specific python and module version.
 
 From source
 ~~~~~~~~~~~
@@ -31,15 +31,15 @@ Once you have a copy of the source, you caninstall it with pip_:
 
    pip install -e .
 
-Stable release (not possible yet)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Stable release
+~~~~~~~~~~~~~~
 
-To install the **cdm** toolbox in your current conda_ environment, run this command in your terminal:
+To install the **cdm_reader_mapper** toolbox in your current conda_ environment, run this command in your terminal:
 
 .. code-block:: console
 
-  pip install cdm
+  pip install cdm_reader_mapper
 
-In the future, this will be the preferred method to install the **cdm** toolbox, as it will always install the moste recent stable release.
+This is the preferred method to install the **cdm_reader_mapper** toolbox, as it will always install the most recent stable release.
 
 .. include:: hyperlinks.rst
