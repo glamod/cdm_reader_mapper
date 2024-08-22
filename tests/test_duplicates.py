@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import pytest  # noqa
 
-from cdm_reader_mapper.cdm_mapper import duplicate_check
-from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.cdm_mapper import duplicate_check, read_tables
 
 from ._results import result_data
 
@@ -43,7 +42,8 @@ def _manipulate_observations(df):
     df.loc[8, "latitude"] = 73.20
     df.loc[8, "longitude"] = 34.00
     return df
-    
+
+
 def test_duplicates_header():
     expected_data = result_data.expected_103_792
     data_path = expected_data.get("cdm_table")
@@ -67,4 +67,4 @@ def test_duplicates_observations():
     )
     df = _manipulate_observations(df)
     DupDetect = duplicate_check(df, cdm_name="observations")
-    return DupDetect.remove_duplicates()    
+    return DupDetect.remove_duplicates()
