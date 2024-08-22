@@ -75,15 +75,3 @@ For more details and an overview of the tool check out the following python note
 
 - example_notebooks/CDM_mapper_example_deck704.ipynb
 
-f. Run **cdm** as an command-line interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can also run the **cdm** toolbox as a command-line interface. To call the function from a terminal type:
-
-   cdm <your-file-path> --data_model imma1 --out_path <yout-output-path>
-
-For more details how to run the command-line interface please call the helper function:
-
-.. code-block:: console
-
-   cdm -h
