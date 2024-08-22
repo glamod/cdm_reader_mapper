@@ -293,14 +293,12 @@ def read(
     Parameters
     ----------
     source : str
-        The file path to read
+        The file (including path) to be read
     data_model : str, optional
         Name of internally available data model
     data_model_path : str, optional
-        Path to external data model. Expected file structure:
-            name_of_model/
-                name_of_model.json
-                code_tables/
+        Path to external data model. 
+        Expected file structure: name_of_model/name_of_model.json
 
     Returns
     -------
