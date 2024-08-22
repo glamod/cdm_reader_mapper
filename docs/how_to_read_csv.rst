@@ -11,10 +11,9 @@ How to read a simple csv file
 
 1. Have a clear understanding of the structure of the data file you wish to read in, namely delimiter used, the variables contained per column, the units, acceptable limits for each variable etc.
 
-2. As described in section ref:`_how-to-build-a-data-model`, create a valid directory tree where the model you will create (**(mymodel)**) should be saved. This can be placed either in the mdf_reader library directory (``~/mdf_reader/data_models/library/``) or in a user defined path which will be provided into the mdf_reader at a later step.
+2. As described in section ref:`_how-to-build-a-data-model`, create a valid directory tree where the model you will create (**(mymodel)**) should be saved. This can be placed in a user defined path which will be provided into the mdf_reader at a later step.
 
-3. Create the **schema** file under ``../library/mymodel/mymodel.json`` or ``path/mymodel/mymodel.json``.
-For example for a data file without sections, stored in comma delimited csv format, that contains 8 columns (year, month, day, longitude, latitude, wind speed, sea surface temperature and sea level pressure respectively) like the following:
+3. Create the **schema** file. For example for a data file without sections, stored in comma delimited csv format, that contains 8 columns (year, month, day, longitude, latitude, wind speed, sea surface temperature and sea level pressure respectively) like the following:
 
 +------+------+------+---------+--------+--------+---------+---------+
 | YR   | MO   | DY   | LON     | LAT    | W      | SST     | SLP     |

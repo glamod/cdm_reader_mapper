@@ -12,7 +12,7 @@ Data Models
 Schema
 ======
 
-The schema file gathers a collection of descriptors that enables the **cdm** toolbox to access and extract meaningful units of information for each element.
+The schema file gathers a collection of descriptors that enables the **cdm_reader_mapper** toolbox to access and extract meaningful units of information for each element.
 
 Valid schemas files are json files that the tool accesses and stores internally as dictionaries. The basename of the schema file must be the same as the data model directory and its extension ``.json``
 
@@ -33,18 +33,17 @@ There are two levels of information in the schema:
 
     Content inside a ``schema.json`` file.
 
-The **cdm** toolbox supports reading and validation of both internal and external schemas:
+The **cdm_reader_mapper** toolbox supports reading and validation of both internal and external schemas:
 
 - An **internal data model** has its schema registered within the tool. To read and validate data from these models, we only need to pass its reference name to the reader and validation modules, using the argument ``data_model``. A list of the reference names for internally supported data models can be access via the tool's function::
 
-   import cdm
-   cdm.properties.supported_data_models()
+   from cdm_reader_mapper import cdm_mapper
+   cdm_mapper.properties.supported_data_models()
 
 - An **external data model** is a data format that is unknown to the tool. If the data model meets the specifications for which the tool was built, then a model can be built externally and fed into it for both functions data reading and model validation using the argument ``data_model_path``::
 
-   model_path = 'cdm/data_models/library/imma1_d701'
-   data_file_path = 'cdm/data/069-701_1845-04_subset.imma'
-   data = cdm.read(data_file_path, data_model_path= model_path)
+   from cdm_reader_mapper import mdf_reader
+   data = mdf_reader.read(<your_data_file_path>, data_model_path=<path_to_yout_data_model>)
 
 .. _code-tables:
 
@@ -74,18 +73,6 @@ The following range of code table structures are currently supported:
 - Range-keyed code tables: code tables (simple or multi-keyed) where one or more keys is a (integer) range of values.
 
 Code tables can be imported as python dictionaries directly using the json package. To be fully read by the tool, however, keys in **range-keyed code tables** need to be expanded and access to all code tables is managed in the application through a **code table manager module**.
-
-The following commands typed in a python console, show how to access code table templates to create new code tables::
-
-      template_names = cdm.code_tables.templates()
-
-To copy a template to edit::
-
-      cdm.code_tables.copy_template(template_name,out_path=file_path)
-
-or::
-
-      cdm.code_tables.copy_template(template_name,out_dir=dir_path)
 
 
 Common features
