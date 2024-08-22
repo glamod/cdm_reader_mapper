@@ -74,4 +74,3 @@ This writes the output to an ascii file with a pipe delimited format using the f
 For more details and an overview of the tool check out the following python notebook:
 
 - example_notebooks/CDM_mapper_example_deck704.ipynb
-
