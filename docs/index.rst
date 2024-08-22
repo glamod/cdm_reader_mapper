@@ -11,7 +11,7 @@ The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
 * to read data files compliant with a user specified data model (**mdf_reader**).
 * to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool (**cdm_mapper**)
 
-It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format.
+It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format. In the meanwhile, it can read data C-RAID_ Copernicus in situ project too.
 
 The tool has been further enhanced to account for any marine meteorological data format, provided that this data meets the following specifications:
 
@@ -33,9 +33,11 @@ This tool outputs a python object with the following attributes:
 
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
-Several data models have been added to the tool including the IMMA schema.
+Several data models have been added to the tool including both the IMMA and the C-RAID schema.
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
+
+In addition, those data will be mapped the standardized C3S CDS Common Data Model CDM_.
 
 .. toctree::
    :maxdepth: 2

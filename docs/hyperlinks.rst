@@ -4,6 +4,8 @@
 
 .. _boolean pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.bool.html
 
+.. _C-RAID: https://www.coriolis.eu.org/Observing-the-Ocean/DBCP-E-SURFMAR/C-RAID-Copernicus-in-situ-project
+
 .. _CDM: cdm_latest.pdf
 
 .. _conda: https://docs.conda.io/en/latest/
