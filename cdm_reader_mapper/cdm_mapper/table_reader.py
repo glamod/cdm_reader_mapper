@@ -92,26 +92,26 @@ def read_tables(
         path to the file
     tb_id:
         any identifier including wildcards if required extension, defaulting to 'psv'
-    cdm_subset: 
+    cdm_subset:
         specifies a subset of tables or a single table.
-        
-        - For multiple subsets of tables: 
+
+        - For multiple subsets of tables:
           This function returns a pandas.DataFrame that is multi-index at
           the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
-          
-        - For a single table: 
+
+        - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
 
     delimiter:
         default is '|'
     extension:
         default is psv
-    col_subset: 
+    col_subset:
         a python dictionary specifying the section or sections of the file to read
-        
+
         - For multiple sections of the tables:
           e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
-          
+
         - For a single section:
           e.g. ``list type object col_subset = [columns]``
           This variable assumes that the column names are all conform to the cdm field names.
@@ -122,7 +122,7 @@ def read_tables(
     Returns
     -------
     pandas.DataFrame: either the entire file or a subset of it.
-    
+
     Note
     ----
     Logs specific messages if there is any error.

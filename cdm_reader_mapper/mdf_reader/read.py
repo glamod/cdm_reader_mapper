@@ -297,7 +297,7 @@ def read(
     data_model : str, optional
         Name of internally available data model
     data_model_path : str, optional
-        Path to external data model. 
+        Path to external data model.
         Expected file structure: name_of_model/name_of_model.json
 
     Returns
