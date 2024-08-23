@@ -3,13 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-Tool overview
-=============
-
-In this chapter we want to introduce a overview of the two big parts in the ``cdm_reader_mapper`` toolbox. On the one hand there is the ``mdf_reader`` and on the other there is the ``cdm_mapper``.
-
-``mdf_reader``
---------------
+``mdf_reader`` overview
+=======================
 
 In the tool's context, a data model is the combination of a **schema file** with information on the file format and its contents and, optionally, the data model contains a set of code tables with ``key:value`` pairs, to translate encoded information in some data elements:
 
@@ -17,7 +12,7 @@ In the tool's context, a data model is the combination of a **schema file** with
 
 
 Workflow
-^^^^^^^^
+--------
 
 .. figure:: _static/images/mdf_reader_diagram.svg
     :width: 100%
@@ -25,7 +20,7 @@ Workflow
     Simplified workflow of the ``mdf_reader``
 
 Input data
-^^^^^^^^^^
+----------
 
 The tool has been created to read meteorological data from both ICOADS_3_ stored in the ``.imma`` format and C-RAID stored in the ``.netcdf``, please read both the `following ICOADS guide`_ and the ``following C-RAID guide`_ to know more details regarding the database and the data format.
 
@@ -43,8 +38,8 @@ The C-RAID containing in-situ platform data is stored in the ``.netcdf``. The **
 
 The data can be read by using the ``c_raid`` schema included in this tool.
 
-Output
-^^^^^^
+Output data
+-----------
 
 The output of the **mdf_reader** is a python object with three attributes:
 
@@ -54,7 +49,7 @@ The output of the **mdf_reader** is a python object with three attributes:
 
 
 Processing of the data elements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------
 
 The individual data element definitions in the schema determines how each element is extracted, transformed and validated within the tool. If the data model or schema has its data elements organised in sections, the reader first identifies the string chunks corresponding to the different sections.
 
@@ -68,7 +63,7 @@ Afterwards, data elements are extracted from each of these chunks, as shown in t
     Schematic representation of the integral process of reading, transforming and validating a data element.
 
 Data elements extraction and transformation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
 
 The data element extraction and transformation from the initial string to the output dataframe occurs mainly in 3 steps:
 
@@ -102,7 +97,7 @@ The data element extraction and transformation from the initial string to the ou
       Safe parsing to datetime objects with pandas.to_datetime_, assigning `NaT` where the conversion is not possible.
 
 Validation of elements against the schema or data model
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------------------
 
 Data model validation is initiated after each element unpacking and conversion. New ``Na/NaN`` values in the data (not identified as missing values during extraction) are understood by the tool to have fail unpacking or conversion, and thus, are not validate against the data model. The resulting preliminary validation mask values are:
 

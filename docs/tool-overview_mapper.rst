@@ -1,10 +1,10 @@
-cdm_mapper
-----------
+``cdm_mapper`` overview
+=======================
 
 After reading ICOADS or C-RAID data with the ``mdf_reader``, this data can be mapped to the standardized C3S Common Data Model (CDM) format.
 
 Workflow
-^^^^^^^^
+--------
 
 .. figure:: _static/images/imodel_diagram.svg
     :width: 100%
@@ -12,7 +12,7 @@ Workflow
     Simplified workflow of the ``cdm_mapper``
 
 Input data
-^^^^^^^^^^
+----------
 
 An ``imodel`` consist of a collection of `.json` files (or `python dictionaries <https://realpython.com/python-dicts/>`_) and python functions (``imodel.py``) that specify how a given `pandas.DataFrame <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ containing marine meteorological data, should be organise and map to the `CDM <https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf>`_ format.
 
@@ -32,7 +32,7 @@ The data to map must have the following structure:
 .. note:: The ``cdm_mapper`` relies on the output of the ``mdf_reader``.
 
 Output data
-^^^^^^^^^^^
+-----------
 
 The output of the main mapper function is a python `dictionary <https://realpython.com/python-dicts/>`_ with the ``{cdm_table_name : cdm_table_object}`` pairs of data, that can be afterwards printed to an ascii file. Each file or python dictionary contains one of the CDM tables for which a mapping has been defined in the ``imodel``. Optionally, the intermediate mapped python object can also be accessed.
 
