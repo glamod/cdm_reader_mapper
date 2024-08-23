@@ -104,10 +104,7 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
     )
 
 
-For more details on how to use the ``reader`` tool see the following `jupyter notebooks`_.
-For more details on how to use the ``mapper`` tool see the following `jupyter notebook`_.
-
-For a detailed guide on how to build a cdm and write the output of the `cdm.map_model()` function in ascii see the `user guide`_.
+For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
 
 Contributing to cdm_reader_mapper
 ---------------------------------
@@ -135,7 +132,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 
 .. _IMMA: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
 
-.. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
+.. _jupyter example notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
 .. _NOC: https://noc.ac.uk/
 
