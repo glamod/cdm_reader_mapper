@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cdm_reader_mapper.cdm_mapper.table_writer &mdash; cdm_reader_mapper unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=3f1b9271"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            cdm_reader_mapper
+          </a>
+              <div class="version">
+                unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tool-set-up.html">Tool set up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../example_notebooks/mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../example_notebooks/create_data_model.html">How to create a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../example_notebooks/CLIWOC_datamodel.html">Generating a data model for CLIWOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../example_notebooks/CDM_mapper_example_deck704.html">Mapping supplemental data from deck 704 to a CDM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changes.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cdm_reader_mapper.cdm_mapper.table_writer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cdm_reader_mapper.cdm_mapper.table_writer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Write Common Data Model (CDM) mapping tables.</span>
+
+<span class="sd">Created on Thu Apr 11 13:45:38 2019</span>
+
+<span class="sd">Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files,</span>
+<span class="sd">The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame</span>
+<span class="sd">(or pd.io.parsers.TextFileReader).</span>
+
+<span class="sd">This module uses a set of printer functions to &quot;print&quot; element values to a</span>
+<span class="sd">string object before exporting them to a final ascii file.</span>
+
+<span class="sd">Each of the CDM table element&#39;s has a data type (pseudo-sql as defined in the CDM documentation) which defines</span>
+<span class="sd">which printer function needs to be used.</span>
+
+<span class="sd">Numeric data types are printed with an specific number of decimal places, defined in the data element attributes. This</span>
+<span class="sd">can vary according to each CDM, element, imodel and mapping .json file. If this is not defined in the input attributes</span>
+<span class="sd">of the imodel, the number of decimal places used comes from a default tool defined in properties.py</span>
+
+<span class="sd">@author: iregon</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">cdm_reader_mapper.common</span> <span class="kn">import</span> <span class="n">logging_hdlr</span>
+
+<span class="n">module_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">print_integer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print all elements that have &#39;int&#39; as type attribute.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: data tables to print</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: data as int type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">null_label</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="p">)</span>  <span class="c1"># ValueError: invalid literal for int() with base 10: &#39;5.0&#39;</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">print_float</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print all elements that have &#39;float&#39; as type attribute.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: data tables to print</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+<span class="sd">    decimal_places: number of decimal places</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: data as float type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">,</span> <span class="n">format_float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">null_label</span>
+        <span class="k">return</span> <span class="n">format_float</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">format_float</span> <span class="o">=</span> <span class="s2">&quot;{:.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">decimal_places</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;f}&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">,</span> <span class="n">format_float</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">print_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print datetime objects in the format: &quot;%Y-%m-%d %H:%M:%S&quot;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: date time elements</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: data as datetime objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">null_label</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">print_varchar</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print string elements.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: data tables to print</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: data as string objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">null_label</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_return_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">null_label</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">print_integer_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print a series of integer objects as array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: data tables to print</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: array of int objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">print_integer_array_i</span><span class="p">,</span> <span class="n">null_label</span><span class="o">=</span><span class="n">null_label</span><span class="p">)</span>
+
+
+<span class="c1"># TODO: tell this to dave and delete them... put error messages in functions above</span>
+<span class="k">def</span> <span class="nf">print_float_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a series of float objects as array.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;float array not defined in printers&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">print_datetime_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a series of datetime objects as array.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;datetime tz array not defined in printers&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">print_varchar_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">null_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print a series of string objects as array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: data tables to print</span>
+<span class="sd">    null_label: specified how nan are represented</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: array of varchar objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">print_varchar_array_i</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">print_integer_array_i</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">null_label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NEED DOCUMENTATION.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    row</span>
+<span class="sd">    null_label</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">row</span><span class="p">]</span>
+    <span class="n">str_row</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">str_row</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">string</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+    <span class="k">return</span> <span class="n">null_label</span>
+
+
+<span class="k">def</span> <span class="nf">print_varchar_array_i</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">null_label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NEED DOCUMENTATION.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    row</span>
+<span class="sd">    null_label</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: varchar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">row</span><span class="p">]</span>
+    <span class="n">str_row</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">str_row</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">string</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+    <span class="k">return</span> <span class="n">null_label</span>
+
+
+<span class="k">def</span> <span class="nf">table_to_ascii</span><span class="p">(</span>
+    <span class="n">table</span><span class="p">,</span>
+    <span class="n">table_atts</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">,</span>
+    <span class="n">null_label</span><span class="o">=</span><span class="s2">&quot;null&quot;</span><span class="p">,</span>
+    <span class="n">cdm_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Export a cdm table to an ascii file.</span>
+
+<span class="sd">    Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files.</span>
+<span class="sd">    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``</span>
+<span class="sd">    (or ``pd.io.parsers.TextFileReader``).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    table:</span>
+<span class="sd">        pandas.Dataframe to export</span>
+<span class="sd">    table_atts: attributes of the pandas.Dataframe stored as a python dictionary.</span>
+<span class="sd">            This contains all element names, characteristics and types encoding,</span>
+<span class="sd">            as well as other characteristics e.g. decimal places, etc.</span>
+<span class="sd">    delimiter:</span>
+<span class="sd">        default &#39;|&#39;</span>
+<span class="sd">    null_label:</span>
+<span class="sd">        specified how nan are represented</span>
+<span class="sd">    cdm_complete: if we export the entire set of tables.</span>
+<span class="sd">        default is ``True``</span>
+<span class="sd">    filename:</span>
+<span class="sd">        the name of the file to stored the data</span>
+<span class="sd">    log_level:</span>
+<span class="sd">        level of logging information to be saved</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Saves cdm tables as ascii files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging_hdlr</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+
+    <span class="n">empty_table</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="s2">&quot;observation_value&quot;</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;observation_value&quot;</span><span class="p">])</span>
+        <span class="n">empty_table</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="s2">&quot;observation_value&quot;</span> <span class="ow">in</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">empty_table</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">empty_table</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">empty_table</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No observation values in table&quot;</span><span class="p">)</span>
+        <span class="n">ascii_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="n">ascii_table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">ascii_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">iele</span> <span class="ow">in</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">iele</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+            <span class="n">itype</span> <span class="o">=</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">iele</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">printers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">itype</span><span class="p">):</span>
+                <span class="n">iprinter_kwargs</span> <span class="o">=</span> <span class="n">iprinters_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">itype</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">iprinter_kwargs</span><span class="p">:</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">iele</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iprinter_kwargs</span><span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">ascii_table</span><span class="p">[</span><span class="n">iele</span><span class="p">]</span> <span class="o">=</span> <span class="n">printers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">itype</span><span class="p">)(</span>
+                    <span class="n">table</span><span class="p">[</span><span class="n">iele</span><span class="p">],</span> <span class="n">null_label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No printer defined for element </span><span class="si">{</span><span class="n">iele</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ascii_table</span><span class="p">[</span><span class="n">iele</span><span class="p">]</span> <span class="o">=</span> <span class="n">null_label</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">wmode</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span>
+    <span class="n">columns_to_ascii</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cdm_complete</span>
+        <span class="k">else</span> <span class="n">table_atts</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">ascii_table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="n">columns_to_ascii</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">wmode</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="cdm_to_ascii">
+<a class="viewcode-back" href="../../../api.html#cdm_reader_mapper.cdm_mapper.cdm_to_ascii">[docs]</a>
+<span class="k">def</span> <span class="nf">cdm_to_ascii</span><span class="p">(</span>
+    <span class="n">cdm_table</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">,</span>
+    <span class="n">null_label</span><span class="o">=</span><span class="s2">&quot;null&quot;</span><span class="p">,</span>
+    <span class="n">cdm_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;psv&quot;</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Export a complete cdm file with multiple tables to an ascii file.</span>
+
+<span class="sd">    Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)</span>
+<span class="sd">    format to ascii files.</span>
+<span class="sd">    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``</span>
+<span class="sd">    (or ``pd.io.parsers.TextFileReader``).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cdm_table:</span>
+<span class="sd">        common data model tables to export</span>
+<span class="sd">    delimiter:</span>
+<span class="sd">        default &#39;|&#39;</span>
+<span class="sd">    null_label:</span>
+<span class="sd">        specified how nan are represented</span>
+<span class="sd">    cdm_complete:</span>
+<span class="sd">        extract the entire cdm file</span>
+<span class="sd">    extension:</span>
+<span class="sd">        default &#39;psv&#39;</span>
+<span class="sd">    out_dir:</span>
+<span class="sd">        where to stored the ascii file</span>
+<span class="sd">    suffix:</span>
+<span class="sd">        file suffix</span>
+<span class="sd">    prefix:</span>
+<span class="sd">        file prefix</span>
+<span class="sd">    log_level:</span>
+<span class="sd">        level of logging information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Saves the cdm tables as ascii files in the given directory with a psv extension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging_hdlr</span><span class="o">.</span><span class="n">init_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+    <span class="c1"># Because how the printers are written, they modify the original data frame!,</span>
+    <span class="c1"># also removing rows with empty observation_value in observation_tables</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">cdm_table</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Printing table </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="p">[</span><span class="n">prefix</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">suffix</span><span class="p">]))</span> <span class="o">+</span> <span class="n">extension</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">filename</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">out_dir</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">table_to_ascii</span><span class="p">(</span>
+            <span class="n">cdm_table</span><span class="p">[</span><span class="n">table</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+            <span class="n">cdm_table</span><span class="p">[</span><span class="n">table</span><span class="p">][</span><span class="s2">&quot;atts&quot;</span><span class="p">],</span>
+            <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
+            <span class="n">null_label</span><span class="o">=</span><span class="n">null_label</span><span class="p">,</span>
+            <span class="n">cdm_complete</span><span class="o">=</span><span class="n">cdm_complete</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span>
+            <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="n">printers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="n">print_integer</span><span class="p">,</span>
+    <span class="s2">&quot;numeric&quot;</span><span class="p">:</span> <span class="n">print_float</span><span class="p">,</span>
+    <span class="s2">&quot;varchar&quot;</span><span class="p">:</span> <span class="n">print_varchar</span><span class="p">,</span>
+    <span class="s2">&quot;timestamp with timezone&quot;</span><span class="p">:</span> <span class="n">print_datetime</span><span class="p">,</span>
+    <span class="s2">&quot;int[]&quot;</span><span class="p">:</span> <span class="n">print_integer_array</span><span class="p">,</span>
+    <span class="s2">&quot;numeric[]&quot;</span><span class="p">:</span> <span class="n">print_float_array</span><span class="p">,</span>
+    <span class="s2">&quot;varchar[]&quot;</span><span class="p">:</span> <span class="n">print_varchar_array</span><span class="p">,</span>
+    <span class="s2">&quot;timestamp with timezone[]&quot;</span><span class="p">:</span> <span class="n">print_datetime_array</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">iprinters_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;numeric&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;decimal_places&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;numeric[]&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;decimal_places&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Generating a data model for CLIWOC — cdm_reader_mapper unknown documentation</title>
+<link href="../_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/nbsphinx-code-cells.css?v=2aa19091" rel="stylesheet" type="text/css"/>
+<!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+<script src="../_static/jquery.js?v=5d32c60e"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+<script src="../_static/documentation_options.js?v=3f1b9271"></script>
+<script src="../_static/doctools.js?v=9a2dae69"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="../_static/js/theme.js"></script>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="CDM_mapper_example_deck704.html" rel="next" title="Mapping supplemental data from deck 704 to a CDM"/>
+<link href="create_data_model.html" rel="prev" title="How to create a data model"/>
+</head>
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../index.html">
+            cdm_reader_mapper
+          </a>
+<div class="version">
+                unknown
+              </div>
+<div role="search">
+<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+</div>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-set-up.html">Tool set up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create_data_model.html">How to create a data model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generating a data model for CLIWOC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Creating-a-data-model">Creating a data model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Custom-Schema">Custom Schema</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CDM_mapper_example_deck704.html">Mapping supplemental data from deck 704 to a CDM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../index.html">cdm_reader_mapper</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+<li class="breadcrumb-item active">Generating a data model for CLIWOC</li>
+<li class="wy-breadcrumbs-aside">
+<a href="../_sources/example_notebooks/CLIWOC_datamodel.ipynb.txt" rel="nofollow"> View page source</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<section id="Generating-a-data-model-for-CLIWOC">
+<h1>Generating a data model for CLIWOC<a class="headerlink" href="#Generating-a-data-model-for-CLIWOC" title="Link to this heading"></a></h1>
+<section id="Creating-a-data-model">
+<h2>Creating a data model<a class="headerlink" href="#Creating-a-data-model" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">cdm_reader_mapper</span> <span class="kn">import</span> <span class="n">mdf_reader</span><span class="p">,</span> <span class="n">test_data</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib.resources</span> <span class="kn">import</span> <span class="n">files</span> <span class="k">as</span> <span class="n">get_files</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib_resources</span> <span class="kn">import</span> <span class="n">files</span> <span class="k">as</span> <span class="n">get_files</span>
+
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-06-06 10:48:27,524 - root - INFO - init basic configure of logging success
+/Users/josidd/Projects/cdm_glamod/venv/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+2024-06-06 10:48:30,630 - root - INFO - init basic configure of logging success
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="s2">"imma1"</span>
+<span class="n">data_file_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_063_714</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span>
+<span class="n">data_raw</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-06-06 10:48:30,755 - root - INFO - Attempting to fetch remote file: imma1_714/input/063-714_2010-07-01_subset.imma.md5
+2024-06-06 10:48:31,193 - root - INFO - READING DATA MODEL SCHEMA FILE...
+2024-06-06 10:48:31,199 - root - INFO - EXTRACTING DATA FROM MODEL: imma1
+2024-06-06 10:48:31,200 - root - INFO - Getting data string from source...
+2024-06-06 10:48:31,337 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')
+2024-06-06 10:48:31,337 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
+2024-06-06 10:48:31,516 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    99 0 48683,20100701,0000,  88.3790,  43.2100,1...
+1    99 0 25629,20100701,0000,  87.8090, -54.8550,1...
+2    99 0 25595,20100701,0000,  87.5610,  41.7610,1...
+3    99 0 26558,20100701,0000,  87.4040,  17.9720,1...
+4    99 0 26559,20100701,0000,  87.4030,  17.9730,1...
+Name: c99, dtype: object
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">line</span> <span class="o">=</span> <span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">line</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+'99 0 26558,20100701,0000,  87.4040,  17.9720,1,        ,    ,       ,       , ,   1.60,1,1013.60,1,       , ,       , ,       ,'
+</pre></div></div>
+</div>
+</section>
+<section id="Custom-Schema">
+<h2>Custom Schema<a class="headerlink" href="#Custom-Schema" title="Link to this heading"></a></h2>
+<p>To use a custom schema we need to use the <code class="docutils literal notranslate"><span class="pre">data_model_path</span></code> argument in <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>. The structure of the directory is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>name_of_model/
+    name_of_model.json
+    code_tables/
+        ...
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">code_tables</span></code> sub-directory contains the code tables that map the key columns in the data to their values.</p>
+<p>In this demonstration we will create a new model in a temporary directory. It will be a copy of the <code class="docutils literal notranslate"><span class="pre">imma1_d703</span></code> schema and code tables.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"imma1_d730"</span>
+<span class="n">my_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">)</span>
+
+<span class="c1"># Load schema and save to json file</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">read_schema</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="n">model_name</span> <span class="o">+</span> <span class="s2">".json"</span><span class="p">),</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
+
+<span class="c1"># Get code tables and copy to the directory</span>
+<span class="n">code_tables_path</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
+    <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s2">"code_tables"</span><span class="p">,</span> <span class="s2">"imma1"</span><span class="p">])</span>
+<span class="p">)</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">code_tables_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="s2">"code_tables"</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+'/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables'
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_file_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_133_730</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="n">data_model_path</span><span class="o">=</span><span class="n">my_model_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-06-06 10:48:31,813 - root - INFO - Attempting to fetch remote file: imma1_730/input/133-730_1776-10-01_subset.imma.md5
+2024-06-06 10:48:31,930 - root - INFO - READING DATA MODEL SCHEMA FILE...
+2024-06-06 10:48:31,942 - root - INFO - EXTRACTING DATA FROM MODEL: /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730
+2024-06-06 10:48:31,944 - root - INFO - Getting data string from source...
+2024-06-06 10:48:32,177 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99_voyage', 'drLatDeg'),('c99_voyage', 'drLatMin'),('c99_voyage', 'drLatSec'),('c99_voyage', 'drLonDeg'),('c99_voyage', 'drLonMin'),('c99_voyage', 'drLonSec'),('c99_voyage', 'LatDeg'),('c99_voyage', 'LatMin'),('c99_voyage', 'LatSec'),('c99_voyage', 'LonDeg'),('c99_voyage', 'LonMin'),('c99_voyage', 'LonSec'),('c99_voyage', 'LMdistance1'),('c99_voyage', 'LMdistance2'),('c99_voyage', 'LMdistance4'),('c99_voyage', 'TimeOB'),('c99_voyage', 'Glasses'),('c99_data', 'AT_outside'),('c99_data', 'SST'),('c99_data', 'attached_tem')
+2024-06-06 10:48:32,178 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
+2024-06-06 10:48:32,503 - root - ERROR - Error validating coded element ('c99_logbook', 'Illustr'):
+2024-06-06 10:48:32,503 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.ILLUSTRATIONI.json not found
+2024-06-06 10:48:32,504 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,504 - root - ERROR - Error validating coded element ('c99_voyage', 'LatInd'):
+2024-06-06 10:48:32,505 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.COORDI.json not found
+2024-06-06 10:48:32,505 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,506 - root - ERROR - Error validating coded element ('c99_voyage', 'LonInd'):
+2024-06-06 10:48:32,506 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.COORDI.json not found
+2024-06-06 10:48:32,507 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,507 - root - ERROR - Error validating coded element ('c99_voyage', 'ZeroMeridian'):
+2024-06-06 10:48:32,507 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.MERIDIAN.json not found
+2024-06-06 10:48:32,508 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,508 - root - ERROR - Error validating coded element ('c99_voyage', 'PosCoastal'):
+2024-06-06 10:48:32,509 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.POSCOASTI.json not found
+2024-06-06 10:48:32,509 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,509 - root - ERROR - Error validating coded element ('c99_voyage', 'Calendar_type'):
+2024-06-06 10:48:32,510 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.CALENDAR.json not found
+2024-06-06 10:48:32,510 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,511 - root - ERROR - Error validating coded element ('c99_voyage', 'Start_day'):
+2024-06-06 10:48:32,511 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.STARTDAYI.json not found
+2024-06-06 10:48:32,511 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,512 - root - ERROR - Error validating coded element ('c99_voyage', 'Anchored_ind'):
+2024-06-06 10:48:32,512 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.ANCHORI.json not found
+2024-06-06 10:48:32,513 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,513 - root - ERROR - Error validating coded element ('c99_data', 'gusts'):
+2024-06-06 10:48:32,514 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.GUSTI.json not found
+2024-06-06 10:48:32,514 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,514 - root - ERROR - Error validating coded element ('c99_data', 'Rain'):
+2024-06-06 10:48:32,515 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.RAINI.json not found
+2024-06-06 10:48:32,515 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,516 - root - ERROR - Error validating coded element ('c99_data', 'Fog'):
+2024-06-06 10:48:32,517 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.FOGI.json not found
+2024-06-06 10:48:32,518 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,518 - root - ERROR - Error validating coded element ('c99_data', 'Snow'):
+2024-06-06 10:48:32,519 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.SNOWI.json not found
+2024-06-06 10:48:32,519 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,519 - root - ERROR - Error validating coded element ('c99_data', 'Thunder'):
+2024-06-06 10:48:32,519 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.THUNDERI.json not found
+2024-06-06 10:48:32,520 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,520 - root - ERROR - Error validating coded element ('c99_data', 'Hail'):
+2024-06-06 10:48:32,521 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.HAILI.json not found
+2024-06-06 10:48:32,521 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,521 - root - ERROR - Error validating coded element ('c99_data', 'Sea_ice'):
+2024-06-06 10:48:32,522 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.SEAICEI.json not found
+2024-06-06 10:48:32,522 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,523 - root - ERROR - Error validating coded element ('c99_data', 'Trivial_correction'):
+2024-06-06 10:48:32,523 - root - ERROR - Code table file /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpude1dlw9/imma1_d730/code_tables/ICOADS.C99.QCI.json not found
+2024-06-06 10:48:32,523 - root - WARNING - Element mask set to False
+2024-06-06 10:48:32,592 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_sentinal"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="3" halign="left">c99_sentinal</th>
+</tr>
+<tr>
+<th></th>
+<th>ATTI</th>
+<th>ATTL</th>
+<th>BLK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_logbook"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_logbook</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>InstAbbr</th>
+<th>InsName</th>
+<th>InsPlace</th>
+<th>InsLand</th>
+<th>No_data_entry</th>
+<th>NameArchiveSet</th>
+<th>ArchivePart</th>
+<th>Specification</th>
+<th>Logbook_id</th>
+<th>Logbook_language</th>
+<th>Image_No</th>
+<th>Illustr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<th>top</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>20</td>
+<td>NaN</td>
+<td>MCC</td>
+<td>1391</td>
+<td>CORREOS, 275A R11</td>
+<td>SPANISH</td>
+<td>MCC_20_1391_0032</td>
+<td>0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_voyage</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>drLatDeg</th>
+<th>drLatMin</th>
+<th>drLatSec</th>
+<th>drLatHem</th>
+<th>drLonDeg</th>
+<th>drLonMin</th>
+<th>drLonSec</th>
+<th>drLonHem</th>
+<th>LatDeg</th>
+<th>LatMin</th>
+<th>LatSec</th>
+<th>LatHem</th>
+<th>LonDeg</th>
+<th>LonMin</th>
+<th>LonSec</th>
+<th>LonHem</th>
+<th>LatInd</th>
+<th>LonInd</th>
+<th>ZeroMeridian</th>
+<th>LMname1</th>
+<th>LMdirection1</th>
+<th>LMdistance1</th>
+<th>LMname2</th>
+<th>LMdirection2</th>
+<th>LMdistance2</th>
+<th>LMname3</th>
+<th>LMdirection3</th>
+<th>LMdistance4</th>
+<th>PosCoastal</th>
+<th>Calendar_type</th>
+<th>logbook_date</th>
+<th>TimeOB</th>
+<th>Day_of_the_week</th>
+<th>PartDay</th>
+<th>Watch</th>
+<th>Glasses</th>
+<th>Start_day</th>
+<th>ShipName</th>
+<th>Nationality</th>
+<th>Ship_type</th>
+<th>Company</th>
+<th>Name1</th>
+<th>Rank1</th>
+<th>Name2</th>
+<th>Rank2</th>
+<th>Name3</th>
+<th>Rank3</th>
+<th>voyage_from</th>
+<th>voyage_to</th>
+<th>Anchored_ind</th>
+<th>AnchorPlace</th>
+<th>DASno</th>
+<th>VoyageIni</th>
+<th>Course_ship</th>
+<th>Ship_speed</th>
+<th>Distance</th>
+<th>EncName</th>
+<th>EncNat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>4.000000</td>
+<td>4.000000</td>
+<td>4.0</td>
+<td>4</td>
+<td>2.000000</td>
+<td>2.00000</td>
+<td>2.0</td>
+<td>2</td>
+<td>2.000000</td>
+<td>2.000000</td>
+<td>2.0</td>
+<td>2</td>
+<td>3.000000</td>
+<td>3.000000</td>
+<td>3.0</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>1.0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5.0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1.0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>&lt;NA&gt;</td>
+<td>2</td>
+<td>5</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>4</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<th>top</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>N</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>E</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>N</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>E</td>
+<td>1</td>
+<td>2</td>
+<td>TENERIFE</td>
+<td>LIZARD</td>
+<td>N87:17E</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>2</td>
+<td>17711001</td>
+<td>NaN</td>
+<td>TUESDAY</td>
+<td>3</td>
+<td>VM</td>
+<td>&lt;NA&gt;</td>
+<td>UNKNOWN</td>
+<td>EL COLON</td>
+<td>SPANISH</td>
+<td>PAQUEBOTE</td>
+<td>MCC</td>
+<td>THOMAS D'ORVES</td>
+<td>CAPITAN</td>
+<td>CHARLES WARREN</td>
+<td>2ND OFFICER/LIEUTENANT</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>LA HABANA</td>
+<td>LA CORUÑA</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>17710819</td>
+<td>WTZ</td>
+<td>NaN</td>
+<td>175.00</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>&lt;NA&gt;</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>mean</th>
+<td>27.250000</td>
+<td>24.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>26.500000</td>
+<td>36.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>22.000000</td>
+<td>9.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>121.666667</td>
+<td>42.666667</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>std</th>
+<td>21.884165</td>
+<td>16.879475</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>19.091883</td>
+<td>19.79899</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>29.698485</td>
+<td>13.435029</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>195.208436</td>
+<td>11.239810</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>min</th>
+<td>1.000000</td>
+<td>5.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>13.000000</td>
+<td>22.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>4.000000</td>
+<td>33.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>25%</th>
+<td>13.750000</td>
+<td>17.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>19.750000</td>
+<td>29.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>11.500000</td>
+<td>4.750000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>9.000000</td>
+<td>36.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>50%</th>
+<td>29.500000</td>
+<td>23.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>26.500000</td>
+<td>36.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>22.000000</td>
+<td>9.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>14.000000</td>
+<td>40.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>75%</th>
+<td>43.000000</td>
+<td>30.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>33.250000</td>
+<td>43.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>32.500000</td>
+<td>14.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>180.500000</td>
+<td>47.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>max</th>
+<td>49.000000</td>
+<td>46.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>40.000000</td>
+<td>50.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>43.000000</td>
+<td>19.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>347.000000</td>
+<td>55.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_voyage</span><span class="o">.</span><span class="n">ZeroMeridian</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     TENERIFE
+1    GREENWICH
+2      NL_0_01
+3      BERMUDA
+4     TENERIFE
+Name: ZeroMeridian, dtype: object
+</pre></div></div>
+</div>
+<p>e.g. the ship types on this deck will be given in a tons of different languages. There is no code table for this variable in the CLIWOC website.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_voyage</span><span class="o">.</span><span class="n">Ship_type</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    PAQUEBOTE
+2        SNAUW
+3     5TH RATE
+4     PAQUEBOT
+Name: Ship_type, dtype: object
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_data"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_data</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AT_reading_units</th>
+<th>SST_reading_units</th>
+<th>AP_reading_units</th>
+<th>BART_reading_units</th>
+<th>ReferenceCourse</th>
+<th>ReferenceWindDirection</th>
+<th>Decl</th>
+<th>Distance_units</th>
+<th>Distance_units_to_landmark</th>
+<th>Distance_units_travelled</th>
+<th>Longitude_units</th>
+<th>units_of_measurement</th>
+<th>humidity_units</th>
+<th>water_at_pump_units</th>
+<th>wind_scale</th>
+<th>BARO_type</th>
+<th>BARO_brand</th>
+<th>API</th>
+<th>Humidity_method</th>
+<th>compas_error</th>
+<th>compas_correction</th>
+<th>AT_outside</th>
+<th>SST</th>
+<th>AP</th>
+<th>wind_dir</th>
+<th>current_dir</th>
+<th>current_speed</th>
+<th>attached_tem</th>
+<th>pump_water</th>
+<th>Humidity</th>
+<th>wind_force</th>
+<th>weather</th>
+<th>prcp_descriptor</th>
+<th>sea_state</th>
+<th>shape_coulds</th>
+<th>dir_coulds</th>
+<th>Clearness</th>
+<th>cloud_fraction</th>
+<th>gusts</th>
+<th>Rain</th>
+<th>Fog</th>
+<th>Snow</th>
+<th>Thunder</th>
+<th>Hail</th>
+<th>Sea_ice</th>
+<th>Trivial_correction</th>
+<th>Release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+<td>1</td>
+<td>4</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>0</td>
+<td>1</td>
+<td>4</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<th>top</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>UNKNOWN</td>
+<td>UNKNOWN</td>
+<td>-20</td>
+<td>NaN</td>
+<td>LEAGUES</td>
+<td>MILLAS</td>
+<td>360 DEGREES</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>S</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>EN REFREGONES FUERTES Y DESPUES BONANCIBLE</td>
+<td>MUY MALOS CARICES. AGUACEROS, RELAMPAGOS Y TRU...</td>
+<td>NaN</td>
+<td>GRANDE DEL O Y DEL ENE</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>CLIWOC VERSION 2.0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>5</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>5</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr>
+<th>mean</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>std</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>min</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>25%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>50%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>75%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>max</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<p>What about the different scales for the wind force, given different languages?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_data"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_data</span><span class="o">.</span><span class="n">wind_force</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    EN REFREGONES FUERTES Y DESPUES BONANCIBLE
+1                                        FOIBLE
+2               STIJVE GEREEFDE MARSZEILSKOELTE
+3                       FRESH GALES AND SQUALLY
+4                                    BONANCIBLE
+Name: wind_force, dtype: object
+</pre></div></div>
+</div>
+</section>
+</section>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="create_data_model.html" rel="prev" title="How to create a data model"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="CDM_mapper_example_deck704.html" rel="next" title="Mapping supplemental data from deck 704 to a CDM">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
+</div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+</div>
+</div>
+</section>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+</body>
+</html>

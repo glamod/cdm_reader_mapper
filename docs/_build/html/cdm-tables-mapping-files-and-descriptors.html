@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDM tables mapping files and descriptors &mdash; cdm_reader_mapper unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=3f1b9271"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Test and overview of the mdf_reader module" href="example_notebooks/mdf_reader_test_overview.html" />
+    <link rel="prev" title="How to register a new data model mapping" href="how-to-register-a-new-data-model-mapping.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            cdm_reader_mapper
+          </a>
+              <div class="version">
+                unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-set-up.html">Tool set up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CDM tables mapping files and descriptors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#descriptors">Descriptors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mapping-sequence">Mapping sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-mapping-functions">Defining mapping functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-tables">Code tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/create_data_model.html">How to create a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CLIWOC_datamodel.html">Generating a data model for CLIWOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CDM_mapper_example_deck704.html">Mapping supplemental data from deck 704 to a CDM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CDM tables mapping files and descriptors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cdm-tables-mapping-files-and-descriptors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cdm-tables-mapping-files-and-descriptors">
+<span id="id1"></span><h1>CDM tables mapping files and descriptors<a class="headerlink" href="#cdm-tables-mapping-files-and-descriptors" title="Link to this heading"></a></h1>
+<p>The following section details the mapping sequence that the <code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> tool follows to map meteorological data to a CDM element.</p>
+<p>We will use <strong>part</strong> of the <code class="docutils literal notranslate"><span class="pre">header.json</span></code> python dictionary from the <code class="docutils literal notranslate"><span class="pre">icoads_r3000</span></code> IMMA1 model to explain how we map an element. In the table below we explain all <strong>elements</strong> attributes and/or descriptors, that are needed in each python dictionary or <code class="docutils literal notranslate"><span class="pre">.json</span></code> file, for a successful mapping of the input meteorological data.</p>
+<p>Below we see content from a <code class="docutils literal notranslate"><span class="pre">header.json</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;report_id&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c98&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;UID&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="s2">&quot;string_add&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:{</span><span class="s2">&quot;prepend&quot;</span><span class="p">:</span><span class="s2">&quot;ICOADS-30&quot;</span><span class="p">,</span><span class="s2">&quot;separator&quot;</span><span class="p">:</span><span class="s2">&quot;-&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;application_area&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;observing_programme&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;PT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="s2">&quot;observing_programme&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;report_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;platform_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;PT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;code_table&quot;</span><span class="p">:</span> <span class="s2">&quot;platform_type&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;platform_sub_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;PT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;code_table&quot;</span><span class="p">:</span> <span class="s2">&quot;platform_sub_type&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;location_accuracy&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;LI&quot;</span><span class="p">,</span><span class="s2">&quot;LAT&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="s2">&quot;location_accuracy&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimal_places&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;station_speed&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;YR&quot;</span><span class="p">,</span><span class="s2">&quot;VS&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;code_table&quot;</span><span class="p">:</span> <span class="s2">&quot;ship_speed_ms&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimal_places&quot;</span><span class="p">:</span><span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;source_id&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:[</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span><span class="s2">&quot;core&quot;</span><span class="p">,</span><span class="s2">&quot;core&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SID&quot;</span><span class="p">,</span><span class="s2">&quot;DCK&quot;</span><span class="p">,</span><span class="s2">&quot;YR&quot;</span><span class="p">,</span><span class="s2">&quot;MO&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="s2">&quot;string_join_add&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:{</span><span class="s2">&quot;prepend&quot;</span><span class="p">:</span><span class="s2">&quot;ICOADS-3-0-0T&quot;</span><span class="p">,</span><span class="s2">&quot;separator&quot;</span><span class="p">:</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;zfill_col&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s2">&quot;zfill&quot;</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;source_record_id&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c98&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;UID&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="descriptors">
+<h2>Descriptors<a class="headerlink" href="#descriptors" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Descriptor variable name</strong></p></td>
+<td><p><strong>Function</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">elements</span></code></p></td>
+<td><div class="line-block">
+<div class="line">String or list of strings with the element name (s) to map in the CDM table.</div>
+<div class="line">e.g. <code class="docutils literal notranslate"><span class="pre">report_id</span></code> information is store in the <code class="docutils literal notranslate"><span class="pre">imma1</span></code> <strong>schema</strong></div>
+<div class="line">as <code class="docutils literal notranslate"><span class="pre">UID</span></code>, this will be the variable name assigned to the <code class="docutils literal notranslate"><span class="pre">element</span></code></div>
+<div class="line">attribute of <code class="docutils literal notranslate"><span class="pre">report_id</span></code>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sections</span></code></p></td>
+<td><div class="line-block">
+<div class="line">String or list of strings with the section name(s) from which the element(s)</div>
+<div class="line">to be map will come from.</div>
+<div class="line">- Use a single string to define a unique section if all the elements are</div>
+<div class="line">located in the same section, e.g. <code class="docutils literal notranslate"><span class="pre">location_accuracy</span></code>: the variables</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">[&quot;LI&quot;,&quot;LAT&quot;]</span></code> come from a single section <code class="docutils literal notranslate"><span class="pre">core</span></code> in the IMMA1 model.</div>
+<div class="line">- Use a list of strings to declare variables that come from multiple</div>
+<div class="line-block">
+<div class="line">sections and elements. e.g. <code class="docutils literal notranslate"><span class="pre">source_id</span></code></div>
+</div>
+<div class="line">- Always respect the order of the sections in the original <strong>schema</strong>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Assigns a default value to the CDM element.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fill_value</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Value to assign for missing data (NA/NaN). Datetime objects not supported.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transform</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Name of the function to be used to perform the mapping of a specific element.</div>
+<div class="line">This function must be defined in the <code class="docutils literal notranslate"><span class="pre">mapping_functions</span></code> class of the</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> module in order to be access by the mapper tool.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kwars</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Keyword arguments of a transform function if any.</div>
+<div class="line">Type dictionary with the format: {<code class="docutils literal notranslate"><span class="pre">keyword</span></code>:<code class="docutils literal notranslate"><span class="pre">value</span></code>,…,}</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">code_table</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Code table name in the imodel mapping library needed to perform the mapping</div>
+<div class="line">a particular element. Type: string.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">decimal_places</span></code></p></td>
+<td><div class="line-block">
+<div class="line">Number of decimal places to keep when printing an element.</div>
+<div class="line">Type: integer</div>
+<div class="line">value, a function name used to estimate this figure.</div>
+<div class="line">Such function should be defined in the same way as the transform function</div>
+<div class="line">but these cannot take keyword arguments. <code class="docutils literal notranslate"><span class="pre">decimal_places</span> <span class="pre">=</span> <span class="pre">0</span></code> for integer</div>
+<div class="line">elements defined as numeric in CDM or the element will be printed with</div>
+<div class="line">default number of decimal places.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mapping-sequence">
+<h2>Mapping sequence<a class="headerlink" href="#mapping-sequence" title="Link to this heading"></a></h2>
+<p>The mapper parses the mapping file element by element and takes the following steps:</p>
+<ol class="loweralpha simple">
+<li><dl class="simple">
+<dt>Clean imodel data</dt><dd><p>Remove any missing <code class="docutils literal notranslate"><span class="pre">elements</span></code> from the imodel. This preliminary step makes the definition of mapping functions easier, as no NaN handling needs to be added to the functions and integer fields casted to float by NA/NaN presence is reverted.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Map CDM element in the following order:</dt><dd><ol class="arabic simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">transform</span></code>: eval function and apply with elements and|or <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> as appropriate</p></li>
+<li><p>Else if <code class="docutils literal notranslate"><span class="pre">code_table</span></code>: map imodel elements using the defined <code class="docutils literal notranslate"><span class="pre">code_table</span></code></p></li>
+<li><p>Else if <code class="docutils literal notranslate"><span class="pre">elements</span></code>: assign imodel elements to CDM element</p></li>
+<li><p>Else if <code class="docutils literal notranslate"><span class="pre">value</span></code>: assign value to CDM element</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p><strong>Fill CDM element NA/NaN values using default if defined</strong></p></li>
+<li><p><strong>Define the number of decimal places in the CDM element attributes, so this gets pass to the table writer if ``decimal_places`` is provided</strong></p></li>
+</ol>
+</section>
+<section id="defining-mapping-functions">
+<h2>Defining mapping functions<a class="headerlink" href="#defining-mapping-functions" title="Link to this heading"></a></h2>
+<p>In the file <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> the user can define any function to <strong>transform</strong> any element in the data model. The python file needs to be accompanied with <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file so all the functions written in <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> can be imported by the <strong>cdm_mapper</strong> toolbox.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remember that any new python dependency that you <code class="docutils literal notranslate"><span class="pre">import</span></code> the top of your <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> must be installed also in your python environment.</p>
+</div>
+<p>The <strong>cdm_mapper</strong> follows a set of rules that need to be taken into account when it comes to adding functions to the <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> script.</p>
+<ul class="simple">
+<li><p>The <strong>cdm-mapper</strong> only parses elements to the transforming function (e.g. Year, day or hour) or <code class="docutils literal notranslate"><span class="pre">code_table</span></code> mapping (e.g. platform_subtype), where none of the elements to be map (e.g. Year, day, hour or platform_subtype) have missing values.</p></li>
+<li><p>The output of all functions in <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> must respect the element type defined in the imodel mapper.</p></li>
+</ul>
+</section>
+<section id="code-tables">
+<span id="cdm-code-tables"></span><h2>Code tables<a class="headerlink" href="#code-tables" title="Link to this heading"></a></h2>
+<p>Elements defined in the <strong>imodel.json</strong> files (e.g. elements inside <code class="docutils literal notranslate"><span class="pre">header.json</span></code>) with the attribute <code class="docutils literal notranslate"><span class="pre">code_table</span></code> have an specific “key” that links the element variable to its corresponding numerical code defined in the C3S CDM. Code tables contain the <code class="docutils literal notranslate"><span class="pre">key:value</span></code> pairs and are stored as individual <code class="docutils literal notranslate"><span class="pre">.json</span></code> files in the <code class="docutils literal notranslate"><span class="pre">lib/mappings/imodel/code_tables</span></code> subdirectory.</p>
+<p>The content of a code table translating <code class="docutils literal notranslate"><span class="pre">platform_sub_type</span></code> information into the appropriate CDM syntax’s (<code class="docutils literal notranslate"><span class="pre">platform_sub_type.json</span></code>) can be seen in text below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;7&quot;</span><span class="p">:</span> <span class="mi">69</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This code table is part of the <code class="docutils literal notranslate"><span class="pre">icoads_r3000</span></code> data model included in this tool.</p>
+<p>The following range of code table structures are currently supported:</p>
+<ul class="simple">
+<li><p>Simple code tables: code tables with a list of <code class="docutils literal notranslate"><span class="pre">key:value</span></code> pairs.</p></li>
+<li><p>Nested code tables: code tables with multiple (2 or more) keys mapping to a value <code class="docutils literal notranslate"><span class="pre">-&gt;</span> <span class="pre">key(1):…:key(n):value.</span></code></p></li>
+<li><p>Range-keyed code tables: code tables (simple or multi-keyed) where one or more keys is a (integer) range of values.</p></li>
+</ul>
+<p>For more information on code tables and their structure check out the <a class="reference external" href="https://cdm-reader-mapper.readthedocs.io/en/mdf_reader/data-models.html#code-tables">cdm_reader_mapper tool - code tables</a> information.</p>
+<p>The code table above, is use by the <code class="docutils literal notranslate"><span class="pre">icoads_r3000</span></code> imodel to map <code class="docutils literal notranslate"><span class="pre">platform_sub_type</span></code> information to the C3s CDM format, this is done in  the following section of the <code class="docutils literal notranslate"><span class="pre">header.json</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;platform_sub_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;PT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;code_table&quot;</span><span class="p">:</span> <span class="s2">&quot;platform_sub_type&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The “key” in this case, will be the value read from the ICOADS section <code class="docutils literal notranslate"><span class="pre">c1</span></code> and element <code class="docutils literal notranslate"><span class="pre">PT</span></code>, for key values equal to 7 a 69 code will be assigned.</p>
+<p>Code tables can be also used for simple transformations of the elements, depending on the medata data to map. e.g. The case of deck 701, where we expand ship names to the ships original full name. We do this by reading meta data information from the <code class="docutils literal notranslate"><span class="pre">c99</span></code> ICOADS supplemental data attachment. The imodel for deck 701 provides a code table to transform the names into the ships original name format recorded in the original ship logbook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;station_name&quot;</span><span class="p">:</span> <span class="p">{</span>
+       <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span>
+       <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span>
+       <span class="s2">&quot;code_table&quot;</span><span class="p">:</span> <span class="s2">&quot;ship_names&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="how-to-register-a-new-data-model-mapping.html" class="btn btn-neutral float-left" title="How to register a new data model mapping" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_notebooks/mdf_reader_test_overview.html" class="btn btn-neutral float-right" title="Test and overview of the mdf_reader module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
