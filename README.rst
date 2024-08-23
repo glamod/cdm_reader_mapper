@@ -153,8 +153,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :alt: Python Black
 
 .. |codefactor| image:: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge
-		:target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
-		:alt: CodeFactor
+		    :target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
+		    :alt: CodeFactor
 
 .. |coveralls| image:: https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg
 	      :target: https://codecov.io/gh/glamod/cdm_reader_mapper
@@ -165,8 +165,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :alt: Documentation Status
 
 .. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow
-   	:target: https://fair-software.eu
-	:alt: FAIR-software
+   	    :target: https://fair-software.eu
+	      :alt: FAIR-software
 
 .. |fossa| image:: https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
         :target: https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
@@ -197,8 +197,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :alt: Ruff
 
 .. |security| image:: https://bestpractices.coreinfrastructure.org/projects/9135/badge
-	:target: https://bestpractices.coreinfrastructure.org/projects/9135
-	:alt: OpenSSf Best Practices
+	      :target: https://bestpractices.coreinfrastructure.org/projects/9135
+	      :alt: OpenSSf Best Practices
 
 .. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
         :target: https://www.repostatus.org/#wip
