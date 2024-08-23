@@ -22,7 +22,7 @@ Workflow
 Input data
 ----------
 
-The tool has been created to read meteorological data from both ICOADS_3_ stored in the ``.imma`` format and C-RAID stored in the ``.netcdf``, please read both the `following ICOADS guide`_ and the ``following C-RAID guide`_ to know more details regarding the database and the data format.
+The tool has been created to read meteorological data from both ICOADS_3_ stored in the ``.imma`` format and C-RAID stored in the ``.netcdf``, please read both the `following ICOADS guide`_ and the `following C-RAID guide`_ to know more details regarding the database and the data format.
 
 Each meteorological report in ICOADS can come from multiple countries, sources and platforms and each report has a source ID (SID) and a deck (DCK) number assigned. “Deck” was originally referred to a punched card deck, but is now used as the primary field to track ICOADS data **collections**. Each deck may contain a single Source ID (SID) or a mixture of SIDs.
 
