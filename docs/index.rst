@@ -58,7 +58,6 @@ In addition, those data will be mapped to the standardized C3S CDS Common Data M
    example_notebooks/create_data_model.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
-   example_notebooks/read_c-raid_buoy_data.ipynb
    contributing
    authors
    api
