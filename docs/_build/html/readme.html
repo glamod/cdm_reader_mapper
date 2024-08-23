@@ -111,7 +111,7 @@
 <td><p><a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg"/></a> <a class="reference external" href="https://zenodo.org/cdm_reader_mapper:alt:DOI"><img alt="zenodo" src="https://img.shields.io/badge/zenodo-package_or_version_not_found-red"/></a></p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p><a class="reference external" href="https://fair-software.eu"><img alt="FAIR-software" src="https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow"/></a> <a class="reference external" href="https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper"><img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge"/></a></p></td>
+<td><p><a class="reference external" href="https://fair-software.eu:alt:FAIR-software"><img alt="fair-software" src="https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow"/></a> <a class="reference external" href="https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper"><img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge"/></a></p></td>
 </tr>
 <tr class="row-even"><td><p>Coding Standards</p></td>
 <td><p><a class="reference external" href="https://github.com/psf/black"><img alt="Python Black" src="https://img.shields.io/badge/code%20style-black-000000.svg"/></a> <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json"/></a> <a class="reference external" href="https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg"/></a></p></td>
@@ -135,6 +135,7 @@
 <p>It was developed to read the <a class="reference external" href="https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf">IMMA</a> (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of:</p>
 <ul class="simple">
 <li><p>Data that is stored in a human-readable manner: “ASCII” format.</p></li>
+<li><p>Data is stored in a Network Common Data Format: “NetCDF” format.</p></li>
 <li><p>Data that is organized in single line reports</p></li>
 <li><p>Reports that have a coherent internal structure and can be modelised.</p></li>
 <li><p>Reports that have a fixed width or field delimited types</p></li>
@@ -176,8 +177,6 @@
 <span class="n">imma_data</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="s2">"imma1"</span><span class="p">,</span> <span class="n">sections</span><span class="o">=</span><span class="p">[</span><span class="s2">"core"</span><span class="p">,</span> <span class="s2">"c1"</span><span class="p">,</span> <span class="s2">"c98"</span><span class="p">])</span>
 
 <span class="n">data_raw</span> <span class="o">=</span> <span class="n">imma_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-<span class="n">attributes</span> <span class="o">=</span> <span class="n">imma_data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):</p>
@@ -186,8 +185,6 @@
 <span class="n">cdm_dict</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">map_model</span><span class="p">(</span>
     <span class="n">name_of_model</span><span class="p">,</span>
     <span class="n">data_raw</span><span class="p">,</span>
-    <span class="n">attributes</span><span class="p">,</span>
-    <span class="n">cdm_subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">log_level</span><span class="o">=</span><span class="s2">"DEBUG"</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -219,7 +216,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
 </div>

@@ -30,7 +30,7 @@ The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 It was developed to read the IMMA_ (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of:
 
 * Data that is stored in a human-readable manner: “ASCII” format.
-- Data is stored in a Network Common Data Format: "NetCDF" format.
+* Data is stored in a Network Common Data Format: "NetCDF" format.
 * Data that is organized in single line reports
 * Reports that have a coherent internal structure and can be modelised.
 * Reports that have a fixed width or field delimited types

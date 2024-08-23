@@ -10,11 +10,11 @@
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=3f1b9271"></script>
@@ -27,17 +27,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changes.html" />
-    <link rel="prev" title="Credits" href="authors.html" />
+    <link rel="prev" title="Credits" href="authors.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
@@ -97,7 +97,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <section id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
 <p>This page provides an auto-generated summary of the <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> API.</p>
@@ -227,6 +227,49 @@ The tables format is contained in a python dictionary, stored as an attribute in
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">cdm_reader_mapper.metmetpy.correct_pt.</span></span><span class="sig-name descname"><span class="pre">correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deck</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Apply ICOADS deck specific platform ID corrections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame or pd.io.parsers.TextFileReader</em>) – Input dataset.</p></li>
+<li><p><strong>dataset</strong> (<em>str</em>) – Name of metmetpy specific data model.</p></li>
+<li><p><strong>data_model</strong> (<em>str</em>) – Name of the ICOADS data model.</p></li>
+<li><p><strong>deck</strong> (<em>str</em>) – Name of the ICOADS model deck.</p></li>
+<li><p><strong>log_level</strong> (<em>str</em>) – level of logging information to save.
+Default: INFO</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pd.DataFrame or pd.io.parsers.TextFileReader</em> – a pandas.DataFrame or pandas.io.parsers.TextFileReader
+with the adjusted data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">cdm_reader_mapper.metmetpy.correct_datetime.</span></span><span class="sig-name descname"><span class="pre">correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deck</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Apply ICOADS deck specific datetime corrections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame or pd.io.parsers.TextFileReader</em>) – Input dataset.</p></li>
+<li><p><strong>data_model</strong> (<em>str</em>) – Name of ICOADS data model.</p></li>
+<li><p><strong>deck</strong> (<em>str</em>) – Name of IOCADS model deck.</p></li>
+<li><p><strong>log_level</strong> (<em>str</em>) – level of logging information to save.
+Default: INFO</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pd.DataFrame or pd.io.parsers.TextFileReader</em> – a pandas.DataFrame or pandas.io.parsers.TextFileReader
+with the adjusted data</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -246,7 +289,7 @@ The tables format is contained in a python dictionary, stored as an attribute in
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -257,7 +300,7 @@ The tables format is contained in a python dictionary, stored as an attribute in
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>
