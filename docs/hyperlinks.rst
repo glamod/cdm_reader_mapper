@@ -12,7 +12,9 @@
 
 .. _dictionary: https://realpython.com/python-dicts
 
-.. _following guide: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
+.. _following ICOADS guide: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
+
+.. _following C-RAID guide: https://www.coriolis.eu.org/Data-Products
 
 .. _Github repository: https://github.com/glamod/mdf_reader
 
@@ -32,6 +34,8 @@
 
 .. _NetCDF: https://www.unidata.ucar.edu/software/netcdf
 
+.. _pandas: https://pandas.pydata.org/docs/
+
 .. _pandas.DataFrame: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
 
 .. _pandas.to_datetime: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_datetime.html
@@ -47,6 +51,8 @@
 .. _tarball: https://github.com/glamod/mdf_reader/tarball/master
 
 .. _US Maury: https://icoads.noaa.gov/maury.html
+
+.. _xarray: https://docs.xarray.dev/en/stable/
 
 .. |logo_c3s| image:: _static/images/logos_c3s/logo_c3s-392x154.png
         :width: 25%
