@@ -6,7 +6,7 @@
 
 .. _C-RAID: https://www.coriolis.eu.org/Observing-the-Ocean/DBCP-E-SURFMAR/C-RAID-Copernicus-in-situ-project
 
-.. _CDM: cdm_latest.pdf
+.. _CDM: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
 
 .. _conda: https://docs.conda.io/en/latest/
 
@@ -26,9 +26,11 @@
 
 .. _IPython: https://jupyter.readthedocs.io/en/latest/install.html
 
+.. _issue tracker: https://github.com/glamod/cdm_reader_mapper/issues
+
 .. _jupyter notebook: https://jupyter.org/install
 
-.. _jupyter notebooks: example_notebooks
+.. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
 .. _Missing data casting rules and indexing: https://pandas.pydata.org/pandas-docs/stable/user_guide/missing_data.html
 

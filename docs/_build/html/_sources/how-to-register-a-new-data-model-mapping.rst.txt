@@ -35,3 +35,9 @@ This is a summary of the steps needed to add an imodel to the mapping tool:
 4. Create :ref:`cdm-code-tables` to transform variables if these required a specific key to translate the information into the CDM.
 
 .. note:: Click on next for a detail description on steps 3 and 4.
+
+.. note:: For any questions, please leave us a comment on the `issue tracker`_.
+
+.. include:: hyperlinks
+
+.. _issue tracker: https://github.com/glamod/cdm_reader_mapper/issues
