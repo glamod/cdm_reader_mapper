@@ -48,6 +48,7 @@ After reading the data into a pandas.DataFrame, the **cdm_mapper** will mapp tho
    tool-set-up
    tool-overview_reader
    tool-overview_mapper
+   tool-overview_metmetpy
    getting-started
    data-models
    how-to-build-a-data-model

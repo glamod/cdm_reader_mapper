@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; cdm_reader_mapper unknown documentation</title>
+  <title>metmetpy overview &mdash; cdm_reader_mapper unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
@@ -23,8 +24,10 @@
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="getting-started.html" />
+    <link rel="prev" title="cdm_mapper overview" href="tool-overview_mapper.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,12 +53,12 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tool-set-up.html">Tool set up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tool-overview_metmetpy.html"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-build-a-data-model.html">How to build a data model</a></li>
@@ -86,8 +89,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Index</li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tool-overview_metmetpy.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -95,17 +99,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <section id="metmetpy-overview">
+<h1><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview<a class="headerlink" href="#metmetpy-overview" title="Link to this heading"></a></h1>
+<p>After mapping to the CDM format, in some cases, it is desired that the final CDM set of tables is composed of a combination of different data models/sources. Based on the IMMA1 reprocessing experience so far. This can be the case of adding data elements from a different data source (like adding WMO PUB 47 metadata). It is recommended to map both things separately and then make the appropriate replacements/additions based on the corresponding CDM element matching (i.e. <code class="docutils literal notranslate"><span class="pre">primary_station_id</span></code>). This part is taken over from <strong>metmetpy</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Correcting data in the CDM foramt is only necessary for ICOADS data.</p>
 </div>
+<p><strong>metmetpy</strong> provides two functions for correcting data in the CDM format:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy.correct_pt.correct</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy.correct_datetime.correct</span></code></p></li>
+</ol>
+<p>The first function applie ICOADS deck specific platform ID corrections to the data, the second one ICOADS deck specific datetime corrections.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In furhter releases <strong>metmetpy</strong> will be included in the <strong>cdm_mapper</strong> module.</p>
+</div>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tool-overview_mapper.html" class="btn btn-neutral float-left" title="cdm_mapper overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getting-started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
