@@ -4,17 +4,17 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tool set up &mdash; cdm_reader_mapper unknown documentation</title>
+  <title>Installation &mdash; cdm_reader_mapper unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=3f1b9271"></script>
@@ -27,17 +27,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="mdf_reader overview" href="tool-overview_reader.html" />
-    <link rel="prev" title="Common Data Model reader and mapper: cdm_reader_mapper toolbox" href="readme.html" />
+    <link rel="prev" title="Common Data Model reader and mapper: cdm_reader_mapper toolbox" href="readme.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
@@ -55,9 +55,12 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tool set up</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#stable-release">Stable release</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-conda-environment">Creating a Conda Environment</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
@@ -93,7 +96,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Tool set up</li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/tool-set-up.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -102,9 +105,9 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
-  <section id="tool-set-up">
-<h1>Tool set up<a class="headerlink" href="#tool-set-up" title="Link to this heading"></a></h1>
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <p>The <strong>cdm_reader_mapper</strong>  toolbox is a pure Python package, but it has a few dependencies that rely in a specific python and module version.</p>
 <section id="stable-release">
 <h2>Stable release<a class="headerlink" href="#stable-release" title="Link to this heading"></a></h2>
@@ -133,6 +136,15 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -e .</span>
 </pre></div>
 </div>
+<section id="creating-a-conda-environment">
+<h3>Creating a Conda Environment<a class="headerlink" href="#creating-a-conda-environment" title="Link to this heading"></a></h3>
+<p>To create a conda environment including <cite>cdm_reader_mapepr</cite>’s dependencies and and development dependencies, run the following command from within your cloned repo:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>my_cdm_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>--file<span class="o">=</span>ci/requirements/environment.yml
+<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>my_cdm_env
+<span class="gp gp-VirtualEnv">(my_xclim_env)</span> <span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>--no-deps<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 
@@ -153,7 +165,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -164,7 +176,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

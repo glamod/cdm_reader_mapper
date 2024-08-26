@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-Tool set up
-===========
+Installation
+============
 
 The **cdm_reader_mapper**  toolbox is a pure Python package, but it has a few dependencies that rely in a specific python and module version.
 
@@ -45,3 +45,14 @@ Once you have a copy of the source, you caninstall it with pip_:
 .. code-block:: console
 
    pip install -e .
+   
+Creating a Conda Environment
+----------------------------
+
+To create a conda environment including `cdm_reader_mapepr`'s dependencies and and development dependencies, run the following command from within your cloned repo:
+
+.. code-block:: console
+
+    $ conda env create -n my_cdm_env python=3.12 --file=ci/requirements/environment.yml
+    $ conda activate my_cdm_env
+    (my_xclim_env) $ python -m pip install -e --no-deps .   
