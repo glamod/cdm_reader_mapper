@@ -13,5 +13,3 @@ After mapping to the CDM format, in some cases, it is desired that the final CDM
 The first function applie ICOADS deck specific platform ID corrections to the data, the second one ICOADS deck specific datetime corrections.
 
 .. note:: In furhter releases **metmetpy** will be included in the **cdm_mapper** module.
-
-
