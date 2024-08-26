@@ -24,7 +24,7 @@ This is the preferred method to install the **cdm_reader_mapper** toolbox, as it
 From source
 ~~~~~~~~~~~
 
-.. warning:: It is not guaranteed that the version on source will run stably. Therefore, we highly recommend to use the ``Stable release`` installation.  
+.. warning:: It is not guaranteed that the version on source will run stably. Therefore, we highly recommend to use the ``Stable release`` installation.
 
 The source for the **cdm_reader_mapper** can be downloaded from the `GitHub repository`_ via git_.
 
