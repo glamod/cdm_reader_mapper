@@ -10,11 +10,11 @@
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=3f1b9271"></script>
@@ -27,17 +27,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="mdf_reader overview" href="tool-overview_reader.html" />
-    <link rel="prev" title="Common Data Model reader and mapper: cdm_reader_mapper toolbox" href="readme.html" />
+    <link rel="prev" title="Common Data Model reader and mapper: cdm_reader_mapper toolbox" href="readme.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
@@ -56,8 +56,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tool set up</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
@@ -102,13 +102,25 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <section id="tool-set-up">
 <h1>Tool set up<a class="headerlink" href="#tool-set-up" title="Link to this heading"></a></h1>
 <p>The <strong>cdm_reader_mapper</strong>  toolbox is a pure Python package, but it has a few dependencies that rely in a specific python and module version.</p>
+<section id="stable-release">
+<h2>Stable release<a class="headerlink" href="#stable-release" title="Link to this heading"></a></h2>
+<p>To install the <strong>cdm_reader_mapper</strong> toolbox in your current <a class="reference external" href="https://docs.conda.io/en/latest/">conda</a> environment, run this command in your terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install cdm_reader_mapper</span>
+</pre></div>
+</div>
+<p>This is the preferred method to install the <strong>cdm_reader_mapper</strong> toolbox, as it will always install the most recent stable release.</p>
+</section>
 <section id="from-source">
 <h2>From source<a class="headerlink" href="#from-source" title="Link to this heading"></a></h2>
-<p>The source for the <strong>mdf_reader</strong> can be downloaded from the <a class="reference external" href="https://github.com/glamod/mdf_reader">GitHub repository</a> via <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is not guaranteed that the version on source will run stably. Therefore, we highly recommend to use the <code class="docutils literal notranslate"><span class="pre">Stable</span> <span class="pre">release</span></code> installation.</p>
+</div>
+<p>The source for the <strong>cdm_reader_mapper</strong> can be downloaded from the <a class="reference external" href="https://github.com/glamod/mdf_reader">GitHub repository</a> via <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>.</p>
 <p>You can either clone the public repository:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/glamod/cdm_reader_mapper</span>
 </pre></div>
@@ -121,14 +133,6 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -e .</span>
 </pre></div>
 </div>
-</section>
-<section id="stable-release">
-<h2>Stable release<a class="headerlink" href="#stable-release" title="Link to this heading"></a></h2>
-<p>To install the <strong>cdm_reader_mapper</strong> toolbox in your current <a class="reference external" href="https://docs.conda.io/en/latest/">conda</a> environment, run this command in your terminal:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install cdm_reader_mapper</span>
-</pre></div>
-</div>
-<p>This is the preferred method to install the <strong>cdm_reader_mapper</strong> toolbox, as it will always install the most recent stable release.</p>
 </section>
 </section>
 
@@ -149,7 +153,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -160,7 +164,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>
