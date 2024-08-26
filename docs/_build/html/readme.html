@@ -1,51 +1,58 @@
 <!DOCTYPE html>
-
-<html class="writer-html5" data-content_root="./" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Common Data Model reader and mapper: cdm_reader_mapper toolbox — cdm_reader_mapper unknown documentation</title>
-<link href="_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
-<link href="_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
-<link href="_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
-<link href="_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<!--[if lt IE 9]>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Common Data Model reader and mapper: cdm_reader_mapper toolbox &mdash; cdm_reader_mapper unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-<script src="_static/jquery.js?v=5d32c60e"></script>
-<script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-<script src="_static/documentation_options.js?v=3f1b9271"></script>
-<script src="_static/doctools.js?v=9a2dae69"></script>
-<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-<script src="_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="_static/copybutton.js?v=f281be69"></script>
-<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-<script src="_static/js/theme.js"></script>
-<link href="genindex.html" rel="index" title="Index"/>
-<link href="search.html" rel="search" title="Search"/>
-<link href="tool-set-up.html" rel="next" title="Tool set up"/>
-<link href="index.html" rel="prev" title="Marine data file reader-mapper toolbox documentation"/>
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=3f1b9271"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tool set up" href="tool-set-up.html" />
+    <link rel="prev" title="Marine data file reader-mapper toolbox documentation" href="index.html" /> 
 </head>
-<body class="wy-body-for-nav">
-<div class="wy-grid-for-nav">
-<nav class="wy-nav-side" data-toggle="wy-nav-shift">
-<div class="wy-side-scroll">
-<div class="wy-side-nav-search">
-<a class="icon icon-home" href="index.html">
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
-<div class="version">
+              <div class="version">
                 unknown
               </div>
 <div role="search">
-<form action="search.html" class="wy-form" id="rtd-search-form" method="get">
-<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-<input name="check_keywords" type="hidden" value="yes"/>
-<input name="area" type="hidden" value="default"/>
-</form>
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">About</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
@@ -73,57 +80,61 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a></li>
 </ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Common Data Model reader and mapper: <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> toolbox</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
 </div>
-</div>
-</nav>
-<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
-<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
-<a href="index.html">cdm_reader_mapper</a>
-</nav>
-<div class="wy-nav-content">
-<div class="rst-content">
-<div aria-label="Page navigation" role="navigation">
-<ul class="wy-breadcrumbs">
-<li><a aria-label="Home" class="icon icon-home" href="index.html"></a></li>
-<li class="breadcrumb-item active">Common Data Model reader and mapper: <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> toolbox</li>
-<li class="wy-breadcrumbs-aside">
-<a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
-</li>
-</ul>
-<hr/>
-</div>
-<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
-<div itemprop="articleBody">
-<section id="common-data-model-reader-and-mapper-cdm-reader-mapper-toolbox">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="common-data-model-reader-and-mapper-cdm-reader-mapper-toolbox">
 <h1>Common Data Model reader and mapper: <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> toolbox<a class="headerlink" href="#common-data-model-reader-and-mapper-cdm-reader-mapper-toolbox" title="Link to this heading"></a></h1>
 <table class="docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p>Versions</p></td>
-<td><p><a class="reference external" href="https://pypi.python.org/pypi/cdm_reader_mapper"><img alt="Python Package Index Build" src="https://img.shields.io/pypi/v/cdm_reader_mapper.svg"/></a> <a class="reference external" href="https://pypi.python.org/pypi/cdm_reader_mapper"><img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/cdm_reader_mapper.svg"/></a></p></td>
+<td><p><a class="reference external" href="https://pypi.python.org/pypi/cdm_reader_mapper"><img alt="Python Package Index Build" src="https://img.shields.io/pypi/v/cdm_reader_mapper.svg" /></a> <a class="reference external" href="https://pypi.python.org/pypi/cdm_reader_mapper"><img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/cdm_reader_mapper.svg" /></a></p></td>
 </tr>
 <tr class="row-even"><td></td>
-<td><p><a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/tags"><img alt="Tag" src="https://img.shields.io/github/v/tag/glamod/cdm_reader_mapper.svg"/></a> <a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/releases"><img alt="Release" src="https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg"/></a></p></td>
+<td><p><a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/tags"><img alt="Tag" src="https://img.shields.io/github/v/tag/glamod/cdm_reader_mapper.svg" /></a> <a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/releases"><img alt="Release" src="https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg" /></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>Documentation and Support</p></td>
-<td><p><a class="reference external" href="https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/cdm_reader_mapper/badge/?version=latest"/></a></p></td>
+<td><p><a class="reference external" href="https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/cdm_reader_mapper/badge/?version=latest" /></a></p></td>
 </tr>
 <tr class="row-even"><td><p>Open Source</p></td>
-<td><p><a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg"/></a> <a class="reference external" href="https://zenodo.org/cdm_reader_mapper:alt:DOI"><img alt="zenodo" src="https://img.shields.io/badge/zenodo-package_or_version_not_found-red"/></a></p></td>
+<td><p><a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg" /></a> <a class="reference external" href="https://zenodo.org/cdm_reader_mapper:alt:DOI"><img alt="zenodo" src="https://img.shields.io/badge/zenodo-package_or_version_not_found-red" /></a></p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p><a class="reference external" href="https://fair-software.eu:alt:FAIR-software"><img alt="fair-software" src="https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow"/></a> <a class="reference external" href="https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper"><img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge"/></a></p></td>
+<td><p><a class="reference external" href="https://fair-software.eu:alt:FAIR-software"><img alt="fair-software" src="https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow" /></a> <a class="reference external" href="https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper"><img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge" /></a></p></td>
 </tr>
 <tr class="row-even"><td><p>Coding Standards</p></td>
-<td><p><a class="reference external" href="https://github.com/psf/black"><img alt="Python Black" src="https://img.shields.io/badge/code%20style-black-000000.svg"/></a> <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json"/></a> <a class="reference external" href="https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg"/></a></p></td>
+<td><p><a class="reference external" href="https://github.com/psf/black"><img alt="Python Black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a> <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" /></a> <a class="reference external" href="https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg" /></a></p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p><a class="reference external" href="https://bestpractices.coreinfrastructure.org/projects/9135"><img alt="OpenSSf Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/9135/badge"/></a> <a class="reference external" href="https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield"><img alt="FOSSA" src="https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield"/></a> <a class="reference external" href="https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper"><img alt="CodeFactor" src="https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge"/></a></p></td>
+<td><p><a class="reference external" href="https://bestpractices.coreinfrastructure.org/projects/9135"><img alt="OpenSSf Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/9135/badge" /></a> <a class="reference external" href="https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield"><img alt="FOSSA" src="https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield" /></a> <a class="reference external" href="https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper"><img alt="CodeFactor" src="https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge" /></a></p></td>
 </tr>
 <tr class="row-even"><td><p>Development Status</p></td>
-<td><p><a class="reference external" href="https://www.repostatus.org/#wip"><img alt="Project Status: WIP: Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." src="https://www.repostatus.org/badges/latest/wip.svg"/></a> <a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml"><img alt="Build Status" src="https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg"/></a> <a class="reference external" href="https://codecov.io/gh/glamod/cdm_reader_mapper"><img alt="Coveralls" src="https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg"/></a></p></td>
+<td><p><a class="reference external" href="https://www.repostatus.org/#wip"><img alt="Project Status: WIP: Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." src="https://www.repostatus.org/badges/latest/wip.svg" /></a> <a class="reference external" href="https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml"><img alt="Build Status" src="https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg" /></a> <a class="reference external" href="https://codecov.io/gh/glamod/cdm_reader_mapper"><img alt="Coveralls" src="https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg" /></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>Funding</p></td>
-<td><p><a class="reference external" href="https://climate.copernicus.eu/"><img alt="Funding" src="https://img.shields.io/badge/Powered%20by-Copernicus-blue.svg"/></a></p></td>
+<td><p><a class="reference external" href="https://climate.copernicus.eu/"><img alt="Funding" src="https://img.shields.io/badge/Powered%20by-Copernicus-blue.svg" /></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -160,7 +171,7 @@
 <p>By default, <code class="code docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> outputs logging information to <code class="code docutils literal notranslate"><span class="pre">stdout</span></code>. To tell <code class="code docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> to output logs to a file, set the <code class="code docutils literal notranslate"><span class="pre">CDM_LOG_FILE</span></code> environment variable <strong>before</strong> loading <code class="code docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"CDM_LOG_FILE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"log_file.log"</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CDM_LOG_FILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;log_file.log&quot;</span>
 
 <span class="kn">import</span> <span class="nn">cdm_reader_mapper</span> <span class="k">as</span> <span class="nn">cdm</span>
 </pre></div>
@@ -174,18 +185,18 @@
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">read_imma1_buoys_nosupp</span><span class="p">()</span>
 
-<span class="n">imma_data</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="s2">"imma1"</span><span class="p">,</span> <span class="n">sections</span><span class="o">=</span><span class="p">[</span><span class="s2">"core"</span><span class="p">,</span> <span class="s2">"c1"</span><span class="p">,</span> <span class="s2">"c98"</span><span class="p">])</span>
+<span class="n">imma_data</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="s2">&quot;imma1&quot;</span><span class="p">,</span> <span class="n">sections</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c98&quot;</span><span class="p">])</span>
 
 <span class="n">data_raw</span> <span class="o">=</span> <span class="n">imma_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name_of_model</span> <span class="o">=</span> <span class="s2">"icoads_r3000_d704"</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name_of_model</span> <span class="o">=</span> <span class="s2">&quot;icoads_r3000_d704&quot;</span>
 
 <span class="n">cdm_dict</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">map_model</span><span class="p">(</span>
     <span class="n">name_of_model</span><span class="p">,</span>
     <span class="n">data_raw</span><span class="p">,</span>
-    <span class="n">log_level</span><span class="o">=</span><span class="s2">"DEBUG"</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -202,31 +213,36 @@
 <p>Furthermore, acknowledgments go to National Oceanography Centre (<a class="reference external" href="https://noc.ac.uk/">NOC</a>) and UK Marine and Climate Advisory Service (<a class="reference external" href="https://www.metoffice.gov.uk/services/data/met-office-marine-data-service">UKMCAS</a>).</p>
 </section>
 </section>
-</div>
-</div>
-<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-<a accesskey="p" class="btn btn-neutral float-left" href="index.html" rel="prev" title="Marine data file reader-mapper toolbox documentation"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
-<a accesskey="n" class="btn btn-neutral float-right" href="tool-set-up.html" rel="next" title="Tool set up">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
-</div>
-<hr/>
-<div role="contentinfo">
-<p>© Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
-</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Marine data file reader-mapper toolbox documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tool-set-up.html" class="btn btn-neutral float-right" title="Tool set up" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
+  </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
-</div>
-</div>
-</section>
-</div>
-<script>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
+
 </body>
 </html>

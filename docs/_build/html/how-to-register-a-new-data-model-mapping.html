@@ -10,11 +10,11 @@
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=3f1b9271"></script>
@@ -27,17 +27,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CDM tables mapping files and descriptors" href="cdm-tables-mapping-files-and-descriptors.html" />
-    <link rel="prev" title="How to read a simple csv file" href="how_to_read_csv.html" />
+    <link rel="prev" title="How to read a simple csv file" href="how_to_read_csv.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
@@ -97,7 +97,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <section id="how-to-register-a-new-data-model-mapping">
 <span id="id1"></span><h1>How to register a new data model mapping<a class="headerlink" href="#how-to-register-a-new-data-model-mapping" title="Link to this heading"></a></h1>
 <p>Using <code class="docutils literal notranslate"><span class="pre">icoads_r3000</span></code> imodel as a reference, a data model (imodel) mapping can be understood in this context as:</p>
@@ -119,29 +119,12 @@
 </li>
 </ul>
 <p>This is a summary of the steps needed to add an imodel to the mapping tool:</p>
-<ol class="arabic simple">
-<li><p>Copy the template mapping structure in the mappings library directory (<code class="docutils literal notranslate"><span class="pre">~/cdm-mapper/lib/mappings/template</span></code>) to the same folder and re-name it according to the <code class="docutils literal notranslate"><span class="pre">imodel</span></code> that you are going to add:</p></li>
-</ol>
-<figure class="align-default" id="id2">
-<a class="reference internal image-reference" href="_images/imodel_dir.png"><img alt="_images/imodel_dir.png" src="_images/imodel_dir.png" style="width: 100%;" /></a>
-<figcaption>
-<p><span class="caption-text">Directory structure of an imodel, showing the <code class="docutils literal notranslate"><span class="pre">icoads_r3000</span></code> .imma data model as an example.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
-<div class="legend">
-<blockquote>
-<div><ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> module hosts the <code class="docutils literal notranslate"><span class="pre">mapping_functions</span></code> class. These the functions used by the tool to map imodel elements to CDM elements (if required). All transform functions have to be defined under this class, so the mapper tool can access them.</p></li>
-<li><p>Additionally, an <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file needs to be added, so python can recognise the imodel directory as a module and this can be use by the tool.</p></li>
-</ul>
-</div></blockquote>
-</div>
-</figcaption>
-</figure>
-<ol class="arabic" start="2">
-<li><p>Create a copy of the <code class="docutils literal notranslate"><span class="pre">template.json</span></code> file for each of the <strong>CDM tables</strong> in your imodel. To access the <strong>CDM tables</strong> templates available in the tool type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_list</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">cdm_tables</span>
+<ol class="arabic">
+<li><p>Copy the mapping structure of an already existing mapping (e.g. <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper/cdm_mapper/tables/icoads_r3000</span></code>) to the same folder and re-name it according to the <code class="docutils literal notranslate"><span class="pre">imodel</span></code> that you are going to add.</p></li>
+<li><p>Create a copy for each of the <strong>CDM tables</strong> in your imodel. To access the <strong>CDM tables</strong> templates available in the tool type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_list</span> <span class="o">=</span> <span class="n">cdm_reader_mapper</span><span class="o">.</span><span class="n">cdm_mapper</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">cdm_tables</span>
 </pre></div>
 </div>
-<p>Your imodel should be looking something like the figure above.</p>
 </li>
 <li><p>Edit the mapping files (<code class="docutils literal notranslate"><span class="pre">*.json</span></code>) and create the mappings to CDM elements (refer to <a class="reference internal" href="cdm-tables-mapping-files-and-descriptors.html#cdm-tables-mapping-files-and-descriptors"><span class="std std-ref">CDM tables mapping files and descriptors</span></a> for more information), this can be achieved using one of the following approaches:</p>
 <blockquote>
@@ -149,7 +132,7 @@
 <li><p>Direct mapping from an imodel element.</p></li>
 <li><p>Direct mapping via <code class="docutils literal notranslate"><span class="pre">code_tables</span></code> that can take one or multiple imodel elements.</p></li>
 <li><p>Assignment of a default value.</p></li>
-<li><p>Any other mapping including any combination of the following can be achieved using functions defined in the <code class="docutils literal notranslate"><span class="pre">imodel.py</span></code> module:</p></li>
+<li><p>Optionally, add any other mapping functions needed for the new data model to the <code class="docutils literal notranslate"><span class="pre">cdm_mapper.mappings</span></code> module:</p></li>
 </ul>
 <ol class="loweralpha simple">
 <li><p>imodel elements attributes</p></li>
@@ -164,10 +147,6 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Click on next for a detail description on steps 3 and 4.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>After finishing your new <code class="docutils literal notranslate"><span class="pre">imodel</span></code>, don’t forget to deactivate and then re-activate your python virtualenv or to reset your jupyter-notebook kernel, so the cdm tool recognises your new mapper. Alternatively you can pass to the main <code class="docutils literal notranslate"><span class="pre">cdm.map_model</span></code> function the directory path where you have stored your cdm imodel mapper (see API Reference for more information).</p>
 </div>
 </section>
 
@@ -188,7 +167,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -199,7 +178,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

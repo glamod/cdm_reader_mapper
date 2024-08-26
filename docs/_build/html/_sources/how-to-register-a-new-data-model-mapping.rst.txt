@@ -14,28 +14,18 @@ Using ``icoads_r3000`` imodel as a reference, a data model (imodel) mapping can 
 
 This is a summary of the steps needed to add an imodel to the mapping tool:
 
-1. Copy the template mapping structure in the mappings library directory (``~/cdm-mapper/lib/mappings/template``) to the same folder and re-name it according to the ``imodel`` that you are going to add:
+1. Copy the mapping structure of an already existing mapping (e.g. ``cdm_reader_mapper/cdm_mapper/tables/icoads_r3000``) to the same folder and re-name it according to the ``imodel`` that you are going to add.
 
-.. figure:: _static/imodel_dir.png
-    :width: 100%
+2. Create a copy for each of the **CDM tables** in your imodel. To access the **CDM tables** templates available in the tool type::
 
-    Directory structure of an imodel, showing the ``icoads_r3000`` .imma data model as an example.
-
-        - The ``imodel.py`` module hosts the ``mapping_functions`` class. These the functions used by the tool to map imodel elements to CDM elements (if required). All transform functions have to be defined under this class, so the mapper tool can access them.
-        - Additionally, an ``__init__.py`` file needs to be added, so python can recognise the imodel directory as a module and this can be use by the tool.
-
-2. Create a copy of the ``template.json`` file for each of the **CDM tables** in your imodel. To access the **CDM tables** templates available in the tool type::
-
-    table_list = cdm.properties.cdm_tables
-
-   Your imodel should be looking something like the figure above.
+    table_list = cdm_reader_mapper.cdm_mapper.properties.cdm_tables
 
 3. Edit the mapping files (``*.json``) and create the mappings to CDM elements (refer to :ref:`cdm-tables-mapping-files-and-descriptors` for more information), this can be achieved using one of the following approaches:
 
     - Direct mapping from an imodel element.
     - Direct mapping via ``code_tables`` that can take one or multiple imodel elements.
     - Assignment of a default value.
-    - Any other mapping including any combination of the following can be achieved using functions defined in the ``imodel.py`` module:
+    - Optionally, add any other mapping functions needed for the new data model to the ``cdm_mapper.mappings`` module:
 
     a.	imodel elements attributes
     b.	parameterization with input keyword arguments
@@ -45,5 +35,3 @@ This is a summary of the steps needed to add an imodel to the mapping tool:
 4. Create :ref:`cdm-code-tables` to transform variables if these required a specific key to translate the information into the CDM.
 
 .. note:: Click on next for a detail description on steps 3 and 4.
-
-.. warning:: After finishing your new ``imodel``, don't forget to deactivate and then re-activate your python virtualenv or to reset your jupyter-notebook kernel, so the cdm tool recognises your new mapper. Alternatively you can pass to the main ``cdm.map_model`` function the directory path where you have stored your cdm imodel mapper (see API Reference for more information).
