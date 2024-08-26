@@ -11,12 +11,7 @@ How to build a data model
 
 The main steps to create a data model (or schema) for the mdf_reader are:
 
-1. Create a valid directory tree to hold the model **(mymodel)** as shown in the figure below.
-
-.. figure:: _static/images/schema.png
-    :width: 45%
-
-    Data model directory
+1. Create a valid directory tree to hold the model **(mymodel)**. For more details see the structure of the **cdm_reader_mapper** toolbox.
 
 2. Create a valid **schema** file:
 

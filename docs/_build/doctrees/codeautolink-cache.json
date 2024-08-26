@@ -1,0 +1,58 @@
+{
+  "api": [],
+  "authors": [],
+  "cdm-tables-mapping-files-and-descriptors": [],
+  "changes": [],
+  "contributing": [],
+  "data-models": [],
+  "getting-started": [],
+  "how-to-build-a-data-model": [],
+  "how-to-register-a-new-data-model-mapping": [],
+  "how_to_read_csv": [],
+  "hyperlinks": [],
+  "index": [],
+  "readme": [
+    {
+      "source": "import os\n\nos.environ[\"CDM_LOG_FILE\"] = \"log_file.log\"\n\nimport cdm_reader_mapper as cdm",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "logging",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Logging"
+        ]
+      },
+      "doc_lineno": 65
+    },
+    {
+      "source": "import cdm_reader_mapper as cdm\n\ndata = cdm.tests.read_imma1_buoys_nosupp()\n\nimma_data = cdm.read(filepath, data_model=\"imma1\", sections=[\"core\", \"c1\", \"c98\"])\n\ndata_raw = imma_data.data.copy()",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "run-a-test",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Run a test"
+        ]
+      },
+      "doc_lineno": 81
+    },
+    {
+      "source": "name_of_model = \"icoads_r3000_d704\"\n\ncdm_dict = cdm.map_model(\n    name_of_model,\n    data_raw,\n    log_level=\"DEBUG\",\n)",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "run-a-test",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Run a test"
+        ]
+      },
+      "doc_lineno": 94
+    }
+  ],
+  "tool-overview_mapper": [],
+  "tool-overview_reader": [],
+  "tool-set-up": []
+}

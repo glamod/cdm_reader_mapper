@@ -12,14 +12,9 @@ Data Models
 Schema
 ======
 
-The schema file gathers a collection of descriptors that enables the **cdm_reader_mapper** toolbox to access and extract meaningful units of information for each element.
+The schema file gathers a collection of descriptors that enables the **mdf_reader** to access and extract meaningful units of information for each element.
 
 Valid schemas files are json files that the tool accesses and stores internally as dictionaries. The basename of the schema file must be the same as the data model directory and its extension ``.json``
-
-.. figure:: _static/images/schema.png
-    :width: 45%
-
-    Data model directory
 
 There are two levels of information in the schema:
 
@@ -33,12 +28,12 @@ There are two levels of information in the schema:
 
     Content inside a ``schema.json`` file.
 
-The **cdm_reader_mapper** toolbox supports reading and validation of both internal and external schemas:
+The **mdf_reader** supports reading and validation of both internal and external schemas:
 
 - An **internal data model** has its schema registered within the tool. To read and validate data from these models, we only need to pass its reference name to the reader and validation modules, using the argument ``data_model``. A list of the reference names for internally supported data models can be access via the tool's function::
 
-   from cdm_reader_mapper import cdm_mapper
-   cdm_mapper.properties.supported_data_models()
+   from cdm_reader_mapper import mdf_reader
+   mdf_reader.properties.supported_data_models()
 
 - An **external data model** is a data format that is unknown to the tool. If the data model meets the specifications for which the tool was built, then a model can be built externally and fed into it for both functions data reading and model validation using the argument ``data_model_path``::
 
@@ -55,7 +50,7 @@ Code tables
 
     Element content inside a ``schema.json`` file.
 
-Elements defined in the data model ``schema.json`` with an element attribute ``"column_type": "key"`` are linked to a code table in the data model through a codetable descriptor in the schema (e.g. ``"codetable": "ICOADS.C99.FORM"``). Code tables contain the ``key:value`` pairs and are stored as individual ``.json`` files in the ``data_models/schema/code_tables`` subdirectory.
+Elements defined in the data model ``schema.json`` with an element attribute ``"column_type": "key"`` are linked to a code table in the data model through a codetable descriptor in the schema (e.g. ``"codetable": "ICOADS.C99.FORM"``). Code tables contain the ``key:value`` pairs and are stored as individual ``.json`` files.
 
 The content of a code table translating a ship-log report type into its real meaning (``ICOADS.C99.FORM.json``) can be seen in text below::
 

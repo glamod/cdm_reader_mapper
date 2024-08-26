@@ -67,11 +67,4 @@ This writes the output to an ascii file with a pipe delimited format using the f
 
     cdm_mapper.cdm_to_ascii(
             cdm_dict,
-            delimiter = '|',
-            extension = 'psv',
-            null_label = 'null',
-            out_dir = None,
-            suffix = None,
-            prefix = None,
-            log_level = 'INFO',
     )

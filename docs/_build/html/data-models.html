@@ -10,11 +10,11 @@
       <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=3f1b9271"></script>
@@ -27,17 +27,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How to build a data model" href="how-to-build-a-data-model.html" />
-    <link rel="prev" title="Getting started" href="getting-started.html" />
+    <link rel="prev" title="Getting started" href="getting-started.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-
-
+          
+          
           <a href="index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
@@ -107,19 +107,13 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <section id="data-models">
 <span id="id1"></span><h1>Data Models<a class="headerlink" href="#data-models" title="Link to this heading"></a></h1>
 <section id="schema">
 <h2>Schema<a class="headerlink" href="#schema" title="Link to this heading"></a></h2>
-<p>The schema file gathers a collection of descriptors that enables the <strong>cdm_reader_mapper</strong> toolbox to access and extract meaningful units of information for each element.</p>
+<p>The schema file gathers a collection of descriptors that enables the <strong>mdf_reader</strong> to access and extract meaningful units of information for each element.</p>
 <p>Valid schemas files are json files that the tool accesses and stores internally as dictionaries. The basename of the schema file must be the same as the data model directory and its extension <code class="docutils literal notranslate"><span class="pre">.json</span></code></p>
-<figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="_images/schema.png"><img alt="_images/schema.png" src="_images/schema.png" style="width: 45%;" /></a>
-<figcaption>
-<p><span class="caption-text">Data model directory</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
-</figcaption>
-</figure>
 <p>There are two levels of information in the schema:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -127,17 +121,17 @@
 <li><p><strong>Specific</strong> information on the data elements and, optionally, on the sections. In the case that the data model has its report elements organised in one or multiple sections (as shown in the figure below). This information is included in the <strong>elements block</strong> of the schema.</p></li>
 </ol>
 </div></blockquote>
-<figure class="align-default" id="id4">
+<figure class="align-default" id="id3">
 <a class="reference internal image-reference" href="_images/new_schema.png"><img alt="_images/new_schema.png" src="_images/new_schema.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-text">Content inside a <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> file.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+<p><span class="caption-text">Content inside a <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> file.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>The <strong>cdm_reader_mapper</strong> toolbox supports reading and validation of both internal and external schemas:</p>
+<p>The <strong>mdf_reader</strong> supports reading and validation of both internal and external schemas:</p>
 <ul>
 <li><p>An <strong>internal data model</strong> has its schema registered within the tool. To read and validate data from these models, we only need to pass its reference name to the reader and validation modules, using the argument <code class="docutils literal notranslate"><span class="pre">data_model</span></code>. A list of the reference names for internally supported data models can be access via the tool’s function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdm_reader_mapper</span> <span class="kn">import</span> <span class="n">cdm_mapper</span>
-<span class="n">cdm_mapper</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">supported_data_models</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cdm_reader_mapper</span> <span class="kn">import</span> <span class="n">mdf_reader</span>
+<span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">supported_data_models</span><span class="p">()</span>
 </pre></div>
 </div>
 </li>
@@ -151,13 +145,13 @@
 </section>
 <section id="code-tables">
 <span id="id2"></span><h2>Code tables<a class="headerlink" href="#code-tables" title="Link to this heading"></a></h2>
-<figure class="align-default" id="id5">
+<figure class="align-default" id="id4">
 <a class="reference internal image-reference" href="_images/elements.png"><img alt="_images/elements.png" src="_images/elements.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-text">Element content inside a <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> file.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+<p><span class="caption-text">Element content inside a <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> file.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>Elements defined in the data model <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> with an element attribute <code class="docutils literal notranslate"><span class="pre">&quot;column_type&quot;:</span> <span class="pre">&quot;key&quot;</span></code> are linked to a code table in the data model through a codetable descriptor in the schema (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;codetable&quot;:</span> <span class="pre">&quot;ICOADS.C99.FORM&quot;</span></code>). Code tables contain the <code class="docutils literal notranslate"><span class="pre">key:value</span></code> pairs and are stored as individual <code class="docutils literal notranslate"><span class="pre">.json</span></code> files in the <code class="docutils literal notranslate"><span class="pre">data_models/schema/code_tables</span></code> subdirectory.</p>
+<p>Elements defined in the data model <code class="docutils literal notranslate"><span class="pre">schema.json</span></code> with an element attribute <code class="docutils literal notranslate"><span class="pre">&quot;column_type&quot;:</span> <span class="pre">&quot;key&quot;</span></code> are linked to a code table in the data model through a codetable descriptor in the schema (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;codetable&quot;:</span> <span class="pre">&quot;ICOADS.C99.FORM&quot;</span></code>). Code tables contain the <code class="docutils literal notranslate"><span class="pre">key:value</span></code> pairs and are stored as individual <code class="docutils literal notranslate"><span class="pre">.json</span></code> files.</p>
 <p>The content of a code table translating a ship-log report type into its real meaning (<code class="docutils literal notranslate"><span class="pre">ICOADS.C99.FORM.json</span></code>) can be seen in text below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="s2">&quot; 1&quot;</span><span class="p">:</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
@@ -315,7 +309,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -326,7 +320,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

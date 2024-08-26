@@ -37,7 +37,7 @@ Several data models have been added to the tool including both the IMMA and the 
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
-In addition, those data will be mapped to the standardized C3S CDS Common Data Model (CDM_).
+After reading the data into a pandas.DataFrame, the **cdm_mapper** will mapp those data to the standardized C3S CDS Common Data Model (CDM_).
 
 .. toctree::
    :maxdepth: 2

@@ -34,9 +34,7 @@ The **core** meteorological variables stored in the ``.imma`` format can be read
 
 .. note:: For each SID-DCK number the data model or schema use to read supplemental metadata will different. e.g. to read metadata from the `US Maury`_ Ship data collection SID 69 and DCK 701, we will use the schema ``imma_d701``)
 
-The C-RAID containing in-situ platform data is stored in the ``.netcdf``. The **mdf_reader** reads the data using the python tool xarray_ and organises and validates them in the same way as for ICOADS data.
-
-The data can be read by using the ``c_raid`` schema included in this tool.
+The C-RAID containing in-situ platform data is stored in the ``.netcdf``. The **mdf_reader** reads the data using the python tool xarray_ and organises and validates them in the same way as for ICOADS data. The data can be read by using the ``c_raid`` schema included in this tool.
 
 Output data
 -----------
@@ -45,7 +43,7 @@ The output of the **mdf_reader** is a python object with three attributes:
 
 • **data**: python pandas.DataFrame_ with data values.
 • **attrs**: `python dictionary`_ with attributes of each of the output elements inherited from the input data model **schema**.
-• **mask**: boolean DF with the results of the validation of each of the data model elements in its columns.
+• **mask**: boolean pandas.DataFrame with the results of the validation of each of the data model elements in its columns.
 
 
 Processing of the data elements
