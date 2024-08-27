@@ -1,54 +1,61 @@
 <!DOCTYPE html>
-
-<html class="writer-html5" data-content_root="../" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Test and overview of the mdf_reader module — cdm_reader_mapper unknown documentation</title>
-<link href="../_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
-<link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/nbsphinx-code-cells.css?v=2aa19091" rel="stylesheet" type="text/css"/>
-<!--[if lt IE 9]>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test and overview of the mdf_reader module &mdash; cdm_reader_mapper unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+  <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-<script src="../_static/jquery.js?v=5d32c60e"></script>
-<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-<script src="../_static/documentation_options.js?v=3f1b9271"></script>
-<script src="../_static/doctools.js?v=9a2dae69"></script>
-<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="../_static/copybutton.js?v=f281be69"></script>
-<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-<script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script src="../_static/js/theme.js"></script>
-<link href="../genindex.html" rel="index" title="Index"/>
-<link href="../search.html" rel="search" title="Search"/>
-<link href="create_data_model.html" rel="next" title="How to create a data model"/>
-<link href="../cdm-tables-mapping-files-and-descriptors.html" rel="prev" title="CDM tables mapping files and descriptors"/>
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=3f1b9271"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to create a data model" href="create_data_model.html" />
+    <link rel="prev" title="CDM tables mapping files and descriptors" href="../cdm-tables-mapping-files-and-descriptors.html" /> 
 </head>
-<body class="wy-body-for-nav">
-<div class="wy-grid-for-nav">
-<nav class="wy-nav-side" data-toggle="wy-nav-shift">
-<div class="wy-side-scroll">
-<div class="wy-side-nav-search">
-<a class="icon icon-home" href="../index.html">
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
-<div class="version">
+              <div class="version">
                 unknown
               </div>
 <div role="search">
-<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-<input name="check_keywords" type="hidden" value="yes"/>
-<input name="area" type="hidden" value="default"/>
-</form>
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tool-set-up.html">Installation</a></li>
@@ -70,28 +77,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
 </ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/example_notebooks/mdf_reader_test_overview.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
 </div>
-</div>
-</nav>
-<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
-<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
-<a href="../index.html">cdm_reader_mapper</a>
-</nav>
-<div class="wy-nav-content">
-<div class="rst-content">
-<div aria-label="Page navigation" role="navigation">
-<ul class="wy-breadcrumbs">
-<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
-<li class="breadcrumb-item active">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</li>
-<li class="wy-breadcrumbs-aside">
-<a href="../_sources/example_notebooks/mdf_reader_test_overview.ipynb.txt" rel="nofollow"> View page source</a>
-</li>
-</ul>
-<hr/>
-</div>
-<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
-<div itemprop="articleBody">
-<section id="Test-and-overview-of-the-mdf_reader-module">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Test-and-overview-of-the-mdf_reader-module">
 <h1>Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module<a class="headerlink" href="#Test-and-overview-of-the-mdf_reader-module" title="Link to this heading"></a></h1>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -125,7 +136,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_125_704</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_125_704</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
 
 <span class="n">data_ori</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
 <span class="n">data_ori</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -146,7 +157,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -160,30 +171,30 @@
     }
 </style>
 <table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>18781020 600 4228 29159 130623  10Panay      12325123       9961                         4                   165 17128704125 5 0  1                1FF111F11AAA1AAAA1AAA     9815020N163002199 0 100200180003Panay                     78011118737S.P.Bray,Jr    013231190214        Bulkhead of cabin        1- .1022200200180014Boston              Rio de Janeiro      300200180014001518781020               4220N 6630W 10 E      400200180014001518781020102 85 EXS             WSW           0629601 58             BOC  CU05R</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>18781020 800 4231 29197 130623  10Panay      1...</td>
-</tr>
-<tr>
-<th>1</th>
-<td>187810201000 4233 29236 130623  10Panay      1...</td>
-</tr>
-<tr>
-<th>2</th>
-<td>187810201200 4235 29271 130623  10Panay      1...</td>
-</tr>
-<tr>
-<th>3</th>
-<td>187810201400 4237 29310 130623  10Panay      1...</td>
-</tr>
-</tbody>
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>18781020 600 4228 29159 130623  10Panay      12325123       9961                         4                   165 17128704125 5 0  1                1FF111F11AAA1AAAA1AAA     9815020N163002199 0 100200180003Panay                     78011118737S.P.Bray,Jr    013231190214        Bulkhead of cabin        1- .1022200200180014Boston              Rio de Janeiro      300200180014001518781020               4220N 6630W 10 E      400200180014001518781020102 85 EXS             WSW           0629601 58             BOC  CU05R</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>18781020 800 4231 29197 130623  10Panay      1...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>187810201000 4233 29236 130623  10Panay      1...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>187810201200 4235 29271 130623  10Panay      1...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>187810201400 4237 29310 130623  10Panay      1...</td>
+    </tr>
+  </tbody>
 </table>
 </div></div>
 </div>
@@ -206,20 +217,20 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-['gcc_immt',
- 'imma1',
- 'imma1_d701',
- 'imma1_d702',
- 'imma1_d704',
- 'imma1_d705-707',
- 'imma1_d714',
- 'imma1_d721',
- 'imma1_d730',
- 'imma1_d781',
- 'imma1_nodt',
- 'td11',
- 'td11_d110',
- 'c_raid']
+[&#39;gcc_immt&#39;,
+ &#39;imma1&#39;,
+ &#39;imma1_d701&#39;,
+ &#39;imma1_d702&#39;,
+ &#39;imma1_d704&#39;,
+ &#39;imma1_d705-707&#39;,
+ &#39;imma1_d714&#39;,
+ &#39;imma1_d721&#39;,
+ &#39;imma1_d730&#39;,
+ &#39;imma1_d781&#39;,
+ &#39;imma1_nodt&#39;,
+ &#39;td11&#39;,
+ &#39;td11_d110&#39;,
+ &#39;c_raid&#39;]
 </pre></div></div>
 </div>
 <p><strong>Schemas</strong> can be designed to be deck specific like the example below</p>
@@ -227,7 +238,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="s2">"imma1_d704"</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="s2">&quot;imma1_d704&quot;</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
 </pre></div>
@@ -241,25 +252,25 @@
 2024-08-23 10:25:48,691 - root - INFO - READING DATA MODEL SCHEMA FILE...
 2024-08-23 10:25:48,695 - root - INFO - EXTRACTING DATA FROM MODEL: imma1_d704
 2024-08-23 10:25:48,696 - root - INFO - Getting data string from source...
-2024-08-23 10:25:49,195 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99_journal', 'vessel_length'),('c99_journal', 'vessel_beam'),('c99_journal', 'hold_depth'),('c99_journal', 'tonnage'),('c99_journal', 'baro_height'),('c99_daily', 'year'),('c99_daily', 'month'),('c99_daily', 'day'),('c99_daily', 'distance'),('c99_daily', 'lat_deg_an'),('c99_daily', 'lat_min_an'),('c99_daily', 'lon_deg_an'),('c99_daily', 'lon_min_an'),('c99_daily', 'lat_deg_on'),('c99_daily', 'lat_min_on'),('c99_daily', 'lon_deg_of'),('c99_daily', 'lon_min_of'),('c99_daily', 'current_speed'),('c99_data4', 'year'),('c99_data4', 'month'),('c99_data4', 'day'),('c99_data4', 'hour'),('c99_data4', 'ship_speed'),('c99_data4', 'compass_correction'),('c99_data4', 'attached_thermometer'),('c99_data4', 'air_temperature'),('c99_data4', 'wet_bulb_temperature'),('c99_data4', 'sea_temperature'),('c99_data4', 'sky_clear'),('c99_data5', 'year'),('c99_data5', 'month'),('c99_data5', 'day'),('c99_data5', 'hour'),('c99_data5', 'ship_speed'),('c99_data5', 'attached_thermometer'),('c99_data5', 'air_temperature'),('c99_data5', 'wet_bulb_temperature'),('c99_data5', 'sea_temperature'),('c99_data5', 'sky_clear'),('c99_data5', 'compass_correction')
+2024-08-23 10:25:49,195 - root - WARNING - Data numeric elements with missing upper or lower threshold: (&#39;c1&#39;, &#39;BSI&#39;),(&#39;c1&#39;, &#39;AQZ&#39;),(&#39;c1&#39;, &#39;AQA&#39;),(&#39;c1&#39;, &#39;UQZ&#39;),(&#39;c1&#39;, &#39;UQA&#39;),(&#39;c1&#39;, &#39;VQZ&#39;),(&#39;c1&#39;, &#39;VQA&#39;),(&#39;c1&#39;, &#39;PQZ&#39;),(&#39;c1&#39;, &#39;PQA&#39;),(&#39;c1&#39;, &#39;DQZ&#39;),(&#39;c1&#39;, &#39;DQA&#39;),(&#39;c5&#39;, &#39;OS&#39;),(&#39;c5&#39;, &#39;OP&#39;),(&#39;c5&#39;, &#39;FM&#39;),(&#39;c5&#39;, &#39;IMMV&#39;),(&#39;c5&#39;, &#39;IX&#39;),(&#39;c5&#39;, &#39;W2&#39;),(&#39;c5&#39;, &#39;WMI&#39;),(&#39;c5&#39;, &#39;SD2&#39;),(&#39;c5&#39;, &#39;SP2&#39;),(&#39;c5&#39;, &#39;IS&#39;),(&#39;c5&#39;, &#39;RS&#39;),(&#39;c5&#39;, &#39;IC1&#39;),(&#39;c5&#39;, &#39;IC2&#39;),(&#39;c5&#39;, &#39;IC3&#39;),(&#39;c5&#39;, &#39;IC4&#39;),(&#39;c5&#39;, &#39;IC5&#39;),(&#39;c5&#39;, &#39;IR&#39;),(&#39;c5&#39;, &#39;RRR&#39;),(&#39;c5&#39;, &#39;TR&#39;),(&#39;c5&#39;, &#39;NU&#39;),(&#39;c5&#39;, &#39;QCI&#39;),(&#39;c5&#39;, &#39;QI1&#39;),(&#39;c5&#39;, &#39;QI2&#39;),(&#39;c5&#39;, &#39;QI3&#39;),(&#39;c5&#39;, &#39;QI4&#39;),(&#39;c5&#39;, &#39;QI5&#39;),(&#39;c5&#39;, &#39;QI6&#39;),(&#39;c5&#39;, &#39;QI7&#39;),(&#39;c5&#39;, &#39;QI8&#39;),(&#39;c5&#39;, &#39;QI9&#39;),(&#39;c5&#39;, &#39;QI10&#39;),(&#39;c5&#39;, &#39;QI11&#39;),(&#39;c5&#39;, &#39;QI12&#39;),(&#39;c5&#39;, &#39;QI13&#39;),(&#39;c5&#39;, &#39;QI14&#39;),(&#39;c5&#39;, &#39;QI15&#39;),(&#39;c5&#39;, &#39;QI16&#39;),(&#39;c5&#39;, &#39;QI17&#39;),(&#39;c5&#39;, &#39;QI18&#39;),(&#39;c5&#39;, &#39;QI19&#39;),(&#39;c5&#39;, &#39;QI20&#39;),(&#39;c5&#39;, &#39;QI21&#39;),(&#39;c5&#39;, &#39;QI22&#39;),(&#39;c5&#39;, &#39;QI23&#39;),(&#39;c5&#39;, &#39;QI24&#39;),(&#39;c5&#39;, &#39;QI25&#39;),(&#39;c5&#39;, &#39;QI26&#39;),(&#39;c5&#39;, &#39;QI27&#39;),(&#39;c5&#39;, &#39;QI28&#39;),(&#39;c5&#39;, &#39;QI29&#39;),(&#39;c5&#39;, &#39;RHI&#39;),(&#39;c5&#39;, &#39;AWSI&#39;),(&#39;c6&#39;, &#39;FBSRC&#39;),(&#39;c6&#39;, &#39;MST&#39;),(&#39;c7&#39;, &#39;OPM&#39;),(&#39;c7&#39;, &#39;LOT&#39;),(&#39;c9&#39;, &#39;CCe&#39;),(&#39;c9&#39;, &#39;WWe&#39;),(&#39;c9&#39;, &#39;Ne&#39;),(&#39;c9&#39;, &#39;NHe&#39;),(&#39;c9&#39;, &#39;He&#39;),(&#39;c9&#39;, &#39;CLe&#39;),(&#39;c9&#39;, &#39;CMe&#39;),(&#39;c9&#39;, &#39;CHe&#39;),(&#39;c9&#39;, &#39;SBI&#39;),(&#39;c95&#39;, &#39;DPRO&#39;),(&#39;c95&#39;, &#39;DPRP&#39;),(&#39;c95&#39;, &#39;UFR&#39;),(&#39;c95&#39;, &#39;ASIR&#39;),(&#39;c96&#39;, &#39;ASII&#39;),(&#39;c97&#39;, &#39;ASIE&#39;),(&#39;c99_journal&#39;, &#39;vessel_length&#39;),(&#39;c99_journal&#39;, &#39;vessel_beam&#39;),(&#39;c99_journal&#39;, &#39;hold_depth&#39;),(&#39;c99_journal&#39;, &#39;tonnage&#39;),(&#39;c99_journal&#39;, &#39;baro_height&#39;),(&#39;c99_daily&#39;, &#39;year&#39;),(&#39;c99_daily&#39;, &#39;month&#39;),(&#39;c99_daily&#39;, &#39;day&#39;),(&#39;c99_daily&#39;, &#39;distance&#39;),(&#39;c99_daily&#39;, &#39;lat_deg_an&#39;),(&#39;c99_daily&#39;, &#39;lat_min_an&#39;),(&#39;c99_daily&#39;, &#39;lon_deg_an&#39;),(&#39;c99_daily&#39;, &#39;lon_min_an&#39;),(&#39;c99_daily&#39;, &#39;lat_deg_on&#39;),(&#39;c99_daily&#39;, &#39;lat_min_on&#39;),(&#39;c99_daily&#39;, &#39;lon_deg_of&#39;),(&#39;c99_daily&#39;, &#39;lon_min_of&#39;),(&#39;c99_daily&#39;, &#39;current_speed&#39;),(&#39;c99_data4&#39;, &#39;year&#39;),(&#39;c99_data4&#39;, &#39;month&#39;),(&#39;c99_data4&#39;, &#39;day&#39;),(&#39;c99_data4&#39;, &#39;hour&#39;),(&#39;c99_data4&#39;, &#39;ship_speed&#39;),(&#39;c99_data4&#39;, &#39;compass_correction&#39;),(&#39;c99_data4&#39;, &#39;attached_thermometer&#39;),(&#39;c99_data4&#39;, &#39;air_temperature&#39;),(&#39;c99_data4&#39;, &#39;wet_bulb_temperature&#39;),(&#39;c99_data4&#39;, &#39;sea_temperature&#39;),(&#39;c99_data4&#39;, &#39;sky_clear&#39;),(&#39;c99_data5&#39;, &#39;year&#39;),(&#39;c99_data5&#39;, &#39;month&#39;),(&#39;c99_data5&#39;, &#39;day&#39;),(&#39;c99_data5&#39;, &#39;hour&#39;),(&#39;c99_data5&#39;, &#39;ship_speed&#39;),(&#39;c99_data5&#39;, &#39;attached_thermometer&#39;),(&#39;c99_data5&#39;, &#39;air_temperature&#39;),(&#39;c99_data5&#39;, &#39;wet_bulb_temperature&#39;),(&#39;c99_data5&#39;, &#39;sea_temperature&#39;),(&#39;c99_data5&#39;, &#39;sky_clear&#39;),(&#39;c99_data5&#39;, &#39;compass_correction&#39;)
 2024-08-23 10:25:49,195 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
 2024-08-23 10:25:49,915 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
 </pre></div></div>
 </div>
 <p>A new <strong>schema</strong> can be build for a particular deck and source as shown in this notebook. The <code class="docutils literal notranslate"><span class="pre">imma1_d704</span></code> schema was build upon the <code class="docutils literal notranslate"><span class="pre">imma1</span></code> schema/data model but extra sections have been added to the <code class="docutils literal notranslate"><span class="pre">.json</span></code> files to include supplemental data from ICOADS documentation. This is a snapshot of the data inside the <code class="docutils literal notranslate"><span class="pre">imma1_d704.json</span></code>.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>"c99_journal": {
-            "header": {"sentinal": "1", "field_layout":"fixed_width","length": 117},
-            "elements": {
-              "sentinal":{
-                  "description": "Journal header record identifier",
-                  "field_length": 1,
-                  "column_type": "str"
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;c99_journal&quot;: {
+            &quot;header&quot;: {&quot;sentinal&quot;: &quot;1&quot;, &quot;field_layout&quot;:&quot;fixed_width&quot;,&quot;length&quot;: 117},
+            &quot;elements&quot;: {
+              &quot;sentinal&quot;:{
+                  &quot;description&quot;: &quot;Journal header record identifier&quot;,
+                  &quot;field_length&quot;: 1,
+                  &quot;column_type&quot;: &quot;str&quot;
               },
-              "reel_no":{
-                  "description": "Microfilm reel number. See if we want the zero padding or not...",
-                  "field_length": 3,
-                  "column_type": "str",
-                  "LMR6": true
+              &quot;reel_no&quot;:{
+                  &quot;description&quot;: &quot;Microfilm reel number. See if we want the zero padding or not...&quot;,
+                  &quot;field_length&quot;: 3,
+                  &quot;column_type&quot;: &quot;str&quot;,
+                  &quot;LMR6&quot;: true
               }
             ...
 </pre></div>
@@ -279,7 +290,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -293,185 +304,190 @@
     }
 </style>
 <table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>sentinal</th>
-<th>reel_no</th>
-<th>journal_no</th>
-<th>frame_no</th>
-<th>ship_name</th>
-<th>journal_ed</th>
-<th>rig</th>
-<th>ship_material</th>
-<th>vessel_type</th>
-<th>vessel_length</th>
-<th>...</th>
-<th>hold_depth</th>
-<th>tonnage</th>
-<th>baro_type</th>
-<th>baro_height</th>
-<th>baro_cdate</th>
-<th>baro_loc</th>
-<th>baro_units</th>
-<th>baro_cor</th>
-<th>thermo_mount</th>
-<th>SST_I</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>1</td>
-<td>002</td>
-<td>0018</td>
-<td>0003</td>
-<td>Panay</td>
-<td>78</td>
-<td>01</td>
-<td>1</td>
-<td>1</td>
-<td>187</td>
-<td>...</td>
-<td>23</td>
-<td>1190</td>
-<td>2</td>
-<td>14</td>
-<td>NaN</td>
-<td>Bulkhead of cabin</td>
-<td>1</td>
-<td>- .102</td>
-<td>2</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>1</th>
-<td>1</td>
-<td>002</td>
-<td>0018</td>
-<td>0003</td>
-<td>Panay</td>
-<td>78</td>
-<td>01</td>
-<td>1</td>
-<td>1</td>
-<td>187</td>
-<td>...</td>
-<td>23</td>
-<td>1190</td>
-<td>2</td>
-<td>14</td>
-<td>NaN</td>
-<td>Bulkhead of cabin</td>
-<td>1</td>
-<td>- .102</td>
-<td>2</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>2</th>
-<td>1</td>
-<td>002</td>
-<td>0018</td>
-<td>0003</td>
-<td>Panay</td>
-<td>78</td>
-<td>01</td>
-<td>1</td>
-<td>1</td>
-<td>187</td>
-<td>...</td>
-<td>23</td>
-<td>1190</td>
-<td>2</td>
-<td>14</td>
-<td>NaN</td>
-<td>Bulkhead of cabin</td>
-<td>1</td>
-<td>- .102</td>
-<td>2</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>3</th>
-<td>1</td>
-<td>002</td>
-<td>0018</td>
-<td>0003</td>
-<td>Panay</td>
-<td>78</td>
-<td>01</td>
-<td>1</td>
-<td>1</td>
-<td>187</td>
-<td>...</td>
-<td>23</td>
-<td>1190</td>
-<td>2</td>
-<td>14</td>
-<td>NaN</td>
-<td>Bulkhead of cabin</td>
-<td>1</td>
-<td>- .102</td>
-<td>2</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>4</th>
-<td>1</td>
-<td>002</td>
-<td>0018</td>
-<td>0003</td>
-<td>Panay</td>
-<td>78</td>
-<td>01</td>
-<td>1</td>
-<td>1</td>
-<td>187</td>
-<td>...</td>
-<td>23</td>
-<td>1190</td>
-<td>2</td>
-<td>14</td>
-<td>NaN</td>
-<td>Bulkhead of cabin</td>
-<td>1</td>
-<td>- .102</td>
-<td>2</td>
-<td>NaN</td>
-</tr>
-</tbody>
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentinal</th>
+      <th>reel_no</th>
+      <th>journal_no</th>
+      <th>frame_no</th>
+      <th>ship_name</th>
+      <th>journal_ed</th>
+      <th>rig</th>
+      <th>ship_material</th>
+      <th>vessel_type</th>
+      <th>vessel_length</th>
+      <th>...</th>
+      <th>hold_depth</th>
+      <th>tonnage</th>
+      <th>baro_type</th>
+      <th>baro_height</th>
+      <th>baro_cdate</th>
+      <th>baro_loc</th>
+      <th>baro_units</th>
+      <th>baro_cor</th>
+      <th>thermo_mount</th>
+      <th>SST_I</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>002</td>
+      <td>0018</td>
+      <td>0003</td>
+      <td>Panay</td>
+      <td>78</td>
+      <td>01</td>
+      <td>1</td>
+      <td>1</td>
+      <td>187</td>
+      <td>...</td>
+      <td>23</td>
+      <td>1190</td>
+      <td>2</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>Bulkhead of cabin</td>
+      <td>1</td>
+      <td>- .102</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>002</td>
+      <td>0018</td>
+      <td>0003</td>
+      <td>Panay</td>
+      <td>78</td>
+      <td>01</td>
+      <td>1</td>
+      <td>1</td>
+      <td>187</td>
+      <td>...</td>
+      <td>23</td>
+      <td>1190</td>
+      <td>2</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>Bulkhead of cabin</td>
+      <td>1</td>
+      <td>- .102</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>002</td>
+      <td>0018</td>
+      <td>0003</td>
+      <td>Panay</td>
+      <td>78</td>
+      <td>01</td>
+      <td>1</td>
+      <td>1</td>
+      <td>187</td>
+      <td>...</td>
+      <td>23</td>
+      <td>1190</td>
+      <td>2</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>Bulkhead of cabin</td>
+      <td>1</td>
+      <td>- .102</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>002</td>
+      <td>0018</td>
+      <td>0003</td>
+      <td>Panay</td>
+      <td>78</td>
+      <td>01</td>
+      <td>1</td>
+      <td>1</td>
+      <td>187</td>
+      <td>...</td>
+      <td>23</td>
+      <td>1190</td>
+      <td>2</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>Bulkhead of cabin</td>
+      <td>1</td>
+      <td>- .102</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>002</td>
+      <td>0018</td>
+      <td>0003</td>
+      <td>Panay</td>
+      <td>78</td>
+      <td>01</td>
+      <td>1</td>
+      <td>1</td>
+      <td>187</td>
+      <td>...</td>
+      <td>23</td>
+      <td>1190</td>
+      <td>2</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>Bulkhead of cabin</td>
+      <td>1</td>
+      <td>- .102</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
 </table>
 <p>5 rows × 24 columns</p>
 </div></div>
 </div>
 <p>To learn how to construct a schema or data model for a particular deck/source, visit this other tutorial: <a class="reference external" href="https://git.noc.ac.uk/brecinosrivas/mdf_reader/-/blob/master/docs/notebooks/create_data_model.ipynb">create_data_model.ipynb</a></p>
 </section>
-</div>
-</div>
-<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-<a accesskey="p" class="btn btn-neutral float-left" href="../cdm-tables-mapping-files-and-descriptors.html" rel="prev" title="CDM tables mapping files and descriptors"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
-<a accesskey="n" class="btn btn-neutral float-right" href="create_data_model.html" rel="next" title="How to create a data model">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
-</div>
-<hr/>
-<div role="contentinfo">
-<p>© Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
-</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../cdm-tables-mapping-files-and-descriptors.html" class="btn btn-neutral float-left" title="CDM tables mapping files and descriptors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="create_data_model.html" class="btn btn-neutral float-right" title="How to create a data model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leidung, Richard Cornes and Elizabeth Kent.</p>
+  </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
-</div>
-</div>
-</section>
-</div>
-<script>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
+
 </body>
 </html>

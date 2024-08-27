@@ -1,54 +1,61 @@
 <!DOCTYPE html>
-
-<html class="writer-html5" data-content_root="../" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>How to create a data model — cdm_reader_mapper unknown documentation</title>
-<link href="../_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
-<link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/nbsphinx-code-cells.css?v=2aa19091" rel="stylesheet" type="text/css"/>
-<!--[if lt IE 9]>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to create a data model &mdash; cdm_reader_mapper unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+  <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-<script src="../_static/jquery.js?v=5d32c60e"></script>
-<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-<script src="../_static/documentation_options.js?v=3f1b9271"></script>
-<script src="../_static/doctools.js?v=9a2dae69"></script>
-<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="../_static/copybutton.js?v=f281be69"></script>
-<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-<script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script src="../_static/js/theme.js"></script>
-<link href="../genindex.html" rel="index" title="Index"/>
-<link href="../search.html" rel="search" title="Search"/>
-<link href="CLIWOC_datamodel.html" rel="next" title="Generating a data model for CLIWOC"/>
-<link href="mdf_reader_test_overview.html" rel="prev" title="Test and overview of the mdf_reader module"/>
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=3f1b9271"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating a data model for CLIWOC" href="CLIWOC_datamodel.html" />
+    <link rel="prev" title="Test and overview of the mdf_reader module" href="mdf_reader_test_overview.html" /> 
 </head>
-<body class="wy-body-for-nav">
-<div class="wy-grid-for-nav">
-<nav class="wy-nav-side" data-toggle="wy-nav-shift">
-<div class="wy-side-scroll">
-<div class="wy-side-nav-search">
-<a class="icon icon-home" href="../index.html">
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
             cdm_reader_mapper
           </a>
-<div class="version">
+              <div class="version">
                 unknown
               </div>
 <div role="search">
-<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-<input name="check_keywords" type="hidden" value="yes"/>
-<input name="area" type="hidden" value="default"/>
-</form>
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tool-set-up.html">Installation</a></li>
@@ -74,28 +81,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
 </ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How to create a data model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/example_notebooks/create_data_model.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
 </div>
-</div>
-</nav>
-<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
-<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
-<a href="../index.html">cdm_reader_mapper</a>
-</nav>
-<div class="wy-nav-content">
-<div class="rst-content">
-<div aria-label="Page navigation" role="navigation">
-<ul class="wy-breadcrumbs">
-<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
-<li class="breadcrumb-item active">How to create a data model</li>
-<li class="wy-breadcrumbs-aside">
-<a href="../_sources/example_notebooks/create_data_model.ipynb.txt" rel="nofollow"> View page source</a>
-</li>
-</ul>
-<hr/>
-</div>
-<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
-<div itemprop="articleBody">
-<section id="How-to-create-a-data-model">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="How-to-create-a-data-model">
 <h1>How to create a data model<a class="headerlink" href="#How-to-create-a-data-model" title="Link to this heading"></a></h1>
 <section id="Creating-a-data-model">
 <h2>Creating a data model<a class="headerlink" href="#Creating-a-data-model" title="Link to this heading"></a></h2>
@@ -152,20 +163,20 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-['gcc_immt',
- 'imma1',
- 'imma1_d701',
- 'imma1_d702',
- 'imma1_d704',
- 'imma1_d705-707',
- 'imma1_d714',
- 'imma1_d721',
- 'imma1_d730',
- 'imma1_d781',
- 'imma1_nodt',
- 'td11',
- 'td11_d110',
- 'c_raid']
+[&#39;gcc_immt&#39;,
+ &#39;imma1&#39;,
+ &#39;imma1_d701&#39;,
+ &#39;imma1_d702&#39;,
+ &#39;imma1_d704&#39;,
+ &#39;imma1_d705-707&#39;,
+ &#39;imma1_d714&#39;,
+ &#39;imma1_d721&#39;,
+ &#39;imma1_d730&#39;,
+ &#39;imma1_d781&#39;,
+ &#39;imma1_nodt&#39;,
+ &#39;td11&#39;,
+ &#39;td11_d110&#39;,
+ &#39;c_raid&#39;]
 </pre></div></div>
 </div>
 <p>According to the manual, ICOADS data stored with the <a class="reference external" href="https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf">IMMA format</a> represents a complex data model, since the data includes blocks of sections which are exclusive to certain DCK’s (e.g. data coming from the NOAA National Climatic Data Center (NCDC) TD-11 formats). Most of the ICOADS data however will need a <strong>schema</strong> based on the <code class="docutils literal notranslate"><span class="pre">imma1.json</span></code> format.</p>
@@ -173,7 +184,7 @@
 <ol class="arabic simple">
 <li><p>First lets read a raw <code class="docutils literal notranslate"><span class="pre">.imma</span></code> file from dck 701 as an example, for a subset of the data collected in April/1845.</p></li>
 </ol>
-<p>One should note that a full schema for this deck already exists: <code class="docutils literal notranslate"><span class="pre">"imma1_d701"</span></code>.</p>
+<p>One should note that a full schema for this deck already exists: <code class="docutils literal notranslate"><span class="pre">&quot;imma1_d701&quot;</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -181,7 +192,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the test data</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_069_701</span>
 
-<span class="n">data_raw</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">),</span> <span class="n">data_model</span><span class="o">=</span><span class="s2">"imma1"</span><span class="p">)</span>
+<span class="n">data_raw</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">),</span> <span class="n">data_model</span><span class="o">=</span><span class="s2">&quot;imma1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -194,17 +205,17 @@
 2024-06-06 07:44:53,238 - root - INFO - READING DATA MODEL SCHEMA FILE...
 2024-06-06 07:44:53,240 - root - INFO - EXTRACTING DATA FROM MODEL: imma1
 2024-06-06 07:44:53,240 - root - INFO - Getting data string from source...
-2024-06-06 07:44:53,338 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')
+2024-06-06 07:44:53,338 - root - WARNING - Data numeric elements with missing upper or lower threshold: (&#39;c1&#39;, &#39;BSI&#39;),(&#39;c1&#39;, &#39;AQZ&#39;),(&#39;c1&#39;, &#39;AQA&#39;),(&#39;c1&#39;, &#39;UQZ&#39;),(&#39;c1&#39;, &#39;UQA&#39;),(&#39;c1&#39;, &#39;VQZ&#39;),(&#39;c1&#39;, &#39;VQA&#39;),(&#39;c1&#39;, &#39;PQZ&#39;),(&#39;c1&#39;, &#39;PQA&#39;),(&#39;c1&#39;, &#39;DQZ&#39;),(&#39;c1&#39;, &#39;DQA&#39;),(&#39;c5&#39;, &#39;OS&#39;),(&#39;c5&#39;, &#39;OP&#39;),(&#39;c5&#39;, &#39;FM&#39;),(&#39;c5&#39;, &#39;IMMV&#39;),(&#39;c5&#39;, &#39;IX&#39;),(&#39;c5&#39;, &#39;W2&#39;),(&#39;c5&#39;, &#39;WMI&#39;),(&#39;c5&#39;, &#39;SD2&#39;),(&#39;c5&#39;, &#39;SP2&#39;),(&#39;c5&#39;, &#39;IS&#39;),(&#39;c5&#39;, &#39;RS&#39;),(&#39;c5&#39;, &#39;IC1&#39;),(&#39;c5&#39;, &#39;IC2&#39;),(&#39;c5&#39;, &#39;IC3&#39;),(&#39;c5&#39;, &#39;IC4&#39;),(&#39;c5&#39;, &#39;IC5&#39;),(&#39;c5&#39;, &#39;IR&#39;),(&#39;c5&#39;, &#39;RRR&#39;),(&#39;c5&#39;, &#39;TR&#39;),(&#39;c5&#39;, &#39;NU&#39;),(&#39;c5&#39;, &#39;QCI&#39;),(&#39;c5&#39;, &#39;QI1&#39;),(&#39;c5&#39;, &#39;QI2&#39;),(&#39;c5&#39;, &#39;QI3&#39;),(&#39;c5&#39;, &#39;QI4&#39;),(&#39;c5&#39;, &#39;QI5&#39;),(&#39;c5&#39;, &#39;QI6&#39;),(&#39;c5&#39;, &#39;QI7&#39;),(&#39;c5&#39;, &#39;QI8&#39;),(&#39;c5&#39;, &#39;QI9&#39;),(&#39;c5&#39;, &#39;QI10&#39;),(&#39;c5&#39;, &#39;QI11&#39;),(&#39;c5&#39;, &#39;QI12&#39;),(&#39;c5&#39;, &#39;QI13&#39;),(&#39;c5&#39;, &#39;QI14&#39;),(&#39;c5&#39;, &#39;QI15&#39;),(&#39;c5&#39;, &#39;QI16&#39;),(&#39;c5&#39;, &#39;QI17&#39;),(&#39;c5&#39;, &#39;QI18&#39;),(&#39;c5&#39;, &#39;QI19&#39;),(&#39;c5&#39;, &#39;QI20&#39;),(&#39;c5&#39;, &#39;QI21&#39;),(&#39;c5&#39;, &#39;QI22&#39;),(&#39;c5&#39;, &#39;QI23&#39;),(&#39;c5&#39;, &#39;QI24&#39;),(&#39;c5&#39;, &#39;QI25&#39;),(&#39;c5&#39;, &#39;QI26&#39;),(&#39;c5&#39;, &#39;QI27&#39;),(&#39;c5&#39;, &#39;QI28&#39;),(&#39;c5&#39;, &#39;QI29&#39;),(&#39;c5&#39;, &#39;RHI&#39;),(&#39;c5&#39;, &#39;AWSI&#39;),(&#39;c6&#39;, &#39;FBSRC&#39;),(&#39;c6&#39;, &#39;MST&#39;),(&#39;c7&#39;, &#39;OPM&#39;),(&#39;c7&#39;, &#39;LOT&#39;),(&#39;c9&#39;, &#39;CCe&#39;),(&#39;c9&#39;, &#39;WWe&#39;),(&#39;c9&#39;, &#39;Ne&#39;),(&#39;c9&#39;, &#39;NHe&#39;),(&#39;c9&#39;, &#39;He&#39;),(&#39;c9&#39;, &#39;CLe&#39;),(&#39;c9&#39;, &#39;CMe&#39;),(&#39;c9&#39;, &#39;CHe&#39;),(&#39;c9&#39;, &#39;SBI&#39;),(&#39;c95&#39;, &#39;DPRO&#39;),(&#39;c95&#39;, &#39;DPRP&#39;),(&#39;c95&#39;, &#39;UFR&#39;),(&#39;c95&#39;, &#39;ASIR&#39;),(&#39;c96&#39;, &#39;ASII&#39;),(&#39;c97&#39;, &#39;ASIE&#39;)
 2024-06-06 07:44:53,339 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
 2024-06-06 07:44:53,513 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
 </pre></div></div>
 </div>
-<p>We now look at the supplementary data column for this data, i.e.: the <code class="docutils literal notranslate"><span class="pre">"c99"</span></code> column.</p>
+<p>We now look at the supplementary data column for this data, i.e.: the <code class="docutils literal notranslate"><span class="pre">&quot;c99&quot;</span></code> column.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;c99&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -225,15 +236,15 @@ Name: c99, dtype: object
 <p>The <code class="docutils literal notranslate"><span class="pre">c99</span></code> column is a bit messy. Here, we will need to separate the Supplemental Metadata ingested in ICOADS as an entire string and sort each row out according to the source &amp; dck documentation.</p>
 <ol class="arabic simple" start="2">
 <li><p>We then need to make a new data model or <strong>schema</strong> which can then be used by the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module. For this we create a schema with the name <code class="docutils literal notranslate"><span class="pre">imma1_d701</span></code>. For the purposes of this notebook we will create this schema in a temporary directory.</p></li>
-<li><p>In this directory we will need to add a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file with the same name. This <code class="docutils literal notranslate"><span class="pre">imma1_d701.json</span></code> file will contain all the data model information with instructions on how to subdivide the metadata added to <code class="docutils literal notranslate"><span class="pre">c99</span></code>. The name of the file is <code class="docutils literal notranslate"><span class="pre">imma1_d701.json</span></code> because the data model for this deck is based on the <code class="docutils literal notranslate"><span class="pre">imma1</span></code> template shown above, but the <code class="docutils literal notranslate"><span class="pre">c99</span></code> will be further subdivided into other columns/sections. We will start with a copy of the original <code class="docutils literal notranslate"><span class="pre">"imma1"</span></code> schema and add elements
+<li><p>In this directory we will need to add a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file with the same name. This <code class="docutils literal notranslate"><span class="pre">imma1_d701.json</span></code> file will contain all the data model information with instructions on how to subdivide the metadata added to <code class="docutils literal notranslate"><span class="pre">c99</span></code>. The name of the file is <code class="docutils literal notranslate"><span class="pre">imma1_d701.json</span></code> because the data model for this deck is based on the <code class="docutils literal notranslate"><span class="pre">imma1</span></code> template shown above, but the <code class="docutils literal notranslate"><span class="pre">c99</span></code> will be further subdivided into other columns/sections. We will start with a copy of the original <code class="docutils literal notranslate"><span class="pre">&quot;imma1&quot;</span></code> schema and add elements
 to the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section.</p></li>
 </ol>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a copy of the "imma1" schema</span>
-<span class="n">schema</span><span class="p">:</span> <span class="n">OrderedDict</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">read_schema</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="s2">"imma1"</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a copy of the &quot;imma1&quot; schema</span>
+<span class="n">schema</span><span class="p">:</span> <span class="n">OrderedDict</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">read_schema</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="s2">&quot;imma1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -242,7 +253,7 @@ to the <code class="docutils literal notranslate"><span class="pre">c99</span></
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the directory where we store the schema</span>
-<span class="n">my_model_name</span> <span class="o">=</span> <span class="s2">"imma1_d701"</span>
+<span class="n">my_model_name</span> <span class="o">=</span> <span class="s2">&quot;imma1_d701&quot;</span>
 <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
 <span class="n">my_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">my_model_name</span><span class="p">)</span>
 <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">)</span>
@@ -304,7 +315,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c99</span> <span class="o">=</span> <span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c99</span> <span class="o">=</span> <span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;c99&quot;</span><span class="p">]</span>
 <span class="n">line</span> <span class="o">=</span> <span class="n">c99</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -325,7 +336,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-'99 0 '
+&#39;99 0 &#39;
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -344,7 +355,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-'3707311'
+&#39;3707311&#39;
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -363,54 +374,54 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-'18450401  '
+&#39;18450401  &#39;
 </pre></div></div>
 </div>
 </section>
 <section id="Create-the-custom-model">
 <h2>Create the custom model<a class="headerlink" href="#Create-the-custom-model" title="Link to this heading"></a></h2>
 <p>We now make the adjustments to the schema to parse the sentinal, voyage number, and date fields. The rest can be skipped for this example.</p>
-<p>Here we add to the dictionary containing the <code class="docutils literal notranslate"><span class="pre">"imma1"</span></code> schema loaded earlier, we then save that to a <code class="docutils literal notranslate"><span class="pre">json</span></code> file in our model directory.</p>
+<p>Here we add to the dictionary containing the <code class="docutils literal notranslate"><span class="pre">&quot;imma1&quot;</span></code> schema loaded earlier, we then save that to a <code class="docutils literal notranslate"><span class="pre">json</span></code> file in our model directory.</p>
 <p>Note that we need to use an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> here, since the ordering of the fields is important, a standard python <code class="docutils literal notranslate"><span class="pre">dict</span></code> is un-ordered and may shuffle the elements.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"sentinal"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"99 0 "</span>
-<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"disable_read"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"field_layout"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"fixed_width"</span>
-<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"length"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># Sentinal length</span>
-<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"elements"</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="s2">&quot;c99&quot;</span><span class="p">][</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;sentinal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;99 0 &quot;</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="s2">&quot;c99&quot;</span><span class="p">][</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;disable_read&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="s2">&quot;c99&quot;</span><span class="p">][</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;field_layout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fixed_width&quot;</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="s2">&quot;c99&quot;</span><span class="p">][</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># Sentinal length</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="s2">&quot;c99&quot;</span><span class="p">][</span><span class="s2">&quot;elements&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">"sentinal"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"attachment sentinal"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="s2">&quot;sentinal&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;attachment sentinal&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">"cvoyd"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Voyage Information"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="s2">&quot;cvoyd&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Voyage Information&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">"year"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Year"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"uint16"</span><span class="p">,</span>
+        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Year&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint16&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">"month"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Month"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"uint8"</span><span class="p">,</span>
+        <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">"day"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Day"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"uint8"</span><span class="p">,</span>
+        <span class="s2">&quot;day&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Day&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">"rest"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Remaining c99 string"</span><span class="p">,</span>
-            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">235</span><span class="p">,</span>  <span class="c1"># 250 - (8 + 7)</span>
-            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="s2">&quot;rest&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Remaining c99 string&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">235</span><span class="p">,</span>  <span class="c1"># 250 - (8 + 7)</span>
+            <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">}</span>
 <span class="p">)</span>
@@ -423,7 +434,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="n">my_model_name</span> <span class="o">+</span> <span class="s2">".json"</span><span class="p">),</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="n">my_model_name</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
     <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -434,9 +445,9 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">code_tables_path</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
-    <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s2">"code_tables"</span><span class="p">,</span> <span class="s2">"imma1"</span><span class="p">])</span>
+    <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s2">&quot;code_tables&quot;</span><span class="p">,</span> <span class="s2">&quot;imma1&quot;</span><span class="p">])</span>
 <span class="p">)</span>
-<span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">code_tables_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="s2">"code_tables"</span><span class="p">))</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">code_tables_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="s2">&quot;code_tables&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -446,7 +457,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-'/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701/code_tables'
+&#39;/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701/code_tables&#39;
 </pre></div></div>
 </div>
 <p>Now we feed this new data model to the <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code> function. To use our custom schema we need to specify the <code class="docutils literal notranslate"><span class="pre">data_model_path</span></code> argument, rather than the <code class="docutils literal notranslate"><span class="pre">data_model</span></code> argument used earlier.</p>
@@ -454,7 +465,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">),</span> <span class="n">data_model_path</span><span class="o">=</span><span class="n">my_model_path</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">),</span> <span class="n">data_model_path</span><span class="o">=</span><span class="n">my_model_path</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -466,7 +477,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 2024-06-06 07:44:53,926 - root - INFO - READING DATA MODEL SCHEMA FILE...
 2024-06-06 07:44:53,935 - root - INFO - EXTRACTING DATA FROM MODEL: /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701
 2024-06-06 07:44:53,936 - root - INFO - Getting data string from source...
-2024-06-06 07:44:54,113 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99', 'year'),('c99', 'month'),('c99', 'day')
+2024-06-06 07:44:54,113 - root - WARNING - Data numeric elements with missing upper or lower threshold: (&#39;c1&#39;, &#39;BSI&#39;),(&#39;c1&#39;, &#39;AQZ&#39;),(&#39;c1&#39;, &#39;AQA&#39;),(&#39;c1&#39;, &#39;UQZ&#39;),(&#39;c1&#39;, &#39;UQA&#39;),(&#39;c1&#39;, &#39;VQZ&#39;),(&#39;c1&#39;, &#39;VQA&#39;),(&#39;c1&#39;, &#39;PQZ&#39;),(&#39;c1&#39;, &#39;PQA&#39;),(&#39;c1&#39;, &#39;DQZ&#39;),(&#39;c1&#39;, &#39;DQA&#39;),(&#39;c5&#39;, &#39;OS&#39;),(&#39;c5&#39;, &#39;OP&#39;),(&#39;c5&#39;, &#39;FM&#39;),(&#39;c5&#39;, &#39;IMMV&#39;),(&#39;c5&#39;, &#39;IX&#39;),(&#39;c5&#39;, &#39;W2&#39;),(&#39;c5&#39;, &#39;WMI&#39;),(&#39;c5&#39;, &#39;SD2&#39;),(&#39;c5&#39;, &#39;SP2&#39;),(&#39;c5&#39;, &#39;IS&#39;),(&#39;c5&#39;, &#39;RS&#39;),(&#39;c5&#39;, &#39;IC1&#39;),(&#39;c5&#39;, &#39;IC2&#39;),(&#39;c5&#39;, &#39;IC3&#39;),(&#39;c5&#39;, &#39;IC4&#39;),(&#39;c5&#39;, &#39;IC5&#39;),(&#39;c5&#39;, &#39;IR&#39;),(&#39;c5&#39;, &#39;RRR&#39;),(&#39;c5&#39;, &#39;TR&#39;),(&#39;c5&#39;, &#39;NU&#39;),(&#39;c5&#39;, &#39;QCI&#39;),(&#39;c5&#39;, &#39;QI1&#39;),(&#39;c5&#39;, &#39;QI2&#39;),(&#39;c5&#39;, &#39;QI3&#39;),(&#39;c5&#39;, &#39;QI4&#39;),(&#39;c5&#39;, &#39;QI5&#39;),(&#39;c5&#39;, &#39;QI6&#39;),(&#39;c5&#39;, &#39;QI7&#39;),(&#39;c5&#39;, &#39;QI8&#39;),(&#39;c5&#39;, &#39;QI9&#39;),(&#39;c5&#39;, &#39;QI10&#39;),(&#39;c5&#39;, &#39;QI11&#39;),(&#39;c5&#39;, &#39;QI12&#39;),(&#39;c5&#39;, &#39;QI13&#39;),(&#39;c5&#39;, &#39;QI14&#39;),(&#39;c5&#39;, &#39;QI15&#39;),(&#39;c5&#39;, &#39;QI16&#39;),(&#39;c5&#39;, &#39;QI17&#39;),(&#39;c5&#39;, &#39;QI18&#39;),(&#39;c5&#39;, &#39;QI19&#39;),(&#39;c5&#39;, &#39;QI20&#39;),(&#39;c5&#39;, &#39;QI21&#39;),(&#39;c5&#39;, &#39;QI22&#39;),(&#39;c5&#39;, &#39;QI23&#39;),(&#39;c5&#39;, &#39;QI24&#39;),(&#39;c5&#39;, &#39;QI25&#39;),(&#39;c5&#39;, &#39;QI26&#39;),(&#39;c5&#39;, &#39;QI27&#39;),(&#39;c5&#39;, &#39;QI28&#39;),(&#39;c5&#39;, &#39;QI29&#39;),(&#39;c5&#39;, &#39;RHI&#39;),(&#39;c5&#39;, &#39;AWSI&#39;),(&#39;c6&#39;, &#39;FBSRC&#39;),(&#39;c6&#39;, &#39;MST&#39;),(&#39;c7&#39;, &#39;OPM&#39;),(&#39;c7&#39;, &#39;LOT&#39;),(&#39;c9&#39;, &#39;CCe&#39;),(&#39;c9&#39;, &#39;WWe&#39;),(&#39;c9&#39;, &#39;Ne&#39;),(&#39;c9&#39;, &#39;NHe&#39;),(&#39;c9&#39;, &#39;He&#39;),(&#39;c9&#39;, &#39;CLe&#39;),(&#39;c9&#39;, &#39;CMe&#39;),(&#39;c9&#39;, &#39;CHe&#39;),(&#39;c9&#39;, &#39;SBI&#39;),(&#39;c95&#39;, &#39;DPRO&#39;),(&#39;c95&#39;, &#39;DPRP&#39;),(&#39;c95&#39;, &#39;UFR&#39;),(&#39;c95&#39;, &#39;ASIR&#39;),(&#39;c96&#39;, &#39;ASII&#39;),(&#39;c97&#39;, &#39;ASIE&#39;),(&#39;c99&#39;, &#39;year&#39;),(&#39;c99&#39;, &#39;month&#39;),(&#39;c99&#39;, &#39;day&#39;)
 2024-06-06 07:44:54,113 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
 2024-06-06 07:44:54,467 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
 </pre></div></div>
@@ -476,7 +487,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;c99&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -486,7 +497,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -500,64 +511,64 @@ intended, qc5 was included in the supplementary attachment in original form.
     }
 </style>
 <table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>sentinal</th>
-<th>cvoyd</th>
-<th>year</th>
-<th>month</th>
-<th>day</th>
-<th>rest</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>99 0</td>
-<td>3008501</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>5404N 2354W                                   ...</td>
-</tr>
-<tr>
-<th>1</th>
-<td>99 0</td>
-<td>8103481</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4836N 2330W                        29291      ...</td>
-</tr>
-<tr>
-<th>2</th>
-<td>99 0</td>
-<td>3707311</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4643N15147W                                   ...</td>
-</tr>
-<tr>
-<th>3</th>
-<td>99 0</td>
-<td>2605971</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4454N 3015W                20200W             ...</td>
-</tr>
-<tr>
-<th>4</th>
-<td>99 0</td>
-<td>2506611</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4356N 2220W                                   ...</td>
-</tr>
-</tbody>
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentinal</th>
+      <th>cvoyd</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>rest</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>99 0</td>
+      <td>3008501</td>
+      <td>1845</td>
+      <td>4</td>
+      <td>1</td>
+      <td>5404N 2354W                                   ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99 0</td>
+      <td>8103481</td>
+      <td>1845</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4836N 2330W                        29291      ...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99 0</td>
+      <td>3707311</td>
+      <td>1845</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4643N15147W                                   ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>99 0</td>
+      <td>2605971</td>
+      <td>1845</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4454N 3015W                20200W             ...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>99 0</td>
+      <td>2506611</td>
+      <td>1845</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4356N 2220W                                   ...</td>
+    </tr>
+  </tbody>
 </table>
 </div></div>
 </div>
@@ -566,38 +577,43 @@ intended, qc5 was included in the supplementary attachment in original form.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"core"</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"core"</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[(</span><span class="s2">"core"</span><span class="p">,</span> <span class="n">c</span><span class="p">)])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[(</span><span class="s2">&quot;core&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
 </section>
 </section>
-</div>
-</div>
-<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-<a accesskey="p" class="btn btn-neutral float-left" href="mdf_reader_test_overview.html" rel="prev" title="Test and overview of the mdf_reader module"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
-<a accesskey="n" class="btn btn-neutral float-right" href="CLIWOC_datamodel.html" rel="next" title="Generating a data model for CLIWOC">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
-</div>
-<hr/>
-<div role="contentinfo">
-<p>© Copyright 2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer.</p>
-</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mdf_reader_test_overview.html" class="btn btn-neutral float-left" title="Test and overview of the mdf_reader module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CLIWOC_datamodel.html" class="btn btn-neutral float-right" title="Generating a data model for CLIWOC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leidung, Richard Cornes and Elizabeth Kent.</p>
+  </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
-</div>
-</div>
-</section>
-</div>
-<script>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
+
 </body>
 </html>
