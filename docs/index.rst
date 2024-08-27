@@ -25,19 +25,13 @@ The tool has been further enhanced to account for any marine meteorological data
 
 The **mdf_reader** uses the information provided in a `data model`_ to read meteorological data into a python pandas.DataFrame_, with the column names and data types set according to each data element’s description specified in the data model or **schema**. In addition to reading, the **mdf_reader** validates data elements against the **schema** provided.
 
-This tool outputs a python object with the following attributes:
-
-1.	A pandas.DataFrame_ (DF) with the data values.
-2.	A `boolean pandas`_ DF with the data validation mask.
-3.	A dictionary_ with a simplified version of the input data model.
-
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
 Several data models have been added to the tool including both the IMMA and the C-RAID schema.
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
-After reading the data into a pandas.DataFrame, the **cdm_mapper** will mapp those data to the standardized C3S CDS Common Data Model (CDM_).
+After reading the data into a pandas.DataFrame, the **cdm_mapper** will map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
 
 .. toctree::
    :maxdepth: 2
