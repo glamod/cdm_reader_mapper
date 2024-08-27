@@ -19,7 +19,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
-| Funding                    | |funding|                                                      |
+| Funding                    | |c3s| |noc| |ukmcas|                                           |
 +----------------------------+----------------------------------------------------------------+
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
@@ -152,6 +152,10 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://github.com/psf/black
         :alt: Python Black
 
+.. |c3s| image:: https://img.shields.io/badge/Powered%20by-Copernicus%20Climate%20Change%20Service-blue.svg
+        :target: https://climate.copernicus.eu/
+        :alt: Funding
+
 .. |codefactor| image:: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge
 		    :target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
 		    :alt: CodeFactor
@@ -171,10 +175,6 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 .. |fossa| image:: https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
         :target: https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
         :alt: FOSSA
-
-.. |funding| image:: https://img.shields.io/badge/Powered%20by-Copernicus-blue.svg
-        :target: https://climate.copernicus.eu/
-        :alt: Funding
 
 .. |license| image:: https://img.shields.io/github/license/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
@@ -212,6 +212,10 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://github.com/glamod/cdm_reader_mapper/tags
         :alt: Tag
 
+.. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UK%20Marine%20and%20Climate%20Advisory%20Service-yellow.svg
+        :target: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
+        :alt: UKMCAS
+
 .. |versions| image:: https://img.shields.io/pypi/pyversions/cdm_reader_mapper.svg
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
@@ -219,3 +223,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 .. |zenodo| image:: https://img.shields.io/badge/zenodo-package_or_version_not_found-red
         :target: https://zenodo.org/cdm_reader_mapper
  	      :alt: DOI
+
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-yellow.svg
+        :target: https://noc.ac.uk/
+        :alt: NOC

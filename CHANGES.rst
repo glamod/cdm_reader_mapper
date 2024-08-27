@@ -36,6 +36,7 @@ Internal changes
 * remove unused code tables in ``mdf_reader`` (:issue:`10`, :pull:`65`)
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 * add FOSSA license scanning to github workflows (:pull:`80`)
+* add ``cdm_reader_mapper`` author list including ORCID iD's (:pull:`38`, :pull:`49`)
 
 Bug fixes
 ^^^^^^^^^
