@@ -68,9 +68,6 @@ About
 
 :License: |license|
 
-:Authors:
-   David Berry, Irene Perez Gonzalez, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer
-
 |logo_c3s| |logo_NOC| |logo_ICOADS|
 
 .. include:: hyperlinks.rst

@@ -1,61 +1,54 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../">
+
+<html class="writer-html5" data-content_root="../" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapping supplemental data from deck 704 to a CDM &mdash; cdm_reader_mapper unknown documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=125d5c1c" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
-
-
-  <!--[if lt IE 9]>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mapping supplemental data from deck 704 to a CDM — cdm_reader_mapper unknown documentation</title>
+<link href="../_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/nbsphinx-code-cells.css?v=2aa19091" rel="stylesheet" type="text/css"/>
+<!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=3f1b9271"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../_static/copybutton.js?v=f281be69"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Contributing" href="../contributing.html" />
-    <link rel="prev" title="Generating a data model for CLIWOC" href="CLIWOC_datamodel.html" />
+<script src="../_static/jquery.js?v=5d32c60e"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+<script src="../_static/documentation_options.js?v=3f1b9271"></script>
+<script src="../_static/doctools.js?v=9a2dae69"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="../_static/js/theme.js"></script>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../contributing.html" rel="next" title="Contributing"/>
+<link href="CLIWOC_datamodel.html" rel="prev" title="Generating a data model for CLIWOC"/>
 </head>
-
 <body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../index.html" class="icon icon-home">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../index.html">
             cdm_reader_mapper
           </a>
-              <div class="version">
+<div class="version">
                 unknown
               </div>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tool-set-up.html">Installation</a></li>
@@ -81,32 +74,28 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
 </ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">cdm_reader_mapper</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Mapping supplemental data from deck 704 to a CDM</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/example_notebooks/CDM_mapper_example_deck704.ipynb.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
-  <section id="Mapping-supplemental-data-from-deck-704-to-a-CDM">
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../index.html">cdm_reader_mapper</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+<li class="breadcrumb-item active">Mapping supplemental data from deck 704 to a CDM</li>
+<li class="wy-breadcrumbs-aside">
+<a href="../_sources/example_notebooks/CDM_mapper_example_deck704.ipynb.txt" rel="nofollow"> View page source</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<section id="Mapping-supplemental-data-from-deck-704-to-a-CDM">
 <h1>Mapping supplemental data from deck 704 to a CDM<a class="headerlink" href="#Mapping-supplemental-data-from-deck-704-to-a-CDM" title="Link to this heading"></a></h1>
 <p>This guide is a follow up from the <a class="reference external" href="https://git.noc.ac.uk/brecinosrivas/mdf_reader/-/tree/master/">mdf_reader()</a> python tool <a class="reference external" href="https://git.noc.ac.uk/brecinosrivas/mdf_reader/-/tree/master/docs/notebooks">notebooks</a>. Where we extracted supplemental metadata from <a class="reference external" href="https://icoads.noaa.gov/r3.html">ICOADSv3.0</a> stored in the <a class="reference external" href="https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf">IMMA</a> format. Now we will map this supplemental data to a Common Data Model (CDM) format defined in the following
 <a class="reference external" href="https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf">documentation</a>.</p>
@@ -143,8 +132,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="s2">&quot;imma1_d704&quot;</span>
-<span class="n">data_file_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_125_704</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="s2">"imma1_d704"</span>
+<span class="n">data_file_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_125_704</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span>
 <span class="n">data_raw</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -158,7 +147,7 @@
 2024-08-23 10:16:18,442 - root - INFO - READING DATA MODEL SCHEMA FILE...
 2024-08-23 10:16:18,449 - root - INFO - EXTRACTING DATA FROM MODEL: imma1_d704
 2024-08-23 10:16:18,449 - root - INFO - Getting data string from source...
-2024-08-23 10:16:18,958 - root - WARNING - Data numeric elements with missing upper or lower threshold: (&#39;c1&#39;, &#39;BSI&#39;),(&#39;c1&#39;, &#39;AQZ&#39;),(&#39;c1&#39;, &#39;AQA&#39;),(&#39;c1&#39;, &#39;UQZ&#39;),(&#39;c1&#39;, &#39;UQA&#39;),(&#39;c1&#39;, &#39;VQZ&#39;),(&#39;c1&#39;, &#39;VQA&#39;),(&#39;c1&#39;, &#39;PQZ&#39;),(&#39;c1&#39;, &#39;PQA&#39;),(&#39;c1&#39;, &#39;DQZ&#39;),(&#39;c1&#39;, &#39;DQA&#39;),(&#39;c5&#39;, &#39;OS&#39;),(&#39;c5&#39;, &#39;OP&#39;),(&#39;c5&#39;, &#39;FM&#39;),(&#39;c5&#39;, &#39;IMMV&#39;),(&#39;c5&#39;, &#39;IX&#39;),(&#39;c5&#39;, &#39;W2&#39;),(&#39;c5&#39;, &#39;WMI&#39;),(&#39;c5&#39;, &#39;SD2&#39;),(&#39;c5&#39;, &#39;SP2&#39;),(&#39;c5&#39;, &#39;IS&#39;),(&#39;c5&#39;, &#39;RS&#39;),(&#39;c5&#39;, &#39;IC1&#39;),(&#39;c5&#39;, &#39;IC2&#39;),(&#39;c5&#39;, &#39;IC3&#39;),(&#39;c5&#39;, &#39;IC4&#39;),(&#39;c5&#39;, &#39;IC5&#39;),(&#39;c5&#39;, &#39;IR&#39;),(&#39;c5&#39;, &#39;RRR&#39;),(&#39;c5&#39;, &#39;TR&#39;),(&#39;c5&#39;, &#39;NU&#39;),(&#39;c5&#39;, &#39;QCI&#39;),(&#39;c5&#39;, &#39;QI1&#39;),(&#39;c5&#39;, &#39;QI2&#39;),(&#39;c5&#39;, &#39;QI3&#39;),(&#39;c5&#39;, &#39;QI4&#39;),(&#39;c5&#39;, &#39;QI5&#39;),(&#39;c5&#39;, &#39;QI6&#39;),(&#39;c5&#39;, &#39;QI7&#39;),(&#39;c5&#39;, &#39;QI8&#39;),(&#39;c5&#39;, &#39;QI9&#39;),(&#39;c5&#39;, &#39;QI10&#39;),(&#39;c5&#39;, &#39;QI11&#39;),(&#39;c5&#39;, &#39;QI12&#39;),(&#39;c5&#39;, &#39;QI13&#39;),(&#39;c5&#39;, &#39;QI14&#39;),(&#39;c5&#39;, &#39;QI15&#39;),(&#39;c5&#39;, &#39;QI16&#39;),(&#39;c5&#39;, &#39;QI17&#39;),(&#39;c5&#39;, &#39;QI18&#39;),(&#39;c5&#39;, &#39;QI19&#39;),(&#39;c5&#39;, &#39;QI20&#39;),(&#39;c5&#39;, &#39;QI21&#39;),(&#39;c5&#39;, &#39;QI22&#39;),(&#39;c5&#39;, &#39;QI23&#39;),(&#39;c5&#39;, &#39;QI24&#39;),(&#39;c5&#39;, &#39;QI25&#39;),(&#39;c5&#39;, &#39;QI26&#39;),(&#39;c5&#39;, &#39;QI27&#39;),(&#39;c5&#39;, &#39;QI28&#39;),(&#39;c5&#39;, &#39;QI29&#39;),(&#39;c5&#39;, &#39;RHI&#39;),(&#39;c5&#39;, &#39;AWSI&#39;),(&#39;c6&#39;, &#39;FBSRC&#39;),(&#39;c6&#39;, &#39;MST&#39;),(&#39;c7&#39;, &#39;OPM&#39;),(&#39;c7&#39;, &#39;LOT&#39;),(&#39;c9&#39;, &#39;CCe&#39;),(&#39;c9&#39;, &#39;WWe&#39;),(&#39;c9&#39;, &#39;Ne&#39;),(&#39;c9&#39;, &#39;NHe&#39;),(&#39;c9&#39;, &#39;He&#39;),(&#39;c9&#39;, &#39;CLe&#39;),(&#39;c9&#39;, &#39;CMe&#39;),(&#39;c9&#39;, &#39;CHe&#39;),(&#39;c9&#39;, &#39;SBI&#39;),(&#39;c95&#39;, &#39;DPRO&#39;),(&#39;c95&#39;, &#39;DPRP&#39;),(&#39;c95&#39;, &#39;UFR&#39;),(&#39;c95&#39;, &#39;ASIR&#39;),(&#39;c96&#39;, &#39;ASII&#39;),(&#39;c97&#39;, &#39;ASIE&#39;),(&#39;c99_journal&#39;, &#39;vessel_length&#39;),(&#39;c99_journal&#39;, &#39;vessel_beam&#39;),(&#39;c99_journal&#39;, &#39;hold_depth&#39;),(&#39;c99_journal&#39;, &#39;tonnage&#39;),(&#39;c99_journal&#39;, &#39;baro_height&#39;),(&#39;c99_daily&#39;, &#39;year&#39;),(&#39;c99_daily&#39;, &#39;month&#39;),(&#39;c99_daily&#39;, &#39;day&#39;),(&#39;c99_daily&#39;, &#39;distance&#39;),(&#39;c99_daily&#39;, &#39;lat_deg_an&#39;),(&#39;c99_daily&#39;, &#39;lat_min_an&#39;),(&#39;c99_daily&#39;, &#39;lon_deg_an&#39;),(&#39;c99_daily&#39;, &#39;lon_min_an&#39;),(&#39;c99_daily&#39;, &#39;lat_deg_on&#39;),(&#39;c99_daily&#39;, &#39;lat_min_on&#39;),(&#39;c99_daily&#39;, &#39;lon_deg_of&#39;),(&#39;c99_daily&#39;, &#39;lon_min_of&#39;),(&#39;c99_daily&#39;, &#39;current_speed&#39;),(&#39;c99_data4&#39;, &#39;year&#39;),(&#39;c99_data4&#39;, &#39;month&#39;),(&#39;c99_data4&#39;, &#39;day&#39;),(&#39;c99_data4&#39;, &#39;hour&#39;),(&#39;c99_data4&#39;, &#39;ship_speed&#39;),(&#39;c99_data4&#39;, &#39;compass_correction&#39;),(&#39;c99_data4&#39;, &#39;attached_thermometer&#39;),(&#39;c99_data4&#39;, &#39;air_temperature&#39;),(&#39;c99_data4&#39;, &#39;wet_bulb_temperature&#39;),(&#39;c99_data4&#39;, &#39;sea_temperature&#39;),(&#39;c99_data4&#39;, &#39;sky_clear&#39;),(&#39;c99_data5&#39;, &#39;year&#39;),(&#39;c99_data5&#39;, &#39;month&#39;),(&#39;c99_data5&#39;, &#39;day&#39;),(&#39;c99_data5&#39;, &#39;hour&#39;),(&#39;c99_data5&#39;, &#39;ship_speed&#39;),(&#39;c99_data5&#39;, &#39;attached_thermometer&#39;),(&#39;c99_data5&#39;, &#39;air_temperature&#39;),(&#39;c99_data5&#39;, &#39;wet_bulb_temperature&#39;),(&#39;c99_data5&#39;, &#39;sea_temperature&#39;),(&#39;c99_data5&#39;, &#39;sky_clear&#39;),(&#39;c99_data5&#39;, &#39;compass_correction&#39;)
+2024-08-23 10:16:18,958 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99_journal', 'vessel_length'),('c99_journal', 'vessel_beam'),('c99_journal', 'hold_depth'),('c99_journal', 'tonnage'),('c99_journal', 'baro_height'),('c99_daily', 'year'),('c99_daily', 'month'),('c99_daily', 'day'),('c99_daily', 'distance'),('c99_daily', 'lat_deg_an'),('c99_daily', 'lat_min_an'),('c99_daily', 'lon_deg_an'),('c99_daily', 'lon_min_an'),('c99_daily', 'lat_deg_on'),('c99_daily', 'lat_min_on'),('c99_daily', 'lon_deg_of'),('c99_daily', 'lon_min_of'),('c99_daily', 'current_speed'),('c99_data4', 'year'),('c99_data4', 'month'),('c99_data4', 'day'),('c99_data4', 'hour'),('c99_data4', 'ship_speed'),('c99_data4', 'compass_correction'),('c99_data4', 'attached_thermometer'),('c99_data4', 'air_temperature'),('c99_data4', 'wet_bulb_temperature'),('c99_data4', 'sea_temperature'),('c99_data4', 'sky_clear'),('c99_data5', 'year'),('c99_data5', 'month'),('c99_data5', 'day'),('c99_data5', 'hour'),('c99_data5', 'ship_speed'),('c99_data5', 'attached_thermometer'),('c99_data5', 'air_temperature'),('c99_data5', 'wet_bulb_temperature'),('c99_data5', 'sea_temperature'),('c99_data5', 'sky_clear'),('c99_data5', 'compass_correction')
 2024-08-23 10:16:18,958 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
 2024-08-23 10:16:19,641 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
 </pre></div></div>
@@ -178,7 +167,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -192,46 +181,46 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>ATTI</th>
-      <th>ATTL</th>
-      <th>BLK</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>99</td>
-      <td>0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>99</td>
-      <td>0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>99</td>
-      <td>0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>99</td>
-      <td>0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>99</td>
-      <td>0</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>ATTI</th>
+<th>ATTL</th>
+<th>BLK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>99</td>
+<td>0</td>
+<td>NaN</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -250,7 +239,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -264,172 +253,172 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sentinal</th>
-      <th>reel_no</th>
-      <th>journal_no</th>
-      <th>frame_no</th>
-      <th>ship_name</th>
-      <th>journal_ed</th>
-      <th>rig</th>
-      <th>ship_material</th>
-      <th>vessel_type</th>
-      <th>vessel_length</th>
-      <th>vessel_beam</th>
-      <th>commander</th>
-      <th>country</th>
-      <th>screw_paddle</th>
-      <th>hold_depth</th>
-      <th>tonnage</th>
-      <th>baro_type</th>
-      <th>baro_height</th>
-      <th>baro_cdate</th>
-      <th>baro_loc</th>
-      <th>baro_units</th>
-      <th>baro_cor</th>
-      <th>thermo_mount</th>
-      <th>SST_I</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0003</td>
-      <td>Panay</td>
-      <td>78</td>
-      <td>01</td>
-      <td>1</td>
-      <td>1</td>
-      <td>187</td>
-      <td>37</td>
-      <td>S.P.Bray,Jr</td>
-      <td>01</td>
-      <td>3</td>
-      <td>23</td>
-      <td>1190</td>
-      <td>2</td>
-      <td>14</td>
-      <td>NaN</td>
-      <td>Bulkhead of cabin</td>
-      <td>1</td>
-      <td>- .102</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0003</td>
-      <td>Panay</td>
-      <td>78</td>
-      <td>01</td>
-      <td>1</td>
-      <td>1</td>
-      <td>187</td>
-      <td>37</td>
-      <td>S.P.Bray,Jr</td>
-      <td>01</td>
-      <td>3</td>
-      <td>23</td>
-      <td>1190</td>
-      <td>2</td>
-      <td>14</td>
-      <td>NaN</td>
-      <td>Bulkhead of cabin</td>
-      <td>1</td>
-      <td>- .102</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0003</td>
-      <td>Panay</td>
-      <td>78</td>
-      <td>01</td>
-      <td>1</td>
-      <td>1</td>
-      <td>187</td>
-      <td>37</td>
-      <td>S.P.Bray,Jr</td>
-      <td>01</td>
-      <td>3</td>
-      <td>23</td>
-      <td>1190</td>
-      <td>2</td>
-      <td>14</td>
-      <td>NaN</td>
-      <td>Bulkhead of cabin</td>
-      <td>1</td>
-      <td>- .102</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0003</td>
-      <td>Panay</td>
-      <td>78</td>
-      <td>01</td>
-      <td>1</td>
-      <td>1</td>
-      <td>187</td>
-      <td>37</td>
-      <td>S.P.Bray,Jr</td>
-      <td>01</td>
-      <td>3</td>
-      <td>23</td>
-      <td>1190</td>
-      <td>2</td>
-      <td>14</td>
-      <td>NaN</td>
-      <td>Bulkhead of cabin</td>
-      <td>1</td>
-      <td>- .102</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0003</td>
-      <td>Panay</td>
-      <td>78</td>
-      <td>01</td>
-      <td>1</td>
-      <td>1</td>
-      <td>187</td>
-      <td>37</td>
-      <td>S.P.Bray,Jr</td>
-      <td>01</td>
-      <td>3</td>
-      <td>23</td>
-      <td>1190</td>
-      <td>2</td>
-      <td>14</td>
-      <td>NaN</td>
-      <td>Bulkhead of cabin</td>
-      <td>1</td>
-      <td>- .102</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sentinal</th>
+<th>reel_no</th>
+<th>journal_no</th>
+<th>frame_no</th>
+<th>ship_name</th>
+<th>journal_ed</th>
+<th>rig</th>
+<th>ship_material</th>
+<th>vessel_type</th>
+<th>vessel_length</th>
+<th>vessel_beam</th>
+<th>commander</th>
+<th>country</th>
+<th>screw_paddle</th>
+<th>hold_depth</th>
+<th>tonnage</th>
+<th>baro_type</th>
+<th>baro_height</th>
+<th>baro_cdate</th>
+<th>baro_loc</th>
+<th>baro_units</th>
+<th>baro_cor</th>
+<th>thermo_mount</th>
+<th>SST_I</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>002</td>
+<td>0018</td>
+<td>0003</td>
+<td>Panay</td>
+<td>78</td>
+<td>01</td>
+<td>1</td>
+<td>1</td>
+<td>187</td>
+<td>37</td>
+<td>S.P.Bray,Jr</td>
+<td>01</td>
+<td>3</td>
+<td>23</td>
+<td>1190</td>
+<td>2</td>
+<td>14</td>
+<td>NaN</td>
+<td>Bulkhead of cabin</td>
+<td>1</td>
+<td>- .102</td>
+<td>2</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>002</td>
+<td>0018</td>
+<td>0003</td>
+<td>Panay</td>
+<td>78</td>
+<td>01</td>
+<td>1</td>
+<td>1</td>
+<td>187</td>
+<td>37</td>
+<td>S.P.Bray,Jr</td>
+<td>01</td>
+<td>3</td>
+<td>23</td>
+<td>1190</td>
+<td>2</td>
+<td>14</td>
+<td>NaN</td>
+<td>Bulkhead of cabin</td>
+<td>1</td>
+<td>- .102</td>
+<td>2</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1</td>
+<td>002</td>
+<td>0018</td>
+<td>0003</td>
+<td>Panay</td>
+<td>78</td>
+<td>01</td>
+<td>1</td>
+<td>1</td>
+<td>187</td>
+<td>37</td>
+<td>S.P.Bray,Jr</td>
+<td>01</td>
+<td>3</td>
+<td>23</td>
+<td>1190</td>
+<td>2</td>
+<td>14</td>
+<td>NaN</td>
+<td>Bulkhead of cabin</td>
+<td>1</td>
+<td>- .102</td>
+<td>2</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1</td>
+<td>002</td>
+<td>0018</td>
+<td>0003</td>
+<td>Panay</td>
+<td>78</td>
+<td>01</td>
+<td>1</td>
+<td>1</td>
+<td>187</td>
+<td>37</td>
+<td>S.P.Bray,Jr</td>
+<td>01</td>
+<td>3</td>
+<td>23</td>
+<td>1190</td>
+<td>2</td>
+<td>14</td>
+<td>NaN</td>
+<td>Bulkhead of cabin</td>
+<td>1</td>
+<td>- .102</td>
+<td>2</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1</td>
+<td>002</td>
+<td>0018</td>
+<td>0003</td>
+<td>Panay</td>
+<td>78</td>
+<td>01</td>
+<td>1</td>
+<td>1</td>
+<td>187</td>
+<td>37</td>
+<td>S.P.Bray,Jr</td>
+<td>01</td>
+<td>3</td>
+<td>23</td>
+<td>1190</td>
+<td>2</td>
+<td>14</td>
+<td>NaN</td>
+<td>Bulkhead of cabin</td>
+<td>1</td>
+<td>- .102</td>
+<td>2</td>
+<td>NaN</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -447,7 +436,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -461,64 +450,64 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sentinal</th>
-      <th>reel_no</th>
-      <th>journal_no</th>
-      <th>frame_start</th>
-      <th>from_city</th>
-      <th>to_city</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>Boston</td>
-      <td>Rio de Janeiro</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>Boston</td>
-      <td>Rio de Janeiro</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>2</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>Boston</td>
-      <td>Rio de Janeiro</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>Boston</td>
-      <td>Rio de Janeiro</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>Boston</td>
-      <td>Rio de Janeiro</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sentinal</th>
+<th>reel_no</th>
+<th>journal_no</th>
+<th>frame_start</th>
+<th>from_city</th>
+<th>to_city</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>Boston</td>
+<td>Rio de Janeiro</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>Boston</td>
+<td>Rio de Janeiro</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>Boston</td>
+<td>Rio de Janeiro</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>Boston</td>
+<td>Rio de Janeiro</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>Boston</td>
+<td>Rio de Janeiro</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -536,7 +525,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -550,166 +539,166 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sentinal</th>
-      <th>reel_no</th>
-      <th>journal_no</th>
-      <th>frame_start</th>
-      <th>frame</th>
-      <th>year</th>
-      <th>month</th>
-      <th>day</th>
-      <th>distance</th>
-      <th>lat_deg_an</th>
-      <th>lat_min_an</th>
-      <th>lat_hemis_an</th>
-      <th>lon_deg_an</th>
-      <th>lon_min_an</th>
-      <th>lon_hemis_an</th>
-      <th>lat_deg_on</th>
-      <th>lat_min_on</th>
-      <th>lat_hemis_on</th>
-      <th>lon_deg_of</th>
-      <th>lon_min_of</th>
-      <th>lon_hemis_of</th>
-      <th>current_speed</th>
-      <th>current_direction</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>3</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-      <td>0.1</td>
-      <td>E</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>3</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-      <td>0.1</td>
-      <td>E</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-      <td>0.1</td>
-      <td>E</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>3</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-      <td>0.1</td>
-      <td>E</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>3</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-      <td>0.1</td>
-      <td>E</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sentinal</th>
+<th>reel_no</th>
+<th>journal_no</th>
+<th>frame_start</th>
+<th>frame</th>
+<th>year</th>
+<th>month</th>
+<th>day</th>
+<th>distance</th>
+<th>lat_deg_an</th>
+<th>lat_min_an</th>
+<th>lat_hemis_an</th>
+<th>lon_deg_an</th>
+<th>lon_min_an</th>
+<th>lon_hemis_an</th>
+<th>lat_deg_on</th>
+<th>lat_min_on</th>
+<th>lat_hemis_on</th>
+<th>lon_deg_of</th>
+<th>lon_min_of</th>
+<th>lon_hemis_of</th>
+<th>current_speed</th>
+<th>current_direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>3</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+<td>0.1</td>
+<td>E</td>
+</tr>
+<tr>
+<th>1</th>
+<td>3</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+<td>0.1</td>
+<td>E</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+<td>0.1</td>
+<td>E</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+<td>0.1</td>
+<td>E</td>
+</tr>
+<tr>
+<th>4</th>
+<td>3</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+<td>0.1</td>
+<td>E</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -727,7 +716,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -741,196 +730,196 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sentinal</th>
-      <th>reel_no</th>
-      <th>journal_no</th>
-      <th>frame_start</th>
-      <th>frame</th>
-      <th>year</th>
-      <th>month</th>
-      <th>day</th>
-      <th>time_ind</th>
-      <th>hour</th>
-      <th>ship_speed</th>
-      <th>compass_ind</th>
-      <th>ship_course_compass</th>
-      <th>compass_correction</th>
-      <th>ship_course_true</th>
-      <th>wind_dir_mag</th>
-      <th>wind_dir_true</th>
-      <th>wind_force</th>
-      <th>barometer</th>
-      <th>temp_ind</th>
-      <th>attached_thermometer</th>
-      <th>air_temperature</th>
-      <th>wet_bulb_temperature</th>
-      <th>sea_temperature</th>
-      <th>present_weather</th>
-      <th>clouds</th>
-      <th>sky_clear</th>
-      <th>sea_state</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>4</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>1</td>
-      <td>2</td>
-      <td>8.5</td>
-      <td>NaN</td>
-      <td>EXS</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>WSW</td>
-      <td>NaN</td>
-      <td>06</td>
-      <td>2960</td>
-      <td>1</td>
-      <td>5.8</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>BOC</td>
-      <td>CU</td>
-      <td>5</td>
-      <td>R</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>4</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>1</td>
-      <td>4</td>
-      <td>8.5</td>
-      <td>NaN</td>
-      <td>EXS</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>WSW</td>
-      <td>NaN</td>
-      <td>06</td>
-      <td>2960</td>
-      <td>1</td>
-      <td>5.6</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>BOC</td>
-      <td>SC</td>
-      <td>3</td>
-      <td>R</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>4</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>1</td>
-      <td>6</td>
-      <td>8.5</td>
-      <td>NaN</td>
-      <td>EXS</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>W</td>
-      <td>NaN</td>
-      <td>06</td>
-      <td>2962</td>
-      <td>1</td>
-      <td>5.6</td>
-      <td>4.8</td>
-      <td>NaN</td>
-      <td>5.2</td>
-      <td>OCG</td>
-      <td>SC</td>
-      <td>0</td>
-      <td>R</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>1</td>
-      <td>8</td>
-      <td>8.0</td>
-      <td>NaN</td>
-      <td>EXS</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>W</td>
-      <td>NaN</td>
-      <td>06</td>
-      <td>2964</td>
-      <td>1</td>
-      <td>5.6</td>
-      <td>4.8</td>
-      <td>NaN</td>
-      <td>5.2</td>
-      <td>CG</td>
-      <td>SC</td>
-      <td>0</td>
-      <td>R</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>4</td>
-      <td>002</td>
-      <td>0018</td>
-      <td>0014</td>
-      <td>0015</td>
-      <td>1878</td>
-      <td>10</td>
-      <td>20</td>
-      <td>1</td>
-      <td>10</td>
-      <td>8.5</td>
-      <td>NaN</td>
-      <td>EXS</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>W</td>
-      <td>NaN</td>
-      <td>06</td>
-      <td>2969</td>
-      <td>1</td>
-      <td>5.7</td>
-      <td>4.8</td>
-      <td>NaN</td>
-      <td>5.0</td>
-      <td>BC</td>
-      <td>SC</td>
-      <td>2</td>
-      <td>L</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sentinal</th>
+<th>reel_no</th>
+<th>journal_no</th>
+<th>frame_start</th>
+<th>frame</th>
+<th>year</th>
+<th>month</th>
+<th>day</th>
+<th>time_ind</th>
+<th>hour</th>
+<th>ship_speed</th>
+<th>compass_ind</th>
+<th>ship_course_compass</th>
+<th>compass_correction</th>
+<th>ship_course_true</th>
+<th>wind_dir_mag</th>
+<th>wind_dir_true</th>
+<th>wind_force</th>
+<th>barometer</th>
+<th>temp_ind</th>
+<th>attached_thermometer</th>
+<th>air_temperature</th>
+<th>wet_bulb_temperature</th>
+<th>sea_temperature</th>
+<th>present_weather</th>
+<th>clouds</th>
+<th>sky_clear</th>
+<th>sea_state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>4</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>1</td>
+<td>2</td>
+<td>8.5</td>
+<td>NaN</td>
+<td>EXS</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>WSW</td>
+<td>NaN</td>
+<td>06</td>
+<td>2960</td>
+<td>1</td>
+<td>5.8</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>BOC</td>
+<td>CU</td>
+<td>5</td>
+<td>R</td>
+</tr>
+<tr>
+<th>1</th>
+<td>4</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>1</td>
+<td>4</td>
+<td>8.5</td>
+<td>NaN</td>
+<td>EXS</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>WSW</td>
+<td>NaN</td>
+<td>06</td>
+<td>2960</td>
+<td>1</td>
+<td>5.6</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>BOC</td>
+<td>SC</td>
+<td>3</td>
+<td>R</td>
+</tr>
+<tr>
+<th>2</th>
+<td>4</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>1</td>
+<td>6</td>
+<td>8.5</td>
+<td>NaN</td>
+<td>EXS</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>W</td>
+<td>NaN</td>
+<td>06</td>
+<td>2962</td>
+<td>1</td>
+<td>5.6</td>
+<td>4.8</td>
+<td>NaN</td>
+<td>5.2</td>
+<td>OCG</td>
+<td>SC</td>
+<td>0</td>
+<td>R</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>1</td>
+<td>8</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>EXS</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>W</td>
+<td>NaN</td>
+<td>06</td>
+<td>2964</td>
+<td>1</td>
+<td>5.6</td>
+<td>4.8</td>
+<td>NaN</td>
+<td>5.2</td>
+<td>CG</td>
+<td>SC</td>
+<td>0</td>
+<td>R</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>002</td>
+<td>0018</td>
+<td>0014</td>
+<td>0015</td>
+<td>1878</td>
+<td>10</td>
+<td>20</td>
+<td>1</td>
+<td>10</td>
+<td>8.5</td>
+<td>NaN</td>
+<td>EXS</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>W</td>
+<td>NaN</td>
+<td>06</td>
+<td>2969</td>
+<td>1</td>
+<td>5.7</td>
+<td>4.8</td>
+<td>NaN</td>
+<td>5.0</td>
+<td>BC</td>
+<td>SC</td>
+<td>2</td>
+<td>L</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -948,7 +937,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -962,214 +951,214 @@
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sentinal</th>
-      <th>reel_no</th>
-      <th>journal_no</th>
-      <th>frame_start</th>
-      <th>frame</th>
-      <th>year</th>
-      <th>month</th>
-      <th>day</th>
-      <th>time_ind</th>
-      <th>hour</th>
-      <th>ship_speed</th>
-      <th>compass_ind</th>
-      <th>ship_course_compass</th>
-      <th>blank</th>
-      <th>ship_course_true</th>
-      <th>wind_dir_mag</th>
-      <th>wind_dir_true</th>
-      <th>wind_force</th>
-      <th>barometer</th>
-      <th>temp_ind</th>
-      <th>attached_thermometer</th>
-      <th>air_temperature</th>
-      <th>wet_bulb_temperature</th>
-      <th>sea_temperature</th>
-      <th>present_weather</th>
-      <th>clouds</th>
-      <th>sky_clear</th>
-      <th>sea_state</th>
-      <th>compass_correction_ind</th>
-      <th>compass_correction</th>
-      <th>compass_correction_dir</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>&lt;NA&gt;</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sentinal</th>
+<th>reel_no</th>
+<th>journal_no</th>
+<th>frame_start</th>
+<th>frame</th>
+<th>year</th>
+<th>month</th>
+<th>day</th>
+<th>time_ind</th>
+<th>hour</th>
+<th>ship_speed</th>
+<th>compass_ind</th>
+<th>ship_course_compass</th>
+<th>blank</th>
+<th>ship_course_true</th>
+<th>wind_dir_mag</th>
+<th>wind_dir_true</th>
+<th>wind_force</th>
+<th>barometer</th>
+<th>temp_ind</th>
+<th>attached_thermometer</th>
+<th>air_temperature</th>
+<th>wet_bulb_temperature</th>
+<th>sea_temperature</th>
+<th>present_weather</th>
+<th>clouds</th>
+<th>sky_clear</th>
+<th>sea_state</th>
+<th>compass_correction_ind</th>
+<th>compass_correction</th>
+<th>compass_correction_dir</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -1182,7 +1171,7 @@
 <blockquote>
 <div><p>Note that this solution of excluding one section, will only work for decks from which sections are exclusive: Among the sections listed in the block, only one of them appears in every report.</p>
 </div></blockquote>
-<p>We can now use the <code class="docutils literal notranslate"><span class="pre">&quot;icoads_r3000_d704&quot;</span></code> model to map the raw data to the Common Data Model <a class="reference external" href="https://www.github.com/glamod/common_data_model">glamod/common_data_model</a>. The function <code class="docutils literal notranslate"><span class="pre">map_model</span></code> from the <code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> module contains all the functions for the model to convert variables to the correct units and/or specification following the <a class="reference external" href="https://github.com/glamod/common_data_model/blob/master/cdm_latest.pdf">CDM Documentation</a>.</p>
+<p>We can now use the <code class="docutils literal notranslate"><span class="pre">"icoads_r3000_d704"</span></code> model to map the raw data to the Common Data Model <a class="reference external" href="https://www.github.com/glamod/common_data_model">glamod/common_data_model</a>. The function <code class="docutils literal notranslate"><span class="pre">map_model</span></code> from the <code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> module contains all the functions for the model to convert variables to the correct units and/or specification following the <a class="reference external" href="https://github.com/glamod/common_data_model/blob/master/cdm_latest.pdf">CDM Documentation</a>.</p>
 <p>To run the data model we need three things:</p>
 <ul class="simple">
 <li><p>raw data (the data we just read above)</p></li>
@@ -1204,7 +1193,7 @@
 <div class="highlight"><pre>
 Help on function map_model in module cdm_reader_mapper.cdm_mapper.mapper:
 
-map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&#39;)
+map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level='INFO')
     Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
@@ -1240,7 +1229,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name_of_model</span> <span class="o">=</span> <span class="s2">&quot;icoads_r3000_d704&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name_of_model</span> <span class="o">=</span> <span class="s2">"icoads_r3000_d704"</span>
 
 <span class="n">cdm_dict</span> <span class="o">=</span> <span class="n">cdm</span><span class="o">.</span><span class="n">map_model</span><span class="p">(</span>
     <span class="n">name_of_model</span><span class="p">,</span>
@@ -1298,7 +1287,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">cdm_dict</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">cdm_dict</span><span class="p">[</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"data"</span><span class="p">]</span>
 <span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1309,7 +1298,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1323,214 +1312,214 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>report_id</th>
-      <th>application_area</th>
-      <th>observing_programme</th>
-      <th>report_type</th>
-      <th>station_name</th>
-      <th>station_type</th>
-      <th>platform_type</th>
-      <th>platform_sub_type</th>
-      <th>primary_station_id</th>
-      <th>station_record_number</th>
-      <th>primary_station_id_scheme</th>
-      <th>longitude</th>
-      <th>latitude</th>
-      <th>location_accuracy</th>
-      <th>location_quality</th>
-      <th>crs</th>
-      <th>station_speed</th>
-      <th>station_course</th>
-      <th>height_of_station_above_local_ground</th>
-      <th>height_of_station_above_sea_level</th>
-      <th>report_meaning_of_timestamp</th>
-      <th>report_timestamp</th>
-      <th>report_duration</th>
-      <th>report_time_accuracy</th>
-      <th>report_time_quality</th>
-      <th>report_quality</th>
-      <th>duplicate_status</th>
-      <th>record_timestamp</th>
-      <th>history</th>
-      <th>source_id</th>
-      <th>source_record_id</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ICOADS-30-020N16</td>
-      <td>[1, 7, 10, 11]</td>
-      <td>[5, 7, 56]</td>
-      <td>0</td>
-      <td>Panay</td>
-      <td>2</td>
-      <td>2</td>
-      <td>26</td>
-      <td>Panay</td>
-      <td>1</td>
-      <td>8</td>
-      <td>-68.41</td>
-      <td>42.28</td>
-      <td>NaN</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4.11552</td>
-      <td>90</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>1878-10-20 06:00:00</td>
-      <td>11</td>
-      <td>3600</td>
-      <td>2</td>
-      <td>0</td>
-      <td>4</td>
-      <td>2024-08-23 08:16:19.992685+00:00</td>
-      <td>2024-08-23 08:16:19. Initial conversion from I...</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-      <td>020N16</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ICOADS-30-020N1P</td>
-      <td>[1, 7, 10, 11]</td>
-      <td>[5, 7, 56]</td>
-      <td>0</td>
-      <td>Panay</td>
-      <td>2</td>
-      <td>2</td>
-      <td>26</td>
-      <td>Panay</td>
-      <td>1</td>
-      <td>8</td>
-      <td>-68.03</td>
-      <td>42.31</td>
-      <td>NaN</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4.11552</td>
-      <td>90</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>1878-10-20 08:00:00</td>
-      <td>11</td>
-      <td>3600</td>
-      <td>2</td>
-      <td>0</td>
-      <td>4</td>
-      <td>2024-08-23 08:16:19.992685+00:00</td>
-      <td>2024-08-23 08:16:19. Initial conversion from I...</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-      <td>020N1P</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>ICOADS-30-020N25</td>
-      <td>[1, 7, 10, 11]</td>
-      <td>[5, 7, 56]</td>
-      <td>0</td>
-      <td>Panay</td>
-      <td>2</td>
-      <td>2</td>
-      <td>26</td>
-      <td>Panay</td>
-      <td>1</td>
-      <td>8</td>
-      <td>-67.64</td>
-      <td>42.33</td>
-      <td>NaN</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4.11552</td>
-      <td>90</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>1878-10-20 10:00:00</td>
-      <td>11</td>
-      <td>3600</td>
-      <td>2</td>
-      <td>0</td>
-      <td>4</td>
-      <td>2024-08-23 08:16:19.992685+00:00</td>
-      <td>2024-08-23 08:16:19. Initial conversion from I...</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-      <td>020N25</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ICOADS-30-020N2Q</td>
-      <td>[1, 7, 10, 11]</td>
-      <td>[5, 7, 56]</td>
-      <td>0</td>
-      <td>Panay</td>
-      <td>2</td>
-      <td>2</td>
-      <td>26</td>
-      <td>Panay</td>
-      <td>1</td>
-      <td>8</td>
-      <td>-67.29</td>
-      <td>42.35</td>
-      <td>NaN</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4.11552</td>
-      <td>90</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>1878-10-20 12:00:00</td>
-      <td>11</td>
-      <td>3600</td>
-      <td>2</td>
-      <td>0</td>
-      <td>4</td>
-      <td>2024-08-23 08:16:19.992685+00:00</td>
-      <td>2024-08-23 08:16:19. Initial conversion from I...</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-      <td>020N2Q</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ICOADS-30-020N3A</td>
-      <td>[1, 7, 10, 11]</td>
-      <td>[5, 7, 56]</td>
-      <td>0</td>
-      <td>Panay</td>
-      <td>2</td>
-      <td>2</td>
-      <td>26</td>
-      <td>Panay</td>
-      <td>1</td>
-      <td>8</td>
-      <td>-66.90</td>
-      <td>42.37</td>
-      <td>NaN</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4.11552</td>
-      <td>90</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>1878-10-20 14:00:00</td>
-      <td>11</td>
-      <td>3600</td>
-      <td>2</td>
-      <td>0</td>
-      <td>4</td>
-      <td>2024-08-23 08:16:19.992685+00:00</td>
-      <td>2024-08-23 08:16:19. Initial conversion from I...</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-      <td>020N3A</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>report_id</th>
+<th>application_area</th>
+<th>observing_programme</th>
+<th>report_type</th>
+<th>station_name</th>
+<th>station_type</th>
+<th>platform_type</th>
+<th>platform_sub_type</th>
+<th>primary_station_id</th>
+<th>station_record_number</th>
+<th>primary_station_id_scheme</th>
+<th>longitude</th>
+<th>latitude</th>
+<th>location_accuracy</th>
+<th>location_quality</th>
+<th>crs</th>
+<th>station_speed</th>
+<th>station_course</th>
+<th>height_of_station_above_local_ground</th>
+<th>height_of_station_above_sea_level</th>
+<th>report_meaning_of_timestamp</th>
+<th>report_timestamp</th>
+<th>report_duration</th>
+<th>report_time_accuracy</th>
+<th>report_time_quality</th>
+<th>report_quality</th>
+<th>duplicate_status</th>
+<th>record_timestamp</th>
+<th>history</th>
+<th>source_id</th>
+<th>source_record_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>ICOADS-30-020N16</td>
+<td>[1, 7, 10, 11]</td>
+<td>[5, 7, 56]</td>
+<td>0</td>
+<td>Panay</td>
+<td>2</td>
+<td>2</td>
+<td>26</td>
+<td>Panay</td>
+<td>1</td>
+<td>8</td>
+<td>-68.41</td>
+<td>42.28</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>4.11552</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>1878-10-20 06:00:00</td>
+<td>11</td>
+<td>3600</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>2024-08-23 08:16:19.992685+00:00</td>
+<td>2024-08-23 08:16:19. Initial conversion from I...</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+<td>020N16</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ICOADS-30-020N1P</td>
+<td>[1, 7, 10, 11]</td>
+<td>[5, 7, 56]</td>
+<td>0</td>
+<td>Panay</td>
+<td>2</td>
+<td>2</td>
+<td>26</td>
+<td>Panay</td>
+<td>1</td>
+<td>8</td>
+<td>-68.03</td>
+<td>42.31</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>4.11552</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>1878-10-20 08:00:00</td>
+<td>11</td>
+<td>3600</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>2024-08-23 08:16:19.992685+00:00</td>
+<td>2024-08-23 08:16:19. Initial conversion from I...</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+<td>020N1P</td>
+</tr>
+<tr>
+<th>2</th>
+<td>ICOADS-30-020N25</td>
+<td>[1, 7, 10, 11]</td>
+<td>[5, 7, 56]</td>
+<td>0</td>
+<td>Panay</td>
+<td>2</td>
+<td>2</td>
+<td>26</td>
+<td>Panay</td>
+<td>1</td>
+<td>8</td>
+<td>-67.64</td>
+<td>42.33</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>4.11552</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>1878-10-20 10:00:00</td>
+<td>11</td>
+<td>3600</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>2024-08-23 08:16:19.992685+00:00</td>
+<td>2024-08-23 08:16:19. Initial conversion from I...</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+<td>020N25</td>
+</tr>
+<tr>
+<th>3</th>
+<td>ICOADS-30-020N2Q</td>
+<td>[1, 7, 10, 11]</td>
+<td>[5, 7, 56]</td>
+<td>0</td>
+<td>Panay</td>
+<td>2</td>
+<td>2</td>
+<td>26</td>
+<td>Panay</td>
+<td>1</td>
+<td>8</td>
+<td>-67.29</td>
+<td>42.35</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>4.11552</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>1878-10-20 12:00:00</td>
+<td>11</td>
+<td>3600</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>2024-08-23 08:16:19.992685+00:00</td>
+<td>2024-08-23 08:16:19. Initial conversion from I...</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+<td>020N2Q</td>
+</tr>
+<tr>
+<th>4</th>
+<td>ICOADS-30-020N3A</td>
+<td>[1, 7, 10, 11]</td>
+<td>[5, 7, 56]</td>
+<td>0</td>
+<td>Panay</td>
+<td>2</td>
+<td>2</td>
+<td>26</td>
+<td>Panay</td>
+<td>1</td>
+<td>8</td>
+<td>-66.90</td>
+<td>42.37</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>4.11552</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>1878-10-20 14:00:00</td>
+<td>11</td>
+<td>3600</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>2024-08-23 08:16:19.992685+00:00</td>
+<td>2024-08-23 08:16:19. Initial conversion from I...</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+<td>020N3A</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -1569,12 +1558,12 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">c99_daily</span><span class="p">[</span>
     <span class="p">[</span>
-        <span class="s2">&quot;lat_deg_on&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lat_min_on&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lat_hemis_on&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lon_deg_of&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lon_min_of&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lon_hemis_of&quot;</span><span class="p">,</span>
+        <span class="s2">"lat_deg_on"</span><span class="p">,</span>
+        <span class="s2">"lat_min_on"</span><span class="p">,</span>
+        <span class="s2">"lat_hemis_on"</span><span class="p">,</span>
+        <span class="s2">"lon_deg_of"</span><span class="p">,</span>
+        <span class="s2">"lon_min_of"</span><span class="p">,</span>
+        <span class="s2">"lon_hemis_of"</span><span class="p">,</span>
     <span class="p">]</span>
 <span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -1586,7 +1575,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1600,64 +1589,64 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>lat_deg_on</th>
-      <th>lat_min_on</th>
-      <th>lat_hemis_on</th>
-      <th>lon_deg_of</th>
-      <th>lon_min_of</th>
-      <th>lon_hemis_of</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>42</td>
-      <td>20</td>
-      <td>N</td>
-      <td>66</td>
-      <td>30</td>
-      <td>W</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>lat_deg_on</th>
+<th>lat_min_on</th>
+<th>lat_hemis_on</th>
+<th>lon_deg_of</th>
+<th>lon_min_of</th>
+<th>lon_hemis_of</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+</tr>
+<tr>
+<th>1</th>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+</tr>
+<tr>
+<th>2</th>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+</tr>
+<tr>
+<th>3</th>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+</tr>
+<tr>
+<th>4</th>
+<td>42</td>
+<td>20</td>
+<td>N</td>
+<td>66</td>
+<td>30</td>
+<td>W</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -1667,7 +1656,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">c99_journal</span><span class="p">[[</span><span class="s2">&quot;baro_type&quot;</span><span class="p">,</span> <span class="s2">&quot;baro_height&quot;</span><span class="p">,</span> <span class="s2">&quot;baro_units&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">c99_journal</span><span class="p">[[</span><span class="s2">"baro_type"</span><span class="p">,</span> <span class="s2">"baro_height"</span><span class="p">,</span> <span class="s2">"baro_units"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1677,7 +1666,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1691,82 +1680,82 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>baro_type</th>
-      <th>baro_height</th>
-      <th>baro_units</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-      <td>14</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>14</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>2</td>
-      <td>14</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2</td>
-      <td>14</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2</td>
-      <td>14</td>
-      <td>1</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>baro_type</th>
+<th>baro_height</th>
+<th>baro_units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2</td>
+<td>14</td>
+<td>1</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>14</td>
+<td>1</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>14</td>
+<td>1</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2</td>
+<td>14</td>
+<td>1</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2</td>
+<td>14</td>
+<td>1</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
 <p>Baro type original code table</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
-    &quot;1&quot;:&quot;aneroid&quot;,
-    &quot;2&quot;:&quot;mercurial&quot;
+    "1":"aneroid",
+    "2":"mercurial"
 }
 </pre></div>
 </div>
 <p>Baro units original code table. It has been left like this:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
-    &quot;1&quot;:&quot;inches&quot;,
-    &quot;2&quot;:&quot;millimeters&quot;,
-    &quot;3&quot;:&quot;millibars&quot;,
-    &quot;4&quot;:&quot;unable to determine&quot;,
-    &quot;5&quot;:&quot;Paris inches&quot;
+    "1":"inches",
+    "2":"millimeters",
+    "3":"millibars",
+    "4":"unable to determine",
+    "5":"Paris inches"
 }
 </pre></div>
 </div>
 <p>Our CDM table will be</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
-  &quot;1&quot;:1001,
-  &quot;2&quot;:1002,
-  &quot;3&quot;:1003,
-  &quot;4&quot;:9999,
-  &quot;5&quot;:1005
+  "1":1001,
+  "2":1002,
+  "3":1003,
+  "4":9999,
+  "5":1005
 }
 </pre></div>
 </div>
-<p>9999 will be the <code class="docutils literal notranslate"><span class="pre">&quot;fill_value&quot;:</span> <span class="pre">9999</span></code> that indicates to the CDM-mapper that these are NaN values.</p>
+<p>9999 will be the <code class="docutils literal notranslate"><span class="pre">"fill_value":</span> <span class="pre">9999</span></code> that indicates to the CDM-mapper that these are NaN values.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_obs</span> <span class="o">=</span> <span class="n">cdm_dict</span><span class="p">[</span><span class="s2">&quot;observations-slp&quot;</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_obs</span> <span class="o">=</span> <span class="n">cdm_dict</span><span class="p">[</span><span class="s2">"observations-slp"</span><span class="p">][</span><span class="s2">"data"</span><span class="p">]</span>
 <span class="n">data_obs</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1777,7 +1766,7 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 <div class="output_area rendered_html docutils container">
 <div>
-<style scoped>
+<style scoped="">
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1791,226 +1780,226 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
     }
 </style>
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>observation_id</th>
-      <th>report_id</th>
-      <th>data_policy_licence</th>
-      <th>date_time</th>
-      <th>date_time_meaning</th>
-      <th>observation_duration</th>
-      <th>longitude</th>
-      <th>latitude</th>
-      <th>crs</th>
-      <th>z_coordinate</th>
-      <th>z_coordinate_type</th>
-      <th>observation_height_above_station_surface</th>
-      <th>observed_variable</th>
-      <th>observation_value</th>
-      <th>value_significance</th>
-      <th>units</th>
-      <th>conversion_flag</th>
-      <th>location_precision</th>
-      <th>spatial_representativeness</th>
-      <th>quality_flag</th>
-      <th>numerical_precision</th>
-      <th>sensor_automation_status</th>
-      <th>exposure_of_sensor</th>
-      <th>original_precision</th>
-      <th>original_units</th>
-      <th>original_value</th>
-      <th>conversion_method</th>
-      <th>processing_level</th>
-      <th>traceability</th>
-      <th>advanced_qc</th>
-      <th>advanced_uncertainty</th>
-      <th>advanced_homogenisation</th>
-      <th>source_id</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ICOADS-30-020N16-SLP</td>
-      <td>ICOADS-30-020N16</td>
-      <td>0</td>
-      <td>1878-10-20 06:00:00</td>
-      <td>2</td>
-      <td>8</td>
-      <td>-68.41</td>
-      <td>42.28</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>58</td>
-      <td>99610.0</td>
-      <td>2</td>
-      <td>32</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>5</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>1001</td>
-      <td>996.1</td>
-      <td>7</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ICOADS-30-020N1P-SLP</td>
-      <td>ICOADS-30-020N1P</td>
-      <td>0</td>
-      <td>1878-10-20 08:00:00</td>
-      <td>2</td>
-      <td>8</td>
-      <td>-68.03</td>
-      <td>42.31</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>58</td>
-      <td>99630.0</td>
-      <td>2</td>
-      <td>32</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>5</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>1001</td>
-      <td>996.3</td>
-      <td>7</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>ICOADS-30-020N25-SLP</td>
-      <td>ICOADS-30-020N25</td>
-      <td>0</td>
-      <td>1878-10-20 10:00:00</td>
-      <td>2</td>
-      <td>8</td>
-      <td>-67.64</td>
-      <td>42.33</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>58</td>
-      <td>99690.0</td>
-      <td>2</td>
-      <td>32</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>5</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>1001</td>
-      <td>996.9</td>
-      <td>7</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ICOADS-30-020N2Q-SLP</td>
-      <td>ICOADS-30-020N2Q</td>
-      <td>0</td>
-      <td>1878-10-20 12:00:00</td>
-      <td>2</td>
-      <td>8</td>
-      <td>-67.29</td>
-      <td>42.35</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>58</td>
-      <td>99760.0</td>
-      <td>2</td>
-      <td>32</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>5</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>1001</td>
-      <td>997.6</td>
-      <td>7</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ICOADS-30-020N3A-SLP</td>
-      <td>ICOADS-30-020N3A</td>
-      <td>0</td>
-      <td>1878-10-20 14:00:00</td>
-      <td>2</td>
-      <td>8</td>
-      <td>-66.90</td>
-      <td>42.37</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>0</td>
-      <td>4.27</td>
-      <td>58</td>
-      <td>99920.0</td>
-      <td>2</td>
-      <td>32</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>5</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>1001</td>
-      <td>999.2</td>
-      <td>7</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>ICOADS-3-0-0T-125-704-1878-10</td>
-    </tr>
-  </tbody>
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>observation_id</th>
+<th>report_id</th>
+<th>data_policy_licence</th>
+<th>date_time</th>
+<th>date_time_meaning</th>
+<th>observation_duration</th>
+<th>longitude</th>
+<th>latitude</th>
+<th>crs</th>
+<th>z_coordinate</th>
+<th>z_coordinate_type</th>
+<th>observation_height_above_station_surface</th>
+<th>observed_variable</th>
+<th>observation_value</th>
+<th>value_significance</th>
+<th>units</th>
+<th>conversion_flag</th>
+<th>location_precision</th>
+<th>spatial_representativeness</th>
+<th>quality_flag</th>
+<th>numerical_precision</th>
+<th>sensor_automation_status</th>
+<th>exposure_of_sensor</th>
+<th>original_precision</th>
+<th>original_units</th>
+<th>original_value</th>
+<th>conversion_method</th>
+<th>processing_level</th>
+<th>traceability</th>
+<th>advanced_qc</th>
+<th>advanced_uncertainty</th>
+<th>advanced_homogenisation</th>
+<th>source_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>ICOADS-30-020N16-SLP</td>
+<td>ICOADS-30-020N16</td>
+<td>0</td>
+<td>1878-10-20 06:00:00</td>
+<td>2</td>
+<td>8</td>
+<td>-68.41</td>
+<td>42.28</td>
+<td>0</td>
+<td>4.27</td>
+<td>0</td>
+<td>4.27</td>
+<td>58</td>
+<td>99610.0</td>
+<td>2</td>
+<td>32</td>
+<td>0</td>
+<td>NaN</td>
+<td>3</td>
+<td>2</td>
+<td>NaN</td>
+<td>5</td>
+<td>3</td>
+<td>NaN</td>
+<td>1001</td>
+<td>996.1</td>
+<td>7</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ICOADS-30-020N1P-SLP</td>
+<td>ICOADS-30-020N1P</td>
+<td>0</td>
+<td>1878-10-20 08:00:00</td>
+<td>2</td>
+<td>8</td>
+<td>-68.03</td>
+<td>42.31</td>
+<td>0</td>
+<td>4.27</td>
+<td>0</td>
+<td>4.27</td>
+<td>58</td>
+<td>99630.0</td>
+<td>2</td>
+<td>32</td>
+<td>0</td>
+<td>NaN</td>
+<td>3</td>
+<td>2</td>
+<td>NaN</td>
+<td>5</td>
+<td>3</td>
+<td>NaN</td>
+<td>1001</td>
+<td>996.3</td>
+<td>7</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+</tr>
+<tr>
+<th>2</th>
+<td>ICOADS-30-020N25-SLP</td>
+<td>ICOADS-30-020N25</td>
+<td>0</td>
+<td>1878-10-20 10:00:00</td>
+<td>2</td>
+<td>8</td>
+<td>-67.64</td>
+<td>42.33</td>
+<td>0</td>
+<td>4.27</td>
+<td>0</td>
+<td>4.27</td>
+<td>58</td>
+<td>99690.0</td>
+<td>2</td>
+<td>32</td>
+<td>0</td>
+<td>NaN</td>
+<td>3</td>
+<td>2</td>
+<td>NaN</td>
+<td>5</td>
+<td>3</td>
+<td>NaN</td>
+<td>1001</td>
+<td>996.9</td>
+<td>7</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+</tr>
+<tr>
+<th>3</th>
+<td>ICOADS-30-020N2Q-SLP</td>
+<td>ICOADS-30-020N2Q</td>
+<td>0</td>
+<td>1878-10-20 12:00:00</td>
+<td>2</td>
+<td>8</td>
+<td>-67.29</td>
+<td>42.35</td>
+<td>0</td>
+<td>4.27</td>
+<td>0</td>
+<td>4.27</td>
+<td>58</td>
+<td>99760.0</td>
+<td>2</td>
+<td>32</td>
+<td>0</td>
+<td>NaN</td>
+<td>3</td>
+<td>2</td>
+<td>NaN</td>
+<td>5</td>
+<td>3</td>
+<td>NaN</td>
+<td>1001</td>
+<td>997.6</td>
+<td>7</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+</tr>
+<tr>
+<th>4</th>
+<td>ICOADS-30-020N3A-SLP</td>
+<td>ICOADS-30-020N3A</td>
+<td>0</td>
+<td>1878-10-20 14:00:00</td>
+<td>2</td>
+<td>8</td>
+<td>-66.90</td>
+<td>42.37</td>
+<td>0</td>
+<td>4.27</td>
+<td>0</td>
+<td>4.27</td>
+<td>58</td>
+<td>99920.0</td>
+<td>2</td>
+<td>32</td>
+<td>0</td>
+<td>NaN</td>
+<td>3</td>
+<td>2</td>
+<td>NaN</td>
+<td>5</td>
+<td>3</td>
+<td>NaN</td>
+<td>1001</td>
+<td>999.2</td>
+<td>7</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ICOADS-3-0-0T-125-704-1878-10</td>
+</tr>
+</tbody>
 </table>
 </div></div>
 </div>
@@ -2024,20 +2013,16 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 </div>
 </section>
 </section>
-
-
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="CLIWOC_datamodel.html" class="btn btn-neutral float-left" title="Generating a data model for CLIWOC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leidung, Richard Cornes and Elizabeth Kent.</p>
-  </div>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="CLIWOC_datamodel.html" rel="prev" title="Generating a data model for CLIWOC"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="../contributing.html" rel="next" title="Contributing">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent.</p>
+</div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
@@ -2045,15 +2030,14 @@ map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level=&#39;INFO&
 
 
 </footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
+</div>
+</div>
+</section>
+</div>
+<script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
 </body>
 </html>
