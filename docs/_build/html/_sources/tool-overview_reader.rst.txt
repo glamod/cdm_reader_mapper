@@ -55,7 +55,7 @@ If the data model has no sections, the reader works with the full report as a si
 
 Afterwards, data elements are extracted from each of these chunks, as shown in the figure below, where each element in the input dataframe is linked to its attributes (orange text) defined within the data model/schema (e.g. elements encoding type, bytes length, etc).
 
-.. figure:: _static/images/fig1.png
+.. figure:: _static/images/schema_data_element.png
     :width: 100%
 
     Schematic representation of the integral process of reading, transforming and validating a data element.

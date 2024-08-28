@@ -101,8 +101,8 @@
 <h2>Creating a data model<a class="headerlink" href="#Creating-a-data-model" title="Link to this heading"></a></h2>
 <p>In this notebook we will create and apply a new <strong>data model/schema</strong> to a raw <code class="docutils literal notranslate"><span class="pre">.imma</span></code> file, using the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>. We will add supplemental metadata to the basic <code class="docutils literal notranslate"><span class="pre">imma1</span></code> data model and display supplemental data as a pandas dataframe.</p>
 <p>Lets first import all the tools that we will need.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -128,45 +128,14 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-06-06 07:44:49,848 - root - INFO - init basic configure of logging success
-2024-06-06 07:44:53,015 - root - INFO - init basic configure of logging success
-</pre></div></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> tool comes with data model templates of <code class="docutils literal notranslate"><span class="pre">.json</span></code> files, that we can use to build our models. For more information see the following <a class="reference external" href="https://git.noc.ac.uk/iregon/mdf_reader/-/blob/master/docs/User_manual.docx">manual</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">supported_data_models</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-['gcc_immt',
- 'imma1',
- 'imma1_d701',
- 'imma1_d702',
- 'imma1_d704',
- 'imma1_d705-707',
- 'imma1_d714',
- 'imma1_d721',
- 'imma1_d730',
- 'imma1_d781',
- 'imma1_nodt',
- 'td11',
- 'td11_d110',
- 'c_raid']
-</pre></div></div>
 </div>
 <p>According to the manual, ICOADS data stored with the <a class="reference external" href="https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf">IMMA format</a> represents a complex data model, since the data includes blocks of sections which are exclusive to certain DCK’s (e.g. data coming from the NOAA National Climatic Data Center (NCDC) TD-11 formats). Most of the ICOADS data however will need a <strong>schema</strong> based on the <code class="docutils literal notranslate"><span class="pre">imma1.json</span></code> format.</p>
 <p>Lets try to build our own <strong>schema</strong> based on this template for a new dck. In this notebook we will organise the data and metadata from the <strong>US Maury collection</strong> that corresponds to <code class="docutils literal notranslate"><span class="pre">source/dck</span> <span class="pre">069-701</span></code>.</p>
@@ -174,8 +143,8 @@
 <li><p>First lets read a raw <code class="docutils literal notranslate"><span class="pre">.imma</span></code> file from dck 701 as an example, for a subset of the data collected in April/1845.</p></li>
 </ol>
 <p>One should note that a full schema for this deck already exists: <code class="docutils literal notranslate"><span class="pre">"imma1_d701"</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the test data</span>
@@ -185,42 +154,14 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-06-06 07:44:53,144 - root - INFO - Attempting to fetch remote file: imma1_701/input/069-701_1845-04-01_subset.imma.md5
-2024-06-06 07:44:53,238 - root - INFO - READING DATA MODEL SCHEMA FILE...
-2024-06-06 07:44:53,240 - root - INFO - EXTRACTING DATA FROM MODEL: imma1
-2024-06-06 07:44:53,240 - root - INFO - Getting data string from source...
-2024-06-06 07:44:53,338 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')
-2024-06-06 07:44:53,339 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
-2024-06-06 07:44:53,513 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
-</pre></div></div>
-</div>
 <p>We now look at the supplementary data column for this data, i.e.: the <code class="docutils literal notranslate"><span class="pre">"c99"</span></code> column.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-0    99 0 300850118450401  5404N 2354W             ...
-1    99 0 810348118450401  4836N 2330W             ...
-2    99 0 370731118450401  4643N15147W             ...
-3    99 0 260597118450401  4454N 3015W             ...
-4    99 0 250661118450401  4356N 2220W             ...
-Name: c99, dtype: object
-</pre></div></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">c99</span></code> column is a bit messy. Here, we will need to separate the Supplemental Metadata ingested in ICOADS as an entire string and sort each row out according to the source &amp; dck documentation.</p>
 <ol class="arabic simple" start="2">
@@ -229,7 +170,7 @@ Name: c99, dtype: object
 to the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section.</p></li>
 </ol>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a copy of the "imma1" schema</span>
@@ -237,8 +178,8 @@ to the <code class="docutils literal notranslate"><span class="pre">c99</span></
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the directory where we store the schema</span>
@@ -249,14 +190,6 @@ to the <code class="docutils literal notranslate"><span class="pre">c99</span></
 <span class="nb">print</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701
-</pre></div></div>
 </div>
 <p>We should now look at the documentation for this deck, to see if we can parse the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section.</p>
 <p>From the US Maury collection <a class="reference external" href="https://icoads.noaa.gov/e-doc/other/transpec/maury/maury_transpec">ICOADS documentation</a>, we find out that the <code class="docutils literal notranslate"><span class="pre">c99</span></code> for this deck is composed of the following sections:</p>
@@ -301,7 +234,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 <div><p>sentinal: section identifier applies to: format.fixed_width is mandatory: it is not mandatory if the section is unique, unique in a parsing_order block, or part of a sequential parsing_order block. type: string comments: the element bearing the sentinal needs to be, additionally, declared in the elements block</p>
 </div></blockquote>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c99</span> <span class="o">=</span> <span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
@@ -309,8 +242,8 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># sentinal = 5</span>
@@ -319,17 +252,8 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-'99 0 '
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># cvoyd voyage number = 7</span>
@@ -338,17 +262,8 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-'3707311'
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># date = 10</span>
@@ -357,15 +272,6 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-'18450401  '
-</pre></div></div>
-</div>
 </section>
 <section id="Create-the-custom-model">
 <h2>Create the custom model<a class="headerlink" href="#Create-the-custom-model" title="Link to this heading"></a></h2>
@@ -373,7 +279,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 <p>Here we add to the dictionary containing the <code class="docutils literal notranslate"><span class="pre">"imma1"</span></code> schema loaded earlier, we then save that to a <code class="docutils literal notranslate"><span class="pre">json</span></code> file in our model directory.</p>
 <p>Note that we need to use an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> here, since the ordering of the fields is important, a standard python <code class="docutils literal notranslate"><span class="pre">dict</span></code> is un-ordered and may shuffle the elements.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"sentinal"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"99 0 "</span>
@@ -418,7 +324,7 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -429,8 +335,8 @@ intended, qc5 was included in the supplementary attachment in original form.
 </div>
 </div>
 <p>The final component of a model for the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module is the <code class="docutils literal notranslate"><span class="pre">code_tables</span></code>. These are the tables that relate <code class="docutils literal notranslate"><span class="pre">key</span></code> columns to their values. For this example we will copy the code tables from the original <code class="docutils literal notranslate"><span class="pre">imma1</span></code> model.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">code_tables_path</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
@@ -440,130 +346,27 @@ intended, qc5 was included in the supplementary attachment in original form.
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-'/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701/code_tables'
-</pre></div></div>
-</div>
 <p>Now we feed this new data model to the <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code> function. To use our custom schema we need to specify the <code class="docutils literal notranslate"><span class="pre">data_model_path</span></code> argument, rather than the <code class="docutils literal notranslate"><span class="pre">data_model</span></code> argument used earlier.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">),</span> <span class="n">data_model_path</span><span class="o">=</span><span class="n">my_model_path</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-06-06 07:44:53,926 - root - INFO - READING DATA MODEL SCHEMA FILE...
-2024-06-06 07:44:53,935 - root - INFO - EXTRACTING DATA FROM MODEL: /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701
-2024-06-06 07:44:53,936 - root - INFO - Getting data string from source...
-2024-06-06 07:44:54,113 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99', 'year'),('c99', 'month'),('c99', 'day')
-2024-06-06 07:44:54,113 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
-2024-06-06 07:44:54,467 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
-</pre></div></div>
-</div>
 <p>And magically all the messy string is <em>partially</em> separated!</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>sentinal</th>
-<th>cvoyd</th>
-<th>year</th>
-<th>month</th>
-<th>day</th>
-<th>rest</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>99 0</td>
-<td>3008501</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>5404N 2354W                                   ...</td>
-</tr>
-<tr>
-<th>1</th>
-<td>99 0</td>
-<td>8103481</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4836N 2330W                        29291      ...</td>
-</tr>
-<tr>
-<th>2</th>
-<td>99 0</td>
-<td>3707311</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4643N15147W                                   ...</td>
-</tr>
-<tr>
-<th>3</th>
-<td>99 0</td>
-<td>2605971</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4454N 3015W                20200W             ...</td>
-</tr>
-<tr>
-<th>4</th>
-<td>99 0</td>
-<td>2506611</td>
-<td>1845</td>
-<td>4</td>
-<td>1</td>
-<td>4356N 2220W                                   ...</td>
-</tr>
-</tbody>
-</table>
-</div></div>
-</div>
 <p>We can also quickly verify that the original fields are parsed in the same way, here we are just verifying that the columns in the <code class="docutils literal notranslate"><span class="pre">core</span></code> section are unchanged following the changes made to the schema.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_new</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"core"</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -587,7 +390,7 @@ intended, qc5 was included in the supplementary attachment in original form.
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
 </div>

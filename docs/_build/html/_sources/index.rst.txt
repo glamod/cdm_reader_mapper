@@ -68,7 +68,7 @@ About
 
 :License: |license|
 
-|logo_c3s| |logo_NOC| |logo_ICOADS|
+|logo_c3s| |logo_NOC| |logo_ICOADS| |logo_copernicus|
 
 .. include:: hyperlinks.rst
 

@@ -25,18 +25,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2024-06-06 07:44:49,848 - root - INFO - init basic configure of logging success\n",
-      "2024-06-06 07:44:53,015 - root - INFO - init basic configure of logging success\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "from __future__ import annotations\n",
     "\n",
@@ -69,33 +60,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "['gcc_immt',\n",
-       " 'imma1',\n",
-       " 'imma1_d701',\n",
-       " 'imma1_d702',\n",
-       " 'imma1_d704',\n",
-       " 'imma1_d705-707',\n",
-       " 'imma1_d714',\n",
-       " 'imma1_d721',\n",
-       " 'imma1_d730',\n",
-       " 'imma1_d781',\n",
-       " 'imma1_nodt',\n",
-       " 'td11',\n",
-       " 'td11_d110',\n",
-       " 'c_raid']"
-      ]
-     },
-     "execution_count": 2,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "mdf_reader.properties.supported_data_models"
    ]
@@ -115,23 +82,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2024-06-06 07:44:53,144 - root - INFO - Attempting to fetch remote file: imma1_701/input/069-701_1845-04-01_subset.imma.md5\n",
-      "2024-06-06 07:44:53,238 - root - INFO - READING DATA MODEL SCHEMA FILE...\n",
-      "2024-06-06 07:44:53,240 - root - INFO - EXTRACTING DATA FROM MODEL: imma1\n",
-      "2024-06-06 07:44:53,240 - root - INFO - Getting data string from source...\n",
-      "2024-06-06 07:44:53,338 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')\n",
-      "2024-06-06 07:44:53,339 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation\n",
-      "2024-06-06 07:44:53,513 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "# Load the test data\n",
     "data = test_data.test_069_701\n",
@@ -148,25 +101,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "0    99 0 300850118450401  5404N 2354W             ...\n",
-       "1    99 0 810348118450401  4836N 2330W             ...\n",
-       "2    99 0 370731118450401  4643N15147W             ...\n",
-       "3    99 0 260597118450401  4454N 3015W             ...\n",
-       "4    99 0 250661118450401  4356N 2220W             ...\n",
-       "Name: c99, dtype: object"
-      ]
-     },
-     "execution_count": 4,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "data_raw.data[\"c99\"]"
    ]
@@ -183,7 +120,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -193,17 +130,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "# Create the directory where we store the schema\n",
     "my_model_name = \"imma1_d701\"\n",
@@ -281,7 +210,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -291,20 +220,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "'99 0 '"
-      ]
-     },
-     "execution_count": 8,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "# sentinal = 5\n",
     "part_1 = line[0:5]\n",
@@ -313,20 +231,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "'3707311'"
-      ]
-     },
-     "execution_count": 9,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "# cvoyd voyage number = 7\n",
     "part_2 = line[5 : 5 + 7]\n",
@@ -335,20 +242,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 10,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "'18450401  '"
-      ]
-     },
-     "execution_count": 10,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "# date = 10\n",
     "part_3 = line[12 : 12 + 10]\n",
@@ -370,7 +266,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 11,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -416,7 +312,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -435,20 +331,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "'/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701/code_tables'"
-      ]
-     },
-     "execution_count": 13,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "code_tables_path = get_files(\n",
     "    \".\".join([mdf_reader.properties._base, \"code_tables\", \"imma1\"])\n",
@@ -465,22 +350,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 14,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2024-06-06 07:44:53,926 - root - INFO - READING DATA MODEL SCHEMA FILE...\n",
-      "2024-06-06 07:44:53,935 - root - INFO - EXTRACTING DATA FROM MODEL: /var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmp1ecjaait/imma1_d701\n",
-      "2024-06-06 07:44:53,936 - root - INFO - Getting data string from source...\n",
-      "2024-06-06 07:44:54,113 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99', 'year'),('c99', 'month'),('c99', 'day')\n",
-      "2024-06-06 07:44:54,113 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation\n",
-      "2024-06-06 07:44:54,467 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "data_new = mdf_reader.read(data.get(\"source\"), data_model_path=my_model_path)"
    ]
@@ -494,109 +366,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 15,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/html": [
-       "<div>\n",
-       "<style scoped>\n",
-       "    .dataframe tbody tr th:only-of-type {\n",
-       "        vertical-align: middle;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe tbody tr th {\n",
-       "        vertical-align: top;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe thead th {\n",
-       "        text-align: right;\n",
-       "    }\n",
-       "</style>\n",
-       "<table border=\"1\" class=\"dataframe\">\n",
-       "  <thead>\n",
-       "    <tr style=\"text-align: right;\">\n",
-       "      <th></th>\n",
-       "      <th>sentinal</th>\n",
-       "      <th>cvoyd</th>\n",
-       "      <th>year</th>\n",
-       "      <th>month</th>\n",
-       "      <th>day</th>\n",
-       "      <th>rest</th>\n",
-       "    </tr>\n",
-       "  </thead>\n",
-       "  <tbody>\n",
-       "    <tr>\n",
-       "      <th>0</th>\n",
-       "      <td>99 0</td>\n",
-       "      <td>3008501</td>\n",
-       "      <td>1845</td>\n",
-       "      <td>4</td>\n",
-       "      <td>1</td>\n",
-       "      <td>5404N 2354W                                   ...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>1</th>\n",
-       "      <td>99 0</td>\n",
-       "      <td>8103481</td>\n",
-       "      <td>1845</td>\n",
-       "      <td>4</td>\n",
-       "      <td>1</td>\n",
-       "      <td>4836N 2330W                        29291      ...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>2</th>\n",
-       "      <td>99 0</td>\n",
-       "      <td>3707311</td>\n",
-       "      <td>1845</td>\n",
-       "      <td>4</td>\n",
-       "      <td>1</td>\n",
-       "      <td>4643N15147W                                   ...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>3</th>\n",
-       "      <td>99 0</td>\n",
-       "      <td>2605971</td>\n",
-       "      <td>1845</td>\n",
-       "      <td>4</td>\n",
-       "      <td>1</td>\n",
-       "      <td>4454N 3015W                20200W             ...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>4</th>\n",
-       "      <td>99 0</td>\n",
-       "      <td>2506611</td>\n",
-       "      <td>1845</td>\n",
-       "      <td>4</td>\n",
-       "      <td>1</td>\n",
-       "      <td>4356N 2220W                                   ...</td>\n",
-       "    </tr>\n",
-       "  </tbody>\n",
-       "</table>\n",
-       "</div>"
-      ],
-      "text/plain": [
-       "  sentinal    cvoyd  year  month  day  \\\n",
-       "0     99 0  3008501  1845      4    1   \n",
-       "1     99 0  8103481  1845      4    1   \n",
-       "2     99 0  3707311  1845      4    1   \n",
-       "3     99 0  2605971  1845      4    1   \n",
-       "4     99 0  2506611  1845      4    1   \n",
-       "\n",
-       "                                                rest  \n",
-       "0  5404N 2354W                                   ...  \n",
-       "1  4836N 2330W                        29291      ...  \n",
-       "2  4643N15147W                                   ...  \n",
-       "3  4454N 3015W                20200W             ...  \n",
-       "4  4356N 2220W                                   ...  "
-      ]
-     },
-     "execution_count": 15,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "data_new.data[\"c99\"]"
    ]
@@ -610,7 +382,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -620,11 +392,6 @@
   }
  ],
  "metadata": {
-  "kernelspec": {
-   "display_name": "cdm_reader_mapper",
-   "language": "python",
-   "name": "cdm_reader_mapper"
-  },
   "language_info": {
    "codemirror_mode": {
     "name": "ipython",

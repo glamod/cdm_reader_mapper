@@ -6,7 +6,7 @@ After reading ICOADS or C-RAID data with the ``mdf_reader``, this data can be ma
 Workflow
 --------
 
-.. figure:: _static/images/imodel_diagram.svg
+.. figure:: _static/images/cdm_mapper_diagram.svg
     :width: 100%
 
     Simplified workflow of the ``cdm_mapper``
