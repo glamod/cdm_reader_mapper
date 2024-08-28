@@ -59,10 +59,10 @@
 .. |logo_c3s| image:: _static/images/logos_c3s/logo_c3s-392x154.png
         :width: 25%
         :target: https://climate.copernicus.eu/
-        
-.. |logo_copernicus| image:: _static/images/logos_c3s/copernicus.png   
+
+.. |logo_copernicus| image:: _static/images/logos_c3s/copernicus.png
         :width: 25%
-        :target: https://www.copernicus.eu/en      
+        :target: https://www.copernicus.eu/en
 
 .. |logo_ICOADS| image:: _static/images/logos_c3s/icoadsLogo.png
         :width: 20%
