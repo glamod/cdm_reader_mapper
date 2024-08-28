@@ -19,7 +19,9 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
-| Funding                    | |c3s| |noc| |ukmcas|                                           |
+| Funding                    | |c3s|                                                          |
++----------------------------+----------------------------------------------------------------+ 
+|                            | |noc| |ukmcas|                                                 |
 +----------------------------+----------------------------------------------------------------+
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
@@ -212,7 +214,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://github.com/glamod/cdm_reader_mapper/tags
         :alt: Tag
 
-.. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UK%20Marine%20and%20Climate%20Advisory%20Service-yellow.svg
+.. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UKMCAS-blue.svg
         :target: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
         :alt: UKMCAS
 
@@ -224,6 +226,6 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://zenodo.org/cdm_reader_mapper
  	      :alt: DOI
 
-.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-yellow.svg
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
         :alt: NOC
