@@ -11,6 +11,7 @@ New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
 * ``common.getting_files.load_file``: optionally, clear cache directory (:pull:`45`)
+* reworked readthedocs documentation for gathered ``cdm_reader_mapper`` package (:issue:`19`, :pull:`83`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
