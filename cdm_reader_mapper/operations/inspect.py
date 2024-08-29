@@ -22,7 +22,18 @@ def count_by_cat_i(series):
 
 
 def get_length(data):
-    """Get length of pandas object."""
+    """Get length of pandas object.
+
+    Parameters
+    ----------
+    data: pd.DataFrame, pd.io.parsers.TextFileReader
+        Input dataset
+
+    Returns
+    -------
+    int
+        Total row count
+    """
     if not isinstance(data, pd.io.parsers.TextFileReader):
         return len(data)
     else:
@@ -30,7 +41,20 @@ def get_length(data):
 
 
 def count_by_cat(data, col):
-    """Count unique values."""
+    """Count unique values.
+
+    Parameters
+    ----------
+    data: pd.DataFrame, pd.io.parsers.TextFileReader
+        Input dataset.
+    col: str, tuple
+        Name of the data column to be selected.
+
+    Returns
+    -------
+    dict
+        Dictionary containing number of unique values.
+    """
     if not isinstance(data, pd.io.parsers.TextFileReader):
         return count_by_cat_i(data[col])
     else:
