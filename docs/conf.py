@@ -62,10 +62,6 @@ extlinks = {
     "user": ("https://github.com/%s", "@%s"),
 }
 
-nbsphinx_execute = "never"
-nbsphinx_allow_errors = False
-
-
 autodoc_typehints = "description"
 autodoc_typehints_format = "fully-qualified"
 autodoc_typehints_description_target = "documented_params"
