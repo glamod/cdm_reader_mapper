@@ -386,13 +386,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.0671875"
      inkscape:cx="823.66032"
-     inkscape:cy="360.29283"
+     inkscape:cy="361.22987"
      inkscape:window-width="1920"
      inkscape:window-height="1137"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1">
+     inkscape:current-layer="g5">
     <inkscape:page
        x="0"
        y="0"
@@ -442,20 +442,7 @@
            x="0 4.5359998 14.832 20.52 30.42 36.666 52.433998 62.352001 68.706001 73.241997"
            y="0"
            sodipodi:role="line"
-           id="tspan5">informatio</tspan></text>
-    </g>
-    <g
-       id="g6"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text6"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,559.54667,161.37333)"
-         clip-path="url(#clipPath7)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:18px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0"
-           y="0"
-           id="tspan6">n</tspan></text>
+           id="tspan5">information</tspan></text>
     </g>
     <g
        id="g7"
