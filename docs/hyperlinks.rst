@@ -4,13 +4,17 @@
 
 .. _boolean pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.bool.html
 
-.. _CDM: cdm_latest.pdf
+.. _C-RAID: https://www.coriolis.eu.org/Observing-the-Ocean/DBCP-E-SURFMAR/C-RAID-Copernicus-in-situ-project
+
+.. _CDM: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
 
 .. _conda: https://docs.conda.io/en/latest/
 
 .. _dictionary: https://realpython.com/python-dicts
 
-.. _following guide: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
+.. _following ICOADS guide: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
+
+.. _following C-RAID guide: https://www.coriolis.eu.org/Data-Products
 
 .. _Github repository: https://github.com/glamod/mdf_reader
 
@@ -22,11 +26,17 @@
 
 .. _IPython: https://jupyter.readthedocs.io/en/latest/install.html
 
+.. _issue tracker: https://github.com/glamod/cdm_reader_mapper/issues
+
 .. _jupyter notebook: https://jupyter.org/install
 
-.. _jupyter notebooks: example_notebooks
+.. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
 .. _Missing data casting rules and indexing: https://pandas.pydata.org/pandas-docs/stable/user_guide/missing_data.html
+
+.. _NetCDF: https://www.unidata.ucar.edu/software/netcdf
+
+.. _pandas: https://pandas.pydata.org/docs/
 
 .. _pandas.DataFrame: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
 
@@ -44,9 +54,15 @@
 
 .. _US Maury: https://icoads.noaa.gov/maury.html
 
+.. _xarray: https://docs.xarray.dev/en/stable/
+
 .. |logo_c3s| image:: _static/images/logos_c3s/logo_c3s-392x154.png
         :width: 25%
         :target: https://climate.copernicus.eu/
+
+.. |logo_copernicus| image:: _static/images/logos_c3s/copernicus.png
+        :width: 25%
+        :target: https://www.copernicus.eu/en
 
 .. |logo_ICOADS| image:: _static/images/logos_c3s/icoadsLogo.png
         :width: 20%

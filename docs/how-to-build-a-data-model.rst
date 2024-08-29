@@ -11,18 +11,11 @@ How to build a data model
 
 The main steps to create a data model (or schema) for the mdf_reader are:
 
-1. Create a valid directory tree to hold the model **(mymodel)** as shown in the figure below. The correct directory path to store your schema is ``~/mdf_reader/data_models/library/``.
+1. Create a valid directory tree to hold the model **(mymodel)**. For more details see the structure of the **cdm_reader_mapper** toolbox.
 
-.. figure:: _static/images/schema.png
-    :width: 45%
+2. Create a valid **schema** file:
 
-    Data model directory
-
-2. Create a valid **schema** file under ``mdf_reader/data_models/library/mymodel/mymodel.json``:
-
-To create the schema file, two important aspects of the schema need to be clear beforehand; i) the order and field lengths of each element in the data input string, ii) do the information in the data input needs to be organised into sections, like ICOADS ``.imma`` data format. With this in mind, one can access all the schema file templates available from within the tool via::
-
-   template_names = mdf_reader.schemas.templates()
+To create the schema file, two important aspects of the schema need to be clear beforehand; i) the order and field lengths of each element in the data input string, ii) do the information in the data input needs to be organised into sections, like ICOADS ``.imma`` data format.
 
 These templates have been created to ease the generation of new valid schema files, these templates cover from a basic schema format to a more complex one:
 
@@ -30,12 +23,7 @@ These templates have been created to ease the generation of new valid schema fil
 - With no sections or with sections: *_basic* or *_sections*
 - More complex options include blocks of sections which in the case of ICOADS data are exclusive for certain decks (e.g. deck ``td11``) or blocks of sections that are optional: ``_complex_exc.json`` or ``_complex_opt.json``
 
-To copy a template to edit you can run the following functions::
-
-   mdf_reader.schemas.copy_template(template_name,out_path=file_path)
-
-
-3. Create valid code tables under ``../library/mymodel/code_tables/table_name[i].json`` if the data model includes code tables.
+3. Create valid code tables if the data model includes code tables.
 
 The general structure of a schema and the description of each attribute is explain in the table below:
 

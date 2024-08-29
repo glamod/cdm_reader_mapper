@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper.common.getting_files import load_file
+from cdm_reader_mapper.common import load_file
 
 
 class test_data:
