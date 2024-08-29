@@ -103,6 +103,7 @@ def _write_csv_files(
         default = imapping.get("default")
         fill_value = imapping.get("fill_value")
         decimal_places = imapping.get("decimal_places")
+
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
