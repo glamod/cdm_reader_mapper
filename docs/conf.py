@@ -62,10 +62,6 @@ extlinks = {
     "user": ("https://github.com/%s", "@%s"),
 }
 
-nbsphinx_execute = "never"
-nbsphinx_allow_errors = False
-
-
 autodoc_typehints = "description"
 autodoc_typehints_format = "fully-qualified"
 autodoc_typehints_description_target = "documented_params"
@@ -82,7 +78,7 @@ napoleon_use_ivar = True
 templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = [".rst"]
+source_suffix = {".rst": "restructuredtext"}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -92,7 +88,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "cdm_reader_mapper"
-copyright = "2019-2023, David Perry, Irene Perez Gonzales, Beatriz Recinos, Andreas Wernecke and Ludwig Lierhammer"
+copyright = "2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

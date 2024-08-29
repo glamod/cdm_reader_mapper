@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.getting_files import load_file
+from cdm_reader_mapper.common import load_file
 
 cdm_tables = [
     "header-{}.psv",
