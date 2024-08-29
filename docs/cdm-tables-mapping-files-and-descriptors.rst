@@ -4,7 +4,7 @@
 CDM tables mapping files and descriptors
 ========================================
 
-The following section details the mapping sequence that the cdm-mapper tool follows to map meteorological data to a CDM element.
+The following section details the mapping sequence that the ``cdm_mapper`` tool follows to map meteorological data to a CDM element.
 
 We will use **part** of the ``header.json`` python dictionary from the ``icoads_r3000`` IMMA1 model to explain how we map an element. In the table below we explain all **elements** attributes and/or descriptors, that are needed in each python dictionary or ``.json`` file, for a successful mapping of the input meteorological data.
 
@@ -118,11 +118,11 @@ d. **Define the number of decimal places in the CDM element attributes, so this 
 Defining mapping functions
 ==========================
 
-In the file ``imodel.py`` the user can define any function to **transform** any element in the data model. The python file needs to be accompanied with ``__init__.py`` file so all the functions written in ``imodel.py`` can be imported by the **cdm-mapper** toolbox.
+In the file ``imodel.py`` the user can define any function to **transform** any element in the data model. The python file needs to be accompanied with ``__init__.py`` file so all the functions written in ``imodel.py`` can be imported by the **cdm_mapper** toolbox.
 
 .. note:: Remember that any new python dependency that you ``import`` the top of your ``imodel.py`` must be installed also in your python environment.
 
-The **cdm-mapper** follows a set of rules that need to be taken into account when it comes to adding functions to the ``imodel.py`` script.
+The **cdm_mapper** follows a set of rules that need to be taken into account when it comes to adding functions to the ``imodel.py`` script.
 
 - The **cdm-mapper** only parses elements to the transforming function (e.g. Year, day or hour) or ``code_table`` mapping (e.g. platform_subtype), where none of the elements to be map (e.g. Year, day, hour or platform_subtype) have missing values.
 

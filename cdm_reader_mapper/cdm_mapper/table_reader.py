@@ -92,29 +92,40 @@ def read_tables(
         path to the file
     tb_id:
         any identifier including wildcards if required extension, defaulting to 'psv'
-    cdm_subset: specifies a subset of tables or a single table.
-            - For multiple subsets of tables: This option will return a pandas.Dataframe that is multi-index at
-                the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
-            - For a single table: the function returns a pandas.Dataframe with a simple indexing for the columns.
+    cdm_subset:
+        specifies a subset of tables or a single table.
+
+        - For multiple subsets of tables:
+          This function returns a pandas.DataFrame that is multi-index at
+          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+
+        - For a single table:
+          This function returns a pandas.DataFrame with a simple indexing for the columns.
 
     delimiter:
         default is '|'
     extension:
         default is psv
-    col_subset: a python dictionary specifying the section or sections of the file to read
-            - For multiple sections of the tables:
-                e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
-            - For a single section:
-                e.g. ``list type object col_subset = [columns]``
-                This variable assumes that the column names are all conform to the cdm field names
+    col_subset:
+        a python dictionary specifying the section or sections of the file to read
+
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
+
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
 
     log_level: Level of logging messages to save
     na_values: specifies the format of NaN values
 
     Returns
     -------
-    pandas.Dataframe: either the entire file or a subset of it.
-    logger.error: logs specific messages if there is any error.
+    pandas.DataFrame: either the entire file or a subset of it.
+
+    Note
+    ----
+    Logs specific messages if there is any error.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     # Because how the printers are written, they modify the original data frame!,
