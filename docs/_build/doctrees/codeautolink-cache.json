@@ -1,5 +1,4 @@
 {
-  "api": [],
   "cdm-tables-mapping-files-and-descriptors": [],
   "contributing": [],
   "data-models": [],
@@ -12,6 +11,9 @@
   "changes": [],
   "tool-overview_mapper": [],
   "hyperlinks": [],
+  "tool-overview_reader": [],
+  "tool-set-up": [],
+  "api": [],
   "index": [],
   "readme": [
     {
@@ -53,7 +55,5 @@
       },
       "doc_lineno": 96
     }
-  ],
-  "tool-overview_reader": [],
-  "tool-set-up": []
+  ]
 }

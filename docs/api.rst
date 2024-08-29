@@ -23,3 +23,9 @@ This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
 .. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime.correct
    :noindex:
+   
+.. autofunction:: cdm_reader_mapper.operations.inspect.get_length
+   :noindex:
+   
+.. autofunction:: cdm_reader_mapper.operations.inspect.count_by_cat
+   :noindex:       
