@@ -170,7 +170,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow
+.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green
    	    :target: https://fair-software.eu
 	      :alt: FAIR-software
 
