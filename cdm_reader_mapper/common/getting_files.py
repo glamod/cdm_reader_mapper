@@ -108,7 +108,7 @@ def _get_file(
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
-    branch: str = "icoads_wd",
+    branch: str = "main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
     clear_cache: bool = False,
