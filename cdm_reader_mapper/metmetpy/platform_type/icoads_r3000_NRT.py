@@ -51,11 +51,13 @@ def deck_792_imma1(data):
         & (data[pt_col] == pt)
     )
 
+    if not any(loc):
+      return data
+
     try:
         data.loc[data[pt_col][loc], pt_col] = buoys
     except KeyError:
         print("Data stays untouched.")
-
     return data
 
 
