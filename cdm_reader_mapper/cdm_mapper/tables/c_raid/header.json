@@ -38,7 +38,8 @@
   },
   "primary_station_id": {
     "sections": "drifter_characteristics",
-    "elements": "DRIFTER_WMO_NUMBER"
+    "elements": "DRIFTER_WMO_NUMBER",
+    "fill_value": "UNKNOWN"
   },
   "station_record_number": {
     "default": 1
