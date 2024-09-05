@@ -309,6 +309,12 @@ class Configurator:
 
     def open_netcdf(self):
         """Open netCDF to pd.Series."""
+        def replace_empty_strings(series):
+            if series.dtype == "object":
+                series = series.str.decode("utf-8")
+                series = series.str.strip().replace("", None)
+            return series
+
         missing_values = []
         attrs = {}
         renames = {}
@@ -341,9 +347,9 @@ class Configurator:
         df = df.assign(**attrs)
         for column in disables:
             df[column] = np.nan
+        df = df.apply(lambda x: replace_empty_strings(x))
         df["missing_values"] = [missing_values] * len(df)
         return df
-
 
 class _FileReader:
     def __init__(
