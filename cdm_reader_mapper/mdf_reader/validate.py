@@ -13,6 +13,20 @@ from .code_tables import code_tables
 from .schema import schemas
 
 
+def validate_datetime(elements, data):
+    """DOCUMENTATION."""
+
+    def is_date_object(object):
+        if hasattr(object, "year"):
+            return True
+
+    mask = pd.DataFrame(index=data.index, data=False, columns=elements)
+    mask[elements] = (
+        data[elements].apply(np.vectorize(is_date_object)) | data[elements].isna()
+    )
+    return mask
+
+
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
     # Find thresholds in schema. Flag if not available -> warn
@@ -182,11 +196,9 @@ def validate(data, mask0, schema, code_tables_path, disables):
         )
 
     # 3. Datetime elements
-    # Those declared as such in element_atts
-    # Because of the way they are converted, read into datetime,
-    # they should already be NaT if they not validate as a valid datetime;
-    # let's check: hurray! they are!
-    mask[datetime_elements] = data[datetime_elements].notna()
+    mask[datetime_elements] = validate_datetime(
+        datetime_elements, data
+    )  # data[datetime_elements].notna()
 
     # 4. str elements
     mask[str_elements] = validate_str(str_elements, data, element_atts)
