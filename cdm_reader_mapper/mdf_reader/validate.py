@@ -54,7 +54,7 @@ def validate_numeric(elements, data, schema):
     return mask
 
 
-def validate_str(elements, data, schema):
+def validate_str(elements, data):
     """DOCUMENTATION."""
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
@@ -201,7 +201,7 @@ def validate(data, mask0, schema, code_tables_path, disables):
     )  # data[datetime_elements].notna()
 
     # 4. str elements
-    mask[str_elements] = validate_str(str_elements, data, element_atts)
+    mask[str_elements] = validate_str(str_elements, data)
 
     # 5. Set False values
     mask0_n = mask0[validated_columns].fillna(False)
