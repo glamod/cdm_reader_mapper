@@ -201,7 +201,7 @@ class result_data:
         )
 
     @property
-    def expected_craid(self):
+    def expected_1260810(self):
         return self._get_data_dict(
             "1260810_2004-12-20_subset",
             "raid",
