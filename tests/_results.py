@@ -203,7 +203,7 @@ class result_data:
     @property
     def expected_craid(self):
         return self._get_data_dict(
-            "craid",
+            "1260810_2004-12-20_subset",
             "raid",
             "c",
         )
