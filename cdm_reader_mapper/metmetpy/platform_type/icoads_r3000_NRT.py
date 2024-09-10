@@ -50,13 +50,7 @@ def deck_792_imma1(data):
         & (data[sid_col] == sid)
         & (data[pt_col] == pt)
     )
-
-    try:
-        data.loc[data[pt_col][loc], pt_col] = buoys
-    except KeyError:
-        print("Data stays untouched.")
-
-    return data
+    return overwrite_data(data, loc, pt_col, buoys)
 
 
 def deck_992_imma1(data):

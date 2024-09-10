@@ -12,6 +12,7 @@ New features and enhancements
 * ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
 * ``common.getting_files.load_file``: optionally, clear cache directory (:pull:`45`)
 * reworked readthedocs documentation for gathered ``cdm_reader_mapper`` package (:issue:`19`, :pull:`83`)
+* ``mdf_reader``: new validation function for datetime objects (:pull:`89`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -40,6 +41,8 @@ Internal changes
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 * add FOSSA license scanning to github workflows (:pull:`80`)
 * add ``cdm_reader_mapper`` author list including ORCID iD's (:pull:`38`, :pull:`49`)
+* ``mdf_reader``: replace empty strings with missing values (:pull:`89`)
+* ``metmetpy``: use function ``overwrite_data`` in all platform type correction functions (:pull:`89`)
 
 Bug fixes
 ^^^^^^^^^
