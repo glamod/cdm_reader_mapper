@@ -57,7 +57,7 @@ from ._testing_cdm_suite import _testing_suite
         ("103_792", "icoads_r3000_NRT", None, None, "103_792", None, True, {}),
         ("114_992", "icoads_r3000_NRT", None, None, "114_992", None, True, {}),
         ("gcc_mix", "gcc_mapping", None, None, "mix_out", None, True, {}),
-        ("craid_1260810", "c_raid", None, None, "craid", None, True, {}),
+        ("craid_1260810", "c_raid", None, None, "1260810", None, True, {}),
         (
             "063_714",
             "icoads_r3000_d714",
