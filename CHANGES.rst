@@ -26,6 +26,8 @@ Breaking changes
 * ``cdm_mapper`` does not need any attribute information from ``mdf_reader`` (:issue:`66`, :pull:`67`)
 * ``cdm_mapper``: map ICOADS wind direction data (``361`` -> ``0``; ``362`` -> ``np.nan``) (:pull:`82`)
 * ``cdm_mapper``: set fill_value to ``UNKNOWN`` for C-RAID's ``primary_station_id`` (:pull:`93`)
+* ``cdm_mapper``: map C-RAID quality flags to CDM quality flags (:pull:`94`)
+
 
 Internal changes
 ^^^^^^^^^^^^^^^^
