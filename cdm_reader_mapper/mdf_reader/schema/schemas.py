@@ -9,7 +9,7 @@ requirements of the data reader tool
 
 from __future__ import annotations
 
-import json
+#import json
 import logging
 import os
 
@@ -111,7 +111,9 @@ def _read_schema(schema):
     return schema
 
 
-def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
+def read_schema(
+    data_model=None, release=None, deck=None, ext_schema_path=None, ext_schema_file=None
+):
     """
     Read a data model schema file.
 
@@ -121,12 +123,18 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
 
     Keyword Arguments
     -----------------
-    schema_name : str, optional
-        The name of data model to read. This is for
+    data_model: str, optional
+        The name of the data model to read. This is for
         data models included in the tool
-    ext_schema_path : str, optional
+    release: str, optional
+        The name of the data model release. If chosen, overwrite data model schema.
+        `data_model` is needed.
+    deck: str, optional
+        The name of the data model deck. If chosen, overwrite data model release schema.
+        `data_model` is needed.
+    ext_schema_path: str, optional
         The path to the external data model schema file
-    ext_schema_file : str, optional
+    ext_schema_file: str, optional
         The external data model schema file
 
 
@@ -140,34 +148,48 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
 
     """
     # 1. Validate input
-    if schema_name:
-        if schema_name not in properties.supported_data_models:
-            logging.warning(f"Input data model {schema_name} not supported.")
+    if data_model:
+        if data_model not in properties.supported_data_models:
+            logging.error(f"Input data model {data_model} not supported.")
+            return
         else:
             schema_path = f"{properties._base}.schema"
-            schema_data = None
-            try:
-                schema_data = get_files(schema_path)
-            except ModuleNotFoundError:
-                logging.error(f"Can't find input schema files in {schema_data}")
-                return
-            schema_file = list(schema_data.glob(f"{schema_name}.json"))[0]
+            schema_data = get_files(schema_path)
+            schema_files = list(schema_data.glob(f"{data_model}.json"))
+        if release:
+            schema_path = f"{schema_path}.{release}"
+            schema_data = get_files(schema_path)
+            release_files = list(schema_data.glob(f"{data_model}_{release}.json"))
+            if len(release_files) == 0:
+                logging.warning(f"Input data model release {release} not supported.")
+            schema_files += release_files
+        if deck:
+            schema_path = f"{schema_path}.{deck}"
+            schema_data = get_files(schema_path)
+            deck_files = list(schema_data.glob(f"{data_model}_{release}_{deck}.json"))
+            if len(deck_files) == 0:
+                logging.warning(f"Input data model release deck {deck} not supported.")
+            schema_files += deck_files
     else:
         if ext_schema_file is None:
             schema_path = os.path.abspath(ext_schema_path)
             schema_name = os.path.basename(schema_path)
-            schema_file = os.path.join(schema_path, schema_name + ".json")
+            schema_files = os.path.join(schema_path, schema_name + ".json")
         else:
-            schema_file = ext_schema_file
+            schema_files = ext_schema_file
 
-        if not os.path.isfile(schema_file):
-            logging.error(f"Can't find input schema file {schema_file}")
+        if not os.path.isfile(schema_files):
+            logging.error(f"Can't find input schema file {schema_files}")
             return
 
+    if isinstance(schema_files, str):
+        schema_files = [schema_files]
+
     # 2. Get schema
-    with open(schema_file) as fileObj:
-        schema = json.load(fileObj)
-        schema["name"] = schema_file
+    #with open(schema_file) as fileObj:
+    #    schema = json.load(fileObj)
+    #    schema["name"] = schema_files
+    schema = {}
 
     # 3. Expand schema
     # Fill in the initial schema to "full complexity": to homogenize schema,
