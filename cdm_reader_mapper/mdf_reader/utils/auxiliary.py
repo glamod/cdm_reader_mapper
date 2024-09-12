@@ -358,6 +358,8 @@ class _FileReader:
         self,
         source,
         data_model=None,
+        release=None,
+        deck=None,
         data_model_path=None,
     ):
         # 0. VALIDATE INPUT
@@ -384,7 +386,9 @@ class _FileReader:
             self.code_tables_path = get_files(model_path)
             self.imodel = data_model
             logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(schema_name=data_model)
+            self.schema = schemas.read_schema(
+                data_model=data_model, release=release, deck=deck
+            )
         else:
             self.code_tables_path = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
