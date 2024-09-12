@@ -9,7 +9,7 @@ requirements of the data reader tool
 
 from __future__ import annotations
 
-#import json
+# import json
 import logging
 import os
 
@@ -186,7 +186,7 @@ def read_schema(
         schema_files = [schema_files]
 
     # 2. Get schema
-    #with open(schema_file) as fileObj:
+    # with open(schema_file) as fileObj:
     #    schema = json.load(fileObj)
     #    schema["name"] = schema_files
     schema = {}

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, object_types, supported_data models  # noqa
+from ..properties import models, numeric_types, object_types, supported_data  # noqa
 
 _base = "cdm_reader_mapper.mdf_reader"
 
