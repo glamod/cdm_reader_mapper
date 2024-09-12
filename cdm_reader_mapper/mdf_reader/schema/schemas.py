@@ -142,11 +142,7 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
     # 1. Validate input
     if schema_name:
         if schema_name not in properties.supported_data_models:
-            print(f"ERROR: \n\tInput data model {schema_name} not supported.")
-            print(
-                "See mdf_reader.properties.supported_data_models for supported data models"
-            )
-            return
+            logging.warning(f"Input data model {schema_name} not supported.")
         else:
             schema_path = f"{properties._base}.schema"
             schema_data = None

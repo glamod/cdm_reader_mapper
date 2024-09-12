@@ -6,37 +6,7 @@ from ..properties import numeric_types, object_types  # noqa
 
 _base = "cdm_reader_mapper.mdf_reader"
 
-supported_data_models = [
-    "gcc_immt",
-    "imma1",
-    "imma1_d701",
-    "imma1_d702",
-    "imma1_d704",
-    "imma1_d705-707",
-    "imma1_d714",
-    "imma1_d721",
-    "imma1_d730",
-    "imma1_d781",
-    "imma1_nodt",
-    "td11",
-    "td11_d110",
-    "c_raid",
-]
-
 open_file = {
-    "gcc_immt": "pandas",
-    "imma1": "pandas",
-    "imma1_d701": "pandas",
-    "imma1_d702": "pandas",
-    "imma1_d704": "pandas",
-    "imma1_d705-707": "pandas",
-    "imma1_d714": "pandas",
-    "imma1_d721": "pandas",
-    "imma1_d730": "pandas",
-    "imma1_d781": "pandas",
-    "imma1_nodt": "pandas",
-    "td11": "pandas",
-    "td11_d110": "pandas",
     "c_raid": "netcdf",
 }
 
