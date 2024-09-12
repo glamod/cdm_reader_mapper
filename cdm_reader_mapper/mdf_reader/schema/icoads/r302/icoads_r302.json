@@ -1,6 +1,6 @@
 {
   "header": {
-    "format": "fixed_width",
+    "format": "fixed_width"
   },
   "sections": {
     "core": {
