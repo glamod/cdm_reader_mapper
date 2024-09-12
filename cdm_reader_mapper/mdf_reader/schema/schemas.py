@@ -47,10 +47,18 @@ def _combine_schemas(schema_files):
             json_dict = json.load(fileObj)
         return json_dict
 
+    def update_dict(old, new):
+        for k, v in new.items():
+            if isinstance(v, dict):
+                old[k] = update_dict(new[k], v)
+            else:
+                old[k] = v
+        return old
+
     schema = {}
     for schema_file in schema_files:
         schema_ = open_json_file(schema_file)
-        schema.update(schema_)
+        schema = update_dict(schema, schema_)
     return schema
 
 
@@ -168,7 +176,7 @@ def read_schema(
             logging.error(f"Input data model {data_model} not supported.")
             return
         else:
-            schema_path = f"{properties._base}.schema"
+            schema_path = f"{properties._base}.schema.{data_model}"
             schema_data = get_files(schema_path)
             schema_files = list(schema_data.glob(f"{data_model}.json"))
         if release:
@@ -202,7 +210,8 @@ def read_schema(
 
     # 2. Get schema
     schema = _combine_schemas(schema_files)
-
+    print(schema)
+    exit()
     # 3. Expand schema
     # Fill in the initial schema to "full complexity": to homogenize schema,
     # explicitly add info that is implicit to given situations/data models
