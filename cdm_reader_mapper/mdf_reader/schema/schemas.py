@@ -39,12 +39,12 @@ def convert_dtype_to_default(dtype, section, element):
     return dtype
 
 
-def _read_schema(schema, schema_file=""):
+def _read_schema(schema):
     """DOCUMENTATION."""
     if not schema["header"]:
         if not schema["sections"]:
             logging.error(
-                f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema_file}"
+                f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema['name']}"
             )
             return
         schema["header"] = dict()
@@ -57,7 +57,7 @@ def _read_schema(schema, schema_file=""):
     if not schema.get("sections"):
         if not schema.get("elements"):
             logging.error(
-                f"Data elements not defined in data model schema file {schema_file} under key 'elements' "
+                f"Data elements not defined in data model schema file {schema['name']} under key 'elements' "
             )
             return
         schema["sections"] = {
@@ -167,6 +167,7 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
     # 2. Get schema
     with open(schema_file) as fileObj:
         schema = json.load(fileObj)
+        schema["name"] = schema_file
 
     # 3. Expand schema
     # Fill in the initial schema to "full complexity": to homogenize schema,
@@ -176,7 +177,7 @@ def read_schema(schema_name=None, ext_schema_path=None, ext_schema_file=None):
     # REPORTS PER RECORD case below if we ever use it!
     # Currently only supported case: one report per record (line)
     # 3.1. First check for no header case: sequential sections
-    return _read_schema(schema, schema_file=schema_file)
+    return _read_schema(schema)
 
 
 def df_schema(df_columns, schema):
