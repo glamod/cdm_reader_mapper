@@ -320,7 +320,7 @@ def read(
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
-    mrd = data_model.split["_"]
+    mrd = data_model.split("_")
     data_model = get_list_element(mrd, 0)
     release = get_list_element(mrd, 1)
     deck = get_list_element(mrd, 2)
