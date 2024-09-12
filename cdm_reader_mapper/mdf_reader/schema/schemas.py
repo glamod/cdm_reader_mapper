@@ -9,7 +9,7 @@ requirements of the data reader tool
 
 from __future__ import annotations
 
-# import json
+import json
 import logging
 import os
 
@@ -37,6 +37,21 @@ def convert_dtype_to_default(dtype, section, element):
         )
         return properties.pandas_int
     return dtype
+
+
+def _combine_schemas(schema_files):
+    """DOCUMENTATION."""
+
+    def open_json_file(ifile):
+        with open(ifile) as fileObj:
+            json_dict = json.load(fileObj)
+        return json_dict
+
+    schema = {}
+    for schema_file in schema_files:
+        schema_ = open_json_file(schema_file)
+        schema.update(schema_)
+    return schema
 
 
 def _read_schema(schema):
@@ -186,10 +201,7 @@ def read_schema(
         schema_files = [schema_files]
 
     # 2. Get schema
-    # with open(schema_file) as fileObj:
-    #    schema = json.load(fileObj)
-    #    schema["name"] = schema_files
-    schema = {}
+    schema = _combine_schemas(schema_files)
 
     # 3. Expand schema
     # Fill in the initial schema to "full complexity": to homogenize schema,
