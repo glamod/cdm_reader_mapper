@@ -10,7 +10,7 @@ from ._testing_cdm_suite import _testing_suite
 @pytest.mark.parametrize(
     "dname, cdm_name, cdm_subset, codes_subset, suffix, out_path, mapping, drops, mdf_kwargs",
     [
-        ("096_702", "icoads_r3000_d702", None, None, "096_702", None, True, {}),
+        ("096_702", "icoads_r3000_d702", None, None, "096_702", None, True, None, {}),
         (
             "096_702",
             "icoads_r3000_d702",
