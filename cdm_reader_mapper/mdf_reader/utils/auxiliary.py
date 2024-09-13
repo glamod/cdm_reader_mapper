@@ -427,11 +427,12 @@ class _FileReader:
                             del self.schema["sections"][section]["elements"][data_var][
                                 attr
                             ]
+
     def _select_years(self, df):
         if self.year_init is None and self.year_end is None:
-            return df 
+            return df
         years = df[properties.year_column[self.data_model]].astype(int)
-        mask = pd.Series([True]*len(years))
+        mask = pd.Series([True] * len(years))
         if self.year_init:
             mask[years < self.year_init] = False
         if self.year_end:
