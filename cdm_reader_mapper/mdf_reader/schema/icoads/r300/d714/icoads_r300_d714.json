@@ -2,9 +2,9 @@
   "sections": {
     "c99": {
       "header": {
-        "sentinal": "99 0",
         "delimiter": ",",
-        "field_layout": "fixed_width"
+        "field_layout": "fixed_width",
+        "disable_read": false
       },
       "elements": {
         "ATTI": {
