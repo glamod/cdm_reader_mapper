@@ -40,6 +40,23 @@ open_file = {
     "c_raid": "netcdf",
 }
 
+year_column = {
+    "gcc_immt": "YR",
+    "imma1": ("core", "YR"),
+    "imma1_d701": ("core", "YR"),
+    "imma1_d702": ("core", "YR"),
+    "imma1_d704": ("core", "YR"),
+    "imma1_d705-707": ("core", "YR"),
+    "imma1_d714": ("core", "YR"),
+    "imma1_d721": ("core", "YR"),
+    "imma1_d730": ("core", "YR"),
+    "imma1_d781": ("core", "YR"),
+    "imma1_nodt": ("core", "YR"),
+    "td11": ("core1", "YEAR"),
+    "td11_d110": ("core1", "YEAR"),
+    "c_raid": ("drifter_measurements", "JULD"),
+}
+
 pandas_dtypes = {}
 for dtype in object_types:
     pandas_dtypes[dtype] = "object"
