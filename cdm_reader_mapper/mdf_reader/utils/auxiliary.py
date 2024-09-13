@@ -431,11 +431,11 @@ class _FileReader:
         if self.year_init is None and self.year_end is None:
             return df 
         years = df[properties.year_column[self.data_model]].astype(int)
-        mask = pd.DataFrame([True]*len(years), columns=[properties.year_column[self.data_model]])
+        mask = pd.Series([True]*len(years))
         if self.year_init:
-            mask = years >= self.year_init
+            mask[years < self.year_init] = False
         if self.year_end:
-            mask = years <= self.year_end
+            mask[years > self.year_end] = False
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
