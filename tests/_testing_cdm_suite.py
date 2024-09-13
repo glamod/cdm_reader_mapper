@@ -79,10 +79,10 @@ def _testing_suite(
     **kwargs,
 ):
     def drop_rows(df):
-        if drop == "all":
-            return (pd.DataFrame,)
-        if drops:
-            df = df.drop(drops).reset_index(drop=True)
+        if drops == "all":
+            return df.drop(df.index)
+        elif drops:
+            return df.drop(drops).reset_index(drop=True)
         return df
 
     exp = "expected_" + suffix

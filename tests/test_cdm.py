@@ -53,7 +53,7 @@ from ._testing_cdm_suite import _testing_suite
             "mix_out",
             None,
             True,
-            [0, 1, 2, 3, 4, 5],
+            [0, 1, 2, 3, 4],
             {"year_init": 2002},
         ),
     ],
