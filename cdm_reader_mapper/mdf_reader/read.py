@@ -316,5 +316,9 @@ def read(
         filename=None,
     )
     return MDFFileReader(
-        source=source, data_model=data_model, data_model_path=data_model_path, year_init=year_init, year_end=year_end,
+        source=source,
+        data_model=data_model,
+        data_model_path=data_model_path,
+        year_init=year_init,
+        year_end=year_end,
     ).read(**kwargs)
