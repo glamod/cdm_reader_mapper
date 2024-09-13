@@ -48,11 +48,17 @@ def _combine_schemas(schema_files):
         return json_dict
 
     def update_dict(old, new):
-        for k, v in new.items():
-            if isinstance(v, dict):
-                old[k] = update_dict(new[k], v)
+        keys = list(old.keys()) + list(new.keys())
+        keys = list(set(keys))
+        for key in keys:
+            if key not in new.keys():
+                continue
+            elif key not in old.keys():
+                old[key] = new[key]
+            elif isinstance(new[key], dict):
+                old[key] = update_dict(old[key], new[key])
             else:
-                old[k] = v
+                old[key] = new[key]
         return old
 
     schema = {}
@@ -210,8 +216,8 @@ def read_schema(
 
     # 2. Get schema
     schema = _combine_schemas(schema_files)
-    print(schema)
-    exit()
+    schema["name"] = schema_files
+
     # 3. Expand schema
     # Fill in the initial schema to "full complexity": to homogenize schema,
     # explicitly add info that is implicit to given situations/data models
