@@ -80,7 +80,7 @@ def _testing_suite(
 ):
     def drop_rows(df):
         if drop == "all":
-            return pd.DataFrame,
+            return (pd.DataFrame,)
         if drops:
             df = df.drop(drops).reset_index(drop=True)
         return df
