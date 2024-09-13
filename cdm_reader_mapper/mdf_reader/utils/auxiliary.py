@@ -427,6 +427,17 @@ class _FileReader:
                             del self.schema["sections"][section]["elements"][data_var][
                                 attr
                             ]
+    def _select_years(self, df):
+        if self.year_init is None and self.year_end is None:
+            return df 
+        years = df[properties.year_column[self.data_model]].astype(int)
+        mask = pd.DataFrame([True]*len(years), columns=[properties.year_column[self.data_model]])
+        if self.year_init:
+            mask = years >= self.year_init
+        if self.year_end:
+            mask = years <= self.year_end
+        index = mask[mask].index
+        return df.iloc[index].reset_index(drop=True)
 
     def _get_configurations(self, order, valid):
         config_dict = Configurator(
@@ -490,6 +501,7 @@ class _FileReader:
 
         missing_values_ = df["missing_values"]
         del df["missing_values"]
+        df = self._select_years(df)
         missing_values = self._set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
         df = df.where(df.notnull(), np.nan)
