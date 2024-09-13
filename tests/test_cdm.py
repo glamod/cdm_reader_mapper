@@ -11,7 +11,7 @@ from ._testing_cdm_suite import _testing_suite
     "dname, cdm_name, cdm_subset, codes_subset, suffix, out_path, mapping, drops, mdf_kwargs",
     [
         ("063_714", "icoads_r3000_d714", None, None, "063_714", ".", True, None, {}),
-        #(
+        # (
         #    "063_714",
         #    None,
         #    None,
@@ -21,8 +21,8 @@ from ._testing_cdm_suite import _testing_suite
         #    False,
         #    None,
         #    {"sections": ["core", "c99"]},
-        #),
-        #(
+        # ),
+        # (
         #    "069_701",
         #    "icoads_r3000_d701_type1",
         #    None,
@@ -32,8 +32,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #(
+        # ),
+        # (
         #    "069_701",
         #    "icoads_r3000_d701_type2",
         #    None,
@@ -43,11 +43,11 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #("096_702", "icoads_r3000_d702", None, None, "096_702", None, True, None, {}),
-        #("144_703", "icoads_r3000", None, None, "144_703", None, True, None, {}),
-        #("125_704", "icoads_r3000_d704", None, None, "125_704", None, True, None, {}),
-        #(
+        # ),
+        # ("096_702", "icoads_r3000_d702", None, None, "096_702", None, True, None, {}),
+        # ("144_703", "icoads_r3000", None, None, "144_703", None, True, None, {}),
+        # ("125_704", "icoads_r3000_d704", None, None, "125_704", None, True, None, {}),
+        # (
         #    "085_705",
         #    "icoads_r3000_d705-707",
         #    None,
@@ -57,8 +57,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #(
+        # ),
+        # (
         #    "084_706",
         #    "icoads_r3000_d705-707",
         #    None,
@@ -68,8 +68,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #(
+        # ),
+        # (
         #    "098_707",
         #    "icoads_r3000_d705-707",
         #    None,
@@ -79,19 +79,19 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #("125_721", "icoads_r3000_d721", None, None, "125_721", None, True, None, {}),
-        #("133_730", "icoads_r3000_d730", None, None, "133_730", None, True, None, {}),
-        #("143_781", "icoads_r3000_d781", None, None, "143_781", None, True, None, {}),
-        #("103_794", "icoads_r3000_NRT", None, None, "103_794", None, True, None, {}),
-        #("091_201", "icoads_r3000", None, None, "091_201", None, True, None, {}),
-        #("077_892", "icoads_r3000", None, None, "077_892", None, True, None, {}),
-        #("147_700", "icoads_r3000", None, None, "147_700", None, True, None, {}),
-        #("103_792", "icoads_r3000_NRT", None, None, "103_792", None, True, None, {}),
-        #("114_992", "icoads_r3000_NRT", None, None, "114_992", None, True, None, {}),
-        #("gcc_mix", "gcc_mapping", None, None, "mix_out", None, True, None, {}),
-        #("craid_1260810", "c_raid", None, None, "1260810", None, True, None, {}),
-        #(
+        # ),
+        # ("125_721", "icoads_r3000_d721", None, None, "125_721", None, True, None, {}),
+        # ("133_730", "icoads_r3000_d730", None, None, "133_730", None, True, None, {}),
+        # ("143_781", "icoads_r3000_d781", None, None, "143_781", None, True, None, {}),
+        # ("103_794", "icoads_r3000_NRT", None, None, "103_794", None, True, None, {}),
+        # ("091_201", "icoads_r3000", None, None, "091_201", None, True, None, {}),
+        # ("077_892", "icoads_r3000", None, None, "077_892", None, True, None, {}),
+        # ("147_700", "icoads_r3000", None, None, "147_700", None, True, None, {}),
+        # ("103_792", "icoads_r3000_NRT", None, None, "103_792", None, True, None, {}),
+        # ("114_992", "icoads_r3000_NRT", None, None, "114_992", None, True, None, {}),
+        # ("gcc_mix", "gcc_mapping", None, None, "mix_out", None, True, None, {}),
+        # ("craid_1260810", "c_raid", None, None, "1260810", None, True, None, {}),
+        # (
         #    "063_714",
         #    "icoads_r3000_d714",
         #    ["header", "observations-sst"],
@@ -101,8 +101,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #(
+        # ),
+        # (
         #    "063_714",
         #    "icoads_r3000_d714",
         #    None,
@@ -112,8 +112,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {},
-        #),
-        #(
+        # ),
+        # (
         #    "063_714",
         #    "icoads_r3000_d714",
         #    None,
@@ -123,8 +123,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    None,
         #    {"chunksize": 3},
-        #),
-        #(
+        # ),
+        # (
         #    "063_714",
         #    "icoads_r3000_d714",
         #    None,
@@ -134,8 +134,8 @@ from ._testing_cdm_suite import _testing_suite
         #    False,
         #    None,
         #    {"sections": ["c99"], "chunksize": 3},
-        #),
-        #(
+        # ),
+        # (
         #    "096_702",
         #    "icoads_r3000_d702",
         #    None,
@@ -145,8 +145,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    [0, 1, 2, 3, 4],
         #    {"year_init": 1874},
-        #),
-        #(
+        # ),
+        # (
         #    "096_702",
         #    "icoads_r3000_d702",
         #    None,
@@ -156,8 +156,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    [5, 6, 7, 8, 9],
         #    {"year_end": 1874},
-        #),
-        #(
+        # ),
+        # (
         #    "096_702",
         #    "icoads_r3000_d702",
         #    None,
@@ -167,8 +167,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    "all",
         #    {"year_init": 1874, "year_end": 1874},
-        #),
-        #(
+        # ),
+        # (
         #    "gcc_mix",
         #    "gcc_mapping",
         #    None,
@@ -178,8 +178,8 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    [0, 1, 2, 3, 4],
         #    {"year_init": 2002},
-        #),
-        #(
+        # ),
+        # (
         #    "craid_1260810",
         #    "c_raid",
         #    None,
@@ -189,7 +189,7 @@ from ._testing_cdm_suite import _testing_suite
         #    True,
         #    "all",
         #    {"year_end": 2003},
-        #),
+        # ),
     ],
 )
 def test_read_data(

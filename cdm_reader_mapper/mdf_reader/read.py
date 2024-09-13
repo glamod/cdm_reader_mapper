@@ -304,7 +304,7 @@ def read(
     year_init: str or int, optional
         Left border of time axis.
     year_end: str or int, optional
-        Right border of time axis. 
+        Right border of time axis.
 
     Returns
     -------
