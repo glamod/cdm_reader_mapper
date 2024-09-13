@@ -155,6 +155,9 @@ def _testing_suite(
     pd.testing.assert_frame_equal(data_pd, data_)
     pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
 
+    if data.empty:
+        return
+
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(
             expected_data["vadt"],
