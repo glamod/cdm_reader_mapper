@@ -63,6 +63,32 @@ def _read_result_data(data_file, columns, **kwargs):
     return data_[columns]
 
 
+def drop_rows(df, drops):
+    if drops == "all":
+        return df.drop(df.index)
+    elif drops:
+        return df.drop(drops).reset_index(drop=True)
+    return df
+
+
+def remove_datetime_columns(output, output_, codes_subset):
+    col_subset = []
+    if codes_subset is not None:
+        for key in output.keys():
+            for att in output[key]["atts"].keys():
+                if att in codes_subset:
+                    col_subset.append((key, att))
+    del output[("header", "record_timestamp")]
+    del output[("header", "history")]
+    del output_[("header", "record_timestamp")]
+    del output_[("header", "history")]
+
+    if len(col_subset) > 0:
+        output = output[col_subset]
+        output_ = output_[col_subset]
+    return output, output_
+
+
 def _testing_suite(
     source=None,
     data_model=None,
@@ -78,13 +104,6 @@ def _testing_suite(
     drops=None,
     **kwargs,
 ):
-    def drop_rows(df):
-        if drops == "all":
-            return df.drop(df.index)
-        elif drops:
-            return df.drop(drops).reset_index(drop=True)
-        return df
-
     exp = "expected_" + suffix
     split = suffix.split("_")
     if len(split) > 1:
@@ -152,8 +171,8 @@ def _testing_suite(
     )
     mask_ = _read_result_data(expected_data["mask"], columns)
 
-    data_ = drop_rows(data_)
-    mask_ = drop_rows(mask_)
+    data_ = drop_rows(data_, drops)
+    mask_ = drop_rows(mask_, drops)
     pd.testing.assert_frame_equal(data_pd, data_)
     pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
 
@@ -167,7 +186,7 @@ def _testing_suite(
             squeeze=True,
             name=None,
         )
-        val_dt_ = drop_rows(val_dt_)
+        val_dt_ = drop_rows(val_dt_, drops)
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
 
     if val_id is not None:
@@ -177,7 +196,7 @@ def _testing_suite(
             squeeze=True,
             name=val_id.name,
         )
-        val_id_ = drop_rows(val_id_)
+        val_id_ = drop_rows(val_id_, drops)
         pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
@@ -191,13 +210,6 @@ def _testing_suite(
         log_level="DEBUG",
     )
 
-    col_subset = []
-    if codes_subset is not None:
-        for key in output.keys():
-            for att in output[key]["atts"].keys():
-                if att in codes_subset:
-                    col_subset.append((key, att))
-
     cdm_mapper.cdm_to_ascii(output, suffix=tb_id)
     output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
 
@@ -205,14 +217,7 @@ def _testing_suite(
         expected_data["cdm_table"], tb_id=f"{tb_id}*", cdm_subset=cdm_subset
     )
 
-    del output[("header", "record_timestamp")]
-    del output[("header", "history")]
-    del output_[("header", "record_timestamp")]
-    del output_[("header", "history")]
+    output, output_ = remove_datetime_columns(output, output_, codes_subset)
 
-    if len(col_subset) > 0:
-        output = output[col_subset]
-        output_ = output_[col_subset]
-
-    output_ = drop_rows(output_)
+    output_ = drop_rows(output_, drops)
     pd.testing.assert_frame_equal(output, output_)
