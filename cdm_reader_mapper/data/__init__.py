@@ -16,7 +16,7 @@ class test_data:
         """IMMA1 deck 714 test data."""
         return self._get_data_dict(
             "063-714_2010-07-01_subset.imma",
-            "imma1_d714",
+            "icoads_r300_d714",
             "714",
             "imma1",
             "icoads_r3000",
