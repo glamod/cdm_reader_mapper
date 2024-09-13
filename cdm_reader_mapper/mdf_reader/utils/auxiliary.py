@@ -359,6 +359,8 @@ class _FileReader:
         source,
         data_model=None,
         data_model_path=None,
+        year_init=None,
+        year_end=None,
     ):
         # 0. VALIDATE INPUT
         if not data_model and not data_model_path:
@@ -374,6 +376,8 @@ class _FileReader:
 
         self.source = source
         self.data_model = data_model
+        self.year_init = year_init
+        self.year_end = year_end
 
         # 1. GET DATA MODEL
         # Schema reader will return empty if cannot read schema or is not valid
