@@ -56,6 +56,18 @@ from ._testing_cdm_suite import _testing_suite
             [0, 1, 2, 3, 4],
             {"year_init": 2002},
         ),
+        ("craid_1260810", "c_raid", None, None, "1260810", None, True, None, {}),
+        (
+            "craid_1260810",
+            "c_raid",
+            None,
+            None,
+            "1260810",
+            None,
+            True,
+            "all",
+            {"year_end": 2003},
+        ),
     ],
 )
 def test_read_data(
