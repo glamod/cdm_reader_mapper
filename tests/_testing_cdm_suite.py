@@ -62,7 +62,6 @@ def _read_result_data(data_file, columns, **kwargs):
     )
     return data_[columns]
 
-
 def _testing_suite(
     source=None,
     data_model=None,
@@ -75,8 +74,14 @@ def _testing_suite(
     suffix="exp",
     mapping=True,
     out_path=None,
+    drops=None,
     **kwargs,
 ):
+    def drop_rows(df):
+        if drops:
+            df = df.drop(drops).reset_index(drop=True)
+        return df
+
     exp = "expected_" + suffix
     split = suffix.split("_")
     if len(split) > 1:
@@ -144,6 +149,8 @@ def _testing_suite(
     )
     mask_ = _read_result_data(expected_data["mask"], columns)
 
+    data_ = drop_rows(data_)
+    mask_ = drop_rows(mask_)
     pd.testing.assert_frame_equal(data_pd, data_)
     pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
 
@@ -154,6 +161,7 @@ def _testing_suite(
             squeeze=True,
             name=None,
         )
+        val_dt_ = drop_rows(val_dt_)
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
 
     if val_id is not None:
@@ -163,6 +171,7 @@ def _testing_suite(
             squeeze=True,
             name=val_id.name,
         )
+        val_id_ = drop_rows(val_id_)
         pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
@@ -199,4 +208,5 @@ def _testing_suite(
         output = output[col_subset]
         output_ = output_[col_subset]
 
+    output_ = drop_rows(output_)
     pd.testing.assert_frame_equal(output, output_)
