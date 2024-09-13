@@ -301,6 +301,10 @@ def read(
     data_model_path: str, optional
         Path to external data model.
         Expected file structure: name_of_model/name_of_model.json
+    year_init: str or int, optional
+        Left border of time axis.
+    year_end: str or int, optional
+        Right border of time axis. 
 
     Returns
     -------
