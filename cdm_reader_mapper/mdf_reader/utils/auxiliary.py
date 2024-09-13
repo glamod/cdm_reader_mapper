@@ -429,14 +429,25 @@ class _FileReader:
                             ]
 
     def _select_years(self, df):
+        def get_years_from_datetime(date):
+            try:
+                return date.year
+            except AttributeError:
+                return date
+
         if self.year_init is None and self.year_end is None:
             return df
-        years = df[properties.year_column[self.data_model]].astype(int)
+
+        dates = df[properties.year_column[self.data_model]]
+        years = dates.apply(lambda x: get_years_from_datetime(x))
+        years = years.astype(int)
+
         mask = pd.Series([True] * len(years))
         if self.year_init:
             mask[years < self.year_init] = False
         if self.year_end:
             mask[years > self.year_end] = False
+
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
