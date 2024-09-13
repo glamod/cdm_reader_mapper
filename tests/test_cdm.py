@@ -45,7 +45,17 @@ from ._testing_cdm_suite import _testing_suite
             {"year_init": 1874, "year_end": 1874},
         ),
         ("gcc_mix", "gcc_mapping", None, None, "mix_out", None, True, None, {}),
-        ("gcc_mix", "gcc_mapping", None, None, "mix_out", None, True, [0, 1, 2, 3, 4, 5], {"year_init": 2002}),
+        (
+            "gcc_mix",
+            "gcc_mapping",
+            None,
+            None,
+            "mix_out",
+            None,
+            True,
+            [0, 1, 2, 3, 4, 5],
+            {"year_init": 2002},
+        ),
     ],
 )
 def test_read_data(
