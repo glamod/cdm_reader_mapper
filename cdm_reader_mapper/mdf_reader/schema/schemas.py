@@ -13,9 +13,8 @@ import json
 import logging
 import os
 
-from cdm_reader_mapper.common.getting_files import get_files
-
 from .. import properties
+from ..utils.auxiliary import get_path
 
 
 def convert_dtype_to_default(dtype, section, element):
@@ -41,24 +40,30 @@ def convert_dtype_to_default(dtype, section, element):
 
 def _collect_schema_files(data_model, release, deck):
     """DOCUMENTATION."""
+    schema_files = []
     if data_model not in properties.supported_data_models:
         logging.error(f"Input data model {data_model} not supported.")
         return
     else:
         schema_path = f"{properties._base}.schema.{data_model}"
-        schema_data = get_files(schema_path)
-        schema_files = list(schema_data.glob(f"{data_model}.json"))
+        schema_data = get_path(schema_path)
+        if schema_data:
+            schema_files = list(schema_data.glob(f"{data_model}.json"))
     if release:
         schema_path = f"{schema_path}.{release}"
-        schema_data = get_files(schema_path)
-        release_files = list(schema_data.glob(f"{data_model}_{release}.json"))
+        schema_data = get_path(schema_path)
+        release_files = []
+        if schema_data:
+            release_files = list(schema_data.glob(f"{data_model}_{release}.json"))
         if len(release_files) == 0:
             logging.warning(f"Input data model release {release} not supported.")
         schema_files += release_files
     if deck:
         schema_path = f"{schema_path}.{deck}"
-        schema_data = get_files(schema_path)
-        deck_files = list(schema_data.glob(f"{data_model}_{release}_{deck}.json"))
+        schema_data = get_path(schema_path)
+        deck_files = []
+        if schema_data:
+            deck_files = list(schema_data.glob(f"{data_model}_{release}_{deck}.json"))
         if len(deck_files) == 0:
             logging.warning(f"Input data model release deck {deck} not supported.")
         schema_files += deck_files
@@ -95,7 +100,7 @@ def _combine_schemas(schema_files):
             release = schema_["substitute"].get("release")
             deck = schema_["substitute"].get("deck")
             schema_files_ = _collect_schema_files(data_model, release, deck)
-            schmea_files_ = [
+            schema_files = [
                 schema_file_
                 for schema_file_ in schema_files_
                 if schema_file not in schema_files

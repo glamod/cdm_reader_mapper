@@ -23,16 +23,25 @@ from ..validate import validate
 from . import converters, decoders
 
 
+def get_path(path):
+    """Get path."""
+    try:
+        return get_files(path)
+    except ModuleNotFoundError:
+        logging.warning(f"No module named {path}")
+
+
 def get_code_tables_paths(data_model, release, deck):
     """Get code tables paths."""
     model_path = f"{properties._base}.code_tables.{data_model}"
-    code_tables_paths = [get_files(model_path)]
+    code_tables_paths = [get_path(model_path)]
     if release:
         model_path = f"{model_path}.{release}"
-        code_tables_paths += [get_files(model_path)]
+        code_tables_paths += [get_path(model_path)]
     if deck:
         model_path = f"{model_path}.{deck}"
-        code_tables_paths += [get_files(model_path)]
+        code_tables_paths += [get_path(model_path)]
+    code_tables_paths = [path for path in code_tables_paths if path]
     return code_tables_paths
 
 
