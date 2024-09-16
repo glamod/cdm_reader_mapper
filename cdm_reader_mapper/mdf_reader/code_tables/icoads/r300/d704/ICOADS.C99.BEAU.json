@@ -1,0 +1,14 @@
+{
+  "01": "Light air",
+  "02": "Light breeze",
+  "03": "Gentle breeze",
+  "04": "Moderate breeze",
+  "05": "Fresh breeze",
+  "06": "Strong breeze",
+  "07": "High wind,moderate gale,near gale",
+  "08": "Gale,fresh gale",
+  "09": "Strong, severe gale",
+  "10": "Storm,whole gale",
+  "11": "Violent storm",
+  "12": "Hurricane force"
+}

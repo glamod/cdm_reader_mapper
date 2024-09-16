@@ -1,0 +1,8 @@
+{
+  "1": "Fahrenheit",
+  "2": "Centigrade",
+  "3": "Attached thermometer is Fahrenheit. Dry bulb, wet bulb and water temperature are Centigrade",
+  "4": "Attached thermometer is Centigrade. Dry bulb, wet bulb and water temperature are Fahrenheit",
+  "5": "Water temperature is Centigrade with other temperatures in Fahrenheit",
+  "6": "Dry bulb and wet bulb are Centigrade with other temperatures in Fahrenheit"
+}
