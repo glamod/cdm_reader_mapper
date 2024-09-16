@@ -2,6 +2,10 @@
   "header": {
     "parsing_order": [
       {
+        "s": [
+          "core"
+        ]
+      },
         "o": [
           "c1",
           "c5",
