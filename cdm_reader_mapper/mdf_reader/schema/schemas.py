@@ -39,6 +39,31 @@ def convert_dtype_to_default(dtype, section, element):
     return dtype
 
 
+def _collect_schema_files(data_model, release, deck):
+        """DOCUMENTATION."""
+        if data_model not in properties.supported_data_models:
+            logging.error(f"Input data model {data_model} not supported.")
+            return
+        else:
+            schema_path = f"{properties._base}.schema.{data_model}"
+            schema_data = get_files(schema_path)
+            schema_files = list(schema_data.glob(f"{data_model}.json"))
+        if release:
+            schema_path = f"{schema_path}.{release}"
+            schema_data = get_files(schema_path)
+            release_files = list(schema_data.glob(f"{data_model}_{release}.json"))
+            if len(release_files) == 0:
+                logging.warning(f"Input data model release {release} not supported.")
+            schema_files += release_files
+        if deck:
+            schema_path = f"{schema_path}.{deck}"
+            schema_data = get_files(schema_path)
+            deck_files = list(schema_data.glob(f"{data_model}_{release}_{deck}.json"))
+            if len(deck_files) == 0:
+                logging.warning(f"Input data model release deck {deck} not supported.")
+            schema_files += deck_files
+        return schema_files
+
 def _combine_schemas(schema_files):
     """DOCUMENTATION."""
 
@@ -64,6 +89,13 @@ def _combine_schemas(schema_files):
     schema = {}
     for schema_file in schema_files:
         schema_ = open_json_file(schema_file)
+        if "substitute" in schema_.keys():
+            data_model = schema_["substitute"].get("data_model")
+            release = schema_["substitute"].get("release")
+            deck = schema_["substitute"].get("deck")
+            schema_files_ = _collect_schema_files(data_model, release, deck)
+            schmea_files_ = [schema_file_ for schema_file_ in schema_files_ if schema_file not in schema_files]
+            schema_ = _combine_schemas(schema_files_)
         schema = update_dict(schema, schema_)
     return schema
 
@@ -178,27 +210,7 @@ def read_schema(
     """
     # 1. Validate input
     if data_model:
-        if data_model not in properties.supported_data_models:
-            logging.error(f"Input data model {data_model} not supported.")
-            return
-        else:
-            schema_path = f"{properties._base}.schema.{data_model}"
-            schema_data = get_files(schema_path)
-            schema_files = list(schema_data.glob(f"{data_model}.json"))
-        if release:
-            schema_path = f"{schema_path}.{release}"
-            schema_data = get_files(schema_path)
-            release_files = list(schema_data.glob(f"{data_model}_{release}.json"))
-            if len(release_files) == 0:
-                logging.warning(f"Input data model release {release} not supported.")
-            schema_files += release_files
-        if deck:
-            schema_path = f"{schema_path}.{deck}"
-            schema_data = get_files(schema_path)
-            deck_files = list(schema_data.glob(f"{data_model}_{release}_{deck}.json"))
-            if len(deck_files) == 0:
-                logging.warning(f"Input data model release deck {deck} not supported.")
-            schema_files += deck_files
+        schema_files = _collect_schema_files(data_model, release, deck)
     else:
         if ext_schema_file is None:
             schema_path = os.path.abspath(ext_schema_path)
