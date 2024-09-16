@@ -16,14 +16,14 @@ _compare_kwargs = {
     "header": {
         "primary_station_id": {"method": "exact"},
         "longitude": {
-            "method": "numeric",  # test: geo
+            "method": "numeric",
             "kwargs": {"method": "gauss", "offset": 0.0},
         },
         "latitude": {
-            "method": "numeric",  # test: geo
+            "method": "numeric",
             "kwargs": {"method": "gauss", "offset": 0.0},
         },
-        "report_timestamp": {"method": "exact"},  # test: date
+        "report_timestamp": {"method": "exact"},
     },
 }
 
@@ -54,12 +54,12 @@ class DupDetect:
 
     def _get_limit(self, limit):
         if limit == "default":
-            limit = 0.75
+            limit = 0.991
         return limit
 
     def _get_equal_musts(self):
         equal_musts = []
-        for value in self.method_kwargs.values():
+        for value in self.compare_kwargs.keys():
             if not isinstance(value, list):
                 value = [value]
             for v in value:
@@ -85,6 +85,7 @@ class DupDetect:
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         """
+        self.total_score()
         self.limit = self._get_limit(limit)
         cond = self.score >= self.limit
         if equal_musts is None:
@@ -96,23 +97,67 @@ class DupDetect:
         self.matches = self.compared[cond]
         return self
 
-    def delete_matches(self, keep="first"):
-        """Get result data set with deleted matches.
+    def flag_duplicates(self, keep="first", limit="default", equal_musts=None):
+        """Get result dataset with flagged duplicates.
 
         Parameters
         ----------
         keep: str, ["first", "last"]
             Which entry shpould be kept in result dataset.
+        limit: float, optional
+            Limit of total score that as to be exceeded to be declared as a duplicate.
+            Default: .75
+        equal_musts: str or list, optional
+            Hashable of column name(s) that must totally be equal to be declared as a duplicate.
+            Default: All column names found in method_kwargs.
         """
+        drop = 0
         if keep == "first":
-            keep = 0
-        elif keep == "last":
             keep = -1
+            drop = 0
+        elif keep == "last":
+            keep = 0
+            drop = -1
         elif not isinstance(keep, int):
             raise ValueError("keep has to be one of 'first', 'last' of integer value.")
         self.result = self.data.copy()
+        self.result["duplicate_status"] = 0
+        if not hasattr(self, "matches"):
+            self.get_matches(limit="default", equal_musts=None)
         for index in self.matches.index:
-            self.result = self.result.drop(index[keep])
+            print(index)
+            self.result.loc[index[keep], "duplicate_status"] = 1
+            self.result.loc[index[drop], "duplicate_status"] = 3
+        return self
+
+    def delete_matches(self, keep="first", limit="default", equal_musts=None):
+        """Get result dataset with deleted matches.
+
+        Parameters
+        ----------
+        keep: str, ["first", "last"]
+            Which entry shpould be kept in result dataset.
+        limit: float, optional
+            Limit of total score that as to be exceeded to be declared as a duplicate.
+            Default: .75
+        equal_musts: str or list, optional
+            Hashable of column name(s) that must totally be equal to be declared as a duplicate.
+            Default: All column names found in method_kwargs.
+        """
+        drop = 0
+        if keep == "first":
+            drop = 0
+        elif keep == "last":
+            drop = -1
+        elif not isinstance(keep, int):
+            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+        self.result = self.data.copy()
+        if not hasattr(self, "matches"):
+            self.get_matches(limit="default", equal_musts=None)
+        for index in self.matches.index:
+            if index[drop] in self.result.index:
+                self.result = self.result.drop(index[drop])
+        self.result = self.result.reset_index(drop=True)
         return self
 
     def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
@@ -129,7 +174,6 @@ class DupDetect:
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         """
-        self.total_score()
         self.get_matches(limit, equal_musts=equal_musts)
         self.delete_matches(keep)
         return self
