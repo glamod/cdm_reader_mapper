@@ -59,11 +59,12 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, code_tables_path, schema, supp=False):
+def validate_codes(elements, data, code_tables_paths, schema, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    if not os.path.isdir(code_tables_path):
-        logging.error(f"Code tables path {code_tables_path} not found")
+    code_table_paths_ = [code_tables_path for code_tables_path in code_tables_paths if os.path.isdir(code_tables_path)]
+    if not code_tables_paths_:
+        logging.error(f"None of code tables paths {code_tables_paths} found")
         logging.warning("All coded elements set to False")
         return mask
 
@@ -74,14 +75,16 @@ def validate_codes(elements, data, code_tables_path, schema, supp=False):
             logging.warning("Element mask set to False")
             continue
 
-        code_table_path = os.path.join(code_tables_path, code_table + ".json")
+        code_table_path = [os.path.join(code_tables_path, code_table + ".json") for code_tables_path in code_table_paths_]
         # Eval elements: if ._yyyy, ._xxx in name: pd.DateTimeIndex().xxxx is the element to pass
         # Additionally, on doing this, should make sure that element is a datetime type:
-        if not os.path.isfile(code_table_path):
+        code_table_path_ = [code_table_ for code_table_ in code_table_path if os.path.isfile(code_table_)]
+        if not code_table_path_:
             logging.error(f"Error validating coded element {element}:")
-            logging.error(f"Code table file {code_table_path} not found")
+            logging.error(f"None of code table files {code_table_path_} found")
             logging.warning("Element mask set to False")
             continue
+        code_table_path = code_table_path_[0]
         try:
             table = code_tables.read_table(code_table_path)
             if supp:
@@ -126,7 +129,7 @@ def validate_codes(elements, data, code_tables_path, schema, supp=False):
     return mask
 
 
-def validate(data, mask0, schema, code_tables_path, disables):
+def validate(data, mask0, schema, code_tables_paths, disables):
     """DOCUMENTATION."""
     logging.basicConfig(
         format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
@@ -189,10 +192,12 @@ def validate(data, mask0, schema, code_tables_path, disables):
     # Get the full list of keys combinations (tuples, triplets...) and check the column combination against that: if it fails, mark the element!
     # Need to see how to grab the YEAR part of a datetime when YEAR comes from a datetime element
     # pd.DatetimeIndex(df['_datetime']).year
-
+    if isinstance(code_table_paths, str):
+        code_tables_paths = [code_table_paths]
+    
     if len(coded_elements) > 0:
         mask[coded_elements] = validate_codes(
-            coded_elements, data, code_tables_path, element_atts
+            coded_elements, data, code_tables_paths, element_atts
         )
 
     # 3. Datetime elements
