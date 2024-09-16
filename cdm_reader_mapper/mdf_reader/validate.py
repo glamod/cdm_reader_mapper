@@ -62,7 +62,7 @@ def validate_str(elements, data):
 def validate_codes(elements, data, code_tables_paths, schema, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    code_table_paths_ = [code_tables_path for code_tables_path in code_tables_paths if os.path.isdir(code_tables_path)]
+    code_tables_paths_ = [code_tables_path for code_tables_path in code_tables_paths if os.path.isdir(code_tables_path)]
     if not code_tables_paths_:
         logging.error(f"None of code tables paths {code_tables_paths} found")
         logging.warning("All coded elements set to False")
@@ -75,7 +75,7 @@ def validate_codes(elements, data, code_tables_paths, schema, supp=False):
             logging.warning("Element mask set to False")
             continue
 
-        code_table_path = [os.path.join(code_tables_path, code_table + ".json") for code_tables_path in code_table_paths_]
+        code_table_path = [os.path.join(code_tables_path, code_table + ".json") for code_tables_path in code_tables_paths_]
         # Eval elements: if ._yyyy, ._xxx in name: pd.DateTimeIndex().xxxx is the element to pass
         # Additionally, on doing this, should make sure that element is a datetime type:
         code_table_path_ = [code_table_ for code_table_ in code_table_path if os.path.isfile(code_table_)]
@@ -192,8 +192,8 @@ def validate(data, mask0, schema, code_tables_paths, disables):
     # Get the full list of keys combinations (tuples, triplets...) and check the column combination against that: if it fails, mark the element!
     # Need to see how to grab the YEAR part of a datetime when YEAR comes from a datetime element
     # pd.DatetimeIndex(df['_datetime']).year
-    if isinstance(code_table_paths, str):
-        code_tables_paths = [code_table_paths]
+    if isinstance(code_tables_paths, str):
+        code_tables_paths = [code_tables_paths]
     
     if len(coded_elements) > 0:
         mask[coded_elements] = validate_codes(

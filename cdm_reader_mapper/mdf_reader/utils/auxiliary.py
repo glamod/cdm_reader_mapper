@@ -23,6 +23,18 @@ from ..validate import validate
 from . import converters, decoders
 
 
+def get_code_tables_paths(data_model, release, deck):
+    """Get code tables paths."""
+    model_path = f"{properties._base}.code_tables.{data_model}"
+    code_tables_paths = [get_files(model_path)]
+    if release:
+        model_path = f"{model_path}.{release}"
+        code_tables_paths += [get_files(model_path)]
+    if deck:
+        model_path = f"{model_path}.{deck}"
+        code_tables_paths += [get_files(model_path)]
+    return code_tables_paths   
+
 def convert_dtypes(dtypes):
     """DOCUMENTATION."""
     parse_dates = []
@@ -386,15 +398,15 @@ class _FileReader:
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
         if self.data_model:
-            model_path = f"{properties._base}.code_tables.{self.data_model}"
-            self.code_tables_path = get_files(model_path)
+            
+            self.code_tables_paths = get_code_tables_paths(data_model, release, deck)
             self.imodel = data_model
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(
                 data_model=data_model, release=release, deck=deck
             )
         else:
-            self.code_tables_path = os.path.join(data_model_path, "code_tables")
+            self.code_tables_paths = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(ext_schema_path=data_model_path)
@@ -654,7 +666,7 @@ class _FileReader:
             df,
             mask,
             self.schema,
-            self.code_tables_path,
+            self.code_tables_paths,
             disables=self.disable_reads,
         )
 
