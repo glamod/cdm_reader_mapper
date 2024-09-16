@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest  # noqa
 
 from cdm_reader_mapper.cdm_mapper import duplicate_check, read_tables
@@ -40,4 +41,7 @@ def test_duplicates_header():
     )
     df = _manipulate_header(df)
     DupDetect = duplicate_check(df)
-    return DupDetect.remove_duplicates()
+    DupDetect.flag_duplicates()
+    np.testing.assert_array_equal(
+        DupDetect.result["duplicate_status"], [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0]
+    )
