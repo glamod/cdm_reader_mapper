@@ -116,7 +116,7 @@
         "VS": {
           "description": "ship speed",
           "field_length": 1,
-          "column_type": "str",
+          "column_type": "key",
           "codetable": "ICOADS.C0.VS"
         },
         "NID": {
