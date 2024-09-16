@@ -211,7 +211,6 @@ class Configurator:
         kwargs = {}
         decode = {}
         for order in self.orders:
-            print(order)
             self.order = order
             header = self.schema["sections"][order]["header"]
             disable_read = header.get("disable_read")
@@ -220,7 +219,6 @@ class Configurator:
                 continue
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
-                print(section)
                 self.sections_dict = sections[section]
                 encoding = sections[section].get("encoding")
                 index = self._get_index(section)
