@@ -3,6 +3,11 @@
     "encoding": "cp1252",
     "parsing_order": [
       {
+        "s": [
+          "core"
+        ]
+      },
+      {
         "o": [
           "c1",
           "c5",
