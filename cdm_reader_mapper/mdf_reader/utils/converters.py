@@ -98,7 +98,6 @@ class df_converters:
         """DOCUMENTATION."""
         if data.dtype != "object":
             return data
-        data = data.str.decode("utf-8")
         return pd.to_datetime(data, format=datetime_format, errors="coerce")
 
 
