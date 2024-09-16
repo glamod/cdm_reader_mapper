@@ -8,43 +8,22 @@ _method_kwargs = {
     "header": {
         "left_on": "report_timestamp",
         "window": 5,
-        "block_on": ["report_id"],
-    },
-    "observations": {
-        "left_on": "observation_id",
-        "window": 5,
-        "block_on": ["date_time"],
+        "block_on": ["primary_station_id"],
     },
 }
 
 _compare_kwargs = {
     "header": {
-        "report_id": {"method": "exact"},
         "primary_station_id": {"method": "exact"},
         "longitude": {
-            "method": "numeric",
+            "method": "numeric",  # test: geo
             "kwargs": {"method": "gauss", "offset": 0.0},
         },
         "latitude": {
-            "method": "numeric",
+            "method": "numeric",  # test: geo
             "kwargs": {"method": "gauss", "offset": 0.0},
         },
-        "report_timestamp": {"method": "exact"},
-        "source_record_id": {"method": "exact"},
-    },
-    "observations": {
-        "observation_id": {"method": "exact"},
-        "report_id": {"method": "exact"},
-        "longitude": {
-            "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.0},
-        },
-        "latitude": {
-            "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.0},
-        },
-        "date_time": {"method": "exact"},
-        "source_id": {"method": "exact"},
+        "report_timestamp": {"method": "exact"},  # test: date
     },
 }
 
