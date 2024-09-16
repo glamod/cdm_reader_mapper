@@ -130,7 +130,7 @@ class DupDetect:
             self.result.loc[index[drop], "duplicate_status"] = 3
         return self
 
-    def delete_matches(self, keep="first", limit="default", equal_musts=None):
+    def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
         """Get result dataset with deleted matches.
 
         Parameters
@@ -158,24 +158,6 @@ class DupDetect:
             if index[drop] in self.result.index:
                 self.result = self.result.drop(index[drop])
         self.result = self.result.reset_index(drop=True)
-        return self
-
-    def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
-        """Remove duplicates from dataset.
-
-        Parameters
-        ----------
-        keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
-        limit: float, optional
-            Limit of total score that as to be exceeded to be declared as a duplicate.
-            Default: .75
-        equal_musts: str or list, optional
-            Hashable of column name(s) that must totally be equal to be declared as a duplicate.
-            Default: All column names found in method_kwargs.
-        """
-        self.get_matches(limit, equal_musts=equal_musts)
-        self.delete_matches(keep)
         return self
 
 
