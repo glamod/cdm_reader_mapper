@@ -125,9 +125,24 @@ class DupDetect:
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=None)
         for index in self.matches.index:
-            print(index)
+            report_id_drop = self.result.loc[index[drop], "report_id"]
+            report_id_keep = self.result.loc[index[keep], "report_id"]
+            duplicates_drop = self.result.loc[index[drop], "duplicates"]
+            duplicates_keep = self.result.loc[index[keep], "duplicates"]
+            
             self.result.loc[index[keep], "duplicate_status"] = 1
+            if self.result.loc[index[keep], "duplicates"] == "null":
+                self.result.loc[index[keep], "duplicates"] = report_id_drop
+            else:
+                duplicates = self.result.loc[index[keep], "duplicates"]
+                self.result.loc[index[keep], "duplicates"] = f"{duplicates_keep}, {report_id_drop}"
+                
             self.result.loc[index[drop], "duplicate_status"] = 3
+            if self.result.loc[index[drop], "duplicates"] == "null":
+                self.result.loc[index[drop], "duplicates"] = report_id_keep
+            else:
+                self.result.loc[index[drop], "duplicates"] = f"{duplicates_drop}, {report_id_keep}"
+ 
         return self
 
     def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
