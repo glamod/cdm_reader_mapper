@@ -1,1 +1,1 @@
-"""Common Data Model (CDM) mapping tables for icoads_r3000_d7001_type1."""
+"""Common Data Model (CDM) ICOADS_R3.0.0T d701 type1 mapping tables."""

@@ -1,1 +1,1 @@
-"""Common Data Model (CDM) mapping tables for gcc_mapping."""
+"""Common Data Model (CDM) GCC mapping tables."""
