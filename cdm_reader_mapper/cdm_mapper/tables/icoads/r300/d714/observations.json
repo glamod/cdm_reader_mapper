@@ -10,7 +10,7 @@
     "elements": "Lat",
     "decimal_places": 4
   },
-  "location_accuracy": {
+  "location_precision": {
     "sections": [
       "core",
       "c99"
