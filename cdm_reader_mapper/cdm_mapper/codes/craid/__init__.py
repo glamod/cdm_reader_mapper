@@ -1,1 +1,1 @@
-"""Common Data Model (CDM) mapper code tables for c_raid."""
+"""Common Data Model (CDM) C-RAID mapper code tables."""
