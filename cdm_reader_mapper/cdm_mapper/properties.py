@@ -7,8 +7,8 @@ from ..properties import numeric_types, object_types  # noqa
 _base = "cdm_reader_mapper.cdm_mapper"
 
 supported_models = [
-    "c_raid",
-    "gcc_mapping",
+    "craid",
+    "gcc",
     "icoads_r3000",
     "icoads_r3000_d701_type1",
     "icoads_r3000_d701_type2",
@@ -20,7 +20,6 @@ supported_models = [
     "icoads_r3000_d730",
     "icoads_r3000_d781",
     "icoads_r3000_NRT",
-    "pub47_noc",
 ]
 
 cdm_tables = [

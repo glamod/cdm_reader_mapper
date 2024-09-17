@@ -48,15 +48,15 @@ imodel_lineages = {
     "icoads_r3000_d730": icoads_lineage,
     "icoads_r3000_d781": icoads_lineage,
     "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
-    "c_raid": ". Initial conversion from C-RAID",
+    "craid": ". Initial conversion from C-RAID",
 }
 
 c2k_methods = {
-    "gcc_mapping": "method_b",
+    "gcc": "method_b",
 }
 
 k_elements = {
-    "gcc_mapping": 1,
+    "gcc": 1,
 }
 
 tf = TimezoneFinder()
