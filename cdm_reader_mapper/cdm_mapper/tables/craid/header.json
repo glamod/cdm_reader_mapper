@@ -12,7 +12,7 @@
     ],
     "transform": "string_join_add",
     "kwargs": {
-      "prepend": "C-RAID",
+      "prepend": "CRAID",
       "separator": "-"
     }
   },
@@ -124,7 +124,7 @@
     "elements": "FORMAT_VERSION",
     "transform": "string_add",
     "kwargs": {
-      "prepend": "C-RAID",
+      "prepend": "CRAID",
       "separator": "-"
     }
   }
