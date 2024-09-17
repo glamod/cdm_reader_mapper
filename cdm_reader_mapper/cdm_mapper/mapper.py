@@ -338,7 +338,7 @@ def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     # Check we have imodel registered, leave otherwise
-    if imodel not in properties.supported_models:
+    if imodel not in properties.supported_data_models:
         logger.error("Input data model " f"{imodel}" " not supported")
         return
 
