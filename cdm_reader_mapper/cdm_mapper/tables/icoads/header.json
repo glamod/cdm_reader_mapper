@@ -4,7 +4,6 @@
     "elements": "UID",
     "transform": "string_add",
     "kwargs": {
-      "prepend": "ICOADS-30",
       "separator": "-"
     }
   },
@@ -158,7 +157,6 @@
     ],
     "transform": "string_join_add",
     "kwargs": {
-      "prepend": "ICOADS-3-0-0T",
       "separator": "-",
       "zfill_col": [
         0,
