@@ -9,17 +9,7 @@ _base = "cdm_reader_mapper.cdm_mapper"
 supported_models = [
     "craid",
     "gcc",
-    "icoads_r3000",
-    "icoads_r3000_d701_type1",
-    "icoads_r3000_d701_type2",
-    "icoads_r3000_d702",
-    "icoads_r3000_d704",
-    "icoads_r3000_d705-707",
-    "icoads_r3000_d714",
-    "icoads_r3000_d721",
-    "icoads_r3000_d730",
-    "icoads_r3000_d781",
-    "icoads_r3000_NRT",
+    "icoads",
 ]
 
 cdm_tables = [
