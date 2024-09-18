@@ -6,7 +6,7 @@ import json
 import logging
 
 from .. import properties
-from .getting_file import get_files
+from .getting_files import get_files
 
 
 def get_path(path):
@@ -17,7 +17,7 @@ def get_path(path):
         logging.warning(f"No module named {path}")
 
 
-def collect_json_files(data_model, module="schema", *args):
+def collect_json_files(data_model, *args, base="."):
     """Collect available data_model release deck files.
 
     Parameters
@@ -25,6 +25,8 @@ def collect_json_files(data_model, module="schema", *args):
     data_model: str
         The name of the data model to read. This is for
         data models included in the tool
+    base: str
+        JSON file base path.
     module: str, default: schema
         Name of the module to get the files.
     args*: optional
@@ -38,7 +40,7 @@ def collect_json_files(data_model, module="schema", *args):
     if data_model not in properties.supported_data_models:
         logging.error(f"Input data model {data_model} not supported.")
         return
-    path = f"{properties._base}.{module}.{data_model}"
+    path = f"{base}.{data_model}"
     data = get_path(path)
     list_of_files = list(data.glob(f"{data_model}.json"))
 
@@ -52,7 +54,7 @@ def collect_json_files(data_model, module="schema", *args):
             arg_files = list(data.glob(f"{data_model}.json"))
         if len(arg_files) == 0:
             logging.warning(f"Input {data_model} not supported.")
-            list_of_files += arg_files
+        list_of_files += arg_files
         i += 1
     return list_of_files
 
