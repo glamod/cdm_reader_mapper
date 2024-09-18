@@ -6,17 +6,27 @@ import json
 import logging
 
 from .. import properties
-from .getting_files import get_files
+from .getting_files import get_path
 
 
-def get_path(path):
-    """Get path."""
-    try:
-        return get_files(path)
-    except ModuleNotFoundError:
-        logging.warning(f"No module named {path}")
-
-
+def open_json_file(ifile, encoding="utf-8"):
+    """Open JSON file.
+    
+    Parameters
+    ----------
+    ifile: str
+        JSON file on disk
+    encoding: str, default: "utf-8"
+        File encoding
+        
+    Returns
+    -------
+    dict
+    """
+    with open(ifile, encoding=encoding) as fileObj:
+        json_dict = json.load(fileObj)
+    return json_dict
+        
 def collect_json_files(data_model, *args, base="."):
     """Collect available data_model release deck files.
 
@@ -65,18 +75,13 @@ def combine_dicts(list_of_files):
     Parameters
     ----------
     list_of_files: str, list
-        One or more json files on disk to be read.
-
+        One or more JSON files on disk to be read.
+        One or more JSON dictionaries.
     Returns
     -------
     dict
         Combined dictionary from read `list_of_files`.
     """
-
-    def open_json_file(ifile):
-        with open(ifile) as fileObj:
-            json_dict = json.load(fileObj)
-        return json_dict
 
     def update_dict(old, new):
         keys = list(old.keys()) + list(new.keys())
@@ -95,8 +100,9 @@ def combine_dicts(list_of_files):
     combined_dict = {}
     if isinstance(list_of_files, str):
         list_of_files = [list_of_files]
-    for json_file in list_of_files:
-        json_dict = open_json_file(json_file)
+    for json_dict in list_of_files:
+        if not isinstance(json_dict, dict):
+            json_dict = open_json_file(json_dict)
         if "substitute" in json_dict.keys():
             data_model = json_dict["substitute"].get("data_model")
             release = json_dict["substitute"].get("release")

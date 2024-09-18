@@ -168,3 +168,10 @@ def load_file(
 def get_files(anchor):
     """Get files."""
     return _files(anchor)
+
+def get_path(path):
+    """Get path."""
+    try:
+        return get_files(path)
+    except ModuleNotFoundError:
+        logging.warning(f"No module named {path}")
