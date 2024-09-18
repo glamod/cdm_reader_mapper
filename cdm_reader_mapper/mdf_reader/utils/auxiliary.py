@@ -15,20 +15,12 @@ import pandas as pd
 import xarray as xr
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
+from cdm_reader_mapper.common.json_dict import get_path
 
 from .. import properties
 from ..schema import schemas
 from ..validate import validate
 from . import converters, decoders
-
-
-def get_path(path):
-    """Get path."""
-    try:
-        return get_files(path)
-    except ModuleNotFoundError:
-        logging.warning(f"No module named {path}")
 
 
 def get_code_tables_paths(data_model, release, deck):
