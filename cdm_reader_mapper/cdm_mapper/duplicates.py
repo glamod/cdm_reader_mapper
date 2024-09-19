@@ -8,6 +8,19 @@ from recordlinkage.compare import Numeric
 
 
 def convert_series(df, conversion):
+    """Convert data types in dataframe.
+    
+    Parameters
+    ----------
+    df: pd.DataFrame
+    conversion: dict
+        Conversion dictionary conating columns and 
+        new data type as key-value pairs.
+        
+    Retunrs
+    -------
+    pd.DataFrame
+    """
     def convert_date_to_float(date):
         date = date.astype("datetime64[ns]")
         return (date - date.min()) / np.timedelta64(1, "s")
@@ -23,10 +36,12 @@ def convert_series(df, conversion):
 
 
 class NumericDate(Numeric):
+    """Copy of rl.compare.Numeric class."""
     pass
 
 
 def numericdate(self, *args, **kwargs):
+    """New method for rl.Compare object using ``NumericDate`` object."""
     compare = NumericDate(*args, **kwargs)
     self.add(compare)
     return self
