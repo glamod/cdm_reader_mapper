@@ -11,14 +11,14 @@ from .getting_files import get_path
 
 def open_json_file(ifile, encoding="utf-8"):
     """Open JSON file.
-    
+
     Parameters
     ----------
     ifile: str
         JSON file on disk
     encoding: str, default: "utf-8"
         File encoding
-        
+
     Returns
     -------
     dict
@@ -26,7 +26,8 @@ def open_json_file(ifile, encoding="utf-8"):
     with open(ifile, encoding=encoding) as fileObj:
         json_dict = json.load(fileObj)
     return json_dict
-        
+
+
 def collect_json_files(data_model, *args, base=".", name=None):
     """Collect available data_model release deck files.
 
@@ -42,6 +43,7 @@ def collect_json_files(data_model, *args, base=".", name=None):
     name: str, optional
         Name of the file to collect.
         Default is a combination of ``data_model`` and ``args``.
+
     Returns
     -------
     list
@@ -82,6 +84,7 @@ def combine_dicts(list_of_files):
     list_of_files: str, list
         One or more JSON files on disk to be read.
         One or more JSON dictionaries.
+
     Returns
     -------
     dict
