@@ -124,7 +124,7 @@ def read_schema(
     -----------------
     data_model: str, optional
         The name of the data model to read. This is for
-        data models included in the tool
+        data models included in the tool.
     release: str, optional
         The name of the data model release. If chosen, overwrite data model schema.
         `data_model` is needed.
@@ -144,7 +144,6 @@ def read_schema(
     -------
     dict
         Data model schema
-
     """
     # 1. Validate input
     if data_model:
