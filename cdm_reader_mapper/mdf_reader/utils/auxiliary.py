@@ -15,26 +15,11 @@ import pandas as pd
 import xarray as xr
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
-from cdm_reader_mapper.common.json_dict import get_path
 
 from .. import properties
 from ..schema import schemas
 from ..validate import validate
 from . import converters, decoders
-
-
-def get_code_tables_paths(data_model, release, deck):
-    """Get code tables paths."""
-    model_path = f"{properties._base}.code_tables.{data_model}"
-    code_tables_paths = [get_path(model_path)]
-    if release:
-        model_path = f"{model_path}.{release}"
-        code_tables_paths += [get_path(model_path)]
-    if deck:
-        model_path = f"{model_path}.{deck}"
-        code_tables_paths += [get_path(model_path)]
-    code_tables_paths = [path for path in code_tables_paths if path]
-    return code_tables_paths
 
 
 def convert_dtypes(dtypes):
@@ -392,6 +377,9 @@ class _FileReader:
 
         self.source = source
         self.data_model = data_model
+        self.release = release
+        self.deck = deck
+        self.data_model_path=data_model_path
         self.year_init = year_init
         self.year_end = year_end
 
@@ -400,15 +388,12 @@ class _FileReader:
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
         if self.data_model:
-
-            self.code_tables_paths = get_code_tables_paths(data_model, release, deck)
             self.imodel = data_model
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(
                 data_model=data_model, release=release, deck=deck
             )
         else:
-            self.code_tables_paths = os.path.join(data_model_path, "code_tables")
             self.imodel = data_model_path
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(ext_schema_path=data_model_path)
@@ -667,8 +652,10 @@ class _FileReader:
         return validate(
             df,
             mask,
-            self.schema,
-            self.code_tables_paths,
+            schema=self.schema,
+            data_model=self.data_model,
+            release=self.release,
+            deck=self.deck,
             disables=self.disable_reads,
         )
 

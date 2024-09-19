@@ -24,43 +24,28 @@ except Exception:
 
 import ast
 
+from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts, open_json_file
 
-def read_table(table_path):
-    """
-    Read a data model code table file to a dictionary.
+from .. import properties
 
-    It completes the code table to the full complexity
-    the data reader expects, by appending information
-    on secondary keys and expanding range keys.
+def table_keys(table):
+    """DOCUMENTATION."""
+    separator = "∿"  # something hopefully not in keys...
+    if table.get("_keys"):
+        _table = deepcopy(table)
+        _table.pop("_keys")
+        keys = list(nested_to_record(_table, sep=separator).keys())
 
-    Arguments
-    ---------
-    table_path : str
-        The file path of the code table.
+        return [x.split(separator) for x in keys]
+    else:
+        return list(table.keys())
 
-    Returns
-    -------
-    dict
-        Code table
-
-    """
-    with open(table_path, encoding="utf-8") as fileObj:
-        table = json.load(fileObj)
-    # Add keys for nested code tables
-    keys_path = ".".join([".".join(table_path.split(".")[:-1]), "keys"])
-    if os.path.isfile(keys_path):
-        with open(keys_path) as fileObj:
-            table_keys = json.load(fileObj)
-            table["_keys"] = {}
-            for x, y in table_keys.items():
-                key = eval_dict_items(x)
-                values = [eval_dict_items(k) for k in y]
-                table["_keys"][key] = values
-    # Expand range keys
-    expand_integer_range_key(table)
-
-    return table
-
+def eval_dict_items(item):
+    """DOCUMENTATION."""
+    try:
+        return ast.literal_eval(item)
+    except Exception:
+        return item
 
 def expand_integer_range_key(d):
     """DOCUMENTATION."""
@@ -106,23 +91,60 @@ def expand_integer_range_key(d):
                 for k, v in d.items():
                     expand_integer_range_key(v)
 
-
-def eval_dict_items(item):
+def _read_table(table_path):
     """DOCUMENTATION."""
-    try:
-        return ast.literal_eval(item)
-    except Exception:
-        return item
+    table = open_json_file(table_path)
+    # Expand range keys
+    expand_integer_range_key(table)
 
+    return table
 
-def table_keys(table):
-    """DOCUMENTATION."""
-    separator = "∿"  # something hopefully not in keys...
-    if table.get("_keys"):
-        _table = deepcopy(table)
-        _table.pop("_keys")
-        keys = list(nested_to_record(_table, sep=separator).keys())
+def read_table(code_table_name, data_model=None, release=None, deck=None, ext_table_path=None, ext_table_file=None):
+    """
+    Read a data model code table file to a dictionary.
 
-        return [x.split(separator) for x in keys]
+    It completes the code table to the full complexity
+    the data reader expects, by appending information
+    on secondary keys and expanding range keys.
+
+    Arguments
+    ---------
+    code_table_name: str
+        The external code table file
+    data_model: str, optional
+        The name of the data model to read. This is for
+        data models included in the tool.
+    release: str, optional
+        The name of the data model release. If chosen, overwrite data model schema.
+        `data_model` is needed.
+    deck: str, optional
+        The name of the data model deck. If chosen, overwrite data model release schema.
+        `data_model` is needed.
+    ext_table_path: str, optional
+        The path to the external code table file
+    Returns
+    -------
+    dict
+        Code table
+    """
+    # 1. Validate input
+    if data_model:
+        table_files = collect_json_files(data_model, release, deck, base=f"{properties._base}.code_tables", name=code_table_name)
     else:
-        return list(table.keys())
+        if ext_table_file:
+            table_path = os.path.abspath(ext_table_path)
+            table_files = os.path.join(table_path, code_table_name + ".json")
+        else:
+            table_files = code_table_name
+
+        if not os.path.isfile(table_files):
+            logging.error(f"Can't find input schema file {schema_files}")
+            return
+
+    if isinstance(table_files, str):
+        table_files = [table_files]
+    # 2. Get tables
+    tables = [_read_table(ifile) for ifile in table_files]
+    
+    #3. Combine tables
+    return combine_dicts(tables)
