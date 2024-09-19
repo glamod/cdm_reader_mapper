@@ -6,10 +6,12 @@ import numpy as np
 import recordlinkage as rl
 from recordlinkage.compare import Numeric
 
+
 def convert_series(df, conversion):
     def convert_date_to_float(date):
         date = date.astype("datetime64[ns]")
         return (date - date.min()) / np.timedelta64(1, "s")
+
     df = df.copy()
     for column, method in conversion.items():
         try:
@@ -19,13 +21,16 @@ def convert_series(df, conversion):
 
     return df
 
+
 class NumericDate(Numeric):
     pass
-    
+
+
 def numericdate(self, *args, **kwargs):
     compare = NumericDate(*args, **kwargs)
     self.add(compare)
-    return self   
+    return self
+
 
 rl.Compare.numericdate = numericdate
 
@@ -50,7 +55,7 @@ _compare_kwargs = {
         },
         "report_timestamp": {
             "method": "numericdate",
-            "kwargs": {"method": "gauss", "offset": 60.},
+            "kwargs": {"method": "gauss", "offset": 60.0},
         },
     },
 }
