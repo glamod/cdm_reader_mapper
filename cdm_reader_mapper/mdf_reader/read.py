@@ -279,6 +279,8 @@ def read(
     source,
     data_model=None,
     data_model_path=None,
+    year_init=None,
+    year_end=None,
     **kwargs,
 ):
     """Read data files compliant with a user specific data model.
@@ -314,5 +316,9 @@ def read(
         filename=None,
     )
     return MDFFileReader(
-        source=source, data_model=data_model, data_model_path=data_model_path
+        source=source,
+        data_model=data_model,
+        data_model_path=data_model_path,
+        year_init=year_init,
+        year_end=year_end,
     ).read(**kwargs)

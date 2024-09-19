@@ -14,3 +14,4 @@ textdistance
 swifter
 platformdirs
 pyarrow
+recordlinkage

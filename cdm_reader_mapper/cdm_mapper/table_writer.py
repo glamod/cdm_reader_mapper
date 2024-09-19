@@ -353,6 +353,9 @@ def cdm_to_ascii(
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
     extension = "." + extension
+    if not cdm_table:
+        logger.warning("All CDM tables are empty")
+        return
     for table in cdm_table.keys():
         logger.info(f"Printing table {table}")
         filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
