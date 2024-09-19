@@ -98,7 +98,7 @@
   "quality_flag": {
     "sections": "drifter_measurements",
     "elements": "AIR_TEMP_ADJUSTED_QC",
-    "code_table": "qc_flag"
+    "code_table": "quality_flag"
   },
   "numerical_precision": {},
   "sensor_automation_status": {

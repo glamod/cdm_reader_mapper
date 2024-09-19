@@ -65,8 +65,7 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
     deck_fix = fix_methods.get(deck)
     if not deck_fix:
         logger.info(
-            f"No platform type fixes to apply to deck {deck} \
-                    data from dataset {dataset}"
+            f"No platform type fixes to apply to deck {deck} data from dataset {dataset}"
         )
         return data
     elif not isinstance(pt_col, list):
@@ -102,7 +101,28 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
 
 
 def correct(data, dataset, data_model, deck, log_level="INFO"):
-    """DOCUMENTATION."""
+    """Apply ICOADS deck specific platform ID corrections.
+
+    Parameters
+    ----------
+    data: pd.DataFrame or pd.io.parsers.TextFileReader
+        Input dataset.
+    dataset: str
+        Name of metmetpy specific data model.
+    data_model: str
+        Name of the ICOADS data model.
+    deck: str
+        Name of the ICOADS model deck.
+    log_level: str
+      level of logging information to save.
+      Default: INFO
+
+    Returns
+    -------
+    pd.DataFrame or pd.io.parsers.TextFileReader
+        a pandas.DataFrame or pandas.io.parsers.TextFileReader
+        with the adjusted data
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     fix_file = _files.glob(f"{dataset}.json")
@@ -118,8 +138,7 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
 
     if not pt_col:
         logger.error(
-            f"Data model {data_model} platform column not defined in\
-                     properties file"
+            f"Data model {data_model} platform column not defined in properties file"
         )
         return
 

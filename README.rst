@@ -3,17 +3,25 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions| |tag| |release|                              |
+| Versions                   | |pypi| |versions|                                              |
++----------------------------+----------------------------------------------------------------+
+|                            | |tag| |release|                                                |
 +----------------------------+----------------------------------------------------------------+
 | Documentation and Support  | |docs|                                                         |
 +----------------------------+----------------------------------------------------------------+
-| Open Source                | |license| |zenodo| |fair-software| |ossf|                      |
+| Open Source                | |license| |zenodo|                                             |
 +----------------------------+----------------------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |security| |fossa| |codefactor|    |
+|                            | |fair-software| |ossf|                                         |
++----------------------------+----------------------------------------------------------------+
+| Coding Standards           | |black| |ruff| |pre-commit|                                    |
++----------------------------+----------------------------------------------------------------+
+|                            | |security| |fossa| |codefactor|                                |
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
-| Funding                    | |c3s| |noc| |ukmcas|                                           |
+| Funding                    | |c3s|                                                          |
++----------------------------+----------------------------------------------------------------+
+|                            | |noc| |ukmcas|                                                 |
 +----------------------------+----------------------------------------------------------------+
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
@@ -24,6 +32,7 @@ The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
 It was developed to read the IMMA_ (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of:
 
 * Data that is stored in a human-readable manner: “ASCII” format.
+* Data is stored in a Network Common Data Format: "NetCDF" format.
 * Data that is organized in single line reports
 * Reports that have a coherent internal structure and can be modelised.
 * Reports that have a fixed width or field delimited types
@@ -33,7 +42,13 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 Installation
 ------------
 
-If you want to contribute, I recommend cloning the repository and installing the package in development mode, e.g.
+You can install the package directly from pip:
+
+.. code-block:: console
+
+    pip install cdm_reader_mapper
+
+If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
 .. code-block:: console
 
@@ -75,7 +90,6 @@ Read imma data with the `cdm.read()` and copy the data attributes:
 
     data_raw = imma_data.data.copy()
 
-    attributes = imma_data.attrs.copy()
 
 Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):
 
@@ -86,16 +100,11 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
     cdm_dict = cdm.map_model(
         name_of_model,
         data_raw,
-        attributes,
-        cdm_subset=None,
         log_level="DEBUG",
     )
 
 
-For more details on how to use the ``mdf_reader`` tool see the following `jupyter notebooks`_.
-For more details on how to use the ``cdm_mapper`` tool see the following `jupyter notebook`_.
-
-For a detailed guide on how to build a cdm and write the output of the `cdm.map_model()` function in ascii see the `user guide`_.
+For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
 
 Contributing to cdm_reader_mapper
 ---------------------------------
@@ -109,7 +118,7 @@ Credits
 
 ``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_).
 
-Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Marine and Climate Advisory Service (UKMCAS_).
+Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
 .. hyperlinks
 
@@ -123,7 +132,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
 
 .. _IMMA: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
 
-.. _jupyter notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
+.. _jupyter example notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
 .. _NOC: https://noc.ac.uk/
 
@@ -150,8 +159,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
         :alt: Funding
 
 .. |codefactor| image:: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper/badge
-		:target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
-		:alt: CodeFactor
+		    :target: https://www.codefactor.io/repository/github/glamod/cdm_reader_mapper
+		    :alt: CodeFactor
 
 .. |coveralls| image:: https://codecov.io/gh/glamod/cdm_reader_mapper/branch/main/graph/badge.svg
 	      :target: https://codecov.io/gh/glamod/cdm_reader_mapper
@@ -161,9 +170,9 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
         :target: https://cdm-reader-mapper.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B%20%20%E2%97%8F-yellow
-   	:target: https://fair-software.eu
-	:alt: FAIR-software
+.. |fair-software| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green
+   	    :target: https://fair-software.eu
+	      :alt: FAIR-software
 
 .. |fossa| image:: https://app.fossa.com/api/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper.svg?type=shield
         :target: https://app.fossa.com/projects/custom%2B41576%2Fgithub.com%2Fglamod%2Fcdm_reader_mapper?ref=badge_shield
@@ -190,8 +199,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
         :alt: Ruff
 
 .. |security| image:: https://bestpractices.coreinfrastructure.org/projects/9135/badge
-	:target: https://bestpractices.coreinfrastructure.org/projects/9135
-	:alt: OpenSSf Best Practices
+	      :target: https://bestpractices.coreinfrastructure.org/projects/9135
+	      :alt: OpenSSf Best Practices
 
 .. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
         :target: https://www.repostatus.org/#wip
@@ -205,7 +214,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
         :target: https://github.com/glamod/cdm_reader_mapper/tags
         :alt: Tag
 
-.. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UK%20Marine%20and%20Climate%20Advisory%20Service-yellow.svg
+.. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UKMCAS-blue.svg
         :target: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
         :alt: UKMCAS
 
@@ -217,6 +226,6 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) nad UK Ma
         :target: https://zenodo.org/cdm_reader_mapper
  	      :alt: DOI
 
-.. |noc| image:: https://img.shields.io/badge/Thanks%20to-National%20Oceanography%20Centre-yellow.svg
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
         :alt: NOC

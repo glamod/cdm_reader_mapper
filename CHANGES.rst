@@ -11,6 +11,10 @@ New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
 * ``common.getting_files.load_file``: optionally, clear cache directory (:pull:`45`)
+* reworked readthedocs documentation for gathered ``cdm_reader_mapper`` package (:issue:`19`, :pull:`83`)
+* ``mdf_reader``: new validation function for datetime objects (:pull:`89`)
+* ``mdf_reader``: select time period with new arguments ``year_init`` ad ``year_end`` (:pull:`98`)
+* ``cdm_mapper``: duplicate check using ``recordlinkage`` (:pull:`81`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -22,6 +26,10 @@ Breaking changes
 * ``cdm_mapper.map_model``: call function without input parameter ``data_atts`` (:issue:`66`, :pull:`67`)
 * ``decimal_places`` information is moved from ``mdf_reader.schema`` to ``cdm_mapper.tables``; ``decimal_places`` in  user-given schemas will be ignored (:issue:`66`, :pull:`67`)
 * ``cdm_mapper`` does not need any attribute information from ``mdf_reader`` (:issue:`66`, :pull:`67`)
+* ``cdm_mapper``: map ICOADS wind direction data (``361`` -> ``0``; ``362`` -> ``np.nan``) (:pull:`82`)
+* ``cdm_mapper``: set fill_value to ``UNKNOWN`` for C-RAID's ``primary_station_id`` (:pull:`93`)
+* ``cdm_mapper``: map C-RAID quality flags to CDM quality flags (:pull:`94`)
+
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -37,6 +45,8 @@ Internal changes
 * ``cdm_mapper.mappings``: use ``datetime`` to convert ``float`` into hours and minutes.
 * add FOSSA license scanning to github workflows (:pull:`80`)
 * add ``cdm_reader_mapper`` author list including ORCID iD's (:pull:`38`, :pull:`49`)
+* ``mdf_reader``: replace empty strings with missing values (:pull:`89`)
+* ``metmetpy``: use function ``overwrite_data`` in all platform type correction functions (:pull:`89`)
 
 Bug fixes
 ^^^^^^^^^

@@ -38,7 +38,8 @@
   },
   "primary_station_id": {
     "sections": "drifter_characteristics",
-    "elements": "DRIFTER_WMO_NUMBER"
+    "elements": "DRIFTER_WMO_NUMBER",
+    "fill_value": "UNKNOWN"
   },
   "station_record_number": {
     "default": 1
@@ -70,7 +71,8 @@
   },
   "location_quality": {
     "sections": "drifter_measurements",
-    "elements": "POSITION_QC"
+    "elements": "POSITION_QC",
+    "code_table": "location_quality"
   },
   "crs": {
     "default": 0
@@ -101,7 +103,7 @@
   "report_time_quality": {
     "sections": "drifter_measurements",
     "elements": "JULD_QC",
-    "code_table": "qc_flag"
+    "code_table": "time_quality"
   },
   "report_quality": {
     "default": 2

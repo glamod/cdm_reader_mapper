@@ -73,7 +73,26 @@ def correct_it(data, data_model, deck, log_level="INFO"):
 
 
 def correct(data, data_model, deck, log_level="INFO"):
-    """DOCUMENTATION."""
+    """Apply ICOADS deck specific datetime corrections.
+
+    Parameters
+    ----------
+    data: pd.DataFrame or pd.io.parsers.TextFileReader
+        Input dataset.
+    data_model: str
+        Name of ICOADS data model.
+    deck: str
+        Name of IOCADS model deck.
+    log_level: str
+      level of logging information to save.
+      Default: INFO
+
+    Returns
+    -------
+    pd.DataFrame or pd.io.parsers.TextFileReader
+        a pandas.DataFrame or pandas.io.parsers.TextFileReader
+        with the adjusted data
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     replacements_method_file = _files.glob(f"{data_model}.json")
     replacements_method_file = [f for f in replacements_method_file]

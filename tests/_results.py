@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.getting_files import load_file
+from cdm_reader_mapper.common import load_file
 
 cdm_tables = [
     "header-{}.psv",
@@ -201,9 +201,9 @@ class result_data:
         )
 
     @property
-    def expected_craid(self):
+    def expected_1260810(self):
         return self._get_data_dict(
-            "craid",
+            "1260810_2004-12-20_subset",
             "raid",
             "c",
         )

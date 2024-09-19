@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper.common.getting_files import load_file
+from cdm_reader_mapper.common import load_file
 
 
 class test_data:
@@ -213,7 +213,7 @@ class test_data:
     def test_craid_1260810(self):
         """C-RAID 1260810 test data."""
         return self._get_data_dict(
-            "1260810_20041220.nc",
+            "1260810_2004-12-20_subset.nc",
             "c_raid",
             "raid",
             "c",

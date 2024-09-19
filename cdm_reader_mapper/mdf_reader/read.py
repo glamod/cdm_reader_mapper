@@ -201,6 +201,8 @@ def read(
     source,
     data_model=None,
     data_model_path=None,
+    year_init=None,
+    year_end=None,
     **kwargs,
 ):
     """Read data files compliant with a user specific data model.
@@ -215,14 +217,12 @@ def read(
     Parameters
     ----------
     source : str
-        The file path to read
+        The file (including path) to be read
     data_model : str, optional
         Name of internally available data model
     data_model_path : str, optional
-        Path to external data model. Expected file structure:
-            name_of_model/
-                name_of_model.json
-                code_tables/
+        Path to external data model.
+        Expected file structure: name_of_model/name_of_model.json
 
     Returns
     -------
@@ -238,5 +238,9 @@ def read(
         filename=None,
     )
     return MDFFileReader(
-        source=source, data_model=data_model, data_model_path=data_model_path
+        source=source,
+        data_model=data_model,
+        data_model_path=data_model_path,
+        year_init=year_init,
+        year_end=year_end,
     ).read(**kwargs)
