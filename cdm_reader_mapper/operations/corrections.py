@@ -226,7 +226,6 @@ def corrections(data, dataset, correction_path, yr, mo):
         os.makedirs(os.path.join(correction_path, f), exist_ok=True)
     if isinstance(data, pd.DataFrame):
         gen_files(data.copy(), dataset, correction_path, yr, mo)
-        return
     elif isinstance(data, pd.io.parsers.TextFileReader):
         # read_params = [
         #    "chunksize",
