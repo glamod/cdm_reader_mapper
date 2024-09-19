@@ -69,9 +69,8 @@ def collect_json_files(data_model, *args, base=".", name=None):
         arg_files = []
         if data:
             arg_files = list(data.glob(f"{ifile}.json"))
-        if len(arg_files) == 0:
-            logging.warning(f"Input {ifile} not supported.")
-        list_of_files += arg_files
+        if len(arg_files) != 0:
+            list_of_files += arg_files
         i += 1
     return list_of_files
 
