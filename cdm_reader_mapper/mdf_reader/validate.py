@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 
 import numpy as np
 import pandas as pd
@@ -68,9 +67,11 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             logging.error(f"Code table not defined for element {element}")
             logging.warning("Element mask set to False")
             continue
-            
+
         try:
-            table = code_tables.read_table(code_table_name, data_model=data_model, release=release, deck=deck)
+            table = code_tables.read_table(
+                code_table_name, data_model=data_model, release=release, deck=deck
+            )
             if supp:
                 key_elements = (
                     [element[1]]
@@ -111,23 +112,13 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             logging.warning("Element mask set to False")
 
     return mask
-    
-    
-    
-    code_tables_paths_ = [
-        code_tables_path
-        for code_tables_path in code_tables_paths
-        if os.path.isdir(code_tables_path)
-    ]
-    if not code_tables_paths_:
-        logging.error(f"None of code tables paths {code_tables_paths} found")
-        logging.warning("All coded elements set to False")
-        return mask
 
 
-def validate(data, mask0, schema={}, data_model="icoads", release=None, deck=None, disables=None):
+def validate(
+    data, mask0, schema={}, data_model="icoads", release=None, deck=None, disables=None
+):
     """Validate data.
-    
+
     Parameters
     ----------
     data: pd.DataFrame
@@ -147,11 +138,11 @@ def validate(data, mask0, schema={}, data_model="icoads", release=None, deck=Non
         `data_model` is needed.
     disables: list, optional
         List of column names to be ignored.
-        
+
     Returns
     -------
     pd.DataFrame
-        Validated boolean mask.     
+        Validated boolean mask.
     """
     logging.basicConfig(
         format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
@@ -216,7 +207,12 @@ def validate(data, mask0, schema={}, data_model="icoads", release=None, deck=Non
     # pd.DatetimeIndex(df['_datetime']).year
     if len(coded_elements) > 0:
         mask[coded_elements] = validate_codes(
-            coded_elements, data, element_atts, data_model, release, deck,
+            coded_elements,
+            data,
+            element_atts,
+            data_model,
+            release,
+            deck,
         )
 
     # 3. Datetime elements
