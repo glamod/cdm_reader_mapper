@@ -9,38 +9,17 @@ requirements of the data reader tool
 
 from __future__ import annotations
 
-import datetime
+import ast
 import logging
 import os
-from copy import deepcopy
-
-try:
-    from pandas.io.json._normalize import nested_to_record
-except Exception:
-    from pandas.io.json.normalize import nested_to_record
-
-import ast
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
-    open_json_file,
+    open_code_table,
 )
 
 from .. import properties
-
-
-def table_keys(table):
-    """DOCUMENTATION."""
-    separator = "∿"  # something hopefully not in keys...
-    if table.get("_keys"):
-        _table = deepcopy(table)
-        _table.pop("_keys")
-        keys = list(nested_to_record(_table, sep=separator).keys())
-
-        return [x.split(separator) for x in keys]
-    else:
-        return list(table.keys())
 
 
 def eval_dict_items(item):
@@ -49,60 +28,6 @@ def eval_dict_items(item):
         return ast.literal_eval(item)
     except Exception:
         return item
-
-
-def expand_integer_range_key(d):
-    """DOCUMENTATION."""
-    # Looping based on print_nested above
-    if isinstance(d, dict):
-        for k, v in list(d.items()):
-            if "range_key" in k[0:9]:
-                range_params = k[10:-1].split(",")
-                try:
-                    lower = int(range_params[0])
-                except Exception as e:
-                    logging.error(f"Lower bound parsing error in range key: {k}")
-                    logging.error("Error is:")
-                    logging.error(e)
-                    return
-                try:
-                    upper = int(range_params[1])
-                except Exception as e:
-                    if range_params[1] == "yyyy":
-                        upper = datetime.date.today().year
-                    else:
-                        logging.error(f"Upper bound parsing error in range key: {k}")
-                        logging.error("Error is:")
-                        logging.error(e)
-                        return
-                if len(range_params) > 2:
-                    try:
-                        step = int(range_params[2])
-                    except Exception as e:
-                        logging.error(f"Range step parsing error in range key: {k}")
-                        logging.error("Error is:")
-                        logging.error(e)
-                        return
-                else:
-                    step = 1
-                for i_range in range(lower, upper + 1, step):
-                    deep_copy_value = deepcopy(
-                        d[k]
-                    )  # Otherwiserepetitions are linked and act as one!
-                    d.update({str(i_range): deep_copy_value})
-                d.pop(k, None)
-            else:
-                for k, v in d.items():
-                    expand_integer_range_key(v)
-
-
-def _read_table(table_path):
-    """DOCUMENTATION."""
-    table = open_json_file(table_path)
-    # Expand range keys
-    expand_integer_range_key(table)
-
-    return table
 
 
 def read_table(
@@ -164,7 +89,7 @@ def read_table(
     if isinstance(table_files, str):
         table_files = [table_files]
     # 2. Get tables
-    tables = [_read_table(ifile) for ifile in table_files]
+    tables = [open_code_table(ifile) for ifile in table_files]
 
     # 3. Combine tables
     return combine_dicts(tables)

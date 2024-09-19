@@ -7,6 +7,8 @@ import logging
 import numpy as np
 import pandas as pd
 
+from cdm_reader_mapper.common.json_dict import get_table_keys
+
 from . import properties
 from .code_tables import code_tables
 from .schema import schemas
@@ -88,7 +90,7 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
             for x in key_elements
         }
-        table_keys = code_tables.table_keys(table)
+        table_keys = get_table_keys(table)
         table_keys_str = ["∿".join(x) if isinstance(x, list) else x for x in table_keys]
         validation_df = data[key_elements]
         imask = pd.Series(index=data.index, data=True)

@@ -147,6 +147,9 @@ def read_schema(
     """
     # 1. Validate input
     if data_model:
+        if data_model not in properties.supported_data_models:
+            logging.error("Input data model " f"{data_model}" " not supported")
+            return
         schema_files = collect_json_files(
             data_model, release, deck, base=f"{properties._base}.schema"
         )
