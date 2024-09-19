@@ -13,6 +13,8 @@ New features and enhancements
 * ``common.getting_files.load_file``: optionally, clear cache directory (:pull:`45`)
 * reworked readthedocs documentation for gathered ``cdm_reader_mapper`` package (:issue:`19`, :pull:`83`)
 * ``mdf_reader``: new validation function for datetime objects (:pull:`89`)
+* ``mdf_reader``: select time period with new arguments ``year_init`` ad ``year_end`` (:pull:`98`)
+* ``cdm_mapper``: duplicate check using ``recordlinkage`` (:pull:`81`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^

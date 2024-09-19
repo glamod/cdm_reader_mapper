@@ -7,7 +7,7 @@ import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import get_length, make_copy
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
     correct_pt,
@@ -63,6 +63,36 @@ def _read_result_data(data_file, columns, **kwargs):
     return data_[columns]
 
 
+def drop_rows(df, drops):
+    if drops == "all":
+        return df.drop(df.index)
+    elif drops:
+        return df.drop(drops).reset_index(drop=True)
+    return df
+
+
+def get_col_subset(output, codes_subset):
+    col_subset = []
+    if codes_subset is not None:
+        for key in output.keys():
+            for att in output[key]["atts"].keys():
+                if att in codes_subset:
+                    col_subset.append((key, att))
+    return col_subset
+
+
+def remove_datetime_columns(output, output_, col_subset):
+    del output[("header", "record_timestamp")]
+    del output[("header", "history")]
+    del output_[("header", "record_timestamp")]
+    del output_[("header", "history")]
+
+    if len(col_subset) > 0:
+        output = output[col_subset]
+        output_ = output_[col_subset]
+    return output, output_
+
+
 def _testing_suite(
     source=None,
     data_model=None,
@@ -75,6 +105,7 @@ def _testing_suite(
     suffix="exp",
     mapping=True,
     out_path=None,
+    drops=None,
     **kwargs,
 ):
     exp = "expected_" + suffix
@@ -144,8 +175,17 @@ def _testing_suite(
     )
     mask_ = _read_result_data(expected_data["mask"], columns)
 
+    data_ = drop_rows(data_, drops)
+    mask_ = drop_rows(mask_, drops)
     pd.testing.assert_frame_equal(data_pd, data_)
     pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
+
+    if isinstance(data, pd.DataFrame):
+        if data.empty:
+            return
+    else:
+        if get_length(data) == 0:
+            return
 
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(
@@ -154,6 +194,7 @@ def _testing_suite(
             squeeze=True,
             name=None,
         )
+        val_dt_ = drop_rows(val_dt_, drops)
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
 
     if val_id is not None:
@@ -163,6 +204,7 @@ def _testing_suite(
             squeeze=True,
             name=val_id.name,
         )
+        val_id_ = drop_rows(val_id_, drops)
         pd.testing.assert_series_equal(val_id, val_id_, check_dtype=False)
 
     if mapping is False:
@@ -176,12 +218,7 @@ def _testing_suite(
         log_level="DEBUG",
     )
 
-    col_subset = []
-    if codes_subset is not None:
-        for key in output.keys():
-            for att in output[key]["atts"].keys():
-                if att in codes_subset:
-                    col_subset.append((key, att))
+    col_subset = get_col_subset(output, codes_subset)
 
     cdm_mapper.cdm_to_ascii(output, suffix=tb_id)
     output = read_tables(".", tb_id=tb_id, cdm_subset=cdm_subset)
@@ -190,13 +227,7 @@ def _testing_suite(
         expected_data["cdm_table"], tb_id=f"{tb_id}*", cdm_subset=cdm_subset
     )
 
-    del output[("header", "record_timestamp")]
-    del output[("header", "history")]
-    del output_[("header", "record_timestamp")]
-    del output_[("header", "history")]
+    output, output_ = remove_datetime_columns(output, output_, col_subset)
 
-    if len(col_subset) > 0:
-        output = output[col_subset]
-        output_ = output_[col_subset]
-
+    output_ = drop_rows(output_, drops)
     pd.testing.assert_frame_equal(output, output_)
