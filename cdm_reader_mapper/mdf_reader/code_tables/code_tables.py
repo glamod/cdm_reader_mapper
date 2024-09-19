@@ -10,12 +10,9 @@ requirements of the data reader tool
 from __future__ import annotations
 
 import datetime
-import json
+import logging
 import os
 from copy import deepcopy
-
-import numpy as np
-import pandas as pd
 
 try:
     from pandas.io.json._normalize import nested_to_record
@@ -24,9 +21,14 @@ except Exception:
 
 import ast
 
-from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts, open_json_file
+from cdm_reader_mapper.common.json_dict import (
+    collect_json_files,
+    combine_dicts,
+    open_json_file,
+)
 
 from .. import properties
+
 
 def table_keys(table):
     """DOCUMENTATION."""
@@ -40,12 +42,14 @@ def table_keys(table):
     else:
         return list(table.keys())
 
+
 def eval_dict_items(item):
     """DOCUMENTATION."""
     try:
         return ast.literal_eval(item)
     except Exception:
         return item
+
 
 def expand_integer_range_key(d):
     """DOCUMENTATION."""
@@ -57,9 +61,9 @@ def expand_integer_range_key(d):
                 try:
                     lower = int(range_params[0])
                 except Exception as e:
-                    print("Lower bound parsing error in range key: ", k)
-                    print("Error is:")
-                    print(e)
+                    logging.error(f"Lower bound parsing error in range key: {k}")
+                    logging.error("Error is:")
+                    logging.error(e)
                     return
                 try:
                     upper = int(range_params[1])
@@ -67,17 +71,17 @@ def expand_integer_range_key(d):
                     if range_params[1] == "yyyy":
                         upper = datetime.date.today().year
                     else:
-                        print("Upper bound parsing error in range key: ", k)
-                        print("Error is:")
-                        print(e)
+                        logging.error(f"Upper bound parsing error in range key: {k}")
+                        logging.error("Error is:")
+                        logging.error(e)
                         return
                 if len(range_params) > 2:
                     try:
                         step = int(range_params[2])
                     except Exception as e:
-                        print("Range step parsing error in range key: ", k)
-                        print("Error is:")
-                        print(e)
+                        logging.error(f"Range step parsing error in range key: {k}")
+                        logging.error("Error is:")
+                        logging.error(e)
                         return
                 else:
                     step = 1
@@ -91,6 +95,7 @@ def expand_integer_range_key(d):
                 for k, v in d.items():
                     expand_integer_range_key(v)
 
+
 def _read_table(table_path):
     """DOCUMENTATION."""
     table = open_json_file(table_path)
@@ -99,7 +104,15 @@ def _read_table(table_path):
 
     return table
 
-def read_table(code_table_name, data_model=None, release=None, deck=None, ext_table_path=None, ext_table_file=None):
+
+def read_table(
+    code_table_name,
+    data_model=None,
+    release=None,
+    deck=None,
+    ext_table_path=None,
+    ext_table_file=None,
+):
     """
     Read a data model code table file to a dictionary.
 
@@ -122,6 +135,7 @@ def read_table(code_table_name, data_model=None, release=None, deck=None, ext_ta
         `data_model` is needed.
     ext_table_path: str, optional
         The path to the external code table file
+
     Returns
     -------
     dict
@@ -129,7 +143,13 @@ def read_table(code_table_name, data_model=None, release=None, deck=None, ext_ta
     """
     # 1. Validate input
     if data_model:
-        table_files = collect_json_files(data_model, release, deck, base=f"{properties._base}.code_tables", name=code_table_name)
+        table_files = collect_json_files(
+            data_model,
+            release,
+            deck,
+            base=f"{properties._base}.code_tables",
+            name=code_table_name,
+        )
     else:
         if ext_table_file:
             table_path = os.path.abspath(ext_table_path)
@@ -138,13 +158,13 @@ def read_table(code_table_name, data_model=None, release=None, deck=None, ext_ta
             table_files = code_table_name
 
         if not os.path.isfile(table_files):
-            logging.error(f"Can't find input schema file {schema_files}")
+            logging.error(f"Can't find input code table file {table_files}")
             return
 
     if isinstance(table_files, str):
         table_files = [table_files]
     # 2. Get tables
     tables = [_read_table(ifile) for ifile in table_files]
-    
-    #3. Combine tables
+
+    # 3. Combine tables
     return combine_dicts(tables)
