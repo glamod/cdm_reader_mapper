@@ -68,48 +68,41 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             logging.warning("Element mask set to False")
             continue
 
-        try:
-            table = code_tables.read_table(
-                code_table_name, data_model=data_model, release=release, deck=deck
+        table = code_tables.read_table(
+            code_table_name, data_model=data_model, release=release, deck=deck
+        )
+        if supp:
+            key_elements = (
+                [element[1]]
+                if not table.get("_keys")
+                else list(table["_keys"].get(element[1]))
             )
-            if supp:
-                key_elements = (
-                    [element[1]]
-                    if not table.get("_keys")
-                    else list(table["_keys"].get(element[1]))
-                )
-            else:
-                key_elements = (
-                    [element]
-                    if not table.get("_keys")
-                    else list(table["_keys"].get(element))
-                )
+        else:
+            key_elements = (
+                [element]
+                if not table.get("_keys")
+                else list(table["_keys"].get(element))
+            )
 
-            dtypes = {
-                x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
-                for x in key_elements
-            }
-            table_keys = code_tables.table_keys(table)
-            table_keys_str = [
-                "∿".join(x) if isinstance(x, list) else x for x in table_keys
-            ]
-            validation_df = data[key_elements]
-            imask = pd.Series(index=data.index, data=True)
-            val = validation_df.notna()
-            val = val.all(axis=1)
-            masked = np.where(val)
-            masked = masked[0]
-            value = validation_df.iloc[masked, :]
-            value = value.astype(dtypes).astype("str")
-            value = value.apply("~".join, axis=1)
-            value = value.isin(table_keys_str)
-            if masked.size != 0:
-                imask.iloc[masked] = value
-            mask[element] = imask
-        except Exception as e:
-            logging.error(f"Error validating coded element {element}:")
-            logging.error(f"Error is {e}:")
-            logging.warning("Element mask set to False")
+        dtypes = {
+            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
+            for x in key_elements
+        }
+        table_keys = code_tables.table_keys(table)
+        table_keys_str = ["∿".join(x) if isinstance(x, list) else x for x in table_keys]
+        validation_df = data[key_elements]
+        imask = pd.Series(index=data.index, data=True)
+        val = validation_df.notna()
+        val = val.all(axis=1)
+        masked = np.where(val)
+        masked = masked[0]
+        value = validation_df.iloc[masked, :]
+        value = value.astype(dtypes).astype("str")
+        value = value.apply("~".join, axis=1)
+        value = value.isin(table_keys_str)
+        if masked.size != 0:
+            imask.iloc[masked] = value
+        mask[element] = imask
 
     return mask
 
