@@ -9,18 +9,20 @@ from recordlinkage.compare import Numeric
 
 def convert_series(df, conversion):
     """Convert data types in dataframe.
-    
+
     Parameters
     ----------
     df: pd.DataFrame
+        Input DataFrame
     conversion: dict
-        Conversion dictionary conating columns and 
+        Conversion dictionary conating columns and
         new data type as key-value pairs.
-        
-    Retunrs
+
+    Returns
     -------
     pd.DataFrame
     """
+
     def convert_date_to_float(date):
         date = date.astype("datetime64[ns]")
         return (date - date.min()) / np.timedelta64(1, "s")
@@ -35,19 +37,20 @@ def convert_series(df, conversion):
     return df
 
 
-class NumericDate(Numeric):
-    """Copy of rl.compare.Numeric class."""
+class Date2(Numeric):
+    """Copy of ``rl.compare.Numeric`` class."""
+
     pass
 
 
-def numericdate(self, *args, **kwargs):
-    """New method for rl.Compare object using ``NumericDate`` object."""
-    compare = NumericDate(*args, **kwargs)
+def date2(self, *args, **kwargs):
+    """New method for ``rl.Compare`` object using ``Date2`` object."""
+    compare = Date2(*args, **kwargs)
     self.add(compare)
     return self
 
 
-rl.Compare.numericdate = numericdate
+rl.Compare.date2 = date2
 
 _method_kwargs = {
     "header": {
@@ -69,7 +72,7 @@ _compare_kwargs = {
             "kwargs": {"method": "gauss", "offset": 0.05},
         },
         "report_timestamp": {
-            "method": "numericdate",
+            "method": "date2",
             "kwargs": {"method": "gauss", "offset": 60.0},
         },
     },
@@ -270,7 +273,7 @@ def set_comparer(compare_dict):
             comparer.conversion[column] = float
         if method == "date":
             comparer.conversion[column] = "datetime64[ns]"
-        if method == "numericdate":
+        if method == "date2":
             comparer.conversion[column] = "convert_date_to_float"
     return comparer
 
