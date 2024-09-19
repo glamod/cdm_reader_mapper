@@ -169,6 +169,7 @@ def get_files(anchor):
     """Get files."""
     return _files(anchor)
 
+
 def get_path(path):
     """Get path."""
     try:

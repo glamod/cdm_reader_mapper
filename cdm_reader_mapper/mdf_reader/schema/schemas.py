@@ -147,7 +147,9 @@ def read_schema(
     """
     # 1. Validate input
     if data_model:
-        schema_files = collect_json_files(data_model, release, deck, base=f"{properties._base}.schema")
+        schema_files = collect_json_files(
+            data_model, release, deck, base=f"{properties._base}.schema"
+        )
     else:
         if ext_schema_file is None:
             schema_path = os.path.abspath(ext_schema_path)

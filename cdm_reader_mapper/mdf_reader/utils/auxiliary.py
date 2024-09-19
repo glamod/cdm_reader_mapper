@@ -379,7 +379,7 @@ class _FileReader:
         self.data_model = data_model
         self.release = release
         self.deck = deck
-        self.data_model_path=data_model_path
+        self.data_model_path = data_model_path
         self.year_init = year_init
         self.year_end = year_end
 
