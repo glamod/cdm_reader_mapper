@@ -27,7 +27,7 @@ def open_json_file(ifile, encoding="utf-8"):
         json_dict = json.load(fileObj)
     return json_dict
         
-def collect_json_files(data_model, *args, base="."):
+def collect_json_files(data_model, *args, base=".", name=None):
     """Collect available data_model release deck files.
 
     Parameters
@@ -35,13 +35,13 @@ def collect_json_files(data_model, *args, base="."):
     data_model: str
         The name of the data model to read. This is for
         data models included in the tool
-    base: str
-        JSON file base path.
-    module: str, default: schema
-        Name of the module to get the files.
     args*: optional
         Optional data_model subdirectories.
-
+    base: str
+        JSON file base path.
+    name: str, optional
+        Name of the file to collect.
+        Default is a combination of ``data_model`` and ``args``.
     Returns
     -------
     list
@@ -52,18 +52,23 @@ def collect_json_files(data_model, *args, base="."):
         return
     path = f"{base}.{data_model}"
     data = get_path(path)
-    list_of_files = list(data.glob(f"{data_model}.json"))
+    if name is None:
+        ifile = data_model
+    else:
+        ifile = name
+    list_of_files = list(data.glob(f"{ifile}.json"))
 
     i = 0
     while i < len(args):
-        data_model = f"{data_model}_{args[i]}"
+        if name is None:
+            ifile = f"{ifile}_{args[i]}"
         path = f"{path}.{args[i]}"
         data = get_path(path)
         arg_files = []
         if data:
-            arg_files = list(data.glob(f"{data_model}.json"))
+            arg_files = list(data.glob(f"{ifile}.json"))
         if len(arg_files) == 0:
-            logging.warning(f"Input {data_model} not supported.")
+            logging.warning(f"Input {ifile} not supported.")
         list_of_files += arg_files
         i += 1
     return list_of_files
