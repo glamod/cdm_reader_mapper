@@ -2,7 +2,32 @@
 
 from __future__ import annotations
 
+import numpy as np
 import recordlinkage as rl
+from recordlinkage.compare import Numeric
+
+def convert_series(df, conversion):
+    def convert_date_to_float(date):
+        date = date.astype("datetime64[ns]")
+        return (date - date.min()) / np.timedelta64(1, "s")
+    df = df.copy()
+    for column, method in conversion.items():
+        try:
+            df[column] = df[column].astype(method)
+        except TypeError:
+            df[column] = locals()[method](df[column])
+
+    return df
+
+class NumericDate(Numeric):
+    pass
+    
+def numericdate(self, *args, **kwargs):
+    compare = NumericDate(*args, **kwargs)
+    self.add(compare)
+    return self   
+
+rl.Compare.numericdate = numericdate
 
 _method_kwargs = {
     "header": {
@@ -17,13 +42,16 @@ _compare_kwargs = {
         "primary_station_id": {"method": "exact"},
         "longitude": {
             "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.0},
+            "kwargs": {"method": "gauss", "offset": 0.05},
         },
         "latitude": {
             "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.0},
+            "kwargs": {"method": "gauss", "offset": 0.05},
         },
-        "report_timestamp": {"method": "exact"},
+        "report_timestamp": {
+            "method": "numericdate",
+            "kwargs": {"method": "gauss", "offset": 60.},
+        },
     },
 }
 
@@ -120,11 +148,17 @@ class DupDetect:
             drop = -1
         elif not isinstance(keep, int):
             raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+
         self.result = self.data.copy()
         self.result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=None)
+
+        drops = []
         for index in self.matches.index:
+            if index[drop] in drops:
+                continue
+
             report_id_drop = self.result.loc[index[drop], "report_id"]
             report_id_keep = self.result.loc[index[keep], "report_id"]
             duplicates_drop = self.result.loc[index[drop], "duplicates"]
@@ -145,6 +179,7 @@ class DupDetect:
                 self.result.loc[index[drop], "duplicates"] = (
                     f"{duplicates_drop}, {report_id_keep}"
                 )
+            drops.append(index[drop])
 
         return self
 
@@ -213,6 +248,10 @@ def set_comparer(compare_dict):
         )
         if method == "numeric":
             comparer.conversion[column] = float
+        if method == "date":
+            comparer.conversion[column] = "datetime64[ns]"
+        if method == "numericdate":
+            comparer.conversion[column] = "convert_date_to_float"
     return comparer
 
 
@@ -259,6 +298,6 @@ def duplicate_check(
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(data)
     comparer = set_comparer(compare_kwargs)
-    data = data.astype(comparer.conversion)
-    compared = comparer.compute(pairs, data)
+    data_ = convert_series(data, comparer.conversion)
+    compared = comparer.compute(pairs, data_)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
