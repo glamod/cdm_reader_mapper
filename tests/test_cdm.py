@@ -10,7 +10,7 @@ from ._testing_cdm_suite import _testing_suite
 @pytest.mark.parametrize(
     "dname, cdm_name, cdm_subset, codes_subset, suffix, out_path, mapping, drops, mdf_kwargs",
     [
-        ("063_714", "icoads_r300_d714", None, None, "063_714", ".", True, None, {}),
+        ("icoads_r300_d714", "icoads_r300_d714", None, None, "063_714", ".", True, None, {}),
         (
             "063_714",
             None,
@@ -23,7 +23,7 @@ from ._testing_cdm_suite import _testing_suite
             {"sections": ["core", "c99"]},
         ),
         (
-            "069_701",
+            "icoads_r300_d701",
             "icoads_r300_d701_type1",
             None,
             None,
@@ -34,7 +34,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "069_701",
+            "icoads_r300_d701",
             "icoads_r300_d701_type2",
             None,
             None,
@@ -45,7 +45,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "096_702",
+            "icoads_r300_d702",
             "icoads_r300_d702",
             None,
             None,
@@ -55,10 +55,10 @@ from ._testing_cdm_suite import _testing_suite
             None,
             {},
         ),
-        ("144_703", "icoads_r300_d703", None, None, "144_703", None, True, None, {}),
-        ("125_704", "icoads_r300_d704", None, None, "125_704", None, True, None, {}),
+        ("icoads_r300_d703", "icoads_r300_d703", None, None, "144_703", None, True, None, {}),
+        ("icoads_r300_d704", "icoads_r300_d704", None, None, "125_704", None, True, None, {}),
         (
-            "085_705",
+            "icoads_r300_d705",
             "icoads_r300_d705",
             None,
             None,
@@ -69,7 +69,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "084_706",
+            "icoads_r300_d706",
             "icoads_r300_d706",
             None,
             None,
@@ -80,7 +80,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "098_707",
+            "icoads_r300_d707",
             "icoads_r300_d707",
             None,
             None,
@@ -90,19 +90,19 @@ from ._testing_cdm_suite import _testing_suite
             None,
             {},
         ),
-        ("125_721", "icoads_r300_d721", None, None, "125_721", None, True, None, {}),
-        ("133_730", "icoads_r300_d730", None, None, "133_730", None, True, None, {}),
-        ("143_781", "icoads_r300_d781", None, None, "143_781", None, True, None, {}),
-        ("103_794", "icoads_r302_d794", None, None, "103_794", None, True, None, {}),
-        ("091_201", "icoads_r300_d201", None, None, "091_201", None, True, None, {}),
-        ("077_892", "icoads_r300_d892", None, None, "077_892", None, True, None, {}),
-        ("147_700", "icoads_r300_d700", None, None, "147_700", None, True, None, {}),
-        ("103_792", "icoads_r302_d792", None, None, "103_792", None, True, None, {}),
-        ("114_992", "icoads_r302_d992", None, None, "114_992", None, True, None, {}),
-        ("gcc_mix", "gcc", None, None, "mix_out", None, True, None, {}),
-        ("craid_1260810", "craid", None, None, "1260810", None, True, None, {}),
+        ("icoads_r300_d721", "icoads_r300_d721", None, None, "125_721", None, True, None, {}),
+        ("icoads_r300_d730", "icoads_r300_d730", None, None, "133_730", None, True, None, {}),
+        ("icoads_r300_d781", "icoads_r300_d781", None, None, "143_781", None, True, None, {}),
+        ("icoads_r302_d794", "icoads_r302_d794", None, None, "103_794", None, True, None, {}),
+        ("icoads_r300_d201", "icoads_r300_d201", None, None, "091_201", None, True, None, {}),
+        ("icoads_r300_d892", "icoads_r300_d892", None, None, "077_892", None, True, None, {}),
+        ("icoads_r300_d700", "icoads_r300_d700", None, None, "147_700", None, True, None, {}),
+        ("icoads_r302_d792", "icoads_r302_d792", None, None, "103_792", None, True, None, {}),
+        ("icoads_r302_d992", "icoads_r302_d992", None, None, "114_992", None, True, None, {}),
+        ("gcc", "gcc", None, None, "mix_out", None, True, None, {}),
+        ("craid", "craid", None, None, "1260810", None, True, None, {}),
         (
-            "063_714",
+            "icoads_r300_d714",
             "icoads_r300_d714",
             ["header", "observations-sst"],
             None,
@@ -113,7 +113,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "063_714",
+            "icoads_r300_d714",
             "icoads_r300_d714",
             None,
             ["platform_sub_type", "wind_direction"],
@@ -124,7 +124,7 @@ from ._testing_cdm_suite import _testing_suite
             {},
         ),
         (
-            "063_714",
+            "icoads_r300_d714",
             "icoads_r300_d714",
             None,
             None,
@@ -135,7 +135,7 @@ from ._testing_cdm_suite import _testing_suite
             {"chunksize": 3},
         ),
         (
-            "063_714",
+            "icoads_r300_d714",
             "icoads_r300_d714",
             None,
             None,
@@ -146,7 +146,7 @@ from ._testing_cdm_suite import _testing_suite
             {"sections": ["c99"], "chunksize": 3},
         ),
         (
-            "096_702",
+            "icoads_r300_d702",
             "icoads_r300_d702",
             None,
             None,
@@ -157,7 +157,7 @@ from ._testing_cdm_suite import _testing_suite
             {"year_init": 1874},
         ),
         (
-            "096_702",
+            "icoads_r300_d702",
             "icoads_r300_d702",
             None,
             None,
@@ -168,7 +168,7 @@ from ._testing_cdm_suite import _testing_suite
             {"year_end": 1874},
         ),
         (
-            "096_702",
+            "icoads_r300_d702",
             "icoads_r300_d702",
             None,
             None,
@@ -179,7 +179,7 @@ from ._testing_cdm_suite import _testing_suite
             {"year_init": 1874, "year_end": 1874},
         ),
         (
-            "gcc_mix",
+            "gcc",
             "gcc",
             None,
             None,
@@ -190,7 +190,7 @@ from ._testing_cdm_suite import _testing_suite
             {"year_init": 2002},
         ),
         (
-            "craid_1260810",
+            "craid",
             "craid",
             None,
             None,
