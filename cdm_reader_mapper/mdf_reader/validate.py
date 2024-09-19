@@ -59,45 +59,18 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, code_tables_paths, schema, supp=False):
+def validate_codes(elements, data, schema, data_model, release, deck, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    code_tables_paths_ = [
-        code_tables_path
-        for code_tables_path in code_tables_paths
-        if os.path.isdir(code_tables_path)
-    ]
-    if not code_tables_paths_:
-        logging.error(f"None of code tables paths {code_tables_paths} found")
-        logging.warning("All coded elements set to False")
-        return mask
-
     for element in elements:
-        code_table = schema.get(element).get("codetable")
-        if not code_table:
+        code_table_name = schema.get(element).get("codetable")
+        if not code_table_name:
             logging.error(f"Code table not defined for element {element}")
             logging.warning("Element mask set to False")
             continue
-
-        code_table_path = [
-            os.path.join(code_tables_path, code_table + ".json")
-            for code_tables_path in code_tables_paths_
-        ]
-        # Eval elements: if ._yyyy, ._xxx in name: pd.DateTimeIndex().xxxx is the element to pass
-        # Additionally, on doing this, should make sure that element is a datetime type:
-        code_table_path_ = [
-            code_table_
-            for code_table_ in code_table_path
-            if os.path.isfile(code_table_)
-        ]
-        if not code_table_path_:
-            logging.error(f"Error validating coded element {element}:")
-            logging.error(f"None of code table files {code_table_path_} found")
-            logging.warning("Element mask set to False")
-            continue
-        code_table_path = code_table_path_[0]
+            
         try:
-            table = code_tables.read_table(code_table_path)
+            table = code_tables.read_table(code_table_name, data_model=data_model, release=release, deck=deck)
             if supp:
                 key_elements = (
                     [element[1]]
@@ -138,10 +111,48 @@ def validate_codes(elements, data, code_tables_paths, schema, supp=False):
             logging.warning("Element mask set to False")
 
     return mask
+    
+    
+    
+    code_tables_paths_ = [
+        code_tables_path
+        for code_tables_path in code_tables_paths
+        if os.path.isdir(code_tables_path)
+    ]
+    if not code_tables_paths_:
+        logging.error(f"None of code tables paths {code_tables_paths} found")
+        logging.warning("All coded elements set to False")
+        return mask
 
 
-def validate(data, mask0, schema, code_tables_paths, disables):
-    """DOCUMENTATION."""
+def validate(data, mask0, schema={}, data_model="icoads", release=None, deck=None, disables=None):
+    """Validate data.
+    
+    Parameters
+    ----------
+    data: pd.DataFrame
+        DataFrame for validation.
+    mask0: pd.DataFrame
+        Boolean mask.
+    schema: dict
+        Data model schema.
+    data_model: str
+        The name of the data model to read. This is for
+        data models included in the tool.
+    release: str, optional
+        The name of the data model release. If chosen, overwrite data model schema.
+        `data_model` is needed.
+    deck: str, optional
+        The name of the data model deck. If chosen, overwrite data model release schema.
+        `data_model` is needed.
+    disables: list, optional
+        List of column names to be ignored.
+        
+    Returns
+    -------
+    pd.DataFrame
+        Validated boolean mask.     
+    """
     logging.basicConfig(
         format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
         level=logging.INFO,
@@ -203,12 +214,9 @@ def validate(data, mask0, schema, code_tables_paths, disables):
     # Get the full list of keys combinations (tuples, triplets...) and check the column combination against that: if it fails, mark the element!
     # Need to see how to grab the YEAR part of a datetime when YEAR comes from a datetime element
     # pd.DatetimeIndex(df['_datetime']).year
-    if isinstance(code_tables_paths, str):
-        code_tables_paths = [code_tables_paths]
-
     if len(coded_elements) > 0:
         mask[coded_elements] = validate_codes(
-            coded_elements, data, code_tables_paths, element_atts
+            coded_elements, data, element_atts, data_model, release, deck,
         )
 
     # 3. Datetime elements
