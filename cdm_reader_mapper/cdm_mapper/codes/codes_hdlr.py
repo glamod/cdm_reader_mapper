@@ -21,7 +21,7 @@ from ..properties import _base
 
 
 class codes_hdlr:
-    """Class for readinf CDM mapper code tables."""
+    """Class for reading CDM mapper code tables."""
 
     def __init__(self, imodel, log_level="INFO"):
         self.imodel = imodel
