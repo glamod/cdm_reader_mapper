@@ -11,6 +11,8 @@ the cdm tool.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
@@ -45,9 +47,9 @@ def get_cdm_atts(cdm_tables):
     cdm_atts = {}
     for cdm_table in cdm_tables:
         if cdm_table == "header":
-            cdm_atts[cdm_table] = header_dict
+            cdm_atts[cdm_table] = deepcopy(header_dict)
         else:
-            cdm_atts[cdm_table] = observations_dict
+            cdm_atts[cdm_table] = deepcopy(observations_dict)
     return cdm_atts
 
 
