@@ -45,11 +45,11 @@ class test_data:
         )
 
     @property
-    def test_icoads_r300_d706(self):
+    def test_icoads_r300_d705(self):
         """IMMA1 deck 705 test data."""
         return self._get_data_dict(
             "085-705_1938-04-01_subset.imma",
-            "icoads_r300_d706",
+            "icoads_r300_d705",
             "705",
             "imma1",
             "icoads_r3000",
