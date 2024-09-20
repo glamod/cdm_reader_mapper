@@ -21,9 +21,9 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
 from . import properties
-from .codes.codes_hdlr import get_code_table
+from .codes.codes import get_code_table
 from .mappings import mapping_functions
-from .tables.tables_hdlr import get_cdm_atts, get_imodel_maps
+from .tables.tables import get_cdm_atts, get_imodel_maps
 
 
 def drop_duplicates(df):
@@ -79,6 +79,53 @@ def _decimal_places(
     return cdm_tables
 
 
+def _transform(
+    to_map,
+    elements,
+    imodel_functions,
+    transform,
+    kwargs,
+    logger,
+):
+    logger.debug(f"\ttransform: {transform}")
+    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+
+    trans = getattr(imodel_functions, transform)
+    if elements:
+        return trans(to_map, **kwargs)
+    return trans(**kwargs)
+
+
+def _code_table(
+    to_map,
+    data_model,
+    code_table,
+    logger,
+):
+    # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
+    # Approach that does not work when it is not nested...so just try and assume not nested if fails
+    # Prepare code_table
+    table_map = get_code_table(*data_model.split("_"), code_table=code_table)
+    try:
+        to_map = to_map.to_frame()
+    except Exception:
+        logger.warning(f"Could not convert {to_map} to frame.")
+
+    to_map_str = to_map.astype(str)
+
+    to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
+    return to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+
+
+def _default(
+    default,
+    length,
+):
+    if isinstance(default, list):
+        return [default] * length
+    return default
+
+
 def _write_csv_files(
     idata,
     mapping,
@@ -123,8 +170,10 @@ def _write_csv_files(
             notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
             to_map = idata[elements].iloc[notna_idx_idx]
-            # notna_idx = notna_idx_idx + idata.index[0]  # to account for parsers #original
-            notna_idx = idata.index[notna_idx_idx]  # fix?
+            # notna_idx = (
+            #    notna_idx_idx + idata.index[0]
+            # )  # to account for parsers #original
+            # na_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -132,42 +181,28 @@ def _write_csv_files(
                 isEmpty = True
 
         if transform and not isEmpty:
-            logger.debug(f"\ttransform: {transform}")
-            logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
-
-            trans = getattr(imodel_functions, transform)
-            logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
-            logger.debug(f"\tidata_i Index: {idata.index}")
-            if elements:
-                logger.debug(f"\tnotna_idx: {notna_idx}")
-                table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
-            else:
-                table_df_i[cdm_key] = trans(**kwargs)
-        elif code_table and not isEmpty:
-            # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
-            # Approach that does not work when it is not nested...so just try and assume not nested if fails
-            # Prepare code_table
-            table_map = get_code_table(
-                *imodel_functions.imodel.split("_"), code_table=code_table
+            table_df_i[cdm_key] = _transform(
+                to_map,
+                elements,
+                imodel_functions,
+                transform,
+                kwargs,
+                logger=logger,
             )
-            try:
-                to_map = to_map.to_frame()
-            except Exception:
-                logger.warning(f"Could not convert {to_map} to frame.")
-
-            to_map_str = to_map.astype(str)
-
-            to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
-            table_df_i[cdm_key] = to_map_str.apply(
-                lambda x: _map_to_df(table_map, x), axis=1
+        elif code_table and not isEmpty:
+            table_df_i[cdm_key] = _code_table(
+                to_map,
+                imodel_functions.imodel,
+                code_table,
+                logger=logger,
             )
         elif elements and not isEmpty:
             table_df_i[cdm_key] = to_map
         elif default is not None:  # (value = 0 evals to False!!)
-            if isinstance(default, list):
-                table_df_i[cdm_key] = [default] * len(table_df_i.index)
-            else:
-                table_df_i[cdm_key] = default
+            table_df_i[cdm_key] = _default(
+                default,
+                len(table_df_i.index),
+            )
 
         if fill_value is not None:
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
