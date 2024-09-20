@@ -148,7 +148,7 @@ def _write_csv_files(
         decimal_places = imapping.get("decimal_places")
 
         if codes_subset:
-            if code_table in codes_subset:
+            if code_table not in codes_subset:
                 code_table = None
 
         if elements:
