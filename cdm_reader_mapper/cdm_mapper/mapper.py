@@ -61,22 +61,18 @@ def _map_to_df(m, x):
 
 
 def _decimal_places(
-    cdm_tables,
+    entry,
     decimal_places,
-    cdm_key,
-    table,
     imodel_functions,
 ):
     if decimal_places is not None:
+
         if isinstance(decimal_places, int):
-            cdm_tables[table]["atts"][cdm_key].update(
-                {"decimal_places": decimal_places}
-            )
+            entry["decimal_places"] = decimal_places
         else:
-            cdm_tables[table]["atts"][cdm_key].update(
-                {"decimal_places": getattr(imodel_functions, decimal_places)()}
-            )
-    return cdm_tables
+            entry["decimal_places"] = getattr(imodel_functions, decimal_places)()
+
+    return entry
 
 
 def _transform(
@@ -173,7 +169,7 @@ def _write_csv_files(
             # notna_idx = (
             #    notna_idx_idx + idata.index[0]
             # )  # to account for parsers #original
-            # na_idx = idata.index[notna_idx_idx]  # fix?
+            # notna_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -207,11 +203,9 @@ def _write_csv_files(
         if fill_value is not None:
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
-        cdm_tables = _decimal_places(
-            cdm_tables,
+        cdm_tables[table]["atts"][cdm_key] = _decimal_places(
+            cdm_tables[table]["atts"][cdm_key],
             decimal_places,
-            cdm_key,
-            table,
             imodel_functions,
         )
 
@@ -231,14 +225,12 @@ def _map(
     codes_subset=None,
     logger=None,
 ):
+    if not cdm_subset:
+        cdm_subset = properties.cdm_tables
 
-    cdm_tables = properties.cdm_tables
-    if cdm_subset:
-        cdm_tables = [cdm_table for cdm_table in cdm_tables if cdm_table in cdm_subset]
+    cdm_atts = get_cdm_atts(cdm_subset)
 
-    cdm_atts = get_cdm_atts(cdm_tables)
-
-    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_tables)
+    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
 
     imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
 
@@ -265,7 +257,6 @@ def _map(
                 table,
                 cols,
                 imodel_functions,
-                # imodel_code_tables,
                 codes_subset,
                 cdm_tables,
             )
@@ -283,6 +274,7 @@ def _map(
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
+
     return cdm_tables
 
 
