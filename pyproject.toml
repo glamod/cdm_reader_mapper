@@ -47,8 +47,8 @@ target-version = [
 ]
 
 [tool.codespell]
-ignore-words-list = "BU,OT,rime,Nam,Fram,sentinal,ND,BUID,SME,ASII,TE,ANTARTIC,ARCHITEC,MISTIC,DESPATCH,EMPRESS,INDEPEND,DONN,LIGHTNIN,MESSENGE,SAPHIRE,THOS,GAGE,LEW,FALS,FALSO,ACHIN,CORSE,GRAT,FROWARD,JAQUES,FOUNDLAND,ROUGE,WIGHT,FIALS,PARIA,SINGEL,MONSERRAT,PIDGEON,vaid,TRU"
-skip = "cdm_reader_mapper/mdf_reader/code_tables/*/ICOADS.*.json"
+ignore-words-list = "sentinal, vaid"
+skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*.csv"
 
 [tool.coverage.run]
 relative_files = true
