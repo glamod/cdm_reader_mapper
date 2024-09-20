@@ -328,13 +328,11 @@ def read(
     )
     mrd = data_model.split("_")
     data_model = get_list_element(mrd, 0)
-    release = get_list_element(mrd, 1)
-    deck = get_list_element(mrd, 2)
+    sub_models = mrd[1:]
     return MDFFileReader(
         source=source,
         data_model=data_model,
-        release=release,
-        deck=deck,
+        sub_models=sub_models,
         data_model_path=data_model_path,
         year_init=year_init,
         year_end=year_end,

@@ -60,7 +60,7 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, data_model, release, deck, supp=False):
+def validate_codes(elements, data, schema, data_model, *sub_models, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -71,7 +71,9 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             continue
 
         table = codes.read_table(
-            code_table_name, data_model=data_model, release=release, deck=deck
+            code_table_name,
+            data_model,
+            *sub_models,
         )
         if supp:
             key_elements = (
@@ -110,27 +112,29 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
 
 
 def validate(
-    data, mask0, schema={}, data_model="icoads", release=None, deck=None, disables=None
+    data_model,
+    *sub_models,
+    data=pd.DataFrame(),
+    mask0=pd.DataFrame(),
+    schema={},
+    disables=None,
 ):
     """Validate data.
 
     Parameters
     ----------
+    data_model: str
+        The name of the data model to read. This is for
+        data models included in the tool.
+    sub_models*: optionally
+        Sub-directories of ``data_model``.
+        E.g. r300 d701 type2
     data: pd.DataFrame
         DataFrame for validation.
     mask0: pd.DataFrame
         Boolean mask.
     schema: dict
         Data model schema.
-    data_model: str
-        The name of the data model to read. This is for
-        data models included in the tool.
-    release: str, optional
-        The name of the data model release. If chosen, overwrite data model schema.
-        `data_model` is needed.
-    deck: str, optional
-        The name of the data model deck. If chosen, overwrite data model release schema.
-        `data_model` is needed.
     disables: list, optional
         List of column names to be ignored.
 
@@ -206,8 +210,7 @@ def validate(
             data,
             element_atts,
             data_model,
-            release,
-            deck,
+            *sub_models,
         )
 
     # 3. Datetime elements

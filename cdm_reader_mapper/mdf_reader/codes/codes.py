@@ -32,11 +32,9 @@ def eval_dict_items(item):
 
 def read_table(
     code_table_name,
-    data_model=None,
-    release=None,
-    deck=None,
+    data_model,
+    *sub_models,
     ext_table_path=None,
-    ext_table_file=None,
 ):
     """
     Read a data model code table file to a dictionary.
@@ -45,21 +43,18 @@ def read_table(
     the data reader expects, by appending information
     on secondary keys and expanding range keys.
 
-    Arguments
+    Parameter
     ---------
     code_table_name: str
-        The external code table file
-    data_model: str, optional
+        The external code table file.
+    data_model: str
         The name of the data model to read. This is for
         data models included in the tool.
-    release: str, optional
-        The name of the data model release. If chosen, overwrite data model schema.
-        `data_model` is needed.
-    deck: str, optional
-        The name of the data model deck. If chosen, overwrite data model release schema.
-        `data_model` is needed.
+    sub_models*: optionally
+        Sub-directories of ``data_model``.
+        E.g. r300 d701 type2
     ext_table_path: str, optional
-        The path to the external code table file
+        The path to the external code table file.
 
     Returns
     -------
@@ -67,24 +62,19 @@ def read_table(
         Code table
     """
     # 1. Validate input
-    if data_model:
-        table_files = collect_json_files(
-            data_model,
-            release,
-            deck,
-            base=f"{properties._base}.code_tables",
-            name=code_table_name,
-        )
-    else:
-        if ext_table_file:
-            table_path = os.path.abspath(ext_table_path)
-            table_files = os.path.join(table_path, code_table_name + ".json")
-        else:
-            table_files = code_table_name
-
+    if ext_table_path:
+        table_path = os.path.abspath(ext_table_path)
+        table_files = os.path.join(table_path, code_table_name + ".json")
         if not os.path.isfile(table_files):
             logging.error(f"Can't find input code table file {table_files}")
             return
+    else:
+        table_files = collect_json_files(
+            data_model,
+            *sub_models,
+            base=f"{properties._base}.codes",
+            name=code_table_name,
+        )
 
     if isinstance(table_files, str):
         table_files = [table_files]

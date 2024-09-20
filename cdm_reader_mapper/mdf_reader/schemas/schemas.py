@@ -110,9 +110,7 @@ def _read_schema(schema):
     return schema
 
 
-def read_schema(
-    data_model=None, release=None, deck=None, ext_schema_path=None, ext_schema_file=None
-):
+def read_schema(data_model, *sub_models, ext_schema_path=None, ext_schema_file=None):
     """
     Read a data model schema file.
 
@@ -120,17 +118,14 @@ def read_schema(
     completes it by adding explicitly information the
     reader tool needs
 
-    Keyword Arguments
-    -----------------
-    data_model: str, optional
+    Parameters
+    ----------
+    data_model: str
         The name of the data model to read. This is for
         data models included in the tool.
-    release: str, optional
-        The name of the data model release. If chosen, overwrite data model schema.
-        `data_model` is needed.
-    deck: str, optional
-        The name of the data model deck. If chosen, overwrite data model release schema.
-        `data_model` is needed.
+    sub_models*: optionally
+        Sub-directories of ``data_model``.
+        E.g. r300 d701 type2
     ext_schema_path: str, optional
         The path to the external data model schema file
     ext_schema_file: str, optional
@@ -146,24 +141,19 @@ def read_schema(
         Data model schema
     """
     # 1. Validate input
-    if data_model:
+    if ext_schema_file:
+        schema_files = ext_schema_file
+    elif ext_schema_path:
+        schema_path = os.path.abspath(ext_schema_path)
+        schema_name = os.path.basename(schema_path)
+        schema_files = os.path.join(schema_path, schema_name + ".json")
+    else:
         if data_model not in properties.supported_data_models:
             logging.error("Input data model " f"{data_model}" " not supported")
             return
         schema_files = collect_json_files(
-            data_model, release, deck, base=f"{properties._base}.schema"
+            data_model, *sub_models, base=f"{properties._base}.schemas"
         )
-    else:
-        if ext_schema_file is None:
-            schema_path = os.path.abspath(ext_schema_path)
-            schema_name = os.path.basename(schema_path)
-            schema_files = os.path.join(schema_path, schema_name + ".json")
-        else:
-            schema_files = ext_schema_file
-
-        if not os.path.isfile(schema_files):
-            logging.error(f"Can't find input schema file {schema_files}")
-            return
 
     if isinstance(schema_files, str):
         schema_files = [schema_files]
