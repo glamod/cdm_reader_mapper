@@ -299,7 +299,7 @@ class mapping_functions:
         strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
         imodel_lineage = find_entry(self.imodel, imodel_lineages)
         if imodel_lineage:
-            strf = strf + imodel_lineages[self.imodel]
+            strf = strf + imodel_lineage
         return strf
 
     def longitude_360to180(self, ds):
