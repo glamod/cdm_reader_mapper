@@ -30,8 +30,6 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-module_path = os.path.dirname(os.path.abspath(__file__))
-
 
 def print_integer(data, null_label):
     """
