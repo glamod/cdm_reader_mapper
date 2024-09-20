@@ -24,5 +24,8 @@
     "elements": "D",
     "transform": "integer_to_float",
     "decimal_places": 0
+  },
+  "conversion_flag": {
+    "default": 2
   }
 }

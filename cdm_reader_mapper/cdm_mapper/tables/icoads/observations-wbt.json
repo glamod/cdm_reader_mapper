@@ -23,5 +23,8 @@
     "sections": "core",
     "elements": "WBT",
     "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
   }
 }

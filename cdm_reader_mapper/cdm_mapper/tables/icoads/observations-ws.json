@@ -23,5 +23,8 @@
     "sections": "core",
     "elements": "W",
     "decimal_places": 1
+  },
+  "conversion_flag": {
+    "default": 2
   }
 }
