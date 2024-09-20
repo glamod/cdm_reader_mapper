@@ -17,7 +17,7 @@ import xarray as xr
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
 from .. import properties
-from ..schema import schemas
+from ..schemas import schemas
 from ..validate import validate
 from . import converters, decoders
 

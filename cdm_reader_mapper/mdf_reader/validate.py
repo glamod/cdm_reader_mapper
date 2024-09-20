@@ -10,8 +10,8 @@ import pandas as pd
 from cdm_reader_mapper.common.json_dict import get_table_keys
 
 from . import properties
-from .code_tables import code_tables
-from .schema import schemas
+from .codes import codes
+from .schemas import schemas
 
 
 def validate_datetime(elements, data):
@@ -70,7 +70,7 @@ def validate_codes(elements, data, schema, data_model, release, deck, supp=False
             logging.warning("Element mask set to False")
             continue
 
-        table = code_tables.read_table(
+        table = codes.read_table(
             code_table_name, data_model=data_model, release=release, deck=deck
         )
         if supp:

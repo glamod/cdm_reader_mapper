@@ -11,7 +11,7 @@ import pandas as pd
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 from . import properties
-from .schema import schemas
+from .schemas import schemas
 from .utils.auxiliary import _FileReader, validate_arg, validate_path
 
 
