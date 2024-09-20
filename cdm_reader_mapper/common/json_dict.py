@@ -34,7 +34,7 @@ def open_json_file(ifile, encoding="utf-8"):
     return json_dict
 
 
-def collect_json_files(idir, *args, base=".", name=None):
+def collect_json_files(idir, *args, base=None, name=None):
     """Collect available data_model release deck files.
 
     Parameters
@@ -78,7 +78,7 @@ def collect_json_files(idir, *args, base=".", name=None):
     return list_of_files
 
 
-def combine_dicts(list_of_files):
+def combine_dicts(list_of_files, base=None):
     """Read list of json files and combine them to one dictionary.
 
     Parameters
@@ -86,6 +86,8 @@ def combine_dicts(list_of_files):
     list_of_files: str, list
         One or more JSON files on disk to be read.
         One or more JSON dictionaries.
+    base: str
+        JSON file base path.
 
     Returns
     -------
@@ -119,7 +121,8 @@ def combine_dicts(list_of_files):
             data_model = json_dict["substitute"].get("data_model")
             release = json_dict["substitute"].get("release")
             deck = json_dict["substitute"].get("deck")
-            new_list_of_files = collect_json_files(data_model, release, deck)
+            print(data_model, release, deck)
+            new_list_of_files = collect_json_files(data_model, release, deck, base=base)
             new_list_of_files = [
                 new_json_file
                 for new_json_file in new_list_of_files

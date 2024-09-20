@@ -159,7 +159,7 @@ def read_schema(data_model, *sub_models, ext_schema_path=None, ext_schema_file=N
         schema_files = [schema_files]
 
     # 2. Get schema
-    schema = combine_dicts(schema_files)
+    schema = combine_dicts(schema_files, base=f"{properties._base}.schemas")
     schema["name"] = schema_files
 
     # 3. Expand schema
