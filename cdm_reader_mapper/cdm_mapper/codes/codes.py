@@ -23,8 +23,9 @@ def get_code_table(data_model, *sub_models, code_table=None):
 
     Parameters
     ----------
-    data_model: str, optional
-        Name of internally available data model
+    data_model: str
+        The name of the data model to read. This is for
+        data models included in the tool.
     sub_models*: optionally
         Sub-directories of ``data_model``.
         E.g. r300 d701 type2
