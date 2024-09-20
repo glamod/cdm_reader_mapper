@@ -101,6 +101,8 @@ def combine_dicts(list_of_files):
                 continue
             elif key not in old.keys():
                 old[key] = new[key]
+            elif new[key] == "ignore":
+                old.pop(key)
             elif isinstance(new[key], dict):
                 old[key] = update_dict(old[key], new[key])
             else:
