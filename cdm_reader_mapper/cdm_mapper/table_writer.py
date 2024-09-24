@@ -251,7 +251,6 @@ def table_to_ascii(
     Saves cdm tables as ascii files
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-
     empty_table = False
     if "observation_value" in table:
         table = table.dropna(subset=["observation_value"])
@@ -367,7 +366,6 @@ def cdm_to_ascii(
             filename=filepath,
             log_level=log_level,
         )
-
 
 printers = {
     "int": print_integer,
