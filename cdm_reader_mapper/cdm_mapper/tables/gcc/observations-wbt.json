@@ -1,7 +1,7 @@
 {
   "observation_id": {
     "kwargs": {
-      "append": "WBT"
+      "append": "_WBT"
     }
   },
   "secondary_variable": {},

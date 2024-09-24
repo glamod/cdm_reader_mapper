@@ -1,7 +1,7 @@
 {
   "observation_id": {
     "kwargs": {
-      "append": "WD"
+      "append": "_WD"
     }
   },
   "secondary_variable": {},
@@ -24,5 +24,8 @@
     "transform": "integer_to_float",
     "decimal_places": 0
   },
-  "conversion_method": {}
+  "conversion_method": {},
+  "conversion_flag": {
+    "default": 2
+  }
 }

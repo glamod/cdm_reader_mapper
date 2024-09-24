@@ -7,10 +7,9 @@
       "GG",
       "ID"
     ],
-    "transform": "string_join_add",
+    "transform": "guid",
     "kwargs": {
-      "prepend": "GDAC",
-      "separator": "-"
+      "prepend": "gdac_"
     }
   },
   "report_id": {
@@ -21,10 +20,9 @@
       "GG",
       "ID"
     ],
-    "transform": "string_join_add",
+    "transform": "guid",
     "kwargs": {
-      "prepend": "GDAC",
-      "separator": "-"
+      "prepend": "gdac_"
     }
   },
   "data_policy_licence": {

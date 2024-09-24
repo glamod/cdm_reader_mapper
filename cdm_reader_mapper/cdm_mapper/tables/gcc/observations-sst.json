@@ -1,7 +1,7 @@
 {
   "observation_id": {
     "kwargs": {
-      "append": "SST"
+      "append": "_SST"
     }
   },
   "observed_variable": {
