@@ -367,6 +367,7 @@ def cdm_to_ascii(
             log_level=log_level,
         )
 
+
 printers = {
     "int": print_integer,
     "numeric": print_float,
