@@ -33,6 +33,6 @@
     "decimal_places": 1
   },
   "conversion_method": {
-    "default": 1
+    "default": 7
   }
 }
