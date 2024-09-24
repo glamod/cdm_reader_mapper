@@ -28,5 +28,8 @@
     "sections": "drifter_measurements",
     "elements": "SST_ADJUSTED",
     "decimal_places": 2
+  },
+  "conversion_method": {
+    "default": 1
   }
 }
