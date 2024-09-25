@@ -150,7 +150,7 @@ def _write_csv_files(
         if codes_subset:
             if code_table not in codes_subset:
                 code_table = None
-        
+
         to_map = None
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
