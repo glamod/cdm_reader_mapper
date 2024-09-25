@@ -48,6 +48,9 @@ def validate(data, data_model, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     mrd = data_model.split("_")
+    if len(mrd) < 3:
+        logging.warning(f"Dataset {data_model} has to deck information.")
+        return
     dck = mrd[2]
 
     if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):

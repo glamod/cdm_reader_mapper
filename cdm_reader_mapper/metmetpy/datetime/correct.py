@@ -29,53 +29,43 @@ invocation) logging an error.
 
 from __future__ import annotations
 
-import json
 from io import StringIO
 
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
+from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from .. import properties
 from . import correction_functions
 
 _base = f"{properties._base}.datetime"
-_files = get_files(_base)
 
 
-def correct_it(data, data_model, deck, log_level="INFO"):
+def correct_it(data, data_model, dck, correction_method, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     # 1. Optional deck specific corrections
-    correction_method_file = _files.glob(f"{data_model}.json")
-    correction_method_file = [f for f in correction_method_file]
-    if not correction_method_file:
-        logger.info(f"No datetime corrections {data_model}")
-    else:
-        with open(correction_method_file[0]) as fileObj:
-            correction_method = json.load(fileObj)
-        datetime_correction = correction_method.get(deck, {}).get("function")
-        if not datetime_correction:
-            logger.info(
-                f"No datetime correction to apply to deck {deck} data from data\
+    datetime_correction = correction_method.get(dck, {}).get("function")
+    if not datetime_correction:
+        logger.info(
+            f"No datetime correction to apply to deck {dck} data from data\
                         model {data_model}"
-            )
-        else:
-            logger.info(f'Applying "{datetime_correction}" datetime correction')
-            try:
-                # trans = eval("datetime_functions_mdl." + datetime_correction)
-                trans = getattr(correction_functions, datetime_correction)
-                trans(data)
-            except Exception:
-                logger.error("Applying correction ", exc_info=True)
-                return
+        )
+    else:
+        logger.info(f'Applying "{datetime_correction}" datetime correction')
+        try:
+            trans = getattr(correction_functions, datetime_correction)
+            trans(data)
+        except Exception:
+            logger.error("Applying correction ", exc_info=True)
+            return
 
     return data
 
 
-def correct(data, data_model, deck, log_level="INFO"):
+def correct(data, data_model, log_level="INFO"):
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
@@ -83,9 +73,7 @@ def correct(data, data_model, deck, log_level="INFO"):
     data: pd.DataFrame or pd.io.parsers.TextFileReader
         Input dataset.
     data_model: str
-        Name of ICOADS data model.
-    deck: str
-        Name of IOCADS model deck.
+        Name of internally available data model.
     log_level: str
       level of logging information to save.
       Default: INFO
@@ -97,18 +85,23 @@ def correct(data, data_model, deck, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    replacements_method_file = _files.glob(f"{data_model}.json")
-    replacements_method_file = [f for f in replacements_method_file]
-    if not replacements_method_file:
+    mrd = data_model.split("_")[0]
+    if len(mrd) < 3:
+        logger.warning(f"Dataset {data_model} has to deck information.")
+        return
+    dck = mrd[2]
+
+    replacements_method_files = collect_json_files(*mrd, base=_base)
+
+    if len(replacements_method_files) == 0:
         logger.warning(f"Data model {data_model} has no replacements in library")
-        logger.warning(
-            "Module will proceed with no attempt to apply id\
-                       replacements".format()
-        )
+        logger.warning("Module will proceed with no attempt to apply id replacements")
         return data
 
+    correction_method = combine_dicts(replacements_method_files, base=_base)
+
     if isinstance(data, pd.DataFrame):
-        data = correct_it(data, data_model, deck, log_level="INFO")
+        data = correct_it(data, data_model, dck, correction_method, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -123,7 +116,7 @@ def correct(data, data_model, deck, log_level="INFO"):
         buffer = StringIO()
         data_ = pandas_TextParser_hdlr.make_copy(data)
         for df in data_:
-            df = correct_it(df, data_model, deck, log_level="INFO")
+            df = correct_it(df, data_model, dck, correction_method, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)

@@ -39,36 +39,27 @@ invocation) logging an error.
 
 from __future__ import annotations
 
-import json
 from io import StringIO
 
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
+from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from .. import properties
-from . import gdac_r0000, icoads_r3000, icoads_r3000_NRT
-from .correction_functions import fill_value
+from . import correction_functions
 
 _base = f"{properties._base}.platform_type"
-_files = get_files(_base)
-
-_fix_function = {
-    "gdac_r0000": gdac_r0000,
-    "icoads_r3000": icoads_r3000,
-    "icoads_r3000_NRT": icoads_r3000_NRT,
-}
 
 
-def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"):
+def correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
-    deck_fix = fix_methods.get(deck)
+    deck_fix = fix_methods.get(dck)
     if not deck_fix:
         logger.info(
-            f"No platform type fixes to apply to deck {deck} data from dataset {dataset}"
+            f"No platform type fixes to apply to deck {dck} data from dataset {data_model}"
         )
         return data
     elif not isinstance(pt_col, list):
@@ -86,13 +77,12 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
     if deck_fix.get("method") == "fillna":
         fillvalue = deck_fix.get("fill_value")
         logger.info(f"Filling na values with {fillvalue}")
-        data[pt_col] = fill_value(data[pt_col], fillvalue)
+        data[pt_col] = correction_functions.fill_value(data[pt_col], fillvalue)
         return data
     elif deck_fix.get("method") == "function":
         transform = deck_fix.get("function")
         logger.info(f"Applying fix function {transform}")
-        fix_function = _fix_function[dataset]
-        trans = getattr(fix_function, transform)
+        trans = getattr(correction_functions.fix_function, transform)
         return trans(data)
     else:
         logger.error(
@@ -103,19 +93,15 @@ def correct_it(data, dataset, data_model, deck, pt_col, fix_methods, log_level="
         return
 
 
-def correct(data, dataset, data_model, deck, log_level="INFO"):
+def correct(data, data_model, log_level="INFO"):
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
     ----------
     data: pd.DataFrame or pd.io.parsers.TextFileReader
         Input dataset.
-    dataset: str
-        Name of metmetpy specific data model.
     data_model: str
-        Name of the ICOADS data model.
-    deck: str
-        Name of the ICOADS model deck.
+        Name of internally available data model
     log_level: str
       level of logging information to save.
       Default: INFO
@@ -127,15 +113,19 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    mrd = data_model.split("_")
+    if len(mrd) < 3:
+        logging.warning(f"Dataset {data_model} has to deck information.")
+        return
+    dck = mrd[2]
 
-    fix_file = _files.glob(f"{dataset}.json")
-    fix_file = [f for f in fix_file]
-    if not fix_file:
-        logger.warning(f"Dataset {dataset} not included in platform library")
+    fix_files = collect_json_files(*mrd, base=_base)
+
+    if len(fix_files) == 0:
+        logger.warning(f"Dataset {data_model} not included in platform library")
         return data
-    else:
-        with open(fix_file[0]) as fileObj:
-            fix_methods = json.load(fileObj)
+
+    fix_methods = combine_dicts(fix_files, base=_base)
 
     pt_col = properties.metadata_datamodels["platform"].get(data_model)
 
@@ -146,9 +136,7 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
         return
 
     if isinstance(data, pd.DataFrame):
-        data = correct_it(
-            data, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
-        )
+        data = correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -162,9 +150,7 @@ def correct(data, dataset, data_model, deck, log_level="INFO"):
         read_dict = {x: data.orig_options.get(x) for x in read_params}
         buffer = StringIO()
         for df in data:
-            df = correct_it(
-                df, dataset, data_model, deck, pt_col, fix_methods, log_level="INFO"
-            )
+            df = correct_it(df, data_model, dck, pt_col, fix_methods, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
 
         buffer.seek(0)
