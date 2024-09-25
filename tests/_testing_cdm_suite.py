@@ -121,6 +121,7 @@ def _testing_suite(
         out_path=out_path,
         **kwargs,
     )
+
     data = read_.data
     mask = read_.mask
     dtypes = read_.dtypes
@@ -177,6 +178,7 @@ def _testing_suite(
 
     data_ = drop_rows(data_, drops)
     mask_ = drop_rows(mask_, drops)
+
     pd.testing.assert_frame_equal(data_pd, data_)
     pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
 
