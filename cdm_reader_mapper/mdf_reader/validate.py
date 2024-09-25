@@ -87,13 +87,13 @@ def validate_codes(elements, data, schema, data_model, *sub_models, supp=False):
                 if not table.get("_keys")
                 else list(table["_keys"].get(element))
             )
-
         dtypes = {
             x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
             for x in key_elements
         }
+
         table_keys = get_table_keys(table)
-        table_keys_str = ["∿".join(x) if isinstance(x, list) else x for x in table_keys]
+        table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
         validation_df = data[key_elements]
         imask = pd.Series(index=data.index, data=True)
         val = validation_df.notna()
