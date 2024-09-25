@@ -69,11 +69,11 @@ def _manipulate_header(df):
 
 
 def test_duplicates_header():
-    expected_data = result_data.expected_103_792
+    expected_data = result_data.expected_icoads_r302_d792
     data_path = expected_data.get("cdm_table")
     df = read_tables(
         data_path,
-        tb_id="103-792*",
+        tb_id="icoads_r302_d792*",
         cdm_subset="header",
     )
     df = _manipulate_header(df)
