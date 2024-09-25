@@ -85,10 +85,10 @@ def correct(data, data_model, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    mrd = data_model.split("_")[0]
+    mrd = data_model.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {data_model} has to deck information.")
-        return
+        return data
     dck = mrd[2]
 
     replacements_method_files = collect_json_files(*mrd, base=_base)

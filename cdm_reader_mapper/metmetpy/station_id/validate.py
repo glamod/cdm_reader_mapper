@@ -49,7 +49,7 @@ def validate(data, data_model, blank=False, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     mrd = data_model.split("_")
     if len(mrd) < 3:
-        logging.warning(f"Dataset {data_model} has to deck information.")
+        logger.error(f"Dataset {data_model} has to deck information.")
         return
     dck = mrd[2]
 

@@ -90,7 +90,7 @@ def correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO"):
                 deck_fix.get("method")
             )
         )
-        return
+    return data
 
 
 def correct(data, data_model, log_level="INFO"):
@@ -115,8 +115,8 @@ def correct(data, data_model, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     mrd = data_model.split("_")
     if len(mrd) < 3:
-        logging.warning(f"Dataset {data_model} has to deck information.")
-        return
+        logger.warning(f"Dataset {data_model} has to deck information.")
+        return data
     dck = mrd[2]
 
     fix_files = collect_json_files(*mrd, base=_base)
@@ -127,13 +127,13 @@ def correct(data, data_model, log_level="INFO"):
 
     fix_methods = combine_dicts(fix_files, base=_base)
 
-    pt_col = properties.metadata_datamodels["platform"].get(data_model)
+    pt_col = properties.metadata_datamodels["platform"].get(mrd[0])
 
     if not pt_col:
         logger.error(
             f"Data model {data_model} platform column not defined in properties file"
         )
-        return
+        return data
 
     if isinstance(data, pd.DataFrame):
         data = correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO")
