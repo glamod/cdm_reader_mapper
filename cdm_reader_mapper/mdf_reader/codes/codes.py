@@ -9,7 +9,6 @@ requirements of the data reader tool
 
 from __future__ import annotations
 
-import ast
 import logging
 import os
 
@@ -20,14 +19,6 @@ from cdm_reader_mapper.common.json_dict import (
 )
 
 from .. import properties
-
-
-def eval_dict_items(item):
-    """DOCUMENTATION."""
-    try:
-        return ast.literal_eval(item)
-    except Exception:
-        return item
 
 
 def read_table(

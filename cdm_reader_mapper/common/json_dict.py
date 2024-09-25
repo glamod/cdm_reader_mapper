@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import datetime
 import json
 import logging
@@ -121,7 +122,6 @@ def combine_dicts(list_of_files, base=None):
             data_model = json_dict["substitute"].get("data_model")
             release = json_dict["substitute"].get("release")
             deck = json_dict["substitute"].get("deck")
-            print(data_model, release, deck)
             new_list_of_files = collect_json_files(data_model, release, deck, base=base)
             new_list_of_files = [
                 new_json_file
@@ -146,9 +146,33 @@ def get_table_keys(table):
         return list(table.keys())
 
 
+def eval_dict_items(item):
+    """DOCUMENTATION."""
+    try:
+        return ast.literal_eval(item)
+    except Exception:
+        return item
+
+
+def add_nested_keys(table, table_path):
+    """DOCUMENTATION."""
+    keys_path = table_path.with_suffix(".keys")
+    if keys_path.is_file():
+        with open(keys_path) as fileObj:
+            table_keys = json.load(fileObj)
+            table["_keys"] = {}
+            for x, y in table_keys.items():
+                key = eval_dict_items(x)
+                values = [eval_dict_items(k) for k in y]
+                table["_keys"][key] = values
+    return table
+
+
 def open_code_table(table_path):
     """DOCUMENTATION."""
     table = open_json_file(table_path)
+    # Add keys for nested code tables
+    table = add_nested_keys(table, table_path)
     # Expand range keys
     expand_integer_range_key(table)
     return table
