@@ -189,7 +189,6 @@ def read_tables(
             na_values=na_values,
             keep_default_na=False,
         )
-
         if len(dfi) == 0:
             logger.warning(
                 f"Table {tb} empty in file system, not added to the final DF"

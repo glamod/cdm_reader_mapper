@@ -1,0 +1,181 @@
+{
+  "sections": {
+    "c99": {
+      "header": {
+        "delimiter": ",",
+        "field_layout": "fixed_width",
+        "disable_read": false
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": true
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": true
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": true,
+          "disable_white_strip": true
+        },
+        "Identifier": {
+          "description": "WMO Buoy number",
+          "field_length": 5,
+          "column_type": "object"
+        },
+        "Odate": {
+          "description": "Observation date",
+          "field_length": 8,
+          "column_type": "str"
+        },
+        "Otime": {
+          "description": "Observation time",
+          "field_length": 4,
+          "column_type": "str"
+        },
+        "Lat": {
+          "description": "Latitude (positive North)",
+          "field_length": 9,
+          "column_type": "float",
+          "valid_max": 90.0,
+          "valid_min": -90.0,
+          "units": "degrees"
+        },
+        "Lon": {
+          "description": "Longitude (positive West)",
+          "field_length": 9,
+          "column_type": "float",
+          "valid_max": 180.0,
+          "valid_min": -180.0,
+          "units": "degrees"
+        },
+        "QC_POS": {
+          "description": "Quality control flag for position",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "PDT": {
+          "description": "Position date",
+          "field_length": 8,
+          "column_type": "str"
+        },
+        "PTM": {
+          "description": "Position time",
+          "field_length": 4,
+          "column_type": "str"
+        },
+        "Drogue": {
+          "description": "Drogue depth",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 99999.0,
+          "valid_min": 0.0,
+          "decimal_places": 1,
+          "units": "metre"
+        },
+        "SST": {
+          "description": "Sea surface temperature",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 99.99,
+          "valid_min": -99.99,
+          "units": "degree Celsius"
+        },
+        "QC_SST": {
+          "description": "Quality control flag for SST",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "Airtemp": {
+          "description": "Air temperature",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 99.99,
+          "valid_min": -99.99,
+          "units": "degree Celsius"
+        },
+        "QC_AirT": {
+          "description": "Quality control flag for Air temp",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "Pressure": {
+          "description": "Air Pressure at sea level",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 1074.6,
+          "valid_min": 870.0,
+          "units": "hectopascal"
+        },
+        "QC_Pr": {
+          "description": "Quality control flag for pressure",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "WSp": {
+          "description": "Wind speed",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 99.99,
+          "valid_min": 0.0,
+          "units": "metres per second"
+        },
+        "QC_Wsp": {
+          "description": "Quality control flag for Wind Speed",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "WDir": {
+          "description": "Wind direction relative to true North",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 360.0,
+          "valid_min": 0.0,
+          "units": "degrees true"
+        },
+        "QC_WD": {
+          "description": "Quality control flag for Wind direction",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        },
+        "RelHum": {
+          "description": "Relative humidity (%)",
+          "field_length": 7,
+          "column_type": "float",
+          "valid_max": 100.0,
+          "valid_min": 0.0,
+          "decimal_places": 2
+        },
+        "QC_RH": {
+          "description": "Quality control flag for relative humidity",
+          "field_length": 1,
+          "column_type": "key",
+          "missing_value": "P",
+          "codetable": "ICOADS.C99.QC"
+        }
+      }
+    }
+  }
+}

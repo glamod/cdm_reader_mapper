@@ -1,0 +1,16 @@
+{
+  "observation_value": {
+    "sections": "c99",
+    "elements": "Pressure",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": 0
+  },
+  "original_value": {
+    "sections": "c99",
+    "elements": "Pressure",
+    "decimal_places": 2
+  }
+}

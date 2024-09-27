@@ -32,23 +32,26 @@ will warn and validate all to True, with NaN to False
 
 from __future__ import annotations
 
-import json
 import re
 
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
+from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from .. import properties
 
 _base = f"{properties._base}.station_id"
-_files = get_files(_base)
 
 
-def validate(data, dataset, data_model, dck, sid=None, blank=False, log_level="INFO"):
+def validate(data, data_model, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    mrd = data_model.split("_")
+    if len(mrd) < 3:
+        logger.error(f"Dataset {data_model} has to deck information.")
+        return
+    dck = mrd[2]
 
     if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
@@ -78,27 +81,24 @@ def validate(data, dataset, data_model, dck, sid=None, blank=False, log_level="I
 
     idSeries = data[id_col]
 
-    for data_model_file in _files.glob(f"{dataset}.json"):
-        break
-    try:
-        data_model_file
-    except UnboundLocalError:
-        logger.error(f'Input dataset "{dataset}" has no ID deck library')
+    data_model_files = collect_json_files(*mrd, base=_base)
+
+    if len(data_model_files) == 0:
+        logger.error(f'Input dataset "{data_model}" has no ID deck library')
         return
 
-    with open(data_model_file) as fileObj:
-        id_models = json.load(fileObj)
+    id_models = combine_dicts(data_model_files, base=_base)
 
     dck_id_model = id_models.get(dck)
     if not dck_id_model:
-        logger.error(f'Input dck "{dck}" not defined in file {data_model_file}')
+        logger.error(f'Input dck "{dck}" not defined in file {data_model_files}')
         return
 
     pattern_dict = dck_id_model.get("valid_patterns")
 
     if pattern_dict == {}:
         logger.warning(
-            f'Input dck "{dck}" validation patterns are empty in file {data_model_file}'
+            f'Input dck "{dck}" validation patterns are empty in file {data_model_files}'
         )
         logger.warning("Adding match-all regex to validation patterns")
         patterns = [".*?"]

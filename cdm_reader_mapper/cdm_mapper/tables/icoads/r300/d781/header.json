@@ -1,0 +1,10 @@
+{
+  "station_name": {
+    "sections": "c99_voyage",
+    "elements": "ship_code"
+  },
+  "primary_station_id": {
+    "sections": "c99_voyage",
+    "elements": "ship_code"
+  }
+}

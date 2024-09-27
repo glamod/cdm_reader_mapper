@@ -1,0 +1,508 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_data",
+          "c99_header",
+          "c99_qc"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "sentinal": "",
+        "length": 173,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "reel_number": {
+          "description": "The microfilm reel number",
+          "field_length": 2,
+          "column_type": "int"
+        },
+        "frame_number": {
+          "description": "The number found at the top of the microfilm frame where the voyage begins. The frame number was kept until the voyage is complete, even if the voyage covered several sequential frames.",
+          "field_length": 4,
+          "column_type": "int"
+        },
+        "voyage_sequence": {
+          "description": "Unique number identifying each voyage",
+          "field_length": 1,
+          "column_type": "int"
+        },
+        "year": {
+          "description": "Year",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "month": {
+          "description": "Month",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "day": {
+          "description": "Day",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "hour": {
+          "description": "Hours of ship position, converted to 24-hour clock (00-23)",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_deg_an": {
+          "description": "latitude by account at noon, degrees",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_min_an": {
+          "description": "latitude by account at noon, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_hemis_an": {
+          "description": "latitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "lon_deg_an": {
+          "description": "longitude by account at noon, degrees",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_min_an": {
+          "description": "longitude by account at noon, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_hemis_an": {
+          "description": "longitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "current_dir": {
+          "description": "Direction towards which the currents are moving. Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "current_speed_ind": {
+          "description": "Units in which speed is measured.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SPEEDI",
+          "LMR6": true
+        },
+        "current_speed": {
+          "description": "Given in fraction or in narrative terms. For narrative terms (values from 40-58) look at key table",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "min_drift_coord": {
+          "description": "Minutes of latitude or longitude of current drift over a given time period.",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "period_drift": {
+          "description": "Time period (in hours 24hrs format) over which the amount of current drift in minutes was calculated. e.g 1hr code as 01",
+          "field_length": 2,
+          "valid_max": 24,
+          "valid_min": 1,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "mag_var_ind": {
+          "description": "Magnetic variation indicator.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.MAGVARI",
+          "LMR6": true
+        },
+        "mag_var": {
+          "description": "Magnetic variation.",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "baro_obs_time": {
+          "description": "Time of barometer reading.",
+          "field_length": 2,
+          "valid_max": 23,
+          "valid_min": 0,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "baro_pressure_one": {
+          "description": "Barometric pressure (first entry). First two characters are either inches or millimeters, last two characters correspond to hundredths of inch or tenths of mm",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "temp_ind": {
+          "description": "Temperature indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": true
+        },
+        "attached_thermometer_one": {
+          "description": "Attached thermometer (first entry). Position is blank for whole degrees, and quarter degrees are rounded to the nearest tenths of a degree.",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "attached_thermometer_two": {
+          "description": "Attached thermometer (second entry). Position is blank for whole degrees, and quarter degrees are rounded to the nearest tenths of a degree.",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "attached_thermometer_three": {
+          "description": "Attached thermometer (third entry). Position is blank for whole degrees, and quarter degrees are rounded to the nearest tenths of a degree.",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "hour_air_temp_one": {
+          "description": "Hour in 24hrs format of first air temperature entry",
+          "field_length": 2,
+          "valid_max": 24,
+          "valid_min": 1,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "air_temperature_one": {
+          "description": "Air temperature (first entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "sea_surface_temperature_one": {
+          "description": "Sea surface temperature (first entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "sea_depth_temperature": {
+          "description": "Sea temperature at depth (first entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "hour_air_temp_two": {
+          "description": "Hour in 24hrs format of second air temperature entry",
+          "field_length": 2,
+          "valid_max": 24,
+          "valid_min": 1,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "air_temperature_two": {
+          "description": "Air temperature (second entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "sea_surface_temperature_two": {
+          "description": "Sea surface temperature (second entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "hour_air_temp_three": {
+          "description": "Hour in 24hrs format of third air temperature entry",
+          "field_length": 2,
+          "valid_max": 24,
+          "valid_min": 1,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "air_temperature_three": {
+          "description": "Air temperature (third entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "sea_surface_temperature_three": {
+          "description": "Sea surface temperature (third entry), units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": false
+        },
+        "wind_dir_start": {
+          "description": "Wind direction. Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_force_start": {
+          "description": "Wind force (part one or only entry), Beaufort Wind scale (0-12) unless the observation was in a descriptive form (20-73).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAU",
+          "LMR6": true
+        },
+        "wind_info_start": {
+          "description": "Additional wind force information when available.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAUINFO",
+          "LMR6": true
+        },
+        "wind_dir_middle": {
+          "description": "Wind direction (middle part). Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_force_middle": {
+          "description": "Wind force (middle part), Beaufort Wind scale (0-12) unless the observation was in a descriptive form (20-73).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAU",
+          "LMR6": true
+        },
+        "wind_info_middle": {
+          "description": "Additional wind force information when available.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAUINFO",
+          "LMR6": true
+        },
+        "wind_dir_later": {
+          "description": "Wind direction (later part). Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_force_later": {
+          "description": "Wind force (later part), Beaufort Wind scale (0-12) unless the observation was in a descriptive form (20-73).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAU",
+          "LMR6": true
+        },
+        "wind_info_later": {
+          "description": "Additional wind force information when available.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAUINFO",
+          "LMR6": true
+        },
+        "cloud_one": {
+          "description": "Forms of clouds by code (first entry).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CT",
+          "LMR6": true
+        },
+        "cloud_dir_one": {
+          "description": "Clouds direction (first entry). Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_two": {
+          "description": "Forms of clouds by code (second entry).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CT",
+          "LMR6": true
+        },
+        "cloud_dir_two": {
+          "description": "Clouds direction (second entry). Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_three": {
+          "description": "Forms of clouds by code (third entry).",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CT",
+          "LMR6": true
+        },
+        "cloud_dir_three": {
+          "description": "Clouds direction (third entry). Given in a variety of formats: NEW, WNE, C (calm), V (variable), or B (baffling), mix between number and directions (N45E) also adding a by (as X) and to (as T).",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sky_clear": {
+          "description": "Portion of clear sky",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 10,
+          "valid_min": 0,
+          "LMR6": true
+        },
+        "hour_of_weather": {
+          "description": "Whole hours with any fraction rounded to the nearest hour.",
+          "field_length": 2,
+          "valid_max": 24,
+          "valid_min": 1,
+          "units": "hours",
+          "column_type": "int",
+          "LMR6": true
+        },
+        "weather_indic": {
+          "description": "Present weather indicator.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.WI",
+          "LMR6": true
+        },
+        "weather": {
+          "description": "Present weather. Refer to weather indicator",
+          "field_length": 6,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "qc_magnetic_var": {
+          "description": "Magnetic variation queality control indicator. MV means that the magnetic variation (mag_var) failed the minimum quality control at the time of the digitization of the report.",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.MVQCI",
+          "LMR6": true
+        }
+      }
+    },
+    "c99_header": {
+      "header": {
+        "sentinal": "",
+        "length": 68,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "rig": {
+          "description": "Rig (type of ship)",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.RIG",
+          "LMR6": false
+        },
+        "form_type": {
+          "description": "",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.FORM",
+          "LMR6": false
+        },
+        "commander": {
+          "description": "Commander as appeared in Journal, left justified",
+          "field_length": 16,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "from_city": {
+          "description": "Departure port as it appears on the form",
+          "field_length": 24,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "to_city": {
+          "description": "Destination port as it appears on the form",
+          "field_length": 24,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    },
+    "c99_qc": {
+      "header": {
+        "sentinal": "",
+        "length": 9,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "qc2": {
+          "description": "reel sequence number",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "qc5": {
+          "description": "qc on day",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "qc6": {
+          "description": "qc on hour",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": true
+        }
+      }
+    }
+  }
+}

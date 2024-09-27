@@ -15,10 +15,9 @@ import pandas as pd
 import xarray as xr
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
-from cdm_reader_mapper.common.getting_files import get_files
 
 from .. import properties
-from ..schema import schemas
+from ..schemas import schemas
 from ..validate import validate
 from . import converters, decoders
 
@@ -358,6 +357,7 @@ class _FileReader:
         self,
         source,
         data_model=None,
+        sub_models=None,
         data_model_path=None,
         year_init=None,
         year_end=None,
@@ -376,6 +376,9 @@ class _FileReader:
 
         self.source = source
         self.data_model = data_model
+        self.imodel = data_model
+        self.sub_models = sub_models
+        self.data_model_path = data_model_path
         self.year_init = year_init
         self.year_end = year_end
 
@@ -383,17 +386,17 @@ class _FileReader:
         # Schema reader will return empty if cannot read schema or is not valid
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
-        if self.data_model:
-            model_path = f"{properties._base}.code_tables.{self.data_model}"
-            self.code_tables_path = get_files(model_path)
-            self.imodel = data_model
+        if data_model_path:
             logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(schema_name=data_model)
+            self.schema = schemas.read_schema(
+                data_model,
+                *sub_models,
+            )
         else:
-            self.code_tables_path = os.path.join(data_model_path, "code_tables")
-            self.imodel = data_model_path
             logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(ext_schema_path=data_model_path)
+            self.schema = schemas.read_schema(
+                data_model, *sub_models, ext_schema_path=data_model_path
+            )
 
     def _adjust_dtype(self, dtype, df):
         if not isinstance(dtype, dict):
@@ -647,10 +650,11 @@ class _FileReader:
     def _validate_df(self, df, isna=None):
         mask = self._create_mask(df, isna, missing_values=self.missing_values)
         return validate(
-            df,
-            mask,
-            self.schema,
-            self.code_tables_path,
+            self.data_model,
+            *self.sub_models,
+            data=df,
+            mask0=mask,
+            schema=self.schema,
             disables=self.disable_reads,
         )
 

@@ -1,0 +1,8 @@
+{
+  "original_value": {
+    "sections": "c99_data",
+    "elements": "wind_dir",
+    "transform": "integer_to_float",
+    "decimal_places": 0
+  }
+}

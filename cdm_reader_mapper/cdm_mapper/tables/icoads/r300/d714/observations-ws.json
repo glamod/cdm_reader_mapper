@@ -1,0 +1,12 @@
+{
+  "observation_value": {
+    "sections": "c99",
+    "elements": "WSp",
+    "decimal_places": 2
+  },
+  "original_value": {
+    "sections": "c99",
+    "elements": "WSp",
+    "decimal_places": 2
+  }
+}
