@@ -1,0 +1,827 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_logbook",
+          "c99_voyage",
+          "c99_data"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_logbook": {
+      "header": {
+        "sentinal": "",
+        "field_layout": "fixed_width",
+        "length": 245
+      },
+      "elements": {
+        "InstAbbr": {
+          "description": "Abbreviation of the Institute where the original data is stored",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "InsName": {
+          "description": "Name of the Institute where the original data is stored",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "InsPlace": {
+          "description": "Place of the Institute where the original data is stored",
+          "field_length": 10,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "InsLand": {
+          "description": "Country of the Institute where the original data is stored",
+          "field_length": 14,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "No_data_entry": {
+          "description": "Administrative number under which the data is found within the Institute",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "NameArchiveSet": {
+          "description": "Administrative name under which the data is found within the Institute",
+          "field_length": 17,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "ArchivePart": {
+          "description": "Part of the archive set in which the data is found",
+          "field_length": 39,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Specification": {
+          "description": "Specification of the part of the archive set in which the data is found",
+          "field_length": 31,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Logbook_id": {
+          "description": "Identification of the logbook that holds the underlying data",
+          "field_length": 30,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Logbook_language": {
+          "description": "Language used in the logbook",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Image_No": {
+          "description": "Identification Number of the original image",
+          "field_length": 23,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Illustr": {
+          "description": "Illustration availability indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.ILLUSTRATIONI",
+          "LMR6": true
+        }
+      }
+    },
+    "c99_voyage": {
+      "header": {
+        "sentinal": "",
+        "field_layout": "fixed_width",
+        "length": 836
+      },
+      "elements": {
+        "drLatDeg": {
+          "description": "Dead reckoning degrees latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLatMin": {
+          "description": "Dead reckoning minutes latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLatSec": {
+          "description": "Dead reckoning seconds latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLatHem": {
+          "description": "Dead reckoning latitude hemisphere (N/S)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "drLonDeg": {
+          "description": "Dead reckoning degrees longitude",
+          "field_length": 3,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLonMin": {
+          "description": "Dead reckoning minutes longitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLonSec": {
+          "description": "Dead reckoning seconds longitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "drLonHem": {
+          "description": "Dead reckoning longitude hemisphere (E/W)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LatDeg": {
+          "description": "True degrees latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LatMin": {
+          "description": "True minutes latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LatSec": {
+          "description": "True seconds latitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LatHem": {
+          "description": "True latitude hemisphere (N/S)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LonDeg": {
+          "description": "True degrees longitude",
+          "field_length": 3,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LonMin": {
+          "description": "True minutes longitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LonSec": {
+          "description": "True seconds longitude",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": true
+        },
+        "LonHem": {
+          "description": "True longitude hemisphere (E/W)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LatInd": {
+          "description": "Latitude indicator, explains what was the origin of the given final decimal latitude.",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.COORDI",
+          "LMR6": true
+        },
+        "LonInd": {
+          "description": "Longitude indicator, explains what was the origin of the given final decimal longitude.",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.COORDI",
+          "LMR6": true
+        },
+        "ZeroMeridian": {
+          "description": "Meridian that is used as the reference for the ships' longitude",
+          "field_length": 43,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.MERIDIAN",
+          "LMR6": true
+        },
+        "LMname1": {
+          "description": "Name of first landmark of which a bearing was recorded",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdirection1": {
+          "description": "Bearing of the first landmark",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdistance1": {
+          "description": "Distance to the first landmark",
+          "field_length": 7,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": false
+        },
+        "LMname2": {
+          "description": "Name of second landmark of which a bearing was recorded",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdirection2": {
+          "description": "Bearing of the second landmark",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdistance2": {
+          "description": "Distance to the second landmark",
+          "field_length": 7,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": false
+        },
+        "LMname3": {
+          "description": "Name of third landmark of which a bearing was recorded",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdirection3": {
+          "description": "Bearing of the third landmark",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "LMdistance4": {
+          "description": "Distance to the third landmark",
+          "field_length": 7,
+          "column_type": "float",
+          "scale": 1.0,
+          "LMR6": false
+        },
+        "PosCoastal": {
+          "description": "If position is considered to be coastal",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.POSCOASTI",
+          "LMR6": true
+        },
+        "Calendar_type": {
+          "description": "Calendar used in original logbook",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CALENDAR",
+          "LMR6": true
+        },
+        "logbook_date": {
+          "description": "Date of the observation from logbook",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "TimeOB": {
+          "description": "Time on board of the observation from logbook at noon 12 hrs",
+          "field_length": 2,
+          "column_type": "float",
+          "scale": 1.0,
+          "units": "hours",
+          "LMR6": false
+        },
+        "Day_of_the_week": {
+          "description": "Day of the week",
+          "field_length": 9,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "PartDay": {
+          "description": "Part of the day",
+          "field_length": 10,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Watch": {
+          "description": "Watch, name of the period of 4 hours which is known as a watch or duty on board ships",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Glasses": {
+          "description": "Number of glasses within a watch; one watch equals 8 glasses",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "Start_day": {
+          "description": "Start time of the ships' day",
+          "field_length": 15,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.STARTDAYI",
+          "LMR6": true
+        },
+        "ShipName": {
+          "description": "Name of the ship",
+          "field_length": 30,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Nationality": {
+          "description": "Nationality of ship and crew",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Ship_type": {
+          "description": "Type of ship; e.g. schooner, barque, frigate",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Company": {
+          "description": "Company which owns or manages the ship",
+          "field_length": 34,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Name1": {
+          "description": "Name of the principal observer",
+          "field_length": 30,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Rank1": {
+          "description": "Full rank of the principal observer",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Name2": {
+          "description": "Name of the second observer",
+          "field_length": 30,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Rank2": {
+          "description": "Full rank of the second observer",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Name3": {
+          "description": "Name of the third observer",
+          "field_length": 30,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Rank3": {
+          "description": "Full rank of the third observer",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "voyage_from": {
+          "description": "Place or country where the ship departed from",
+          "field_length": 45,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "voyage_to": {
+          "description": "Place or country where the ship sailed to",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Anchored_ind": {
+          "description": "Ship at anchor or moored",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.ANCHORI",
+          "LMR6": true
+        },
+        "AnchorPlace": {
+          "description": "Place or country where the ship anchor or moored",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "DASno": {
+          "description": "Dutch Asiatic Shipping Number",
+          "field_length": 6,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "VoyageIni": {
+          "description": "Initial date of the start of the voyage of this ship. Format is year-month-day (YYYYMMDD) and is extracted from the logbooks date (i.e. it is not corrected to UTC)",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Course_ship": {
+          "description": "Course made good; course of the ship during the past 24 hours",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Ship_speed": {
+          "description": "Ships' speed; average speed of the ship during the previous 24 hours",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "Distance": {
+          "description": "Distance travelled during the previous 24 hours",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "EncName": {
+          "description": "Name of ship that was encountered",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "EncNat": {
+          "description": "Nationality of ship that was encountered",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "sentinal": "",
+        "field_layout": "fixed_width",
+        "length": 1317
+      },
+      "elements": {
+        "AT_reading_units": {
+          "description": "Air Therm Reading Units. Units of the (outside) air thermometer reading",
+          "field_length": 10,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "SST_reading_units": {
+          "description": "Sea surface temperature reading units. Units of the sea surface thermometer reading",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "AP_reading_units": {
+          "description": "Air Pressure Reading Units. Units of the reading of the air pressure",
+          "field_length": 19,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "BART_reading_units": {
+          "description": "Barometer Temperature Reading Units. Units of the reading of the attached thermometer",
+          "field_length": 10,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "ReferenceCourse": {
+          "description": "Reference that is used for the ships' course (e.g. true north or magnetic north)",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "ReferenceWindDirection": {
+          "description": "Reference that is used for the wind direction (e.g. true north or magnetic north)",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Decl": {
+          "description": "Declination code PENDING CODE TABLE",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Distance_units": {
+          "description": "Units of distances, other than the following two fields",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Distance_units_to_landmark": {
+          "description": "Units of distances to landmarks",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Distance_units_travelled": {
+          "description": "Units of distances travelled by the ship",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Longitude_units": {
+          "description": "Longitudes used (e.g. 180E-180W or 0-360E)",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "units_of_measurement": {
+          "description": "Units of other values that may be used (e.g. current speed units)",
+          "field_length": 45,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "humidity_units": {
+          "description": "Units of the reading of the humidity instrument",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "water_at_pump_units": {
+          "description": "Units of the amount of water reported at the pump",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_scale": {
+          "description": "Name of, or reference to the wind scale that has been used",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "BARO_type": {
+          "description": "Barometer type. ",
+          "field_length": 13,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "BARO_brand": {
+          "description": "Brand of the barometer",
+          "field_length": 6,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "API": {
+          "description": "Index correction to the barometer",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Humidity_method": {
+          "description": "Method of measuring the humidity",
+          "field_length": 10,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "compas_error": {
+          "description": "Established error of the compass",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "compas_correction": {
+          "description": "Applied correction to the compass",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "AT_outside": {
+          "description": "Reading of the (outside) air thermometer",
+          "field_length": 6,
+          "column_type": "float",
+          "LMR6": true
+        },
+        "SST": {
+          "description": "Reading of the sea surface thermometer",
+          "field_length": 6,
+          "column_type": "float",
+          "LMR6": true
+        },
+        "AP": {
+          "description": "Reading of the air pressure",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_dir": {
+          "description": "All wind directions. All reported wind directions on this day; the wind direction is the direction that points to where the wind comes from.",
+          "field_length": 98,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "current_dir": {
+          "description": "Direction of the current; This direction points to where the current is flowing towards to.",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "current_speed": {
+          "description": "Speed of the current. PENDING KEY TABLE",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "attached_tem": {
+          "description": "Reading of the attached thermometer.",
+          "field_length": 4,
+          "column_type": "float",
+          "LMR6": true
+        },
+        "pump_water": {
+          "description": "Amount of water reported at the pump.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Humidity": {
+          "description": "Reading of the humidity instrument.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_force": {
+          "description": "All reported wind forces on this day.",
+          "field_length": 242,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "weather": {
+          "description": "Weather description.",
+          "field_length": 150,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "prcp_descriptor": {
+          "description": "Information about the precipitation.",
+          "field_length": 100,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sea_state": {
+          "description": "State of the sea.",
+          "field_length": 150,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "shape_coulds": {
+          "description": "Shape of the clouds.",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "dir_coulds": {
+          "description": "Directions of the clouds.",
+          "field_length": 44,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "Clearness": {
+          "description": "Clearness/brightness of the sky.",
+          "field_length": 50,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_fraction": {
+          "description": "Clouded part of the sky.",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "gusts": {
+          "description": "1 If wind gusts are reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.GUSTI",
+          "LMR6": true
+        },
+        "Rain": {
+          "description": "1 If rain was reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.RAINI",
+          "LMR6": true
+        },
+        "Fog": {
+          "description": "1 If fog was reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.FOGI",
+          "LMR6": true
+        },
+        "Snow": {
+          "description": "1 If snow was reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SNOWI",
+          "LMR6": true
+        },
+        "Thunder": {
+          "description": "1 If thunder and or lightning was reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.THUNDERI",
+          "LMR6": true
+        },
+        "Hail": {
+          "description": "1 If hail was reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.HAILI",
+          "LMR6": true
+        },
+        "Sea_ice": {
+          "description": "1 If sea-ice or icebergs were reported.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SEAICEI",
+          "LMR6": true
+        },
+        "Trivial_correction": {
+          "description": "If a trivial correction was made in this observation.",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.QCI",
+          "LMR6": true
+        },
+        "Release": {
+          "description": "Number of the CLIWOC release in which the current record appeared first. If corrections/modifications were made to the observation, the release number was increased to the current version.",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    }
+  }
+}

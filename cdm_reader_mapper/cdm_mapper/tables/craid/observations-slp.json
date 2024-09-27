@@ -1,0 +1,38 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "SLP"
+    }
+  },
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "sections": "drifter_measurements",
+    "elements": "ATMS_ADJUSTED",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": 0
+  },
+  "units": {
+    "default": 32
+  },
+  "quality_flag": {
+    "sections": "drifter_measurements",
+    "elements": "ATMS_ADJUSTED_QC",
+    "code_table": "quality_flag"
+  },
+  "original_units": {
+    "default": 530
+  },
+  "original_value": {
+    "sections": "drifter_measurements",
+    "elements": "ATMS_ADJUSTED",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 7
+  }
+}

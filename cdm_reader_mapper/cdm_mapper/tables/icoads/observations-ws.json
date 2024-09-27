@@ -1,0 +1,30 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WS"
+    }
+  },
+  "observed_variable": {
+    "default": 107
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "W",
+    "decimal_places": 1
+  },
+  "units": {
+    "default": 731
+  },
+  "original_precision": {},
+  "original_units": {
+    "default": 731
+  },
+  "original_value": {
+    "sections": "core",
+    "elements": "W",
+    "decimal_places": 1
+  },
+  "conversion_flag": {
+    "default": 2
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "longitude": {
+    "sections": "c99",
+    "elements": "Lon",
+    "transform": "float_opposite",
+    "decimal_places": 4
+  },
+  "latitude": {
+    "sections": "c99",
+    "elements": "Lat",
+    "decimal_places": 4
+  },
+  "location_precision": {
+    "sections": [
+      "core",
+      "c99"
+    ],
+    "elements": [
+      "LI",
+      "Lat"
+    ]
+  }
+}

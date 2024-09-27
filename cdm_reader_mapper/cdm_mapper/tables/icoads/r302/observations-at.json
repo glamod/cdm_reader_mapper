@@ -1,0 +1,20 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "prepend": "ICOADS-302"
+    }
+  },
+  "report_id": {
+    "kwargs": {
+      "prepend": "ICOADS-302"
+    }
+  },
+  "data_policy_licence": {
+    "default": 0
+  },
+  "source_id": {
+    "kwargs": {
+      "prepend": "ICOADS-3-0-2T"
+    }
+  }
+}

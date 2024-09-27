@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from .code_tables import code_tables  # noqa
+from .codes import codes  # noqa
 from .read import read  # noqa
-from .schema import schemas  # noqa
+from .schemas import schemas  # noqa

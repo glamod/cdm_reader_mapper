@@ -1,0 +1,20 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WS"
+    }
+  },
+  "observed_variable": {
+    "default": 107
+  },
+  "observation_value": {},
+  "units": {
+    "default": 731
+  },
+  "quality_flag": {},
+  "original_units": {},
+  "original_value": {},
+  "conversion_method": {
+    "default": 1
+  }
+}

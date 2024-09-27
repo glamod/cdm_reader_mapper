@@ -15,6 +15,7 @@ New features and enhancements
 * ``mdf_reader``: new validation function for datetime objects (:pull:`89`)
 * ``mdf_reader``: select time period with new arguments ``year_init`` ad ``year_end`` (:pull:`98`)
 * ``cdm_mapper``: duplicate check using ``recordlinkage`` (:pull:`81`)
+* ``mdf_reader.read``: optionally, set left and right time bounds (``year_init`` and ``year_end``) (:issue:`11`, :pull:`97`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -29,7 +30,14 @@ Breaking changes
 * ``cdm_mapper``: map ICOADS wind direction data (``361`` -> ``0``; ``362`` -> ``np.nan``) (:pull:`82`)
 * ``cdm_mapper``: set fill_value to ``UNKNOWN`` for C-RAID's ``primary_station_id`` (:pull:`93`)
 * ``cdm_mapper``: map C-RAID quality flags to CDM quality flags (:pull:`94`)
-
+* ``mdf_reader``: summarize schema and code tables (:issue:`11`, :pull:`97`)
+* ``mdf_reader``: rename ``c_raid`` to ``craid``, ``gcc_immt`` to ``gcc`` and ``imma1`` to ``icoads`` (:issue:`11`, :pull:`97`)
+* ``cdm_mapper``: summarize tables and code tables (:issue:`11`, :pull:`97`)
+* ``cdm_mapper``: rename ``c_raid`` to ``craid`` and ``gcc_mapping`` to ``gcc`` (:issue:`11`, :pull:`97`)
+* ``metmetpy``: rename ``immt`` to ``gcc`` and ``imma`` to ``icoads`` (:issue:`11`, :pull:`97`)
+* ``cdm_mapper.map_model``: use standardized imodel_name as <data_model>_<release>_<deck> (e.g. icoads_r300_d701) (:issue:`11`, :pull:`97`)
+* ``mdf_reader.read``: use standardized imodel_name as <data_model>_<release>_<deck> (e.g. icoads_r300_d701) (:issue:`11`, :pull:`97`)
+* ``mdf_reader``: (``core``, ``VS``) set column_type to ``key`` for all ICOADS decks (:issue:`11`, :pull:`97`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
