@@ -127,6 +127,7 @@ def _write_csv_files(
     imodel_functions,
     codes_subset,
     cdm_tables,
+    atts,
 ):
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
@@ -252,6 +253,8 @@ def _map(
                 logger,
                 cols,
                 imodel_functions,
+                codes_subset,
+                cdm_subset,
                 cdm_tables[table]["atts"],
             )
     return cdm_tables

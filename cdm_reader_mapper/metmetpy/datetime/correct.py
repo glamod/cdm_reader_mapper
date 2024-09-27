@@ -94,5 +94,7 @@ def correct(data, data_model, log_level="INFO"):
         logger.warning("Module will proceed with no attempt to apply id replacements")
         return data
 
+    correction_method = combine_dicts(replacements_method_files, base=_base)
+
     data = correct_it(data, data_model, dck, correction_method, log_level="INFO")
     return data

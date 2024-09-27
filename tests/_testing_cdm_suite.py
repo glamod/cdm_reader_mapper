@@ -163,9 +163,6 @@ def _testing_suite(
     if isinstance(data, pd.DataFrame):
         if data.empty:
             return
-    else:
-        if get_length(data) == 0:
-            return
 
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(

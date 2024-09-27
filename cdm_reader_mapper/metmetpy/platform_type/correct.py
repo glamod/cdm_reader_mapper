@@ -131,5 +131,4 @@ def correct(data, data_model, log_level="INFO"):
         )
         return data
 
-    return correct_it(
-        data, data_model, dck, pt_col, fix_methods, log_level="INFO"
+    return correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO")
