@@ -1,0 +1,33 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "SLP"
+    }
+  },
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "SLP",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": 0
+  },
+  "units": {
+    "default": 32
+  },
+  "original_units": {
+    "default": 530
+  },
+  "original_value": {
+    "sections": "core",
+    "elements": "SLP",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 7
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "z_coordinate": {
+    "sections": "c99_journal",
+    "elements": "baro_height",
+    "transform": "feet_to_m",
+    "decimal_places": 2
+  },
+  "observation_height_above_station_surface": {
+    "sections": "c99_journal",
+    "elements": "baro_height",
+    "transform": "feet_to_m",
+    "decimal_places": 2
+  },
+  "original_units": {
+    "sections": "c99_journal",
+    "elements": "baro_units",
+    "code_table": "baro_units",
+    "fill_value": 9999
+  }
+}

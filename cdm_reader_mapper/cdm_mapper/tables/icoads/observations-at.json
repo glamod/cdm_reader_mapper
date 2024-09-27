@@ -1,0 +1,30 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "AT"
+    }
+  },
+  "observed_variable": {
+    "default": 85
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "AT",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "units": {
+    "default": 5
+  },
+  "original_units": {
+    "default": 60
+  },
+  "original_value": {
+    "sections": "core",
+    "elements": "AT",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

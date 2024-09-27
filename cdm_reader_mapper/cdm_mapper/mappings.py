@@ -37,29 +37,31 @@ from . import properties
 
 icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
 imodel_lineages = {
-    "icoads_r3000": icoads_lineage,
-    "icoads_r3000_d701_type1": icoads_lineage,
-    "icoads_r3000_d701_type2": icoads_lineage,
-    "icoads_r3000_d702": icoads_lineage,
-    "icoads_r3000_d704": icoads_lineage,
-    "icoads_r3000_d705-707": icoads_lineage,
-    "icoads_r3000_d714": icoads_lineage + " with supplemental data recovery",
-    "icoads_r3000_d721": icoads_lineage,
-    "icoads_r3000_d730": icoads_lineage,
-    "icoads_r3000_d781": icoads_lineage,
-    "icoads_r3000_NRT": ". Initial conversion from ICOADS R3.0.2T NRT",
-    "c_raid": ". Initial conversion from C-RAID",
+    "icoads": icoads_lineage,
+    "icoads_r300_d714": icoads_lineage + " with supplemental data recovery",
+    "icoads_r302": ". Initial conversion from ICOADS R3.0.2T NRT",
+    "craid": ". Initial conversion from C-RAID",
 }
 
 c2k_methods = {
-    "gcc_mapping": "method_b",
+    "gcc": "method_b",
 }
 
 k_elements = {
-    "gcc_mapping": 1,
+    "gcc": 1,
 }
 
 tf = TimezoneFinder()
+
+
+def find_entry(imodel, d):
+    """Find entry in dict."""
+    if not imodel:
+        return
+    if imodel in d.keys():
+        return d[imodel]
+    imodel = "_".join(imodel.split("_")[:-1])
+    return find_entry(imodel, d)
 
 
 def coord_360_to_180i(long3):
@@ -295,8 +297,9 @@ class mapping_functions:
     def lineage(self, ds):
         """Get lineage."""
         strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
-        if self.imodel in imodel_lineages.keys():
-            strf = strf + imodel_lineages[self.imodel]
+        imodel_lineage = find_entry(self.imodel, imodel_lineages)
+        if imodel_lineage:
+            strf = strf + imodel_lineage
         return strf
 
     def longitude_360to180(self, ds):
@@ -347,9 +350,8 @@ class mapping_functions:
 
     def temperature_celsius_to_kelvin(self, ds):
         """Convert temperature from degrre Ceslius to Kelvin."""
-        if self.imodel in c2k_methods.keys():
-            method = c2k_methods[self.imodel]
-        else:
+        method = find_entry(self.imodel, c2k_methods)
+        if not method:
             method = "method_a"
         if method == "method_a":
             return ds + 273.15

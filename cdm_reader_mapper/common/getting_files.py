@@ -108,7 +108,7 @@ def _get_file(
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
-    branch: str = "main",
+    branch: str = "cds",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
     clear_cache: bool = False,
@@ -168,3 +168,11 @@ def load_file(
 def get_files(anchor):
     """Get files."""
     return _files(anchor)
+
+
+def get_path(path):
+    """Get path."""
+    try:
+        return get_files(path)
+    except ModuleNotFoundError:
+        logging.warning(f"No module named {path}")

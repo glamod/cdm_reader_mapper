@@ -1,0 +1,10 @@
+{
+  "station_name": {
+    "sections": "c99_data",
+    "elements": "name"
+  },
+  "primary_station_id": {
+    "sections": "c99_data",
+    "elements": "name"
+  }
+}

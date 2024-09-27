@@ -1,0 +1,872 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_journal",
+          "c99_voyage",
+          "c99_daily"
+        ]
+      },
+      {
+        "e": [
+          "c99_data4",
+          "c99_data5"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c98": {
+      "header": {
+        "sentinal": "9815",
+        "length": 15
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str"
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 15,
+          "valid_min": 15
+        },
+        "UID": {
+          "description": "unique report ID",
+          "field_length": 6,
+          "column_type": "str"
+        },
+        "RN1": {
+          "description": "Release no.: primary",
+          "field_length": 1,
+          "column_type": "int",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RN2": {
+          "description": "Release no.: secondary",
+          "field_length": 1,
+          "column_type": "int",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RN3": {
+          "description": "Release no.: tertiary",
+          "field_length": 1,
+          "column_type": "int",
+          "encoding": "base36",
+          "valid_max": 35,
+          "valid_min": 0
+        },
+        "RSA": {
+          "description": "Release status indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C98.RSA"
+        },
+        "IRF": {
+          "description": "intermediate reject flag",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C98.IRF"
+        }
+      }
+    },
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_journal": {
+      "header": {
+        "sentinal": "1",
+        "field_layout": "fixed_width",
+        "length": 117
+      },
+      "elements": {
+        "sentinal": {
+          "description": "Journal header record identifier",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "reel_no": {
+          "description": "Microfilm reel number. See if we want the zero padding or not...",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_no": {
+          "description": "Marine Meteorological Journal number,right justified, zero padded",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "frame_no": {
+          "description": "microfilm frame number found at number the top of the frame containing the Journal # and name of ship",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "ship_name": {
+          "description": "Ship name, left justified",
+          "field_length": 26,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_ed": {
+          "description": "Last two digits of year of issue",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "rig": {
+          "description": "Rig (type of ship) as appeared at beginning of journal",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.RIG",
+          "LMR6": false
+        },
+        "ship_material": {
+          "description": "Construction material",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.MAT",
+          "LMR6": false
+        },
+        "vessel_type": {
+          "description": "Type of vessel",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.VESS",
+          "LMR6": false
+        },
+        "vessel_length": {
+          "description": "Length of vessel in feet rounded to nearest whole foot",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "vessel_beam": {
+          "description": "Width of vessel in feet rounded to nearest whole foot",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "commander": {
+          "description": "Commander as appeared in Journal, left justified",
+          "field_length": 15,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "country": {
+          "description": "Nation of registry",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.NAT",
+          "LMR6": false
+        },
+        "screw_paddle": {
+          "description": "Screw or paddle",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SP",
+          "LMR6": false
+        },
+        "hold_depth": {
+          "description": "Rounded to the nearest whole foot",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "tonnage": {
+          "description": "Rounded to nearest whole ton",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "baro_type": {
+          "description": "Barometer type. Add code table",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BAROT",
+          "LMR6": true
+        },
+        "baro_height": {
+          "description": "Barometer height above sea level in feet",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "baro_cdate": {
+          "description": "Date barometer last compared to standard (ddmmyyyy)",
+          "field_length": 8,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "baro_loc": {
+          "description": "Barometer location description",
+          "field_length": 25,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "baro_units": {
+          "description": "Barometer units",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BAROU",
+          "LMR6": false
+        },
+        "baro_cor": {
+          "description": "Journal header record.Do something with this, see digitization format doc",
+          "field_length": 6,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "thermo_mount": {
+          "description": "Are thermos mounted as recommended in journal",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.THERMOM",
+          "LMR6": false
+        },
+        "SST_I": {
+          "description": "Sea surface temperature method",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SSTM",
+          "LMR6": true
+        }
+      }
+    },
+    "c99_voyage": {
+      "header": {
+        "sentinal": "2",
+        "length": 52,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "sentinal": {
+          "description": "Voyage header record identifier",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "reel_no": {
+          "description": "Microfilm reel number. See if we want the zero padding or not...",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_no": {
+          "description": "Marine Meteorological Journal number,right justified, zero padded",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "frame_start": {
+          "description": "As starting frame number in the voyage header record: ensures connection between header info and data",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "from_city": {
+          "description": "Departure port as it appears on the form",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "to_city": {
+          "description": "Destination port as it appears on the form",
+          "field_length": 20,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    },
+    "c99_daily": {
+      "header": {
+        "sentinal": "3",
+        "field_layout": "fixed_width",
+        "length": 61
+      },
+      "elements": {
+        "sentinal": {
+          "description": "Daily information record identifier",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "reel_no": {
+          "description": "Microfilm reel number. See if we want the zero padding or not...",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_no": {
+          "description": "Marine Meteorological Journal number,right justified, zero padded",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "frame_start": {
+          "description": "As starting frame number in the voyage header record: ensures connection between header info and data",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "frame": {
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "year": {
+          "description": "As indicated in the form",
+          "field_length": 4,
+          "column_type": "int"
+        },
+        "month": {
+          "description": "As indicated in the form",
+          "field_length": 2,
+          "column_type": "int"
+        },
+        "day": {
+          "description": "As indicated in the form",
+          "field_length": 2,
+          "column_type": "int"
+        },
+        "distance": {
+          "description": "Distance run by log since prededing run by log noon. Knots to tenths (tenth position blank if not reported)",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": false
+        },
+        "lat_deg_an": {
+          "description": "latitude by account at noon, degrees",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_min_an": {
+          "description": "latitude by account at noon, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_hemis_an": {
+          "description": "latitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "lon_deg_an": {
+          "description": "longitude by account at noon, degrees",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_min_an": {
+          "description": "longitude by account at noon, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_hemis_an": {
+          "description": "longitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "lat_deg_on": {
+          "description": "latitude by observation at noon, degrees",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_min_on": {
+          "description": "latitude by observation at noon, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_hemis_on": {
+          "description": "latitude by observation at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "lon_deg_of": {
+          "description": "longitude by chronometer from forenoon observation, degrees",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_min_of": {
+          "description": "longitude by chronometer from forenoon observation, minutes",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_hemis_of": {
+          "description": "longitude by chronometer from forenoon observation, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "current_speed": {
+          "description": "Current speed in the past 24 hours. To knots hundredths",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.01,
+          "LMR6": false
+        },
+        "current_direction": {
+          "description": "Direction towards which the currents are moving. Code table? not in document, probably as other directions....",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    },
+    "c99_data4": {
+      "header": {
+        "sentinal": "4",
+        "field_layout": "fixed_width",
+        "length": 97
+      },
+      "elements": {
+        "sentinal": {
+          "description": "Data information record type identifier",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "reel_no": {
+          "description": "The number from the microfilm roll",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_no": {
+          "description": "Meteorological Journal Number, right justified, zero filled",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "frame_start": {
+          "description": "As starting frame number in the voyage header record: ensures connection between header info and data",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "frame": {
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "year": {
+          "description": "Year",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "month": {
+          "description": "Month",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "day": {
+          "description": "Day",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "time_ind": {
+          "description": "Time indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TI",
+          "LMR6": true
+        },
+        "hour": {
+          "description": "Hour, right justified, zero filled",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "ship_speed": {
+          "description": "Ship speed knots, to tenths",
+          "field_length": 3,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "compass_ind": {
+          "description": "Compass indicator. Reflects: course steered, compass correction, Leeway, ships true course",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CI",
+          "LMR6": false
+        },
+        "ship_course_compass": {
+          "description": "Ship course steered by compass. See digitization format for translation",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "compass_correction": {
+          "description": "Correction in points or degrees, as indicated in compass_ind. LMR6 false? see ref Jackson et. al. 2000 in translation info",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "ship_course_true": {
+          "description": "Ship course true. Same rules as course steered by compass",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_dir_mag": {
+          "description": "Mean wind direction - magnetic. Same rules as course steered by compass",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_dir_true": {
+          "description": "Wind direction - true. Same rules as course steered by compass",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_force": {
+          "description": "Mean Beaufort force",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAU",
+          "LMR6": true
+        },
+        "barometer": {
+          "description": "Barometer in inches or millimetres. Left|right justified to confirm",
+          "field_length": 4,
+          "column_type": "str",
+          "disable_white_strip": true,
+          "LMR6": true
+        },
+        "temp_ind": {
+          "description": "Temperature indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": true
+        },
+        "attached_thermometer": {
+          "description": "Attached thermometer. It's integer values from tens to hundreds...",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "air_temperature": {
+          "description": "Air temperature. Units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "wet_bulb_temperature": {
+          "description": "Wet bulb temperature. Units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "sea_temperature": {
+          "description": "Sea surface temperature",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "present_weather": {
+          "description": "Present weather, left justified, blank filled. Split in 5?",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "clouds": {
+          "description": "Forms of clouds by symbols",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sky_clear": {
+          "description": "Clear sky in tenths",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "sea_state": {
+          "description": "State of the sea, left justified, blank filled. Split in 4?",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    },
+    "c99_data5": {
+      "header": {
+        "sentinal": "5",
+        "field_layout": "fixed_width",
+        "length": 103
+      },
+      "elements": {
+        "sentinal": {
+          "description": "Data information record type identifier",
+          "field_length": 1,
+          "column_type": "str"
+        },
+        "reel_no": {
+          "description": "The number from the microfilm roll",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "journal_no": {
+          "description": "Meteorological Journal Number, right justified, zero filled",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "frame_start": {
+          "description": "As starting frame number in the voyage header record: ensures connection between header info and data",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "frame": {
+          "description": "Frame number at the top of each frame from which the daily information was extracted",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "year": {
+          "description": "Year",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "month": {
+          "description": "Month",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "day": {
+          "description": "Day",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "time_ind": {
+          "description": "Time indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TI",
+          "LMR6": false
+        },
+        "hour": {
+          "description": "Hour, right justified, zero filled",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "ship_speed": {
+          "description": "Ship speed knots, to tenths",
+          "field_length": 3,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "compass_ind": {
+          "description": "Compass indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.CI",
+          "LMR6": false
+        },
+        "ship_course_compass": {
+          "description": "Ship course steered by compass",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "blank": {
+          "description": "blank fields",
+          "field_length": 2,
+          "column_type": "str"
+        },
+        "ship_course_true": {
+          "description": "Ship course true",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_dir_mag": {
+          "description": "Mean wind direction - magnetic",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_dir_true": {
+          "description": "Wind direction - true",
+          "field_length": 7,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "wind_force": {
+          "description": "Mean Beaufort force. Add code table",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BEAU",
+          "LMR6": true
+        },
+        "barometer": {
+          "description": "Barometer in inches or millimetres. Left|right justified to confirm",
+          "field_length": 4,
+          "column_type": "str",
+          "disable_white_strip": true,
+          "LMR6": true
+        },
+        "temp_ind": {
+          "description": "Temperature indicator",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": true
+        },
+        "attached_thermometer": {
+          "description": "Attached thermometer. It's integer values from tens to hundreds...",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "air_temperature": {
+          "description": "Air temperature. Units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "wet_bulb_temperature": {
+          "description": "Wet bulb temperature. Units according to temperature indicator",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "sea_temperature": {
+          "description": "Sea surface temperature",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "present_weather": {
+          "description": "Present weather, left justified, blank filled. Split in 5?",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "clouds": {
+          "description": "Forms of clouds by symbols",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sky_clear": {
+          "description": "Clear sky in tenths",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "sea_state": {
+          "description": "State of the sea, left justified, blank filled. Split in 4?",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "compass_correction_ind": {
+          "description": "Compass correction indicator",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "compass_correction": {
+          "description": "compass correction",
+          "field_length": 4,
+          "column_type": "float",
+          "scale": 0.1,
+          "LMR6": true
+        },
+        "compass_correction_dir": {
+          "description": "Direction of correction (of compass...)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        }
+      }
+    }
+  }
+}

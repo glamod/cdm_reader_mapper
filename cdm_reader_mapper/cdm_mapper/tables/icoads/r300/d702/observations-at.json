@@ -1,0 +1,9 @@
+{
+  "original_value": "ignore",
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "air_temp_units",
+    "code_table": "at_units",
+    "decimal_places": 0
+  }
+}

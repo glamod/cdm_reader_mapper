@@ -1,0 +1,13 @@
+{
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "air_temp_units",
+    "code_table": "temperature_units",
+    "decimal_places": 0
+  },
+  "original_value": {
+    "sections": "c99_data",
+    "elements": "air_temperature",
+    "decimal_places": 0
+  }
+}

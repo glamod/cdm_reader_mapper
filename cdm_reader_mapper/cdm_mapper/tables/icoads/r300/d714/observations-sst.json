@@ -1,0 +1,13 @@
+{
+  "observation_value": {
+    "sections": "c99",
+    "elements": "SST",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "original_value": {
+    "sections": "c99",
+    "elements": "SST",
+    "decimal_places": 2
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_voyage",
+          "c99_data",
+          "c99_qc"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_voyage": {
+      "header": {
+        "sentinal": "",
+        "length": 36,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ship_code": {
+          "description": "Ship code",
+          "field_length": 4,
+          "column_type": "str"
+        },
+        "year": {
+          "description": "Year GMT",
+          "field_length": 4,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "month": {
+          "description": "Month",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "day": {
+          "description": "Day",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "hour": {
+          "description": "Hour (0-23, where 0 is midnight)",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_deg_an": {
+          "description": "latitude by account at noon, degrees",
+          "field_length": 2,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lat_min_an": {
+          "description": "latitude by account at noon, minutes",
+          "field_length": 4,
+          "column_type": "float",
+          "valid_max": 59.9,
+          "valid_min": 0.0,
+          "decimal_places": 1,
+          "units": "minutes",
+          "LMR6": true
+        },
+        "lat_hemis_an": {
+          "description": "latitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "lon_deg_an": {
+          "description": "longitude by account at noon, degrees",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "lon_min_an": {
+          "description": "longitude by account at noon, minutes",
+          "field_length": 4,
+          "column_type": "float",
+          "valid_max": 59.9,
+          "valid_min": 0.0,
+          "decimal_places": 1,
+          "units": "minutes",
+          "LMR6": true
+        },
+        "lon_hemis_an": {
+          "description": "longitude by account at noon, hemisphere",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "voyage_dir": {
+          "description": "Voyage direction. 0-360, 888 is unknown and 999 missing",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": true
+        },
+        "voyage_speed": {
+          "description": "Voyage speed, knots",
+          "field_length": 4,
+          "column_type": "float",
+          "missing_value": -9.9,
+          "decimal_places": 1,
+          "units": "knots",
+          "LMR6": true
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "sentinal": "",
+        "length": 73,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "cloud_amount": {
+          "description": "Total could amount",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "low_cloud_amount": {
+          "description": "Low cloud amount",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "type_hi_cloud": {
+          "description": "Type of high cloud.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "type_middle_cloud": {
+          "description": "Type of high cloud.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "type_low_cloud": {
+          "description": "Type of high cloud.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_height": {
+          "description": "Cloud Height, 8888 is Unknown.",
+          "field_length": 4,
+          "column_type": "int",
+          "valid_min": 0,
+          "valid_max": 9000,
+          "missing_value": 9999,
+          "LMR6": false
+        },
+        "visibility": {
+          "description": "Visibility.",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.V",
+          "LMR6": true
+        },
+        "present_weather": {
+          "description": "Present Weather.",
+          "field_length": 2,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.W",
+          "LMR6": true
+        },
+        "past_weather": {
+          "description": "Past Weather.",
+          "field_length": 1,
+          "column_type": "int",
+          "valid_min": 0,
+          "valid_max": 9
+        },
+        "past_weather_second": {
+          "description": "Past Weather Second.",
+          "field_length": 1,
+          "column_type": "int",
+          "valid_min": 0,
+          "valid_max": 9
+        },
+        "wave_height": {
+          "description": "Wave height (88.8 for Unknown) NEED Checking",
+          "field_length": 4,
+          "column_type": "float",
+          "valid_max": 50.0,
+          "valid_min": 0.0,
+          "missing_value": 99.9,
+          "decimal_places": 1,
+          "units": "metre"
+        },
+        "swell_dir": {
+          "description": "Swell direction 0 - 359, 361 for calm and 362 for variable",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "swell_height": {
+          "description": "Swell height Need Checking",
+          "field_length": 4,
+          "column_type": "float",
+          "missing_value": 99.9,
+          "decimal_places": 1,
+          "units": "metre"
+        },
+        "wind_indicator": {
+          "description": "Wind indicator.",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_dir": {
+          "description": "Wind direction 0 - 359, 361 for calm and 362 for variable",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "wind_speed": {
+          "description": "Wind speed. NEEDS CHECKING",
+          "field_length": 4,
+          "column_type": "float",
+          "valid_max": 99.9,
+          "valid_min": 0.0,
+          "units": "metres per second",
+          "LMR6": false
+        },
+        "air_temp": {
+          "description": "Air temperature -88.88 for unknown",
+          "field_length": 5,
+          "column_type": "float",
+          "missing_value": -99.9,
+          "units": "degree Celsius"
+        },
+        "wet_bulb_temp": {
+          "description": "Wet bulb temperature -88.88 for unknown",
+          "field_length": 5,
+          "column_type": "float",
+          "missing_value": -99.9,
+          "units": "degree Celsius"
+        },
+        "slp": {
+          "description": "sea level pressure 8888.8 for unknown",
+          "field_length": 6,
+          "column_type": "float",
+          "missing_value": 9999.9,
+          "units": "hectopascal"
+        },
+        "sst": {
+          "description": "Sea surface temperature -88.88 for unknown",
+          "field_length": 5,
+          "column_type": "float",
+          "missing_value": -99.9,
+          "units": "degree Celsius"
+        },
+        "salinity": {
+          "description": "Salinity 88.88 for unknown",
+          "field_length": 6,
+          "column_type": "float",
+          "missing_value": 99.999,
+          "decimal_places": 3
+        },
+        "sea_lum": {
+          "description": "Sea luminance",
+          "field_length": 1,
+          "column_type": "key",
+          "codetable": "ICOADS.C99.SEALUMI"
+        }
+      }
+    },
+    "c99_qc": {
+      "header": {
+        "sentinal": "",
+        "length": 13,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "mark": {
+          "description": "Mark, means missing data",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "date_flag": {
+          "description": "Date flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "loc_flag": {
+          "description": "Location flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "landlock_flag": {
+          "description": "Landlock flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "air_temp_flag": {
+          "description": "Air temperature flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wb_temp_flag": {
+          "description": "Wetbulb temperature flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sst_temp_flag": {
+          "description": "Sea surface temperature flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_flag": {
+          "description": "Could flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wind_flag": {
+          "description": "Wind flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "wave_flag": {
+          "description": "Wave flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "slp_flag": {
+          "description": "Sea level pressure flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "weather_flag": {
+          "description": "Weather flag",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "mark_two": {
+          "description": "Mark, means missing data",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    }
+  }
+}

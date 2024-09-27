@@ -1,0 +1,13 @@
+{
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "temp_ind",
+    "code_table": "sst_units",
+    "decimal_places": 0
+  },
+  "original_value": {
+    "sections": "c99_data",
+    "elements": "sea_surface_temperature_one",
+    "decimal_places": 0
+  }
+}
