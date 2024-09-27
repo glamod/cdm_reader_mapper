@@ -31,7 +31,7 @@ def datetime_decimalhour_to_hm(ds):
 
 
 # ---------------- Data model conversions -------------------------------------
-def imma1(data, conversion):
+def icoads(data, conversion):
     """DOCUMENTATiON."""
 
     def to_datetime(data):
@@ -97,15 +97,15 @@ def imma1(data, conversion):
 # ---------------- Send input to appropriate function -------------------------
 def to_datetime(data, model):
     """DOCUMENTATiON."""
-    if model == "imma1":
-        return imma1(data, "to_datetime")
+    if model == "icoads":
+        return icoads(data, "to_datetime")
     else:
         return
 
 
 def from_datetime(data, model):
     """DOCUMENTATiON."""
-    if model == "imma1":
-        return imma1(data, "from_datetime")
+    if model == "icoads":
+        return icoads(data, "from_datetime")
     else:
         return

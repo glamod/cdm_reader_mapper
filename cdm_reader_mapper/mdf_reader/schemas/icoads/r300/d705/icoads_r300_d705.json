@@ -1,0 +1,260 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_data"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "sentinal": "",
+        "field_layout": "fixed_width",
+        "length": 93
+      },
+      "elements": {
+        "Form_type": {
+          "description": "Form type",
+          "field_length": 3,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "Day_of_the_week": {
+          "description": "Day of the week (GMT)",
+          "field_length": 1,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "GMT": {
+          "description": "Greenwich Mean Time (00-23)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": true
+        },
+        "octant": {
+          "description": "Octant",
+          "field_length": 1,
+          "column_type": "int",
+          "LMR6": false
+        },
+        "beaufort_force": {
+          "description": "Beaufort Force (0-12; a dash = 13 or -)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "visibility": {
+          "description": "Visibility (0-9)",
+          "field_length": 1,
+          "column_type": "int",
+          "valid_max": 9,
+          "valid_min": 0,
+          "LMR6": true
+        },
+        "present_weather": {
+          "description": "Present weather (00-99)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "past_weather": {
+          "description": "Past weather (0-9; a dash=11 or -)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "beaufort_weather": {
+          "description": "Beaufort weather, alpha characters or CLICOM numeric code values",
+          "field_length": 6,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_coded": {
+          "description": "Barometer as coded (PP; 00-99)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_read": {
+          "description": "Barometer as read (inches to hundredths or millimeters to tenths) Note: The instrument correction in the header record is not always in the same units as the barometer as read units.",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "attached_thermometer": {
+          "description": "Attached Thermometer",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_corrected": {
+          "description": "Barometer as corrected (in. to hundredths, mm to tenths, if both reported selected units that correspond to barometer as read) ",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "baro_type": {
+          "description": "Barometer type",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_correction": {
+          "description": "Barometer correction",
+          "field_length": 5,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "temp_ind": {
+          "description": "Air temperature indicator (S=stationary thermometer, P=psychrometer; O= other)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "total_could_amount": {
+          "description": "N Total cloud amount (as recorded in tenths or code; 0-10; a dash = 11 or -)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "nh_low_cloud_amount": {
+          "description": "Nh Low cloud amount (as recorded in tenths or code; 0-10; a dash = 11 or -)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_type_one": {
+          "description": "Cloud Type 1 or high cloud type",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_dir_one": {
+          "description": "Direction of upper high cloud movement",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_type_two": {
+          "description": "Cloud Type 2 or middle cloud type",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_dir_two": {
+          "description": "Direction of middle cloud movement",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_type_three": {
+          "description": "Cloud Type 3 or low cloud type",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "cloud_dir_three": {
+          "description": "Direction of low cloud movement",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sea_state": {
+          "description": "Sea state",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "sea_dir": {
+          "description": "Swell (wind wave) direction right justify",
+          "field_length": 4,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "swell_type": {
+          "description": "Character of swell (same as state of the sea)",
+          "field_length": 3,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "air_sea_temp_diff": {
+          "description": "Temperature difference (air-water) generally 0-9 but some times the actual difference was recorded ",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_diff_ind": {
+          "description": "Characteristic of change of the barometer in three hours (0-9; a dash = 11 or -)",
+          "field_length": 1,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "barometer_differences": {
+          "description": "Barometer change in two digit code (00-99). An exception for 703, place the two hour pressure change in this field (hundredths of inches)",
+          "field_length": 2,
+          "column_type": "str",
+          "LMR6": false
+        },
+        "ship_name": {
+          "description": "Ship name",
+          "field_length": 26,
+          "column_type": "str",
+          "LMR6": false
+        }
+      }
+    }
+  }
+}

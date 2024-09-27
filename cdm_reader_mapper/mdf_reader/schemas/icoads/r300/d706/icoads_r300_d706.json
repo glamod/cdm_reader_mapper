@@ -1,0 +1,7 @@
+{
+  "substitute": {
+    "data_model": "icoads",
+    "release": "r300",
+    "deck": "d705"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "original_value": "ignore",
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "slp_units",
+    "code_table": "baro_units",
+    "decimal_places": 0
+  }
+}

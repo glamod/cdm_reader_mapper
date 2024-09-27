@@ -1,0 +1,35 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "AT"
+    }
+  },
+  "observed_variable": {
+    "default": 85
+  },
+  "observation_value": {
+    "sections": "drifter_measurements",
+    "elements": "AIR_TEMP_ADJUSTED",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "units": {
+    "default": 5
+  },
+  "quality_flag": {
+    "sections": "drifter_measurements",
+    "elements": "AIR_TEMP_ADJUSTED_QC",
+    "code_table": "quality_flag"
+  },
+  "original_units": {
+    "default": 60
+  },
+  "original_value": {
+    "sections": "drifter_measurements",
+    "elements": "AIR_TEMP_ADJUSTED",
+    "decimal_places": 2
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

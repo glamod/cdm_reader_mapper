@@ -1,0 +1,197 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "core"
+        ]
+      },
+      {
+        "o": [
+          "c1",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9",
+          "c95",
+          "c96",
+          "c97",
+          "c98"
+        ]
+      },
+      {
+        "s": [
+          "c99_sentinal",
+          "c99_data"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "c99_sentinal": {
+      "header": {
+        "sentinal": "99 0 ",
+        "length": 5,
+        "field_layout": "fixed_width"
+      },
+      "elements": {
+        "ATTI": {
+          "description": "attm ID",
+          "field_length": 2,
+          "column_type": "str",
+          "ignore": false
+        },
+        "ATTL": {
+          "description": "attm length",
+          "field_length": 2,
+          "column_type": "int",
+          "valid_max": 0,
+          "valid_min": 0,
+          "ignore": false
+        },
+        "BLK": {
+          "description": "blank space",
+          "field_length": 1,
+          "column_type": "object",
+          "ignore": false,
+          "disable_white_strip": true
+        }
+      }
+    },
+    "c99_data": {
+      "header": {
+        "format": "delimited",
+        "delimiter": "}"
+      },
+      "elements": {
+        "control_No": {
+          "description": "Ship control number",
+          "column_type": "str"
+        },
+        "name": {
+          "description": "Name of ship",
+          "column_type": "str"
+        },
+        "baro_type": {
+          "description": "Barometer type. PENDING KEY TABLE",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.BAROT",
+          "LMR6": false
+        },
+        "slp_units": {
+          "description": "Pressure units",
+          "column_type": "str"
+        },
+        "baro_therm_scale": {
+          "description": "Barometer thermometer scale",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "baro_temp": {
+          "description": "Barometer temperature",
+          "column_type": "int",
+          "scale": 1
+        },
+        "baro_corrections": {
+          "description": "Barometer corrections",
+          "column_type": "str"
+        },
+        "date_barom_corr": {
+          "description": "Date of last barometer correction",
+          "column_type": "str"
+        },
+        "air_temp_units": {
+          "description": "Air thermometer units",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "a_temp_melt_snow": {
+          "description": "Air Temperature melt snow",
+          "column_type": "str"
+        },
+        "sst_units": {
+          "description": "Sea thermometer scale",
+          "column_type": "key",
+          "codetable": "ICOADS.C99.TEMPI",
+          "LMR6": false
+        },
+        "s_temp_melt_snow": {
+          "description": "Sea Temperature melt snow",
+          "column_type": "str"
+        },
+        "weather": {
+          "description": "Weather",
+          "column_type": "str"
+        },
+        "sea_state": {
+          "description": "Sea state",
+          "column_type": "int",
+          "LMR6": false
+        },
+        "voy_remarks": {
+          "description": "Remarks about the Voyage",
+          "column_type": "str"
+        },
+        "ship_remarks": {
+          "description": "Remarks about the Ship",
+          "column_type": "str"
+        },
+        "baro_place_of_exam": {
+          "description": "Place where the barometer was examined",
+          "column_type": "str"
+        },
+        "baro_port_of_compare": {
+          "description": "Port where barometer readings were compared to other readings made with a good condition barometer",
+          "column_type": "str"
+        },
+        "atemp_place_of_exam": {
+          "description": "Place where the air temperature thermometer was examined",
+          "column_type": "str"
+        },
+        "stemp_place_of_exam": {
+          "description": "Place where the sea temperature thermometer was examined",
+          "column_type": "str"
+        },
+        "voyage_from": {
+          "description": "Voyage from",
+          "column_type": "str"
+        },
+        "voyage_to": {
+          "description": "Voyage to",
+          "column_type": "str"
+        },
+        "air_therm_loc": {
+          "description": "Air thermometer location on the ship",
+          "column_type": "str"
+        },
+        "notes_voyage": {
+          "description": "Registrators notes about the voyage",
+          "column_type": "str"
+        },
+        "notes_ship": {
+          "description": "Registrators notes about the ship",
+          "column_type": "str"
+        },
+        "notes_date": {
+          "description": "Registrators notes about the date",
+          "column_type": "str"
+        },
+        "notes_registrator": {
+          "description": "Registrator of the ship",
+          "column_type": "str"
+        },
+        "ocean_crossed": {
+          "description": "Ocean crossed in the voyage",
+          "column_type": "str"
+        },
+        "extra_data": {
+          "description": "Extra truncated data",
+          "column_type": "str"
+        }
+      }
+    }
+  }
+}

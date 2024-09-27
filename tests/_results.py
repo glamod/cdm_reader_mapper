@@ -49,163 +49,143 @@ class result_data:
         self.name = "CDM reader mapper result testing data."
 
     @property
-    def expected_063_714(self):
+    def expected_icoads_r300_d714(self):
         return self._get_data_dict(
-            "063-714_2010-07-01_subset",
-            "714",
-            "imma1",
+            "2010-07-01_subset",
+            "icoads_r300_d714",
         )
 
     @property
-    def expected_069_701_type1(self):
+    def expected_icoads_r300_d701_type1(self):
         return self._get_data_dict(
-            "069-701_type1_1845-04-01_subset",
-            "701",
-            "imma1",
+            "type1_1845-04-01_subset",
+            "icoads_r300_d701",
         )
 
     @property
-    def expected_069_701_type2(self):
+    def expected_icoads_r300_d701_type2(self):
         return self._get_data_dict(
-            "069-701_type2_1845-04-01_subset",
-            "701",
-            "imma1",
+            "type2_1845-04-01_subset",
+            "icoads_r300_d701",
         )
 
     @property
-    def expected_085_705(self):
+    def expected_icoads_r300_d705(self):
         return self._get_data_dict(
-            "085-705_1938-04-01_subset",
-            "705",
-            "imma1",
+            "1938-04-01_subset",
+            "icoads_r300_d705",
         )
 
     @property
-    def expected_143_781(self):
+    def expected_icoads_r300_d781(self):
         return self._get_data_dict(
-            "143-781_1987-09-01_subset",
-            "781",
-            "imma1",
+            "1987-09-01_subset",
+            "icoads_r300_d781",
         )
 
     @property
-    def expected_084_706(self):
+    def expected_icoads_r300_d706(self):
         return self._get_data_dict(
-            "084-706_1919-03-01_subset",
-            "706",
-            "imma1",
+            "1919-03-01_subset",
+            "icoads_r300_d706",
         )
 
     @property
-    def expected_096_702(self):
+    def expected_icoads_r300_d702(self):
         return self._get_data_dict(
-            "096-702_1873-01-01_subset",
-            "702",
-            "imma1",
+            "1873-01-01_subset",
+            "icoads_r300_d702",
         )
 
     @property
-    def expected_098_707(self):
+    def expected_icoads_r300_d707(self):
         return self._get_data_dict(
-            "098-707_1916-04-01_subset",
-            "707",
-            "imma1",
+            "1916-04-01_subset",
+            "icoads_r300_d707",
         )
 
     @property
-    def expected_103_794(self):
+    def expected_icoads_r302_d794(self):
         return self._get_data_dict(
-            "103-794_2022-11-01_subset",
-            "794",
-            "imma1",
+            "2022-11-01_subset",
+            "icoads_r302_d794",
         )
 
     @property
-    def expected_125_704(self):
+    def expected_icoads_r300_d704(self):
         return self._get_data_dict(
-            "125-704_1878-10-01_subset",
-            "704",
-            "imma1",
+            "1878-10-01_subset",
+            "icoads_r300_d704",
         )
 
     @property
-    def expected_125_721(self):
+    def expected_icoads_r300_d721(self):
         return self._get_data_dict(
-            "125-721_1862-06-01_subset",
-            "721",
-            "imma1",
+            "1862-06-01_subset",
+            "icoads_r300_d721",
         )
 
     @property
-    def expected_133_730(self):
+    def expected_icoads_r300_d730(self):
         return self._get_data_dict(
-            "133-730_1776-10-01_subset",
-            "730",
-            "imma1",
+            "1776-10-01_subset",
+            "icoads_r300_d730",
         )
 
     @property
-    def expected_144_703(self):
+    def expected_icoads_r300_d703(self):
         return self._get_data_dict(
-            "144-703_1979-09-01_subset",
-            "703",
-            "imma1",
+            "1979-09-01_subset",
+            "icoads_r300_d703",
         )
 
     @property
-    def expected_091_201(self):
+    def expected_icoads_r300_d201(self):
         return self._get_data_dict(
-            "091-201_1913-11-01_subset",
-            "201",
-            "imma1",
+            "1913-11-01_subset",
+            "icoads_r300_d201",
         )
 
     @property
-    def expected_077_892(self):
+    def expected_icoads_r300_d892(self):
         return self._get_data_dict(
-            "077-892_1996-02-01_subset",
-            "892",
-            "imma1",
+            "1996-02-01_subset",
+            "icoads_r300_d892",
         )
 
     @property
-    def expected_147_700(self):
+    def expected_icoads_r300_d700(self):
         return self._get_data_dict(
-            "147-700_2002-08-01_subset",
-            "700",
-            "imma1",
+            "2002-08-01_subset",
+            "icoads_r300_d700",
         )
 
     @property
-    def expected_103_792(self):
+    def expected_icoads_r302_d792(self):
         return self._get_data_dict(
-            "103-792_2022-02-01_subset",
-            "792",
-            "imma1",
+            "2022-02-01_subset",
+            "icoads_r302_d792",
         )
 
     @property
-    def expected_114_992(self):
+    def expected_icoads_r302_d992(self):
         return self._get_data_dict(
-            "114-992_2022-01-01_subset",
-            "992",
-            "imma1",
+            "2022-01-01_subset",
+            "icoads_r302_d992",
         )
 
     @property
-    def expected_mix_out(self):
+    def expected_gcc(self):
         return self._get_data_dict(
-            "mix-out_20030201",
+            "20030201",
             "gcc",
-            "immt",
         )
 
     @property
-    def expected_1260810(self):
+    def expected_craid(self):
         return self._get_data_dict(
-            "1260810_2004-12-20_subset",
-            "raid",
-            "c",
+            "2004-12-20_subset",
+            "craid",
         )
 
     def __getitem__(self, attr):
@@ -217,9 +197,10 @@ class result_data:
         except HTTPError:
             return pd.DataFrame()
 
-    def _get_data_dict(self, data_file, deck, dm):
-        drs = f"{dm}_{deck}"
+    def _get_data_dict(self, data_file, data_model):
+        drs = data_model.split("_")
 
+        data_file = f"{data_model}_{data_file}"
         data = f"data_{data_file}.csv"
         mask = f"mask_{data_file}.csv"
         vaid = f"vaid_{data_file}.csv"
@@ -227,14 +208,14 @@ class result_data:
 
         for cdm_table in cdm_tables:
             name = cdm_table.format(data_file)
-            path = load_file(os.path.join(drs, "cdm_tables", name)).parent
+            path = load_file(os.path.join(*drs, "cdm_tables", name)).parent
 
         return {
-            "data": self._load_file(os.path.join(drs, "output", data)),
-            "mask": self._load_file(os.path.join(drs, "output", mask)),
+            "data": self._load_file(os.path.join(*drs, "output", data)),
+            "mask": self._load_file(os.path.join(*drs, "output", mask)),
             "cdm_table": path,
-            "vaid": self._load_file(os.path.join(drs, "validation", vaid)),
-            "vadt": self._load_file(os.path.join(drs, "validation", vadt)),
+            "vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
+            "vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
         }
 
 
