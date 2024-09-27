@@ -39,10 +39,11 @@ from cdm_reader_mapper.common import logging_hdlr
 from . import model_datetimes
 
 
-def validate(data, data_model, dck, log_level="INFO"):
+def validate(data, data_model, log_level="INFO"):
     """DOCUMENTATiON."""
     # dck input only to be consistent with other validators in the metmetpy module
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    model = data_model.split("_")[0]
 
     if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
@@ -51,11 +52,11 @@ def validate(data, data_model, dck, log_level="INFO"):
         )
         return
 
-    data_model_datetime = model_datetimes.to_datetime(data, data_model)
+    data_model_datetime = model_datetimes.to_datetime(data, model)
 
     if not isinstance(data_model_datetime, pd.Series):
         logger.error(
-            f'Data model "{data_model}" datetime conversor not defined in model_datetimes module "{data_model}"'
+            f'Data model "{model}" datetime conversor not defined in model_datetimes module"'
         )
         return
     elif len(data_model_datetime) == 0:

@@ -1,0 +1,14 @@
+{
+  "station_name": {
+    "sections": "c99_voyage",
+    "elements": "ShipName"
+  },
+  "platform_sub_type": {
+    "sections": "c99_voyage",
+    "elements": "Ship_type"
+  },
+  "primary_station_id": {
+    "sections": "c99_voyage",
+    "elements": "ShipName"
+  }
+}

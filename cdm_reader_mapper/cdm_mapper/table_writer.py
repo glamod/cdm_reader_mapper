@@ -29,8 +29,6 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-module_path = os.path.dirname(os.path.abspath(__file__))
-
 
 def print_integer(data, null_label):
     """
@@ -253,7 +251,6 @@ def table_to_ascii(
     Saves cdm tables as ascii files
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-
     empty_table = False
     if "observation_value" in table:
         table = table.dropna(subset=["observation_value"])

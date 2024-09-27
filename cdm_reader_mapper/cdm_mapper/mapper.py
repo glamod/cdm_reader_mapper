@@ -18,9 +18,9 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
-from .codes.codes_hdlr import codes_hdlr
+from .codes.codes import get_code_table
 from .mappings import mapping_functions
-from .tables.tables_hdlr import tables_hdlr
+from .tables.tables import get_cdm_atts, get_imodel_maps
 
 
 def drop_duplicates(df):
@@ -58,19 +58,65 @@ def _map_to_df(m, x):
 
 
 def _decimal_places(
-    atts,
+    entry,
     decimal_places,
-    cdm_key,
     imodel_functions,
 ):
     if decimal_places is not None:
+
         if isinstance(decimal_places, int):
-            atts[cdm_key].update({"decimal_places": decimal_places})
+            entry["decimal_places"] = decimal_places
         else:
-            atts[cdm_key].update(
-                {"decimal_places": getattr(imodel_functions, decimal_places)()}
-            )
-    return atts
+            entry["decimal_places"] = getattr(imodel_functions, decimal_places)()
+
+    return entry
+
+
+def _transform(
+    to_map,
+    elements,
+    imodel_functions,
+    transform,
+    kwargs,
+    logger,
+):
+    logger.debug(f"\ttransform: {transform}")
+    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+
+    trans = getattr(imodel_functions, transform)
+    if elements:
+        return trans(to_map, **kwargs)
+    return trans(**kwargs)
+
+
+def _code_table(
+    to_map,
+    data_model,
+    code_table,
+    logger,
+):
+    # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
+    # Approach that does not work when it is not nested...so just try and assume not nested if fails
+    # Prepare code_table
+    table_map = get_code_table(*data_model.split("_"), code_table=code_table)
+    try:
+        to_map = to_map.to_frame()
+    except Exception:
+        logger.warning(f"Could not convert {to_map} to frame.")
+
+    to_map_str = to_map.astype(str)
+
+    to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
+    return to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+
+
+def _default(
+    default,
+    length,
+):
+    if isinstance(default, list):
+        return [default] * length
+    return default
 
 
 def _write_csv_files(
@@ -79,8 +125,8 @@ def _write_csv_files(
     logger,
     cols,
     imodel_functions,
-    imodel_code_tables,
-    atts,
+    codes_subset,
+    cdm_tables,
 ):
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
@@ -97,6 +143,11 @@ def _write_csv_files(
         fill_value = imapping.get("fill_value")
         decimal_places = imapping.get("decimal_places")
 
+        if codes_subset:
+            if code_table not in codes_subset:
+                code_table = None
+
+        to_map = None
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
@@ -112,8 +163,10 @@ def _write_csv_files(
             notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
             to_map = idata[elements].iloc[notna_idx_idx]
-            # notna_idx = notna_idx_idx + idata.index[0]  # to account for parsers #original
-            notna_idx = idata.index[notna_idx_idx]  # fix?
+            # notna_idx = (
+            #    notna_idx_idx + idata.index[0]
+            # )  # to account for parsers #original
+            # notna_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -121,40 +174,28 @@ def _write_csv_files(
                 isEmpty = True
 
         if transform and not isEmpty:
-            logger.debug(f"\ttransform: {transform}")
-            logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
-
-            trans = getattr(imodel_functions, transform)
-            logger.debug(f"\ttable_df_i Index: {table_df_i.index}")
-            logger.debug(f"\tidata_i Index: {idata.index}")
-            if elements:
-                logger.debug(f"\tnotna_idx: {notna_idx}")
-                table_df_i.loc[notna_idx, cdm_key] = trans(to_map, **kwargs)
-            else:
-                table_df_i[cdm_key] = trans(**kwargs)
+            table_df_i[cdm_key] = _transform(
+                to_map,
+                elements,
+                imodel_functions,
+                transform,
+                kwargs,
+                logger=logger,
+            )
         elif code_table and not isEmpty:
-            # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
-            # Approach that does not work when it is not nested...so just try and assume not nested if fails
-            # Prepare code_table
-            table_map = imodel_code_tables.get(code_table)
-            try:
-                to_map = to_map.to_frame()
-            except Exception:
-                logger.warning(f"Could not convert {to_map} to frame.")
-
-            to_map_str = to_map.astype(str)
-
-            to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
-            table_df_i[cdm_key] = to_map_str.apply(
-                lambda x: _map_to_df(table_map, x), axis=1
+            table_df_i[cdm_key] = _code_table(
+                to_map,
+                imodel_functions.imodel,
+                code_table,
+                logger=logger,
             )
         elif elements and not isEmpty:
             table_df_i[cdm_key] = to_map
         elif default is not None:  # (value = 0 evals to False!!)
-            if isinstance(default, list):
-                table_df_i[cdm_key] = [default] * len(table_df_i.index)
-            else:
-                table_df_i[cdm_key] = default
+            table_df_i[cdm_key] = _default(
+                default,
+                len(table_df_i.index),
+            )
 
         if fill_value is not None:
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
@@ -162,7 +203,6 @@ def _write_csv_files(
         atts = _decimal_places(
             atts,
             decimal_places,
-            cdm_key,
             imodel_functions,
         )
 
@@ -173,91 +213,28 @@ def _write_csv_files(
     return table_df_i, atts
 
 
-def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
-    """
-    Map to the C3S Climate Data Store Common Data Model (CDM).
+def _map(
+    data_model,
+    *sub_models,
+    data=pd.DataFrame(),
+    cdm_subset=None,
+    codes_subset=None,
+    logger=None,
+):
+    if not cdm_subset:
+        cdm_subset = properties.cdm_tables
 
-    Maps a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
-    header and observational tables using mapping information from the input data model (imodel).
+    cdm_atts = get_cdm_atts(cdm_subset)
 
-    Parameters
-    ----------
-    imodel: a data model that can be
-            1. A generic mapping from a defined data model, like IMMA1's core and attachments
-               e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000``
-            2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1's core and attachments
-               to CDM in a specific way. e.g. ``~/cdm-mapper/lib/mappings/icoads_r3000_d704``
-    data: input data to map
-        e.g. a pandas.Dataframe.
-    cdm_subset: subset of CDM model tables to map.
-        Defaults to the full set of CDM tables defined for the imodel. Type: list.
-    codes_subset: subset of code mapping tables to map.
-        Defaults to the full set of code mapping tables. defined for the imodel. Type: list.
-    log_level: level of logging information to save.
-        Defaults to ‘DEBUG’. Type: string.
+    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
 
-    Returns
-    -------
-    cdm_tables: a python dictionary with the ``cdm_table_name`` and ``cdm_table_object`` pairs.
+    imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
 
-    cdm_table_name: is the name of the CDM table i.e. ``header``, ``observations_at``, etc.
-    cdm_table_object: is the python dictionary with the ``{data:cdm_table_object, atts:cdm_table_atts}`` pairs.
-
-    1. cdm_table_object: is a python pandas DataFrame object with the CDM elements aligned in columns according
-    to the order established by the imodel.
-
-    2. cdm_table_atts: python dictionary with the CDM element attributes. These element attributes can be the
-    elements encoding, decimal places or other characteristics specified in the imodel.
-    """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    codes_imodel = codes_hdlr(imodel)
-    tables_imodel = tables_hdlr()
-    # Get imodel mapping pack
-    # Read mappings to CDM from imodel
-    try:
-        # Read mappings to CDM from imodel
-        imodel_maps = tables_imodel.load_tables_maps(imodel, cdm_subset=cdm_subset)
-        if len(imodel_maps) < 1:
-            logger.error(f"No mapping codes found for model {imodel}")
-            return
-        imodel_functions = mapping_functions(imodel)
-        imodel_code_tables = codes_imodel.load_code_tables_maps(
-            codes_subset=codes_subset
-        )
-        if imodel_code_tables is None:
-            logger.warning(f"No code table mappings found for model {imodel}")
-        elif len(imodel_code_tables) < 1:
-            logger.warning(
-                f"No code table mappings found for model {imodel} (not NoneType)"
-            )
-    except Exception:
-        logger.error(f"Error loading {imodel} cdm mappings", exc_info=True)
-        return
-
-    if not imodel_maps:
-        logger.error(f"Error loading {imodel} cdm mappings")
-        return
-    # Read CDM table attributes
-    cdm_atts = tables_imodel.load_tables()
-    # Check that imodel cdm tables are consistent with CDM tables (at least in naming....)
-    not_in_tool = [x for x in imodel_maps.keys() if x not in cdm_atts.keys()]
-    if len(not_in_tool) > 0:
-        if any(not_in_tool):
-            logger.error(
-                "One or more tables registered in the data model is not supported by the tool: {}".format(
-                    ",".join(not_in_tool)
-                )
-            )
-            logger.info(
-                "CDM tables registered in the tool in properties.py are: {}".format(
-                    ",".join(properties.cdm_tables)
-                )
-            )
-            return
     # Initialize dictionary to store temporal tables (buffer) and table attributes
     cdm_tables = {k: {"atts": cdm_atts.get(k)} for k in imodel_maps.keys()}
     # Create pandas data types for buffer reading from CDM table definition pseudo-sql dtypes
     # Also keep track of datetime columns for reader to parse
+
     date_columns = {}
     for table, values in imodel_maps.items():
         date_columns[table] = [
@@ -266,7 +243,6 @@ def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
             if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
         ]
 
-    # Now map per iterable item, per table
     for idata in data:
         cols = [x for x in idata]
         for table, mapping in imodel_maps.items():
@@ -276,23 +252,20 @@ def _map(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
                 logger,
                 cols,
                 imodel_functions,
-                imodel_code_tables,
                 cdm_tables[table]["atts"],
             )
-
     return cdm_tables
 
 
-def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"):
+def map_model(
+    imodel, data=pd.DataFrame(), cdm_subset=None, codes_subset=None, log_level="INFO"
+):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
     imodel: str
-      a data model that can be of several types.
-      1. A generic mapping from a defined data model, like IMMA1’s core and attachments.
-      e.g. ``cdm/library/mappings/icoads_r3000``
-      2. A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
+      A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
       CDM in a specific way.
       e.g. ``cdm/library/mappings/icoads_r3000_d704``
     data: pd.DataFrame
@@ -314,9 +287,10 @@ def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"
       a python dictionary with the ``{cdm_table_name: cdm_table_object}`` pairs.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    imodel = imodel.split("_")
     # Check we have imodel registered, leave otherwise
-    if imodel not in properties.supported_models:
-        logger.error("Input data model " f"{imodel}" " not supported")
+    if imodel[0] not in properties.supported_data_models:
+        logger.error("Input data model " f"{imodel[0]}" " not supported")
         return
 
     # Check input data type and content (empty?)
@@ -335,9 +309,10 @@ def map_model(imodel, data, cdm_subset=None, codes_subset=None, log_level="INFO"
 
     # Map thing:
     return _map(
-        imodel,
-        data,
+        imodel[0],
+        *imodel[1:],
+        data=data,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
-        log_level=log_level,
+        logger=logger,
     )

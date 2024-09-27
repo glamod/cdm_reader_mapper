@@ -1,0 +1,30 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "DPT"
+    }
+  },
+  "observed_variable": {
+    "default": 36
+  },
+  "observation_value": {
+    "sections": "core",
+    "elements": "DPT",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "units": {
+    "default": 5
+  },
+  "original_units": {
+    "default": 60
+  },
+  "original_value": {
+    "sections": "core",
+    "elements": "DPT",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

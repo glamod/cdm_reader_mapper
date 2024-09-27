@@ -1,0 +1,14 @@
+{
+  "station_name": {
+    "sections": "c99_journal",
+    "elements": "ship_name"
+  },
+  "platform_sub_type": {
+    "sections": "c99_journal",
+    "elements": "rig"
+  },
+  "primary_station_id": {
+    "sections": "c99_journal",
+    "elements": "ship_name"
+  }
+}

@@ -2,26 +2,9 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, object_types  # noqa
+from ..properties import numeric_types, object_types, supported_data_models  # noqa
 
 _base = "cdm_reader_mapper.cdm_mapper"
-
-supported_models = [
-    "c_raid",
-    "gcc_mapping",
-    "icoads_r3000",
-    "icoads_r3000_d701_type1",
-    "icoads_r3000_d701_type2",
-    "icoads_r3000_d702",
-    "icoads_r3000_d704",
-    "icoads_r3000_d705-707",
-    "icoads_r3000_d714",
-    "icoads_r3000_d721",
-    "icoads_r3000_d730",
-    "icoads_r3000_d781",
-    "icoads_r3000_NRT",
-    "pub47_noc",
-]
 
 cdm_tables = [
     "header",

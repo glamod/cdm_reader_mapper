@@ -7,7 +7,7 @@ import logging
 import pandas as pd
 
 from . import properties
-from .schema import schemas
+from .schemas import schemas
 from .utils.auxiliary import _FileReader, validate_arg, validate_path
 
 
@@ -216,13 +216,17 @@ def read(
 
     Parameters
     ----------
-    source : str
+    source: str
         The file (including path) to be read
-    data_model : str, optional
+    data_model: str, optional
         Name of internally available data model
-    data_model_path : str, optional
+    data_model_path: str, optional
         Path to external data model.
         Expected file structure: name_of_model/name_of_model.json
+    year_init: str or int, optional
+        Left border of time axis.
+    year_end: str or int, optional
+        Right border of time axis.
 
     Returns
     -------
@@ -231,15 +235,26 @@ def read(
         and attributes (``attrs``) corresponding to the information
         from ``source``.
     """
+
+    def get_list_element(lst, idx):
+        try:
+            return lst[idx]
+        except IndexError:
+            return None
+
     logging.basicConfig(
         format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
         level=logging.INFO,
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
+    mrd = data_model.split("_")
+    data_model = get_list_element(mrd, 0)
+    sub_models = mrd[1:]
     return MDFFileReader(
         source=source,
         data_model=data_model,
+        sub_models=sub_models,
         data_model_path=data_model_path,
         year_init=year_init,
         year_end=year_end,

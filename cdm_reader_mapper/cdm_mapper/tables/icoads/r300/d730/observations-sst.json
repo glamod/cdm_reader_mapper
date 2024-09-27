@@ -1,0 +1,8 @@
+{
+  "original_units": {
+    "sections": "c99_data",
+    "elements": "SST_reading_units",
+    "code_table": "temperature_units",
+    "decimal_places": 0
+  }
+}
