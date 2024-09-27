@@ -39,7 +39,6 @@ invocation) logging an error.
 
 from __future__ import annotations
 
-
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
