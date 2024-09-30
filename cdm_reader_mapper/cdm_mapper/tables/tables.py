@@ -22,13 +22,14 @@ from cdm_reader_mapper.common.json_dict import (
 from .. import properties
 
 
-def get_cdm_atts(cdm_tables):
+def get_cdm_atts(cdm_tables=None):
     """Get CDM attribute tables.
 
     Parameters
     ----------
-    cdm_tables: list
+    cdm_tables: str, list, optional
         List of cdm_tables
+        If None select all available tables.
 
     Returns
     -------
@@ -43,6 +44,11 @@ def get_cdm_atts(cdm_tables):
         "common", base=f"{properties._base}.tables", name="observations"
     )[0]
     observations_dict = open_json_file(observations_file)
+
+    if cdm_tables is None:
+        cdm_tables = properties.cdm_tables
+    if isinstance(cdm_tables, str):
+        cdm_tables = [cdm_tables]
 
     cdm_atts = {}
     for cdm_table in cdm_tables:
