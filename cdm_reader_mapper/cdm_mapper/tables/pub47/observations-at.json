@@ -17,8 +17,5 @@
   },
   "sensor_id": {
     "elements": "thermometer1_parameter"
-  },
-  "sensor_automation_status": {
-    "elements": "automation"
   }
 }

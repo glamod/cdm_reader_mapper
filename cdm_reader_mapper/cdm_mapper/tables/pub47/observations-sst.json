@@ -7,8 +7,5 @@
   },
   "sensor_id": {
     "elements": "sea_thermometer1_parameter"
-  },
-  "sensor_automation_status": {
-    "elements": "automation"
   }
 }

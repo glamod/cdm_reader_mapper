@@ -15,8 +15,5 @@
   },
   "sensor_id": {
     "elements": "barometer1_parameter"
-  },
-  "sensor_automation_status": {
-    "elements": "automation"
   }
 }

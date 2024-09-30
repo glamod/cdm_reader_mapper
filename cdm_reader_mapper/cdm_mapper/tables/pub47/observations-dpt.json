@@ -17,8 +17,5 @@
   },
   "sensor_id": {
     "elements": "hygrometer1_parameter"
-  },
-  "sensor_automation_status": {
-    "elements": "automation"
   }
 }
