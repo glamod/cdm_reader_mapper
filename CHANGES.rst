@@ -38,6 +38,7 @@ Breaking changes
 * ``cdm_mapper.map_model``: use standardized imodel_name as <data_model>_<release>_<deck> (e.g. icoads_r300_d701) (:issue:`11`, :pull:`97`)
 * ``mdf_reader.read``: use standardized imodel_name as <data_model>_<release>_<deck> (e.g. icoads_r300_d701) (:issue:`11`, :pull:`97`)
 * ``mdf_reader``: (``core``, ``VS``) set column_type to ``key`` for all ICOADS decks (:issue:`11`, :pull:`97`)
+* ``cdm_mapper``: rename pub47_noc mapping to pub47 (:pull:`102`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
