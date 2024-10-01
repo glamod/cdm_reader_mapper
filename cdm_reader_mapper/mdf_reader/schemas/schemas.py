@@ -110,7 +110,7 @@ def _read_schema(schema):
     return schema
 
 
-def read_schema(data_model, *sub_models, ext_schema_path=None, ext_schema_file=None):
+def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
     """
     Read a data model schema file.
 
@@ -120,20 +120,14 @@ def read_schema(data_model, *sub_models, ext_schema_path=None, ext_schema_file=N
 
     Parameters
     ----------
-    data_model: str
-        The name of the data model to read. This is for
-        data models included in the tool.
-    sub_models*: optionally
-        Sub-directories of ``data_model``.
-        E.g. r300 d701 type2
+    imodel: str, optional
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
     ext_schema_path: str, optional
-        The path to the external data model schema file
+        The path to the external input data model schema file.
+        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
     ext_schema_file: str, optional
-        The external data model schema file
-
-
-    Either schema_name or one of ext_schema_path or ext_schema_file must be provided.
-
+        The external input data model schema file.
 
     Returns
     -------
@@ -148,12 +142,11 @@ def read_schema(data_model, *sub_models, ext_schema_path=None, ext_schema_file=N
         schema_name = os.path.basename(schema_path)
         schema_files = os.path.join(schema_path, schema_name + ".json")
     else:
-        if data_model not in properties.supported_data_models:
-            logging.error("Input data model " f"{data_model}" " not supported")
+        imodel = imodel.split("_")
+        if imodel[0] not in properties.supported_data_models:
+            logging.error("Input data model " f"{imodel[0]}" " not supported")
             return
-        schema_files = collect_json_files(
-            data_model, *sub_models, base=f"{properties._base}.schemas"
-        )
+        schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
 
     if isinstance(schema_files, str):
         schema_files = [schema_files]
