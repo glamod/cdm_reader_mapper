@@ -39,6 +39,9 @@ Breaking changes
 * ``mdf_reader.read``: use standardized imodel_name as <data_model>_<release>_<deck> (e.g. icoads_r300_d701) (:issue:`11`, :pull:`97`)
 * ``mdf_reader``: (``core``, ``VS``) set column_type to ``key`` for all ICOADS decks (:issue:`11`, :pull:`97`)
 * ``cdm_mapper``: rename pub47_noc mapping to pub47 (:pull:`102`)
+* Note by each function call: rename ``data_model`` into ``imodel`` e.g. imodel=icoads_r300_d704 (:pull:`103`)
+* ``cdm_mapper.map_model``: call with (data, imodel=imodel) (:pull:`103`)
+* ``mdf_reader.read``: call with (source, imodel=imodel) (:pull:`103`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -56,6 +59,7 @@ Internal changes
 * add ``cdm_reader_mapper`` author list including ORCID iD's (:pull:`38`, :pull:`49`)
 * ``mdf_reader``: replace empty strings with missing values (:pull:`89`)
 * ``metmetpy``: use function ``overwrite_data`` in all platform type correction functions (:pull:`89`)
+* rename ``data_model`` into ``imodel`` (:pull:`103`)
 
 Bug fixes
 ^^^^^^^^^
