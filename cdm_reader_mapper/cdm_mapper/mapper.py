@@ -115,7 +115,7 @@ def _default(
     return default
 
 
-def _write_csv_files(
+def _to_map(
     idata,
     mapping,
     logger,
@@ -127,7 +127,6 @@ def _write_csv_files(
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
     )  # We cannot predifine column based dtypes here!
-    logger.debug(f"Table: {table}")
     decimals = {}
     for cdm_key, imapping in mapping.items():
         logger.debug(f"\tElement: {cdm_key}")
@@ -194,8 +193,8 @@ def _write_csv_files(
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
         decimals[cdm_key] = _decimal_places(
-                decimal_places,
-                imodel_functions,
+            decimal_places,
+            imodel_functions,
         )
 
     if "observation_value" in table_df_i:
@@ -232,23 +231,24 @@ def _map(
     cols = [x for x in data]
     cdm_tables = {}
     for table, mapping in imodel_maps.items():
-            cdm_tables[table] = {}
-            data_, decimals_ = _write_csv_files(
-                data,
-                mapping,
-                logger,
-                cols,
-                imodel_functions,
-                codes_subset,
-                cdm_subset,
-            )
-            
-            for k, v in decimals_.items():
-                if v is not None:
-                    cdm_atts[table][k]["decimal_places"] = v
-                    print(cdm_atts[table][k])
-            cdm_tables[table]["data"] = data_
-            cdm_tables[table]["atts"] = cdm_atts[table]
+        logger.debug(f"Table: {table}")
+        cdm_tables[table] = {}
+        data_, decimals_ = _to_map(
+            data,
+            mapping,
+            logger,
+            cols,
+            imodel_functions,
+            codes_subset,
+            cdm_subset,
+        )
+
+        for k, v in decimals_.items():
+            if v is not None:
+                cdm_atts[table][k]["decimal_places"] = v
+
+        cdm_tables[table]["data"] = data_
+        cdm_tables[table]["atts"] = cdm_atts[table]
 
     return cdm_tables
 
@@ -292,11 +292,11 @@ def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"
     if not isinstance(data, pd.DataFrame):
         logger.error("Input data type " f"{type(data)}" " not supported")
         return
-    
+
     logger.info("Input data is a pd.DataFrame")
     if len(data) == 0:
-            logger.error("Input data is empty")
-            return
+        logger.error("Input data is empty")
+        return
 
     # Map thing:
     return _map(
