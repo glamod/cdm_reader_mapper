@@ -8,7 +8,7 @@ from ._testing_cdm_suite import _testing_suite
 
 
 @pytest.mark.parametrize(
-    "data_model, cdm_subset, codes_subset, out_path, mapping, drops, mdf_kwargs",
+    "imodel, cdm_subset, codes_subset, out_path, mapping, drops, mdf_kwargs",
     [
         ("icoads_r300_d714", None, None, ".", True, None, {}),
         (
@@ -115,7 +115,7 @@ from ._testing_cdm_suite import _testing_suite
     ],
 )
 def test_read_data(
-    data_model,
+    imodel,
     cdm_subset,
     codes_subset,
     out_path,
@@ -124,8 +124,8 @@ def test_read_data(
     mdf_kwargs,
 ):
     _testing_suite(
-        **dict(getattr(test_data, f"test_{data_model}")),
-        data_model=data_model,
+        **dict(getattr(test_data, f"test_{imodel}")),
+        imodel=imodel,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         out_path=out_path,
