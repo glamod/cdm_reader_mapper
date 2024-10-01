@@ -13,4 +13,4 @@ def _read_data(**kwargs):
 
 
 data_dict = dict(test_data.test_icoads_r300_d714)
-data_df, attrs_df, mask_df = _read_data(**data_dict, data_model="icoads_r300_d714")
+data_df, attrs_df, mask_df = _read_data(**data_dict, imodel="icoads_r300_d714")

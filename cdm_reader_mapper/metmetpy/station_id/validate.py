@@ -44,12 +44,12 @@ from .. import properties
 _base = f"{properties._base}.station_id"
 
 
-def validate(data, data_model, blank=False, log_level="INFO"):
+def validate(data, imodel, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    mrd = data_model.split("_")
+    mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.error(f"Dataset {data_model} has to deck information.")
+        logger.error(f"Dataset {imodel} has to deck information.")
         return
     dck = mrd[2]
 
@@ -60,10 +60,10 @@ def validate(data, data_model, blank=False, log_level="INFO"):
         )
         return
 
-    id_col = properties.metadata_datamodels["id"].get(data_model)
+    id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
         logger.error(
-            f"Data model {data_model} ID column not defined in\
+            f"Data model {imodel} ID column not defined in\
                      properties file"
         )
         return
@@ -84,7 +84,7 @@ def validate(data, data_model, blank=False, log_level="INFO"):
     data_model_files = collect_json_files(*mrd, base=_base)
 
     if len(data_model_files) == 0:
-        logger.error(f'Input dataset "{data_model}" has no ID deck library')
+        logger.error(f'Input dataset "{imodel}" has no ID deck library')
         return
 
     id_models = combine_dicts(data_model_files, base=_base)

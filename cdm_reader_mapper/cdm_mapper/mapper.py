@@ -260,20 +260,17 @@ def _map(
     return cdm_tables
 
 
-def map_model(
-    imodel, data=pd.DataFrame(), cdm_subset=None, codes_subset=None, log_level="INFO"
-):
+def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
+    data: pd.DataFrame, pd.parser.TextFileReader or io.String
+      input data to map.
     imodel: str
       A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
       CDM in a specific way.
-      e.g. ``cdm/library/mappings/icoads_r3000_d704``
-    data: pd.DataFrame
-      input data to map.
-      Type: string.
+      e.g. ``icoads_r300_d704``
     cdm_subset: list, optional
       subset of CDM model tables to map.
       Defaults to the full set of CDM tables defined for the imodel.

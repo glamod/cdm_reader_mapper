@@ -14,16 +14,6 @@ from .utils.auxiliary import _FileReader, validate_arg, validate_path
 class MDFFileReader(_FileReader):
     """Class to represent reader output.
 
-    Parameters
-    ----------
-    source : str
-        The file path to read
-    data_model : str, optional
-        Name of internally available data model
-    data_model_path : str, optional
-        Path to external data model
-
-
     Attributes
     ----------
     data : pd.DataFrame
@@ -199,8 +189,8 @@ class MDFFileReader(_FileReader):
 
 def read(
     source,
-    data_model=None,
-    data_model_path=None,
+    imodel=None,
+    ext_schema_path=None,
     year_init=None,
     year_end=None,
     **kwargs,
@@ -218,11 +208,13 @@ def read(
     ----------
     source: str
         The file (including path) to be read
-    data_model: str, optional
-        Name of internally available data model
-    data_model_path: str, optional
-        Path to external data model.
-        Expected file structure: name_of_model/name_of_model.json
+    imodel: str, optional
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
+    ext_schema_path: str, optional
+        The path to the external input data model schema file.
+        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
+        One of ``imodel`` or ``imodel_path`` must be set.
     year_init: str or int, optional
         Left border of time axis.
     year_end: str or int, optional
@@ -248,14 +240,10 @@ def read(
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
-    mrd = data_model.split("_")
-    data_model = get_list_element(mrd, 0)
-    sub_models = mrd[1:]
     return MDFFileReader(
         source=source,
-        data_model=data_model,
-        sub_models=sub_models,
-        data_model_path=data_model_path,
+        imodel=imodel,
+        ext_schema_path=ext_schema_path,
         year_init=year_init,
         year_end=year_end,
     ).read(**kwargs)

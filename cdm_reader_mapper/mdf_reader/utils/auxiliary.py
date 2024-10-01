@@ -351,29 +351,25 @@ class _FileReader:
     def __init__(
         self,
         source,
-        data_model=None,
-        sub_models=None,
-        data_model_path=None,
+        imodel=None,
+        ext_schema_path=None,
         year_init=None,
         year_end=None,
     ):
         # 0. VALIDATE INPUT
-        if not data_model and not data_model_path:
+        if not imodel and not ext_schema_path:
             logging.error(
-                "A valid data model name or path to data model must be provided"
+                "A valid input data model name or path to data model must be provided"
             )
             return
         if not os.path.isfile(source):
             logging.error(f"Can't find input data file {source}")
             return
-        if not validate_path("data_model_path", data_model_path):
+        if not validate_path("ext_schema_path", ext_schema_path):
             return
 
         self.source = source
-        self.data_model = data_model
-        self.imodel = data_model
-        self.sub_models = sub_models
-        self.data_model_path = data_model_path
+        self.imodel = imodel
         self.year_init = year_init
         self.year_end = year_end
 
@@ -381,17 +377,12 @@ class _FileReader:
         # Schema reader will return empty if cannot read schema or is not valid
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
-        if data_model_path:
+        if not ext_schema_path:
             logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(
-                data_model,
-                *sub_models,
-            )
+            self.schema = schemas.read_schema(imodel=imodel)
         else:
             logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(
-                data_model, *sub_models, ext_schema_path=data_model_path
-            )
+            self.schema = schemas.read_schema(ext_schema_path=ext_schema_path)
 
     def _adjust_dtype(self, dtype, df):
         if not isinstance(dtype, dict):
@@ -436,7 +427,8 @@ class _FileReader:
         if self.year_init is None and self.year_end is None:
             return df
 
-        dates = df[properties.year_column[self.data_model]]
+        data_model = self.imodel.split("_")[0]
+        dates = df[properties.year_column[data_model]]
         years = dates.apply(lambda x: get_years_from_datetime(x))
         years = years.astype(int)
 
@@ -578,8 +570,7 @@ class _FileReader:
     def _validate_df(self, df, isna=None):
         mask = self._create_mask(df, isna, missing_values=self.missing_values)
         return validate(
-            self.data_model,
-            *self.sub_models,
+            imodel=self.imodel,
             data=df,
             mask0=mask,
             schema=self.schema,
