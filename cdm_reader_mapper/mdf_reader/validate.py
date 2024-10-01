@@ -60,7 +60,7 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, data_model, *sub_models, supp=False):
+def validate_codes(elements, data, schema, imodel, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -72,8 +72,7 @@ def validate_codes(elements, data, schema, data_model, *sub_models, supp=False):
 
         table = codes.read_table(
             code_table_name,
-            data_model,
-            *sub_models,
+            imodel=imodel,
         )
         if supp:
             key_elements = (
@@ -112,23 +111,19 @@ def validate_codes(elements, data, schema, data_model, *sub_models, supp=False):
 
 
 def validate(
-    data_model,
-    *sub_models,
-    data=pd.DataFrame(),
-    mask0=pd.DataFrame(),
-    schema={},
+    imodel,
+    data,
+    mask0,
+    schema,
     disables=None,
 ):
     """Validate data.
 
     Parameters
     ----------
-    data_model: str
-        The name of the data model to read. This is for
-        data models included in the tool.
-    sub_models*: optionally
-        Sub-directories of ``data_model``.
-        E.g. r300 d701 type2
+    imodel: str
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
     data: pd.DataFrame
         DataFrame for validation.
     mask0: pd.DataFrame
@@ -209,8 +204,7 @@ def validate(
             coded_elements,
             data,
             element_atts,
-            data_model,
-            *sub_models,
+            imodel,
         )
 
     # 3. Datetime elements

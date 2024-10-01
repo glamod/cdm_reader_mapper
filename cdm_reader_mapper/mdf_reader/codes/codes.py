@@ -23,8 +23,7 @@ from .. import properties
 
 def read_table(
     code_table_name,
-    data_model,
-    *sub_models,
+    imodel=None,
     ext_table_path=None,
 ):
     """
@@ -38,14 +37,12 @@ def read_table(
     ---------
     code_table_name: str
         The external code table file.
-    data_model: str
-        The name of the data model to read. This is for
-        data models included in the tool.
-    sub_models*: optionally
-        Sub-directories of ``data_model``.
-        E.g. r300 d701 type2
+    imodel: str, optional
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
     ext_table_path: str, optional
         The path to the external code table file.
+        One of ``imodel`` and ``ext_table_path`` must be set.
 
     Returns
     -------
@@ -60,9 +57,9 @@ def read_table(
             logging.error(f"Can't find input code table file {table_files}")
             return
     else:
+        imodel = imodel.split("_")
         table_files = collect_json_files(
-            data_model,
-            *sub_models,
+            *imodel,
             base=f"{properties._base}.codes",
             name=code_table_name,
         )

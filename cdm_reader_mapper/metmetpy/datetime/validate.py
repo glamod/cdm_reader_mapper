@@ -39,11 +39,11 @@ from cdm_reader_mapper.common import logging_hdlr
 from . import model_datetimes
 
 
-def validate(data, data_model, log_level="INFO"):
+def validate(data, imodel, log_level="INFO"):
     """DOCUMENTATiON."""
     # dck input only to be consistent with other validators in the metmetpy module
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    model = data_model.split("_")[0]
+    model = imodel.split("_")[0]
 
     if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
