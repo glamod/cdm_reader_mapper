@@ -72,7 +72,7 @@ def print_float(data, null_label, decimal_places):
     def _return_str(x, null_label, format_float):
         if pd.isna(x):
             return null_label
-        return format_float.format(float(x))
+        return format_float.format(x)
 
     format_float = "{:." + str(decimal_places) + "f}"
     return data.apply(lambda x: _return_str(x, null_label, format_float))
@@ -117,8 +117,6 @@ def print_varchar(data, null_label):
     """
 
     def _return_str(x, null_label):
-        if isinstance(x, list):
-            return str(x)
         if pd.isna(x):
             return null_label
         return str(x)
