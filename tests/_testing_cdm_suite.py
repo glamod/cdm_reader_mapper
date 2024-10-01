@@ -95,7 +95,7 @@ def remove_datetime_columns(output, output_, col_subset):
 
 def _testing_suite(
     source=None,
-    data_model=None,
+    imodel=None,
     cdm_subset=None,
     codes_subset=None,
     suffix="exp",
@@ -104,11 +104,11 @@ def _testing_suite(
     drops=None,
     **kwargs,
 ):
-    exp = f"expected_{data_model}"
+    exp = f"expected_{imodel}"
 
     read_ = mdf_reader.read(
         source=source,
-        data_model=data_model,
+        imodel=imodel,
         out_path=out_path,
         **kwargs,
     )
@@ -121,12 +121,12 @@ def _testing_suite(
 
     data = correct_datetime.correct(
         data=data,
-        data_model=data_model,
+        imodel=imodel,
     )
 
     data = correct_pt.correct(
         data=data,
-        data_model=data_model,
+        imodel=imodel,
     )
 
     if not isinstance(data, pd.DataFrame):
@@ -140,12 +140,12 @@ def _testing_suite(
 
     val_dt = validate_datetime.validate(
         data=data_pd,
-        data_model=data_model,
+        imodel=imodel,
     )
 
     val_id = validate_id.validate(
         data=data_pd,
-        data_model=data_model,
+        imodel=imodel,
     )
 
     expected_data = getattr(result_data, exp)
@@ -198,8 +198,8 @@ def _testing_suite(
         return
 
     output = cdm_mapper.map_model(
-        data_model,
-        data,
+        data=data,
+        imodel=imodel,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",
@@ -207,11 +207,11 @@ def _testing_suite(
 
     col_subset = get_col_subset(output, codes_subset)
 
-    cdm_mapper.cdm_to_ascii(output, suffix=data_model)
-    output = read_tables(".", tb_id=data_model, cdm_subset=cdm_subset)
+    cdm_mapper.cdm_to_ascii(output, suffix=imodel)
+    output = read_tables(".", tb_id=imodel, cdm_subset=cdm_subset)
 
     output_ = read_tables(
-        expected_data["cdm_table"], tb_id=f"{data_model}*", cdm_subset=cdm_subset
+        expected_data["cdm_table"], tb_id=f"{imodel}*", cdm_subset=cdm_subset
     )
 
     output, output_ = remove_datetime_columns(output, output_, col_subset)
