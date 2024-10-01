@@ -65,15 +65,16 @@ def correct_it(data, data_model, dck, correction_method, log_level="INFO"):
     return data
 
 
-def correct(data, data_model, log_level="INFO"):
+def correct(data, imodel, log_level="INFO"):
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
     ----------
     data: pd.DataFrame or pd.io.parsers.TextFileReader
         Input dataset.
-    data_model: str
+    imodel: str
         Name of internally available data model.
+        e.g. icoads_d300_704
     log_level: str
       level of logging information to save.
       Default: INFO
@@ -85,23 +86,23 @@ def correct(data, data_model, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    mrd = data_model.split("_")
+    mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {data_model} has to deck information.")
+        logger.warning(f"Dataset {imodel} has to deck information.")
         return data
     dck = mrd[2]
 
     replacements_method_files = collect_json_files(*mrd, base=_base)
 
     if len(replacements_method_files) == 0:
-        logger.warning(f"Data model {data_model} has no replacements in library")
+        logger.warning(f"Data model {imodel} has no replacements in library")
         logger.warning("Module will proceed with no attempt to apply id replacements")
         return data
 
     correction_method = combine_dicts(replacements_method_files, base=_base)
 
     if isinstance(data, pd.DataFrame):
-        data = correct_it(data, data_model, dck, correction_method, log_level="INFO")
+        data = correct_it(data, imodel, dck, correction_method, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -116,7 +117,7 @@ def correct(data, data_model, log_level="INFO"):
         buffer = StringIO()
         data_ = pandas_TextParser_hdlr.make_copy(data)
         for df in data_:
-            df = correct_it(df, data_model, dck, correction_method, log_level="INFO")
+            df = correct_it(df, imodel, dck, correction_method, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)

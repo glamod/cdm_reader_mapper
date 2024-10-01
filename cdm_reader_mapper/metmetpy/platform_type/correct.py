@@ -52,14 +52,14 @@ from . import correction_functions
 _base = f"{properties._base}.platform_type"
 
 
-def correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO"):
+def correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     deck_fix = fix_methods.get(dck)
     if not deck_fix:
         logger.info(
-            f"No platform type fixes to apply to deck {dck} data from dataset {data_model}"
+            f"No platform type fixes to apply to deck {dck} data from dataset {imodel}"
         )
         return data
     elif not isinstance(pt_col, list):
@@ -93,15 +93,16 @@ def correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO"):
     return data
 
 
-def correct(data, data_model, log_level="INFO"):
+def correct(data, imodel, log_level="INFO"):
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
     ----------
     data: pd.DataFrame or pd.io.parsers.TextFileReader
         Input dataset.
-    data_model: str
-        Name of internally available data model
+    imodel: str
+        Name of internally available data model.
+        e.g. icoads_d300_704
     log_level: str
       level of logging information to save.
       Default: INFO
@@ -113,16 +114,16 @@ def correct(data, data_model, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    mrd = data_model.split("_")
+    mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {data_model} has to deck information.")
+        logger.warning(f"Dataset {imodel} has to deck information.")
         return data
     dck = mrd[2]
 
     fix_files = collect_json_files(*mrd, base=_base)
 
     if len(fix_files) == 0:
-        logger.warning(f"Dataset {data_model} not included in platform library")
+        logger.warning(f"Dataset {imodel} not included in platform library")
         return data
 
     fix_methods = combine_dicts(fix_files, base=_base)
@@ -131,12 +132,12 @@ def correct(data, data_model, log_level="INFO"):
 
     if not pt_col:
         logger.error(
-            f"Data model {data_model} platform column not defined in properties file"
+            f"Data model {imodel} platform column not defined in properties file"
         )
         return data
 
     if isinstance(data, pd.DataFrame):
-        data = correct_it(data, data_model, dck, pt_col, fix_methods, log_level="INFO")
+        data = correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -150,7 +151,7 @@ def correct(data, data_model, log_level="INFO"):
         read_dict = {x: data.orig_options.get(x) for x in read_params}
         buffer = StringIO()
         for df in data:
-            df = correct_it(df, data_model, dck, pt_col, fix_methods, log_level="INFO")
+            df = correct_it(df, imodel, dck, pt_col, fix_methods, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
 
         buffer.seek(0)
