@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
@@ -56,6 +57,7 @@ def read_table(
         if not os.path.isfile(table_files):
             logging.error(f"Can't find input code table file {table_files}")
             return
+        table_files = Path(table_files)
     else:
         imodel = imodel.split("_")
         table_files = collect_json_files(
@@ -64,7 +66,7 @@ def read_table(
             name=code_table_name,
         )
 
-    if isinstance(table_files, str):
+    if isinstance(table_files, Path):
         table_files = [table_files]
     # 2. Get tables
     tables = [open_code_table(ifile) for ifile in table_files]
