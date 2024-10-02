@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest  # noqa
 
-from cdm_reader_mapper.operations import corrections, inspect, replace, select
+from cdm_reader_mapper.operations import inspect, replace, select
 
 from ._data import data_df, data_pa, mask_df, mask_pa
 from ._results import correction_df, table_df
