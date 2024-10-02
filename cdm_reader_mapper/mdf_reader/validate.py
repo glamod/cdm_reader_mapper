@@ -75,6 +75,8 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
             imodel=imodel,
             ext_table_path=ext_table_path,
         )
+        if not table:
+            continue
         if supp:
             key_elements = (
                 [element[1]]
