@@ -24,23 +24,6 @@ cdm_tables = [
 
 _base = Path(__file__).parent
 
-for correction_file in (_base / "results").glob("2022-02.txt.gz"):
-    break
-
-correction_df = pd.read_csv(
-    correction_file,
-    delimiter="|",
-    dtype="object",
-    header=None,
-    usecols=[0, 1, 2],
-    names=["report_id", "primary_station_id", "primary_station_id.isChange"],
-    quotechar=None,
-    quoting=3,
-)
-
-table_df = read_tables((_base / "results"), "test", cdm_subset=["header"])
-table_df.set_index("report_id", inplace=True, drop=False)
-
 
 class result_data:
     """Expected results for cdm_reader_mapper testing suite"""
@@ -220,3 +203,13 @@ class result_data:
 
 
 result_data = result_data()
+
+table_df = read_tables(
+    result_data.expected_icoads_r302_d792["cdm_table"], cdm_subset=["header"]
+)
+correction_file = list((_base / "corrections").glob("2022-02.txt.gz"))[0]
+correction_df = pd.read_csv(
+    correction_file,
+    delimiter="|",
+    names=["report_id", "primary_station_id", "primary_station_id.isChange"],
+)

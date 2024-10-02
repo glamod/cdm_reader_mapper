@@ -7,13 +7,14 @@ import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import get_length, make_copy
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
     correct_pt,
     validate_datetime,
     validate_id,
 )
+from cdm_reader_mapper.operations.inspect import get_length
 
 from ._results import result_data
 
