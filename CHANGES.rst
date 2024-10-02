@@ -43,6 +43,7 @@ Breaking changes
 * ``cdm_mapper.map_model``: call with (data, imodel=imodel) (:pull:`103`)
 * ``mdf_reader.read``: call with (source, imodel=imodel) (:pull:`103`)
 * Re-order arguments to ``mdf_reader.validate``, and create argument for ``ext_table_path`` (:pull:`105`)
+* ``operations``: delete corrections module (:pull:`104`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -61,6 +62,7 @@ Internal changes
 * ``mdf_reader``: replace empty strings with missing values (:pull:`89`)
 * ``metmetpy``: use function ``overwrite_data`` in all platform type correction functions (:pull:`89`)
 * rename ``data_model`` into ``imodel`` (:pull:`103`)
+* implement assertion tests for module operations (:pull:`104`)
 
 Bug fixes
 ^^^^^^^^^
