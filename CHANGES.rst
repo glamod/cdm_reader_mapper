@@ -42,6 +42,7 @@ Breaking changes
 * Note by each function call: rename ``data_model`` into ``imodel`` e.g. imodel=icoads_r300_d704 (:pull:`103`)
 * ``cdm_mapper.map_model``: call with (data, imodel=imodel) (:pull:`103`)
 * ``mdf_reader.read``: call with (source, imodel=imodel) (:pull:`103`)
+* Re-order arguments to ``mdf_reader.validate``, and create argument for ``ext_table_path`` (:pull:`105`)
 * ``operations``: delete corrections module (:pull:`104`)
 
 Internal changes
@@ -70,6 +71,7 @@ Bug fixes
 * ensure ``format`` schema field for delimited files is passed correctly, avoiding ``"...Please specify either format or field_layout in your header schema..."`` error (:pull:`40`)
 * there is a loss of data precision due to data type conversion. Hence, use default data types of both ``int`` and ``float`` (:issue:`59`, :pull:`60`)
 * reading C-RAID data: adjust datetime formats to read dates into ``MDFFileReader`` (:pull:`60`)
+* ensure external code tables are used when using an external schema in ``mdf_reader.read`` (:pull:`105`)
 
 
 0.3.0 (2024-05-17)
