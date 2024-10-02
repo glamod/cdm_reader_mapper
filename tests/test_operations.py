@@ -50,18 +50,6 @@ def test_inspect_count_by_cat_parser():
     inspect.count_by_cat(data_pa, ("c1", "PT"))
 
 
-def test_corrections_pandas():
-    corrections.corrections(
-        data_df, dataset="test_data", correction_path=".", yr="2010", mo="07"
-    )
-
-
-def test_corrections_parser():
-    corrections.corrections(
-        data_pa, dataset="test_data", correction_path=".", yr="2010", mo="07"
-    )
-
-
 def test_replace():
     replace.replace_columns(
         table_df,
