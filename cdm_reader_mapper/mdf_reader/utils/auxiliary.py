@@ -372,6 +372,8 @@ class _FileReader:
         self.imodel = imodel
         self.year_init = year_init
         self.year_end = year_end
+        self.ext_schema_path = ext_schema_path
+        self.ext_table_path = None
 
         # 1. GET DATA MODEL
         # Schema reader will return empty if cannot read schema or is not valid
@@ -383,6 +385,7 @@ class _FileReader:
         else:
             logging.info("READING DATA MODEL SCHEMA FILE...")
             self.schema = schemas.read_schema(ext_schema_path=ext_schema_path)
+            self.ext_table_path = os.path.join(ext_schema_path, "code_tables")
 
     def _adjust_dtype(self, dtype, df):
         if not isinstance(dtype, dict):
@@ -570,9 +573,10 @@ class _FileReader:
     def _validate_df(self, df, isna=None):
         mask = self._create_mask(df, isna, missing_values=self.missing_values)
         return validate(
-            imodel=self.imodel,
             data=df,
             mask0=mask,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
             schema=self.schema,
             disables=self.disable_reads,
         )
