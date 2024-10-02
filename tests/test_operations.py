@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
-import pytest
+import pytest  # noqa
 
 from cdm_reader_mapper import mdf_reader, test_data
 from cdm_reader_mapper.operations import inspect, replace, select
@@ -15,7 +15,7 @@ def _read_data(**kwargs):
     return mdf_reader.read(**kwargs)
 
 
-def _get_data(TextParser, **kwargs):
+def _get_data(**kwargs):
     return _read_data(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
