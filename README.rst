@@ -82,11 +82,12 @@ Read imma data with the `cdm.read()` and copy the data attributes:
 
 .. code-block:: python
 
-    import cdm_reader_mapper as cdm
+    from cdm_reader_mapper.mdf_reader import read
+    from cdm_reader_mapper.data import test_data
 
-    data = cdm.tests.read_imma1_buoys_nosupp()
+    data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_data = cdm.read(filepath, data_model="imma1", sections=["core", "c1", "c98"])
+    imma_data = read(filepath, imodel="icoads", sections=["core", "c1", "c98"])
 
     data_raw = imma_data.data.copy()
 
@@ -95,11 +96,13 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
 
 .. code-block:: python
 
+    from cdm_reader_mapper.cdm_mapper import map_model
+
     name_of_model = "icoads_r3000_d704"
 
-    cdm_dict = cdm.map_model(
-        name_of_model,
+    cdm_dict = map_model(
         data_raw,
+        name_of_model,
         log_level="DEBUG",
     )
 
