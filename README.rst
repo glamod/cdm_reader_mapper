@@ -78,7 +78,7 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 Run a test
 ----------
 
-Read imma data with the `cdm.read()` and copy the data attributes:
+Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy the data attributes:
 
 .. code-block:: python
 
