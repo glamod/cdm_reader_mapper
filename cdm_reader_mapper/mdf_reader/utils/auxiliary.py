@@ -353,6 +353,8 @@ class _FileReader:
         source,
         imodel=None,
         ext_schema_path=None,
+        ext_schema_file=None,
+        ext_table_path=None,
         year_init=None,
         year_end=None,
     ):
@@ -372,20 +374,19 @@ class _FileReader:
         self.imodel = imodel
         self.year_init = year_init
         self.year_end = year_end
-        self.ext_schema_path = ext_schema_path
-        self.ext_table_path = None
+        self.ext_table_path = ext_table_path
 
         # 1. GET DATA MODEL
         # Schema reader will return empty if cannot read schema or is not valid
         # and will log the corresponding error
         # multiple_reports_per_line error also while reading schema
-        if not ext_schema_path:
-            logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(imodel=imodel)
+        logging.info("READING DATA MODEL SCHEMA FILE...")
+        if ext_schema_path or ext_schema_file:
+            self.schema = schemas.read_schema(
+                ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
+            )
         else:
-            logging.info("READING DATA MODEL SCHEMA FILE...")
-            self.schema = schemas.read_schema(ext_schema_path=ext_schema_path)
-            self.ext_table_path = os.path.join(ext_schema_path, "code_tables")
+            self.schema = schemas.read_schema(imodel=imodel)
 
     def _adjust_dtype(self, dtype, df):
         if not isinstance(dtype, dict):

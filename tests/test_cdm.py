@@ -102,6 +102,53 @@ from ._testing_cdm_suite import _testing_suite
             "all",
             {"year_end": 2003},
         ),
+        (
+            "icoads_r300_d703",
+            None,
+            None,
+            None,
+            False,
+            None,
+            {
+                "ext_table_path": os.path.join(
+                    ".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"
+                )
+            },
+        ),
+        (
+            "icoads_r300_d703",
+            None,
+            None,
+            None,
+            False,
+            None,
+            {
+                "ext_table_path": os.path.join(
+                    ".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"
+                ),
+                "ext_schema_path": os.path.join(
+                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
+                ),
+            },
+        ),
+        (
+            "icoads_r300_d703",
+            None,
+            None,
+            None,
+            False,
+            None,
+            {
+                "ext_schema_file": os.path.join(
+                    ".",
+                    "cdm_reader_mapper",
+                    "mdf_reader",
+                    "schemas",
+                    "icoads",
+                    "icoads.json",
+                )
+            },
+        ),
     ],
 )
 def test_read_data(
