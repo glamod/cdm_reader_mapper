@@ -156,6 +156,24 @@ from ._testing_cdm_suite import _testing_suite
                 ),
             },
         ),
+        (
+            "icoads_r300_d703",
+            None,
+            None,
+            None,
+            False,
+            None,
+            {
+                "ext_schema_file": os.path.join(
+                    ".",
+                    "cdm_reader_mapper",
+                    "mdf_reader",
+                    "schemas",
+                    "icoads",
+                    "icoads.json",
+                )
+            },
+        ),
     ],
 )
 def test_read_data(
