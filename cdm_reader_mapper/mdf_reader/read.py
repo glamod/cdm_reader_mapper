@@ -325,7 +325,7 @@ def read(
         source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
-        ext_code_path=ext_codes_path,
+        ext_codes_path=ext_codes_path,
         year_init=year_init,
         year_end=year_end,
     ).read(**kwargs)
