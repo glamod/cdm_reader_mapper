@@ -25,7 +25,7 @@ from .. import properties
 def read_table(
     code_table_name,
     imodel=None,
-    ext_codes_path=None,
+    ext_table_path=None,
 ):
     """
     Read a data model code table file to a dictionary.
@@ -41,10 +41,10 @@ def read_table(
     imodel: str, optional
         Name of internally available input data model.
         e.g. icoads_r300_d704
-    ext_codes_path: str, optional
+    ext_table_path: str, optional
         The path to the external code table file.
         The code table file must have the same name as the directory.
-        One of ``imodel`` and ``ext_codes_path`` must be set.
+        One of ``imodel`` and ``ext_table_path`` must be set.
 
     Returns
     -------
@@ -52,8 +52,8 @@ def read_table(
         Code table
     """
     # 1. Validate input
-    if ext_codes_path:
-        table_path = os.path.abspath(ext_codes_path)
+    if ext_table_path:
+        table_path = os.path.abspath(ext_table_path)
         table_files = os.path.join(table_path, code_table_name + ".json")
         if not os.path.isfile(table_files):
             logging.error(f"Can't find input code table file {table_files}")

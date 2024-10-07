@@ -60,7 +60,7 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, imodel, ext_codes_path, supp=False):
+def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -73,7 +73,7 @@ def validate_codes(elements, data, schema, imodel, ext_codes_path, supp=False):
         table = codes.read_table(
             code_table_name,
             imodel=imodel,
-            ext_codes_path=ext_codes_path,
+            ext_table_path=ext_table_path,
         )
         if not table:
             continue
@@ -117,7 +117,7 @@ def validate(
     data,
     mask0,
     imodel,
-    ext_codes_path,
+    ext_table_path,
     schema,
     disables=None,
 ):
@@ -132,7 +132,7 @@ def validate(
     imodel: str
         Name of internally available input data model.
         e.g. icoads_r300_d704
-    ext_codes_path: str
+    ext_table_path: str
         Path to the code tables for an external data model
     schema: dict
         Data model schema.
@@ -211,7 +211,7 @@ def validate(
             data,
             element_atts,
             imodel,
-            ext_codes_path,
+            ext_table_path,
         )
 
     # 3. Datetime elements
