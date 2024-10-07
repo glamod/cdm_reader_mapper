@@ -269,6 +269,7 @@ def read(
     source,
     imodel=None,
     ext_schema_path=None,
+    ext_schema_file=None,
     ext_table_path=None,
     year_init=None,
     year_end=None,
@@ -292,8 +293,11 @@ def read(
         e.g. icoads_r300_d704
     ext_schema_path: str, optional
         The path to the external input data model schema file.
+        The schema file must have the same name as the directory.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-        One of ``imodel`` or ``imodel_path`` must be set.
+    ext_schema_file: str, optional
+        The external input data model schema file.
+        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
     ext_table_path: str, optional
         The path to the external input data model code tables.
     year_init: str or int, optional
@@ -325,6 +329,7 @@ def read(
         source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
+        ext_schema_file=ext_schema_file,
         ext_table_path=ext_table_path,
         year_init=year_init,
         year_end=year_end,
