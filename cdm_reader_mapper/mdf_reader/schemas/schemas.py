@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
@@ -129,6 +130,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
     ext_schema_file: str, optional
         The external input data model schema file.
+        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
 
     Returns
     -------
@@ -137,11 +139,18 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
     """
     # 1. Validate input
     if ext_schema_file:
-        schema_files = ext_schema_file
+        if not os.path.isfile(ext_schema_file):
+            logging.error(f"Can't find input schema file {ext_schema_file}")
+            return
+        schema_files = Path(ext_schema_file)
     elif ext_schema_path:
         schema_path = os.path.abspath(ext_schema_path)
         schema_name = os.path.basename(schema_path)
         schema_files = os.path.join(schema_path, schema_name + ".json")
+        if not os.path.isfile(schema_files):
+            logging.error(f"Can't find input schema file {schema_files}")
+            return
+        schema_files = Path(schema_files)
     else:
         imodel = imodel.split("_")
         if imodel[0] not in properties.supported_data_models:
@@ -149,7 +158,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
             return
         schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
 
-    if isinstance(schema_files, str):
+    if isinstance(schema_files, Path):
         schema_files = [schema_files]
 
     # 2. Get schema
