@@ -125,6 +125,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
         e.g. icoads_r300_d704
     ext_schema_path: str, optional
         The path to the external input data model schema file.
+        The schema file must have the same name as the directory.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
     ext_schema_file: str, optional
         The external input data model schema file.

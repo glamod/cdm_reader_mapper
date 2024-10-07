@@ -43,6 +43,7 @@ def read_table(
         e.g. icoads_r300_d704
     ext_codes_path: str, optional
         The path to the external code table file.
+        The code table file must have the same name as the directory.
         One of ``imodel`` and ``ext_codes_path`` must be set.
 
     Returns
