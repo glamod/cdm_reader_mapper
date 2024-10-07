@@ -16,6 +16,7 @@ New features and enhancements
 * ``mdf_reader``: select time period with new arguments ``year_init`` ad ``year_end`` (:pull:`98`)
 * ``cdm_mapper``: duplicate check using ``recordlinkage`` (:pull:`81`)
 * ``mdf_reader.read``: optionally, set left and right time bounds (``year_init`` and ``year_end``) (:issue:`11`, :pull:`97`)
+* ``mdf_reader.read``: optionally, set both external schema and code table paths and external schema file (:issue:`47`, :pull:`111`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
