@@ -269,6 +269,7 @@ def read(
     source,
     imodel=None,
     ext_schema_path=None,
+    ext_codes_path=None,
     year_init=None,
     year_end=None,
     **kwargs,
@@ -293,6 +294,8 @@ def read(
         The path to the external input data model schema file.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
         One of ``imodel`` or ``imodel_path`` must be set.
+    ext_codes_path: str, optional
+        The path to the external input data model code tables.
     year_init: str or int, optional
         Left border of time axis.
     year_end: str or int, optional
@@ -322,6 +325,7 @@ def read(
         source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
+        ext_code_path=ext_codes_path,
         year_init=year_init,
         year_end=year_end,
     ).read(**kwargs)
