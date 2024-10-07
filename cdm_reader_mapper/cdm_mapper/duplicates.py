@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 import numpy as np
 import recordlinkage as rl
 from recordlinkage.compare import Numeric
@@ -76,6 +78,11 @@ _compare_kwargs = {
             "kwargs": {"method": "gauss", "offset": 60.0},
         },
     },
+}
+
+_histories = {
+    "duplicate_status": "Added duplicate information - flag",
+    "duplicates": "Added duplicate information - duplicates",
 }
 
 
@@ -162,6 +169,41 @@ class DupDetect:
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         """
+
+        def add_history(df, indexes):
+            indexes = list(indexes)
+            history_tstmp = history_tstmp = datetime.datetime.now(
+                datetime.UTC
+            ).strftime("%Y-%m-%d %H:%M:%S")
+            addition = "".join(
+                [f"; {history_tstmp}. {add}" for add in _histories.items()]
+            )
+            df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(
+                lambda x: x + addition
+            )
+            return df
+
+        def add_duplicates(df, dups):
+
+            def _add_dups(x):
+                _dups = dups.get(x.name)
+                if _dups is None:
+                    return x["duplicates"]
+                _dups = ",".join(_dups)
+                return "{" + _dups + "}"
+
+            df["duplicates"] = df.apply(lambda x: _add_dups(x), axis=1)
+
+            return df
+
+        def add_report_quality(df, indexes_good, indexes_bad):
+            df["report_quality"] = df["report_quality"].astype(int)
+            failed = df["report_quality"] == 1
+            df.loc[indexes_good, "report_quality"] = 0
+            df.loc[indexes_bad, "report_quality"] = 1
+            df.loc[failed, "report_quality"] = 1
+            return df
+
         drop = 0
         if keep == "first":
             keep = -1
@@ -177,32 +219,40 @@ class DupDetect:
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=None)
 
-        drops = []
+        indexes = []
+        indexes_good = []
+        indexes_bad = []
+        duplicates = {}
+
         for index in self.matches.index:
-            if index[drop] in drops:
+            if index[drop] in indexes_bad:
                 continue
+
+            indexes += index
+            indexes_good.append(index[keep])
+            indexes_bad.append(index[drop])
 
             report_id_drop = self.result.loc[index[drop], "report_id"]
             report_id_keep = self.result.loc[index[keep], "report_id"]
-            duplicates_drop = self.result.loc[index[drop], "duplicates"]
-            duplicates_keep = self.result.loc[index[keep], "duplicates"]
 
-            self.result.loc[index[keep], "duplicate_status"] = 1
-            if self.result.loc[index[keep], "duplicates"] == "null":
-                self.result.loc[index[keep], "duplicates"] = report_id_drop
+            if index[drop] not in duplicates.keys():
+                duplicates[index[drop]] = [report_id_keep]
             else:
-                self.result.loc[index[keep], "duplicates"] = (
-                    f"{duplicates_keep}, {report_id_drop}"
-                )
+                duplicates[index[drop]].append(report_id_keep)
 
-            self.result.loc[index[drop], "duplicate_status"] = 3
-            if self.result.loc[index[drop], "duplicates"] == "null":
-                self.result.loc[index[drop], "duplicates"] = report_id_keep
+            if index[keep] not in duplicates.keys():
+                duplicates[index[keep]] = [report_id_drop]
             else:
-                self.result.loc[index[drop], "duplicates"] = (
-                    f"{duplicates_drop}, {report_id_keep}"
-                )
-            drops.append(index[drop])
+                duplicates[index[keep]].append(report_id_drop)
+
+        self.result.loc[indexes_good, "duplicate_status"] = 1
+        self.result.loc[indexes_bad, "duplicate_status"] = 3
+
+        self.result = add_report_quality(
+            self.result, indexes_good=indexes_good, indexes_bad=indexes_bad
+        )
+        self.result = add_duplicates(self.result, duplicates)
+        self.result = add_history(self.result, indexes)
 
         return self
 
