@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import pytest  # noqa
 
 from cdm_reader_mapper.cdm_mapper import duplicate_check, read_tables
@@ -77,16 +78,18 @@ def _manipulate_header(df):
     return df
 
 
-def test_duplicates_header():
-    expected_data = result_data.expected_icoads_r302_d792
-    data_path = expected_data.get("cdm_table")
-    df = read_tables(
-        data_path,
-        tb_id="icoads_r302_d792*",
-        cdm_subset="header",
-    )
-    df = _manipulate_header(df)
-    DupDetect = duplicate_check(df)
+expected_data = result_data.expected_icoads_r302_d792
+data_path = expected_data.get("cdm_table")
+df = read_tables(
+    data_path,
+    tb_id="icoads_r302_d792*",
+    cdm_subset="header",
+)
+df = _manipulate_header(df)
+DupDetect = duplicate_check(df)
+
+
+def test_duplicates_flag():
     DupDetect.flag_duplicates()
     np.testing.assert_array_equal(
         DupDetect.result["duplicate_status"], [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3]
@@ -113,3 +116,9 @@ def test_duplicates_header():
             "{ICOADS-302-N688EH}",
         ],
     )
+
+
+def test_duplicates_remove():
+    DupDetect.remove_duplicates()
+    expected = DupDetect.data.iloc[[0, 1, 2, 3, 4, 6, 8, 10, 12]].reset_index(drop=True)
+    pd.testing.assert_frame_equal(expected, DupDetect.result)
