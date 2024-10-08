@@ -30,6 +30,7 @@ def convert_series(df, conversion):
         return (date - date.min()) / np.timedelta64(1, "s")
 
     df = df.copy()
+    df = df.mask(df == "null", np.nan)
     for column, method in conversion.items():
         try:
             df[column] = df[column].astype(method)
@@ -264,7 +265,6 @@ class DupDetect:
         )
         self.result = add_duplicates(self.result, duplicates)
         self.result = add_history(self.result, indexes)
-
         return self
 
     def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
