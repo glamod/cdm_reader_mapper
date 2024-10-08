@@ -17,6 +17,7 @@ New features and enhancements
 * ``cdm_mapper``: duplicate check using ``recordlinkage`` (:pull:`81`)
 * ``mdf_reader.read``: optionally, set left and right time bounds (``year_init`` and ``year_end``) (:issue:`11`, :pull:`97`)
 * ``mdf_reader.read``: optionally, set both external schema and code table paths and external schema file (:issue:`47`, :pull:`111`)
+* ``cdm_mapper``: Change both columns history and report_quality during duplicate_check (:pull:`112`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
