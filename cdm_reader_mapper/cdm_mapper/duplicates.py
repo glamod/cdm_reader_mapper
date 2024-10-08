@@ -86,6 +86,52 @@ _histories = {
 }
 
 
+def add_history(df, indexes):
+    """Add duplicate information to history."""
+
+    def _datetime_now():
+
+        try:
+            now = datetime.datetime.now(datetime.UTC)
+        except AttributeError:
+            now = datetime.datetime.utcnow()
+
+        return now.strftime("%Y-%m-%d %H:%M:%S")
+
+    indexes = list(indexes)
+    history_tstmp = _datetime_now()
+    addition = "".join([f"; {history_tstmp}. {add}" for add in _histories.items()])
+    df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(
+        lambda x: x + addition
+    )
+    return df
+
+
+def add_duplicates(df, dups):
+    """Add duplicates to table."""
+
+    def _add_dups(x):
+        _dups = dups.get(x.name)
+        if _dups is None:
+            return x["duplicates"]
+        _dups = ",".join(_dups)
+        return "{" + _dups + "}"
+
+    df["duplicates"] = df.apply(lambda x: _add_dups(x), axis=1)
+
+    return df
+
+
+def add_report_quality(df, indexes_good, indexes_bad):
+    """Add report quality to table."""
+    df["report_quality"] = df["report_quality"].astype(int)
+    failed = df["report_quality"] == 1
+    df.loc[indexes_good, "report_quality"] = 0
+    df.loc[indexes_bad, "report_quality"] = 1
+    df.loc[failed, "report_quality"] = 1
+    return df
+
+
 class DupDetect:
     """Class for duplicate check.
 
@@ -169,41 +215,6 @@ class DupDetect:
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         """
-
-        def add_history(df, indexes):
-            indexes = list(indexes)
-            history_tstmp = history_tstmp = datetime.datetime.now(
-                datetime.UTC
-            ).strftime("%Y-%m-%d %H:%M:%S")
-            addition = "".join(
-                [f"; {history_tstmp}. {add}" for add in _histories.items()]
-            )
-            df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(
-                lambda x: x + addition
-            )
-            return df
-
-        def add_duplicates(df, dups):
-
-            def _add_dups(x):
-                _dups = dups.get(x.name)
-                if _dups is None:
-                    return x["duplicates"]
-                _dups = ",".join(_dups)
-                return "{" + _dups + "}"
-
-            df["duplicates"] = df.apply(lambda x: _add_dups(x), axis=1)
-
-            return df
-
-        def add_report_quality(df, indexes_good, indexes_bad):
-            df["report_quality"] = df["report_quality"].astype(int)
-            failed = df["report_quality"] == 1
-            df.loc[indexes_good, "report_quality"] = 0
-            df.loc[indexes_bad, "report_quality"] = 1
-            df.loc[failed, "report_quality"] = 1
-            return df
-
         drop = 0
         if keep == "first":
             keep = -1
