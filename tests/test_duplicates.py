@@ -78,13 +78,18 @@ def _manipulate_header(df):
     return df
 
 
-expected_data = result_data.expected_icoads_r302_d792
-data_path = expected_data.get("cdm_table")
-df = read_tables(
-    data_path,
-    tb_id="icoads_r302_d792*",
-    cdm_subset="header",
-)
+def _get_test_data(imodel):
+    exp_name = f"expected_{imodel}"
+    exp_data = getattr(result_data, exp_name)
+    data_path = exp_data.get("cdm_table")
+    return read_tables(
+        data_path,
+        tb_id=f"{imodel}*",
+        cdm_subset="header",
+    )
+
+
+df = _get_test_data("icoads_r302_d792")
 df = _manipulate_header(df)
 DupDetect = duplicate_check(df)
 
@@ -125,13 +130,7 @@ def test_duplicates_remove():
 
 
 def test_duplicates_craid():
-    expected_data = result_data.expected_craid
-    data_path = expected_data.get("cdm_table")
-    df = read_tables(
-        data_path,
-        tb_id="craid*",
-        cdm_subset="header",
-    )
+    df = _get_test_data("craid")
     DupDetect = duplicate_check(df, ignore_columns="primary_station_id")
     DupDetect.flag_duplicates()
     np.testing.assert_array_equal(DupDetect.result["duplicate_status"], [0] * 10)
