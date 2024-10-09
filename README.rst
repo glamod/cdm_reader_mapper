@@ -46,7 +46,7 @@ You can install the package directly from pip:
 
 .. code-block:: console
 
-    pip install git+https://github.com/glamod/cdm_reader_mapper.git@v0.3.0
+    pip install git+https://github.com/glamod/cdm_reader_mapper.git
 
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
