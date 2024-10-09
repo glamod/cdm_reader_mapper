@@ -18,6 +18,7 @@ New features and enhancements
 * ``mdf_reader.read``: optionally, set left and right time bounds (``year_init`` and ``year_end``) (:issue:`11`, :pull:`97`)
 * ``mdf_reader.read``: optionally, set both external schema and code table paths and external schema file (:issue:`47`, :pull:`111`)
 * ``cdm_mapper``: Change both columns history and report_quality during duplicate_check (:pull:`112`)
+* ``cdm_mapper``: optionally, set column names to be ignored while duplicate check (:pull:`115`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -46,6 +47,7 @@ Breaking changes
 * ``mdf_reader.read``: call with (source, imodel=imodel) (:pull:`103`)
 * Re-order arguments to ``mdf_reader.validate``, and create argument for ``ext_table_path`` (:pull:`105`)
 * ``operations``: delete corrections module (:pull:`104`)
+* ``cdm_mapper``: duplicate check is available for header table only (:pull:`115`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
