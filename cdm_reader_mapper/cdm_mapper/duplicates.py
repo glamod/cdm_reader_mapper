@@ -172,7 +172,6 @@ class DupDetect:
         """Get total score of duplicate check."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
-        return self
 
     def get_duplicates(
         self, keep="first", limit="default", equal_musts=None, overwrite=True
@@ -185,12 +184,17 @@ class DupDetect:
             Which entry shpould be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
-            Default: .75
+            Default: .991
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         overwrite: bool
             If True overwrite find duplicates again.
+
+        Returns
+        -------
+        list
+            List of tuples containing duplicate matches.
         """
         if keep == "first":
             self.drop = 0
@@ -211,7 +215,7 @@ class DupDetect:
             for must in equal_musts:
                 cond = cond & (self.compared[must])
             self.matches = self.compared[cond]
-        return self
+        return self.matches
 
     def flag_duplicates(
         self, keep="first", limit="default", equal_musts=None, overwrite=True
@@ -224,12 +228,17 @@ class DupDetect:
             Which entry shpould be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
-            Default: .75
+            Default: .991
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         overwrite: bool
             If True overwrite find duplicates again.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with flagged duplicates
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
@@ -271,7 +280,7 @@ class DupDetect:
         )
         self.result = add_duplicates(self.result, duplicates)
         self.result = add_history(self.result, indexes)
-        return self
+        return self.result
 
     def remove_duplicates(
         self, keep="first", limit="default", equal_musts=None, overwrite=True
@@ -284,18 +293,23 @@ class DupDetect:
             Which entry shpould be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
-            Default: .75
+            Default: .991
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
         overwrite: bool
             If True overwrite find duplicates again.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame without duplicates.
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
         drops = [index[self.drop] for index in self.matches.index]
         self.result = self.result.drop(drops).reset_index(drop=True)
-        return self
+        return self.result
 
 
 def set_comparer(compare_dict):
