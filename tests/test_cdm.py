@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import pytest  # noqa
-
 import os
+
+import pytest  # noqa
 
 from cdm_reader_mapper import test_data
 
