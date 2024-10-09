@@ -19,7 +19,7 @@ def _manipulate_header(df):
 
     # No Duplicate: Lat and Lon values differ to much
     # valid is .5 degrees
-    df.loc[6] = df.loc[4]  # no duplicate
+    df.loc[6] = df.loc[4]
     df.loc[5, "report_id"] = "ICOADS-302-N688EY"
     df.loc[6, "latitude"] = -65.80
     df.loc[6, "longitude"] = 21.20
@@ -27,28 +27,28 @@ def _manipulate_header(df):
 
     # Duplicate: report timestamp differs no enough
     # valid is 60 seconds
-    df.loc[7] = df.loc[1]  # duplicate
+    df.loc[7] = df.loc[1]
     df.loc[7, "report_id"] = "ICOADS-302-N688DT"
     df.loc[7, "report_timestamp"] = "2022-02-01 00:01:00"
     df.loc[7, "report_quality"] = 2
 
     # No Duplicate: report timestamp differs to much
     # valid is 60 seconds
-    df.loc[8] = df.loc[1]  # no duplicate
+    df.loc[8] = df.loc[1]
     df.loc[8, "report_id"] = "ICOADS-302-N688DU"
     df.loc[8, "report_timestamp"] = "2022-02-02 00:00:00"
     df.loc[8, "report_quality"] = 2
 
     # Duplicate : Different report_id's
     # Failure in data set
-    df.loc[9] = df.loc[2]  # duplicate
+    df.loc[9] = df.loc[2]
     df.loc[9, "report_id"] = "ICOADS-302-N688DW"
     df.loc[9, "report_quality"] = 2
 
     # Duplicate : Different report_id's
     # Failure in data set
     # each report needs a specific report_id
-    df.loc[10] = df.loc[3]  # no duplicate
+    df.loc[10] = df.loc[3]
     df.loc[10, "report_id"] = "ICOADS-302-N688EF"
     df.loc[10, "latitude"] = 66.00
     df.loc[10, "longitude"] = 8.50
@@ -56,7 +56,7 @@ def _manipulate_header(df):
 
     # Duplicate: Lat and Lon values differ not enough
     # valid is .5 degrees
-    df.loc[11] = df.loc[3]  # duplicate
+    df.loc[11] = df.loc[3]
     df.loc[11, "report_id"] = "ICOADS-302-N688EE"
     df.loc[11, "latitude"] = 66.05
     df.loc[11, "longitude"] = 8.15
@@ -70,7 +70,7 @@ def _manipulate_header(df):
 
     # Duplicate: Lat and Lon values differ not enough
     # valid is .5 degrees
-    df.loc[13] = df.loc[3]  # duplicate
+    df.loc[13] = df.loc[3]
     df.loc[13, "report_id"] = "ICOADS-302-N688EC"
     df.loc[13, "latitude"] = 65.95
     df.loc[13, "longitude"] = 8.05
