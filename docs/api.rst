@@ -18,6 +18,13 @@ This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 .. autofunction:: cdm_reader_mapper.cdm_mapper.cdm_to_ascii
    :noindex:
 
+.. autofunction:: cdm_reader_mapper.cdm_mapper.duplicate_check
+   :noindex:
+
+.. autoclass:: cdm_reader_mapper.cdm_mapper.duplicates.DupDetect
+   :members: get_duplicates, flag_duplicates, remove_duplicates
+   :noindex:
+
 .. autofunction:: cdm_reader_mapper.metmetpy.correct_pt.correct
    :noindex:
 
