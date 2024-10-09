@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
 import pytest  # noqa
+from np.testing import assert_array_equal
+from pd.testing import assert_frame_equal
 
 from cdm_reader_mapper.cdm_mapper import duplicate_check, read_tables
 
@@ -96,14 +96,15 @@ DupDetect = duplicate_check(df)
 
 def test_duplicates_flag():
     DupDetect.flag_duplicates()
-    np.testing.assert_array_equal(
-        DupDetect.result["duplicate_status"], [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3]
+    result = DupDetect.result
+    assert_array_equal(
+        result["duplicate_status"], [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3]
     )
-    np.testing.assert_array_equal(
-        DupDetect.result["report_quality"], [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1]
+    assert_array_equal(
+        result["report_quality"], [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1]
     )
-    np.testing.assert_array_equal(
-        DupDetect.result["duplicates"],
+    assert_array_equal(
+        result["duplicates"],
         [
             "null",
             "{ICOADS-302-N688DT}",
@@ -126,16 +127,13 @@ def test_duplicates_flag():
 def test_duplicates_remove():
     DupDetect.remove_duplicates()
     expected = DupDetect.data.iloc[[0, 1, 2, 3, 4, 6, 8, 10, 12]].reset_index(drop=True)
-    pd.testing.assert_frame_equal(expected, DupDetect.result)
+    assert_frame_equal(expected, DupDetect.result)
 
 
 def test_duplicates_craid():
     df = _get_test_data("craid")
     DupDetect = duplicate_check(df, ignore_columns="primary_station_id")
     DupDetect.flag_duplicates()
-    np.testing.assert_array_equal(DupDetect.result["duplicate_status"], [0] * 10)
-    np.testing.assert_array_equal(DupDetect.result["report_quality"], [2] * 10)
-    np.testing.assert_array_equal(
-        DupDetect.result["duplicates"],
-        ["null"] * 10,
-    )
+    assert_array_equal(DupDetect.result["duplicate_status"], [0] * 10)
+    assert_array_equal(DupDetect.result["report_quality"], [2] * 10)
+    assert_array_equal(DupDetect.result["duplicates"], ["null"] * 10)
