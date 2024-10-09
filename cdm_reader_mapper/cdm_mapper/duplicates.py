@@ -119,13 +119,10 @@ def add_duplicates(df, dups):
     return df
 
 
-def add_report_quality(df, indexes_good, indexes_bad):
+def add_report_quality(df, indexes_bad):
     """Add report quality to table."""
     df["report_quality"] = df["report_quality"].astype(int)
-    failed = df["report_quality"] == 1
-    df.loc[indexes_good, "report_quality"] = 0
     df.loc[indexes_bad, "report_quality"] = 1
-    df.loc[failed, "report_quality"] = 1
     return df
 
 
@@ -220,7 +217,7 @@ class DupDetect:
     def flag_duplicates(
         self, keep="first", limit="default", equal_musts=None, overwrite=True
     ):
-        """Get result dataset with flagged duplicates.
+        r"""Get result dataset with flagged duplicates.
 
         Parameters
         ----------
@@ -238,7 +235,13 @@ class DupDetect:
         Returns
         -------
         pd.DataFrame
-            DataFrame with flagged duplicates
+            Input DataFrame with flagged duplicates. \n
+            Flags for ``duplicate_status``: see `duplicate_status`_  \n
+            Flags for ``report_quality``: see `quality_flag`_
+
+
+        .. _duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
+        .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
@@ -275,9 +278,7 @@ class DupDetect:
         self.result.loc[indexes_good, "duplicate_status"] = 1
         self.result.loc[indexes_bad, "duplicate_status"] = 3
 
-        self.result = add_report_quality(
-            self.result, indexes_good=indexes_good, indexes_bad=indexes_bad
-        )
+        self.result = add_report_quality(self.result, indexes_bad=indexes_bad)
         self.result = add_duplicates(self.result, duplicates)
         self.result = add_history(self.result, indexes)
         return self.result
@@ -303,7 +304,7 @@ class DupDetect:
         Returns
         -------
         pd.DataFrame
-            DataFrame without duplicates.
+            Input DataFrame without duplicates.
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
