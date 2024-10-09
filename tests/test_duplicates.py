@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import pytest  # noqa
-from np.testing import assert_array_equal
-from pd.testing import assert_frame_equal
+from numpy.testing import assert_array_equal
+from pandas.testing import assert_frame_equal
 
 from cdm_reader_mapper.cdm_mapper import duplicate_check, read_tables
 
