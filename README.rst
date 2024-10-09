@@ -87,7 +87,7 @@ Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy 
 
     data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_data = read(filepath, imodel="icoads", sections=["core", "c1", "c98"])
+    imma_data = read(filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"])
 
     data_raw = imma_data.data.copy()
 
@@ -98,7 +98,7 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
 
     from cdm_reader_mapper.cdm_mapper import map_model
 
-    name_of_model = "icoads_r3000_d704"
+    name_of_model = "icoads_r300_d704"
 
     cdm_dict = map_model(
         data_raw,
