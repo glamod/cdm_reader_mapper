@@ -53,10 +53,11 @@ After reading the data into a pandas.DataFrame, the **cdm_mapper** will map obse
    example_notebooks/create_data_model.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
+   api
    contributing
    authors
-   api
    changes
+   security
 
 
 About
