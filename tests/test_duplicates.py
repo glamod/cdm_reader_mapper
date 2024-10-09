@@ -122,3 +122,36 @@ def test_duplicates_remove():
     DupDetect.remove_duplicates()
     expected = DupDetect.data.iloc[[0, 1, 2, 3, 4, 6, 8, 10, 12]].reset_index(drop=True)
     pd.testing.assert_frame_equal(expected, DupDetect.result)
+
+
+def test_duplicates_craid():
+    expected_data = result_data.expected_craid
+    data_path = expected_data.get("cdm_table")
+    df = read_tables(
+        data_path,
+        tb_id="craid*",
+        cdm_subset="header",
+    )
+    DupDetect = duplicate_check(df, ignore_columns="primary_station_id")
+    DupDetect.flag_duplicates()
+    np.testing.assert_array_equal(
+        DupDetect.result["duplicate_status"], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    np.testing.assert_array_equal(
+        DupDetect.result["report_quality"], [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    )
+    np.testing.assert_array_equal(
+        DupDetect.result["duplicates"],
+        [
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+            "null",
+        ],
+    )
