@@ -87,7 +87,9 @@ Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy 
 
     data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_data = read(filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"])
+    imma_data = read(
+        filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"]
+    )
 
     data_raw = imma_data.data.copy()
 
