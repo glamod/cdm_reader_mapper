@@ -56,28 +56,24 @@ def date2(self, *args, **kwargs):
 rl.Compare.date2 = date2
 
 _method_kwargs = {
-    "header": {
-        "left_on": "report_timestamp",
-        "window": 5,
-        "block_on": ["primary_station_id"],
-    },
+    "left_on": "report_timestamp",
+    "window": 5,
+    "block_on": ["primary_station_id"],
 }
 
 _compare_kwargs = {
-    "header": {
-        "primary_station_id": {"method": "exact"},
-        "longitude": {
-            "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.05},
-        },
-        "latitude": {
-            "method": "numeric",
-            "kwargs": {"method": "gauss", "offset": 0.05},
-        },
-        "report_timestamp": {
-            "method": "date2",
-            "kwargs": {"method": "gauss", "offset": 60.0},
-        },
+    "primary_station_id": {"method": "exact"},
+    "longitude": {
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.05},
+    },
+    "latitude": {
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.05},
+    },
+    "report_timestamp": {
+        "method": "date2",
+        "kwargs": {"method": "gauss", "offset": 60.0},
     },
 }
 
@@ -339,13 +335,32 @@ def set_comparer(compare_dict):
     return comparer
 
 
+def remove_ignores(dic, columns):
+    """Remove entries containing column names."""
+    new_dict = {}
+    if isinstance(columns, str):
+        columns = [columns]
+    for k, v in dic.items():
+        if k in columns:
+            continue
+        if v in columns:
+            continue
+        if isinstance(v, list):
+            v2 = [v_ for v_ in v if v_ not in columns]
+            if len(v2) == 0:
+                continue
+            v = v2
+        new_dict[k] = v
+    return new_dict
+
+
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
     method_kwargs=None,
     compare_kwargs=None,
-    cdm_name="header",
     table_name=None,
+    ignore_columns=None,
 ):
     """Duplicate check.
 
@@ -358,15 +373,14 @@ def duplicate_check(
         Default: SortedNeighbourhood
     method_kwargs: dict, optional
         Keyword arguments for recordlinkage duplicate check.
-        Default: _method_kwargs[cdm_name]
+        Default: _method_kwargs
     compare_kwargs: dict, optional
         Keyword arguments for recordlinkage.Compare object.
-        Default: _compare_kwargs[cdm_name]
-    cdm_name: str, ["header", "observations"]
-        Name of CDM table.
-        Use only if at least one of method_kwargs or compare_kwargs is None.
-    table_name: str
+        Default: _compare_kwargs
+    table_name: str, optional
         Name of the CDM table to be selected from data.
+    ignore_columns: str or list, optional
+        Name of data columns to ignore for duplicate check.
 
     Returns
     -------
@@ -375,9 +389,12 @@ def duplicate_check(
     if table_name:
         data = data[table_name]
     if not method_kwargs:
-        method_kwargs = _method_kwargs[cdm_name]
+        method_kwargs = _method_kwargs
     if not compare_kwargs:
-        compare_kwargs = _compare_kwargs[cdm_name]
+        compare_kwargs = _compare_kwargs
+    if ignore_columns:
+        method_kwargs = remove_ignores(method_kwargs, ignore_columns)
+        compare_kwargs = remove_ignores(compare_kwargs, ignore_columns)
 
     indexer = getattr(rl.index, method)(**method_kwargs)
     pairs = indexer.index(data)
