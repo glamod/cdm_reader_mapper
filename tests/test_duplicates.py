@@ -134,24 +134,9 @@ def test_duplicates_craid():
     )
     DupDetect = duplicate_check(df, ignore_columns="primary_station_id")
     DupDetect.flag_duplicates()
-    np.testing.assert_array_equal(
-        DupDetect.result["duplicate_status"], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    )
-    np.testing.assert_array_equal(
-        DupDetect.result["report_quality"], [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-    )
+    np.testing.assert_array_equal(DupDetect.result["duplicate_status"], [0] * 10)
+    np.testing.assert_array_equal(DupDetect.result["report_quality"], [2] * 10)
     np.testing.assert_array_equal(
         DupDetect.result["duplicates"],
-        [
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-            "null",
-        ],
+        ["null"] * 10,
     )
