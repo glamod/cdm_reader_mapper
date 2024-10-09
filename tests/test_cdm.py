@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest  # noqa
 
+import os
+
 from cdm_reader_mapper import test_data
 
 from ._testing_cdm_suite import _testing_suite
