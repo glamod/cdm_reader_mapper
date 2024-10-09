@@ -174,31 +174,48 @@ class DupDetect:
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
         return self
 
-    def get_matches(self, limit="default", equal_musts=None):
+    def get_duplicates(
+        self, keep="first", limit="default", equal_musts=None, overwrite=True
+    ):
         """Get duplicate matches.
 
         Parameters
         ----------
+        keep: str, ["first", "last"]
+            Which entry shpould be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .75
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
+        overwrite: bool
+            If True overwrite find duplicates again.
         """
-        self.total_score()
-        self.limit = self._get_limit(limit)
-        cond = self.score >= self.limit
-        if equal_musts is None:
-            equal_musts = self._get_equal_musts()
-        if isinstance(equal_musts, str):
-            equal_musts = [equal_musts]
-        for must in equal_musts:
-            cond = cond & (self.compared[must])
-        self.matches = self.compared[cond]
+        if keep == "first":
+            self.drop = 0
+            self.keep = -1
+        elif keep == "last":
+            self.drop = -1
+            self.keep = 0
+        elif not isinstance(keep, int):
+            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+        if overwrite is True:
+            self.total_score()
+            self.limit = self._get_limit(limit)
+            cond = self.score >= self.limit
+            if equal_musts is None:
+                equal_musts = self._get_equal_musts()
+            if isinstance(equal_musts, str):
+                equal_musts = [equal_musts]
+            for must in equal_musts:
+                cond = cond & (self.compared[must])
+            self.matches = self.compared[cond]
         return self
 
-    def flag_duplicates(self, keep="first", limit="default", equal_musts=None):
+    def flag_duplicates(
+        self, keep="first", limit="default", equal_musts=None, overwrite=True
+    ):
         """Get result dataset with flagged duplicates.
 
         Parameters
@@ -211,21 +228,14 @@ class DupDetect:
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
+        overwrite: bool
+            If True overwrite find duplicates again.
         """
-        drop = 0
-        if keep == "first":
-            keep = -1
-            drop = 0
-        elif keep == "last":
-            keep = 0
-            drop = -1
-        elif not isinstance(keep, int):
-            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
-
+        self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
         self.result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
-            self.get_matches(limit="default", equal_musts=None)
+            self.get_matches(limit="default", equal_musts=equal_musts)
 
         indexes = []
         indexes_good = []
@@ -233,25 +243,25 @@ class DupDetect:
         duplicates = {}
 
         for index in self.matches.index:
-            if index[drop] in indexes_bad:
+            if index[self.drop] in indexes_bad:
                 continue
 
             indexes += index
-            indexes_good.append(index[keep])
-            indexes_bad.append(index[drop])
+            indexes_good.append(index[self.keep])
+            indexes_bad.append(index[self.drop])
 
-            report_id_drop = self.result.loc[index[drop], "report_id"]
-            report_id_keep = self.result.loc[index[keep], "report_id"]
+            report_id_drop = self.result.loc[index[self.drop], "report_id"]
+            report_id_keep = self.result.loc[index[self.keep], "report_id"]
 
-            if index[drop] not in duplicates.keys():
-                duplicates[index[drop]] = [report_id_keep]
+            if index[self.drop] not in duplicates.keys():
+                duplicates[index[self.drop]] = [report_id_keep]
             else:
-                duplicates[index[drop]].append(report_id_keep)
+                duplicates[index[self.drop]].append(report_id_keep)
 
-            if index[keep] not in duplicates.keys():
-                duplicates[index[keep]] = [report_id_drop]
+            if index[self.keep] not in duplicates.keys():
+                duplicates[index[self.keep]] = [report_id_drop]
             else:
-                duplicates[index[keep]].append(report_id_drop)
+                duplicates[index[self.keep]].append(report_id_drop)
 
         self.result.loc[indexes_good, "duplicate_status"] = 1
         self.result.loc[indexes_bad, "duplicate_status"] = 3
@@ -263,7 +273,9 @@ class DupDetect:
         self.result = add_history(self.result, indexes)
         return self
 
-    def remove_duplicates(self, keep="first", limit="default", equal_musts=None):
+    def remove_duplicates(
+        self, keep="first", limit="default", equal_musts=None, overwrite=True
+    ):
         """Get result dataset with deleted matches.
 
         Parameters
@@ -276,21 +288,13 @@ class DupDetect:
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
+        overwrite: bool
+            If True overwrite find duplicates again.
         """
-        drop = 0
-        if keep == "first":
-            drop = 0
-        elif keep == "last":
-            drop = -1
-        elif not isinstance(keep, int):
-            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+        self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
-        if not hasattr(self, "matches"):
-            self.get_matches(limit="default", equal_musts=None)
-        for index in self.matches.index:
-            if index[drop] in self.result.index:
-                self.result = self.result.drop(index[drop])
-        self.result = self.result.reset_index(drop=True)
+        drops = [index[self.drop] for index in self.matches.index]
+        self.result = self.result.drop(drops).reset_index(drop=True)
         return self
 
 
