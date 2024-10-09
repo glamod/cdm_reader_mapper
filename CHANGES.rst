@@ -48,6 +48,7 @@ Breaking changes
 * Re-order arguments to ``mdf_reader.validate``, and create argument for ``ext_table_path`` (:pull:`105`)
 * ``operations``: delete corrections module (:pull:`104`)
 * ``cdm_mapper``: duplicate check is available for header table only (:pull:`115`)
+* ``cdm_mapper``: set report_quality to ``1`` for bad duplicates (:pull:`115`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
