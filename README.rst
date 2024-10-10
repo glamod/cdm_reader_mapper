@@ -46,7 +46,7 @@ You can install the package directly from pip:
 
 .. code-block:: console
 
-    pip install cdm_reader_mapper
+    pip install git+https://github.com/glamod/cdm_reader_mapper.git
 
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
@@ -78,15 +78,18 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 Run a test
 ----------
 
-Read imma data with the `cdm.read()` and copy the data attributes:
+Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy the data attributes:
 
 .. code-block:: python
 
-    import cdm_reader_mapper as cdm
+    from cdm_reader_mapper.mdf_reader import read
+    from cdm_reader_mapper.data import test_data
 
-    data = cdm.tests.read_imma1_buoys_nosupp()
+    data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_data = cdm.read(filepath, data_model="imma1", sections=["core", "c1", "c98"])
+    imma_data = read(
+        filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"]
+    )
 
     data_raw = imma_data.data.copy()
 
@@ -95,11 +98,13 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
 
 .. code-block:: python
 
-    name_of_model = "icoads_r3000_d704"
+    from cdm_reader_mapper.cdm_mapper import map_model
 
-    cdm_dict = cdm.map_model(
-        name_of_model,
+    name_of_model = "icoads_r300_d704"
+
+    cdm_dict = map_model(
         data_raw,
+        imodel=name_of_model,
         log_level="DEBUG",
     )
 
