@@ -104,7 +104,7 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
 
     cdm_dict = map_model(
         data_raw,
-        name_of_model,
+        imodel=name_of_model,
         log_level="DEBUG",
     )
 
