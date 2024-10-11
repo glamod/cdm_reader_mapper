@@ -451,24 +451,26 @@ def duplicate_check(
     if block_ons is not None:
         if not isinstance(block_ons, list):
             block_ons = [block_ons]
+
         for block_on in block_ons:
-            for ignore_entry in ignore_entries:
-                d1 = data.where(data[block_on] != ignore_entry).dropna()
-                d2 = data.where(data[block_on] == ignore_entry).dropna()
+            entries = data[block_on].isin(ignore_entries)
 
-                if d1.empty:
-                    continue
-                if d2.empty:
-                    continue
+            d1 = data.mask(entries).dropna()
+            d2 = data.where(entries).dropna()
 
-                method_kwargs_ = remove_ignores(method_kwargs, block_on)
-                compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
-                indexer = getattr(rl.index, method)(**method_kwargs_)
-                pairs = indexer.index(d2, d1)
-                comparer = set_comparer(compare_kwargs_)
-                compared_ = comparer.compute(pairs, data_)
-                compared_[block_ons] = 1
-                compared.append(compared_)
+            if d1.empty:
+                continue
+            if d2.empty:
+                continue
+
+            method_kwargs_ = remove_ignores(method_kwargs, block_on)
+            compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
+            indexer = getattr(rl.index, method)(**method_kwargs_)
+            pairs = indexer.index(d2, d1)
+            comparer = set_comparer(compare_kwargs_)
+            compared_ = comparer.compute(pairs, data_)
+            compared_[block_ons] = 1
+            compared.append(compared_)
 
     compared = pd.concat(compared)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
