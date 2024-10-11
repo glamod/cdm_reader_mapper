@@ -391,6 +391,32 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
+_compare_kwargs = {
+    "primary_station_id": {"method": "exact"},
+    "longitude": {
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
+    },
+    "latitude": {
+        "method": "numeric",
+        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
+    },
+    "report_timestamp": {
+        "method": "date2",
+        "kwargs": {"method": "gauss", "offset": 60.0},  # C-RAID: weniger
+    },
+}
+
+
+def change_offsets(dic, dic_o):
+    """Change offsets in compare dictionary."""
+    for key in dic.keys:
+        if key not in dic_o.keys():
+            continue
+        dic[key]["kwargs"]["offset"] = dic_o[key]
+    return dic
+
+
 class Compare:
     """Class to compare DataFrame with recordlinkage Comparer."""
 
@@ -423,7 +449,8 @@ def duplicate_check(
     compare_kwargs=None,
     table_name=None,
     ignore_columns=None,
-    ignore_entries=["SHIP", "MASKSTID"],
+    ignore_entries=None,
+    offsets=None,
 ):
     """Duplicate check.
 
@@ -447,6 +474,11 @@ def duplicate_check(
     ignore_entries: str or list, optional
         Name of column entries to be ignored for duplicate check.
         Those values will be renamed and added to each block_on group in rl.index object.
+    offsets: dict, optional
+        Change offsets for recordlinkage Compare object.
+        Key: Column name
+        Value: new offset
+        E.g. offsets={"latitude": 0.1}
 
     Returns
     -------
@@ -461,6 +493,9 @@ def duplicate_check(
     if ignore_columns:
         method_kwargs = remove_ignores(method_kwargs, ignore_columns)
         compare_kwargs = remove_ignores(compare_kwargs, ignore_columns)
+    if offsets:
+        compare_kwargs = change_offsets(compare_kwargs, offsets)
+
     if isinstance(ignore_entries, str):
         ignore_entries = [ignore_entries]
     if ignore_entries is None:
