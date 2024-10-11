@@ -107,7 +107,6 @@ def add_history(df, indexes):
 
 def add_duplicates(df, dups):
     """Add duplicates to table."""
-
     for k, v in dups.items():
         v_ = df.loc[v, "report_id"]
         v_ = v_.to_list()
@@ -392,20 +391,6 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
-def multiply_entries(data, columns, entries):
-    if isinstance(columns, str):
-        columns = [columns]
-    if isinstance(entries, str):
-        entries = [entries]
-
-    for column in columns:
-        given_entries = data[column].drop_duplicates().values()
-        for entry in entries:
-            selected = data[column] == entry
-            for given_entry in given_entries:
-                renamed = selected.replace({entry: given_entry})
-
-
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -463,7 +448,7 @@ def duplicate_check(
     compared = [comparer.compute(pairs, data_)]
 
     block_ons = method_kwargs.get("block_on")
-    if not block_ons is None:
+    if block_ons is not None:
         if not isinstance(block_ons, list):
             block_ons = [block_ons]
         for block_on in block_ons:
