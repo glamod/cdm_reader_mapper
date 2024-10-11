@@ -159,7 +159,7 @@ class DupDetect:
     """
 
     def __init__(self, data, compared, method, method_kwargs, compare_kwargs):
-        self.data = data
+        self.data = data.copy()
         self.compared = compared
         self.method = method
         self.method_kwargs = method_kwargs
@@ -369,6 +369,7 @@ def set_comparer(compare_dict):
             comparer.conversion[column] = "datetime64[ns]"
         if method == "date2":
             comparer.conversion[column] = "convert_date_to_float"
+
     return comparer
 
 
@@ -391,26 +392,9 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
-_compare_kwargs = {
-    "primary_station_id": {"method": "exact"},
-    "longitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
-    },
-    "latitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
-    },
-    "report_timestamp": {
-        "method": "date2",
-        "kwargs": {"method": "gauss", "offset": 60.0},  # C-RAID: weniger
-    },
-}
-
-
 def change_offsets(dic, dic_o):
     """Change offsets in compare dictionary."""
-    for key in dic.keys:
+    for key in dic.keys():
         if key not in dic_o.keys():
             continue
         dic[key]["kwargs"]["offset"] = dic_o[key]
@@ -429,6 +413,7 @@ class Compare:
         pairs_df=None,
         convert_data=False,
     ):
+        data = data.copy()
         indexer = getattr(rl.index, method)(**method_kwargs)
         comparer = set_comparer(compare_kwargs)
         if convert_data is True:
@@ -484,6 +469,7 @@ def duplicate_check(
     -------
         DupDetect object
     """
+    data = data.copy()
     if table_name:
         data = data[table_name]
     if not method_kwargs:
@@ -512,6 +498,7 @@ def duplicate_check(
     data_ = Compared_.data
 
     block_ons = method_kwargs.get("block_on")
+
     if block_ons is None:
         return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
 
