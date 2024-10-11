@@ -473,37 +473,40 @@ def duplicate_check(
         compare_kwargs=compare_kwargs,
         convert_data=True,
     )
-    compared = [Compared_.compared]
+    compared = Compared_.compared
     data_ = Compared_.data
 
     block_ons = method_kwargs.get("block_on")
-    if block_ons is not None:
-        if not isinstance(block_ons, list):
-            block_ons = [block_ons]
+    if block_ons is None:
+        return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
 
-        for block_on in block_ons:
-            entries = data[block_on].isin(ignore_entries)
+    compared = [compared]
+    if not isinstance(block_ons, list):
+        block_ons = [block_ons]
 
-            d1 = data.mask(entries).dropna()
-            d2 = data.where(entries).dropna()
+    for block_on in block_ons:
+        entries = data[block_on].isin(ignore_entries)
 
-            if d1.empty:
-                continue
-            if d2.empty:
-                continue
+        d1 = data.mask(entries).dropna()
+        d2 = data.where(entries).dropna()
 
-            method_kwargs_ = remove_ignores(method_kwargs, block_on)
-            compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
+        if d1.empty:
+            continue
+        if d2.empty:
+            continue
 
-            compared_ = Compare(
-                data=data_,
-                method=method,
-                method_kwargs=method_kwargs_,
-                compare_kwargs=compare_kwargs_,
-                pairs_df=[d2, d1],
-            ).compared
-            compared_[block_ons] = 1
-            compared.append(compared_)
+        method_kwargs_ = remove_ignores(method_kwargs, block_on)
+        compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
+
+        compared_ = Compare(
+            data=data_,
+            method=method,
+            method_kwargs=method_kwargs_,
+            compare_kwargs=compare_kwargs_,
+            pairs_df=[d2, d1],
+        ).compared
+        compared_[block_ons] = 1
+        compared.append(compared_)
 
     compared = pd.concat(compared)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
