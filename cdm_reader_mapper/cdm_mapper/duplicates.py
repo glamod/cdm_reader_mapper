@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime
 
 import numpy as np
+import pandas as pd
 import recordlinkage as rl
 from recordlinkage.compare import Numeric
 
@@ -65,15 +66,15 @@ _compare_kwargs = {
     "primary_station_id": {"method": "exact"},
     "longitude": {
         "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},
+        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
     },
     "latitude": {
         "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},
+        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
     },
     "report_timestamp": {
         "method": "date2",
-        "kwargs": {"method": "gauss", "offset": 60.0},
+        "kwargs": {"method": "gauss", "offset": 60.0},  # C-RAID: weniger
     },
 }
 
@@ -107,15 +108,11 @@ def add_history(df, indexes):
 def add_duplicates(df, dups):
     """Add duplicates to table."""
 
-    def _add_dups(x):
-        _dups = dups.get(x.name)
-        if _dups is None:
-            return x["duplicates"]
-        _dups = ",".join(_dups)
-        return "{" + _dups + "}"
-
-    df["duplicates"] = df.apply(lambda x: _add_dups(x), axis=1)
-
+    for k, v in dups.items():
+        v_ = df.loc[v, "report_id"]
+        v_ = v_.to_list()
+        df.loc[k, "duplicates"] = "{" + ",".join(v_) + "}"
+        
     return df
 
 
@@ -125,7 +122,23 @@ def add_report_quality(df, indexes_bad):
     df.loc[indexes_bad, "report_quality"] = 1
     return df
 
+def swap_dict_values(dic, v1, v2):
+    """Swap two value in a dictionary."""
+    dic[v1] = dic[v2]
+    del dic[v2]
+    for k, v in dic.items():
+        if v2 in v:
+            dic[k] = [v1]
+    return dic
 
+def expand_dict(dic, k, v):
+    """Expand dictionary values."""
+    if k not in dic.keys():
+        dic[k] = [v]
+    else:
+        dic[k].append(v)
+    return dic
+       
 class DupDetect:
     """Class for duplicate check.
 
@@ -151,8 +164,11 @@ class DupDetect:
         self.compare_kwargs = compare_kwargs
 
     def _get_limit(self, limit):
+        _limit = 0.991
         if limit == "default":
-            limit = 0.991
+            return _limit
+        if limit is None:
+            return _limit
         return limit
 
     def _get_equal_musts(self):
@@ -212,6 +228,7 @@ class DupDetect:
             for must in equal_musts:
                 cond = cond & (self.compared[must])
             self.matches = self.compared[cond]
+
         return self.matches
 
     def flag_duplicates(
@@ -249,31 +266,30 @@ class DupDetect:
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=equal_musts)
 
-        indexes = []
         indexes_good = []
         indexes_bad = []
         duplicates = {}
 
         for index in self.matches.index:
-            if index[self.drop] in indexes_bad:
+            keep_ = index[self.keep]
+            drop_ = index[self.drop]
+        
+            if drop_ in indexes_bad:
                 continue
+                
+            if drop_ in indexes_good:
+                indexes_good.remove(drop_)
+                duplicates = swap_dict_values(duplicates, keep_, drop_)
+                
+            if keep_ not in indexes_good:
+                indexes_good.append(keep_)
+            if drop_ not in indexes_bad:
+                indexes_bad.append(drop_)
 
-            indexes += index
-            indexes_good.append(index[self.keep])
-            indexes_bad.append(index[self.drop])
-
-            report_id_drop = self.result.loc[index[self.drop], "report_id"]
-            report_id_keep = self.result.loc[index[self.keep], "report_id"]
-
-            if index[self.drop] not in duplicates.keys():
-                duplicates[index[self.drop]] = [report_id_keep]
-            else:
-                duplicates[index[self.drop]].append(report_id_keep)
-
-            if index[self.keep] not in duplicates.keys():
-                duplicates[index[self.keep]] = [report_id_drop]
-            else:
-                duplicates[index[self.keep]].append(report_id_drop)
+            duplicates = expand_dict(duplicates, drop_, keep_)
+            duplicates = expand_dict(duplicates, keep_, drop_)
+                
+        indexes = indexes_good + indexes_bad
 
         self.result.loc[indexes_good, "duplicate_status"] = 1
         self.result.loc[indexes_bad, "duplicate_status"] = 3
@@ -373,6 +389,21 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
+def multiply_entries(data, columns, entries):
+    if isinstance(columns, str):
+        columns = [columns]
+    if isinstance(entries, str):  
+        entries = [entries]
+    
+    for column in columns:
+        given_entries = data[column].drop_duplicates().values()
+        for entry in entries:
+            selected = data[column] == entry
+            for given_entry in given_entries:
+                renamed = selected.replace({entry: given_entry})
+            
+                
+             
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -380,6 +411,7 @@ def duplicate_check(
     compare_kwargs=None,
     table_name=None,
     ignore_columns=None,
+    ignore_entries=["SHIP", "MASKSTID"],
 ):
     """Duplicate check.
 
@@ -399,7 +431,10 @@ def duplicate_check(
     table_name: str, optional
         Name of the CDM table to be selected from data.
     ignore_columns: str or list, optional
-        Name of data columns to ignore for duplicate check.
+        Name of data columns to be ignored for duplicate check.
+    ignore_entries: str or list, optional
+        Name of column entries to be ignored for duplicate check.
+        Those values will be renamed and added to each block_on group in rl.index object.
 
     Returns
     -------
@@ -414,10 +449,39 @@ def duplicate_check(
     if ignore_columns:
         method_kwargs = remove_ignores(method_kwargs, ignore_columns)
         compare_kwargs = remove_ignores(compare_kwargs, ignore_columns)
+    if isinstance(ignore_entries, str):
+        ignore_entries = [ignore_entries]
+    if ignore_entries is None:
+        ignore_entries = []
 
     indexer = getattr(rl.index, method)(**method_kwargs)
-    pairs = indexer.index(data)
     comparer = set_comparer(compare_kwargs)
     data_ = convert_series(data, comparer.conversion)
-    compared = comparer.compute(pairs, data_)
+    pairs = indexer.index(data_)
+    compared = [comparer.compute(pairs, data_)]
+    
+    block_ons = method_kwargs.get("block_on")
+    if not block_ons is None:
+        if not isinstance(block_ons, list):
+            block_ons = [block_ons]
+        for block_on in block_ons:
+            for ignore_entry in ignore_entries:
+                d1 = data.where(data[block_on] != ignore_entry).dropna()
+                d2 = data.where(data[block_on] == ignore_entry).dropna()
+
+                if d1.empty:
+                    continue
+                if d2.empty: 
+                    continue
+                
+                method_kwargs_ = remove_ignores(method_kwargs, block_on)
+                compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
+                indexer = getattr(rl.index, method)(**method_kwargs_)
+                pairs = indexer.index(d2, d1)
+                comparer = set_comparer(compare_kwargs_)
+                compared_ = comparer.compute(pairs, data_)
+                compared_[block_ons] = 1
+                compared.append(compared_)
+    
+    compared = pd.concat(compared)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
