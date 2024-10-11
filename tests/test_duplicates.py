@@ -75,6 +75,12 @@ def _manipulate_header(df):
     df.loc[13, "latitude"] = 65.95
     df.loc[13, "longitude"] = 8.05
     df.loc[13, "report_quality"] = 2
+
+    # Duplicate: ignore primary_station_id SHIP
+    df.loc[14] = df.loc[3]
+    df.loc[14, "report_id"] = "ICOADS-302-N688EG"
+    df.loc[14, "primary_station_id"] = "SHIP"
+    df.loc[14, "report_quality"] = 2
     return df
 
 
@@ -118,7 +124,7 @@ def test_duplicates_flag():
             "{ICOADS-302-N688DV}",
             "null",
             "{ICOADS-302-N688ED}",
-            "{ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EG,ICOADS-302-N688EH}",
+            "{ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EH,ICOADS-302-N688EG}",
             "{ICOADS-302-N688ED}",
             "{ICOADS-302-N688ED}",
         ],
@@ -127,7 +133,7 @@ def test_duplicates_flag():
 
 def test_duplicates_remove():
     DupDetect.remove_duplicates()
-    expected = DupDetect.data.iloc[[0, 1, 2, 3, 4, 6, 8, 10, 12]].reset_index(drop=True)
+    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12]].reset_index(drop=True)
     assert_frame_equal(expected, DupDetect.result)
 
 
