@@ -112,7 +112,7 @@ def add_duplicates(df, dups):
         v_ = df.loc[v, "report_id"]
         v_ = v_.to_list()
         df.loc[k, "duplicates"] = "{" + ",".join(v_) + "}"
-        
+
     return df
 
 
@@ -121,6 +121,7 @@ def add_report_quality(df, indexes_bad):
     df["report_quality"] = df["report_quality"].astype(int)
     df.loc[indexes_bad, "report_quality"] = 1
     return df
+
 
 def swap_dict_values(dic, v1, v2):
     """Swap two value in a dictionary."""
@@ -131,6 +132,7 @@ def swap_dict_values(dic, v1, v2):
             dic[k] = [v1]
     return dic
 
+
 def expand_dict(dic, k, v):
     """Expand dictionary values."""
     if k not in dic.keys():
@@ -138,7 +140,8 @@ def expand_dict(dic, k, v):
     else:
         dic[k].append(v)
     return dic
-       
+
+
 class DupDetect:
     """Class for duplicate check.
 
@@ -273,14 +276,14 @@ class DupDetect:
         for index in self.matches.index:
             keep_ = index[self.keep]
             drop_ = index[self.drop]
-        
+
             if drop_ in indexes_bad:
                 continue
-                
+
             if drop_ in indexes_good:
                 indexes_good.remove(drop_)
                 duplicates = swap_dict_values(duplicates, keep_, drop_)
-                
+
             if keep_ not in indexes_good:
                 indexes_good.append(keep_)
             if drop_ not in indexes_bad:
@@ -288,7 +291,7 @@ class DupDetect:
 
             duplicates = expand_dict(duplicates, drop_, keep_)
             duplicates = expand_dict(duplicates, keep_, drop_)
-                
+
         indexes = indexes_good + indexes_bad
 
         self.result.loc[indexes_good, "duplicate_status"] = 1
@@ -392,18 +395,17 @@ def remove_ignores(dic, columns):
 def multiply_entries(data, columns, entries):
     if isinstance(columns, str):
         columns = [columns]
-    if isinstance(entries, str):  
+    if isinstance(entries, str):
         entries = [entries]
-    
+
     for column in columns:
         given_entries = data[column].drop_duplicates().values()
         for entry in entries:
             selected = data[column] == entry
             for given_entry in given_entries:
                 renamed = selected.replace({entry: given_entry})
-            
-                
-             
+
+
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -459,7 +461,7 @@ def duplicate_check(
     data_ = convert_series(data, comparer.conversion)
     pairs = indexer.index(data_)
     compared = [comparer.compute(pairs, data_)]
-    
+
     block_ons = method_kwargs.get("block_on")
     if not block_ons is None:
         if not isinstance(block_ons, list):
@@ -471,9 +473,9 @@ def duplicate_check(
 
                 if d1.empty:
                     continue
-                if d2.empty: 
+                if d2.empty:
                     continue
-                
+
                 method_kwargs_ = remove_ignores(method_kwargs, block_on)
                 compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
                 indexer = getattr(rl.index, method)(**method_kwargs_)
@@ -482,6 +484,6 @@ def duplicate_check(
                 compared_ = comparer.compute(pairs, data_)
                 compared_[block_ons] = 1
                 compared.append(compared_)
-    
+
     compared = pd.concat(compared)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)

@@ -194,11 +194,11 @@ class result_data:
             path = load_file(os.path.join(*drs, "cdm_tables", name)).parent
 
         return {
-            #"data": self._load_file(os.path.join(*drs, "output", data)),
-            #"mask": self._load_file(os.path.join(*drs, "output", mask)),
+            # "data": self._load_file(os.path.join(*drs, "output", data)),
+            # "mask": self._load_file(os.path.join(*drs, "output", mask)),
             "cdm_table": path,
-            #"vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
-            #"vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
+            # "vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
+            # "vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
         }
 
 

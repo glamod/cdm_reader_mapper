@@ -123,7 +123,8 @@ def test_duplicates_flag():
             "{ICOADS-302-N688ED}",
         ],
     )
-    
+
+
 def test_duplicates_remove():
     DupDetect.remove_duplicates()
     expected = DupDetect.data.iloc[[0, 1, 2, 3, 4, 6, 8, 10, 12]].reset_index(drop=True)
