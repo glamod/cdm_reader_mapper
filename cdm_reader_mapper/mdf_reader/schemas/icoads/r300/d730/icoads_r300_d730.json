@@ -74,19 +74,19 @@
           "column_type": "str",
           "LMR6": false
         },
-        "InsName": {
+        "InstName": {
           "description": "Name of the Institute where the original data is stored",
           "field_length": 50,
           "column_type": "str",
           "LMR6": false
         },
-        "InsPlace": {
+        "InstPlace": {
           "description": "Place of the Institute where the original data is stored",
           "field_length": 10,
           "column_type": "str",
           "LMR6": false
         },
-        "InsLand": {
+        "InstLand": {
           "description": "Country of the Institute where the original data is stored",
           "field_length": 14,
           "column_type": "str",
