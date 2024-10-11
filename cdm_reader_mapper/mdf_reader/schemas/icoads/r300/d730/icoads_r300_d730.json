@@ -92,7 +92,7 @@
           "column_type": "str",
           "LMR6": false
         },
-        "No_data_entry": {
+        "NumArchiveSet": {
           "description": "Administrative number under which the data is found within the Institute",
           "field_length": 15,
           "column_type": "str",
