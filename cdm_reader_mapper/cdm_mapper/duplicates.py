@@ -391,6 +391,31 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
+class Compare:
+    """Class to compare DataFrame with recordlinkage Comparer."""
+
+    def __init__(
+        self,
+        data,
+        method,
+        method_kwargs,
+        compare_kwargs,
+        pairs_df=None,
+        convert_data=False,
+    ):
+        indexer = getattr(rl.index, method)(**method_kwargs)
+        comparer = set_comparer(compare_kwargs)
+        if convert_data is True:
+            data_ = convert_series(data, comparer.conversion)
+        else:
+            data_ = data.copy()
+        if pairs_df is None:
+            pairs_df = [data_]
+        pairs = indexer.index(*pairs_df)
+        self.data = data_
+        self.compared = comparer.compute(pairs, data_)
+
+
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -441,11 +466,15 @@ def duplicate_check(
     if ignore_entries is None:
         ignore_entries = []
 
-    indexer = getattr(rl.index, method)(**method_kwargs)
-    comparer = set_comparer(compare_kwargs)
-    data_ = convert_series(data, comparer.conversion)
-    pairs = indexer.index(data_)
-    compared = [comparer.compute(pairs, data_)]
+    Compared_ = Compare(
+        data=data,
+        method=method,
+        method_kwargs=method_kwargs,
+        compare_kwargs=compare_kwargs,
+        convert_data=True,
+    )
+    compared = [Compared_.compared]
+    data_ = Compared_.data
 
     block_ons = method_kwargs.get("block_on")
     if block_ons is not None:
@@ -465,10 +494,14 @@ def duplicate_check(
 
             method_kwargs_ = remove_ignores(method_kwargs, block_on)
             compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
-            indexer = getattr(rl.index, method)(**method_kwargs_)
-            pairs = indexer.index(d2, d1)
-            comparer = set_comparer(compare_kwargs_)
-            compared_ = comparer.compute(pairs, data_)
+
+            compared_ = Compare(
+                data=data_,
+                method=method,
+                method_kwargs=method_kwargs_,
+                compare_kwargs=compare_kwargs_,
+                pairs_df=[d2, d1],
+            ).compared
             compared_[block_ons] = 1
             compared.append(compared_)
 
