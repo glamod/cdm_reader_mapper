@@ -49,6 +49,7 @@ Breaking changes
 * ``operations``: delete corrections module (:pull:`104`)
 * ``cdm_mapper``: duplicate check is available for header table only (:pull:`115`)
 * ``cdm_mapper``: set report_quality to ``1`` for bad duplicates (:pull:`115`)
+* ``cdm_mapper``: set default primary_station_id to ``4`` for C-RAID mapping (:issue:`117`, :pull:`121`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
