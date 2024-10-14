@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import datetime
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
 import recordlinkage as rl
-from recordlinkage.compare import Numeric
+
+from ._duplicate_settings import Compare, _compare_kwargs, _histories, _method_kwargs
 
 
 def convert_series(df, conversion):
@@ -39,49 +41,6 @@ def convert_series(df, conversion):
             df[column] = locals()[method](df[column])
 
     return df
-
-
-class Date2(Numeric):
-    """Copy of ``rl.compare.Numeric`` class."""
-
-    pass
-
-
-def date2(self, *args, **kwargs):
-    """New method for ``rl.Compare`` object using ``Date2`` object."""
-    compare = Date2(*args, **kwargs)
-    self.add(compare)
-    return self
-
-
-rl.Compare.date2 = date2
-
-_method_kwargs = {
-    "left_on": "report_timestamp",
-    "window": 5,
-    "block_on": ["primary_station_id"],
-}
-
-_compare_kwargs = {
-    "primary_station_id": {"method": "exact"},
-    "longitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
-    },
-    "latitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
-    },
-    "report_timestamp": {
-        "method": "date2",
-        "kwargs": {"method": "gauss", "offset": 60.0},  # C-RAID: weniger
-    },
-}
-
-_histories = {
-    "duplicate_status": "Added duplicate information - flag",
-    "duplicates": "Added duplicate information - duplicates",
-}
 
 
 def add_history(df, indexes):
@@ -344,7 +303,7 @@ def set_comparer(compare_dict):
     recordlinkage.Compare object:
         recordlinkage.Compare object with added methods.
     """
-    comparer = rl.Compare()
+    comparer = Compare()
     setattr(comparer, "conversion", {})
     for column, c_dict in compare_dict.items():
         try:
@@ -401,7 +360,7 @@ def change_offsets(dic, dic_o):
     return dic
 
 
-class Compare:
+class Comparer:
     """Class to compare DataFrame with recordlinkage Comparer."""
 
     def __init__(
@@ -413,7 +372,6 @@ class Compare:
         pairs_df=None,
         convert_data=False,
     ):
-        data = data.copy()
         indexer = getattr(rl.index, method)(**method_kwargs)
         comparer = set_comparer(compare_kwargs)
         if convert_data is True:
@@ -423,8 +381,8 @@ class Compare:
         if pairs_df is None:
             pairs_df = [data_]
         pairs = indexer.index(*pairs_df)
-        self.data = data_
         self.compared = comparer.compute(pairs, data_)
+        self.data = data_
 
 
 def duplicate_check(
@@ -473,9 +431,9 @@ def duplicate_check(
     if table_name:
         data = data[table_name]
     if not method_kwargs:
-        method_kwargs = _method_kwargs
+        method_kwargs = deepcopy(_method_kwargs)
     if not compare_kwargs:
-        compare_kwargs = _compare_kwargs
+        compare_kwargs = deepcopy(_compare_kwargs)
     if ignore_columns:
         method_kwargs = remove_ignores(method_kwargs, ignore_columns)
         compare_kwargs = remove_ignores(compare_kwargs, ignore_columns)
@@ -487,7 +445,7 @@ def duplicate_check(
     if ignore_entries is None:
         ignore_entries = []
 
-    Compared_ = Compare(
+    Compared_ = Comparer(
         data=data,
         method=method,
         method_kwargs=method_kwargs,
@@ -520,7 +478,7 @@ def duplicate_check(
         method_kwargs_ = remove_ignores(method_kwargs, block_on)
         compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
 
-        compared_ = Compare(
+        compared_ = Comparer(
             data=data_,
             method=method,
             method_kwargs=method_kwargs_,
