@@ -45,7 +45,7 @@
     "default": 1
   },
   "primary_station_id_scheme": {
-    "fill_value": "8"
+    "fill_value": "4"
   },
   "longitude": {
     "sections": "drifter_measurements",
