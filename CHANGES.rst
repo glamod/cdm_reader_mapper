@@ -78,6 +78,8 @@ Bug fixes
 * there is a loss of data precision due to data type conversion. Hence, use default data types of both ``int`` and ``float`` (:issue:`59`, :pull:`60`)
 * reading C-RAID data: adjust datetime formats to read dates into ``MDFFileReader`` (:pull:`60`)
 * ensure external code tables are used when using an external schema in ``mdf_reader.read`` (:pull:`105`)
+* restructure ``CLIWOC_datamodel`` Jupyter notebook to add an example of data model construction (:pull:`110`)
+* remove ``create_data_model.ipynb`` example Jupyter notebook (:pull:`110`)
 
 
 0.3.0 (2024-05-17)
