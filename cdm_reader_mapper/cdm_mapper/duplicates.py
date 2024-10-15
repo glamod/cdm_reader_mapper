@@ -67,9 +67,11 @@ def add_duplicates(df, dups):
 
     def _add_dups(row):
         idx = row.name
-        if idx not in dups.keys():
+        if idx not in dups.index:
             return row
-        v_ = report_ids.iloc[dups[idx]]
+
+        dup_idx = dups.loc[idx].to_list()[0]
+        v_ = report_ids.iloc[dup_idx]
         v_ = v_.tolist()
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
@@ -211,9 +213,13 @@ class DupDetect:
             if drop[drop_] in keeps:
                 return (int(drop[drop_]), int(drop[keep_]))
 
+        def _get_duplicates(x, last):
+            b = list(set(x[last].values))
+            return pd.Series({"dups": b})
+
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
-        self.result = self.data.copy()
-        self.result["duplicate_status"] = 0
+        result = self.data.copy()
+        result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=equal_musts)
 
@@ -222,19 +228,28 @@ class DupDetect:
         drop_ = indexes_df.columns[self.drop]
         keep_ = indexes_df.columns[self.keep]
         indexes_df = indexes_df.drop_duplicates(subset=[drop_])
+
         keeps = indexes_df[keep_].values
         replaces = indexes_df.apply(lambda x: _get_similars(x, keeps), axis=1)
         replaces = dict(replaces.dropna().values)
         indexes_df[keep_] = indexes_df[keep_].replace(replaces)
 
+        dup_keep = indexes_df.groupby(indexes_df[keep_]).apply(
+            lambda x: _get_duplicates(x, drop_)
+        )
+        dup_drop = indexes_df.groupby(indexes_df[drop_]).apply(
+            lambda x: _get_duplicates(x, keep_)
+        )
+        duplicates = pd.concat([dup_keep, dup_drop])
+
         indexes_good = indexes_df[keep_].values.tolist()
         indexes_bad = indexes_df[drop_].values.tolist()
         indexes = indexes_good + indexes_bad
-        self.result.loc[indexes_good, "duplicate_status"] = 1
-        self.result.loc[indexes_bad, "duplicate_status"] = 3
-        self.result = add_report_quality(self.result, indexes_bad=indexes_bad)
-        # self.result = add_duplicates(self.result, duplicates)
-        self.result = add_history(self.result, indexes)
+        result.loc[indexes_good, "duplicate_status"] = 1
+        result.loc[indexes_bad, "duplicate_status"] = 3
+        result = add_report_quality(result, indexes_bad=indexes_bad)
+        result = add_duplicates(result, duplicates)
+        self.result = add_history(result, indexes)
         return self.result
 
     def remove_duplicates(
