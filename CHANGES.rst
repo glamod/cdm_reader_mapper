@@ -50,6 +50,7 @@ Breaking changes
 * ``cdm_mapper``: duplicate check is available for header table only (:pull:`115`)
 * ``cdm_mapper``: set report_quality to ``1`` for bad duplicates (:pull:`115`)
 * ``cdm_mapper``: set default primary_station_id to ``4`` for C-RAID mapping (:issue:`117`, :pull:`121`)
+* renamed some element names in ``icoads_r300_d730`` schema for consistency (``InsName`` to ``InstName``, ``InsPlace`` to ``InstPlace``, ``InsLand`` to ``InstLand``, ``No_data_entry`` to ``NumArchiveSet``) (:pull:`110`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -78,6 +79,7 @@ Bug fixes
 * there is a loss of data precision due to data type conversion. Hence, use default data types of both ``int`` and ``float`` (:issue:`59`, :pull:`60`)
 * reading C-RAID data: adjust datetime formats to read dates into ``MDFFileReader`` (:pull:`60`)
 * ensure external code tables are used when using an external schema in ``mdf_reader.read`` (:pull:`105`)
+* update readme and example Jupyter notebooks to :pull:`103` (:pull:`110`)
 * restructure ``CLIWOC_datamodel`` Jupyter notebook to add an example of data model construction (:pull:`110`)
 * remove ``create_data_model.ipynb`` example Jupyter notebook (:pull:`110`)
 
