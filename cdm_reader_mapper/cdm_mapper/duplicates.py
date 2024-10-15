@@ -66,42 +66,25 @@ def add_history(df, indexes):
 
 def add_duplicates(df, dups):
     """Add duplicates to table."""
+
     def _add_dups(row):
         idx = row.name
-        if not idx in dups.keys():
+        if idx not in dups.keys():
             return row
         v_ = report_ids.iloc[dups[idx]]
         v_ = v_.tolist()
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
-        
+
     report_ids = df["report_id"]
     return df.apply(lambda x: _add_dups(x), axis=1)
+
 
 def add_report_quality(df, indexes_bad):
     """Add report quality to table."""
     df["report_quality"] = df["report_quality"].astype(int)
     df.loc[indexes_bad, "report_quality"] = 1
     return df
-
-
-def swap_dict_values(dic, v1, v2):
-    """Swap two value in a dictionary."""
-    dic[v1] = dic[v2]
-    del dic[v2]
-    for k, v in dic.items():
-        if v2 in v:
-            dic[k] = [v1]
-    return dic
-
-
-def expand_dict(dic, k, v):
-    """Expand dictionary values."""
-    if k not in dic.keys():
-        dic[k] = [v]
-    else:
-        dic[k].append(v)
-    return dic
 
 
 class DupDetect:
@@ -225,42 +208,34 @@ class DupDetect:
         .. _duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
+
+        def _get_similars(drop, keeps):
+            if drop[drop_] in keeps:
+                return (int(drop[drop_]), int(drop[keep_]))
+
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
         self.result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=equal_musts)
 
-        indexes_good = []
-        indexes_bad = []
-        duplicates = {}
+        indexes = self.matches.index
+        indexes_df = indexes.to_frame().reset_index(drop=True)
+        drop_ = indexes_df.columns[self.drop]
+        keep_ = indexes_df.columns[self.keep]
+        indexes_df = indexes_df.drop_duplicates(subset=[drop_])
+        keeps = indexes_df[keep_].values
+        replaces = indexes_df.apply(lambda x: _get_similars(x, keeps), axis=1)
+        replaces = dict(replaces.dropna().values)
+        indexes_df[keep_] = indexes_df[keep_].replace(replaces)
 
-        for index in self.matches.index:
-            keep_ = index[self.keep]
-            drop_ = index[self.drop]
-
-            if drop_ in indexes_bad:
-                continue
-
-            if drop_ in indexes_good:
-                indexes_good.remove(drop_)
-                duplicates = swap_dict_values(duplicates, keep_, drop_)
-
-            if keep_ not in indexes_good:
-                indexes_good.append(keep_)
-            if drop_ not in indexes_bad:
-                indexes_bad.append(drop_)
-
-            duplicates = expand_dict(duplicates, drop_, keep_)
-            duplicates = expand_dict(duplicates, keep_, drop_)
-
+        indexes_good = indexes_df[keep_].values.tolist()
+        indexes_bad = indexes_df[drop_].values.tolist()
         indexes = indexes_good + indexes_bad
-
         self.result.loc[indexes_good, "duplicate_status"] = 1
         self.result.loc[indexes_bad, "duplicate_status"] = 3
-
         self.result = add_report_quality(self.result, indexes_bad=indexes_bad)
-        self.result = add_duplicates(self.result, duplicates)
+        # self.result = add_duplicates(self.result, duplicates)
         self.result = add_history(self.result, indexes)
         return self.result
 
