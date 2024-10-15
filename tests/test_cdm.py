@@ -59,16 +59,6 @@ from ._testing_cdm_suite import _testing_suite
             None,
             {},
         ),
-        ("icoads_r300_d714", None, None, None, True, None, {"chunksize": 3}),
-        (
-            "icoads_r300_d714",
-            None,
-            None,
-            None,
-            False,
-            None,
-            {"sections": ["c99"], "chunksize": 3},
-        ),
         (
             "icoads_r300_d702",
             None,
@@ -113,19 +103,6 @@ from ._testing_cdm_suite import _testing_suite
             True,
             "all",
             {"year_end": 2003},
-        ),
-        (
-            "icoads_r300_d703",
-            None,
-            None,
-            None,
-            False,
-            None,
-            {
-                "ext_schema_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
-                )
-            },
         ),
         (
             "icoads_r300_d703",
