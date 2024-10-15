@@ -58,9 +58,7 @@ def add_history(df, indexes):
     indexes = list(indexes)
     history_tstmp = _datetime_now()
     addition = "".join([f"; {history_tstmp}. {add}" for add in _histories.items()])
-    df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(
-        lambda x: x + addition
-    )
+    df.loc[indexes, "history"] = df.loc[indexes, "history"] + addition
     return df
 
 
