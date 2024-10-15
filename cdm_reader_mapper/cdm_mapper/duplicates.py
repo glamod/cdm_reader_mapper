@@ -66,13 +66,17 @@ def add_history(df, indexes):
 
 def add_duplicates(df, dups):
     """Add duplicates to table."""
-    for k, v in dups.items():
-        v_ = df.loc[v, "report_id"]
-        v_ = v_.to_list()
-        df.loc[k, "duplicates"] = "{" + ",".join(v_) + "}"
-
-    return df
-
+    def _add_dups(row):
+        idx = row.name
+        if not idx in dups.keys():
+            return row
+        v_ = report_ids.iloc[dups[idx]]
+        v_ = v_.tolist()
+        row["duplicates"] = "{" + ",".join(v_) + "}"
+        return row
+        
+    report_ids = df["report_id"]
+    return df.apply(lambda x: _add_dups(x), axis=1)
 
 def add_report_quality(df, indexes_bad):
     """Add report quality to table."""
