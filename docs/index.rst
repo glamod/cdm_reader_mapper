@@ -50,7 +50,6 @@ After reading the data into a pandas.DataFrame, the **cdm_mapper** will map obse
    how-to-register-a-new-data-model-mapping.rst
    cdm-tables-mapping-files-and-descriptors.rst
    example_notebooks/mdf_reader_test_overview.ipynb
-   example_notebooks/create_data_model.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
    api
