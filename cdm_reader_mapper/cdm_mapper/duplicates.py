@@ -73,7 +73,7 @@ def add_duplicates(df, dups):
 
         dup_idx = dups.loc[idx].to_list()[0]
         v_ = report_ids.iloc[dup_idx]
-        v_ = v_.tolist()
+        v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
 
@@ -136,7 +136,11 @@ class DupDetect:
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
 
     def get_duplicates(
-        self, keep="first", limit="default", equal_musts=None, overwrite=True
+        self,
+        keep="first",
+        limit="default",
+        equal_musts=None,
+        overwrite=True,
     ):
         """Get duplicate matches.
 
@@ -225,7 +229,7 @@ class DupDetect:
             self.get_matches(limit="default", equal_musts=equal_musts)
 
         indexes = self.matches.index
-        indexes_df = indexes.to_frame().reset_index(drop=True)
+        indexes_df = indexes.to_frame()
         drop_ = indexes_df.columns[self.drop]
         keep_ = indexes_df.columns[self.keep]
         indexes_df = indexes_df.drop_duplicates(subset=[drop_])
@@ -251,8 +255,12 @@ class DupDetect:
         result.loc[indexes_good, "duplicate_status"] = 1
         result.loc[indexes_bad, "duplicate_status"] = 3
         result = add_report_quality(result, indexes_bad=indexes_bad)
-        result = add_duplicates(result, duplicates)
-        self.result = add_history(result, indexes)
+
+        result = add_history(result, indexes)
+        result = result.sort_index(ascending=True)
+        self.result = add_duplicates(result, duplicates)
+        self.data = self.data.sort_index(ascending=True)
+
         return self.result
 
     def remove_duplicates(
@@ -279,9 +287,11 @@ class DupDetect:
             Input DataFrame without duplicates.
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
-        self.result = self.data.copy()
+        result = self.data.copy()
         drops = self.matches.index.get_level_values(self.drop)
-        self.result = self.result.drop(drops).reset_index(drop=True)
+        result = result.drop(drops)
+        self.result = result.sort_index(ascending=True)
+        self.data = self.data.sort_index(ascending=True)
         return self.result
 
 
@@ -389,6 +399,7 @@ def duplicate_check(
     ignore_columns=None,
     ignore_entries=None,
     offsets=None,
+    reindex_by_null=True,
 ):
     """Duplicate check.
 
@@ -418,12 +429,24 @@ def duplicate_check(
         Key: Column name
         Value: new offset
         E.g. offsets={"latitude": 0.1}
+    reindex_by_null: bool, optional
+        If True data is re-indexed in ascending order according to the number of nulls in each row.
 
     Returns
     -------
         DupDetect object
     """
+
+    def _count_nulls(row):
+        return (row == "null").sum()
+
     data = data.copy()
+
+    if reindex_by_null is True:
+        nulls = data.apply(lambda x: _count_nulls(x), axis=1)
+        indexes_ = list(zip(*sorted(zip(nulls.values, nulls.index))))
+        data = data.reindex(indexes_[1])
+
     if table_name:
         data = data[table_name]
     if not method_kwargs:

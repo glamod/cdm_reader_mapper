@@ -22,6 +22,7 @@ New features and enhancements
 * ``cdm_mapper``: optionally, set offset values for duplicate_check (:pull:`119`)
 * ``cdm_mapper``: optionally, set column entries to be ignored while duplicate_check (:pull:`119`)
 * ``cdm_mapper``: optionally, add both column names ``station_speed`` and ``station_course`` on duplicate check list (:pull:`119`)
+* ``cdm_mapper``: optionally, re-index data in ascending order according to the number of nulls in each row (:pull:`119`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^

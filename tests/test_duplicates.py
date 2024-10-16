@@ -109,9 +109,7 @@ def test_duplicates_remove():
         },
     )
     DupDetect.remove_duplicates()
-    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]].reset_index(
-        drop=True
-    )
+    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
     assert_frame_equal(expected, DupDetect.result)
 
 
