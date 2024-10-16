@@ -16,7 +16,7 @@ def _manipulate_header(df):
     # No Duplicate: Lat and Lon values differ to much
     # valid is .5 degrees
     df.loc[6] = df.loc[4]
-    df.loc[5, "report_id"] = "ICOADS-302-N688EY"
+    df.loc[6, "report_id"] = "ICOADS-302-N688EZ"
     df.loc[6, "latitude"] = -65.80
     df.loc[6, "longitude"] = 21.20
     df.loc[6, "report_quality"] = 2
@@ -139,7 +139,7 @@ exp3 = {
     "duplicate_status": [1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 3, 0],
     "report_quality": [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2],
     "duplicates": [
-        "{ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688DT}",
+        "{ICOADS-302-N688DS,ICOADS-302-N688DV,ICOADS-302-N688EH,ICOADS-302-N688EI,ICOADS-302-N688EY,ICOADS-302-N688EZ,ICOADS-302-N688DT,ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
