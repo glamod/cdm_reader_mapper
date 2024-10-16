@@ -25,8 +25,14 @@ _compare_kwargs = {
         "method": "date2",
         "kwargs": {"method": "gauss", "offset": 60.0},
     },
-    "station_speed": {"method": "numeric"},
-    "station_course": {"method": "numeric"},
+    "station_speed": {
+        "method": "numeric",
+        "kwargs": {"method": "step", "offset": 0.09},
+    },
+    "station_course": {
+        "method": "numeric",
+        "kwargs": {"method": "step", "offset": 0.9},
+    },
 }
 
 _histories = {
