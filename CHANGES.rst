@@ -20,7 +20,8 @@ New features and enhancements
 * ``cdm_mapper``: Change both columns history and report_quality during duplicate_check (:pull:`112`)
 * ``cdm_mapper``: optionally, set column names to be ignored while duplicate check (:pull:`115`)
 * ``cdm_mapper``: optionally, set offset values for duplicate_check (:pull:`119`)
-* ``cdm_mapper``: optionally, set column entries to be ignored while duplicate_check. This only affects columns in each block_on group in the recordlinkage.index object.
+* ``cdm_mapper``: optionally, set column entries to be ignored while duplicate_check (:pull:`119`)
+* ``cdm_mapper``: optionally, add both column names ``station_speed`` and ``station_course`` on duplicate check list (:pull:`119`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
