@@ -94,6 +94,25 @@ def _manipulate_header(df):
     df.loc[16, "longitude"] = -21.10
     df.loc[16, "report_quality"] = 2
 
+    # No Duplicate:
+    df.loc[17] = df.loc[1]
+    df.loc[17, "report_id"] = "ICOADS-302-N688EK"
+    df.loc[17, "station_course"] = 316.0
+
+    # No Duplicate:
+    df.loc[18] = df.loc[1]
+    df.loc[18, "report_id"] = "ICOADS-302-N688EL"
+    df.loc[18, "station_speed"] = 4.0
+
+    # Duplicate:
+    df.loc[19] = df.loc[1]
+    df.loc[19, "report_id"] = "ICOADS-302-N688EM"
+    df.loc[19, "station_course"] = "null"
+
+    # Duplicate:
+    df.loc[20] = df.loc[1]
+    df.loc[20, "report_id"] = "ICOADS-302-N688EN"
+    df.loc[20, "station_speed"] = "null"
     return df
 
 
@@ -109,8 +128,8 @@ def _get_test_data(imodel):
 
 
 exp1 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 0, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 0, 3, 0, 0, 0, 0],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
@@ -129,12 +148,16 @@ exp1 = {
         "null",
         "null",
         "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "null",
+        "null",
     ],
 }
 
 exp2 = {
-    "duplicate_status": [0, 1, 1, 3, 1, 3, 0, 3, 0, 3, 0, 3, 1, 3, 3, 0, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1],
+    "duplicate_status": [0, 1, 1, 3, 1, 3, 0, 3, 0, 3, 0, 3, 1, 3, 3, 0, 3, 0, 0, 0, 0],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
@@ -153,14 +176,18 @@ exp2 = {
         "{ICOADS-302-N688ED}",
         "null",
         "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "null",
+        "null",
     ],
 }
 
 exp3 = {
-    "duplicate_status": [1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3],
-    "report_quality": [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1],
+    "duplicate_status": [1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3, 3, 3, 3, 3],
+    "report_quality": [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1],
     "duplicates": [
-        "{ICOADS-302-N688DS,ICOADS-302-N688DV,ICOADS-302-N688EH,ICOADS-302-N688EI,ICOADS-302-N688EY,ICOADS-302-N688EZ,ICOADS-302-N688DT,ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EV,ICOADS-302-N688EW}",
+        "{ICOADS-302-N688DS,ICOADS-302-N688DV,ICOADS-302-N688EH,ICOADS-302-N688EI,ICOADS-302-N688EY,ICOADS-302-N688EZ,ICOADS-302-N688DT,ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EV,ICOADS-302-N688EW,ICOADS-302-N688EK,ICOADS-302-N688EL,ICOADS-302-N688EM,ICOADS-302-N688EN}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
@@ -175,14 +202,18 @@ exp3 = {
         "null",
         "{ICOADS-302-N688DR}",
         "null",
+        "{ICOADS-302-N688DR}",
+        "{ICOADS-302-N688DR}",
+        "{ICOADS-302-N688DR}",
+        "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
     ],
 }
 
 exp4 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 3, 3, 3, 0, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 3, 3, 3, 0, 3, 0, 0, 0, 0],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
@@ -201,12 +232,16 @@ exp4 = {
         "{ICOADS-302-N688EH}",
         "null",
         "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "null",
+        "null",
     ],
 }
 
 exp5 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3, 0, 0, 0, 0],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
@@ -225,12 +260,16 @@ exp5 = {
         "null",
         "{ICOADS-302-N688EI}",
         "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "null",
+        "null",
     ],
 }
 
 exp6 = {
-    "duplicate_status": [0, 0, 1, 1, 1, 3, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 2, 1],
+    "duplicate_status": [0, 0, 1, 1, 1, 3, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 3, 0, 0, 0, 0],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1],
     "duplicates": [
         "null",
         "null",
@@ -249,6 +288,66 @@ exp6 = {
         "null",
         "null",
         "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "null",
+        "null",
+    ],
+}
+
+exp7 = {
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 0, 3, 0, 0, 3, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1],
+    "duplicates": [
+        "null",
+        "{ICOADS-302-N688EM,ICOADS-302-N688EN,ICOADS-302-N688DT}",
+        "{ICOADS-302-N688DW}",
+        "{ICOADS-302-N688EE,ICOADS-302-N688EC}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EI}",
+        "null",
+        "{ICOADS-302-N688DS}",
+        "null",
+        "{ICOADS-302-N688DV}",
+        "null",
+        "{ICOADS-302-N688EH}",
+        "null",
+        "{ICOADS-302-N688EH}",
+        "null",
+        "null",
+        "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "{ICOADS-302-N688DS}",
+        "{ICOADS-302-N688DS}",
+    ],
+}
+
+exp8 = {
+    "duplicate_status": [0, 1, 1, 3, 1, 3, 0, 3, 0, 3, 0, 3, 1, 3, 3, 0, 3, 0, 0, 3, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1],
+    "duplicates": [
+        "null",
+        "{ICOADS-302-N688EM,ICOADS-302-N688EN,ICOADS-302-N688DT}",
+        "{ICOADS-302-N688DW}",
+        "{ICOADS-302-N688ED}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EI}",
+        "null",
+        "{ICOADS-302-N688DS}",
+        "null",
+        "{ICOADS-302-N688DV}",
+        "null",
+        "{ICOADS-302-N688ED}",
+        "{ICOADS-302-N688EH,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EG}",
+        "{ICOADS-302-N688ED}",
+        "{ICOADS-302-N688ED}",
+        "null",
+        "{ICOADS-302-N688EI}",
+        "null",
+        "null",
+        "{ICOADS-302-N688DS}",
+        "{ICOADS-302-N688DS}",
     ],
 }
 

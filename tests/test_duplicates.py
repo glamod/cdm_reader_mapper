@@ -16,6 +16,8 @@ from ._duplicates import (
     exp4,
     exp5,
     exp6,
+    exp7,
+    exp8,
     method_kwargs_,
 )
 
@@ -24,7 +26,37 @@ from ._duplicates import (
     "method, method_kwargs, compare_kwargs, ignore_columns, ignore_entries, offsets, expected",
     [
         (None, None, None, None, None, None, exp1),
-        (None, None, None, None, ["SHIP", "MASKSTID"], None, exp2),
+        (
+            None,
+            None,
+            None,
+            None,
+            {"primary_station_id": ["SHIP", "MASKSTID"]},
+            None,
+            exp2,
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            {"station_speed": "null", "station_course": "null"},
+            None,
+            exp7,
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            {
+                "primary_station_id": ["SHIP", "MASKSTID"],
+                "station_speed": "null",
+                "station_course": "null",
+            },
+            None,
+            exp8,
+        ),
         (None, method_kwargs_, None, None, None, None, exp1),
         (None, None, compare_kwargs_, None, None, None, exp3),
         (None, None, None, ["primary_station_id"], None, None, exp4),
@@ -68,9 +100,16 @@ def test_duplicates_flag(
 
 
 def test_duplicates_remove():
-    DupDetect = duplicate_check(df_icoads, ignore_entries=["SHIP", "MASKSTID"])
+    DupDetect = duplicate_check(
+        df_icoads,
+        ignore_entries={
+            "primary_station_id": ["SHIP", "MASKSTID"],
+            "station_speed": "null",
+            "station_course": "null",
+        },
+    )
     DupDetect.remove_duplicates()
-    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15]].reset_index(
+    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]].reset_index(
         drop=True
     )
     assert_frame_equal(expected, DupDetect.result)
