@@ -40,7 +40,7 @@ def convert_series(df, conversion):
         except TypeError:
             df[column] = locals()[method](df[column])
 
-    df = df.infer_objects(copy=False).fillna(9999.)
+    df = df.infer_objects(copy=False).fillna(9999.0)
     return df
 
 
@@ -409,9 +409,10 @@ def duplicate_check(
         Name of the CDM table to be selected from data.
     ignore_columns: str or list, optional
         Name of data columns to be ignored for duplicate check.
-    ignore_entries: str or list, optional
-        Name of column entries to be ignored for duplicate check.
-        Those values will be renamed and added to each block_on group in rl.index object.
+    ignore_entries: dict, optional
+        Key: Column name
+        Value: value to be ignored
+        E.g. offsets={"station_speed": null}
     offsets: dict, optional
         Change offsets for recordlinkage Compare object.
         Key: Column name
@@ -435,11 +436,6 @@ def duplicate_check(
     if offsets:
         compare_kwargs = change_offsets(compare_kwargs, offsets)
 
-    if isinstance(ignore_entries, str):
-        ignore_entries = [ignore_entries]
-    if ignore_entries is None:
-        ignore_entries = []
-
     Compared_ = Comparer(
         data=data,
         method=method,
@@ -450,17 +446,15 @@ def duplicate_check(
     compared = Compared_.compared
     data_ = Compared_.data
 
-    block_ons = method_kwargs.get("block_on")
-
-    if block_ons is None:
+    if ignore_entries is None:
         return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
 
     compared = [compared]
-    if not isinstance(block_ons, list):
-        block_ons = [block_ons]
 
-    for block_on in block_ons:
-        entries = data[block_on].isin(ignore_entries)
+    for column_, entry_ in ignore_entries.items():
+        if isinstance(entry_, str):
+            entry_ = [entry_]
+        entries = data[column_].isin(entry_)
 
         d1 = data.mask(entries).dropna()
         d2 = data.where(entries).dropna()
@@ -470,8 +464,8 @@ def duplicate_check(
         if d2.empty:
             continue
 
-        method_kwargs_ = remove_ignores(method_kwargs, block_on)
-        compare_kwargs_ = remove_ignores(compare_kwargs, block_on)
+        method_kwargs_ = remove_ignores(method_kwargs, column_)
+        compare_kwargs_ = remove_ignores(compare_kwargs, column_)
 
         compared_ = Comparer(
             data=data_,
@@ -480,7 +474,7 @@ def duplicate_check(
             compare_kwargs=compare_kwargs_,
             pairs_df=[d2, d1],
         ).compared
-        compared_[block_ons] = 1
+        compared_[list(ignore_entries.keys())] = 1
         compared.append(compared_)
 
     compared = pd.concat(compared)
