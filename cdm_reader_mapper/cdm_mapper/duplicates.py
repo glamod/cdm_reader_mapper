@@ -40,6 +40,7 @@ def convert_series(df, conversion):
         except TypeError:
             df[column] = locals()[method](df[column])
 
+    df = df.infer_objects(copy=False).fillna(9999.)
     return df
 
 
