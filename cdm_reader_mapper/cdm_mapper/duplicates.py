@@ -277,7 +277,7 @@ class DupDetect:
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         self.result = self.data.copy()
-        drops = [index[self.drop] for index in self.matches.index]
+        drops = self.matches.index.get_level_values(self.drop)
         self.result = self.result.drop(drops).reset_index(drop=True)
         return self.result
 
