@@ -235,10 +235,12 @@ class DupDetect:
         indexes_df[keep_] = indexes_df[keep_].replace(replaces)
 
         dup_keep = indexes_df.groupby(indexes_df[keep_]).apply(
-            lambda x: _get_duplicates(x, drop_)
+            lambda x: _get_duplicates(x, drop_),
+            include_groups=False,
         )
         dup_drop = indexes_df.groupby(indexes_df[drop_]).apply(
-            lambda x: _get_duplicates(x, keep_)
+            lambda x: _get_duplicates(x, keep_),
+            include_groups=False,
         )
         duplicates = pd.concat([dup_keep, dup_drop])
 
