@@ -15,15 +15,15 @@ _compare_kwargs = {
     "primary_station_id": {"method": "exact"},
     "longitude": {
         "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
+        "kwargs": {"method": "step", "offset": 0.11},
     },
     "latitude": {
         "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},  # C-RAID: 0.005 -> 0.0005
+        "kwargs": {"method": "step", "offset": 0.11},
     },
     "report_timestamp": {
         "method": "date2",
-        "kwargs": {"method": "gauss", "offset": 60.0},  # C-RAID: weniger
+        "kwargs": {"method": "gauss", "offset": 60.0},
     },
 }
 

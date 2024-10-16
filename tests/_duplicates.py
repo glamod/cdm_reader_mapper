@@ -77,6 +77,23 @@ def _manipulate_header(df):
     df.loc[14, "report_id"] = "ICOADS-302-N688EG"
     df.loc[14, "primary_station_id"] = "SHIP"
     df.loc[14, "report_quality"] = 2
+
+    # No Duplicate: Lat and Lon values differ to much
+    # valid is .5 degrees
+    df.loc[15] = df.loc[4]
+    df.loc[15, "report_id"] = "ICOADS-302-N688EV"
+    df.loc[15, "latitude"] = 65.60
+    df.loc[15, "longitude"] = -21.40
+    df.loc[15, "report_quality"] = 2
+
+    # Duplicate: Lat and Lon values differ not enough
+    # valid is .5 degrees
+    df.loc[16] = df.loc[4]
+    df.loc[16, "report_id"] = "ICOADS-302-N688EW"
+    df.loc[16, "latitude"] = 65.90
+    df.loc[16, "longitude"] = -21.10
+    df.loc[16, "report_quality"] = 2
+
     return df
 
 
@@ -92,14 +109,14 @@ def _get_test_data(imodel):
 
 
 exp1 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 0, 3, 0, 0, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
         "{ICOADS-302-N688DW}",
         "{ICOADS-302-N688EE,ICOADS-302-N688EC}",
-        "{ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
         "{ICOADS-302-N688EI}",
         "null",
         "{ICOADS-302-N688DS}",
@@ -110,18 +127,20 @@ exp1 = {
         "null",
         "{ICOADS-302-N688EH}",
         "null",
+        "null",
+        "{ICOADS-302-N688EI}",
     ],
 }
 
 exp2 = {
-    "duplicate_status": [0, 1, 1, 3, 1, 3, 0, 3, 0, 3, 0, 3, 1, 3, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1],
+    "duplicate_status": [0, 1, 1, 3, 1, 3, 0, 3, 0, 3, 0, 3, 1, 3, 3, 0, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
         "{ICOADS-302-N688DW}",
         "{ICOADS-302-N688ED}",
-        "{ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
         "{ICOADS-302-N688EI}",
         "null",
         "{ICOADS-302-N688DS}",
@@ -132,14 +151,16 @@ exp2 = {
         "{ICOADS-302-N688EH,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EG}",
         "{ICOADS-302-N688ED}",
         "{ICOADS-302-N688ED}",
+        "null",
+        "{ICOADS-302-N688EI}",
     ],
 }
 
 exp3 = {
-    "duplicate_status": [1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 3, 0],
-    "report_quality": [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2],
+    "duplicate_status": [1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3],
+    "report_quality": [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1],
     "duplicates": [
-        "{ICOADS-302-N688DS,ICOADS-302-N688DV,ICOADS-302-N688EH,ICOADS-302-N688EI,ICOADS-302-N688EY,ICOADS-302-N688EZ,ICOADS-302-N688DT,ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC}",
+        "{ICOADS-302-N688DS,ICOADS-302-N688DV,ICOADS-302-N688EH,ICOADS-302-N688EI,ICOADS-302-N688EY,ICOADS-302-N688EZ,ICOADS-302-N688DT,ICOADS-302-N688DW,ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC,ICOADS-302-N688EV,ICOADS-302-N688EW}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
         "{ICOADS-302-N688DR}",
@@ -154,18 +175,20 @@ exp3 = {
         "null",
         "{ICOADS-302-N688DR}",
         "null",
+        "{ICOADS-302-N688DR}",
+        "{ICOADS-302-N688DR}",
     ],
 }
 
 exp4 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 3, 3, 3],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 0, 3, 3, 3, 3, 0, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
         "{ICOADS-302-N688DW}",
         "{ICOADS-302-N688EE,ICOADS-302-N688ED,ICOADS-302-N688EC,ICOADS-302-N688EG}",
-        "{ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
         "{ICOADS-302-N688EI}",
         "null",
         "{ICOADS-302-N688DS}",
@@ -176,18 +199,20 @@ exp4 = {
         "{ICOADS-302-N688EH}",
         "{ICOADS-302-N688EH}",
         "{ICOADS-302-N688EH}",
+        "null",
+        "{ICOADS-302-N688EI}",
     ],
 }
 
 exp5 = {
-    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 3, 3, 0, 3, 0],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2],
+    "duplicate_status": [0, 1, 1, 1, 1, 3, 0, 3, 0, 3, 3, 3, 0, 3, 0, 3, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1],
     "duplicates": [
         "null",
         "{ICOADS-302-N688DT}",
         "{ICOADS-302-N688DW}",
         "{ICOADS-302-N688EF,ICOADS-302-N688EE,ICOADS-302-N688EC}",
-        "{ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY,ICOADS-302-N688EV}",
         "{ICOADS-302-N688EI}",
         "null",
         "{ICOADS-302-N688DS}",
@@ -198,18 +223,20 @@ exp5 = {
         "null",
         "{ICOADS-302-N688EH}",
         "null",
+        "{ICOADS-302-N688EI}",
+        "{ICOADS-302-N688EI}",
     ],
 }
 
 exp6 = {
-    "duplicate_status": [0, 0, 1, 1, 1, 3, 0, 0, 0, 3, 0, 3, 0, 3, 0],
-    "report_quality": [1, 1, 0, 1, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2],
+    "duplicate_status": [0, 0, 1, 1, 1, 3, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 3],
+    "report_quality": [1, 1, 0, 1, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 2, 2, 1],
     "duplicates": [
         "null",
         "null",
         "{ICOADS-302-N688DW}",
         "{ICOADS-302-N688EE,ICOADS-302-N688EC}",
-        "{ICOADS-302-N688EY}",
+        "{ICOADS-302-N688EW,ICOADS-302-N688EY}",
         "{ICOADS-302-N688EI}",
         "null",
         "null",
@@ -220,6 +247,8 @@ exp6 = {
         "null",
         "{ICOADS-302-N688EH}",
         "null",
+        "null",
+        "{ICOADS-302-N688EI}",
     ],
 }
 

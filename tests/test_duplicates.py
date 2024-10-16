@@ -70,7 +70,9 @@ def test_duplicates_flag(
 def test_duplicates_remove():
     DupDetect = duplicate_check(df_icoads, ignore_entries=["SHIP", "MASKSTID"])
     DupDetect.remove_duplicates()
-    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12]].reset_index(drop=True)
+    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15]].reset_index(
+        drop=True
+    )
     assert_frame_equal(expected, DupDetect.result)
 
 
