@@ -71,12 +71,11 @@ def add_duplicates(df, dups):
         if idx not in dups.index:
             return row
 
-        dup_idx = dups.loc[idx].to_list()[0]
-        v_ = report_ids.iloc[dup_idx]
+        dup_idx = dups.loc[idx].values.flatten()
+        v_ = report_ids.iloc[dup_idx[0]]
         v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
-
     report_ids = df["report_id"]
     return df.apply(lambda x: _add_dups(x), axis=1)
 
@@ -181,7 +180,6 @@ class DupDetect:
             for must in equal_musts:
                 cond = cond & (self.compared[must])
             self.matches = self.compared[cond]
-        print(self.compared)
         return self.matches
 
     def flag_duplicates(
