@@ -181,7 +181,7 @@ class DupDetect:
             for must in equal_musts:
                 cond = cond & (self.compared[must])
             self.matches = self.compared[cond]
-
+        print(self.compared)
         return self.matches
 
     def flag_duplicates(
@@ -440,7 +440,7 @@ def duplicate_check(
     def _count_nulls(row):
         return (row == "null").sum()
 
-    data = data.copy()
+    data = data.reset_index(drop=True)
 
     if reindex_by_null is True:
         nulls = data.apply(lambda x: _count_nulls(x), axis=1)
