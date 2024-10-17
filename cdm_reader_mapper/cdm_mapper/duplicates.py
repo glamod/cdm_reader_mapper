@@ -76,6 +76,7 @@ def add_duplicates(df, dups):
         v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
+
     report_ids = df["report_id"]
     return df.apply(lambda x: _add_dups(x), axis=1)
 
