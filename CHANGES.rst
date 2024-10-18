@@ -7,6 +7,10 @@ Changelog
 -------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
+Announcements
+^^^^^^^^^^^^^
+* Now under Apache v2.0 license (:pull:`69`)
+
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``common.getting_files.load_file``: optionally, load data within data reference syntax (:pull:`41`)
