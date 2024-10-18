@@ -24,7 +24,7 @@ class test_data:
         """IMMA1 deck 701 test data."""
         return self._get_data_dict(
             "1845-04-01_subset.imma",
-            "icoads_r300_d701_type1",
+            "icoads_r300_d701",
         )
 
     @property
