@@ -28,7 +28,7 @@ jobs:
         uses: fossa-contrib/fossa-action@vcdc5065bcdee31a32e47d4585df72d66e8e941c2
         with:
           fossa-api-key: abcdefghijklmnopqrstuvwxyz
-  
+
   test:
     name: py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
