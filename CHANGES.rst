@@ -23,6 +23,10 @@ New features and enhancements
 * ``mdf_reader.read``: optionally, set both external schema and code table paths and external schema file (:issue:`47`, :pull:`111`)
 * ``cdm_mapper``: Change both columns history and report_quality during duplicate_check (:pull:`112`)
 * ``cdm_mapper``: optionally, set column names to be ignored while duplicate check (:pull:`115`)
+* ``cdm_mapper``: optionally, set offset values for duplicate_check (:pull:`119`)
+* ``cdm_mapper``: optionally, set column entries to be ignored while duplicate_check (:pull:`119`)
+* ``cdm_mapper``: add both column names ``station_speed`` and ``station_course`` to default duplicate check list (:pull:`119`)
+* ``cdm_mapper``: optionally, re-index data in ascending order according to the number of nulls in each row (:pull:`119`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -74,6 +78,9 @@ Internal changes
 * ``metmetpy``: use function ``overwrite_data`` in all platform type correction functions (:pull:`89`)
 * rename ``data_model`` into ``imodel`` (:pull:`103`)
 * implement assertion tests for module operations (:pull:`104`)
+* ``cdm_mapper``: put settings for duplicate check in _duplicate_settings (:pull:`119`)
+* ``cdm_mapper``: use pandas.apply function instead of for loops in duplicate_check (:pull:`119`)
+* adding some more duplicate checks to testing suite (:pull:`119`)
 
 Bug fixes
 ^^^^^^^^^
