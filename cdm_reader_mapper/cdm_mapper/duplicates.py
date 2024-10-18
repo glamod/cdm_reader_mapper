@@ -71,7 +71,7 @@ def add_duplicates(df, dups):
         if idx not in dups.index:
             return row
 
-        dup_idx = dups.loc[idx].values.flatten()
+        dup_idx = dups.loc[idx].to_list()
         v_ = report_ids.iloc[dup_idx[0]]
         v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
@@ -221,6 +221,17 @@ class DupDetect:
             b = list(set(x[last].values))
             return pd.Series({"dups": b})
 
+        def replace_keeps_and_drops(df, keep_):
+            while True:
+                keeps = df[keep_].values
+                replaces = df.apply(lambda x: _get_similars(x, keeps), axis=1)
+                replaces = dict(replaces.dropna().values)
+                keys = replaces.keys()
+                values = replaces.values()
+                df[keep_] = df[keep_].replace(replaces)
+                if not set(keys).intersection(values):
+                    return df
+
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         result = self.data.copy()
         result["duplicate_status"] = 0
@@ -233,10 +244,7 @@ class DupDetect:
         keep_ = indexes_df.columns[self.keep]
         indexes_df = indexes_df.drop_duplicates(subset=[drop_])
 
-        keeps = indexes_df[keep_].values
-        replaces = indexes_df.apply(lambda x: _get_similars(x, keeps), axis=1)
-        replaces = dict(replaces.dropna().values)
-        indexes_df[keep_] = indexes_df[keep_].replace(replaces)
+        indexes_df = replace_keeps_and_drops(indexes_df, keep_)
 
         dup_keep = indexes_df.groupby(indexes_df[keep_]).apply(
             lambda x: _get_duplicates(x, drop_),
@@ -254,7 +262,6 @@ class DupDetect:
         result.loc[indexes_good, "duplicate_status"] = 1
         result.loc[indexes_bad, "duplicate_status"] = 3
         result = add_report_quality(result, indexes_bad=indexes_bad)
-
         result = add_history(result, indexes)
         result = result.sort_index(ascending=True)
         self.result = add_duplicates(result, duplicates)
