@@ -76,8 +76,9 @@ def _decimal_places(
 
 
 def _transform(
+    series,
     to_map,
-    elements,
+    notna_idx,
     imodel_functions,
     transform,
     kwargs,
@@ -87,8 +88,9 @@ def _transform(
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
 
     trans = getattr(imodel_functions, transform)
-    if elements:
-        return trans(to_map, **kwargs)
+    if notna_idx is None:
+        series.loc[notna_idx] = trans(to_map, **kwargs)
+        return series
     return trans(**kwargs)
 
 
@@ -152,6 +154,7 @@ def _write_csv_files(
                 code_table = None
 
         to_map = None
+        notna_idx = None
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
@@ -175,18 +178,15 @@ def _write_csv_files(
                 isEmpty = True
 
         if transform and not isEmpty:
-            transformed = _transform(
+            table_df_i[cdm_key] = _transform(
+                table_df_i[cdm_key],
                 to_map,
-                elements,
+                notna_idx,
                 imodel_functions,
                 transform,
                 kwargs,
                 logger=logger,
             )
-            if elements:
-                table_df_i.loc[notna_idx, cdm_key] = transformed
-            else:
-                table_df_i[cdm_key] = transformed
         elif code_table and not isEmpty:
             table_df_i[cdm_key] = _code_table(
                 to_map,
