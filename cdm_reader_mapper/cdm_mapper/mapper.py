@@ -167,10 +167,7 @@ def _write_csv_files(
             notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
             to_map = idata[elements].iloc[notna_idx_idx]
-            # notna_idx = (
-            #    notna_idx_idx + idata.index[0]
-            # )  # to account for parsers #original
-            # notna_idx = idata.index[notna_idx_idx]  # fix?
+            notna_idx = idata.index[notna_idx_idx]  # fix?
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -178,7 +175,7 @@ def _write_csv_files(
                 isEmpty = True
 
         if transform and not isEmpty:
-            table_df_i[cdm_key] = _transform(
+            transformed = _transform(
                 to_map,
                 elements,
                 imodel_functions,
@@ -186,6 +183,10 @@ def _write_csv_files(
                 kwargs,
                 logger=logger,
             )
+            if elements:
+                table_df_i.loc[notna_idx, cdm_key] = transformed
+            else:
+                table_df_i[cdm_key] = transformed
         elif code_table and not isEmpty:
             table_df_i[cdm_key] = _code_table(
                 to_map,
