@@ -88,7 +88,7 @@ def _transform(
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
 
     trans = getattr(imodel_functions, transform)
-    if notna_idx is None:
+    if notna_idx is not None:
         series.loc[notna_idx] = trans(to_map, **kwargs)
         return series
     return trans(**kwargs)
