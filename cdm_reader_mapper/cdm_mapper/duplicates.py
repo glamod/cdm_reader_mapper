@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import datetime
+from copy import deepcopy
 
 import numpy as np
+import pandas as pd
 import recordlinkage as rl
-from recordlinkage.compare import Numeric
+
+from ._duplicate_settings import Compare, _compare_kwargs, _histories, _method_kwargs
 
 
 def convert_series(df, conversion):
@@ -37,50 +40,8 @@ def convert_series(df, conversion):
         except TypeError:
             df[column] = locals()[method](df[column])
 
+    df = df.infer_objects(copy=False).fillna(9999.0)
     return df
-
-
-class Date2(Numeric):
-    """Copy of ``rl.compare.Numeric`` class."""
-
-    pass
-
-
-def date2(self, *args, **kwargs):
-    """New method for ``rl.Compare`` object using ``Date2`` object."""
-    compare = Date2(*args, **kwargs)
-    self.add(compare)
-    return self
-
-
-rl.Compare.date2 = date2
-
-_method_kwargs = {
-    "left_on": "report_timestamp",
-    "window": 5,
-    "block_on": ["primary_station_id"],
-}
-
-_compare_kwargs = {
-    "primary_station_id": {"method": "exact"},
-    "longitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},
-    },
-    "latitude": {
-        "method": "numeric",
-        "kwargs": {"method": "gauss", "offset": 0.05},
-    },
-    "report_timestamp": {
-        "method": "date2",
-        "kwargs": {"method": "gauss", "offset": 60.0},
-    },
-}
-
-_histories = {
-    "duplicate_status": "Added duplicate information - flag",
-    "duplicates": "Added duplicate information - duplicates",
-}
 
 
 def add_history(df, indexes):
@@ -98,25 +59,26 @@ def add_history(df, indexes):
     indexes = list(indexes)
     history_tstmp = _datetime_now()
     addition = "".join([f"; {history_tstmp}. {add}" for add in _histories.items()])
-    df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(
-        lambda x: x + addition
-    )
+    df.loc[indexes, "history"] = df.loc[indexes, "history"] + addition
     return df
 
 
 def add_duplicates(df, dups):
     """Add duplicates to table."""
 
-    def _add_dups(x):
-        _dups = dups.get(x.name)
-        if _dups is None:
-            return x["duplicates"]
-        _dups = ",".join(_dups)
-        return "{" + _dups + "}"
+    def _add_dups(row):
+        idx = row.name
+        if idx not in dups.index:
+            return row
 
-    df["duplicates"] = df.apply(lambda x: _add_dups(x), axis=1)
+        dup_idx = dups.loc[idx].to_list()
+        v_ = report_ids.iloc[dup_idx[0]]
+        v_ = sorted(v_.tolist())
+        row["duplicates"] = "{" + ",".join(v_) + "}"
+        return row
 
-    return df
+    report_ids = df["report_id"]
+    return df.apply(lambda x: _add_dups(x), axis=1)
 
 
 def add_report_quality(df, indexes_bad):
@@ -144,15 +106,18 @@ class DupDetect:
     """
 
     def __init__(self, data, compared, method, method_kwargs, compare_kwargs):
-        self.data = data
+        self.data = data.copy()
         self.compared = compared
         self.method = method
         self.method_kwargs = method_kwargs
         self.compare_kwargs = compare_kwargs
 
     def _get_limit(self, limit):
+        _limit = 0.991
         if limit == "default":
-            limit = 0.991
+            return _limit
+        if limit is None:
+            return _limit
         return limit
 
     def _get_equal_musts(self):
@@ -171,7 +136,11 @@ class DupDetect:
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
 
     def get_duplicates(
-        self, keep="first", limit="default", equal_musts=None, overwrite=True
+        self,
+        keep="first",
+        limit="default",
+        equal_musts=None,
+        overwrite=True,
     ):
         """Get duplicate matches.
 
@@ -243,44 +212,61 @@ class DupDetect:
         .. _duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
+
+        def _get_similars(drop, keeps):
+            if drop[drop_] in keeps:
+                return (int(drop[drop_]), int(drop[keep_]))
+
+        def _get_duplicates(x, last):
+            b = list(set(x[last].values))
+            return pd.Series({"dups": b})
+
+        def replace_keeps_and_drops(df, keep_):
+            while True:
+                keeps = df[keep_].values
+                replaces = df.apply(lambda x: _get_similars(x, keeps), axis=1)
+                replaces = dict(replaces.dropna().values)
+                keys = replaces.keys()
+                values = replaces.values()
+                df[keep_] = df[keep_].replace(replaces)
+                if not set(keys).intersection(values):
+                    return df
+
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
-        self.result = self.data.copy()
-        self.result["duplicate_status"] = 0
+        result = self.data.copy()
+        result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=equal_musts)
 
-        indexes = []
-        indexes_good = []
-        indexes_bad = []
-        duplicates = {}
+        indexes = self.matches.index
+        indexes_df = indexes.to_frame()
+        drop_ = indexes_df.columns[self.drop]
+        keep_ = indexes_df.columns[self.keep]
+        indexes_df = indexes_df.drop_duplicates(subset=[drop_])
 
-        for index in self.matches.index:
-            if index[self.drop] in indexes_bad:
-                continue
+        indexes_df = replace_keeps_and_drops(indexes_df, keep_)
 
-            indexes += index
-            indexes_good.append(index[self.keep])
-            indexes_bad.append(index[self.drop])
+        dup_keep = indexes_df.groupby(indexes_df[keep_]).apply(
+            lambda x: _get_duplicates(x, drop_),
+            include_groups=False,
+        )
+        dup_drop = indexes_df.groupby(indexes_df[drop_]).apply(
+            lambda x: _get_duplicates(x, keep_),
+            include_groups=False,
+        )
+        duplicates = pd.concat([dup_keep, dup_drop])
 
-            report_id_drop = self.result.loc[index[self.drop], "report_id"]
-            report_id_keep = self.result.loc[index[self.keep], "report_id"]
+        indexes_good = indexes_df[keep_].values.tolist()
+        indexes_bad = indexes_df[drop_].values.tolist()
+        indexes = indexes_good + indexes_bad
+        result.loc[indexes_good, "duplicate_status"] = 1
+        result.loc[indexes_bad, "duplicate_status"] = 3
+        result = add_report_quality(result, indexes_bad=indexes_bad)
+        result = add_history(result, indexes)
+        result = result.sort_index(ascending=True)
+        self.result = add_duplicates(result, duplicates)
+        self.data = self.data.sort_index(ascending=True)
 
-            if index[self.drop] not in duplicates.keys():
-                duplicates[index[self.drop]] = [report_id_keep]
-            else:
-                duplicates[index[self.drop]].append(report_id_keep)
-
-            if index[self.keep] not in duplicates.keys():
-                duplicates[index[self.keep]] = [report_id_drop]
-            else:
-                duplicates[index[self.keep]].append(report_id_drop)
-
-        self.result.loc[indexes_good, "duplicate_status"] = 1
-        self.result.loc[indexes_bad, "duplicate_status"] = 3
-
-        self.result = add_report_quality(self.result, indexes_bad=indexes_bad)
-        self.result = add_duplicates(self.result, duplicates)
-        self.result = add_history(self.result, indexes)
         return self.result
 
     def remove_duplicates(
@@ -307,9 +293,11 @@ class DupDetect:
             Input DataFrame without duplicates.
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
-        self.result = self.data.copy()
-        drops = [index[self.drop] for index in self.matches.index]
-        self.result = self.result.drop(drops).reset_index(drop=True)
+        result = self.data.copy()
+        drops = self.matches.index.get_level_values(self.drop)
+        result = result.drop(drops)
+        self.result = result.sort_index(ascending=True)
+        self.data = self.data.sort_index(ascending=True)
         return self.result
 
 
@@ -326,7 +314,7 @@ def set_comparer(compare_dict):
     recordlinkage.Compare object:
         recordlinkage.Compare object with added methods.
     """
-    comparer = rl.Compare()
+    comparer = Compare()
     setattr(comparer, "conversion", {})
     for column, c_dict in compare_dict.items():
         try:
@@ -351,6 +339,7 @@ def set_comparer(compare_dict):
             comparer.conversion[column] = "datetime64[ns]"
         if method == "date2":
             comparer.conversion[column] = "convert_date_to_float"
+
     return comparer
 
 
@@ -373,6 +362,40 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
+def change_offsets(dic, dic_o):
+    """Change offsets in compare dictionary."""
+    for key in dic.keys():
+        if key not in dic_o.keys():
+            continue
+        dic[key]["kwargs"]["offset"] = dic_o[key]
+    return dic
+
+
+class Comparer:
+    """Class to compare DataFrame with recordlinkage Comparer."""
+
+    def __init__(
+        self,
+        data,
+        method,
+        method_kwargs,
+        compare_kwargs,
+        pairs_df=None,
+        convert_data=False,
+    ):
+        indexer = getattr(rl.index, method)(**method_kwargs)
+        comparer = set_comparer(compare_kwargs)
+        if convert_data is True:
+            data_ = convert_series(data, comparer.conversion)
+        else:
+            data_ = data.copy()
+        if pairs_df is None:
+            pairs_df = [data_]
+        pairs = indexer.index(*pairs_df)
+        self.compared = comparer.compute(pairs, data_)
+        self.data = data_
+
+
 def duplicate_check(
     data,
     method="SortedNeighbourhood",
@@ -380,6 +403,9 @@ def duplicate_check(
     compare_kwargs=None,
     table_name=None,
     ignore_columns=None,
+    ignore_entries=None,
+    offsets=None,
+    reindex_by_null=True,
 ):
     """Duplicate check.
 
@@ -399,25 +425,86 @@ def duplicate_check(
     table_name: str, optional
         Name of the CDM table to be selected from data.
     ignore_columns: str or list, optional
-        Name of data columns to ignore for duplicate check.
+        Name of data columns to be ignored for duplicate check.
+    ignore_entries: dict, optional
+        Key: Column name
+        Value: value to be ignored
+        E.g. offsets={"station_speed": null}
+    offsets: dict, optional
+        Change offsets for recordlinkage Compare object.
+        Key: Column name
+        Value: new offset
+        E.g. offsets={"latitude": 0.1}
+    reindex_by_null: bool, optional
+        If True data is re-indexed in ascending order according to the number of nulls in each row.
 
     Returns
     -------
         DupDetect object
     """
+
+    def _count_nulls(row):
+        return (row == "null").sum()
+
+    data = data.reset_index(drop=True)
+
+    if reindex_by_null is True:
+        nulls = data.apply(lambda x: _count_nulls(x), axis=1)
+        indexes_ = list(zip(*sorted(zip(nulls.values, nulls.index))))
+        data = data.reindex(indexes_[1])
+
     if table_name:
         data = data[table_name]
     if not method_kwargs:
-        method_kwargs = _method_kwargs
+        method_kwargs = deepcopy(_method_kwargs)
     if not compare_kwargs:
-        compare_kwargs = _compare_kwargs
+        compare_kwargs = deepcopy(_compare_kwargs)
     if ignore_columns:
         method_kwargs = remove_ignores(method_kwargs, ignore_columns)
         compare_kwargs = remove_ignores(compare_kwargs, ignore_columns)
+    if offsets:
+        compare_kwargs = change_offsets(compare_kwargs, offsets)
 
-    indexer = getattr(rl.index, method)(**method_kwargs)
-    pairs = indexer.index(data)
-    comparer = set_comparer(compare_kwargs)
-    data_ = convert_series(data, comparer.conversion)
-    compared = comparer.compute(pairs, data_)
+    Compared_ = Comparer(
+        data=data,
+        method=method,
+        method_kwargs=method_kwargs,
+        compare_kwargs=compare_kwargs,
+        convert_data=True,
+    )
+    compared = Compared_.compared
+    data_ = Compared_.data
+
+    if ignore_entries is None:
+        return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
+
+    compared = [compared]
+
+    for column_, entry_ in ignore_entries.items():
+        if isinstance(entry_, str):
+            entry_ = [entry_]
+        entries = data[column_].isin(entry_)
+
+        d1 = data.mask(entries).dropna()
+        d2 = data.where(entries).dropna()
+
+        if d1.empty:
+            continue
+        if d2.empty:
+            continue
+
+        method_kwargs_ = remove_ignores(method_kwargs, column_)
+        compare_kwargs_ = remove_ignores(compare_kwargs, column_)
+
+        compared_ = Comparer(
+            data=data_,
+            method=method,
+            method_kwargs=method_kwargs_,
+            compare_kwargs=compare_kwargs_,
+            pairs_df=[d2, d1],
+        ).compared
+        compared_[list(ignore_entries.keys())] = 1
+        compared.append(compared_)
+
+    compared = pd.concat(compared)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
