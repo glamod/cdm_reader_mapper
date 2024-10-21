@@ -81,6 +81,7 @@ Internal changes
 * ``cdm_mapper``: put settings for duplicate check in _duplicate_settings (:pull:`119`)
 * ``cdm_mapper``: use pandas.apply function instead of for loops in duplicate_check (:pull:`119`)
 * adding some more duplicate checks to testing suite (:pull:`119`)
+* ``cdm_mapper``: re-adding conserderation of indexes of nan values during transformation (:pull:`125`)
 
 Bug fixes
 ^^^^^^^^^
