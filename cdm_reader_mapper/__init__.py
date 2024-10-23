@@ -11,4 +11,4 @@ from .data import test_data  # noqa
 
 __author__ = """Ludwig Lierhammer"""
 __email__ = "ludwiglierhammer@dwd.de"
-__version__ = "0.4.2"
+__version__ = "0.4.3"
