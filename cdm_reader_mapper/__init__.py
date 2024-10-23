@@ -10,16 +10,6 @@ from . import operations  # noqa
 from .data import test_data  # noqa
 
 
-def _get_version():
-    """Test."""
-    try:
-        from ._version import __version__
-
-        return __version__
-    except ImportError:
-        return "unknown"
-
-
 __author__ = """Ludwig Lierhammer"""
 __email__ = "ludwiglierhammer@dwd.de"
-__version__ = _get_version()
+__version__ = "0.4.2"
