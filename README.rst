@@ -229,7 +229,7 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13982457.svg
         :target: https://doi.org/10.5281/zenodo.13982457
- 	      :alt: DOI
+ 	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
