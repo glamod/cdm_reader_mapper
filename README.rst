@@ -207,9 +207,9 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 	      :target: https://bestpractices.coreinfrastructure.org/projects/9135
 	      :alt: OpenSSf Best Practices
 
-.. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
-        :target: https://www.repostatus.org/#wip
-        :alt: Project Status: WIP: Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+        :target: https://www.repostatus.org/#active
+        :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
 .. |release| image:: https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/releases
