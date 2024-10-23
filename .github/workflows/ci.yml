@@ -18,7 +18,7 @@ permissions:
 jobs:
   build:
     name: License Scanning
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout tree
