@@ -1,11 +1,6 @@
 [build-system]
-requires = [
-  "setuptools>=42",
-  "wheel",
-  "setuptools_scm[toml]>=3.4",
-  "setuptools_scm_git_archive"
-]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.9,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "cdm_reader_mapper"
@@ -65,6 +60,32 @@ target-version = [
   "py312"
 ]
 
+[tool.bumpversion]
+commit = true
+commit_args = "--no-verify"
+tag = false
+allow_dirty = false
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(\\-(?P<release>[a-z]+)(\\.(?P<build>\\d+)))?"
+serialize = [
+  "{major}.{minor}.{patch}-{release}.{build}",
+  "{major}.{minor}.{patch}"
+]
+
+[[tool.bumpversion.files]]
+filename = "cdm_reader_mapper/__init__.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
+
+[tool.bumpversion.parts.build]
+independent = false
+
+[tool.bumpversion.parts.release]
+optional_value = "release"
+values = [
+  "dev",
+  "release"
+]
+
 [tool.codespell]
 ignore-words-list = "sentinal, vaid, SME, ASII, TRU"
 skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*.csv"
@@ -119,12 +140,12 @@ exclude = [
 
 [tool.isort]
 profile = "black"
-py_version = 39
+py_version = 310
 append_only = true
 add_imports = "from __future__ import annotations"
 
 [tool.mypy]
-python_version = 3.9
+python_version = 3.10
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
@@ -216,15 +237,6 @@ max-doc-length = 180
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
-
-[tool.setuptools]
-packages = ["cdm_reader_mapper"]
-
-[tool.setuptools_scm]
-fallback_version = "999"
-write_to = "cdm_reader_mapper/_version.py"
-write_to_template = '__version__ = "{version}"'
-tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 
 [tool.vulture]
 exclude = []
