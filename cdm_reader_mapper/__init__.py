@@ -9,7 +9,6 @@ from . import metmetpy  # noqa
 from . import operations  # noqa
 from .data import test_data  # noqa
 
-
 __author__ = """Ludwig Lierhammer"""
 __email__ = "ludwiglierhammer@dwd.de"
 __version__ = "0.4.2"
