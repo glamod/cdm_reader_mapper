@@ -227,8 +227,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://img.shields.io/badge/zenodo-package_or_version_not_found-red
-        :target: https://zenodo.org/cdm_reader_mapper
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13982457.svg
+        :target: https://doi.org/10.5281/zenodo.13982457
  	      :alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
