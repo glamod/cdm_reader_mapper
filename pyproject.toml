@@ -1,11 +1,6 @@
 [build-system]
-requires = [
-  "setuptools>=42",
-  "wheel",
-  "setuptools_scm[toml]>=3.4",
-  "setuptools_scm_git_archive"
-]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.9,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "cdm_reader_mapper"
@@ -243,15 +238,6 @@ max-doc-length = 180
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
-
-[tool.setuptools]
-packages = ["cdm_reader_mapper"]
-
-[tool.setuptools_scm]
-fallback_version = "999"
-write_to = "cdm_reader_mapper/_version.py"
-write_to_template = '__version__ = "{version}"'
-tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 
 [tool.vulture]
 exclude = []
