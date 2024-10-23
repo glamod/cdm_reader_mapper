@@ -27,7 +27,7 @@ jobs:
       - name: Run FOSSA scan and upload build data
         uses: fossa-contrib/fossa-action@cdc5065bcdee31a32e47d4585df72d66e8e941c2
         with:
-          fossa-api-key: abcdefghijklmnopqrstuvwxyz
+          fossa-api-key: 19af6f8474ef534bf68ecc9f70d10a78
 
   test:
     name: py${{ matrix.python-version }}
