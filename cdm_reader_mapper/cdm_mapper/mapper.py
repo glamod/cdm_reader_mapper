@@ -3,9 +3,8 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
-the C3S Climate Data Store Common Data Model (CDM) header and observational
-tables using the mapping information available in the tool's mapping library
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
+header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 
 @author: iregon
@@ -13,12 +12,10 @@ for the input data model.
 
 from __future__ import annotations
 
-from io import StringIO
-
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
 from .codes.codes import get_code_table
@@ -61,18 +58,14 @@ def _map_to_df(m, x):
 
 
 def _decimal_places(
-    entry,
     decimal_places,
     imodel_functions,
 ):
     if decimal_places is not None:
-
         if isinstance(decimal_places, int):
-            entry["decimal_places"] = decimal_places
+            return decimal_places
         else:
-            entry["decimal_places"] = getattr(imodel_functions, decimal_places)()
-
-    return entry
+            return getattr(imodel_functions, decimal_places)()
 
 
 def _transform(
@@ -124,11 +117,10 @@ def _default(
     return default
 
 
-def _write_csv_files(
+def _to_map(
     idata,
     mapping,
     logger,
-    table,
     cols,
     imodel_functions,
     codes_subset,
@@ -137,7 +129,7 @@ def _write_csv_files(
     table_df_i = pd.DataFrame(
         index=idata.index, columns=mapping.keys()
     )  # We cannot predifine column based dtypes here!
-    logger.debug(f"Table: {table}")
+    decimals = {}
     for cdm_key, imapping in mapping.items():
         logger.debug(f"\tElement: {cdm_key}")
         isEmpty = False
@@ -171,6 +163,7 @@ def _write_csv_files(
             logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
             to_map = idata[elements].iloc[notna_idx_idx]
             notna_idx = idata.index[notna_idx_idx]  # fix?
+
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -205,8 +198,7 @@ def _write_csv_files(
         if fill_value is not None:
             table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
 
-        cdm_tables[table]["atts"][cdm_key] = _decimal_places(
-            cdm_tables[table]["atts"][cdm_key],
+        decimals[cdm_key] = _decimal_places(
             decimal_places,
             imodel_functions,
         )
@@ -215,8 +207,7 @@ def _write_csv_files(
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
     table_df_i = drop_duplicates(table_df_i)
-    table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
-    return cdm_tables
+    return table_df_i, decimals
 
 
 def _map(
@@ -231,15 +222,9 @@ def _map(
         cdm_subset = properties.cdm_tables
 
     cdm_atts = get_cdm_atts(cdm_subset)
-
     imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
 
     imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
-
-    # Initialize dictionary to store temporal tables (buffer) and table attributes
-    cdm_tables = {
-        k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
-    }
 
     date_columns = {}
     for table, values in imodel_maps.items():
@@ -249,33 +234,27 @@ def _map(
             if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
         ]
 
-    for idata in data:
-        cols = [x for x in idata]
-        for table, mapping in imodel_maps.items():
-            cdm_tables = _write_csv_files(
-                idata,
-                mapping,
-                logger,
-                table,
-                cols,
-                imodel_functions,
-                codes_subset,
-                cdm_tables,
-            )
+    cols = [x for x in data]
+    cdm_tables = {}
+    for table, mapping in imodel_maps.items():
+        logger.debug(f"Table: {table}")
+        cdm_tables[table] = {}
+        data_, decimals_ = _to_map(
+            data,
+            mapping,
+            logger,
+            cols,
+            imodel_functions,
+            codes_subset,
+            cdm_subset,
+        )
 
-    for table in cdm_tables.keys():
-        # Convert dtime to object to be parsed by the reader
-        logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
-        )
-        cdm_tables[table]["buffer"].seek(0)
-        cdm_tables[table]["data"] = pd.read_csv(
-            cdm_tables[table]["buffer"],
-            names=imodel_maps[table].keys(),
-            parse_dates=date_columns[table],
-        )
-        cdm_tables[table]["buffer"].close()
-        cdm_tables[table].pop("buffer")
+        for k, v in decimals_.items():
+            if v is not None:
+                cdm_atts[table][k]["decimal_places"] = v
+
+        cdm_tables[table]["data"] = data_
+        cdm_tables[table]["atts"] = cdm_atts[table]
 
     return cdm_tables
 
@@ -316,22 +295,13 @@ def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"
     # Check input data type and content (empty?)
     # Make sure data is an iterable: this is to homogenize how we handle
     # dataframes and textreaders
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if len(data) == 0:
-            logger.error("Input data is empty")
-            return
-        else:
-            data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-
-    else:
+    if not isinstance(data, pd.DataFrame):
         logger.error("Input data type " f"{type(data)}" " not supported")
+        return
+
+    logger.info("Input data is a pd.DataFrame")
+    if len(data) == 0:
+        logger.error("Input data is empty")
         return
 
     # Map thing:

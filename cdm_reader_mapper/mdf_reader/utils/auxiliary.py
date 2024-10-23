@@ -3,18 +3,14 @@
 from __future__ import annotations
 
 import ast
-import csv
 import json
 import logging
 import os
 from copy import deepcopy
-from io import StringIO
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
 from .. import properties
 from ..schemas import schemas
@@ -93,9 +89,8 @@ class Configurator:
         self.valid = valid
         self.schema = schema
         self.str_line = ""
-        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
-            if len(df) > 0:
-                self.str_line = df.iloc[0]
+        if len(df) > 0 and hasattr(df, "iloc"):
+            self.str_line = df.iloc[0]
 
     def _add_field_length(self, index):
         if "field_length" in self.sections_dict.keys():
@@ -522,90 +517,23 @@ class _FileReader:
         self,
         order,
         valid,
-        chunksize,
         open_with="pandas",
     ):
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         elif open_with == "pandas":
             TextParser = self._read_pandas(
-                encoding=self.schema["header"].get("encoding"),
+                encoding=self.schema["header"].get("encoding", "utf-8"),
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
-                chunksize=chunksize,
             )
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
-            )
-            return df, df.isna()
-        else:
-            data_buffer = StringIO()
-            missings_buffer = StringIO()
-            isna_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(
-                    df_, order, valid, open_with=open_with
-                )
-                df_isna = df.isna()
-                missing_values.to_csv(
-                    missings_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-                df_isna.to_csv(
-                    isna_buffer,
-                    header=False,
-                    mode="a",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            missings_buffer.seek(0)
-            self.missing_values = pd.read_csv(
-                missings_buffer,
-                names=missing_values.columns,
-                chunksize=None,
-            )
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            isna_buffer.seek(0)
-            isna = pd.read_csv(
-                isna_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data, isna
+        df, self.missing_values = self._read_sections(
+            TextParser, order, valid, open_with=open_with
+        )
+        return df, df.isna()
 
     def _convert_and_decode_df(
         self,
@@ -656,38 +584,28 @@ class _FileReader:
 
     def _dump_atts(self, out_atts, out_path):
         """Dump attributes to atts.json."""
-        if not isinstance(self.data, pd.io.parsers.TextFileReader):
-            data = [self.data]
-            valid = [self.mask]
-        else:
-            data = pandas_TextParser_hdlr.make_copy(self.data)
-            valid = pandas_TextParser_hdlr.make_copy(self.mask)
+        data_df = self.data.copy()
+        valid_df = self.mask.copy()
         logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-            header = False
-            mode = "a"
-            out_atts_json = {}
-            if i == 0:
-                mode = "w"
-                cols = [x for x in data_df]
-                if isinstance(cols[0], tuple):
-                    header = [":".join(x) for x in cols]
-                    out_atts_json = {
-                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
-                    }
-                else:
-                    header = cols
-                    out_atts_json = out_atts
-            kwargs = {
-                "header": header,
-                "mode": mode,
-                "encoding": "utf-8",
-                "index": True,
-                "index_label": "index",
-                "escapechar": "\0",
-            }
-            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
 
-            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-                json.dump(out_atts_json, fileObj, indent=4)
+        cols = [x for x in data_df]
+        if isinstance(cols[0], tuple):
+            header = [":".join(x) for x in cols]
+            out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
+        else:
+            header = cols
+            out_atts_json = out_atts
+
+        kwargs = {
+            "header": header,
+            "mode": "w",
+            "encoding": "utf-8",
+            "index": True,
+            "index_label": "index",
+            "escapechar": "\0",
+        }
+        data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
+        valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
+
+        with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
+            json.dump(out_atts_json, fileObj, indent=4)
