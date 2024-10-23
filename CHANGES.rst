@@ -3,7 +3,24 @@
 Changelog
 =========
 
-0.4.0 (unpublished)
+0.4.3 (2024-10-23)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* First release on pypi (:issue:`17`)
+* First release on zenodo (:issue:`18`)
+
+0.4.2 (2024-10-23)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+0.4.1 (2024-10-23)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+0.4.0 (2024-10-23)
 -------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
