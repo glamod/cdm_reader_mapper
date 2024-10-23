@@ -3,9 +3,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions|                                              |
-+----------------------------+----------------------------------------------------------------+
-|                            | |tag| |release|                                                |
+| Versions                   | |pypi| |versions| |tag| |release|                              |
 +----------------------------+----------------------------------------------------------------+
 | Documentation and Support  | |docs|                                                         |
 +----------------------------+----------------------------------------------------------------+
@@ -46,7 +44,7 @@ You can install the package directly from pip:
 
 .. code-block:: console
 
-    pip install git+https://github.com/glamod/cdm_reader_mapper.git
+    pip install cdm_reader_mapper
 
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
@@ -207,9 +205,9 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 	      :target: https://bestpractices.coreinfrastructure.org/projects/9135
 	      :alt: OpenSSf Best Practices
 
-.. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
-        :target: https://www.repostatus.org/#wip
-        :alt: Project Status: WIP: Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+        :target: https://www.repostatus.org/#active
+        :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
 .. |release| image:: https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg
         :target: https://github.com/glamod/cdm_reader_mapper/releases
@@ -227,9 +225,9 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://img.shields.io/badge/zenodo-package_or_version_not_found-red
-        :target: https://zenodo.org/cdm_reader_mapper
- 	      :alt: DOI
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13982457.svg
+        :target: https://doi.org/10.5281/zenodo.13982457
+ 	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
