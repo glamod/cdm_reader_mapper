@@ -28,7 +28,26 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12"
 ]
-dynamic = ["version", "dependencies"]
+dynamic = ["version"]
+dependencies = [
+  "matplotlib",
+  "pandas>=2.1.0",
+  "dask",
+  "distributed",
+  "datashader",
+  "msgpack",
+  "requests",
+  "xarray",
+  "netcdf4",
+  "h5netcdf",
+  "timezonefinder",
+  "python-slugify",
+  "textdistance",
+  "swifter",
+  "platformdirs",
+  "pyarrow",
+  "recordlinkage"
+]
 
 [project.urls]
 "Homepage" = "https://cdm-reader-mapper.readthedocs.io"
@@ -200,9 +219,6 @@ convention = "numpy"
 
 [tool.setuptools]
 packages = ["cdm_reader_mapper"]
-
-[tool.setuptools.dynamic]
-dependencies = {file = "ci/requirements/requirements.txt"}
 
 [tool.setuptools_scm]
 fallback_version = "999"
