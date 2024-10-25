@@ -56,6 +56,16 @@ If you want to contribute, we recommend cloning the repository and installing th
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
+Documentation
+-------------
+
+The official documentation is at https://cdm-reader-mapper.readthedocs.io/
+
+How to make the most of cdm_reader_mapper:
+
+* `How to read an IMMA file`_
+* `How to build your own data model schema`_
+* `How to map to the Common Data Model (CDM)`_
 
 Logging
 -------
@@ -132,6 +142,12 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 .. _Contributing Guidelines: https://github.com/glamod/cdm_reader_mapper/blob/main/CONTRIBUTING.rst
 
 .. _data model: https://cds.climate.copernicus.eu/toolbox/doc/how-to/15_how_to_understand_the_common_data_model/15_how_to_understand_the_common_data_model.html
+
+.. _How to build your own data model schema: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/CLIWOC_datamodel.html
+
+.. _How to map to the Common Data Model (CDM): https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/CDM_mapper_example_deck704.html
+
+.. _How to read an IMMA file: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/mdf_reader_test_overview.html
 
 .. _IMMA: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
 
