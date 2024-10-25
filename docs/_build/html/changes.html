@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; cdm_reader_mapper 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5bfaad31"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API reference" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            cdm_reader_mapper
+          </a>
+              <div class="version">
+                0.4.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-set-up.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_metmetpy.html"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CLIWOC_datamodel.html">Generating a data model for CLIWOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CDM_mapper_example_deck704.html">Mapping data from ICOADS deck 704 to the Common Data Model (CDM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">0.4.3 (2024-10-23)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#announcements">Announcements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">0.4.2 (2024-10-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">0.4.1 (2024-10-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">0.4.0 (2024-10-23)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Announcements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#new-features-and-enhancements">New features and enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#breaking-changes">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#internal-changes">Internal changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">0.3.0 (2024-05-17)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">New features and enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Internal changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Bug fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">0.2.0 (2024-03-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Internal changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Bug fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id15">0.1.0 (2024-01-16)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">Internal changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/changes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>0.4.3 (2024-10-23)<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>)</p>
+<section id="announcements">
+<h3>Announcements<a class="headerlink" href="#announcements" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>First release on pypi (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/17">#17</a>)</p></li>
+<li><p>First release on zenodo (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/18">#18</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2>0.4.2 (2024-10-23)<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>)</p>
+</section>
+<section id="id3">
+<h2>0.4.1 (2024-10-23)<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>)</p>
+</section>
+<section id="id4">
+<h2>0.4.0 (2024-10-23)<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>) and Joseph Siddons (<a class="extlink-user reference external" href="https://github.com/jtsiddons">&#64;jtsiddons</a>)</p>
+<section id="id5">
+<h3>Announcements<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Now under Apache v2.0 license (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/69">#69</a>)</p></li>
+</ul>
+</section>
+<section id="new-features-and-enhancements">
+<h3>New features and enhancements<a class="headerlink" href="#new-features-and-enhancements" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">common.getting_files.load_file</span></code>: optionally, load data within data reference syntax (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/41">#41</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">common.getting_files.load_file</span></code>: optionally, clear cache directory (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/45">#45</a>)</p></li>
+<li><p>reworked readthedocs documentation for gathered <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> package (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/19">#19</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/83">#83</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: new validation function for datetime objects (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/89">#89</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: select time period with new arguments <code class="docutils literal notranslate"><span class="pre">year_init</span></code> ad <code class="docutils literal notranslate"><span class="pre">year_end</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/98">#98</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: duplicate check using <code class="docutils literal notranslate"><span class="pre">recordlinkage</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/81">#81</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>: optionally, set left and right time bounds (<code class="docutils literal notranslate"><span class="pre">year_init</span></code> and <code class="docutils literal notranslate"><span class="pre">year_end</span></code>) (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>: optionally, set both external schema and code table paths and external schema file (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/47">#47</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/111">#111</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: Change both columns history and report_quality during duplicate_check (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/112">#112</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: optionally, set column names to be ignored while duplicate check (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/115">#115</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: optionally, set offset values for duplicate_check (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: optionally, set column entries to be ignored while duplicate_check (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: add both column names <code class="docutils literal notranslate"><span class="pre">station_speed</span></code> and <code class="docutils literal notranslate"><span class="pre">station_course</span></code> to default duplicate check list (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: optionally, re-index data in ascending order according to the number of nulls in each row (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+</ul>
+</section>
+<section id="breaking-changes">
+<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>set chunksize from 10000 to 3 in testing suite (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/35">#35</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: read header column <code class="docutils literal notranslate"><span class="pre">location_quality</span></code> from <code class="docutils literal notranslate"><span class="pre">(c1,</span> <span class="pre">LZ)</span></code> and set fill_value to <code class="docutils literal notranslate"><span class="pre">0</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/36">#36</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/37">#37</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: set default value of header column <code class="docutils literal notranslate"><span class="pre">report_quality</span></code> to <code class="docutils literal notranslate"><span class="pre">2</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/36">#36</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/37">#37</a>)</p></li>
+<li><p>reading C-RAID data: set decimal places according to input file data precision (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/60">#60</a>)</p></li>
+<li><p>always convert data types of both <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">float</span></code> in schemas into default data types (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/59">#59</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/60">#60</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.map_model</span></code>: call function without input parameter <code class="docutils literal notranslate"><span class="pre">data_atts</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/66">#66</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/67">#67</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decimal_places</span></code> information is moved from <code class="docutils literal notranslate"><span class="pre">mdf_reader.schema</span></code> to <code class="docutils literal notranslate"><span class="pre">cdm_mapper.tables</span></code>; <code class="docutils literal notranslate"><span class="pre">decimal_places</span></code> in  user-given schemas will be ignored (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/66">#66</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/67">#67</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> does not need any attribute information from <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/66">#66</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/67">#67</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: map ICOADS wind direction data (<code class="docutils literal notranslate"><span class="pre">361</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">0</span></code>; <code class="docutils literal notranslate"><span class="pre">362</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">np.nan</span></code>) (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/82">#82</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: set fill_value to <code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> for C-RAID’s <code class="docutils literal notranslate"><span class="pre">primary_station_id</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/93">#93</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: map C-RAID quality flags to CDM quality flags (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/94">#94</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: summarize schema and code tables (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: rename <code class="docutils literal notranslate"><span class="pre">c_raid</span></code> to <code class="docutils literal notranslate"><span class="pre">craid</span></code>, <code class="docutils literal notranslate"><span class="pre">gcc_immt</span></code> to <code class="docutils literal notranslate"><span class="pre">gcc</span></code> and <code class="docutils literal notranslate"><span class="pre">imma1</span></code> to <code class="docutils literal notranslate"><span class="pre">icoads</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: summarize tables and code tables (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: rename <code class="docutils literal notranslate"><span class="pre">c_raid</span></code> to <code class="docutils literal notranslate"><span class="pre">craid</span></code> and <code class="docutils literal notranslate"><span class="pre">gcc_mapping</span></code> to <code class="docutils literal notranslate"><span class="pre">gcc</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code>: rename <code class="docutils literal notranslate"><span class="pre">immt</span></code> to <code class="docutils literal notranslate"><span class="pre">gcc</span></code> and <code class="docutils literal notranslate"><span class="pre">imma</span></code> to <code class="docutils literal notranslate"><span class="pre">icoads</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.map_model</span></code>: use standardized imodel_name as &lt;data_model&gt;_&lt;release&gt;_&lt;deck&gt; (e.g. icoads_r300_d701) (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>: use standardized imodel_name as &lt;data_model&gt;_&lt;release&gt;_&lt;deck&gt; (e.g. icoads_r300_d701) (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: (<code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">VS</span></code>) set column_type to <code class="docutils literal notranslate"><span class="pre">key</span></code> for all ICOADS decks (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/11">#11</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/97">#97</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: rename pub47_noc mapping to pub47 (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/102">#102</a>)</p></li>
+<li><p>Note by each function call: rename <code class="docutils literal notranslate"><span class="pre">data_model</span></code> into <code class="docutils literal notranslate"><span class="pre">imodel</span></code> e.g. imodel=icoads_r300_d704 (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/103">#103</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.map_model</span></code>: call with (data, imodel=imodel) (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/103">#103</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>: call with (source, imodel=imodel) (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/103">#103</a>)</p></li>
+<li><p>Re-order arguments to <code class="docutils literal notranslate"><span class="pre">mdf_reader.validate</span></code>, and create argument for <code class="docutils literal notranslate"><span class="pre">ext_table_path</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/105">#105</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">operations</span></code>: delete corrections module (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/104">#104</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: duplicate check is available for header table only (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/115">#115</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: set report_quality to <code class="docutils literal notranslate"><span class="pre">1</span></code> for bad duplicates (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/115">#115</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: set default primary_station_id to <code class="docutils literal notranslate"><span class="pre">4</span></code> for C-RAID mapping (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/117">#117</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/121">#121</a>)</p></li>
+<li><p>renamed some element names in <code class="docutils literal notranslate"><span class="pre">icoads_r300_d730</span></code> schema for consistency (<code class="docutils literal notranslate"><span class="pre">InsName</span></code> to <code class="docutils literal notranslate"><span class="pre">InstName</span></code>, <code class="docutils literal notranslate"><span class="pre">InsPlace</span></code> to <code class="docutils literal notranslate"><span class="pre">InstPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">InsLand</span></code> to <code class="docutils literal notranslate"><span class="pre">InstLand</span></code>, <code class="docutils literal notranslate"><span class="pre">No_data_entry</span></code> to <code class="docutils literal notranslate"><span class="pre">NumArchiveSet</span></code>) (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/110">#110</a>)</p></li>
+</ul>
+</section>
+<section id="internal-changes">
+<h3>Internal changes<a class="headerlink" href="#internal-changes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>replace deprecated <code class="docutils literal notranslate"><span class="pre">datetime.datetime.utcnow()</span></code> with <code class="docutils literal notranslate"><span class="pre">datetime.datetime.now(datetime.UTC)</span></code> (see: <a class="reference external" href="https://github.com/python/cpython/issues/103857">https://github.com/python/cpython/issues/103857</a>) (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/39">#39</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/43">#43</a>)</p></li>
+<li><p>make use of <code class="docutils literal notranslate"><span class="pre">cdm-testdata</span></code> release <code class="docutils literal notranslate"><span class="pre">v2024.06.07</span></code> <a class="reference external" href="https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07">https://github.com/glamod/cdm-testdata/releases/tag/v2024.06.07</a> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/44">#44</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/45">#45</a>)</p></li>
+<li><p>migration to <code class="docutils literal notranslate"><span class="pre">setup-micromamba</span></code>: <a class="reference external" href="https://github.com/mamba-org/provision-with-micromamba#migration-to-setup-micromamba">https://github.com/mamba-org/provision-with-micromamba#migration-to-setup-micromamba</a> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/48">#48</a>)</p></li>
+<li><p>update actions to use Node.js 20: <a class="reference external" href="https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions">https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions</a> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/48">#48</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader.auxiliary.utils</span></code>: rename variable for missing values to <code class="docutils literal notranslate"><span class="pre">missing_values</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/56">#56</a>)</p></li>
+<li><p>add <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks: <code class="docutils literal notranslate"><span class="pre">codespell</span></code>, <code class="docutils literal notranslate"><span class="pre">pylint</span></code> and <code class="docutils literal notranslate"><span class="pre">vulture</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/56">#56</a>)</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">pytest.parametrize</span></code> for testing suite (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/61">#61</a>)</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">ast.literal_eval</span></code> instead of <code class="docutils literal notranslate"><span class="pre">eval</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/64">#64</a>)</p></li>
+<li><p>remove unused code tables in <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/10">#10</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/65">#65</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.mappings</span></code>: use <code class="docutils literal notranslate"><span class="pre">datetime</span></code> to convert <code class="docutils literal notranslate"><span class="pre">float</span></code> into hours and minutes.</p></li>
+<li><p>add FOSSA license scanning to github workflows (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/80">#80</a>)</p></li>
+<li><p>add <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> author list including ORCID iD’s (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/38">#38</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/49">#49</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: replace empty strings with missing values (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/89">#89</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code>: use function <code class="docutils literal notranslate"><span class="pre">overwrite_data</span></code> in all platform type correction functions (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/89">#89</a>)</p></li>
+<li><p>rename <code class="docutils literal notranslate"><span class="pre">data_model</span></code> into <code class="docutils literal notranslate"><span class="pre">imodel</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/103">#103</a>)</p></li>
+<li><p>implement assertion tests for module operations (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/104">#104</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: put settings for duplicate check in _duplicate_settings (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: use pandas.apply function instead of for loops in duplicate_check (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p>adding some more duplicate checks to testing suite (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/119">#119</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: re-adding conserderation of indexes of nan values during transformation (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/125">#125</a>)</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>indexing working with user-given chunksize (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/35">#35</a>)</p></li>
+<li><p>fix reading of custom schema in <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/40">#40</a>)</p></li>
+<li><p>ensure <code class="docutils literal notranslate"><span class="pre">format</span></code> schema field for delimited files is passed correctly, avoiding <code class="docutils literal notranslate"><span class="pre">&quot;...Please</span> <span class="pre">specify</span> <span class="pre">either</span> <span class="pre">format</span> <span class="pre">or</span> <span class="pre">field_layout</span> <span class="pre">in</span> <span class="pre">your</span> <span class="pre">header</span> <span class="pre">schema...&quot;</span></code> error (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/40">#40</a>)</p></li>
+<li><p>there is a loss of data precision due to data type conversion. Hence, use default data types of both <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">float</span></code> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/59">#59</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/60">#60</a>)</p></li>
+<li><p>reading C-RAID data: adjust datetime formats to read dates into <code class="docutils literal notranslate"><span class="pre">MDFFileReader</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/60">#60</a>)</p></li>
+<li><p>ensure external code tables are used when using an external schema in <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/105">#105</a>)</p></li>
+<li><p>update readme and example Jupyter notebooks to <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/103">#103</a> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/110">#110</a>)</p></li>
+<li><p>restructure <code class="docutils literal notranslate"><span class="pre">CLIWOC_datamodel</span></code> Jupyter notebook to add an example of data model construction (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/110">#110</a>)</p></li>
+<li><p>remove <code class="docutils literal notranslate"><span class="pre">create_data_model.ipynb</span></code> example Jupyter notebook (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/110">#110</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id6">
+<h2>0.3.0 (2024-05-17)<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>) and Joseph Siddons (<a class="extlink-user reference external" href="https://github.com/jtsiddons">&#64;jtsiddons</a>)</p>
+<section id="id7">
+<h3>New features and enhancements<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: read C-RAID netCDF buoy data (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/13">#13</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>)</p></li>
+<li><p>adding both GCC IMMT and C-RAID netCDF data to <code class="docutils literal notranslate"><span class="pre">test_data</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: adding C-RAID mapping and code tables (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/13">#13</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: add <code class="docutils literal notranslate"><span class="pre">load_tables</span></code> to <code class="docutils literal notranslate"><span class="pre">__init.py__</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/32">#32</a>)</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Breaking changes<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>adding tests for IMMT and C-Raid data (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/26">#26</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.map_model</span></code>: drop duplicated lines in pd.DataFrame before writing CDM table on disk (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>)</p></li>
+<li><p>add pyarrow (see: <a class="reference external" href="https://github.com/pandas-dev/pandas/issues/54466">https://github.com/pandas-dev/pandas/issues/54466</a>) to requirements</p></li>
+<li><p>solving pyarrow-snappy issue (see: openforcefield/openff-nagl#106) (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/33">#33</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/28">#28</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/34">#34</a>)</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Internal changes<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>do not differentiate between tuple and single column names (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code>: Do not raise errors if <code class="docutils literal notranslate"><span class="pre">validate_datetime</span></code>, <code class="docutils literal notranslate"><span class="pre">correct_datetime</span></code>, <code class="docutils literal notranslate"><span class="pre">correct_pt</span></code> and/or <code class="docutils literal notranslate"><span class="pre">validate_id</span></code> do not find any entries (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>)</p></li>
+<li><p>get rid of warnings (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/9">#9</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/27">#27</a>)</p></li>
+<li><p>adding python 3.12 to testing suite (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/29">#29</a>)</p></li>
+<li><p>set time out for testing suite to 10 minutes (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/29">#29</a>)</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Bug fixes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: set debugging logger into if statement (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code>: do not use code table <code class="docutils literal notranslate"><span class="pre">qc_flag</span></code> with <code class="docutils literal notranslate"><span class="pre">report_id</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/24">#24</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code>: fixing ICOADS 30000 NRT functions for <code class="docutils literal notranslate"><span class="pre">pandas&gt;=2.2.0</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/31">#31</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_mapper.read_tables</span></code>: if table not available return empty <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/32">#32</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id11">
+<h2>0.2.0 (2024-03-15)<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>) and Joseph Siddons (<a class="extlink-user reference external" href="https://github.com/jtsiddons">&#64;jtsiddons</a>)</p>
+<section id="id12">
+<h3>Breaking changes<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>move converters and decoders from <code class="docutils literal notranslate"><span class="pre">common</span></code> to <code class="docutils literal notranslate"><span class="pre">mdf_reader/utils</span></code> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/3">#3</a>)</p></li>
+<li><p>delete redundant functions from <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper.common</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code>: import common (__init__.py)</p></li>
+<li><p>remove unused modules from <code class="docutils literal notranslate"><span class="pre">metmetpy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper.mdf_reader</span></code> split data_models into code_tables and schema</p></li>
+<li><p>logging: Allow for use of log file (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/6">#6</a>)</p></li>
+<li><p>cannot use as command-line tool anymore (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/22">#22</a>)</p></li>
+<li><p>outsource input and result data to <cite>cdm-testdata</cite> (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/16">#16</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/21">#21</a>)</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>Internal changes<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>adding tests to cdm_reader_mapper testing suite (<a class="extlink-issue reference external" href="https://github.com/glamod/cdm_reader_mapper/issues/12">#12</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/2">#2</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/20">#20</a>, <a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/22">#22</a>)</p></li>
+<li><p>adding testing result data (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/4">#4</a>)</p></li>
+<li><p>use slugify instead of unidecde for licening reasons</p></li>
+<li><p>remove pip install instruction (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/2">#2</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HISTORY.rst</span></code> has been renamed <code class="docutils literal notranslate"><span class="pre">CHANGES.rst</span></code>, to follow <cite>xclim</cite>-like conventions (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/7">#7</a>).</p></li>
+<li><p>speed up mapping functions with <cite>swifter</cite> (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/4">#4</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: adding auxiliary functions and classes (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/4">#4</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code>: read tables line-by-line (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/20">#20</a>)</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Bug fixes<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixed an issue with missing <code class="docutils literal notranslate"><span class="pre">conda</span></code> dependencies in the <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> documentation (<a class="extlink-pull reference external" href="https://github.com/glamod/cdm_reader_mapper/pull/14">#14</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="id15">
+<h2>0.1.0 (2024-01-16)<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<p>Contributors to this version: Ludwig Lierhammer (<a class="extlink-user reference external" href="https://github.com/ludwiglierhammer">&#64;ludwiglierhammer</a>)</p>
+<section id="id16">
+<h3>Breaking changes<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>combine <a class="reference external" href="https://github.com/glamod/mdf_reader/tree/backup">mdf_reader</a> , <a class="reference external" href="https://github.com/glamod/cdm-mapper">cdm-mapper</a>, <a class="reference external" href="https://github.com/glamod/pandas_operations">pandas_operations</a> and <a class="reference external" href="https://github.com/glamod/metmetpy">metmetpy</a></p></li>
+<li><p>optionally: use <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> as a command-line interface tool</p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>Internal changes<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>make use of <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code></p></li>
+<li><p>prepare for <code class="docutils literal notranslate"><span class="pre">pandas&gt;=2.1.0</span></code></p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">setuptools_scm</span></code> for automatic updating of version numbers</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

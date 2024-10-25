@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to build a data model &mdash; cdm_reader_mapper 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5bfaad31"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to read a simple csv file" href="how_to_read_csv.html" />
+    <link rel="prev" title="Data Models" href="data-models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            cdm_reader_mapper
+          </a>
+              <div class="version">
+                0.4.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-set-up.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_metmetpy.html"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to build a data model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#schema-header-block">Schema header block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schema-element-block">Schema element block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schema-section-block">Schema section block</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#section-header">Section header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#section-elements">Section elements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#code-tables">Code Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CLIWOC_datamodel.html">Generating a data model for CLIWOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CDM_mapper_example_deck704.html">Mapping data from ICOADS deck 704 to the Common Data Model (CDM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How to build a data model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/how-to-build-a-data-model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-build-a-data-model">
+<span id="id1"></span><h1>How to build a data model<a class="headerlink" href="#how-to-build-a-data-model" title="Link to this heading"></a></h1>
+<p>The main steps to create a data model (or schema) for the mdf_reader are:</p>
+<ol class="arabic simple">
+<li><p>Create a valid directory tree to hold the model <strong>(mymodel)</strong>. For more details see the structure of the <strong>cdm_reader_mapper</strong> toolbox.</p></li>
+<li><p>Create a valid <strong>schema</strong> file:</p></li>
+</ol>
+<p>To create the schema file, two important aspects of the schema need to be clear beforehand; i) the order and field lengths of each element in the data input string, ii) do the information in the data input needs to be organised into sections, like ICOADS <code class="docutils literal notranslate"><span class="pre">.imma</span></code> data format.</p>
+<p>These templates have been created to ease the generation of new valid schema files, these templates cover from a basic schema format to a more complex one:</p>
+<ul class="simple">
+<li><p>Fixed width or delimited: <em>fixed_width_</em> or <em>delimited_</em></p></li>
+<li><p>With no sections or with sections: <em>_basic</em> or <em>_sections</em></p></li>
+<li><p>More complex options include blocks of sections which in the case of ICOADS data are exclusive for certain decks (e.g. deck <code class="docutils literal notranslate"><span class="pre">td11</span></code>) or blocks of sections that are optional: <code class="docutils literal notranslate"><span class="pre">_complex_exc.json</span></code> or <code class="docutils literal notranslate"><span class="pre">_complex_opt.json</span></code></p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p>Create valid code tables if the data model includes code tables.</p></li>
+</ol>
+<p>The general structure of a schema and the description of each attribute is explain in the table below:</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><em>Schema block</em></p></td>
+<td><p><em>Scope</em></p></td>
+<td><p><em>Attribute</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><p>Header</p></td>
+<td><p>common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">encoding</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>no sections</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">field_layout</span></code>, <code class="docutils literal notranslate"><span class="pre">delimiter</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>sections</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">parsing_order</span></code></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><p>Elements</p></td>
+<td><p>common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">column_type</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ignore</span></code>, <code class="docutils literal notranslate"><span class="pre">missing_value</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>numeric</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">decimal_places</span></code>, <code class="docutils literal notranslate"><span class="pre">encoding</span></code>,</p>
+<p><code class="docutils literal notranslate"><span class="pre">offset</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>,  <code class="docutils literal notranslate"><span class="pre">units</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">valid_max</span></code>, <code class="docutils literal notranslate"><span class="pre">valid_min</span></code></p>
+</td>
+</tr>
+<tr class="row-odd"><td><p>object, str</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">disable_white_strip</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>key</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">code_table</span></code>,  <code class="docutils literal notranslate"><span class="pre">encoding</span></code>
+<code class="docutils literal notranslate"><span class="pre">disable_white_strip</span></code>,</p></td>
+</tr>
+<tr class="row-odd"><td><p>datetime</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">datetime_format</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>fixed_width</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">field_length</span></code></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><p>Sections
+(header)</p></td>
+<td><p>common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">delimiter</span></code>, <code class="docutils literal notranslate"><span class="pre">disable_read</span></code>
+<code class="docutils literal notranslate"><span class="pre">field_layout</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>fixed_width</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">length</span></code>, <code class="docutils literal notranslate"><span class="pre">sentinal</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<section id="schema-header-block">
+<span id="id2"></span><h2>Schema header block<a class="headerlink" href="#schema-header-block" title="Link to this heading"></a></h2>
+<p>The <strong>header</strong> block is the first block of the schema file, and is common to all schema types, but some of its descriptors are, however, specific to certain model types.
+There is no need to declare a <strong>header</strong> block in data models for which sections are sequential (e.g. all elements in the data source appear in the same order as declared in the sections block).</p>
+<ul>
+<li><p>Example of a header block for a <code class="docutils literal notranslate"><span class="pre">.imma</span></code> based schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;parsing_order&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">]},</span>
+         <span class="p">{</span><span class="s2">&quot;o&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span><span class="s2">&quot;c5&quot;</span><span class="p">,</span><span class="s2">&quot;c6&quot;</span><span class="p">,</span><span class="s2">&quot;c7&quot;</span><span class="p">,</span><span class="s2">&quot;c8&quot;</span><span class="p">,</span><span class="s2">&quot;c9&quot;</span><span class="p">,</span><span class="s2">&quot;c95&quot;</span><span class="p">,</span><span class="s2">&quot;c96&quot;</span><span class="p">,</span><span class="s2">&quot;c97&quot;</span><span class="p">,</span><span class="s2">&quot;c98&quot;</span><span class="p">]},</span>
+         <span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;c99_sentinal&quot;</span><span class="p">,</span> <span class="s2">&quot;c99_data&quot;</span><span class="p">,</span> <span class="s2">&quot;c99_header&quot;</span><span class="p">,</span> <span class="s2">&quot;c99_qc&quot;</span><span class="p">]}]</span>
+ <span class="p">},</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Scope</p></th>
+<th class="head"><p>Descriptor name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">encoding</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Data models with
+sections (1 or Multiple)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">parsing_order</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Data models with no
+sections</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">field_layout</span></code>,
+<code class="docutils literal notranslate"><span class="pre">delimiter</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">delimiter</span></code></dt><dd><ul class="simple">
+<li><p>String type descriptor that defines the field delimiter for data models.</p></li>
+<li><p>Setting this descriptor makes the default value of <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+<li><p>Mainly this descriptor will be use if <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+<li><p>When use together with <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> the code understands that the data layout is a mixture of <em>delimited</em> and <em>fixed_width</em> strings. In this case the delimiter is removed and the section is read as a <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> type of section.</p></li>
+<li><p>This case has been added to overcome how pandas managed the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section in <code class="docutils literal notranslate"><span class="pre">.imma1</span></code> model. e.g. Deck 704 c99 section, which is a sequence of fixed width elements separated by commas.</p></li>
+<li><p>Applies to <code class="docutils literal notranslate"><span class="pre">delimited</span></code> and <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> field layouts</p></li>
+<li><p>It is a mandatory field only in the case that <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">encoding</span></code></dt><dd><ul class="simple">
+<li><p>String type descriptor that denotes the file encoding</p></li>
+<li><p>Applies to all elements</p></li>
+<li><p>It is not a mandatory field descriptor</p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p>all python supported, see the following <a class="reference external" href="https://docs.python.org/3.7/library/codecs.html#standard-encodings">link</a> for all possible encodings.</p></li>
+<li><p>defaults to <cite>utf-8</cite></p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">filed_layout</span></code></dt><dd><ul class="simple">
+<li><p>String type descriptor that defines the layout of fields in the data model with no sections</p></li>
+<li><p>Applies to all data models with no sections</p></li>
+<li><p>Is mandatory descriptor (for data models with no sections)</p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">delimited</span></code> or <code class="docutils literal notranslate"><span class="pre">fix_width</span></code></p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">delimited</span></code> if <code class="docutils literal notranslate"><span class="pre">delimiter</span></code> is set, but can be specified to <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> type together with a <code class="docutils literal notranslate"><span class="pre">delimiter</span></code> option.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt><code class="docutils literal notranslate"><span class="pre">parsing_order</span></code></dt><dd><ul>
+<li><p>List of dictionaries containing the order in which the tool must look for sections in a report and grouped the data by section block types. This field applies to those data types which reports are divided into multiple sections i.e. ICOADS data</p></li>
+<li><p>Applies to all data models with multiple sections</p></li>
+<li><p>The different section block types are:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: <em>sequential</em>. Sections in this block appear as listed in all reports.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">e</span></code>: <em>exclusive</em>. Among the sections listed in the block, only one of them appears in every report.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">o</span></code>: <em>optional</em>. Any combination of sections listed in the block can be present in the report. Any order, any missing or present (but does not handle repetitions).</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>``parsing_order``: [{&quot;s&quot;:[&quot;core&quot;]}, {&quot;o&quot;:[&quot;c1&quot;, &quot;c99&quot;]}]
+</pre></div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="schema-element-block">
+<span id="id3"></span><h2>Schema element block<a class="headerlink" href="#schema-element-block" title="Link to this heading"></a></h2>
+<p>The elements block is a feature common to all data model types. It is the second and last block of data in a schema file with no sections, while it is part of each of the sections’ blocks in more complex schemas. This is an example of an element block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s2">&quot;YR&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;year UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint16&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mi">2024</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mi">1600</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;year&quot;</span>
+             <span class="p">},</span>
+             <span class="s2">&quot;MO&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;month UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;month&quot;</span>
+             <span class="p">},</span>
+             <span class="s2">&quot;DY&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;day UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;day&quot;</span>
+             <span class="p">},</span>
+             <span class="s2">&quot;HR&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;hour UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mf">23.99</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                 <span class="s2">&quot;decimal_places&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;hour&quot;</span>
+             <span class="p">}}</span>
+</pre></div>
+</div>
+<p>Elements in the data are parsed in the order they are declare here. The element block above would define a file / section with elements named: <code class="docutils literal notranslate"><span class="pre">YR</span></code>, <code class="docutils literal notranslate"><span class="pre">MO</span></code>, <code class="docutils literal notranslate"><span class="pre">DY</span></code> and <code class="docutils literal notranslate"><span class="pre">HR</span></code>.
+All elements attributes, some of which are data type specific, are listed and detailed in the following table:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Scope</p></th>
+<th class="head"><p>Descriptor name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">column_type</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, <code class="docutils literal notranslate"><span class="pre">ignore</span></code>, <code class="docutils literal notranslate"><span class="pre">missing_value</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Fixed width types</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">field_length</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Numeric types</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">decimal_places</span></code>, <code class="docutils literal notranslate"><span class="pre">encoding</span></code>, <code class="docutils literal notranslate"><span class="pre">offset</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>,
+<code class="docutils literal notranslate"><span class="pre">valid_max</span></code>, <code class="docutils literal notranslate"><span class="pre">valid_min</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Object, <code class="docutils literal notranslate"><span class="pre">str</span></code> types</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">disable_white_strip</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Key type</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">codetable</span></code>, <code class="docutils literal notranslate"><span class="pre">disable_white_strip</span></code>, <code class="docutils literal notranslate"><span class="pre">encoding</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Datetime type</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">datetime_format</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">description</span></code></dt><dd><ul>
+<li><p>String type descriptor that describes the data element (e.g. free text describing the data element).</p></li>
+<li><p>Applies to all elements</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">field_length</span></code></dt><dd><ul>
+<li><p>Numeric integer descriptor that determines the field length of the elements (number of bytes or number of characters in a report string).</p></li>
+<li><p>Applies to the schema format type: <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> and is a mandatory field in the element block.</p></li>
+<li><p>It can be set to <cite>null</cite>, or not present; if the element is unique in a section whose length is unknown and if this section is the last in the data model (e.g. like it is usually the case for ICOADS supplemental data section c99). If this is the case and the length is unknown the default will be set by the function <a class="reference external" href="https://mdf-reader.readthedocs.io/en/mdf_reader/autoapi/mdf_reader/properties/index.html#module-mdf_reader.properties">mdf_reader.properties.MAX_FULL_REPORT_WIDTH()</a>, which sets the <code class="docutils literal notranslate"><span class="pre">field_length</span></code> to 100000.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">column_type</span></code></dt><dd><ul>
+<li><p>Numeric integer descriptor that determines the element data type.</p></li>
+<li><p>Mandatory field.</p></li>
+<li><p>Applies to all elements</p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p>Numeric data types: all types interpreter by <a class="reference external" href="https://numpy.org/devdocs/user/basics.types.html">numpy</a>.</p></li>
+<li><p>Datetimes: string or <code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code> object that formats dates or datetimes when read in a single field. The object must be a <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime">datetime.datetime</a> valid format. Can be also read via code tables and the parameter <code class="docutils literal notranslate"><span class="pre">key</span></code>.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">missing_value</span></code></dt><dd><ul>
+<li><p>String type descriptor that denotes if there are additional missing values to tag for an element in a schema.</p></li>
+<li><p>Applies to all elements</p></li>
+<li><p>Default values are the same as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/user_guide/missing_data.html#working-with-missing-data">pandas default missing values</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">ignore</span></code></dt><dd><ul>
+<li><p>Boolean type descriptor that ignores an element on the output</p></li>
+<li><p>Options: <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>, defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p>Applies to all elements</p></li>
+<li><p>Is not a mandatory field descriptor</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">units</span></code></dt><dd><ul>
+<li><p>String type descriptor that states the units of the measured data element.</p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements.</p></li>
+<li><p>Is not a mandatory field descriptor</p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">encoding</span></code></dt><dd><ul>
+<li><p>String type descriptor added if an element needs it</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Not to be confuse with file <code class="docutils literal notranslate"><span class="pre">encoding</span></code></p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements and <em>column_type. [key]</em> elements</p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base36</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">signed_overpunch</span></code></p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">valid_max</span></code></dt><dd><ul>
+<li><p>Numeric type of descriptor that indicates the valid maximum value for numeric elements. This should be the valid maximum in variable declared units, after decoding and conversion (offset, scale…) and it is use for element validation.</p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <em>+inf</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">valid_min</span></code></dt><dd><ul>
+<li><p>Numeric type of descriptor that indicates the minimum value for numeric elements. This should be the valid minimum in variable declared units, after encoding and conversion (offset, scale …) and it is use for element validation.</p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <em>-inf</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">scale</span></code></dt><dd><ul>
+<li><p>Numeric type of descriptor. This scale is applied to numeric elements in order to convert the original value to the declared element units.</p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <em>1</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">offset</span></code></dt><dd><ul>
+<li><p>Numeric type of descriptor. This offset is applied to numeric elements in order to convert the original value to the declared element units.</p></li>
+<li><p>Applies to <em>column_type. [numerics]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <em>0</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">decimal_places</span></code></dt><dd><ul>
+<li><p>Numeric integer descriptor that defines the number of decimal places to which the observed value is reported.</p></li>
+<li><p>Applies to <em>column_type. [numeric_floats]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">pandas.display.precision</span></code> = 6.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">codetable</span></code></dt><dd><ul>
+<li><p>String type of descriptor containing the key code look up table name. It is the File basename of a code table (with no .json extension) located in the <code class="docutils literal notranslate"><span class="pre">mymodel/code_tables</span></code> directory. See <a class="reference internal" href="data-models.html#code-tables"><span class="std std-ref">Code tables</span></a> for more information.</p></li>
+<li><p>Applies to <em>column_type. [key]</em> elements</p></li>
+<li><p>Is mandatory if <code class="docutils literal notranslate"><span class="pre">&quot;column_type&quot;:</span> <span class="pre">&quot;key&quot;</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">disable_white_strip</span></code></dt><dd><ul>
+<li><p>Boolean or string type descriptor that modifies the default leading/trailing blank stripping.</p></li>
+<li><p>Applies to <em>column_type. [key, object, str]</em> elements</p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p><em>do not perform any stripping: true</em></p></li>
+<li><p><em>do not perform right stripping (trailing blanks): `r`</em></p></li>
+<li><p><em>do not perform left stripping (leading blanks): `l`</em></p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <em>false</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">datetime_format</span></code></dt><dd><ul>
+<li><p>String type of descriptor that sets the format for the dates.</p></li>
+<li><p>Applies to <em>column_type. [datetime]</em> elements</p></li>
+<li><p>Is not a mandatory field</p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">%Y%m%d</span></code></p></li>
+<li><p>All python.datetime formats are valid.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="schema-section-block">
+<h2>Schema section block<a class="headerlink" href="#schema-section-block" title="Link to this heading"></a></h2>
+<p>If the data model is organized in sections then the schema has two main blocks: <strong>the header</strong> (see <a class="reference internal" href="#schema-header-block"><span class="std std-ref">Schema header block</span></a>) and <strong>the sections blocks</strong>. The sections block has a separate block per section, with the following general layout:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A section specific header (or sub-header) with info on how to access that specific section.</p></li>
+<li><p>The section’s elements block (See <a class="reference internal" href="#schema-element-block"><span class="std std-ref">Schema element block</span></a>)</p></li>
+</ul>
+</div></blockquote>
+<p>Example of a schema section block: “core” section of the <code class="docutils literal notranslate"><span class="pre">.imma</span></code> schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;core&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;sentinal&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span><span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="mi">108</span><span class="p">},</span>
+         <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s2">&quot;YR&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;year UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint16&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mi">2024</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mi">1600</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;year&quot;</span>
+             <span class="p">},</span>
+             <span class="s2">&quot;MO&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;month UTC&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;field_length&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="s2">&quot;column_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_max&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+                 <span class="s2">&quot;valid_min&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;month&quot;</span>
+             <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="section-header">
+<h3>Section header<a class="headerlink" href="#section-header" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">delimiter</span></code></dt><dd><ul>
+<li><p>String type descriptor that defines the field delimiter for the data model section.</p></li>
+<li><p>Setting this descriptor makes the default value of <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+<li><p>Mainly this descriptor will be use if <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+<li><p>When use together with <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> the code understands that the data layout is a mixture of <em>delimited</em> and <em>fixed_width</em> strings. In this case the delimiter is removed and the section is read as a <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> type of section.</p></li>
+<li><p>Applies to <code class="docutils literal notranslate"><span class="pre">delimited</span></code> and <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code> field layouts</p></li>
+<li><p>It is a mandatory field only in the case that <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> == <code class="docutils literal notranslate"><span class="pre">delimited</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">disable_read</span></code></dt><dd><ul>
+<li><p>Boolean type descriptor that if set to True will ignore the elements of that section. This section will then be produced in the output as a single string.</p></li>
+<li><p>Options: <code class="docutils literal notranslate"><span class="pre">True</span></code> of <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p>Defaults to False</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">field_layout</span></code></dt><dd><ul>
+<li><p>String type descriptor that defines the layout of fields in the section of the data model</p></li>
+<li><p>Applies to all sections</p></li>
+<li><p>If field <code class="docutils literal notranslate"><span class="pre">delimiter</span></code> is set, then <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">delimited</span></code>, else to <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code>.</p></li>
+<li><p>This descriptor does not need to be specified in the schema files in the majority of the cases. However, to account for mixed formats, like c99 section in imma1 files for deck 704, this default setting can be overridden by specifying the <code class="docutils literal notranslate"><span class="pre">field_layout</span></code> parameter.</p></li>
+<li><dl class="simple">
+<dt>Options:</dt><dd><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">delimited</span></code> or <code class="docutils literal notranslate"><span class="pre">fix_width</span></code></p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">delimited</span></code> if <code class="docutils literal notranslate"><span class="pre">delimiter</span></code> is set, else defaults to what ever is set in the <code class="docutils literal notranslate"><span class="pre">fixed_width</span></code>.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sentinal</span></code></dt><dd><ul>
+<li><p>String type of descriptor that allows the code to identify a section.</p></li>
+<li><p>Applies to sections of <em>format.fixed_width</em></p></li>
+<li><p>It is a mandatory field if the section is unique, unique in a parsing_order block, or part of a sequential parsing_order block.</p></li>
+<li><p>Elements bearing the sentinal need to be, additionally, declared in the elements block.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">length</span></code></dt><dd><ul>
+<li><p>Numeric integer type of descriptor that defines the length of the section (how many bytes or characters in a string).</p></li>
+<li><p>Applies to <em>format.fixed_width</em></p></li>
+<li><p>It is a mandatory field</p></li>
+<li><p>Can be also set to <code class="docutils literal notranslate"><span class="pre">null</span></code>, or not reported, if the section is the last one to be parsed and the length is unknown (like the c99 section of the <cite>.imma</cite> model.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="section-elements">
+<h3>Section elements<a class="headerlink" href="#section-elements" title="Link to this heading"></a></h3>
+<p>Same as <a class="reference internal" href="#schema-element-block"><span class="std std-ref">Schema element block</span></a>.</p>
+</section>
+</section>
+<section id="code-tables">
+<h2>Code Tables<a class="headerlink" href="#code-tables" title="Link to this heading"></a></h2>
+<p>To learn about how to construct a code table, please read the <a class="reference internal" href="data-models.html#code-tables"><span class="std std-ref">Code tables</span></a> section.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data-models.html" class="btn btn-neutral float-left" title="Data Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="how_to_read_csv.html" class="btn btn-neutral float-right" title="How to read a simple csv file" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

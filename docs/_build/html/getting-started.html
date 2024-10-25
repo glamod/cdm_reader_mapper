@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; cdm_reader_mapper 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5bfaad31"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Models" href="data-models.html" />
+    <link rel="prev" title="metmetpy overview" href="tool-overview_metmetpy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            cdm_reader_mapper
+          </a>
+              <div class="version">
+                0.4.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-set-up.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool-overview_metmetpy.html"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#read-an-imma-file">1. Read an IMMA file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-subsection-of-an-imma-file">2. Read subsection of an IMMA file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#map-this-data-to-a-cdm-build-for-the-same-deck">3. Map this data to a CDM build for the same deck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#write-the-output">4. Write the output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CLIWOC_datamodel.html">Generating a data model for CLIWOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_notebooks/CDM_mapper_example_deck704.html">Mapping data from ICOADS deck 704 to the Common Data Model (CDM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cdm_reader_mapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting-started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="read-an-imma-file">
+<h2>1. Read an IMMA file<a class="headerlink" href="#read-an-imma-file" title="Link to this heading"></a></h2>
+<p>You can test the tool very easy by using a sample data set that comes with the repository. For this you need to run the following code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">from cdm_reader_mapper import mdf_reader</span>
+<span class="go">from cdm_reader_mapper.test_data import test_069_701 as test_data</span>
+
+<span class="go">filepath = test_data.source</span>
+<span class="go">data_model = test_data.data_model</span>
+
+<span class="go">data = mdf_reader.read(filepath, data_model=data_model)</span>
+</pre></div>
+</div>
+<p>or simplify the command by passing <cite>test_data</cite>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">data = mdf_reader.read(**test_data)</span>
+</pre></div>
+</div>
+</section>
+<section id="read-subsection-of-an-imma-file">
+<h2>2. Read subsection of an IMMA file<a class="headerlink" href="#read-subsection-of-an-imma-file" title="Link to this heading"></a></h2>
+<p>You can also read subsections from the IMMA test file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">imma_data = mfd_reader.read(filepath, data_model=data_model, sections = [&quot;core&quot;, &quot;c1&quot;, &quot;c98&quot;])</span>
+</pre></div>
+</div>
+</section>
+<section id="map-this-data-to-a-cdm-build-for-the-same-deck">
+<h2>3. Map this data to a CDM build for the same deck<a class="headerlink" href="#map-this-data-to-a-cdm-build-for-the-same-deck" title="Link to this heading"></a></h2>
+<p>In this case deck 704: US Marine Meteorological Journal collection of data code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">from cdm_reader_mapper import cdm_mapper</span>
+
+<span class="go">name_of_model = &#39;icoads_r3000_d704&#39;</span>
+
+<span class="go">cdm_dict = cdm_mapper.map_model(</span>
+<span class="go">              name_of_model,</span>
+<span class="go">              data_raw.data,</span>
+<span class="go">              attributes,</span>
+<span class="go">              cdm_subset = None,</span>
+<span class="go">              log_level = &#39;DEBUG&#39;,</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</section>
+<section id="write-the-output">
+<h2>4. Write the output<a class="headerlink" href="#write-the-output" title="Link to this heading"></a></h2>
+<p>This writes the output to an ascii file with a pipe delimited format using the following function:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">from cdm_reader_mapper import cdm_mapper</span>
+
+<span class="go">cdm_mapper.cdm_to_ascii(</span>
+<span class="go">        cdm_dict,</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tool-overview_metmetpy.html" class="btn btn-neutral float-left" title="metmetpy overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data-models.html" class="btn btn-neutral float-right" title="Data Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

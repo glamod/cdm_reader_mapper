@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Generating a data model for CLIWOC — cdm_reader_mapper 0.4.3 documentation</title>
+<link href="../_static/pygments.css?v=fa44fd50" rel="stylesheet" type="text/css"/>
+<link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/nbsphinx-code-cells.css?v=2aa19091" rel="stylesheet" type="text/css"/>
+<!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+<script src="../_static/jquery.js?v=5d32c60e"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+<script src="../_static/documentation_options.js?v=5bfaad31"></script>
+<script src="../_static/doctools.js?v=9a2dae69"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="../_static/js/theme.js"></script>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="CDM_mapper_example_deck704.html" rel="next" title="Mapping data from ICOADS deck 704 to the Common Data Model (CDM)"/>
+<link href="mdf_reader_test_overview.html" rel="prev" title="Test and overview of the mdf_reader module"/>
+</head>
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="../index.html">
+            cdm_reader_mapper
+          </a>
+<div class="version">
+                0.4.3
+              </div>
+<div role="search">
+<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+<input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+</div>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-set-up.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-overview_reader.html"><code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-overview_mapper.html"><code class="docutils literal notranslate"><span class="pre">cdm_mapper</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool-overview_metmetpy.html"><code class="docutils literal notranslate"><span class="pre">metmetpy</span></code> overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data-models.html">Data Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to-build-a-data-model.html">How to build a data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to_read_csv.html">How to read a simple csv file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to-register-a-new-data-model-mapping.html">How to register a new data model mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cdm-tables-mapping-files-and-descriptors.html">CDM tables mapping files and descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mdf_reader_test_overview.html">Test and overview of the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generating a data model for CLIWOC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ICOADS-IMMA">ICOADS IMMA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Supplementary-Data">Supplementary Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CLIWOC">CLIWOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-Data">The Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Initial-Read">Initial Read</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Supplementary-(c99)-data">Supplementary (<code class="docutils literal notranslate"><span class="pre">c99</span></code>) data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Creating-a-data-model">Creating a data model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Custom-Schema">Custom Schema</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Copy-the-%22icoads%22-schema">Copy the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Copy-the-code-tables">Copy the code tables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Extending-the-schema:-CLIWOC-logbook-information">Extending the schema: CLIWOC logbook information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ImageAvail-Code-Table"><code class="docutils literal notranslate"><span class="pre">ImageAvail</span></code> Code Table</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Reading">Reading</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Analysing-the-output">Analysing the output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Internal-Schema">Internal Schema</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CDM_mapper_example_deck704.html">Mapping data from ICOADS deck 704 to the Common Data Model (CDM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="../index.html">cdm_reader_mapper</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+<li class="breadcrumb-item active">Generating a data model for CLIWOC</li>
+<li class="wy-breadcrumbs-aside">
+<a href="../_sources/example_notebooks/CLIWOC_datamodel.ipynb.txt" rel="nofollow"> View page source</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<section id="Generating-a-data-model-for-CLIWOC">
+<h1>Generating a data model for CLIWOC<a class="headerlink" href="#Generating-a-data-model-for-CLIWOC" title="Link to this heading"></a></h1>
+<p>The purpose of this notebook is to demonstrate the structure of data models used by the <code class="docutils literal notranslate"><span class="pre">mdf_reader</span></code> component of <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code>.</p>
+<section id="ICOADS-IMMA">
+<h2>ICOADS IMMA<a class="headerlink" href="#ICOADS-IMMA" title="Link to this heading"></a></h2>
+<p>A common format for marine observational records is the ICOADS IMMA format. This is a text format, where each line contains the data (including metadata) for an individual record. The format is <em>attachment</em> based, each record is constructed from a selection of (typically) fixed-width sections (called attachments) containing different subsets of the data or metadata associated with the record. Documentation on the format, and the available attachments can be found at
+<a class="reference external" href="https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf">https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf</a>.</p>
+<p>Records within the same file can contain different attachments, meaning that the IMMA format is not a fixed-width format, as line lengths will vary between records. Each record, however, must contain a certain subset of the attachments (in this case the <code class="docutils literal notranslate"><span class="pre">core</span></code> (or <code class="docutils literal notranslate"><span class="pre">c0</span></code>), <code class="docutils literal notranslate"><span class="pre">c1</span></code>, and <code class="docutils literal notranslate"><span class="pre">c98</span></code> attachments).</p>
+<section id="Supplementary-Data">
+<h3>Supplementary Data<a class="headerlink" href="#Supplementary-Data" title="Link to this heading"></a></h3>
+<p>Additional data or metadata can be provided in the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment. This attachment is not fixed-width as different sources or decks can provide different collections of supplementary data.</p>
+</section>
+</section>
+<section id="CLIWOC">
+<h2>CLIWOC<a class="headerlink" href="#CLIWOC" title="Link to this heading"></a></h2>
+<p>In this example we use a subset of ICOADS release 3.0.0 IMMA formatted data for deck 730, which is data from the Climatological Database for the World’s Oceans (CLIWOC). There is a large amount of supplementary data available in the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment, which for deck 730 can be split into multiple sections. Here, we will start with the standard schema for the ICOADS IMMA format (included in <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> as the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> <code class="docutils literal notranslate"><span class="pre">imodel</span></code>), and extend the schema with fields for a subset of
+the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment. We will add fields for the <em>logbook</em> section of the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment for this deck.</p>
+<p>An internal schema already exists for this deck (<code class="docutils literal notranslate"><span class="pre">"icoads_r300_d730"</span></code>), the purpose of this notebook is to demonstrate how one can extend the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> data model to parse <code class="docutils literal notranslate"><span class="pre">c99</span></code> data.</p>
+</section>
+<section id="Overview">
+<h2>Overview<a class="headerlink" href="#Overview" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>An initial read of the data subset using the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> data model which does not parse the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment.</p></li>
+<li><p>Extension of the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> schema to add fields for the logbook section of the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment for deck 730.</p></li>
+<li><p>Construction of a code table for a categorical field in the <code class="docutils literal notranslate"><span class="pre">c99</span></code> attachment.</p></li>
+<li><p>Comparison with the internal schema for deck 730.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">cdm_reader_mapper</span> <span class="kn">import</span> <span class="n">mdf_reader</span>
+<span class="kn">from</span> <span class="nn">cdm_reader_mapper.data</span> <span class="kn">import</span> <span class="n">test_data</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib.resources</span> <span class="kn">import</span> <span class="n">files</span> <span class="k">as</span> <span class="n">get_files</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib_resources</span> <span class="kn">import</span> <span class="n">files</span> <span class="k">as</span> <span class="n">get_files</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-10-11 09:37:32,558 - root - INFO - init basic configure of logging success
+</pre></div></div>
+</div>
+</section>
+<section id="The-Data">
+<h2>The Data<a class="headerlink" href="#The-Data" title="Link to this heading"></a></h2>
+<p>For this example we load a subset of ICOADS data for deck 730 from the <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> test data. This is the data that will be used throughout this notebook.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_file_path</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_icoads_r300_d730</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-10-11 09:37:35,590 - root - INFO - Attempting to fetch remote file: icoads/r300/d730/input/icoads_r300_d730_1776-10-01_subset.imma.md5
+</pre></div></div>
+</div>
+</section>
+<section id="Initial-Read">
+<h2>Initial Read<a class="headerlink" href="#Initial-Read" title="Link to this heading"></a></h2>
+<p>First we read the data using the basic <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> data model. This isn’t necessary for extending the schema, it is to highlight the raw <code class="docutils literal notranslate"><span class="pre">c99</span></code> data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="n">imodel</span><span class="o">=</span><span class="s2">"icoads"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-10-11 09:37:35,682 - root - INFO - READING DATA MODEL SCHEMA FILE...
+2024-10-11 09:37:35,686 - root - INFO - EXTRACTING DATA FROM MODEL: icoads
+2024-10-11 09:37:35,686 - root - INFO - Getting data string from source...
+2024-10-11 09:37:35,781 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')
+2024-10-11 09:37:35,781 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
+2024-10-11 09:37:35,981 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
+</pre></div></div>
+</div>
+<section id="Supplementary-(c99)-data">
+<h3>Supplementary (<code class="docutils literal notranslate"><span class="pre">c99</span></code>) data<a class="headerlink" href="#Supplementary-(c99)-data" title="Link to this heading"></a></h3>
+<p>By looking at the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section we can see that the supplementary data has not been parsed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    99 0 AGI     ARCHIVO GENERAL DE INDIAS        ...
+1    99 0 CARAN   CENTRE D'ACCUEIL ET DE RECHERCHE ...
+2    99 0 RAZ     RIJKSARCHIEF ZEELAND             ...
+3    99 0 NMM     NATIONAL MARITIME MUSEUM         ...
+4    99 0 AGI     ARCHIVO GENERAL DE INDIAS        ...
+Name: c99, dtype: object
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_raw</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"c99"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+'99 0 NMM     NATIONAL MARITIME MUSEUM                          GREENWICH UNITED KINGDOM                                                                                                      NMM ADM/L/R13                 ENGLISH                       0492500N 405000E                1 1BERMUDA                                    LIZARD                                            N87:17E            230                                                                                                                                                0 21771100112TUESDAY                   12             RAINBOW                       BRITISH 5TH RATE       RN                                THOMAS COLLINGWOOD            CAPTAIN                  CHARLES WARREN                2ND OFFICER/LIEUTENANT                                                          BERMUDA                                      SPITHEAD                                          0                                                        17710829S25E                  39.00                                                                                                        UNKNOWN        UNKNOWN         -22                    LEAGUESNM     180 DEGREES                                                                                                                                                                                                 ESE, E                                                                                                                                                                         FRESH GALES AND SQUALLY                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             00000000CLIWOC VERSION 2.0'
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Creating-a-data-model">
+<h2>Creating a data model<a class="headerlink" href="#Creating-a-data-model" title="Link to this heading"></a></h2>
+<section id="Custom-Schema">
+<h3>Custom Schema<a class="headerlink" href="#Custom-Schema" title="Link to this heading"></a></h3>
+<p>To use a custom schema we need to use the <code class="docutils literal notranslate"><span class="pre">ext_schema_path</span></code> argument in <code class="docutils literal notranslate"><span class="pre">mdf_reader.read</span></code>. The structure of the directory is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>name_of_model/
+    name_of_model.json
+    code_tables/
+        ...
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">code_tables</span></code> sub-directory contains the code tables that map the key columns in the data to their values.</p>
+<p>In this example we create a temporary directory for the data model, so that it is cleaned up after the notebook is finished; in reality you would want to store the data model in a permanent directory!</p>
+<p>We start from the basic <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> model. The <code class="docutils literal notranslate"><span class="pre">c99</span></code> section will be based on the <code class="docutils literal notranslate"><span class="pre">"icoads_r300_d730"</span></code> schema and code tables.</p>
+<section id="Copy-the-%22icoads%22-schema">
+<h4>Copy the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> schema<a class="headerlink" href="#Copy-the-%22icoads%22-schema" title="Link to this heading"></a></h4>
+<p>First we create a copy of the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> schema (located at <code class="docutils literal notranslate"><span class="pre">mdf_reader/schemas/icoads/icoads.json</span></code>). NOTE: <code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper.mdf_reader.properties._base</span></code> is used so that we have a relative path to the original schema and code tables.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="n">my_model_name</span> <span class="o">=</span> <span class="s2">"cliwoc"</span>
+<span class="n">my_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">my_model_name</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">)</span>
+
+<span class="c1"># Get a copy of the "imma1" schema</span>
+<span class="n">icoads_schema_path</span> <span class="o">=</span> <span class="n">icoads_code_tables_path</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
+    <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s2">"schemas"</span><span class="p">,</span> <span class="s2">"icoads"</span><span class="p">])</span>
+<span class="p">)</span>
+<span class="n">icoads_schema_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">icoads_schema_path</span><span class="p">,</span> <span class="s2">"icoads.json"</span><span class="p">)</span>
+
+<span class="n">my_schema_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="n">my_model_name</span> <span class="o">+</span> <span class="s2">".json"</span><span class="p">)</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">icoads_schema_path</span><span class="p">,</span> <span class="n">my_schema_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+'/var/folders/vf/pskk3w4j38l8kk7bc9xm07j00000gp/T/tmpwu4trpw8/cliwoc/cliwoc.json'
+</pre></div></div>
+</div>
+</section>
+<section id="Copy-the-code-tables">
+<h4>Copy the code tables<a class="headerlink" href="#Copy-the-code-tables" title="Link to this heading"></a></h4>
+<p>We now copy each of the <code class="docutils literal notranslate"><span class="pre">"icoads"</span></code> code tables. This includes generic <code class="docutils literal notranslate"><span class="pre">icoads</span></code> code tables (located in <code class="docutils literal notranslate"><span class="pre">mdf_reader/codes/icoads</span></code>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get code tables and copy to the directory</span>
+<span class="n">my_code_tables_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_model_path</span><span class="p">,</span> <span class="s2">"code_tables"</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">my_code_tables_path</span><span class="p">)</span>
+
+<span class="c1"># Original code table directories (general ICOADS and Deck specific)</span>
+<span class="n">icoads_code_tables_path</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
+    <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mdf_reader</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s2">"codes"</span><span class="p">,</span> <span class="s2">"icoads"</span><span class="p">])</span>
+<span class="p">)</span>
+
+<span class="c1"># Get filenames for each of the code tables</span>
+<span class="n">code_table_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">icoads_code_tables_path</span><span class="p">,</span> <span class="s2">"ICOADS.*.json"</span><span class="p">))</span>
+
+<span class="c1"># Copy each file</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">code_table_files</span><span class="p">:</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_code_tables_path</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Extending-the-schema:-CLIWOC-logbook-information">
+<h4>Extending the schema: CLIWOC logbook information<a class="headerlink" href="#Extending-the-schema:-CLIWOC-logbook-information" title="Link to this heading"></a></h4>
+<p>For this example we’ll load the schema into the environment as a dictionary (we use an ordered dictionary to guarantee that the ordering of the fields is maintained!).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">my_schema_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">io</span><span class="p">:</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We now add the contents for section <code class="docutils literal notranslate"><span class="pre">c99</span></code>. There are some standard (“header”_ fields we need to supply. The <code class="docutils literal notranslate"><span class="pre">"sentinal"</span></code> is the prefix for the attachment, this is printed in the raw supplementary data and identifies the start of the attachment.</p>
+<p>We also need to specify the length of the attachment and the layout.</p>
+<p>We then add our data fields to the <code class="docutils literal notranslate"><span class="pre">elements</span></code> field for the <code class="docutils literal notranslate"><span class="pre">c99</span></code> section. We’ll add the fields for the logbook component of the supplementary data for CLIWOC data, there are additional components we can resolve but we’ll keep it to the logbook for this example.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"sentinal"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"99 0 "</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"disable_read"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"field_layout"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"fixed_width"</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"header"</span><span class="p">][</span><span class="s2">"length"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">245</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># Sentinal length</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="s2">"c99"</span><span class="p">][</span><span class="s2">"elements"</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">"sentinal"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"attachment sentinal"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+            <span class="s2">"ignore"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"InstAbbr"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Abbreviation of the Institute storing the original data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"InstName"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Full name of the Institute storing the original data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"InstCity"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"City where the Institute storing the data is located"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"InstCountry"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Country where the Institute storing the data is located"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ArchiveID"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Administrative number under which the data is found within the Institute storing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ArchiveName"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Administrative name under which the data is found within the Institute storing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">17</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ArchivePart"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Part of the archive set in which the data is found within the Institute storing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ArchivePartSpec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Specification of the part of the archive set in which the data is found within the Institute storing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"LogbookID"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Identificaion Number of the logbook containing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"LogbookLang"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Language of the logbook containing the data"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ImageID"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Identificaion Number of the original image of the logbook"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"str"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"IllustrationAvail"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Illustration available on the current page of the logbook"</span><span class="p">,</span>
+            <span class="s2">"field_length"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"column_type"</span><span class="p">:</span> <span class="s2">"key"</span><span class="p">,</span>
+            <span class="s2">"codetable"</span><span class="p">:</span> <span class="s2">"CLIWOC_ILLUSTRATION_I"</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can now write the dictionary to the schema file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">my_schema_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="ImageAvail-Code-Table">
+<h4><code class="docutils literal notranslate"><span class="pre">ImageAvail</span></code> Code Table<a class="headerlink" href="#ImageAvail-Code-Table" title="Link to this heading"></a></h4>
+<p>One of the fields we have added has <code class="docutils literal notranslate"><span class="pre">"column_type"</span></code> of <code class="docutils literal notranslate"><span class="pre">"key"</span></code>. This is used to indicate categorical data, where the key value maps to a larger descriptive value. We also specified a code table for this field, which should describe that mapping. Let’s create that table now. As with the schema it should be json formatted.</p>
+<p>For this field, we have two possible values. We save the dictionary to a json file in the code_tables directory, the name of the file must match the <code class="docutils literal notranslate"><span class="pre">"codetable"</span></code> value for the field (plus the <code class="docutils literal notranslate"><span class="pre">".json"</span></code> extension).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">illustration_avail_codes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"0"</span><span class="p">:</span> <span class="s2">"No illustration on the current logbook page."</span><span class="p">,</span>
+    <span class="s2">"1"</span><span class="p">:</span> <span class="s2">"Illustration available on the current logbook page."</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">illustration_avail_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">my_code_tables_path</span><span class="p">,</span> <span class="s2">"CLIWOC_ILLUSTRATION_I.json"</span>
+<span class="p">)</span>
+
+<span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">illustration_avail_codes</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">illustration_avail_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Reading">
+<h3>Reading<a class="headerlink" href="#Reading" title="Link to this heading"></a></h3>
+<p>We can now read the data file with the schema we have just created (copied…). We specify the path to the data model (the directory containing the schema json file) and the path to the code tables.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+    <span class="n">data_file_path</span><span class="p">,</span>  <span class="c1"># Path to the data file</span>
+    <span class="n">ext_schema_path</span><span class="o">=</span><span class="n">my_model_path</span><span class="p">,</span>  <span class="c1"># Path to the directory containing the schema json file</span>
+    <span class="n">ext_table_path</span><span class="o">=</span><span class="n">my_code_tables_path</span><span class="p">,</span>  <span class="c1"># Path to the directory containing the json code tables</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-10-11 09:37:36,111 - root - INFO - READING DATA MODEL SCHEMA FILE...
+2024-10-11 09:37:36,115 - root - INFO - EXTRACTING DATA FROM MODEL: None
+2024-10-11 09:37:36,116 - root - INFO - Getting data string from source...
+2024-10-11 09:37:36,230 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE')
+2024-10-11 09:37:36,230 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
+2024-10-11 09:37:36,689 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
+</pre></div></div>
+</div>
+<section id="Analysing-the-output">
+<h4>Analysing the output<a class="headerlink" href="#Analysing-the-output" title="Link to this heading"></a></h4>
+<p>We can now investigate components of the c99 section.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="12" halign="left">c99</th>
+</tr>
+<tr>
+<th></th>
+<th>InstAbbr</th>
+<th>InstName</th>
+<th>InstCity</th>
+<th>InstCountry</th>
+<th>ArchiveID</th>
+<th>ArchiveName</th>
+<th>ArchivePart</th>
+<th>ArchivePartSpec</th>
+<th>LogbookID</th>
+<th>LogbookLang</th>
+<th>ImageID</th>
+<th>IllustrationAvail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>CORREOS, 275A R11</td>
+<td>SPANISH</td>
+<td>NaN</td>
+<td>0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>CARAN</td>
+<td>CENTRE D'ACCUEIL ET DE RECHERCHE DES ARCH. NAT...</td>
+<td>PARIS</td>
+<td>FRANCE</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>COTE - 4/JJ/39</td>
+<td>FRENCH</td>
+<td>NaN</td>
+<td>0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>RAZ</td>
+<td>RIJKSARCHIEF ZEELAND</td>
+<td>MIDDELBURG</td>
+<td>NEDERLAND</td>
+<td>20</td>
+<td>NaN</td>
+<td>MCC</td>
+<td>1391</td>
+<td>MCC_20_1391</td>
+<td>DUTCH</td>
+<td>MCC_20_1391_0032</td>
+<td>0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>NMM</td>
+<td>NATIONAL MARITIME MUSEUM</td>
+<td>GREENWICH</td>
+<td>UNITED KINGDOM</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NMM ADM/L/R13</td>
+<td>ENGLISH</td>
+<td>NaN</td>
+<td>0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>CORREOS, 193B R3</td>
+<td>SPANISH</td>
+<td>NaN</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99"</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="12" halign="left">c99</th>
+</tr>
+<tr>
+<th></th>
+<th>InstAbbr</th>
+<th>InstName</th>
+<th>InstCity</th>
+<th>InstCountry</th>
+<th>ArchiveID</th>
+<th>ArchiveName</th>
+<th>ArchivePart</th>
+<th>ArchivePartSpec</th>
+<th>LogbookID</th>
+<th>LogbookLang</th>
+<th>ImageID</th>
+<th>IllustrationAvail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<th>top</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>20</td>
+<td>NaN</td>
+<td>MCC</td>
+<td>1391</td>
+<td>CORREOS, 275A R11</td>
+<td>SPANISH</td>
+<td>MCC_20_1391_0032</td>
+<td>0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Internal-Schema">
+<h2>Internal Schema<a class="headerlink" href="#Internal-Schema" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cdm_reader_mapper</span></code> already includes a data model for the CLIWOC deck. The model parses all sections of supplementary data and provides all required code tables. Let’s now read in the data using the <code class="docutils literal notranslate"><span class="pre">"icoads_r300_d730"</span></code> model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span> <span class="o">=</span> <span class="n">mdf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+    <span class="n">data_file_path</span><span class="p">,</span>
+    <span class="n">imodel</span><span class="o">=</span><span class="s2">"icoads_r300_d730"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024-10-11 09:37:36,713 - root - INFO - READING DATA MODEL SCHEMA FILE...
+2024-10-11 09:37:36,718 - root - INFO - EXTRACTING DATA FROM MODEL: icoads_r300_d730
+2024-10-11 09:37:36,718 - root - INFO - Getting data string from source...
+2024-10-11 09:37:36,862 - root - WARNING - Data numeric elements with missing upper or lower threshold: ('c1', 'BSI'),('c1', 'AQZ'),('c1', 'AQA'),('c1', 'UQZ'),('c1', 'UQA'),('c1', 'VQZ'),('c1', 'VQA'),('c1', 'PQZ'),('c1', 'PQA'),('c1', 'DQZ'),('c1', 'DQA'),('c5', 'OS'),('c5', 'OP'),('c5', 'FM'),('c5', 'IMMV'),('c5', 'IX'),('c5', 'W2'),('c5', 'WMI'),('c5', 'SD2'),('c5', 'SP2'),('c5', 'IS'),('c5', 'RS'),('c5', 'IC1'),('c5', 'IC2'),('c5', 'IC3'),('c5', 'IC4'),('c5', 'IC5'),('c5', 'IR'),('c5', 'RRR'),('c5', 'TR'),('c5', 'NU'),('c5', 'QCI'),('c5', 'QI1'),('c5', 'QI2'),('c5', 'QI3'),('c5', 'QI4'),('c5', 'QI5'),('c5', 'QI6'),('c5', 'QI7'),('c5', 'QI8'),('c5', 'QI9'),('c5', 'QI10'),('c5', 'QI11'),('c5', 'QI12'),('c5', 'QI13'),('c5', 'QI14'),('c5', 'QI15'),('c5', 'QI16'),('c5', 'QI17'),('c5', 'QI18'),('c5', 'QI19'),('c5', 'QI20'),('c5', 'QI21'),('c5', 'QI22'),('c5', 'QI23'),('c5', 'QI24'),('c5', 'QI25'),('c5', 'QI26'),('c5', 'QI27'),('c5', 'QI28'),('c5', 'QI29'),('c5', 'RHI'),('c5', 'AWSI'),('c6', 'FBSRC'),('c6', 'MST'),('c7', 'OPM'),('c7', 'LOT'),('c9', 'CCe'),('c9', 'WWe'),('c9', 'Ne'),('c9', 'NHe'),('c9', 'He'),('c9', 'CLe'),('c9', 'CMe'),('c9', 'CHe'),('c9', 'SBI'),('c95', 'DPRO'),('c95', 'DPRP'),('c95', 'UFR'),('c95', 'ASIR'),('c96', 'ASII'),('c97', 'ASIE'),('c99_voyage', 'drLatDeg'),('c99_voyage', 'drLatMin'),('c99_voyage', 'drLatSec'),('c99_voyage', 'drLonDeg'),('c99_voyage', 'drLonMin'),('c99_voyage', 'drLonSec'),('c99_voyage', 'LatDeg'),('c99_voyage', 'LatMin'),('c99_voyage', 'LatSec'),('c99_voyage', 'LonDeg'),('c99_voyage', 'LonMin'),('c99_voyage', 'LonSec'),('c99_voyage', 'LMdistance1'),('c99_voyage', 'LMdistance2'),('c99_voyage', 'LMdistance4'),('c99_voyage', 'TimeOB'),('c99_voyage', 'Glasses'),('c99_data', 'AT_outside'),('c99_data', 'SST'),('c99_data', 'attached_tem')
+2024-10-11 09:37:36,862 - root - WARNING - Corresponding upper and/or lower bounds set to +/-inf for validation
+2024-10-11 09:37:39,558 - root - INFO - CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">c99</span></code> section has been split into multiple sections. There is no <code class="docutils literal notranslate"><span class="pre">c99</span></code> section in the output, however we now have:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c99_logbook</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c99_voyage</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c99_data</span></code></p></li>
+</ul>
+<p>We can compare the <code class="docutils literal notranslate"><span class="pre">c99_logbook</span></code> section to the output of our model. We see that we have extracted the same data, although we chose different column names for the elements.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_logbook"</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="12" halign="left">c99_logbook</th>
+</tr>
+<tr>
+<th></th>
+<th>InstAbbr</th>
+<th>InsName</th>
+<th>InsPlace</th>
+<th>InsLand</th>
+<th>No_data_entry</th>
+<th>NameArchiveSet</th>
+<th>ArchivePart</th>
+<th>Specification</th>
+<th>Logbook_id</th>
+<th>Logbook_language</th>
+<th>Image_No</th>
+<th>Illustr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<th>top</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>20</td>
+<td>NaN</td>
+<td>MCC</td>
+<td>1391</td>
+<td>CORREOS, 275A R11</td>
+<td>SPANISH</td>
+<td>MCC_20_1391_0032</td>
+<td>0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99"</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="12" halign="left">c99</th>
+</tr>
+<tr>
+<th></th>
+<th>InstAbbr</th>
+<th>InstName</th>
+<th>InstCity</th>
+<th>InstCountry</th>
+<th>ArchiveID</th>
+<th>ArchiveName</th>
+<th>ArchivePart</th>
+<th>ArchivePartSpec</th>
+<th>LogbookID</th>
+<th>LogbookLang</th>
+<th>ImageID</th>
+<th>IllustrationAvail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<th>top</th>
+<td>AGI</td>
+<td>ARCHIVO GENERAL DE INDIAS</td>
+<td>SEVILLE</td>
+<td>SPAIN</td>
+<td>20</td>
+<td>NaN</td>
+<td>MCC</td>
+<td>1391</td>
+<td>CORREOS, 275A R11</td>
+<td>SPANISH</td>
+<td>MCC_20_1391_0032</td>
+<td>0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<p>We can also look at the additional components we did not parse in our model.</p>
+<p>We can note some remaining issues with the model as we look at the extra data. Most of the challenges relate to language translations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="58" halign="left">c99_voyage</th>
+</tr>
+<tr>
+<th></th>
+<th>drLatDeg</th>
+<th>drLatMin</th>
+<th>drLatSec</th>
+<th>drLatHem</th>
+<th>drLonDeg</th>
+<th>drLonMin</th>
+<th>drLonSec</th>
+<th>drLonHem</th>
+<th>LatDeg</th>
+<th>LatMin</th>
+<th>LatSec</th>
+<th>LatHem</th>
+<th>LonDeg</th>
+<th>LonMin</th>
+<th>LonSec</th>
+<th>LonHem</th>
+<th>LatInd</th>
+<th>LonInd</th>
+<th>ZeroMeridian</th>
+<th>LMname1</th>
+<th>LMdirection1</th>
+<th>LMdistance1</th>
+<th>LMname2</th>
+<th>LMdirection2</th>
+<th>LMdistance2</th>
+<th>LMname3</th>
+<th>LMdirection3</th>
+<th>LMdistance4</th>
+<th>PosCoastal</th>
+<th>Calendar_type</th>
+<th>logbook_date</th>
+<th>TimeOB</th>
+<th>Day_of_the_week</th>
+<th>PartDay</th>
+<th>Watch</th>
+<th>Glasses</th>
+<th>Start_day</th>
+<th>ShipName</th>
+<th>Nationality</th>
+<th>Ship_type</th>
+<th>Company</th>
+<th>Name1</th>
+<th>Rank1</th>
+<th>Name2</th>
+<th>Rank2</th>
+<th>Name3</th>
+<th>Rank3</th>
+<th>voyage_from</th>
+<th>voyage_to</th>
+<th>Anchored_ind</th>
+<th>AnchorPlace</th>
+<th>DASno</th>
+<th>VoyageIni</th>
+<th>Course_ship</th>
+<th>Ship_speed</th>
+<th>Distance</th>
+<th>EncName</th>
+<th>EncNat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>4.000000</td>
+<td>4.000000</td>
+<td>4.0</td>
+<td>4</td>
+<td>2.000000</td>
+<td>2.00000</td>
+<td>2.0</td>
+<td>2</td>
+<td>2.000000</td>
+<td>2.000000</td>
+<td>2.0</td>
+<td>2</td>
+<td>3.000000</td>
+<td>3.000000</td>
+<td>3.0</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>1.0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5.0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1.0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>&lt;NA&gt;</td>
+<td>2</td>
+<td>5</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>4</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<th>top</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>N</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>E</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>N</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>E</td>
+<td>1</td>
+<td>2</td>
+<td>TENERIFE</td>
+<td>LIZARD</td>
+<td>N87:17E</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>2</td>
+<td>17711001</td>
+<td>NaN</td>
+<td>TUESDAY</td>
+<td>3</td>
+<td>VM</td>
+<td>&lt;NA&gt;</td>
+<td>UNKNOWN</td>
+<td>EL COLON</td>
+<td>SPANISH</td>
+<td>PAQUEBOTE</td>
+<td>MCC</td>
+<td>THOMAS D'ORVES</td>
+<td>CAPITAN</td>
+<td>CHARLES WARREN</td>
+<td>2ND OFFICER/LIEUTENANT</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>LA HABANA</td>
+<td>LA CORUÑA</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>17710819</td>
+<td>WTZ</td>
+<td>NaN</td>
+<td>175.00</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>&lt;NA&gt;</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>mean</th>
+<td>27.250000</td>
+<td>24.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>26.500000</td>
+<td>36.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>22.000000</td>
+<td>9.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>121.666667</td>
+<td>42.666667</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>std</th>
+<td>21.884165</td>
+<td>16.879475</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>19.091883</td>
+<td>19.79899</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>29.698485</td>
+<td>13.435029</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>195.208436</td>
+<td>11.239810</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>&lt;NA&gt;</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>min</th>
+<td>1.000000</td>
+<td>5.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>13.000000</td>
+<td>22.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>4.000000</td>
+<td>33.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>25%</th>
+<td>13.750000</td>
+<td>17.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>19.750000</td>
+<td>29.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>11.500000</td>
+<td>4.750000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>9.000000</td>
+<td>36.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>50%</th>
+<td>29.500000</td>
+<td>23.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>26.500000</td>
+<td>36.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>22.000000</td>
+<td>9.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>14.000000</td>
+<td>40.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>75%</th>
+<td>43.000000</td>
+<td>30.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>33.250000</td>
+<td>43.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>32.500000</td>
+<td>14.250000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>180.500000</td>
+<td>47.500000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>max</th>
+<td>49.000000</td>
+<td>46.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>40.000000</td>
+<td>50.00000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>43.000000</td>
+<td>19.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>347.000000</td>
+<td>55.000000</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>230.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>12.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_voyage</span><span class="o">.</span><span class="n">ZeroMeridian</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     TENERIFE
+1    GREENWICH
+2      NL_0_01
+3      BERMUDA
+4     TENERIFE
+Name: ZeroMeridian, dtype: object
+</pre></div></div>
+</div>
+<p>For example, the ship types on this deck will be given in many different languages. There is no code table for this variable in the CLIWOC website.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_voyage"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_voyage</span><span class="o">.</span><span class="n">Ship_type</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    PAQUEBOTE
+2        SNAUW
+3     5TH RATE
+4     PAQUEBOT
+Name: Ship_type, dtype: object
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_data"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_data</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>AT_reading_units</th>
+<th>SST_reading_units</th>
+<th>AP_reading_units</th>
+<th>BART_reading_units</th>
+<th>ReferenceCourse</th>
+<th>ReferenceWindDirection</th>
+<th>Decl</th>
+<th>Distance_units</th>
+<th>Distance_units_to_landmark</th>
+<th>Distance_units_travelled</th>
+<th>Longitude_units</th>
+<th>units_of_measurement</th>
+<th>humidity_units</th>
+<th>water_at_pump_units</th>
+<th>wind_scale</th>
+<th>BARO_type</th>
+<th>BARO_brand</th>
+<th>API</th>
+<th>Humidity_method</th>
+<th>compas_error</th>
+<th>compas_correction</th>
+<th>AT_outside</th>
+<th>SST</th>
+<th>AP</th>
+<th>wind_dir</th>
+<th>current_dir</th>
+<th>current_speed</th>
+<th>attached_tem</th>
+<th>pump_water</th>
+<th>Humidity</th>
+<th>wind_force</th>
+<th>weather</th>
+<th>prcp_descriptor</th>
+<th>sea_state</th>
+<th>shape_coulds</th>
+<th>dir_coulds</th>
+<th>Clearness</th>
+<th>cloud_fraction</th>
+<th>gusts</th>
+<th>Rain</th>
+<th>Fog</th>
+<th>Snow</th>
+<th>Thunder</th>
+<th>Hail</th>
+<th>Sea_ice</th>
+<th>Trivial_correction</th>
+<th>Release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+<td>1</td>
+<td>4</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<th>unique</th>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>0</td>
+<td>1</td>
+<td>4</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<th>top</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>UNKNOWN</td>
+<td>UNKNOWN</td>
+<td>-20</td>
+<td>NaN</td>
+<td>LEAGUES</td>
+<td>MILLAS</td>
+<td>360 DEGREES</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>S</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>EN REFREGONES FUERTES Y DESPUES BONANCIBLE</td>
+<td>MUY MALOS CARICES. AGUACEROS, RELAMPAGOS Y TRU...</td>
+<td>NaN</td>
+<td>GRANDE DEL O Y DEL ENE</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>CLIWOC VERSION 2.0</td>
+</tr>
+<tr>
+<th>freq</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>2</td>
+<td>5</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>1</td>
+<td>NaN</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>5</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr>
+<th>mean</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>std</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>min</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>25%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>50%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>75%</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>max</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<p>What about the different scales for the wind force, given different languages?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_data</span><span class="o">.</span><span class="n">data</span><span class="p">[[</span><span class="s2">"c99_data"</span><span class="p">]]</span><span class="o">.</span><span class="n">c99_data</span><span class="o">.</span><span class="n">wind_force</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0    EN REFREGONES FUERTES Y DESPUES BONANCIBLE
+1                                        FOIBLE
+2               STIJVE GEREEFDE MARSZEILSKOELTE
+3                       FRESH GALES AND SQUALLY
+4                                    BONANCIBLE
+Name: wind_force, dtype: object
+</pre></div></div>
+</div>
+</section>
+</section>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="mdf_reader_test_overview.html" rel="prev" title="Test and overview of the mdf_reader module"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="CDM_mapper_example_deck704.html" rel="next" title="Mapping data from ICOADS deck 704 to the Common Data Model (CDM)">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright 2019-2024, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent.</p>
+</div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+</div>
+</div>
+</section>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+</body>
+</html>

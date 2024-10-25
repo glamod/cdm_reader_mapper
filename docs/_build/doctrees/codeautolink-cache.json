@@ -1,0 +1,59 @@
+{
+  "api": [],
+  "authors": [],
+  "cdm-tables-mapping-files-and-descriptors": [],
+  "changes": [],
+  "contributing": [],
+  "data-models": [],
+  "getting-started": [],
+  "how-to-build-a-data-model": [],
+  "how-to-register-a-new-data-model-mapping": [],
+  "how_to_read_csv": [],
+  "tool-overview_mapper": [],
+  "tool-overview_metmetpy": [],
+  "hyperlinks": [],
+  "index": [],
+  "readme": [
+    {
+      "source": "import os\n\nos.environ[\"CDM_LOG_FILE\"] = \"log_file.log\"\n\nimport cdm_reader_mapper as cdm",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "logging",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Logging"
+        ]
+      },
+      "doc_lineno": 75
+    },
+    {
+      "source": "from cdm_reader_mapper.mdf_reader import read\nfrom cdm_reader_mapper.data import test_data\n\ndata = test_data.test_icoads_r300_d701.get(\"source\")\n\nimma_data = read(\n    filepath, imodel=\"icoads_r300_d701\", sections=[\"core\", \"c1\", \"c98\"]\n)\n\ndata_raw = imma_data.data.copy()",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "run-a-test",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Run a test"
+        ]
+      },
+      "doc_lineno": 91
+    },
+    {
+      "source": "from cdm_reader_mapper.cdm_mapper import map_model\n\nname_of_model = \"icoads_r300_d704\"\n\ncdm_dict = map_model(\n    data_raw,\n    imodel=name_of_model,\n    log_level=\"DEBUG\",\n)",
+      "names": [],
+      "example": {
+        "document": "readme",
+        "ref_id": "run-a-test",
+        "headings": [
+          "Common Data Model reader and mapper: cdm_reader_mapper toolbox",
+          "Run a test"
+        ]
+      },
+      "doc_lineno": 107
+    }
+  ],
+  "tool-overview_reader": [],
+  "tool-set-up": []
+}
