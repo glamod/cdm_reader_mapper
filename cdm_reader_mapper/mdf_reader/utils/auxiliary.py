@@ -50,9 +50,7 @@ def validate_arg(arg_name, arg_value, arg_type):
         Returns True if type of `arg_value` equals `arg_type`
     """
     if arg_value and not isinstance(arg_value, arg_type):
-        logging.error(
-            f"Argument {arg_name} must be {arg_type}, input type is {type(arg_value)}"
-        )
+        logging.error(f"Argument {arg_name} must be {arg_type}, input type is {type(arg_value)}")
         return False
     return True
 
@@ -92,89 +90,27 @@ class Configurator:
         self.orders = order
         self.valid = valid
         self.schema = schema
-        self.str_line = ""
-        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
-            if len(df) > 0:
-                self.str_line = df.iloc[0]
 
-    def _add_field_length(self, index):
-        if "field_length" in self.sections_dict.keys():
-            field_length = self.sections_dict["field_length"]
-        else:
-            field_length = properties.MAX_FULL_REPORT_WIDTH
+    def _add_field_length(self, index, sections_dict):
+        field_length = sections_dict.get("field_length", properties.MAX_FULL_REPORT_WIDTH)
         return index + field_length
 
-    def _validate_sentinal(self, i):
-        slen = len(self.sentinal)
-        str_start = self.str_line[i : i + slen]
-        if str_start != self.sentinal:
-            self.length = 0
-            return i
-        else:
-            self.sentinal = None
-            return self._add_field_length(i)
+    def _validate_sentinal(self, i, line, sentinal):
+        slen = len(sentinal)
+        str_start = line[i : i + slen]
+        return str_start == sentinal
 
-    def _validate_delimited(self, i, j):
-        i = self._skip_delimiter(self.str_line, i)
-        if self.delimiter_format == "delimited":
-            j = self._next_delimiter(self.str_line, i)
-            return i, j
-        elif self.field_layout == "fixed_width":
-            j = self._add_field_length(i)
-            return i, j
-        return None, None
-
-    def _skip_delimiter(self, line, index):
-        length = len(line)
-        while True:
-            if index == length:
-                break
-            if line[index] == self.delimiter:
-                index += 1
-            break
-        return index
-
-    def _next_delimiter(self, line, index):
-        while True:
-            if index == len(line):
-                break
-            if line[index] == self.delimiter:
-                break
-            index += 1
-        return index
-
-    def _get_index(self, section):
+    def _get_index(self, section, order):
         if len(self.orders) == 1:
             return section
         else:
-            return (self.order, section)
+            return (order, section)
 
-    def _get_ignore(self):
-        if self.order in self.valid:
-            ignore = self.sections_dict.get("ignore")
-        else:
-            ignore = True
+    def _get_ignore(self, section_dict):
+        ignore = section_dict.get("ignore")
         if isinstance(ignore, str):
             ignore = ast.literal_eval(ignore)
         return ignore
-
-    def _get_borders(self, i, j):
-        if self.sentinal is not None:
-            j = self._validate_sentinal(i)
-        elif self.delimiter is None:
-            j = self._add_field_length(i)
-        else:
-            i, j = self._validate_delimited(i, j)
-            self.missing = False
-        return i, j
-
-    def _adjust_right_borders(self, j, k):
-        if self.length is None:
-            self.length = j - k
-        if j - k > self.length:
-            self.missing = False
-            j = k + self.length
-        return j, k
 
     def _get_dtypes(self):
         return properties.pandas_dtypes.get(self.sections_dict.get("column_type"))
@@ -186,15 +122,10 @@ class Configurator:
         column_type = self.sections_dict.get("column_type")
         if column_type is None:
             return {}
-        return {
-            converter_arg: self.sections_dict.get(converter_arg)
-            for converter_arg in properties.data_type_conversion_args.get(column_type)
-        }
+        return {converter_arg: self.sections_dict.get(converter_arg) for converter_arg in properties.data_type_conversion_args.get(column_type)}
 
     def _get_decoders(self):
-        return decoders.get(self.sections_dict["encoding"]).get(
-            self.sections_dict.get("column_type")
-        )
+        return decoders.get(self.sections_dict["encoding"]).get(self.sections_dict.get("column_type"))
 
     def _convert_entries(self, series, converter_func, **kwargs):
         return converter_func(series, **kwargs)
@@ -220,8 +151,8 @@ class Configurator:
             for section in sections.keys():
                 self.sections_dict = sections[section]
                 encoding = sections[section].get("encoding")
-                index = self._get_index(section)
-                ignore = self._get_ignore()
+                index = self._get_index(section, order)
+                ignore = self._get_ignore(self.sections_dict)
                 if ignore is not True:
                     dtype = self._get_dtypes()
                     if dtype:
@@ -252,58 +183,77 @@ class Configurator:
 
     def open_pandas(self):
         """Open TextParser to pd.DataSeries."""
+        return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
+
+    def _read_line(self, line: str):
+        i = j = 0
         missing_values = []
-        self.delimiter = None
-        i = 0
-        j = 0
         data_dict = {}
         for order in self.orders:
-            self.order = order
             header = self.schema["sections"][order]["header"]
-            self.sentinal = header.get("sentinal")
-            self.sentinal_length = header.get("sentinal_length")
-            self.delimiter = header.get("delimiter")
-            self.field_layout = header.get("field_layout")
-            self.delimiter_format = header.get("format")
+
             disable_read = header.get("disable_read")
             if disable_read is True:
-                data_dict[order] = self.str_line[i : properties.MAX_FULL_REPORT_WIDTH]
+                data_dict[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
+
+            sentinal = header.get("sentinal")
+            bad_sentinal = sentinal is not None and not self._validate_sentinal(i, line, sentinal)
+
+            section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
             sections = self.schema["sections"][order]["elements"]
-            k = i
-            for section in sections.keys():
-                self.length = header.get("length")
-                self.missing = True
-                self.sections_dict = sections[section]
-                index = self._get_index(section)
-                ignore = self._get_ignore()
-                na_value = sections[section].get("missing_value")
 
-                i, j = self._get_borders(i, j)
-
-                if i is None:
+            field_layout = header.get("field_layout")
+            delimiter = header.get("delimiter")
+            if delimiter is not None:
+                delimiter_format = header.get("format")
+                if delimiter_format == "delimited":
+                    # Read as CSV
+                    field_names = sections.keys()
+                    fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
+                    for field_name, field in zip(field_names, fields):
+                        index = self._get_index(field_name, order)
+                        data_dict[index] = field.strip()
+                        i += len(field)
+                    j = i
+                    continue
+                elif field_layout != "fixed_width":
                     logging.error(
-                        f"Delimiter is set to {self.delimiter}. Please specify either format or field_layout in your header schema {header}."
+                        f"Delimiter for {order} is set to {delimiter}. Please specify either format or field_layout in your header schema {header}."
                     )
                     return
 
-                j, k = self._adjust_right_borders(j, k)
+            k = i + section_length
+            for section, section_dict in sections.items():
+                missing = True
+                index = self._get_index(section, order)
+                ignore = (order not in self.valid) or self._get_ignore(section_dict)
+                na_value = section_dict.get("missing_value")
+                field_length = section_dict.get("field_length", properties.MAX_FULL_REPORT_WIDTH)
+
+                j = (i + field_length) if not bad_sentinal else i
+                if j > k:
+                    missing = False
+                    j = k
 
                 if ignore is not True:
-                    data_dict[index] = self.str_line[i:j]
+                    data_dict[index] = line[i:j]
 
                     if not data_dict[index].strip():
                         data_dict[index] = None
                     if data_dict[index] == na_value:
                         data_dict[index] = None
 
-                if i == j and self.missing is True:
+                if i == j and missing is True:
                     missing_values.append(index)
 
+                if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
+                    j += len(delimiter)
                 i = j
 
         df = pd.Series(data_dict)
         df["missing_values"] = missing_values
+        print(missing_values)
         return df
 
     def open_netcdf(self):
@@ -320,7 +270,6 @@ class Configurator:
         renames = {}
         disables = []
         for order in self.orders:
-            self.order = order
             header = self.schema["sections"][order]["header"]
             disable_read = header.get("disable_read")
             if disable_read is True:
@@ -328,9 +277,9 @@ class Configurator:
                 continue
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
-                self.sections_dict = sections[section]
-                index = self._get_index(section)
-                ignore = self._get_ignore()
+                section_dict = sections[section]
+                index = self._get_index(section, order)
+                ignore = (order not in self.valid) or self._get_ignore(section_dict)
                 if ignore is not True:
                     if section in self.df.data_vars:
                         renames[section] = index
@@ -365,9 +314,7 @@ class _FileReader:
     ):
         # 0. VALIDATE INPUT
         if not imodel and not ext_schema_path:
-            logging.error(
-                "A valid input data model name or path to data model must be provided"
-            )
+            logging.error("A valid input data model name or path to data model must be provided")
             return
         if not os.path.isfile(source):
             logging.error(f"Can't find input data file {source}")
@@ -387,9 +334,7 @@ class _FileReader:
         # multiple_reports_per_line error also while reading schema
         logging.info("READING DATA MODEL SCHEMA FILE...")
         if ext_schema_path or ext_schema_file:
-            self.schema = schemas.read_schema(
-                ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
-            )
+            self.schema = schemas.read_schema(ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file)
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
@@ -418,13 +363,9 @@ class _FileReader:
                 for attr, value in elements[data_var].items():
                     if value == "__from_file__":
                         if attr in ds[data_var].attrs:
-                            self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ] = ds[data_var].attrs[attr]
+                            self.schema["sections"][section]["elements"][data_var][attr] = ds[data_var].attrs[attr]
                         else:
-                            del self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ]
+                            del self.schema["sections"][section]["elements"][data_var][attr]
 
     def _select_years(self, df):
         def get_years_from_datetime(date):
@@ -451,9 +392,7 @@ class _FileReader:
         return df.iloc[index].reset_index(drop=True)
 
     def _get_configurations(self, order, valid):
-        config_dict = Configurator(
-            schema=self.schema, order=order, valid=valid
-        ).get_configuration()
+        config_dict = Configurator(schema=self.schema, order=order, valid=valid).get_configuration()
         for attr, val in config_dict["self"].items():
             setattr(self, attr, val)
         del config_dict["self"]
@@ -468,9 +407,7 @@ class _FileReader:
             index="index",
             values="values",
         )
-        missing_values = pd.DataFrame(
-            data=pivots_, columns=ref.columns, index=ref.index
-        )
+        missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
         return missing_values.notna()
 
     def _read_pandas(self, **kwargs):
@@ -497,16 +434,9 @@ class _FileReader:
         open_with,
     ):
         if open_with == "pandas":
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_pandas(),
-                axis=1,
-            )
+            df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_pandas()
         elif open_with == "netcdf":
-            df = Configurator(
-                df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_netcdf()
+            df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_netcdf()
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
@@ -538,18 +468,14 @@ class _FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
-            )
+            df, self.missing_values = self._read_sections(TextParser, order, valid, open_with=open_with)
             return df, df.isna()
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()
             isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(
-                    df_, order, valid, open_with=open_with
-                )
+                df, missing_values = self._read_sections(df_, order, valid, open_with=open_with)
                 df_isna = df.isna()
                 missing_values.to_csv(
                     missings_buffer,
@@ -672,9 +598,7 @@ class _FileReader:
                 cols = [x for x in data_df]
                 if isinstance(cols[0], tuple):
                     header = [":".join(x) for x in cols]
-                    out_atts_json = {
-                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
-                    }
+                    out_atts_json = {":".join(x): out_atts.get(x) for x in out_atts.keys()}
                 else:
                     header = cols
                     out_atts_json = out_atts
