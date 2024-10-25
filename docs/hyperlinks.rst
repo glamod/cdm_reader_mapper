@@ -68,6 +68,6 @@
         :width: 20%
         :target: https://icoads.noaa.gov/
 
-.. |logo_NOC| image:: _static/images/logos_c3s/LOGO_2020_-_NOC_1_COLOUR.png
-        :width: 25%
+.. |logo_NOC| image:: _static/images/logos_c3s/LOGO_2024_-_NOC_1_COLOUR.png
+        :width: 10%
         :target: https://noc.ac.uk/
