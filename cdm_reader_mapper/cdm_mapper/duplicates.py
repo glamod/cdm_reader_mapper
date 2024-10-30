@@ -221,11 +221,20 @@ class DupDetect:
             b = list(set(x[last].values))
             return pd.Series({"dups": b})
 
+        def _delete_values_equal_keys(dictionary):
+            dictionary_ = {}
+            for k, v in dictionary.items():
+                if k == v:
+                    continue
+                dictionary_[k] = v
+            return dictionary_
+
         def replace_keeps_and_drops(df, keep_):
             while True:
                 keeps = df[keep_].values
                 replaces = df.apply(lambda x: _get_similars(x, keeps), axis=1)
                 replaces = dict(replaces.dropna().values)
+                replaces = _delete_values_equal_keys(replaces)
                 keys = replaces.keys()
                 values = replaces.values()
                 df[keep_] = df[keep_].replace(replaces)
