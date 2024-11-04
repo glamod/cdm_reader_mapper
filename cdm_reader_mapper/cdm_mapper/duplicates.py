@@ -70,7 +70,7 @@ def add_duplicates(df, dups):
         idx = row.name
         if idx not in dups.index:
             return row
-        
+
         dup_idx = dups.loc[idx].to_list()
         v_ = report_ids.iloc[dup_idx[0]]
         v_ = sorted(v_.tolist())
