@@ -384,6 +384,19 @@ def change_offsets(dic, dic_o):
     return dic
 
 
+def reindex_nulls(df):
+    """Reindex by nulls."""
+
+    def _count_nulls(row):
+        return (row == "null").sum()
+
+    nulls = df.apply(lambda x: _count_nulls(x), axis=1)
+    if nulls.empty:
+        return df
+    indexes_ = list(zip(*sorted(zip(nulls.values, nulls.index))))
+    return df.reindex(indexes_[1])
+
+
 class Comparer:
     """Class to compare DataFrame with recordlinkage Comparer."""
 
@@ -455,16 +468,10 @@ def duplicate_check(
     -------
         DupDetect object
     """
-
-    def _count_nulls(row):
-        return (row == "null").sum()
-
     data = data.reset_index(drop=True)
 
     if reindex_by_null is True:
-        nulls = data.apply(lambda x: _count_nulls(x), axis=1)
-        indexes_ = list(zip(*sorted(zip(nulls.values, nulls.index))))
-        data = data.reindex(indexes_[1])
+        data = reindex_nulls(data)
 
     if table_name:
         data = data[table_name]
