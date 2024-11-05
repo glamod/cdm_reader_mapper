@@ -14,6 +14,7 @@ Announcements
 Bug fixes
 ^^^^^^^^^
 * Two reports that describe each other as best duplicates are not considered duplicates (:pull:`149`)
+* Reindex only if null values available (:pull:`153`)
 
 0.4.3 (2024-10-23)
 ------------------
