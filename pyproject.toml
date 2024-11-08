@@ -59,7 +59,7 @@ target-version = [
   "py310",
   "py311",
   "py312",
-  "py313"
+  "py13"
 ]
 
 [tool.bumpversion]
@@ -176,13 +176,7 @@ testpaths = ["./tests"]
 [tool.ruff]
 src = ["xclim"]
 line-length = 150
-target-version = [
-  "py39",
-  "py310",
-  "py311",
-  "py312",
-  "py313"
-]
+target-version = "py311"
 exclude = [
   ".git",
   "build",
