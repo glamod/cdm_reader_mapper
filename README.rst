@@ -126,6 +126,16 @@ If you're interested in participating in the development of `cdm_reader_mapper` 
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
+How to cite this library
+------------------------
+
+If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://doi.org/10.5281/zenodo.13982457.
+
+License
+-------
+
+This is free software: you can redistribute it and/or modify it under the terms of the `Apache License 2.0`_. A copy of this license is provided in the code repository (`LICENSE`_).
+
 Credits
 -------
 
@@ -133,13 +143,21 @@ Credits
 
 Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
+This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-pypackage`_ project template.
+
 .. hyperlinks
+
+.. _Apache License 2.0: https://opensource.org/license/apache-2-0/
+
+.. _audreyfeldroy/cookiecutter-pypackage: https://github.com/audreyfeldroy/cookiecutter-pypackage/
 
 .. _C3S: https://climate.copernicus.eu/
 
 .. _C3S CDS Common Data Model: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
 
 .. _Contributing Guidelines: https://github.com/glamod/cdm_reader_mapper/blob/main/CONTRIBUTING.rst
+
+.. _Cookiecutter: https://github.com/cookiecutter/cookiecutter/
 
 .. _data model: https://cds.climate.copernicus.eu/toolbox/doc/how-to/15_how_to_understand_the_common_data_model/15_how_to_understand_the_common_data_model.html
 
