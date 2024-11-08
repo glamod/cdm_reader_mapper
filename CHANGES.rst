@@ -13,7 +13,8 @@ Announcements
 
 Bug fixes
 ^^^^^^^^^
-* Two reports that describe each other as best duplicates are not flagged as duplicates (:pull:`149`)
+* ``cdm_mapper``: Two reports that describe each other as best duplicates are not flagged as duplicates (DupDetect) (:pull:`149`)
+* ``cdm_mapper``: Reindex only if null values available (DupDetect) (:pull:`153`)
 
 0.4.3 (2024-10-23)
 ------------------
