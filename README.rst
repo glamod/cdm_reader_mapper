@@ -171,6 +171,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 
 .. _jupyter example notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
 
+.. _LICENSE: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
+
 .. _NOC: https://noc.ac.uk/
 
 .. _python: https://www.python.org
