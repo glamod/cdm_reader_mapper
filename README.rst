@@ -129,7 +129,7 @@ If you would like to contribute code or documentation (which is greatly apprecia
 How to cite this library
 ------------------------
 
-If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://doi.org/10.5281/zenodo.13982457.
+If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/14056188.
 
 License
 -------
@@ -261,8 +261,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13982457.svg
-        :target: https://doi.org/10.5281/zenodo.13982457
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14056188.svg
+        :target: https://doi.org/10.5281/zenodo.14056188
  	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
