@@ -3,6 +3,18 @@
 Changelog
 =========
 
+1.0.0 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* Final version used for GLAMOD marine processing release 7.0
+
+Bug fixes
+^^^^^^^^^
+* Two reports that describe each other as best duplicates are not considered duplicates (:pull:`149`)
+
 0.4.3 (2024-10-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
@@ -16,9 +28,19 @@ Announcements
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Announcements
+^^^^^^^^^^^^^
+* Testing first release on pypi (:issue:`17`)
+* Testing first release on zenodo (:issue:`18`)
+
 0.4.1 (2024-10-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* Testing first release on pypi (:issue:`17`)
+* Testing first release on zenodo (:issue:`18`)
 
 0.4.0 (2024-10-23)
 -------------------
