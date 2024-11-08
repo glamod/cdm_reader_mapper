@@ -16,7 +16,7 @@
 
 .. _following C-RAID guide: https://www.coriolis.eu.org/Data-Products
 
-.. _Github repository: https://github.com/glamod/mdf_reader
+.. _Github repository: https://github.com/glamod/cdm_reader_mapper
 
 .. _git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
