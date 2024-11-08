@@ -5,7 +5,7 @@ channels:
     - nodefaults
 
 dependencies:
-    - pandas
+    - pandas>=2.1.0
     - dask
     - matplotlib
     - xarray
