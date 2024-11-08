@@ -13,7 +13,7 @@ Announcements
 
 Bug fixes
 ^^^^^^^^^
-* Two reports that describe each other as best duplicates are not considered duplicates (:pull:`149`)
+* Two reports that describe each other as best duplicates are not flagged as duplicates (:pull:`149`)
 
 0.4.3 (2024-10-23)
 ------------------
