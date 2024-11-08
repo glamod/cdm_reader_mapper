@@ -3,6 +3,14 @@
 Changelog
 =========
 
+1.0.1 (2024-11-08)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* set package version to v1.0.1
+
 1.0.0 (2024-11-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
