@@ -176,7 +176,13 @@ testpaths = ["./tests"]
 [tool.ruff]
 src = ["xclim"]
 line-length = 150
-target-version = "py39"
+target-version = [
+  "py39",
+  "py310",
+  "py311",
+  "py312",
+  "py313"
+]
 exclude = [
   ".git",
   "build",
