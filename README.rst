@@ -3,7 +3,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions| |tag| |release|                              |
+| Versions                   | |pypi| |versions|                                              |
 +----------------------------+----------------------------------------------------------------+
 | Documentation and Support  | |docs|                                                         |
 +----------------------------+----------------------------------------------------------------+
@@ -244,14 +244,6 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 .. |status| image:: https://www.repostatus.org/badges/latest/active.svg
         :target: https://www.repostatus.org/#active
         :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
-
-.. |release| image:: https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/releases
-        :alt: Release
-
-.. |tag| image:: https://img.shields.io/github/v/tag/glamod/cdm_reader_mapper.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/tags
-        :alt: Tag
 
 .. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UKMCAS-blue.svg
         :target: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
