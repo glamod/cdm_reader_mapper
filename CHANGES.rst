@@ -3,6 +3,19 @@
 Changelog
 =========
 
+1.0.2 (2024-11-13)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* New PyPi Classifiers:
+
+  * Development Status :: 5 - Production/Stable
+  * Development Status :: Intended Audience :: Science/Research
+  * License :: OSI Approved :: Apache Software License
+  * Operating System :: OS Independent
+
 1.0.1 (2024-11-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
