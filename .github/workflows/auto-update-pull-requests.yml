@@ -13,7 +13,7 @@ jobs:
         steps:
         - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         - name: Update ALL THE PRS!
-          uses: castastrophe/actions-pr-auto-update@02e7423a75162eea2328c805520f99f22a81b662  # v1.0.0
+          uses: castastrophe/actions-pr-auto-update@7bec478b011528e4bb2d3e15b08080f5e4bf8a95  # v1.1.0
           with:
                 # defaults to github.token
                 token: ${{ secrets.GITHUB_TOKEN }}
