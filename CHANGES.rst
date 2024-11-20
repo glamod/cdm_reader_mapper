@@ -3,6 +3,40 @@
 Changelog
 =========
 
+1.0.2 (2024-11-13)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* New PyPi Classifiers:
+
+  * Development Status :: 5 - Production/Stable
+  * Development Status :: Intended Audience :: Science/Research
+  * License :: OSI Approved :: Apache Software License
+  * Operating System :: OS Independent
+
+1.0.1 (2024-11-08)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* set package version to v1.0.1
+
+1.0.0 (2024-11-08)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* Final version used for GLAMOD marine processing release 7.0
+
+Bug fixes
+^^^^^^^^^
+* ``cdm_mapper``: Two reports that describe each other as best duplicates are not flagged as duplicates (DupDetect) (:pull:`149`)
+* ``cdm_mapper``: Reindex only if null values available (DupDetect) (:pull:`153`)
+
 0.4.3 (2024-10-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
@@ -16,9 +50,19 @@ Announcements
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Announcements
+^^^^^^^^^^^^^
+* Testing first release on pypi (:issue:`17`)
+* Testing first release on zenodo (:issue:`18`)
+
 0.4.1 (2024-10-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* Testing first release on pypi (:issue:`17`)
+* Testing first release on zenodo (:issue:`18`)
 
 0.4.0 (2024-10-23)
 -------------------

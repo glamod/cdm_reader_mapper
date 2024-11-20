@@ -10,9 +10,12 @@
 'CI':
   - changed-files:
     - any-glob-to-any-file:
+      - '.flake8'
+      - '.gitignore'
       - '.pre-commit-config.yaml'
-      - '.readthedocs.yml'
-      - '.yamllint.yml'
+      - '.pylintrc.toml'
+      - '.readthedocs.yaml'
+      - '.yamllint.yaml'
       - '.github/workflows/*'
       - 'docs/Makefile'
       - 'Makefile'
@@ -25,6 +28,7 @@
       - 'AUTHORS.rst'
       - 'CONTRIBUTING.rst'
       - 'README.rst'
+      - 'CHANGES.rst'
 
 'cdm_mapper':
   - changed-files:
@@ -63,3 +67,19 @@
   - changed-files:
     - any-glob-to-any-file:
       - 'CONTRIBUTING.rst'
+      - 'CHANGES.rst'
+
+'license':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'LICENSE'
+
+'zenodo':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.zenodo.json'
+
+'release':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pyproject.toml'

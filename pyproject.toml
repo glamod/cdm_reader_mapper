@@ -13,10 +13,12 @@ requires-python = ">=3.9"
 license = {file = "LICENSE"}
 keywords = ["cdm_reader_mapper"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
   "Natural Language :: English",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",

@@ -61,7 +61,7 @@ After reading the data into a pandas.DataFrame, the **cdm_mapper** will map obse
 About
 -----
 
-:Version: |tag| |release|
+:Version: |pypi|
 
 :Citation: |zenodo|
 
