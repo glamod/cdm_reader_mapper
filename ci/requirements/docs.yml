@@ -6,7 +6,7 @@ channels:
 
 dependencies:
     #cdm_reader_mapper
-    - python>=3.19
+    - python>=3.9
     - pandas>=2.1.0
     - matplotlib
     - datashader
