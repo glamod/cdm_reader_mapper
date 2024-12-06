@@ -76,9 +76,7 @@ def _decimal_places(
 
 
 def _transform(
-    series,
     to_map,
-    notna_idx,
     imodel_functions,
     transform,
     kwargs,
@@ -86,12 +84,8 @@ def _transform(
 ):
     logger.debug(f"\ttransform: {transform}")
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
-
     trans = getattr(imodel_functions, transform)
-    if notna_idx is not None:
-        series.loc[notna_idx] = trans(to_map, **kwargs)
-        return series
-    return trans(**kwargs)
+    return trans(to_map, **kwargs)
 
 
 def _code_table(
@@ -154,7 +148,6 @@ def _write_csv_files(
                 code_table = None
 
         to_map = None
-        notna_idx = None
         if elements:
             # make sure they are clean and conform to their atts (tie dtypes)
             # we'll only let map if row complete so mapping functions do not need to worry about handling NA
@@ -167,10 +160,8 @@ def _write_csv_files(
                     )
                 )
                 continue
-            notna_idx_idx = np.where(idata[elements].notna().all(axis=1))[0]
-            logger.debug(f"\tnotna_idx_idx: {notna_idx_idx}")
-            to_map = idata[elements].iloc[notna_idx_idx]
-            notna_idx = idata.index[notna_idx_idx]  # fix?
+
+            to_map = idata[elements]
             if len(elements) == 1:
                 to_map = to_map.iloc[:, 0]
 
@@ -179,9 +170,7 @@ def _write_csv_files(
 
         if transform and not isEmpty:
             table_df_i[cdm_key] = _transform(
-                table_df_i[cdm_key],
                 to_map,
-                notna_idx,
                 imodel_functions,
                 transform,
                 kwargs,
