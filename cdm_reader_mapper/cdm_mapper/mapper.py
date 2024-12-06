@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from io import StringIO
 
-import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
