@@ -336,9 +336,7 @@ class mapping_functions:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        return np.vectorize(string_add_i)(
-            prepend, joint, append, sep=separator
-        )
+        return np.vectorize(string_add_i)(prepend, joint, append, sep=separator)
 
     def temperature_celsius_to_kelvin(self, df):
         """Convert temperature from degrre Ceslius to Kelvin."""
