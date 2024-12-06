@@ -195,7 +195,7 @@ class mapping_functions:
             errors="coerce",
         )
 
-    def datetime_utcnow(self):
+    def datetime_utcnow(self, df):
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 
@@ -250,7 +250,7 @@ class mapping_functions:
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
 
-    def default_decimal_places(self):
+    def default_decimal_places(self, df):
         """Return default number of decimal places."""
         return properties.default_decimal_places
 
@@ -294,7 +294,7 @@ class mapping_functions:
         df = self.icoads_wd_conversion(df)
         return self.integer_to_float(df)
 
-    def lineage(self):
+    def lineage(self, df):
         """Get lineage."""
         strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
         imodel_lineage = find_entry(self.imodel, imodel_lineages)
