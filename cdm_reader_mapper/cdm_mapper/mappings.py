@@ -172,23 +172,24 @@ class mapping_functions:
         self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_hm(self, df):
-        """Convert dateimt object to hours and minutes."""
-        timedelta = datetime.timedelta(hours=ds)
+        """Convert datetime object to hours and minutes."""
+        hr = df.values[4]
+        timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
-        hours = int(seconds / 3600)
-        minutes = int(seconds / 60) % 60
-        return hours, minutes
+        df["HR"] = int(seconds / 3600)
+        df["M"] = int(seconds / 60) % 60
+        return df
 
     def datetime_imma1(self, df):  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
-        hours, minutes = np.vectorize(self.datetime_decimalhour_to_hm)(
-            df.iloc[:, -1].values
-        )
-        df = df.drop(df.columns[len(df.columns) - 1], axis=1)
-        df["H"] = hours
-        df["M"] = minutes
-        # VALUES!!!!
+        hr_ = df.columns[-1]
+        df = df.assign(HR=df.iloc[:, -1])
+        df["HR"] = df["HR"].fillna(0)
+        df["M"] = df["HR"].copy()
+        df = df.drop(columns=hr_, axis=1)
+        df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
+        df = df.astype(int)
         return pd.to_datetime(
             df.astype(str).apply("-".join, axis=1).values,
             format=date_format,
@@ -205,7 +206,7 @@ class mapping_functions:
 
     def datetime_to_cdm_time(self, df):
         """
-        Convert time object to dattime object.
+        Convert time object to datetime object.
 
         Converts year, month, day and time indicator to
         a datetime obj with a 24hrs format '%Y-%m-%d-%H'
@@ -285,8 +286,8 @@ class mapping_functions:
 
     def icoads_wd_conversion(self, df):
         """Convert ICOADS WD."""
-        df = df.mask(ds == 361, 0)
-        df = df.mask(ds == 362, np.nan)
+        df = df.mask(df == 361, 0)
+        df = df.mask(df == 362, np.nan)
         return df
 
     def icoads_wd_integer_to_float(self, df):
@@ -331,22 +332,13 @@ class mapping_functions:
         self, df, prepend=None, append=None, separator="", zfill_col=None, zfill=None
     ):
         """Join string."""
-        # This duplication is to prevent error in Int to object casting of types
-        # when nrows ==1, shown after introduction of nullable integers in objects.
-        duplicated = False
-        if len(df) == 1:
-            df = pd.concat([df, df])
-            duplicated = True
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        df["string_add"] = np.vectorize(string_add_i)(
+        return np.vectorize(string_add_i)(
             prepend, joint, append, sep=separator
         )
-        if duplicated:
-            df = df[:-1]
-        return df["string_add"]
 
     def temperature_celsius_to_kelvin(self, df):
         """Convert temperature from degrre Ceslius to Kelvin."""
@@ -354,7 +346,7 @@ class mapping_functions:
         if not method:
             method = "method_a"
         if method == "method_a":
-            return ds + 273.15
+            return df + 273.15
         if method == "method_b":
             df.iloc[:, 0] = np.where((df.iloc[:, 0] == 0) | (df.iloc[:, 0] == 5), 1, -1)
             return df.iloc[:, 0] * df.iloc[:, 1] + 273.15
