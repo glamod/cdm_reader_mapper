@@ -171,7 +171,7 @@ class mapping_functions:
         self.imodel = imodel
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_hm(self, ds):
+    def datetime_decimalhour_to_hm(self, df):
         """Convert dateimt object to hours and minutes."""
         timedelta = datetime.timedelta(hours=ds)
         seconds = timedelta.total_seconds()
@@ -261,9 +261,9 @@ class mapping_functions:
             joint = joint + sep + df.iloc[:, i].astype(str)
         return joint
 
-    def float_opposite(self, ds):
+    def float_opposite(self, df):
         """Return float opposite."""
-        return -ds
+        return -df
 
     def select_column(self, df):
         """Select columns."""
@@ -275,26 +275,26 @@ class mapping_functions:
                 s.update(df[ci])
         return s
 
-    def float_scale(self, ds, factor=1):
+    def float_scale(self, df, factor=1):
         """Multiply with scale factor."""
-        return ds * factor
+        return df * factor
 
-    def integer_to_float(self, ds):
+    def integer_to_float(self, df):
         """Convert integer to float."""
-        return ds.astype(float)
+        return df.astype(float)
 
-    def icoads_wd_conversion(self, ds):
+    def icoads_wd_conversion(self, df):
         """Convert ICOADS WD."""
-        ds = ds.mask(ds == 361, 0)
-        ds = ds.mask(ds == 362, np.nan)
-        return ds
+        df = df.mask(ds == 361, 0)
+        df = df.mask(ds == 362, np.nan)
+        return df
 
-    def icoads_wd_integer_to_float(self, ds):
+    def icoads_wd_integer_to_float(self, df):
         """Convert ICOADS WD integer to float."""
-        ds = self.icoads_wd_conversion(ds)
-        return self.integer_to_float(ds)
+        df = self.icoads_wd_conversion(df)
+        return self.integer_to_float(df)
 
-    def lineage(self, ds):
+    def lineage(self):
         """Get lineage."""
         strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
         imodel_lineage = find_entry(self.imodel, imodel_lineages)
@@ -302,9 +302,9 @@ class mapping_functions:
             strf = strf + imodel_lineage
         return strf
 
-    def longitude_360to180(self, ds):
+    def longitude_360to180(self, df):
         """Convert longitudes within -180 and 180 degrees."""
-        return np.vectorize(longitude_360to180_i)(ds)
+        return np.vectorize(longitude_360to180_i)(df)
 
     def location_accuracy(self, df):  # (li_core,lat_core) math.radians(lat_core)
         """Calculate location accuracy."""
@@ -312,20 +312,20 @@ class mapping_functions:
             df.iloc[:, 0], df.iloc[:, 1]
         )  # last minute tweak so that is does no fail on nans!
 
-    def observing_programme(self, ds):
+    def observing_programme(self, df):
         """Map observing programme."""
         op = {str(i): [5, 7, 56] for i in range(0, 6)}
         op.update({"7": [5, 7, 9]})
-        return ds.map(op, na_action="ignore")
+        return df.map(op, na_action="ignore")
 
     def string_add(
-        self, ds, prepend="", append="", separator="", zfill_col=None, zfill=None
+        self, df, prepend="", append="", separator="", zfill_col=None, zfill=None
     ):
         """Add string."""
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
-                ds.iloc[:, col] = ds.iloc[:, col].astype(str).str.zfill(width)
-        return np.vectorize(string_add_i)(prepend, ds, append, separator)
+                df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
+        return np.vectorize(string_add_i)(prepend, df, append, separator)
 
     def string_join_add(
         self, df, prepend=None, append=None, separator="", zfill_col=None, zfill=None
@@ -348,7 +348,7 @@ class mapping_functions:
             df = df[:-1]
         return df["string_add"]
 
-    def temperature_celsius_to_kelvin(self, ds):
+    def temperature_celsius_to_kelvin(self, df):
         """Convert temperature from degrre Ceslius to Kelvin."""
         method = find_entry(self.imodel, c2k_methods)
         if not method:
@@ -356,11 +356,10 @@ class mapping_functions:
         if method == "method_a":
             return ds + 273.15
         if method == "method_b":
-            ds.iloc[:, 0] = np.where((ds.iloc[:, 0] == 0) | (ds.iloc[:, 0] == 5), 1, -1)
-            # print(ds.iloc[:, 0]*ds.iloc[:, 1])
-            return ds.iloc[:, 0] * ds.iloc[:, 1] + 273.15
+            df.iloc[:, 0] = np.where((df.iloc[:, 0] == 0) | (df.iloc[:, 0] == 5), 1, -1)
+            return df.iloc[:, 0] * df.iloc[:, 1] + 273.15
 
-    def time_accuracy(self, ds):  # ti_core
+    def time_accuracy(self, df):  # ti_core
         """Calculate time accuracy."""
         # Shouldn't we use the code_table mapping for this? see CDM!
         secs = {
@@ -369,12 +368,12 @@ class mapping_functions:
             "2": int(round(3600 / 60)),
             "3": int(round(3600 / 100)),
         }
-        return ds.map(secs, na_action="ignore")
+        return df.map(secs, na_action="ignore")
 
-    def feet_to_m(self, ds):
+    def feet_to_m(self, df):
         """Convert feet into meter."""
-        ds.astype(float)
-        return np.round(ds / 3.2808, 2)
+        df.astype(float)
+        return np.round(df / 3.2808, 2)
 
     def guid(self, df, prepend="", append=""):
         """DOCUMENTATION."""
