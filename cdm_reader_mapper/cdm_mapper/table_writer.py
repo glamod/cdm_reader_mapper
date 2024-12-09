@@ -30,6 +30,8 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
+from ._utilities import dict_to_tuple_list, get_cdm_subset
+
 
 def print_integer(data, null_label):
     """
@@ -212,11 +214,46 @@ def print_varchar_array_i(row, null_label=None):
     return null_label
 
 
+def print_values(table, table_atts, null_label=None, logger=None):
+    """
+    NEED DOCUMENTATION.
+
+    Parameters
+    ----------
+    table
+    table_atts
+    null_label
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    ascii_table = pd.DataFrame(
+        index=table.index, columns=table_atts.keys(), dtype="object"
+    )
+    for iele in table_atts.keys():
+        if iele in table:
+            itype = table_atts.get(iele).get("data_type")
+            if printers.get(itype):
+                iprinter_kwargs = iprinters_kwargs.get(itype)
+                if iprinter_kwargs:
+                    kwargs = {x: table_atts.get(iele).get(x) for x in iprinter_kwargs}
+                else:
+                    kwargs = {}
+                ascii_table[iele] = printers.get(itype)(
+                    table[iele], null_label, **kwargs
+                )
+            else:
+                logger.error(f"No printer defined for element {iele}")
+    return ascii_table
+
+
 def table_to_ascii(
     table,
-    table_atts,
+    table_atts={},
     delimiter="|",
     null_label="null",
+    col_subset=None,
     cdm_complete=True,
     filename=None,
     log_level="INFO",
@@ -251,54 +288,47 @@ def table_to_ascii(
     Saves cdm tables as ascii files
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    empty_table = False
+
     if "observation_value" in table:
         table = table.dropna(subset=["observation_value"])
-        empty_table = True if len(table) == 0 else False
     elif "observation_value" in table_atts.keys():
-        empty_table = True
-    else:
-        empty_table = True if len(table) == 0 else False
-    if empty_table:
+        table = pd.DataFrame()
+
+    csv_kwargs = {
+        "index": False,
+        "sep": delimiter,
+        "header": True,
+        "mode": "w",
+    }
+
+    if table.empty:
         logger.warning("No observation values in table")
         ascii_table = pd.DataFrame(columns=table_atts.keys(), dtype="object")
-        ascii_table.to_csv(filename, index=False, sep=delimiter, header=True, mode="w")
+        ascii_table.to_csv(filename, **csv_kwargs)
         return
 
-    ascii_table = pd.DataFrame(
-        index=table.index, columns=table_atts.keys(), dtype="object"
-    )
-    for iele in table_atts.keys():
-        if iele in table:
-            itype = table_atts.get(iele).get("data_type")
-            if printers.get(itype):
-                iprinter_kwargs = iprinters_kwargs.get(itype)
-                if iprinter_kwargs:
-                    kwargs = {x: table_atts.get(iele).get(x) for x in iprinter_kwargs}
-                else:
-                    kwargs = {}
-                ascii_table[iele] = printers.get(itype)(
-                    table[iele], null_label, **kwargs
-                )
-            else:
-                logger.error(f"No printer defined for element {iele}")
-        else:
-            ascii_table[iele] = null_label
+    if col_subset:
+        if isinstance(col_subset, dict):
+            col_subset = dict_to_tuple_list(col_subset)
+        cdm_complete = False
+        table = table[col_subset]
 
-    header = True
-    wmode = "w"
-    columns_to_ascii = (
-        [x for x in table_atts.keys() if x in table.columns]
-        if not cdm_complete
-        else table_atts.keys()
-    )
+    if table_atts:
+        table = print_values(table, table_atts, null_label=null_label, logger=logger)
+        columns_to_ascii = (
+            [x for x in table_atts.keys() if x in table.columns]
+            if not cdm_complete
+            else table_atts.keys()
+        )
+    else:
+        table = table.fillna(null_label)
+        columns_to_ascii = table.columns
+
     ascii_table.to_csv(
         filename,
-        index=False,
-        sep=delimiter,
         columns=columns_to_ascii,
-        header=header,
-        mode=wmode,
+        na_rep=null_label,
+        **csv_kwargs,
     )
 
 
@@ -308,7 +338,7 @@ def cdm_to_ascii(
     null_label="null",
     cdm_complete=True,
     extension="psv",
-    out_dir=None,
+    out_dir=".",
     suffix=None,
     prefix=None,
     log_level="INFO",
@@ -335,6 +365,7 @@ def cdm_to_ascii(
         default 'psv'
     out_dir:
         where to stored the ascii file
+        default: current directory
     suffix:
         file suffix
     prefix:
@@ -345,6 +376,10 @@ def cdm_to_ascii(
     Returns
     -------
     Saves the cdm tables as ascii files in the given directory with a psv extension.
+
+    Note
+    ----
+    Use this function after mapping to th CDM.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     # Because how the printers are written, they modify the original data frame!,
@@ -356,16 +391,105 @@ def cdm_to_ascii(
     for table in cdm_table.keys():
         logger.info(f"Printing table {table}")
         filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-        filepath = filename if not out_dir else os.path.join(out_dir, filename)
+        filename = os.path.join(out_dir, filename)
         table_to_ascii(
             cdm_table[table]["data"],
             cdm_table[table]["atts"],
             delimiter=delimiter,
             null_label=null_label,
             cdm_complete=cdm_complete,
-            filename=filepath,
+            filename=filename,
             log_level=log_level,
         )
+
+
+def write_tables(
+    cdm_table,
+    out_dir=".",
+    suffix=None,
+    prefix=None,
+    extension="psv",
+    filename=None,
+    cdm_subset=None,
+    cdm_complete=True,
+    delimiter="|",
+    col_subset=None,
+    log_level="INFO",
+):
+    """Write pandas.DataFrame to CDM-table file on file system.
+
+    Parameters
+    ----------
+    cdm_table:
+        pandas.Dataframe to export
+    tb_path:
+        path to the file
+        default is current directory
+    suffix:
+        file suffix
+    prefix:
+        file prefix
+    extension:
+        default is psv
+    filename:
+        name of the file
+        default: Automatically create file name from table name and tb_id.
+    col_subset:
+        specifies a subset of tables or a single table.
+
+        - For multiple subsets of tables:
+          This function returns a pandas.DataFrame that is multi-index at
+          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+
+        - For a single table:
+          This function returns a pandas.DataFrame with a simple indexing for the columns.
+    col_subset:
+        a python dictionary specifying the section or sections of the file to read
+
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
+
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
+    cdm_complete:
+        extract the entire cdm file
+    delimiter:
+        default is '|'
+    log_level:
+        Level of logging messages to save
+
+    Returns
+    -------
+    pandas.DataFrame: either the entire file or a subset of it.
+
+    Note
+    ----
+    Use this function after reading CDM tables.
+    """
+    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    if cdm_table.empty:
+        logger.warning("All CDM tbales are empty.")
+        return
+
+    extension = "." + extension
+    cdm_subset = get_cdm_subset(cdm_subset)
+
+    for table in cdm_subset:
+        if table not in table.columns:
+            continue
+        logger.info(f"Printing table {table}")
+        if not filename:
+            filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
+            filename = os.path.join(out_dir, filename)
+            table_to_ascii(
+                cdm_table[table],
+                delimiter=delimiter,
+                filename=filename,
+                col_subset=col_subset,
+                cdm_complete=cdm_complete,
+                log_level=log_level,
+            )
 
 
 printers = {
