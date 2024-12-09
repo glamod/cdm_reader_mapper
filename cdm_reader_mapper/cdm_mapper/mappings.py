@@ -189,7 +189,7 @@ class mapping_functions:
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
-        df = df.astype(int)
+        df = df.astype(int, errors="ignore")
         return pd.to_datetime(
             df.astype(str).apply("-".join, axis=1).values,
             format=date_format,
