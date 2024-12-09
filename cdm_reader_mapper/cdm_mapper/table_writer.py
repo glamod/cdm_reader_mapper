@@ -4,8 +4,7 @@ Write Common Data Model (CDM) mapping tables.
 Created on Thu Apr 11 13:45:38 2019
 
 Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files,
-The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame
-(or pd.io.parsers.TextFileReader).
+The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame.
 
 This module uses a set of printer functions to "print" element values to a
 string object before exporting them to a final ascii file.
@@ -73,7 +72,7 @@ def print_float(data, null_label, decimal_places):
     def _return_str(x, null_label, format_float):
         if pd.isna(x):
             return null_label
-        return format_float.format(x)
+        return format_float.format(float(x))
 
     format_float = "{:." + str(decimal_places) + "f}"
     return data.apply(lambda x: _return_str(x, null_label, format_float))
@@ -118,6 +117,10 @@ def print_varchar(data, null_label):
     """
 
     def _return_str(x, null_label):
+        if isinstance(x, list):
+            if len(x) == 0:
+                return null_label
+            return str(x)
         if pd.isna(x):
             return null_label
         return str(x)
@@ -225,8 +228,7 @@ def table_to_ascii(
     Export a cdm table to an ascii file.
 
     Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
 
     Parameters
     ----------
@@ -318,8 +320,7 @@ def cdm_to_ascii(
 
     Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)
     format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
 
     Parameters
     ----------
