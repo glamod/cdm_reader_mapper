@@ -53,7 +53,7 @@ from ._testing_cdm_suite import _testing_suite
         (
             "icoads_r300_d714",
             None,
-            ["platform_sub_type", "wind_direction"],
+            ["ship_speed_ms"],
             None,
             True,
             None,
