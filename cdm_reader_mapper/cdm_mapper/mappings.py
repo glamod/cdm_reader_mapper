@@ -33,8 +33,6 @@ import pandas as pd
 import swifter  # noqa
 from timezonefinder import TimezoneFinder
 
-from . import properties
-
 icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
 imodel_lineages = {
     "icoads": icoads_lineage,
@@ -250,10 +248,6 @@ class mapping_functions:
         return df_time.swifter.apply(
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
-
-    def default_decimal_places(self, df):
-        """Return default number of decimal places."""
-        return properties.default_decimal_places
 
     def df_col_join(self, df, sep):
         """Join pandas Dataframe."""

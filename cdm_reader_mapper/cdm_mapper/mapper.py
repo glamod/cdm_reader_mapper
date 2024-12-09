@@ -62,14 +62,13 @@ def _map_to_df(m, x):
 def _decimal_places(
     entry,
     decimal_places,
-    imodel_functions,
 ):
     if decimal_places is not None:
 
         if isinstance(decimal_places, int):
             entry["decimal_places"] = decimal_places
         else:
-            entry["decimal_places"] = getattr(imodel_functions, decimal_places)()
+            entry["decimal_places"] = properties.default_decimal_places
 
     return entry
 
@@ -196,7 +195,6 @@ def _write_csv_files(
         cdm_tables[table]["atts"][cdm_key] = _decimal_places(
             cdm_tables[table]["atts"][cdm_key],
             decimal_places,
-            imodel_functions,
         )
 
     if "observation_value" in table_df_i:
