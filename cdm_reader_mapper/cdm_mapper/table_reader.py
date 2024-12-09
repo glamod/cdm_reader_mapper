@@ -52,25 +52,7 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
-
-
-def get_cdm_subset(cdm_subset):
-    """Return cdm_subset."""
-    if cdm_subset is None:
-        return properties.cdm_tables
-    elif not isinstance(cdm_subset, list):
-        return [cdm_subset]
-    return cdm_subset
-
-
-def get_usecols(tb, col_subset=None):
-    """Return usecols for pandas.read_csv function."""
-    if isinstance(col_subset, str):
-        return [col_subset]
-    elif isinstance(col_subset, list):
-        return col_subset
-    elif isinstance(col_subset, dict):
-        return col_subset.get(tb)
+from ._utilities import get_cdm_subset, get_usecols
 
 
 def read_tables(
@@ -84,7 +66,7 @@ def read_tables(
     na_values=[],
 ):
     """
-    Read CDM table like files from file system to a pandas data frame.
+    Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
@@ -156,11 +138,10 @@ def read_tables(
         if len(paths_) == 1:
             file_paths[tb] = paths_[0]
             continue
-        logger.error(
+        logger.warning(
             f"Pattern {tb_id} resulted in multiple files for table {tb}. "
             "Cannot securely retrieve cdm table(s)"
         )
-        return pd.DataFrame()
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
