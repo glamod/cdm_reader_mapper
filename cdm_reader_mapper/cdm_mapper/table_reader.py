@@ -138,11 +138,10 @@ def read_tables(
         if len(paths_) == 1:
             file_paths[tb] = paths_[0]
             continue
-        logger.error(
+        logger.warning(
             f"Pattern {tb_id} resulted in multiple files for table {tb}. "
             "Cannot securely retrieve cdm table(s)"
         )
-        return pd.DataFrame()
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
