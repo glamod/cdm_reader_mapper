@@ -171,7 +171,8 @@ class mapping_functions:
 
     def datetime_decimalhour_to_hm(self, df):
         """Convert datetime object to hours and minutes."""
-        timedelta = datetime.timedelta(hours=df["HR"])
+        hr = df.values[4]
+        timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
         df["HR"] = int(seconds / 3600)
         df["M"] = int(seconds / 60) % 60
@@ -180,9 +181,11 @@ class mapping_functions:
     def datetime_imma1(self, df):  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
-        df = df["core"]
+        hr_ = df.columns[-1]
+        df = df.assign(HR=df.iloc[:, -1])
         df["HR"] = df["HR"].fillna(0)
         df["M"] = df["HR"].copy()
+        df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
         df = df.astype(int, errors="ignore")
         return pd.to_datetime(
@@ -217,25 +220,25 @@ class mapping_functions:
         df = df["core"].dropna(how="any")
         date_format = "%Y-%m-%d-%H-%M"
 
-        df["H"] = "12"
-        df["M"] = "0"
-        df[["YR", "MO", "DY"]] = df[["YR", "MO", "DY"]].astype(str)
+        df_dates = df.iloc[:, 0:3].astype(str)
+        df_dates["H"] = "12"
+        df_dates["M"] = "0"
+        df_coords = df.iloc[:, 3:5].astype(float)
 
         # Convert long to -180 to 180 for time zone finding
-        df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float)
-        df["lon_converted"] = coord_360_to_180i(df["LON"])
-        df["time_zone"] = df.swifter.apply(
+        df_coords["lon_converted"] = coord_360_to_180i(df_coords["LON"])
+        time_zone = df_coords.swifter.apply(
             lambda x: time_zone_i(x["LAT"], x["lon_converted"]),
             axis=1,
         )
 
         data = pd.to_datetime(
-            df[["YR", "MO", "DY", "H", "M"]].swifter.apply("-".join, axis=1).values,
+            df_dates.swifter.apply("-".join, axis=1).values,
             format=date_format,
             errors="coerce",
         )
 
-        d = {"Dates": data, "Time_zone": df["time_zone"].values}
+        d = {"Dates": data, "Time_zone": time_zone.values}
         df_time = pd.DataFrame(data=d)
 
         return df_time.swifter.apply(
@@ -355,6 +358,7 @@ class mapping_functions:
 
     def guid(self, df, prepend="", append=""):
         """DOCUMENTATION."""
+        df = df.copy()
         df["YR"] = df["YR"].apply(lambda x: f"{x:04d}")
         df["MO"] = df["MO"].apply(lambda x: f"{x:02d}")
         df["DY"] = df["DY"].apply(lambda x: f"{x:02d}")
