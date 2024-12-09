@@ -473,16 +473,16 @@ def write_tables(
         logger.info(f"Printing table {table}")
         if not filename:
             filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-            filename = os.path.join(out_dir, filename)  
-            
+            filename = os.path.join(out_dir, filename)
+
         table_to_ascii(
-                cdm_table[table],
-                delimiter=delimiter,
-                null_label=null_label,
-                filename=filename,
-                col_subset=col_subset,
-                cdm_complete=cdm_complete,
-                log_level=log_level,
+            cdm_table[table],
+            delimiter=delimiter,
+            null_label=null_label,
+            filename=filename,
+            col_subset=col_subset,
+            cdm_complete=cdm_complete,
+            log_level=log_level,
         )
 
 
