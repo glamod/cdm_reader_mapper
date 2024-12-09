@@ -399,6 +399,7 @@ def write_tables(
     prefix=None,
     extension="psv",
     filename=None,
+    null_label="null",
     cdm_subset=None,
     cdm_complete=True,
     delimiter="|",
@@ -423,6 +424,8 @@ def write_tables(
     filename:
         name of the file
         default: Automatically create file name from table name and tb_id.
+    null_label:
+        specified how nan are represented
     col_subset:
         specifies a subset of tables or a single table.
 
@@ -458,27 +461,29 @@ def write_tables(
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     if cdm_table.empty:
-        logger.warning("All CDM tbales are empty.")
+        logger.warning("All CDM tables are empty.")
         return
 
     extension = "." + extension
     cdm_subset = get_cdm_subset(cdm_subset)
 
     for table in cdm_subset:
-        if table not in table.columns:
+        if table not in cdm_table.columns:
             continue
         logger.info(f"Printing table {table}")
         if not filename:
             filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-            filename = os.path.join(out_dir, filename)
-            table_to_ascii(
+            filename = os.path.join(out_dir, filename)  
+            
+        table_to_ascii(
                 cdm_table[table],
                 delimiter=delimiter,
+                null_label=null_label,
                 filename=filename,
                 col_subset=col_subset,
                 cdm_complete=cdm_complete,
                 log_level=log_level,
-            )
+        )
 
 
 printers = {
