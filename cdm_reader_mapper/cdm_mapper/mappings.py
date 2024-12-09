@@ -292,7 +292,8 @@ class mapping_functions:
 
     def icoads_wd_integer_to_float(self, df):
         """Convert ICOADS WD integer to float."""
-        df = self.icoads_wd_conversion(df)
+        notna = df.notna()
+        df[notna] = self.icoads_wd_conversion(df[notna])
         return self.integer_to_float(df)
 
     def lineage(self, df):
