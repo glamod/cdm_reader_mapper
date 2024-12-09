@@ -171,8 +171,7 @@ class mapping_functions:
 
     def datetime_decimalhour_to_hm(self, df):
         """Convert datetime object to hours and minutes."""
-        hr = df.values[4]
-        timedelta = datetime.timedelta(hours=hr)
+        timedelta = datetime.timedelta(hours=df["HR"])
         seconds = timedelta.total_seconds()
         df["HR"] = int(seconds / 3600)
         df["M"] = int(seconds / 60) % 60
@@ -181,11 +180,9 @@ class mapping_functions:
     def datetime_imma1(self, df):  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
-        hr_ = df.columns[-1]
-        df = df.assign(HR=df.iloc[:, -1])
+        df = df["core"]
         df["HR"] = df["HR"].fillna(0)
         df["M"] = df["HR"].copy()
-        df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
         df = df.astype(int, errors="ignore")
         return pd.to_datetime(
@@ -217,32 +214,28 @@ class mapping_functions:
         -------
         date: datetime obj
         """
-        df = df.dropna(how="any")
+        df = df["core"].dropna(how="any")
         date_format = "%Y-%m-%d-%H-%M"
 
-        df_dates = df.core.iloc[:, 0:3]
-        df_dates["H"] = 12
-        df_dates["M"] = 0
-        df_coords = df.core.iloc[:, 3:5]
+        df["H"] = "12"
+        df["M"] = "0"
+        df[["YR", "MO", "DY"]] = df[["YR", "MO", "DY"]].astype(str)
 
         # Convert long to -180 to 180 for time zone finding
-        df_coords["LON"] = df_coords["LON"].astype(float)
-        df_coords["LAT"] = df_coords["LAT"].astype(float)
-        df_coords["lon_converted"] = coord_360_to_180i(
-            df_coords["LON"]
-        )  # df_coords["LON"].swifter.apply(coord_360_to_180i)
-
-        df_coords["time_zone"] = df_coords.swifter.apply(
-            lambda x: time_zone_i(x["LAT"], x["lon_converted"]), axis=1
+        df[["LON", "LAT"]] = df[["LON", "LAT"]].astype(float)
+        df["lon_converted"] = coord_360_to_180i(df["LON"])
+        df["time_zone"] = df.swifter.apply(
+            lambda x: time_zone_i(x["LAT"], x["lon_converted"]),
+            axis=1,
         )
 
         data = pd.to_datetime(
-            df_dates.iloc[:, 0:5].astype(str).swifter.apply("-".join, axis=1).values,
+            df[["YR", "MO", "DY", "H", "M"]].swifter.apply("-".join, axis=1).values,
             format=date_format,
             errors="coerce",
         )
 
-        d = {"Dates": data, "Time_zone": df_coords.time_zone.values}
+        d = {"Dates": data, "Time_zone": df["time_zone"].values}
         df_time = pd.DataFrame(data=d)
 
         return df_time.swifter.apply(
