@@ -395,6 +395,7 @@ def cdm_to_ascii(
 def write_tables(
     cdm_table,
     out_dir=".",
+    table_name=None,
     suffix=None,
     prefix=None,
     extension="psv",
@@ -412,9 +413,12 @@ def write_tables(
     ----------
     cdm_table:
         pandas.Dataframe to export
-    tb_path:
+    out_dir:
         path to the file
         default is current directory
+    table_name:
+        Name of the CDM table in `cdm_table`.
+        This is necessary if only one single table should be processed.
     suffix:
         file suffix
     prefix:
@@ -467,6 +471,10 @@ def write_tables(
     extension = "." + extension
     cdm_subset = get_cdm_subset(cdm_subset)
 
+    if table_name:
+        if table_name not in cdm_table.columns:
+            cdm_table.columns = [(table_name, c) for c in cdm_table.columns]
+
     for table in cdm_subset:
         if table not in cdm_table.columns:
             continue
@@ -492,9 +500,7 @@ printers = {
     "varchar": print_varchar,
     "timestamp with timezone": print_datetime,
     "int[]": print_integer_array,
-    "numeric[]": print_float_array,
     "varchar[]": print_varchar_array,
-    "timestamp with timezone[]": print_datetime_array,
 }
 
 iprinters_kwargs = {
