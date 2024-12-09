@@ -313,7 +313,7 @@ def table_to_ascii(
         table = table.fillna(null_label)
         columns_to_ascii = table.columns
 
-    ascii_table.to_csv(
+    table.to_csv(
         filename,
         columns=columns_to_ascii,
         na_rep=null_label,
