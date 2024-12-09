@@ -143,17 +143,6 @@ def print_integer_array(data, null_label):
     return data.apply(print_integer_array_i, null_label=null_label)
 
 
-# TODO: tell this to dave and delete them... put error messages in functions above
-def print_float_array(data, null_label, decimal_places=None):
-    """Print a series of float objects as array."""
-    return "float array not defined in printers"
-
-
-def print_datetime_array(data, null_label):
-    """Print a series of datetime objects as array."""
-    return "datetime tz array not defined in printers"
-
-
 def print_varchar_array(data, null_label):
     """
     Print a series of string objects as array.
