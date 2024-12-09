@@ -473,10 +473,13 @@ def write_tables(
 
     if table_name:
         if table_name not in cdm_table.columns:
-            cdm_table.columns = [(table_name, c) for c in cdm_table.columns]
+            columns = cdm_table.columns.values
+            top = [table_name] * len(columns)
+            cdm_table.columns = pd.MultiIndex.from_arrays([top, columns])
 
     for table in cdm_subset:
         if table not in cdm_table.columns:
+            logger.warning(f"No file for table {table} found.")
             continue
         logger.info(f"Printing table {table}")
         if not filename:
@@ -492,6 +495,7 @@ def write_tables(
             cdm_complete=cdm_complete,
             log_level=log_level,
         )
+        filename = None
 
 
 printers = {
