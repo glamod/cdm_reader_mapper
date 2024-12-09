@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
-from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper.cdm_mapper import read_tables, write_tables
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
@@ -219,3 +219,23 @@ def _testing_suite(
 
     output_ = drop_rows(output_, drops)
     pd.testing.assert_frame_equal(output, output_)
+
+
+def _testing_writers(imodel):
+
+    exp = f"expected_{imodel}"
+    expected_data = getattr(result_data, exp)
+    output = read_tables(
+        expected_data["cdm_table"],
+        tb_id=f"{imodel}*",
+    )
+
+    write_tables(output, suffix=f"{imodel}_all")
+    output_ = read_tables(".", tb_id=f"{imodel}_all")
+    pd.testing.assert_frame_equal(output, output_)
+
+    for table in ["header", "observations-sst"]:
+        write_tables(output[table], suffix=f"{imodel}_{table}_all", table_name=table)
+        output_table = read_tables(".", tb_id=f"{imodel}_{table}_all")
+        output_origi = output[table].dropna(how="all").reset_index(drop=True)
+        pd.testing.assert_frame_equal(output_origi, output_table[table])
