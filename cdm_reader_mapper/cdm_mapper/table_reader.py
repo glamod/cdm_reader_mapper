@@ -57,8 +57,8 @@ from ._utilities import get_cdm_subset, get_usecols
 
 def read_tables(
     inp_dir,
-    suffix="*",
-    prefix="*",
+    suffix=None,
+    prefix=None,
     extension="psv",
     na_values=[],
     cdm_subset=None,
@@ -119,10 +119,14 @@ def read_tables(
         logger.error(f"Data path not found {inp_dir}: ")
         return pd.DataFrame()
 
+    extension = "." + extension
     # See if there's anything at all:
-    files = glob.glob(os.path.join(inp_dir, f"*{prefix}*{suffix}*.{extension}"))
+    pattern = "-".join(filter(bool, [prefix, "*", suffix])) + extension
+    logger.info(os.path.join(inp_dir, pattern))
+    files = glob.glob(os.path.join(inp_dir, pattern))
+
     if len(files) == 0:
-        logger.error(f"No files found matching pattern {prefix}*{suffix}")
+        logger.error(f"No files found matching pattern {pattern}")
         return pd.DataFrame()
 
     # See if subset, if any of the tables is not as specs
@@ -136,7 +140,7 @@ def read_tables(
         logger.info(f"Getting file path for pattern {table}")
         patterns_ = os.path.join(
             inp_dir,
-            "-".join(filter(bool, ["*", prefix, table, suffix, "*"])) + extension,
+            "-".join(filter(bool, [prefix, table, suffix])) + extension,
         )
         paths_ = glob.glob(patterns_)
         if len(paths_) == 1:
