@@ -492,9 +492,17 @@ def write_tables(
         if not filename_:
             filename_ = "-".join(filter(bool, [prefix, table, suffix])) + extension
             filename_ = os.path.join(out_dir, filename)
-
+            
+        if mode = "cdm":
+            table_dict = {
+              "table": cdm_table[table]["data"],
+              "table_atts": cdm_table[table]["atts"],
+            }
+        else:
+            table_dict = {"table": cdm_table[table]}            }
+            
         table_to_ascii(
-            cdm_table[table],
+            **table_dict,
             delimiter=delimiter,
             null_label=null_label,
             filename=filename_,
