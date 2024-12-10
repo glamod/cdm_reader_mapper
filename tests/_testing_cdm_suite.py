@@ -209,10 +209,10 @@ def _testing_suite(
     col_subset = get_col_subset(output, codes_subset)
 
     write_tables(output, suffix=imodel)
-    output = read_tables(".", tb_id=imodel, cdm_subset=cdm_subset)
+    output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
 
     output_ = read_tables(
-        expected_data["cdm_table"], tb_id=f"{imodel}*", cdm_subset=cdm_subset
+        expected_data["cdm_table"], suffix=imodel, cdm_subset=cdm_subset
     )
 
     output, output_ = remove_datetime_columns(output, output_, col_subset)
@@ -227,15 +227,15 @@ def _testing_writers(imodel):
     expected_data = getattr(result_data, exp)
     output = read_tables(
         expected_data["cdm_table"],
-        tb_id=f"{imodel}*",
+        suffix=imodel,
     )
 
     write_tables(output, suffix=f"{imodel}_all")
-    output_ = read_tables(".", tb_id=f"{imodel}_all")
+    output_ = read_tables(".", suffix=f"{imodel}_all")
     pd.testing.assert_frame_equal(output, output_)
 
     for table in ["header", "observations-sst"]:
         write_tables(output[table], suffix=f"{imodel}_{table}_all", table_name=table)
-        output_table = read_tables(".", tb_id=f"{imodel}_{table}_all")
+        output_table = read_tables(".", suffix=f"{imodel}_{table}_all")
         output_origi = output[table].dropna(how="all").reset_index(drop=True)
         pd.testing.assert_frame_equal(output_origi, output_table[table])

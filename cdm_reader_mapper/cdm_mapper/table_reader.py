@@ -120,7 +120,7 @@ def read_tables(
         return pd.DataFrame()
 
     # See if there's anything at all:
-    files = glob.glob(os.path.join(inp_dir, f"{prefix}*{suffix}.{extension}"))
+    files = glob.glob(os.path.join(inp_dir, f"*{prefix}*{suffix}*.{extension}"))
     if len(files) == 0:
         logger.error(f"No files found matching pattern {prefix}*{suffix}")
         return pd.DataFrame()
@@ -135,7 +135,8 @@ def read_tables(
             return pd.DataFrame()
         logger.info(f"Getting file path for pattern {table}")
         patterns_ = os.path.join(
-            inp_dir, "-".join(filter(bool, [prefix, table, suffix])) + extension
+            inp_dir,
+            "-".join(filter(bool, ["*", prefix, table, suffix, "*"])) + extension,
         )
         paths_ = glob.glob(patterns_)
         if len(paths_) == 1:
