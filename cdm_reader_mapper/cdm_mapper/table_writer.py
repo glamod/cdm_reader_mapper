@@ -473,6 +473,14 @@ def write_tables(
         filename = {table_name: filename}
     elif filename is None:
         filename = {}
+        
+    if isinstance(cdm_table, dict):
+        mode = "cdm"
+    elif isinstance(cdm_table, (pd.DataFrame, pd.Series)):
+        mode = "pdf"
+    else:
+        logger.error(f"Invalid type: {type(cdm_table)}. Valid is: dict, pd.DataFrame or pd.Series.")
+        return
 
     for table in cdm_subset:
         if table not in cdm_table.columns:
