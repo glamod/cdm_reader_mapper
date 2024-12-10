@@ -208,7 +208,7 @@ def _testing_suite(
 
     col_subset = get_col_subset(output, codes_subset)
 
-    cdm_mapper.cdm_to_ascii(output, suffix=imodel)
+    write_tables(output, suffix=imodel)
     output = read_tables(".", tb_id=imodel, cdm_subset=cdm_subset)
 
     output_ = read_tables(

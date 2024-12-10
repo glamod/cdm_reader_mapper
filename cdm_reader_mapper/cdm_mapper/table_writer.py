@@ -321,77 +321,6 @@ def table_to_ascii(
     )
 
 
-def cdm_to_ascii(
-    cdm_table,
-    delimiter="|",
-    null_label="null",
-    cdm_complete=True,
-    extension="psv",
-    out_dir=".",
-    suffix=None,
-    prefix=None,
-    log_level="INFO",
-):
-    """
-    Export a complete cdm file with multiple tables to an ascii file.
-
-    Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)
-    format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
-
-    Parameters
-    ----------
-    cdm_table:
-        common data model tables to export
-    delimiter:
-        default '|'
-    null_label:
-        specified how nan are represented
-    cdm_complete:
-        extract the entire cdm file
-    extension:
-        default 'psv'
-    out_dir:
-        where to stored the ascii file
-        default: current directory
-    suffix:
-        file suffix
-    prefix:
-        file prefix
-    log_level:
-        level of logging information
-
-    Returns
-    -------
-    Saves the cdm tables as ascii files in the given directory with a psv extension.
-
-    Note
-    ----
-    Use this function after mapping to th CDM.
-    """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    # Because how the printers are written, they modify the original data frame!,
-    # also removing rows with empty observation_value in observation_tables
-    extension = "." + extension
-    if not cdm_table:
-        logger.warning("All CDM tables are empty")
-        return
-    for table in cdm_table.keys():
-        logger.info(f"Printing table {table}")
-        filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-        filename = os.path.join(out_dir, filename)
-        table_to_ascii(
-            cdm_table[table]["data"],
-            cdm_table[table]["atts"],
-            delimiter=delimiter,
-            null_label=null_label,
-            cdm_complete=cdm_complete,
-            filename=filename,
-            log_level=log_level,
-        )
-
-
 def write_tables(
     cdm_table,
     out_dir=".",
@@ -468,18 +397,20 @@ def write_tables(
             columns = cdm_table.columns.values
             top = [table_name] * len(columns)
             cdm_table.columns = pd.MultiIndex.from_arrays([top, columns])
-            
+
     if isinstance(filename, str):
         filename = {table_name: filename}
     elif filename is None:
         filename = {}
-        
+
     if isinstance(cdm_table, dict):
         mode = "cdm"
     elif isinstance(cdm_table, (pd.DataFrame, pd.Series)):
         mode = "pdf"
     else:
-        logger.error(f"Invalid type: {type(cdm_table)}. Valid is: dict, pd.DataFrame or pd.Series.")
+        logger.error(
+            f"Invalid type: {type(cdm_table)}. Valid is: dict, pd.DataFrame or pd.Series."
+        )
         return
 
     for table in cdm_subset:
@@ -487,20 +418,20 @@ def write_tables(
             logger.warning(f"No file for table {table} found.")
             continue
         logger.info(f"Printing table {table}")
-        
+
         filename_ = filename.get(table)
         if not filename_:
             filename_ = "-".join(filter(bool, [prefix, table, suffix])) + extension
             filename_ = os.path.join(out_dir, filename)
-            
-        if mode = "cdm":
+
+        if mode == "cdm":
             table_dict = {
-              "table": cdm_table[table]["data"],
-              "table_atts": cdm_table[table]["atts"],
+                "table": cdm_table[table]["data"],
+                "table_atts": cdm_table[table]["atts"],
             }
         else:
-            table_dict = {"table": cdm_table[table]}            }
-            
+            table_dict = {"table": cdm_table[table]}
+
         table_to_ascii(
             **table_dict,
             delimiter=delimiter,
