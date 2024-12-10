@@ -427,7 +427,7 @@ def write_tables(
         default is psv
     filename:
         name of the file
-        default: Automatically create file name from table name and tb_id.
+        default: Automatically create file name from table name, prefix and suffix.
     null_label:
         specified how nan are represented
     col_subset:
@@ -439,15 +439,6 @@ def write_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
-    col_subset:
-        a python dictionary specifying the section or sections of the file to read
-
-        - For multiple sections of the tables:
-          e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
-
-        - For a single section:
-          e.g. ``list type object col_subset = [columns]``
-          This variable assumes that the column names are all conform to the cdm field names.
     cdm_complete:
         extract the entire cdm file
     delimiter:
