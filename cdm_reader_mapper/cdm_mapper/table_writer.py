@@ -23,14 +23,13 @@ of the imodel, the number of decimal places used comes from a default tool defin
 from __future__ import annotations
 
 import ast
-import os
 
 import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from ._utilities import dict_to_tuple_list, get_cdm_subset
+from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
 
 
 def print_integer(data, null_label):
@@ -395,7 +394,6 @@ def write_tables(
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
-    extension = "." + extension
     cdm_subset = get_cdm_subset(cdm_subset)
 
     if isinstance(cdm_table, pd.DataFrame):
@@ -425,8 +423,9 @@ def write_tables(
 
         filename_ = filename.get(table)
         if not filename_:
-            filename_ = "-".join(filter(bool, [prefix, table, suffix])) + extension
-            filename_ = os.path.join(out_dir, filename_)
+            filename_ = get_filename(
+                [prefix, table, suffix], path=out_dir, extension=extension
+            )
 
         table_to_ascii(
             **cdm_table[table],

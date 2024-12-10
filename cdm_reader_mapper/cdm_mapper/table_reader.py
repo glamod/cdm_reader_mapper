@@ -52,7 +52,7 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
-from ._utilities import get_cdm_subset, get_usecols
+from ._utilities import get_cdm_subset, get_filename, get_usecols
 
 
 def read_tables(
@@ -119,11 +119,9 @@ def read_tables(
         logger.error(f"Data path not found {inp_dir}: ")
         return pd.DataFrame()
 
-    extension = "." + extension
     # See if there's anything at all:
-    pattern = "-".join(filter(bool, [prefix, "*", suffix])) + extension
-    logger.info(os.path.join(inp_dir, pattern))
-    files = glob.glob(os.path.join(inp_dir, pattern))
+    pattern = get_filename([prefix, "*", suffix], path=inp_dir, extension=extension)
+    files = glob.glob(pattern)
 
     if len(files) == 0:
         logger.error(f"No files found matching pattern {pattern}")
@@ -138,11 +136,10 @@ def read_tables(
             logger.error(f"Requested table {table} not defined in CDM")
             return pd.DataFrame()
         logger.info(f"Getting file path for pattern {table}")
-        patterns_ = os.path.join(
-            inp_dir,
-            "-".join(filter(bool, [prefix, table, suffix])) + extension,
+        pattern_ = get_filename(
+            [prefix, table, suffix], path=inp_dir, extension=extension
         )
-        paths_ = glob.glob(patterns_)
+        paths_ = glob.glob(pattern_)
         if len(paths_) == 1:
             file_paths[table] = paths_[0]
             continue
