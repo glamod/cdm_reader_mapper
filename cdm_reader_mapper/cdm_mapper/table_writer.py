@@ -238,8 +238,8 @@ def print_values(table, table_atts, null_label=None, logger=None):
 
 
 def table_to_ascii(
-    table,
-    table_atts={},
+    data,
+    atts={},
     delimiter="|",
     null_label="null",
     col_subset=None,
@@ -278,10 +278,10 @@ def table_to_ascii(
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
-    if "observation_value" in table:
-        table = table.dropna(subset=["observation_value"])
-    elif "observation_value" in table_atts.keys():
-        table = pd.DataFrame()
+    if "observation_value" in data:
+        data = data.dropna(subset=["observation_value"])
+    elif "observation_value" in atts.keys():
+        data = pd.DataFrame()
 
     csv_kwargs = {
         "index": False,
@@ -290,9 +290,9 @@ def table_to_ascii(
         "mode": "w",
     }
 
-    if table.empty:
+    if data.empty:
         logger.warning("No observation values in table")
-        ascii_table = pd.DataFrame(columns=table_atts.keys(), dtype="object")
+        ascii_table = pd.DataFrame(columns=atts.keys(), dtype="object")
         ascii_table.to_csv(filename, **csv_kwargs)
         return
 
@@ -300,20 +300,20 @@ def table_to_ascii(
         if isinstance(col_subset, dict):
             col_subset = dict_to_tuple_list(col_subset)
         cdm_complete = False
-        table = table[col_subset]
+        data = data[col_subset]
 
-    if table_atts:
-        table = print_values(table, table_atts, null_label=null_label, logger=logger)
+    if atts:
+        data = print_values(data, atts, null_label=null_label, logger=logger)
         columns_to_ascii = (
-            [x for x in table_atts.keys() if x in table.columns]
+            [x for x in atts.keys() if x in data.columns]
             if not cdm_complete
-            else table_atts.keys()
+            else atts.keys()
         )
     else:
-        table = table.fillna(null_label)
-        columns_to_ascii = table.columns
+        data = data.fillna(null_label)
+        columns_to_ascii = data.columns
 
-    table.to_csv(
+    data.to_csv(
         filename,
         columns=columns_to_ascii,
         na_rep=null_label,
@@ -385,36 +385,31 @@ def write_tables(
     Use this function after reading CDM tables.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    if cdm_table.empty:
-        logger.warning("All CDM tables are empty.")
-        return
 
     extension = "." + extension
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    if table_name:
-        if table_name not in cdm_table.columns:
-            columns = cdm_table.columns.values
-            top = [table_name] * len(columns)
-            cdm_table.columns = pd.MultiIndex.from_arrays([top, columns])
+    if isinstance(cdm_table, pd.DataFrame):
+        if table_name:
+            cdm_table = {table_name: {"data": cdm_table}}
+        else:
+            data = cdm_table.copy()
+            cdm_table = {}
+            for table in cdm_subset:
+                if table in data.columns:
+                    cdm_table[table] = {"data": data[table]}
+
+    if not cdm_table:
+        logger.warning("All CDM tables are empty")
+        return
 
     if isinstance(filename, str):
         filename = {table_name: filename}
     elif filename is None:
         filename = {}
 
-    if isinstance(cdm_table, dict):
-        mode = "cdm"
-    elif isinstance(cdm_table, (pd.DataFrame, pd.Series)):
-        mode = "pdf"
-    else:
-        logger.error(
-            f"Invalid type: {type(cdm_table)}. Valid is: dict, pd.DataFrame or pd.Series."
-        )
-        return
-
     for table in cdm_subset:
-        if table not in cdm_table.columns:
+        if table not in cdm_table.keys():
             logger.warning(f"No file for table {table} found.")
             continue
         logger.info(f"Printing table {table}")
@@ -422,18 +417,10 @@ def write_tables(
         filename_ = filename.get(table)
         if not filename_:
             filename_ = "-".join(filter(bool, [prefix, table, suffix])) + extension
-            filename_ = os.path.join(out_dir, filename)
-
-        if mode == "cdm":
-            table_dict = {
-                "table": cdm_table[table]["data"],
-                "table_atts": cdm_table[table]["atts"],
-            }
-        else:
-            table_dict = {"table": cdm_table[table]}
+            filename_ = os.path.join(out_dir, filename_)
 
         table_to_ascii(
-            **table_dict,
+            **cdm_table[table],
             delimiter=delimiter,
             null_label=null_label,
             filename=filename_,
