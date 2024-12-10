@@ -360,6 +360,15 @@ def write_tables(
         default: Automatically create file name from table name, prefix and suffix.
     null_label:
         specified how nan are represented
+    cdm_subset:
+        specifies a subset of tables or a single table.
+
+        - For multiple subsets of tables:
+          This function returns a pandas.DataFrame that is multi-index at
+          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+
+        - For a single table:
+          This function returns a pandas.DataFrame with a simple indexing for the columns.
     col_subset:
         specifies a subset of tables or a single table.
 
