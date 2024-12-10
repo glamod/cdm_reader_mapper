@@ -427,6 +427,7 @@ def write_tables(
         default is psv
     filename:
         name of the file
+        List one filename for each table name in ``cdm_table``.
         default: Automatically create file name from table name, prefix and suffix.
     null_label:
         specified how nan are represented
@@ -467,26 +468,32 @@ def write_tables(
             columns = cdm_table.columns.values
             top = [table_name] * len(columns)
             cdm_table.columns = pd.MultiIndex.from_arrays([top, columns])
+            
+    if isinstance(filename, str):
+        filename = {table_name: filename}
+    elif filename is None:
+        filename = {}
 
     for table in cdm_subset:
         if table not in cdm_table.columns:
             logger.warning(f"No file for table {table} found.")
             continue
         logger.info(f"Printing table {table}")
-        if not filename:
-            filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-            filename = os.path.join(out_dir, filename)
+        
+        filename_ = filename.get(table)
+        if not filename_:
+            filename_ = "-".join(filter(bool, [prefix, table, suffix])) + extension
+            filename_ = os.path.join(out_dir, filename)
 
         table_to_ascii(
             cdm_table[table],
             delimiter=delimiter,
             null_label=null_label,
-            filename=filename,
+            filename=filename_,
             col_subset=col_subset,
             cdm_complete=cdm_complete,
             log_level=log_level,
         )
-        filename = None
 
 
 printers = {
