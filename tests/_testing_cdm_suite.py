@@ -99,7 +99,6 @@ def _testing_suite(
     imodel=None,
     cdm_subset=None,
     codes_subset=None,
-    suffix="exp",
     mapping=True,
     out_path=None,
     drops=None,
@@ -212,7 +211,7 @@ def _testing_suite(
     output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
 
     output_ = read_tables(
-        expected_data["cdm_table"], suffix=imodel, cdm_subset=cdm_subset
+        expected_data["cdm_table"], suffix=f"{imodel}*", cdm_subset=cdm_subset
     )
 
     output, output_ = remove_datetime_columns(output, output_, col_subset)
@@ -227,7 +226,7 @@ def _testing_writers(imodel):
     expected_data = getattr(result_data, exp)
     output = read_tables(
         expected_data["cdm_table"],
-        suffix=imodel,
+        suffix=f"{imodel}*",
     )
 
     write_tables(output, suffix=f"{imodel}_all")
