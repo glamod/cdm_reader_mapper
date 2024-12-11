@@ -171,6 +171,9 @@ class mapping_functions:
 
     def datetime_decimalhour_to_hm(self, df):
         """Convert datetime object to hours and minutes."""
+        if df.values.any():
+            df = df.apply(lambda x: None)
+            return df
         hr = df.values[4]
         timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
