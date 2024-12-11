@@ -3,6 +3,14 @@
 Changelog
 =========
 
+1.1.0 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+* Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
+
 1.0.2 (2024-11-13)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
