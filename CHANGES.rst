@@ -7,6 +7,15 @@ Changelog
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``cdm_mapper``: rename function ``cdm_to_ascii`` to ``write_tables`` (:issue:`182`, :pull:`185`)
+* ``cdm_mapper``: update parameter names and list of functions ``read_tables`` and ``write_tables`` (:pull:`185`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* ``cdm_mapper``: save utility functions from ``table_reader.py`` and ``table_writer.py`` to ``_utilities.py`` (:pull:`185`)
+
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)

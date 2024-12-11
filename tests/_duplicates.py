@@ -122,7 +122,7 @@ def _get_test_data(imodel):
     data_path = exp_data.get("cdm_table")
     return read_tables(
         data_path,
-        tb_id=f"{imodel}*",
+        suffix=f"{imodel}*",
         cdm_subset="header",
     )
 
