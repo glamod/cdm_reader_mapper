@@ -183,7 +183,6 @@ class mapping_functions:
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
         df = df.assign(HR=df.iloc[:, -1])
-        df["HR"] = df["HR"].fillna(0)
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
