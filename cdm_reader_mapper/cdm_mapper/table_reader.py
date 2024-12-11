@@ -57,32 +57,30 @@ from ._utilities import get_cdm_subset, get_filename, get_usecols
 
 def read_tables(
     inp_dir,
-    suffix=None,
     prefix=None,
+    suffix=None,
     extension="psv",
-    na_values=[],
     cdm_subset=None,
-    delimiter="|",
     col_subset=None,
-    log_level="INFO",
+    delimiter="|",
+    na_values=None,
 ):
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
-    inp_dir:
-        path to the file
-    suffix:
-        file suffix
-    prefix:
-        file prefix
-    extension:
-        default is psv
-    na_values:
-        specifies the format of NaN values
-    cdm_subset:
-        specifies a subset of tables or a single table.
+    inp_dir: str
+        Path to the input file(s).
+    prefix: str, optional
+        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    suffix: str, optional
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    extension: str
+        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Default: psv
+    cdm_subset: str or list, optional
+        Specifies a subset of tables or a single table.
 
         - For multiple subsets of tables:
           This function returns a pandas.DataFrame that is multi-index at
@@ -90,29 +88,31 @@ def read_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
-    col_subset:
-        a python dictionary specifying the section or sections of the file to read
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
 
         - For multiple sections of the tables:
-          e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
 
         - For a single section:
           e.g. ``list type object col_subset = [columns]``
           This variable assumes that the column names are all conform to the cdm field names.
-    delimiter:
-        default is '|'
-    log_level:
-        Level of logging messages to save
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
+    na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
+        Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
+        For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
 
     Returns
     -------
-    pandas.DataFrame: either the entire file or a subset of it.
+    pandas.DataFrame
 
     Note
     ----
     Logs specific messages if there is any error.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
     if not os.path.isdir(inp_dir):

@@ -244,7 +244,6 @@ def table_to_ascii(
     col_subset=None,
     cdm_complete=True,
     filename=None,
-    log_level="INFO",
 ):
     """
     Export a cdm table to an ascii file.
@@ -268,14 +267,12 @@ def table_to_ascii(
         default is ``True``
     filename:
         the name of the file to stored the data
-    log_level:
-        level of logging information to be saved
 
     Returns
     -------
     Saves cdm tables as ascii files
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
 
     if "observation_value" in data:
         data = data.dropna(subset=["observation_value"])
@@ -324,43 +321,44 @@ def write_tables(
     cdm_table,
     out_dir=".",
     table_name=None,
-    suffix=None,
     prefix=None,
+    suffix=None,
     extension="psv",
     filename=None,
-    null_label="null",
     cdm_subset=None,
+    col_subset=None,
     cdm_complete=True,
     delimiter="|",
-    col_subset=None,
-    log_level="INFO",
+    null_label="null",
 ):
     """Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
-    cdm_table:
-        pandas.Dataframe to export
-    out_dir:
-        path to the file
-        default is current directory
-    table_name:
+    cdm_table: pandas.DataFrame
+        Dataframe to export.
+    out_dir: str
+        Path of the output directory.
+        Default: current directory
+    table_name: str, optional
         Name of the CDM table in `cdm_table`.
-        This is necessary if only one single table should be processed.
-    suffix:
-        file suffix
-    prefix:
-        file prefix
-    extension:
-        default is psv
-    filename:
-        name of the file
-        List one filename for each table name in ``cdm_table``.
-        default: Automatically create file name from table name, prefix and suffix.
-    null_label:
-        specified how nan are represented
-    cdm_subset:
-        specifies a subset of tables or a single table.
+        Note: This is necessary if ``cdm_table`` contains only one single table with single-index columns.
+    prefix: str, optional
+        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    suffix: str, optional
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    extension: str
+        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Default: psv
+    filename: str or dict, optional
+        Name of the output file name(s).
+        List one filename for each table name in ``cdm_table`` ({<table>:<filename>}).
+        Default: Automatically create file name from table name, ``prefix`` and ``suffix``.
+    null_label: str
+        Specifies how NaN values are represented in the DataFrame.
+        Default: null
+    cdm_subset: str or list, optional
+        Specifies a subset of tables or a single table.
 
         - For multiple subsets of tables:
           This function returns a pandas.DataFrame that is multi-index at
@@ -368,31 +366,27 @@ def write_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
-    col_subset:
-        specifies a subset of tables or a single table.
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
 
-        - For multiple subsets of tables:
-          This function returns a pandas.DataFrame that is multi-index at
-          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
 
-        - For a single table:
-          This function returns a pandas.DataFrame with a simple indexing for the columns.
-    cdm_complete:
-        extract the entire cdm file
-    delimiter:
-        default is '|'
-    log_level:
-        Level of logging messages to save
-
-    Returns
-    -------
-    pandas.DataFrame: either the entire file or a subset of it.
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
+    cdm_complete: bool
+        If True extract the all available CDM columns.
+        Default: True
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
 
     Note
     ----
     Use this function after reading CDM tables.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
 
     cdm_subset = get_cdm_subset(cdm_subset)
 
@@ -434,7 +428,6 @@ def write_tables(
             filename=filename_,
             col_subset=col_subset,
             cdm_complete=cdm_complete,
-            log_level=log_level,
         )
 
 
