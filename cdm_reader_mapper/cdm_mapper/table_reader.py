@@ -119,8 +119,11 @@ def read_tables(
         logger.error(f"Data path not found {inp_dir}: ")
         return pd.DataFrame()
 
+    if suffix is None:
+        suffix = ""
+
     # See if there's anything at all:
-    pattern = get_filename([prefix, "*", suffix], path=inp_dir, extension=extension)
+    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
     files = glob.glob(pattern)
 
     if len(files) == 0:
@@ -137,16 +140,14 @@ def read_tables(
             return pd.DataFrame()
         logger.info(f"Getting file path for pattern {table}")
         pattern_ = get_filename(
-            [prefix, table, "*", suffix], path=inp_dir, extension=extension
+            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
         )
-        logger.info(pattern_)
         paths_ = glob.glob(pattern_)
-        logger.info(paths_)
         if len(paths_) == 1:
             file_paths[table] = paths_[0]
             continue
         logger.warning(
-            f"Pattern {prefix}*{suffix} resulted in multiple files for table {table}. "
+            f"Pattern {pattern_} resulted in multiple files for table {table}. "
             "Cannot securely retrieve cdm table(s)"
         )
 
