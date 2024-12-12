@@ -58,13 +58,13 @@ class CDM:
     def select_from_list(self, selection, **kwargs):
         """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_list(self.data, selection, **kwargs)
-        self.columns = self.data.columns
+        #self.columns = self.data.columns
         return self
 
     def select_from_index(self, index, **kwargs):
         """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_index(self.data, index, **kwargs)
-        self.columns = self.data.columns
+        #self.columns = self.data.columns
         return self
 
     def unique(self, **kwargs):

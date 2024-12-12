@@ -44,8 +44,8 @@ def test_select_true(TextParser):
 @pytest.mark.parametrize("TextParser", [True, False])
 def test_select_from_index(TextParser):
     read_ = _get_data(TextParser)
+    read_.select_from_index([0, 2, 4])
     data = read_.data
-    result = select.select_from_index(data, [0, 2, 4])
 
     if TextParser is True:
         data = make_copy(data).read()
@@ -61,7 +61,8 @@ def test_select_from_list(TextParser):
     read_ = _get_data(TextParser)
     data = read_.data
     selection = {("c1", "B1"): [26, 41]}
-    result = select.select_from_list(data, selection, out_rejected=True, in_index=True)
+    read_.select_from_list(selection, out_rejected=True, in_index=True)
+    data = read_.data
 
     if TextParser is True:
         data = make_copy(data).read()
@@ -80,14 +81,13 @@ def test_select_from_list(TextParser):
 @pytest.mark.parametrize("TextParser", [True, False])
 def test_inspect_get_length(TextParser):
     read_ = _get_data(TextParser)
-    result = inspect.get_length(read_.data)
-    assert result == 5
+    assert len(read_) == 5
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
 def test_inspect_count_by_cat(TextParser):
     read_ = _get_data(TextParser)
-    result = inspect.count_by_cat(read_.data, ("c1", "B1"))
+    result = read_.unique(columns=("c1", "B1"))
     assert result == {("c1", "B1"): {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
