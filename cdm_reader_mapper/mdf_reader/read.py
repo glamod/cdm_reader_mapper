@@ -9,6 +9,7 @@ from io import StringIO as StringIO
 import pandas as pd
 
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.core.cdm_class import CDM
 
 from . import properties
 from .schemas import schemas
@@ -23,11 +24,11 @@ class MDFFileReader(_FileReader):
     data : pd.DataFrame or pd.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the output data
-    attrs : dict
-        a dictionary with the output data elements attributes
     mask : pd.DataFrame or pd.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the output data validation mask
+    attrs : dict
+        a dictionary with the output data elements attributes
     """
 
     def __init__(self, *args, **kwargs):
@@ -259,7 +260,7 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        return self
+        return CDM(data=self.data, mask=self.mask, attrs=self.attrs, imodel=self.imodel)
 
 
 # END AUX FUNCTIONS -----------------------------------------------------------
