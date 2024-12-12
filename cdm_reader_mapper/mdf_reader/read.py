@@ -260,7 +260,7 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        return CDM(data=self.data, mask=self.mask, attrs=self.attrs, imodel=self.imodel)
+        return CDM(self)
 
 
 # END AUX FUNCTIONS -----------------------------------------------------------
