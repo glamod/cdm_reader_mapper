@@ -112,21 +112,26 @@ class CDM:
     def flag_duplicates(self, overwrite=True, **kwargs):
         """Flag detected duplicates in ``cdm``."""
         self.DupDetect.flag_duplicates(**kwargs)
+        df_ = self.cdm.copy()
+        df_["header"] = self.DupDetect.result
         if overwrite is True:
-            self.cdm = self.DupDetect.result
+            self.cdm = df_
         else:
-            self.cdm_dups_flagged = self.DupDetect.result
+            self.cdm_dups_flagged = df_
         return self
 
     def get_duplicates(self, **kwargs):
         """Get duplicate matches in ``cdm``."""
-        self.DupDetect.get_duplicates(**kwargs)
+        return self.DupDetect.get_duplicates(**kwargs)
 
     def remove_duplicates(self, overwrite=True, **kwargs):
         """Remove detected duplicates in ``cdm``."""
         self.DupDetect.remove_duplicates(**kwargs)
+        df_ = self.cdm.copy()
+        header_ = self.DupDetect.result
+        df_ = df_[df_.index.isin(header_.index)]
         if overwrite is True:
-            self.cdm = self.DupDetect.result
+            self.cdm = df_
         else:
-            self.cdm_dups_removed = self.DupDetect.result
+            self.cdm_dups_removed = df_
         return self
