@@ -9,7 +9,7 @@ from cdm_reader_mapper.cdm_mapper import map_model
 from cdm_reader_mapper.cdm_mapper import write_tables
 
 
-def class CDM:
+class CDM:
     """Class for mapping to the CDM and manipulating the data.
 
     Attributes
