@@ -1,12 +1,13 @@
 """Common Data Model (CDM) class."""
 
-from cdm_reader_mapper.operations import (select, inspect, replace)
-from cdm_reader_mapper.metmetpy.datetime import correct as correct_datetime
-from cdm_reader_mapper.metmetpy.datetime import validate as validate_datetime
-from cdm_reader_mapper.metmetpy.platform_type import correct as correct_pt
-from cdm_reader_mapper.metmetpy.station_id import validate as validate_id
-from cdm_reader_mapper.cdm_mapper import map_model
-from cdm_reader_mapper.cdm_mapper import write_tables
+from __future__ import annotations
+
+from cdm_reader_mapper import cdm_to_ascii, map_model
+from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
+from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
+from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
+from cdm_reader_mapper.metmetpy.station_id.validate import validate as validate_id
+from cdm_reader_mapper.operations import inspect, replace, select
 
 
 class CDM:
@@ -16,62 +17,79 @@ class CDM:
     ----------
     data: pd.DataFrame or pd.io.parsers.TextFileReader
         MDF data
+    columns:
+        The column labels of ``data``.
+    dtypes: dict
+        Data types of ``data``.
+    attrs: dict
+        ``data`` elements attributes.
+    parse_dates: bool, list of Hashable, list of lists or dict of {Hashable : list}
+        Parameter used in pandas.read_csv.
     mask: pd.DataFrame or pd.io.parsers.TextFileReader
         MDF validation mask
-    attrs: dict
-        Data elements attributes.
     imodel: str
         Name of the CDM input model.
-        
     """
-    
-    def __init__(self, data, mask, attrs, imodel):
-        self.data = data
-        self.mask = mask
-        self.attrs = attrs
-        self.imodel = imodel
-        
+
+    def __init__(self, MDFFileReader):
+        self.data = MDFFileReader.data
+        self.columns = MDFFileReader.columns
+        self.dtypes = MDFFileReader.dtypes
+        self.attrs = MDFFileReader.attrs
+        self.parse_dates = MDFFileReader.parse_dates
+        self.mask = MDFFileReader.mask
+        self.imodel = MDFFileReader.imodel
+
     def __len__(self):
+        """Length of ``data``."""
         return inspect.get_length(self.data)
-        
+
     def select_true(self, **kwargs):
+        """Select valid values from ``data`` via ``mask``."""
         self.data = select.select_true(self.data, self.mask, **kwargs)
         return self
-        
+
     def select_from_list(self, selection, **kwargs):
+        """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_list(self.data, selection, **kwargs)
         return self
-        
+
     def select_from_index(self, index, **kwargs):
+        """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_index(self.data, index, **kwargs)
         return self
-        
+
     def unique(self, **kwargs):
+        """Get unique values of ``data``."""
         return inspect.count_by_cat(self.data, **kwargs)
-        
-    def replace_columns(self, df_corr, **kwargs)
+
+    def replace_columns(self, df_corr, **kwargs):
+        """Replace columns in ``data``."""
         self.data = replace.replace_columns(df_l=self.data, df_r=df_corr, **kwargs)
-        
-    self.correct_datetime(self):
+
+    def correct_datetime(self):
+        """Correct datetime information in ``data``."""
         self.data = correct_datetime(self.data, self.imodel)
         return self
-        
-    self.validate_datetime(self):
+
+    def validate_datetime(self):
+        """Validate datetime information in ``data``."""
         return validate_datetime(self.data, self.imodel)
-        
-    self.correct_pt(self):
+
+    def correct_pt(self):
+        """Correct platform type information in ``data``."""
         self.data = correct_pt(self.data, self.imodel)
         return self
-        
-    self.validate_id(self, **kwargs):
+
+    def validate_id(self, **kwargs):
+        """Validate station id information in ``data``."""
         return validate_id(self.data, self.imodel, **kwargs)
-        
-    self.map_model(self, **kwargs):
+
+    def map_model(self, **kwargs):
+        """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
         return self
-        
-    self.write_tables(self, **kwargs):
-        write_tables(self.cdm, **kwargs)
-        
-    
 
+    def write_tables(self, **kwargs):
+        """Write CDM tables on disk."""
+        cdm_to_ascii(self.cdm, **kwargs)
