@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper.cdm_mapper import cdm_to_ascii, map_model
+from cdm_reader_mapper.cdm_mapper import cdm_to_ascii, duplicate_check, map_model
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
@@ -93,10 +93,37 @@ class CDM:
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
-        self.cdm_columns = self.cdm.columns 
+        self.cdm_columns = self.cdm.columns
         self.cdm_dtypes = self.cdm.dtypes
         return self
 
     def write_tables(self, **kwargs):
         """Write CDM tables on disk."""
         cdm_to_ascii(self.cdm, **kwargs)
+
+    def duplicate_check(self, **kwargs):
+        """Duplicate check."""
+        self.DupDetect = duplicate_check(self.cdm, **kwargs)
+        return self
+
+    def flag_duplicates(self, overwrite=True, **kwargs):
+        """Flag detected duplicates in ``cdm``."""
+        self.DupDetect.flag_duplicates(**kwargs)
+        if overwrite is True:
+            self.cdm = self.DupDetect.result
+        else:
+            self.cdm_dups_flagged = self.DupDetect.result
+        return self
+
+    def get_duplicates(self, **kwargs):
+        """Get duplicate matches in ``cdm``."""
+        self.DupDetect.get_duplicates(**kwargs)
+
+    def remove_duplicates(self, overwrite=True, **kwargs):
+        """Remove detected duplicates in ``cdm``."""
+        self.DupDetect.remove_duplicates(**kwargs)
+        if overwrite is True:
+            self.cdm = self.DupDetect.result
+        else:
+            self.cdm_dups_removed = self.DupDetect.result
+        return self
