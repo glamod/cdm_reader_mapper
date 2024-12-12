@@ -5,16 +5,8 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper import cdm_mapper, mdf_reader
+from cdm_reader_mapper import mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-from cdm_reader_mapper.metmetpy import (
-    correct_datetime,
-    correct_pt,
-    validate_datetime,
-    validate_id,
-)
-from cdm_reader_mapper.operations.inspect import get_length
 
 from ._results import result_data
 
@@ -114,66 +106,34 @@ def _testing_suite(
         **kwargs,
     )
 
-    data = read_.data
-    mask = read_.mask
-    dtypes = read_.dtypes
-    parse_dates = read_.parse_dates
-    columns = read_.columns
+    read_.correct_datetime()
+    read_.correct_pt()
 
-    data = correct_datetime.correct(
-        data=data,
-        imodel=imodel,
-    )
+    val_dt = read_.validate_datetime()
 
-    data = correct_pt.correct(
-        data=data,
-        imodel=imodel,
-    )
-
-    if not isinstance(data, pd.DataFrame):
-        data_pd = make_copy(data).read()
-    else:
-        data_pd = data.copy()
-    if not isinstance(mask, pd.DataFrame):
-        mask_pd = make_copy(mask).read()
-    else:
-        mask_pd = mask.copy()
-
-    val_dt = validate_datetime.validate(
-        data=data_pd,
-        imodel=imodel,
-    )
-
-    val_id = validate_id.validate(
-        data=data_pd,
-        imodel=imodel,
-    )
+    val_id = read_.validate_id()
 
     expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return
 
-    data_ = _read_result_data(
+    data_exp = _read_result_data(
         result_data_file,
-        columns,
-        dtype=dtypes,
-        parse_dates=parse_dates,
+        read_.columns,
+        dtype=read_.dtypes,
+        parse_dates=read_.parse_dates,
     )
-    mask_ = _read_result_data(expected_data["mask"], columns)
+    mask_exp = _read_result_data(expected_data["mask"], read_.columns)
 
-    data_ = drop_rows(data_, drops)
-    mask_ = drop_rows(mask_, drops)
+    data_exp = drop_rows(data_exp, drops)
+    mask_exp = drop_rows(mask_exp, drops)
 
-    pd.testing.assert_frame_equal(data_pd, data_)
-    pd.testing.assert_frame_equal(mask_pd, mask_, check_dtype=False)
+    pd.testing.assert_frame_equal(read_.data, data_exp)
+    pd.testing.assert_frame_equal(read_.mask, mask_exp, check_dtype=False)
 
-    if isinstance(data, pd.DataFrame):
-        if data.empty:
-            return
-    else:
-        if get_length(data) == 0:
-            return
+    if len(read_) == 0:
+        return
 
     if val_dt is not None:
         val_dt_ = _pandas_read_csv(
@@ -198,24 +158,22 @@ def _testing_suite(
     if mapping is False:
         return
 
-    output = cdm_mapper.map_model(
-        data=data,
-        imodel=imodel,
+    read_.map_model(
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",
     )
 
-    col_subset = get_col_subset(output, codes_subset)
+    col_subset = get_col_subset(read_.cdm, codes_subset)
 
-    cdm_mapper.cdm_to_ascii(output, suffix=imodel)
+    read_.write_tables(suffix=imodel)
     output = read_tables(".", tb_id=imodel, cdm_subset=cdm_subset)
 
-    output_ = read_tables(
+    output_exp = read_tables(
         expected_data["cdm_table"], tb_id=f"{imodel}*", cdm_subset=cdm_subset
     )
 
-    output, output_ = remove_datetime_columns(output, output_, col_subset)
+    output, output_exp = remove_datetime_columns(output, output_exp, col_subset)
 
-    output_ = drop_rows(output_, drops)
-    pd.testing.assert_frame_equal(output, output_)
+    output_exp = drop_rows(output_exp, drops)
+    pd.testing.assert_frame_equal(output, output_exp)
