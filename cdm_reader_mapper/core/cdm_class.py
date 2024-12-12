@@ -49,22 +49,33 @@ class CDM:
         """Length of ``data``."""
         return inspect.get_length(self.data)
 
-    def select_true(self, **kwargs):
+    def select_true(self, overwrite=True, **kwargs):
         """Select valid values from ``data`` via ``mask``."""
-        self.data = select.select_true(self.data, self.mask, **kwargs)
-        self.columns = self.data.columns
+        selected = select.select_true(self.data, self.mask, **kwargs)
+        if overwrite is True:
+            self.data = selected[0]
+        else:
+            self.selected = selected[0]
+        self.deselected = selected[1]
         return self
 
-    def select_from_list(self, selection, **kwargs):
+    def select_from_list(self, selection, overwrite=True, **kwargs):
         """Select columns of ``data`` from list of column names."""
-        self.data = select.select_from_list(self.data, selection, **kwargs)
-        #self.columns = self.data.columns
+        selected = select.select_from_list(self.data, selection, **kwargs)
+        if overwrite is True:
+            self.data = selected[0]
+        else:
+            self.selected = selected[0]
+        self.deselected = selected[1]
         return self
 
-    def select_from_index(self, index, **kwargs):
+    def select_from_index(self, index, overwrite=True, **kwargs):
         """Select columns of ``data`` from list of column names."""
-        self.data = select.select_from_index(self.data, index, **kwargs)
-        #self.columns = self.data.columns
+        selected = select.select_from_index(self.data, index, **kwargs)
+        if overwrite is True:
+            self.data = selected
+        else:
+            self.selected = selected
         return self
 
     def unique(self, **kwargs):
