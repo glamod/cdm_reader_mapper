@@ -12,6 +12,7 @@ def _manipulate_header(df):
     df_.columns = pd.MultiIndex.from_product([["header"], df_.columns])
     return df_
 
+
 def _manipulation(df):
     df = df.copy()
     # Duplicate : Different report_id's

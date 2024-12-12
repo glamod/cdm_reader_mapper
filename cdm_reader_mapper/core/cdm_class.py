@@ -98,8 +98,6 @@ class CDM:
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
-        # self.cdm_columns = self.cdm.columns
-        # self.cdm_dtypes = self.cdm.dtypes
         return self
 
     def write_tables(self, **kwargs):

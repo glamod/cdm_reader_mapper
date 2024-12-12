@@ -7,7 +7,7 @@ from cdm_reader_mapper import read_mdf, test_data
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.operations import inspect, replace, select
 
-from ._results import correction_df, table_df
+from ._results import cdm_header, correction_df
 
 data_dict = dict(test_data.test_icoads_r300_d721)
 
@@ -92,6 +92,7 @@ def test_inspect_count_by_cat(TextParser):
 
 
 def test_replace():
+    table_df = cdm_header.cdm["header"]
     result = replace.replace_columns(
         table_df,
         correction_df,
