@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper import cdm_to_ascii, map_model
+from cdm_reader_mapper.cdm_mapper import cdm_to_ascii, map_model
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
