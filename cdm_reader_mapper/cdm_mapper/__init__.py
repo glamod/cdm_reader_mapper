@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from .duplicates import duplicate_check  # noqa
 from .mapper import map_model  # noqa
 from .table_reader import read_tables  # noqa
 from .table_writer import cdm_to_ascii  # noqa
