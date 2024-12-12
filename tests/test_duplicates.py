@@ -4,12 +4,10 @@ import pytest  # noqa
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
-from cdm_reader_mapper.cdm_mapper import duplicate_check
-
 from ._duplicates import (
+    cdm_craid,
+    cdm_icoads,
     compare_kwargs_,
-    df_craid,
-    df_icoads,
     exp1,
     exp2,
     exp3,
@@ -83,8 +81,7 @@ def test_duplicates_flag(
 ):
     if method is None:
         method = "SortedNeighbourhood"
-    DupDetect = duplicate_check(
-        df_icoads,
+    cdm_icoads.duplicate_check(
         method=method,
         method_kwargs=method_kwargs,
         compare_kwargs=compare_kwargs,
@@ -92,30 +89,30 @@ def test_duplicates_flag(
         ignore_entries=ignore_entries,
         offsets=offsets,
     )
-    DupDetect.flag_duplicates()
-    result = DupDetect.result
+    cdm_icoads.flag_duplicates()
+    result = cdm_icoads.cdm
     assert_array_equal(result["duplicate_status"], expected["duplicate_status"])
     assert_array_equal(result["report_quality"], expected["report_quality"])
     assert_array_equal(result["duplicates"], expected["duplicates"])
 
 
 def test_duplicates_remove():
-    DupDetect = duplicate_check(
-        df_icoads,
+    cdm_icoads.duplicate_check(
         ignore_entries={
             "primary_station_id": ["SHIP", "MASKSTID"],
             "station_speed": "null",
             "station_course": "null",
         },
     )
-    DupDetect.remove_duplicates()
-    expected = DupDetect.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
-    assert_frame_equal(expected, DupDetect.result)
+    cdm_icoads.remove_duplicates(overwrite=False)
+    expected = cdm_icoads.cdm.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
+    assert_frame_equal(expected, cdm_icoads.cdm_dups_removed)
 
 
 def test_duplicates_craid():
-    DupDetect = duplicate_check(df_craid, ignore_columns="primary_station_id")
-    DupDetect.flag_duplicates()
-    assert_array_equal(DupDetect.result["duplicate_status"], [0] * 10)
-    assert_array_equal(DupDetect.result["report_quality"], [2] * 10)
-    assert_array_equal(DupDetect.result["duplicates"], ["null"] * 10)
+    cdm_craid.duplicate_check(ignore_columns="primary_station_id")
+    cdm_craid.flag_duplicates()
+    result = cdm_craid.cdm
+    assert_array_equal(result["duplicate_status"], [0] * 10)
+    assert_array_equal(result["report_quality"], [2] * 10)
+    assert_array_equal(result["duplicates"], ["null"] * 10)

@@ -364,7 +364,7 @@ compare_kwargs_ = {
         "kwargs": {"method": "gauss", "offset": 60.0},
     },
 }
-df_icoads = _get_test_data("icoads_r302_d792")
-df_icoads = _manipulate_header(df_icoads)
+cdm_icoads = _get_test_data("icoads_r302_d792")
+cdm_icoads["cdm"] = _manipulate_header(cdm_icoads.cdm)
 
-df_craid = _get_test_data("craid")
+cdm_craid = _get_test_data("craid")
