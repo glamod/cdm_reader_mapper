@@ -47,16 +47,19 @@ class CDM:
     def select_true(self, **kwargs):
         """Select valid values from ``data`` via ``mask``."""
         self.data = select.select_true(self.data, self.mask, **kwargs)
+        self.columns = self.data.columns
         return self
 
     def select_from_list(self, selection, **kwargs):
         """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_list(self.data, selection, **kwargs)
+        self.columns = self.data.columns
         return self
 
     def select_from_index(self, index, **kwargs):
         """Select columns of ``data`` from list of column names."""
         self.data = select.select_from_index(self.data, index, **kwargs)
+        self.columns = self.data.columns
         return self
 
     def unique(self, **kwargs):
@@ -66,6 +69,8 @@ class CDM:
     def replace_columns(self, df_corr, **kwargs):
         """Replace columns in ``data``."""
         self.data = replace.replace_columns(df_l=self.data, df_r=df_corr, **kwargs)
+        self.columns = self.data.columns
+        return self
 
     def correct_datetime(self):
         """Correct datetime information in ``data``."""
@@ -88,6 +93,8 @@ class CDM:
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
+        self.cdm_columns = self.cdm.columns 
+        self.cdm_dtypes = self.cdm.dtypes
         return self
 
     def write_tables(self, **kwargs):
