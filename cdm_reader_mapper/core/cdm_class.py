@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper.cdm_mapper import cdm_to_ascii, map_model
-from cdm_reader_mapper.duplicates import duplicate_check
+from cdm_reader_mapper.cdm_mapper.mapper import map_model
+from cdm_reader_mapper.cdm_mapper.table_writer import cdm_to_ascii
+from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
@@ -97,6 +98,7 @@ class CDM:
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
+        print(self.cdm)
         self.cdm_columns = self.cdm.columns
         self.cdm_dtypes = self.cdm.dtypes
         return self

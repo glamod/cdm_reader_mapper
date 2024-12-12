@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper import read_tables
 
 from ._results import result_data
 

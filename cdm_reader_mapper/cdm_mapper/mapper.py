@@ -315,7 +315,6 @@ def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"
         if not not_empty:
             logger.error("Input data is empty")
             return
-
     else:
         logger.error("Input data type " f"{type(data)}" " not supported")
         return
