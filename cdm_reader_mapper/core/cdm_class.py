@@ -31,14 +31,17 @@ class CDM:
         Name of the CDM input model.
     """
 
-    def __init__(self, MDFFileReader):
-        self.data = MDFFileReader.data
-        self.columns = MDFFileReader.columns
-        self.dtypes = MDFFileReader.dtypes
-        self.attrs = MDFFileReader.attrs
-        self.parse_dates = MDFFileReader.parse_dates
-        self.mask = MDFFileReader.mask
-        self.imodel = MDFFileReader.imodel
+    def __init__(self, MDFFileReader=None, cdm_tables=None):
+        if MDFFileReader is not None:
+            self.data = MDFFileReader.data
+            self.columns = MDFFileReader.columns
+            self.dtypes = MDFFileReader.dtypes
+            self.attrs = MDFFileReader.attrs
+            self.parse_dates = MDFFileReader.parse_dates
+            self.mask = MDFFileReader.mask
+            self.imodel = MDFFileReader.imodel
+        if cdm_tables is not None:
+            self.cdm = cdm_tables
 
     def __len__(self):
         """Length of ``data``."""

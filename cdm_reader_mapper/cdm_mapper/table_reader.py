@@ -50,6 +50,7 @@ import os
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.core.cdm_class import CDM
 
 from . import properties
 
@@ -208,4 +209,4 @@ def read_tables(
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return merged
+    return CDM(cdm_tables=merged)
