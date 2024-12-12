@@ -89,8 +89,8 @@ def test_duplicates_flag(
         ignore_entries=ignore_entries,
         offsets=offsets,
     )
-    cdm_icoads.flag_duplicates()
-    result = cdm_icoads.cdm
+    cdm_icoads.flag_duplicates(overwrite=False)
+    result = cdm_icoads.cdm_dups_flagged
     assert_array_equal(result["duplicate_status"], expected["duplicate_status"])
     assert_array_equal(result["report_quality"], expected["report_quality"])
     assert_array_equal(result["duplicates"], expected["duplicates"])
