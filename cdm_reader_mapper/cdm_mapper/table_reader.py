@@ -133,13 +133,13 @@ def read_tables(
     # also removing rows with empty observation_value in observation_tables
     if not os.path.isdir(tb_path):
         logger.error(f"Data path not found {tb_path}: ")
-        return pd.DataFrame()
+        return CDM(cdm_tables=pd.DataFrame())
 
     # See if there's anything at all:
     files = glob.glob(os.path.join(tb_path, f"*{tb_id}*.{extension}"))
     if len(files) == 0:
         logger.error(f"No files found matching pattern {tb_id}")
-        return pd.DataFrame()
+        return CDM(cdm_tables=pd.DataFrame())
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
@@ -147,7 +147,7 @@ def read_tables(
     for tb in cdm_subset:
         if tb not in properties.cdm_tables:
             logger.error(f"Requested table {tb} not defined in CDM")
-            return pd.DataFrame()
+            return CDM(cdm_tables=pd.DataFrame())
 
     file_paths = {}
     for tb in cdm_subset:
@@ -161,11 +161,11 @@ def read_tables(
             f"Pattern {tb_id} resulted in multiple files for table {tb}. "
             "Cannot securely retrieve cdm table(s)"
         )
-        return pd.DataFrame()
+        return CDM(cdm_tables=pd.DataFrame())
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
-        return pd.DataFrame()
+        return CDM(cdm_tables=pd.DataFrame())
 
     logger.info(
         "Reading into dataframe data files {}: ".format(
@@ -197,7 +197,7 @@ def read_tables(
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
-        return pd.DataFrame()
+        return CDM(cdm_tables=pd.DataFrame())
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
