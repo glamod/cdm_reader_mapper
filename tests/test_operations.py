@@ -88,7 +88,7 @@ def test_inspect_get_length(TextParser):
 def test_inspect_count_by_cat(TextParser):
     read_ = _get_data(TextParser)
     result = inspect.count_by_cat(read_.data, ("c1", "B1"))
-    assert result == {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}
+    assert result == {("c1", "B1"): {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
 def test_replace():

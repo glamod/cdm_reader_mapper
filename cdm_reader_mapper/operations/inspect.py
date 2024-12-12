@@ -40,14 +40,14 @@ def get_length(data):
         return pandas_TextParser_hdlr.get_length(data)
 
 
-def count_by_cat(data, col=None):
+def count_by_cat(data, columns=None):
     """Count unique values.
 
     Parameters
     ----------
     data: pd.DataFrame, pd.io.parsers.TextFileReader
         Input dataset.
-    col: str, tuple
+    col: str, list or tuple
         Name of the data column to be selected.
 
     Returns
@@ -55,19 +55,21 @@ def count_by_cat(data, col=None):
     dict
         Dictionary containing number of unique values.
     """
-    if col is None:
-        col = data.columns
+    if columns is None:
+        columns = data.columns
+    if not isinstance(columns, list):
+        columns = [columns]
     counts = {}
     if not isinstance(data, pd.io.parsers.TextFileReader):
-        for c in col:
-            counts[c] = count_by_cat_i(data[col])
+        for column in columns:
+            counts[column] = count_by_cat_i(data[column])
         return counts
     else:
-        for c in col:
+        for column in columns:
             data_cp = pandas_TextParser_hdlr.make_copy(data)
             count_dicts = []
             for df in data_cp:
-                count_dicts.append(count_by_cat_i(df[col]))
+                count_dicts.append(count_by_cat_i(df[column]))
 
             data_cp.close()
             cats = [list(x.keys()) for x in count_dicts]
@@ -76,5 +78,5 @@ def count_by_cat(data, col=None):
             count_dict = {}
             for cat in cats:
                 count_dict[cat] = sum([x.get(cat) for x in count_dicts if x.get(cat)])
-            counts[c] = count_dict
+            counts[column] = count_dict
         return counts
