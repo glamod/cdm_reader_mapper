@@ -98,9 +98,8 @@ class CDM:
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
         self.cdm = map_model(self.data, self.imodel, **kwargs)
-        print(self.cdm)
-        self.cdm_columns = self.cdm.columns
-        self.cdm_dtypes = self.cdm.dtypes
+        # self.cdm_columns = self.cdm.columns
+        # self.cdm_dtypes = self.cdm.dtypes
         return self
 
     def write_tables(self, **kwargs):
@@ -109,7 +108,7 @@ class CDM:
 
     def duplicate_check(self, **kwargs):
         """Duplicate check."""
-        self.DupDetect = duplicate_check(self.cdm, **kwargs)
+        self.DupDetect = duplicate_check(self.cdm["header"], **kwargs)
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):

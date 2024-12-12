@@ -365,6 +365,6 @@ compare_kwargs_ = {
     },
 }
 cdm_icoads = _get_test_data("icoads_r302_d792")
-cdm_icoads["cdm"] = _manipulate_header(cdm_icoads.cdm)
+cdm_icoads.cdm = _manipulate_header(cdm_icoads.cdm)
 
 cdm_craid = _get_test_data("craid")

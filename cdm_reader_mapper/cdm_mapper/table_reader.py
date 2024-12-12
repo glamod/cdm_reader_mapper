@@ -173,11 +173,6 @@ def read_tables(
         )
     )
 
-    if len(cdm_subset) == 1:
-        indexing = False
-    else:
-        indexing = True
-
     df_list = []
     for tb, tb_file in file_paths.items():
         usecols = get_usecols(tb, col_subset)
@@ -195,9 +190,6 @@ def read_tables(
                 f"Table {tb} empty in file system, not added to the final DF"
             )
             continue
-
-        if indexing is False:
-            return dfi
 
         dfi = dfi.set_index("report_id", drop=False)
         dfi.columns = pd.MultiIndex.from_product([[tb], dfi.columns])
