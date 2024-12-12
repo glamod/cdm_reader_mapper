@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import mdf_reader, test_data
+from cdm_reader_mapper import read_mdf, test_data
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.operations import inspect, replace, select
 
@@ -13,7 +13,7 @@ data_dict = dict(test_data.test_icoads_r300_d721)
 
 
 def _read_data(**kwargs):
-    return mdf_reader.read(**kwargs)
+    return read_mdf(**kwargs)
 
 
 def _get_data(TextParser, **kwargs):
