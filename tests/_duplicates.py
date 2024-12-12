@@ -1,11 +1,19 @@
 from __future__ import annotations
 
+import pandas as pd
+
 from cdm_reader_mapper import read_tables
 
 from ._results import result_data
 
 
 def _manipulate_header(df):
+    df_ = _manipulation(df["header"])
+    df_.columns = pd.MultiIndex.from_product([["header"], df_.columns])
+    return df_
+
+def _manipulation(df):
+    df = df.copy()
     # Duplicate : Different report_id's
     # Failure in data set;
     # each report needs a specific report_id
