@@ -27,13 +27,13 @@ from .mappings import mapping_functions
 from .tables.tables import get_cdm_atts, get_imodel_maps
 
 
-def print_integer(data, null_label):
+def convert_integer(data, null_label):
     """
-    Print all elements that have 'int' as type attribute.
+    Convert all elements that have 'int' as type attribute.
 
     Parameters
     ----------
-    data: data tables to print
+    data: data tables to convert
     null_label: specified how nan are represented
 
     Returns
@@ -51,13 +51,13 @@ def print_integer(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def print_float(data, null_label, decimal_places):
+def convert_float(data, null_label, decimal_places):
     """
-    Print all elements that have 'float' as type attribute.
+    Convert all elements that have 'float' as type attribute.
 
     Parameters
     ----------
-    data: data tables to print
+    data: data tables to convert
     null_label: specified how nan are represented
     decimal_places: number of decimal places
 
@@ -75,9 +75,9 @@ def print_float(data, null_label, decimal_places):
     return data.apply(lambda x: _return_str(x, null_label, format_float))
 
 
-def print_datetime(data, null_label):
+def convert_datetime(data, null_label):
     """
-    Print datetime objects in the format: "%Y-%m-%d %H:%M:%S".
+    Convert datetime objects in the format: "%Y-%m-%d %H:%M:%S".
 
     Parameters
     ----------
@@ -99,13 +99,13 @@ def print_datetime(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def print_varchar(data, null_label):
+def convert_varchar(data, null_label):
     """
-    Print string elements.
+    Convert string elements.
 
     Parameters
     ----------
-    data: data tables to print
+    data: data tables to convert
     null_label: specified how nan are represented
 
     Returns
@@ -121,52 +121,41 @@ def print_varchar(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def print_integer_array(data, null_label):
+def convert_integer_array(data, null_label):
     """
-    Print a series of integer objects as array.
+    Convert a series of integer objects as array.
 
     Parameters
     ----------
-    data: data tables to print
+    data: data tables to convert
     null_label: specified how nan are represented
 
     Returns
     -------
     data: array of int objects
     """
-    return data.apply(print_integer_array_i, null_label=null_label)
+    return data.apply(convert_integer_array_i, null_label=null_label)
 
 
-# TODO: tell this to dave and delete them... put error messages in functions above
-def print_float_array(data, null_label, decimal_places=None):
-    """Print a series of float objects as array."""
-    return "float array not defined in printers"
-
-
-def print_datetime_array(data, null_label):
-    """Print a series of datetime objects as array."""
-    return "datetime tz array not defined in printers"
-
-
-def print_varchar_array(data, null_label):
+def convert_varchar_array(data, null_label):
     """
-    Print a series of string objects as array.
+    Convert a series of string objects as array.
 
     Parameters
     ----------
-    data: data tables to print
+    data: data tables to convert
     null_label: specified how nan are represented
 
     Returns
     -------
     data: array of varchar objects
     """
-    return data.apply(print_varchar_array_i)
+    return data.apply(convert_varchar_array_i)
 
 
-def print_integer_array_i(row, null_label=None):
+def convert_integer_array_i(row, null_label=None):
     """
-    NEED DOCUMENTATION.
+    Convert a series of integer objects.
 
     Parameters
     ----------
@@ -186,9 +175,9 @@ def print_integer_array_i(row, null_label=None):
     return null_label
 
 
-def print_varchar_array_i(row, null_label=None):
+def convert_varchar_array_i(row, null_label=None):
     """
-    NEED DOCUMENTATION.
+    Convert a series of string objects.
 
     Parameters
     ----------
@@ -393,17 +382,17 @@ def _convert_dtype(data, atts, null_label, logger):
     for column in atts.keys():
         if column in data:
             itype = atts.get(column).get("data_type")
-            if printers.get(itype):
-                iprinter_kwargs = iprinters_kwargs.get(itype)
-                if iprinter_kwargs:
-                    kwargs = {x: atts.get(column).get(x) for x in iprinter_kwargs}
+            if converters.get(itype):
+                iconverter_kwargs = iconverters_kwargs.get(itype)
+                if iconverter_kwargs:
+                    kwargs = {x: atts.get(column).get(x) for x in iconverter_kwargs}
                 else:
                     kwargs = {}
-                cdm_table[column] = printers.get(itype)(
+                cdm_table[column] = converters.get(itype)(
                     data[column], null_label, **kwargs
                 )
             else:
-                logger.error(f"No printer defined for element {column}")
+                logger.error(f"No converter defined for element {column}")
         else:
             cdm_table[column] = null_label
     return cdm_table
@@ -561,18 +550,16 @@ def map_model(
     )
 
 
-printers = {
-    "int": print_integer,
-    "numeric": print_float,
-    "varchar": print_varchar,
-    "timestamp with timezone": print_datetime,
-    "int[]": print_integer_array,
-    "numeric[]": print_float_array,
-    "varchar[]": print_varchar_array,
-    "timestamp with timezone[]": print_datetime_array,
+converters = {
+    "int": convert_integer,
+    "numeric": convert_float,
+    "varchar": convert_varchar,
+    "timestamp with timezone": convert_datetime,
+    "int[]": convert_integer_array,
+    "varchar[]": convert_varchar_array,
 }
 
-iprinters_kwargs = {
+iconverters_kwargs = {
     "numeric": ["decimal_places"],
     "numeric[]": ["decimal_places"],
 }
