@@ -24,9 +24,12 @@ from __future__ import annotations
 
 import os
 
+import pandas as pd
+
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
+from .tables.tables import get_cdm_atts
 
 
 def table_to_ascii(
@@ -71,7 +74,7 @@ def table_to_ascii(
 
 
 def cdm_to_ascii(
-    cdm_table,
+    cdm_tables,
     delimiter="|",
     extension="psv",
     out_dir=None,
@@ -89,7 +92,7 @@ def cdm_to_ascii(
 
     Parameters
     ----------
-    cdm_table:
+    cdm_tables:
         common data model tables to export
     delimiter:
         default '|'
@@ -112,15 +115,20 @@ def cdm_to_ascii(
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
     extension = "." + extension
-    if cdm_table.empty:
+    if cdm_tables.empty:
         logger.warning("All CDM tables are empty")
         return
     for table in properties.cdm_tables:
+        if table not in cdm_tables:
+            cdm_atts = get_cdm_atts(table)
+            cdm_table = pd.DataFrame(columns=cdm_atts.keys())
+        else:
+            cdm_table = cdm_tables[table]
         filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
         filepath = filename if not out_dir else os.path.join(out_dir, filename)
         logger.info(f"Writing table {table}: {filepath}")
         table_to_ascii(
-            cdm_table[table],
+            cdm_table,
             delimiter=delimiter,
             filename=filepath,
         )
