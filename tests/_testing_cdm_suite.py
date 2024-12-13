@@ -74,11 +74,12 @@ def drop_rows(df, drops):
 
 def get_col_subset(output, codes_subset):
     col_subset = []
-    if codes_subset is not None:
-        for key in output.keys():
-            for att in output[key]["atts"].keys():
-                if att in codes_subset:
-                    col_subset.append((key, att))
+    if codes_subset is None:
+        return col_subset
+    for subset in codes_subset:
+        for column in output.columns:
+            if subset in column:
+                col_subset.append(column)
     return col_subset
 
 
