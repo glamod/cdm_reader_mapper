@@ -13,8 +13,10 @@ for the input data model.
 
 from __future__ import annotations
 
+import ast
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
@@ -23,6 +25,187 @@ from . import properties
 from .codes.codes import get_code_table
 from .mappings import mapping_functions
 from .tables.tables import get_cdm_atts, get_imodel_maps
+
+
+def print_integer(data, null_label):
+    """
+    Print all elements that have 'int' as type attribute.
+
+    Parameters
+    ----------
+    data: data tables to print
+    null_label: specified how nan are represented
+
+    Returns
+    -------
+    data: data as int type
+    """
+
+    def _return_str(x, null_label):
+        if pd.isna(x):
+            return null_label
+        return str(
+            int(float(x))
+        )  # ValueError: invalid literal for int() with base 10: '5.0'
+
+    return data.apply(lambda x: _return_str(x, null_label))
+
+
+def print_float(data, null_label, decimal_places):
+    """
+    Print all elements that have 'float' as type attribute.
+
+    Parameters
+    ----------
+    data: data tables to print
+    null_label: specified how nan are represented
+    decimal_places: number of decimal places
+
+    Returns
+    -------
+    data: data as float type
+    """
+
+    def _return_str(x, null_label, format_float):
+        if pd.isna(x):
+            return null_label
+        return format_float.format(x)
+
+    format_float = "{:." + str(decimal_places) + "f}"
+    return data.apply(lambda x: _return_str(x, null_label, format_float))
+
+
+def print_datetime(data, null_label):
+    """
+    Print datetime objects in the format: "%Y-%m-%d %H:%M:%S".
+
+    Parameters
+    ----------
+    data: date time elements
+    null_label: specified how nan are represented
+
+    Returns
+    -------
+    data: data as datetime objects
+    """
+
+    def _return_str(x, null_label):
+        if pd.isna(x):
+            return null_label
+        if isinstance(x, str):
+            return x
+        return x.strftime("%Y-%m-%d %H:%M:%S")
+
+    return data.apply(lambda x: _return_str(x, null_label))
+
+
+def print_varchar(data, null_label):
+    """
+    Print string elements.
+
+    Parameters
+    ----------
+    data: data tables to print
+    null_label: specified how nan are represented
+
+    Returns
+    -------
+    data: data as string objects
+    """
+
+    def _return_str(x, null_label):
+        if pd.isna(x):
+            return null_label
+        return str(x)
+
+    return data.apply(lambda x: _return_str(x, null_label))
+
+
+def print_integer_array(data, null_label):
+    """
+    Print a series of integer objects as array.
+
+    Parameters
+    ----------
+    data: data tables to print
+    null_label: specified how nan are represented
+
+    Returns
+    -------
+    data: array of int objects
+    """
+    return data.apply(print_integer_array_i, null_label=null_label)
+
+
+# TODO: tell this to dave and delete them... put error messages in functions above
+def print_float_array(data, null_label, decimal_places=None):
+    """Print a series of float objects as array."""
+    return "float array not defined in printers"
+
+
+def print_datetime_array(data, null_label):
+    """Print a series of datetime objects as array."""
+    return "datetime tz array not defined in printers"
+
+
+def print_varchar_array(data, null_label):
+    """
+    Print a series of string objects as array.
+
+    Parameters
+    ----------
+    data: data tables to print
+    null_label: specified how nan are represented
+
+    Returns
+    -------
+    data: array of varchar objects
+    """
+    return data.apply(print_varchar_array_i)
+
+
+def print_integer_array_i(row, null_label=None):
+    """
+    NEED DOCUMENTATION.
+
+    Parameters
+    ----------
+    row
+    null_label
+
+    Returns
+    -------
+    data: int
+    """
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(int(x)) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
+
+
+def print_varchar_array_i(row, null_label=None):
+    """
+    NEED DOCUMENTATION.
+
+    Parameters
+    ----------
+    row
+    null_label
+
+    Returns
+    -------
+    data: varchar
+    """
+    row = row if not isinstance(row, str) else ast.literal_eval(row)
+    row = row if isinstance(row, list) else [row]
+    str_row = [str(x) for x in row if np.isfinite(x)]
+    string = ",".join(filter(bool, str_row))
+    if len(string) > 0:
+        return "{" + string + "}"
+    return null_label
 
 
 def drop_duplicates(df):
@@ -211,6 +394,8 @@ def _map(
     data=pd.DataFrame(),
     cdm_subset=None,
     codes_subset=None,
+    cdm_complete=True,
+    null_label="null",
     logger=None,
 ):
     if not cdm_subset:
@@ -249,24 +434,65 @@ def _map(
                 cdm_tables,
             )
 
+    table_list = []
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
         logger.debug(
             f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
         )
         cdm_tables[table]["buffer"].seek(0)
-        cdm_tables[table]["data"] = pd.read_csv(
+        data = pd.read_csv(
             cdm_tables[table]["buffer"],
             names=imodel_maps[table].keys(),
             parse_dates=date_columns[table],
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
+        atts = cdm_tables[table]["atts"]
+        cdm_table = pd.DataFrame(index=data.index, columns=atts.keys(), dtype="object")
+        for column in atts.keys():
+            # if "observation_value" in atts.keys():
+            #    logger.error("No observation values in table.")
+            # elif column in data:
+            if column in data:
+                itype = atts.get(column).get("data_type")
+                if printers.get(itype):
+                    iprinter_kwargs = iprinters_kwargs.get(itype)
+                    if iprinter_kwargs:
+                        kwargs = {x: atts.get(column).get(x) for x in iprinter_kwargs}
+                    else:
+                        kwargs = {}
+                    cdm_table[column] = printers.get(itype)(
+                        data[column], null_label, **kwargs
+                    )
+                else:
+                    logger.error(f"No printer defined for element {column}")
+            else:
+                cdm_table[column] = null_label
 
-    return cdm_tables
+        columns = (
+            [x for x in atts.keys() if x in data.columns]
+            if not cdm_complete
+            else list(atts.keys())
+        )
+        cdm_table = cdm_table[columns]
+        cdm_table.columns = pd.MultiIndex.from_product([[table], columns])
+        table_list.append(cdm_table)
+
+    merged = pd.concat(table_list, axis=1, join="outer")
+    merged = merged.reset_index(drop=True)
+    return merged
 
 
-def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"):
+def map_model(
+    data,
+    imodel,
+    cdm_subset=None,
+    codes_subset=None,
+    null_label="null",
+    cdm_complete=True,
+    log_level="INFO",
+):
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
@@ -327,5 +553,24 @@ def map_model(data, imodel, cdm_subset=None, codes_subset=None, log_level="INFO"
         data=data,
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
+        null_label=null_label,
+        cdm_complete=cdm_complete,
         logger=logger,
     )
+
+
+printers = {
+    "int": print_integer,
+    "numeric": print_float,
+    "varchar": print_varchar,
+    "timestamp with timezone": print_datetime,
+    "int[]": print_integer_array,
+    "numeric[]": print_float_array,
+    "varchar[]": print_varchar_array,
+    "timestamp with timezone[]": print_datetime_array,
+}
+
+iprinters_kwargs = {
+    "numeric": ["decimal_places"],
+    "numeric[]": ["decimal_places"],
+}
