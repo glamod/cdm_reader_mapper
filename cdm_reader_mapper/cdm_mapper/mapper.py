@@ -388,6 +388,27 @@ def _write_csv_files(
     return cdm_tables
 
 
+def _convert_dtype(data, atts, null_label, logger):
+    cdm_table = pd.DataFrame(index=data.index, columns=atts.keys(), dtype="object")
+    for column in atts.keys():
+        if column in data:
+            itype = atts.get(column).get("data_type")
+            if printers.get(itype):
+                iprinter_kwargs = iprinters_kwargs.get(itype)
+                if iprinter_kwargs:
+                    kwargs = {x: atts.get(column).get(x) for x in iprinter_kwargs}
+                else:
+                    kwargs = {}
+                cdm_table[column] = printers.get(itype)(
+                    data[column], null_label, **kwargs
+                )
+            else:
+                logger.error(f"No printer defined for element {column}")
+        else:
+            cdm_table[column] = null_label
+    return cdm_table
+
+
 def _map(
     data_model,
     *sub_models,
@@ -449,27 +470,8 @@ def _map(
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
         atts = cdm_tables[table]["atts"]
-        cdm_table = pd.DataFrame(index=data.index, columns=atts.keys(), dtype="object")
-        for column in atts.keys():
-            # if "observation_value" in atts.keys():
-            #    logger.error("No observation values in table.")
-            # elif column in data:
-            if column in data:
-                itype = atts.get(column).get("data_type")
-                if printers.get(itype):
-                    iprinter_kwargs = iprinters_kwargs.get(itype)
-                    if iprinter_kwargs:
-                        kwargs = {x: atts.get(column).get(x) for x in iprinter_kwargs}
-                    else:
-                        kwargs = {}
-                    cdm_table[column] = printers.get(itype)(
-                        data[column], null_label, **kwargs
-                    )
-                else:
-                    logger.error(f"No printer defined for element {column}")
-            else:
-                cdm_table[column] = null_label
 
+        cdm_table = _convert_dtype(data, atts, null_label, logger)
         columns = (
             [x for x in atts.keys() if x in data.columns]
             if not cdm_complete
