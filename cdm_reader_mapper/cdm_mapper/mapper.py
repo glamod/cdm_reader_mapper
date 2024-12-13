@@ -14,6 +14,7 @@ for the input data model.
 from __future__ import annotations
 
 import ast
+from copy import deepcopy
 from io import StringIO
 
 import numpy as np
@@ -288,114 +289,138 @@ def _default(
     return default
 
 
+def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
+    isEmpty = False
+    elements = imapping.get("elements")
+    transform = imapping.get("transform")
+    kwargs = imapping.get("kwargs", {})
+    code_table = imapping.get("code_table")
+    default = imapping.get("default")
+    fill_value = imapping.get("fill_value")
+    decimal_places = imapping.get("decimal_places")
+
+    if codes_subset:
+        if code_table not in codes_subset:
+            code_table = None
+
+    to_map = None
+    if elements:
+        # make sure they are clean and conform to their atts (tie dtypes)
+        # we'll only let map if row complete so mapping functions do not need to worry about handling NA
+        logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
+        missing_els = [x for x in elements if x not in cols]
+        if len(missing_els) > 0:
+            logger.warning(
+                "Following elements from data model missing from input data: {} to map.".format(
+                    ",".join([str(x) for x in missing_els])
+                )
+            )
+            return default(None, len(idata)), atts
+
+        to_map = idata[elements]
+        if len(elements) == 1:
+            to_map = to_map.iloc[:, 0]
+
+        if len(to_map) == 0:
+            isEmpty = True
+
+    if transform and not isEmpty:
+        data = _transform(
+            to_map,
+            imodel_functions,
+            transform,
+            kwargs,
+            logger=logger,
+        )
+    elif code_table and not isEmpty:
+        data = _code_table(
+            to_map,
+            imodel_functions.imodel,
+            code_table,
+            logger=logger,
+        )
+    elif elements and not isEmpty:
+        data = to_map
+    elif default is not None:  # (value = 0 evals to False!!)
+        data = _default(
+            default,
+            len(idata),
+        )
+    else:
+        data = _default(
+            None,
+            len(idata),
+        )
+
+    if fill_value is not None:
+        data = data.fillna(value=fill_value)
+    atts = _decimal_places(atts, decimal_places)
+    return data, atts
+
+
+def _convert_dtype(data, atts, null_label, logger):
+    if atts is None:
+        return np.nan
+    itype = atts.get("data_type")
+    if converters.get(itype):
+        iconverter_kwargs = iconverters_kwargs.get(itype)
+        if iconverter_kwargs:
+            kwargs = {x: atts.get(x) for x in iconverter_kwargs}
+        else:
+            kwargs = {}
+        return converters.get(itype)(data, np.nan, **kwargs)
+    return data
+
+
 def _write_csv_files(
     idata,
     mapping,
-    logger,
     table,
     cols,
+    null_label,
     imodel_functions,
     codes_subset,
     cdm_tables,
+    cdm_complete,
+    logger,
 ):
-    table_df_i = pd.DataFrame(
-        index=idata.index, columns=mapping.keys()
-    )  # We cannot predifine column based dtypes here!
+    atts = deepcopy(cdm_tables[table]["atts"])
+    columns = (
+        [x for x in atts.keys() if x in idata.columns]
+        if not cdm_complete
+        else list(atts.keys())
+    )
+    table_df_i = pd.DataFrame(index=idata.index, columns=columns)
+
     logger.debug(f"Table: {table}")
-    for cdm_key, imapping in mapping.items():
-        logger.debug(f"\tElement: {cdm_key}")
-        isEmpty = False
-        elements = imapping.get("elements")
-        transform = imapping.get("transform")
-        kwargs = imapping.get("kwargs", {})
-        code_table = imapping.get("code_table")
-        default = imapping.get("default")
-        fill_value = imapping.get("fill_value")
-        decimal_places = imapping.get("decimal_places")
-
-        if codes_subset:
-            if code_table not in codes_subset:
-                code_table = None
-
-        to_map = None
-        if elements:
-            # make sure they are clean and conform to their atts (tie dtypes)
-            # we'll only let map if row complete so mapping functions do not need to worry about handling NA
-            logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
-            missing_els = [x for x in elements if x not in cols]
-            if len(missing_els) > 0:
-                logger.warning(
-                    "Following elements from data model missing from input data: {} to map {} ".format(
-                        ",".join([str(x) for x in missing_els]), cdm_key
-                    )
-                )
-                continue
-
-            to_map = idata[elements]
-            if len(elements) == 1:
-                to_map = to_map.iloc[:, 0]
-
-            if len(to_map) == 0:
-                isEmpty = True
-
-        if transform and not isEmpty:
-            table_df_i[cdm_key] = _transform(
-                to_map,
+    for column in columns:
+        if column not in mapping.keys():
+            continue
+        else:
+            logger.debug(f"\tElement: {column}")
+            table_df_i[column], atts[column] = _mapping(
+                idata,
+                mapping[column],
                 imodel_functions,
-                transform,
-                kwargs,
-                logger=logger,
-            )
-        elif code_table and not isEmpty:
-            table_df_i[cdm_key] = _code_table(
-                to_map,
-                imodel_functions.imodel,
-                code_table,
-                logger=logger,
-            )
-        elif elements and not isEmpty:
-            table_df_i[cdm_key] = to_map
-        elif default is not None:  # (value = 0 evals to False!!)
-            table_df_i[cdm_key] = _default(
-                default,
-                len(table_df_i.index),
+                atts[column],
+                codes_subset,
+                cols,
+                logger,
             )
 
-        if fill_value is not None:
-            table_df_i[cdm_key] = table_df_i[cdm_key].fillna(value=fill_value)
-
-        cdm_tables[table]["atts"][cdm_key] = _decimal_places(
-            cdm_tables[table]["atts"][cdm_key],
-            decimal_places,
+        table_df_i[column] = _convert_dtype(
+            table_df_i[column], atts.get(column), null_label, logger
         )
 
     if "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
+    table_df_i.columns = pd.MultiIndex.from_product([[table], columns])
     table_df_i = drop_duplicates(table_df_i)
+    table_df_i = table_df_i.fillna(null_label)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
+    cdm_tables[table]["columns"] = table_df_i.columns
     return cdm_tables
-
-
-def _convert_dtype(data, atts, null_label, logger):
-    cdm_table = pd.DataFrame(index=data.index, columns=atts.keys(), dtype="object")
-    for column in atts.keys():
-        if column in data:
-            itype = atts.get(column).get("data_type")
-            if converters.get(itype):
-                iconverter_kwargs = iconverters_kwargs.get(itype)
-                if iconverter_kwargs:
-                    kwargs = {x: atts.get(column).get(x) for x in iconverter_kwargs}
-                else:
-                    kwargs = {}
-                cdm_table[column] = converters.get(itype)(
-                    data[column], null_label, **kwargs
-                )
-            else:
-                logger.error(f"No converter defined for element {column}")
-        else:
-            cdm_table[column] = null_label
-    return cdm_table
 
 
 def _map(
@@ -436,12 +461,14 @@ def _map(
             cdm_tables = _write_csv_files(
                 idata,
                 mapping,
-                logger,
                 table,
                 cols,
+                null_label,
                 imodel_functions,
                 codes_subset,
                 cdm_tables,
+                cdm_complete,
+                logger,
             )
 
     table_list = []
@@ -453,22 +480,14 @@ def _map(
         cdm_tables[table]["buffer"].seek(0)
         data = pd.read_csv(
             cdm_tables[table]["buffer"],
-            names=imodel_maps[table].keys(),
+            names=cdm_tables[table]["columns"],
             parse_dates=date_columns[table],
+            na_values=[],
+            keep_default_na=False,
         )
         cdm_tables[table]["buffer"].close()
         cdm_tables[table].pop("buffer")
-        atts = cdm_tables[table]["atts"]
-
-        cdm_table = _convert_dtype(data, atts, null_label, logger)
-        columns = (
-            [x for x in atts.keys() if x in data.columns]
-            if not cdm_complete
-            else list(atts.keys())
-        )
-        cdm_table = cdm_table[columns]
-        cdm_table.columns = pd.MultiIndex.from_product([[table], columns])
-        table_list.append(cdm_table)
+        table_list.append(data)
 
     merged = pd.concat(table_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
