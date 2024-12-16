@@ -3,7 +3,36 @@
 Changelog
 =========
 
-1.0.0 (unreleased)
+1.1.0 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+* Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
+
+1.0.2 (2024-11-13)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* New PyPi Classifiers:
+
+  * Development Status :: 5 - Production/Stable
+  * Development Status :: Intended Audience :: Science/Research
+  * License :: OSI Approved :: Apache Software License
+  * Operating System :: OS Independent
+
+1.0.1 (2024-11-08)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Announcements
+^^^^^^^^^^^^^
+* set package version to v1.0.1
+
+1.0.0 (2024-11-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
@@ -13,7 +42,8 @@ Announcements
 
 Bug fixes
 ^^^^^^^^^
-* Two reports that describe each other as best duplicates are not considered duplicates (:pull:`149`)
+* ``cdm_mapper``: Two reports that describe each other as best duplicates are not flagged as duplicates (DupDetect) (:pull:`149`)
+* ``cdm_mapper``: Reindex only if null values available (DupDetect) (:pull:`153`)
 
 0.4.3 (2024-10-23)
 ------------------

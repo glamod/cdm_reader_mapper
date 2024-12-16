@@ -3,10 +3,10 @@
 How to register a new data model mapping
 ========================================
 
-Using ``icoads_r3000`` imodel as a reference, a data model (imodel) mapping can be understood in this context as:
+Using ``icoads_r300`` imodel as a reference, a data model (imodel) mapping can be understood in this context as:
 
 - A generic mapping from a defined data model.
-    e.g. the IMMA data model (``imodel = icoads_r3000``), which in this case maps core ICOADS variables into the CDM format.
+    e.g. the IMMA data model (``imodel = icoads_r300``), which in this case maps core ICOADS variables into the CDM format.
 - A specific mapping from a generic data model.
     e.g. the case of mapping a specific ICOADS collection, where the ``imodel`` is built for a specific source and deck (``imodel = imma1_sid-dck``).
 - A combination of multiple data models in a single CDM mapping.
@@ -14,7 +14,7 @@ Using ``icoads_r3000`` imodel as a reference, a data model (imodel) mapping can 
 
 This is a summary of the steps needed to add an imodel to the mapping tool:
 
-1. Copy the mapping structure of an already existing mapping (e.g. ``cdm_reader_mapper/cdm_mapper/tables/icoads_r3000``) to the same folder and re-name it according to the ``imodel`` that you are going to add.
+1. Copy the mapping structure of an already existing mapping (e.g. ``cdm_reader_mapper/cdm_mapper/tables/icoads/r300``) to the same folder and re-name it according to the ``imodel`` that you are going to add.
 
 2. Create a copy for each of the **CDM tables** in your imodel. To access the **CDM tables** templates available in the tool type::
 

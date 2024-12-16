@@ -6,7 +6,7 @@ CDM tables mapping files and descriptors
 
 The following section details the mapping sequence that the ``cdm_mapper`` tool follows to map meteorological data to a CDM element.
 
-We will use **part** of the ``header.json`` python dictionary from the ``icoads_r3000`` IMMA1 model to explain how we map an element. In the table below we explain all **elements** attributes and/or descriptors, that are needed in each python dictionary or ``.json`` file, for a successful mapping of the input meteorological data.
+We will use **part** of the ``header.json`` python dictionary from the ``icoads_r300`` IMMA1 model to explain how we map an element. In the table below we explain all **elements** attributes and/or descriptors, that are needed in each python dictionary or ``.json`` file, for a successful mapping of the input meteorological data.
 
 Below we see content from a ``header.json`` file::
 
@@ -141,7 +141,7 @@ The content of a code table translating ``platform_sub_type`` information into t
          "7": 69
      }
 
-This code table is part of the ``icoads_r3000`` data model included in this tool.
+This code table is part of the ``icoads_r300`` data model included in this tool.
 
 The following range of code table structures are currently supported:
 
@@ -151,7 +151,7 @@ The following range of code table structures are currently supported:
 
 For more information on code tables and their structure check out the `cdm_reader_mapper tool - code tables <https://cdm-reader-mapper.readthedocs.io/en/mdf_reader/data-models.html#code-tables>`_ information.
 
-The code table above, is use by the ``icoads_r3000`` imodel to map ``platform_sub_type`` information to the C3s CDM format, this is done in  the following section of the ``header.json`` file::
+The code table above, is use by the ``icoads_r300`` imodel to map ``platform_sub_type`` information to the C3s CDM format, this is done in  the following section of the ``header.json`` file::
 
     "platform_sub_type": {
             "sections": "c1",

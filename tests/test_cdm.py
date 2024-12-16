@@ -53,7 +53,7 @@ from ._testing_cdm_suite import _testing_suite
         (
             "icoads_r300_d714",
             None,
-            ["platform_sub_type", "wind_direction"],
+            ["platform_sub_type", "ship_speed_ms"],
             None,
             True,
             None,
@@ -103,6 +103,19 @@ from ._testing_cdm_suite import _testing_suite
             True,
             "all",
             {"year_end": 2003},
+        ),
+        (
+            "icoads_r300_d703",
+            None,
+            None,
+            None,
+            False,
+            None,
+            {
+                "ext_schema_path": os.path.join(
+                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
+                )
+            },
         ),
         (
             "icoads_r300_d703",

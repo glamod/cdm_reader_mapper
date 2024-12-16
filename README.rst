@@ -3,7 +3,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions| |tag| |release|                              |
+| Versions                   | |pypi| |versions|                                              |
 +----------------------------+----------------------------------------------------------------+
 | Documentation and Support  | |docs|                                                         |
 +----------------------------+----------------------------------------------------------------+
@@ -11,9 +11,9 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 +----------------------------+----------------------------------------------------------------+
 |                            | |fair-software| |ossf|                                         |
 +----------------------------+----------------------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit|                                    |
+| Coding Standards           | |black| |ruff| |pre-commit| |codefactor|                       |
 +----------------------------+----------------------------------------------------------------+
-|                            | |security| |fossa| |codefactor|                                |
+|                            | |security| |fossa|                                             |
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
@@ -56,6 +56,16 @@ If you want to contribute, we recommend cloning the repository and installing th
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
+Documentation
+-------------
+
+The official documentation is at https://cdm-reader-mapper.readthedocs.io/
+
+How to make the most of cdm_reader_mapper:
+
+* `How to read an IMMA file`_
+* `How to build your own data model schema`_
+* `How to map to the Common Data Model (CDM)`_
 
 Logging
 -------
@@ -116,6 +126,16 @@ If you're interested in participating in the development of `cdm_reader_mapper` 
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
+How to cite this library
+------------------------
+
+If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/14135493.
+
+License
+-------
+
+This is free software: you can redistribute it and/or modify it under the terms of the `Apache License 2.0`_. A copy of this license is provided in the code repository (`LICENSE`_).
+
 Credits
 -------
 
@@ -123,7 +143,13 @@ Credits
 
 Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
+This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-pypackage`_ project template.
+
 .. hyperlinks
+
+.. _Apache License 2.0: https://opensource.org/license/apache-2-0/
+
+.. _audreyfeldroy/cookiecutter-pypackage: https://github.com/audreyfeldroy/cookiecutter-pypackage/
 
 .. _C3S: https://climate.copernicus.eu/
 
@@ -131,11 +157,21 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
 
 .. _Contributing Guidelines: https://github.com/glamod/cdm_reader_mapper/blob/main/CONTRIBUTING.rst
 
+.. _Cookiecutter: https://github.com/cookiecutter/cookiecutter/
+
 .. _data model: https://cds.climate.copernicus.eu/toolbox/doc/how-to/15_how_to_understand_the_common_data_model/15_how_to_understand_the_common_data_model.html
+
+.. _How to build your own data model schema: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/CLIWOC_datamodel.html
+
+.. _How to map to the Common Data Model (CDM): https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/CDM_mapper_example_deck704.html
+
+.. _How to read an IMMA file: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/mdf_reader_test_overview.html
 
 .. _IMMA: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
 
 .. _jupyter example notebooks: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/example_notebooks
+
+.. _LICENSE: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
 
 .. _NOC: https://noc.ac.uk/
 
@@ -209,14 +245,6 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://www.repostatus.org/#active
         :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |release| image:: https://img.shields.io/github/v/release/glamod/cdm_reader_mapper.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/releases
-        :alt: Release
-
-.. |tag| image:: https://img.shields.io/github/v/tag/glamod/cdm_reader_mapper.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/tags
-        :alt: Tag
-
 .. |ukmcas| image:: https://img.shields.io/badge/Thanks%20to-UKMCAS-blue.svg
         :target: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
         :alt: UKMCAS
@@ -225,8 +253,8 @@ Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Ma
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13982457.svg
-        :target: https://doi.org/10.5281/zenodo.13982457
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14135493.svg
+        :target: https://doi.org/10.5281/zenodo.14135493
  	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
