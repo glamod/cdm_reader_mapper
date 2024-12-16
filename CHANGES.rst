@@ -14,7 +14,8 @@ Breaking changes
 Internal changes
 ^^^^^^^^^^^^^^^^
 * ``cdm_mapper``: dtype conversion from ``cdm_to_ascii`` to ``map_model``'s new submodule ``_conversions```(:pull:`189`)
-* ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_map_and_convert`` (:pull:`189`)
+* ``cdm_mapper``: rename ``mappings`` to ``_mapping_functions`` (:pull:`189`)
+* ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_mappings`` (:pull:`189`)
 
 Bug fixes
 ^^^^^^^^^
