@@ -95,9 +95,9 @@ def convert_str(data, null_label):
     """
 
     def _return_str(x, null_label):
+        if isinstance(x, list):
+            return str(x)
         if pd.isna(x):
-            return null_label
-        if x is None:
             return null_label
         return str(x)
 
