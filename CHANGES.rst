@@ -7,6 +7,15 @@ Changelog
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``cdm_mapper``: ``map_model`` returns pandas.DataFrame instead of CDM dictionary (:pull:`189`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* ``cdm_mapper``: dtype conversion from ``table_reader`` to new submodule ``_conversions```(:pull:`189`)
+* ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_map_and_convert`` (:pull:`189`)
+
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
