@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from . import properties
-from ._convertions import converters, iconverters_kwargs
+from ._conversions import converters, iconverters_kwargs
 from ._mappings import mapping_functions
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps
