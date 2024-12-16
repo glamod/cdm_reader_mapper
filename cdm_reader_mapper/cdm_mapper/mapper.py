@@ -12,7 +12,6 @@ for the input data model.
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
@@ -59,12 +58,11 @@ def _map_to_df(m, x):
 
 def _decimal_places(
     decimal_places,
-    imodel_functions,
 ):
     if decimal_places is not None:
         if isinstance(decimal_places, int):
             return decimal_places
-        return getattr(imodel_functions, decimal_places)()
+        return properties.default_decimal_places
 
 
 def _transform(
@@ -151,7 +149,7 @@ def _to_map(
                     )
                 )
                 continue
-                
+
             to_map = idata[elements]
 
             if len(elements) == 1:
