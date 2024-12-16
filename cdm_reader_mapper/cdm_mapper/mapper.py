@@ -151,7 +151,7 @@ def _to_map(
                     )
                 )
                 continue
-                
+
             to_map = idata[elements]
 
             if len(elements) == 1:
