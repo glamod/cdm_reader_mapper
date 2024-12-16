@@ -50,7 +50,7 @@ def convert_float(data, null_label, decimal_places):
     def _return_str(x, null_label, format_float):
         if pd.isna(x):
             return null_label
-        return format_float.format(x)
+        return format_float.format(float(x))
 
     format_float = "{:." + str(decimal_places) + "f}"
     return data.apply(lambda x: _return_str(x, null_label, format_float))
@@ -97,6 +97,8 @@ def convert_str(data, null_label):
     def _return_str(x, null_label):
         if pd.isna(x):
             return null_label
+        if x is None:
+            return null_label
         return str(x)
 
     return data.apply(lambda x: _return_str(x, null_label))
@@ -129,9 +131,9 @@ def convert_str_array(data, null_label):
 
     Returns
     -------
-    data: array of varchar objects
+    data: array of str objects
     """
-    return data.apply(convert_varchar_array_i)
+    return data.apply(convert_str_array_i)
 
 
 def convert_integer_array_i(row, null_label=None):
@@ -147,16 +149,24 @@ def convert_integer_array_i(row, null_label=None):
     -------
     data: int
     """
+
+    def _return_str(x):
+        if x is None:
+            return x
+        if np.isfinite(x):
+            return str(int(x))
+
     row = row if not isinstance(row, str) else ast.literal_eval(row)
     row = row if isinstance(row, list) else [row]
-    str_row = [str(int(x)) for x in row if np.isfinite(x)]
+
+    str_row = [_return_str(x) for x in row]
     string = ",".join(filter(bool, str_row))
     if len(string) > 0:
         return "{" + string + "}"
     return null_label
 
 
-def convert_varchar_array_i(row, null_label=None):
+def convert_str_array_i(row, null_label=None):
     """
     Convert a series of string objects.
 
@@ -167,11 +177,18 @@ def convert_varchar_array_i(row, null_label=None):
 
     Returns
     -------
-    data: varchar
+    data: str
     """
+
+    def _return_str(x):
+        if x is None:
+            return x
+        if np.isfinite(x):
+            return str(x)
+
     row = row if not isinstance(row, str) else ast.literal_eval(row)
     row = row if isinstance(row, list) else [row]
-    str_row = [str(x) for x in row if np.isfinite(x)]
+    str_row = [_return_str(x) for x in row]
     string = ",".join(filter(bool, str_row))
     if len(string) > 0:
         return "{" + string + "}"
