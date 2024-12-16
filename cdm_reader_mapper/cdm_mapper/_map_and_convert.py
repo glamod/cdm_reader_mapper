@@ -106,6 +106,12 @@ def _default(
     return default
 
 
+def _fill_value(data, fill_value):
+    if data is None:
+        return fill_value
+    return data.fillna(value=fill_value)
+
+
 def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
     isEmpty = False
     elements = imapping.get("elements")
@@ -132,7 +138,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
                     ",".join([str(x) for x in missing_els])
                 )
             )
-            return default(None, len(idata)), atts
+            return _default(None, len(idata)), atts
 
         to_map = idata[elements]
         if len(elements) == 1:
@@ -170,7 +176,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
         )
 
     if fill_value is not None:
-        data = data.fillna(value=fill_value)
+        data = _fill_value(data, fill_value)
     atts = _decimal_places(atts, decimal_places)
     return data, atts
 
@@ -224,7 +230,6 @@ def _map_and_convert(
                 cols,
                 logger,
             )
-
         table_df_i[column] = _convert_dtype(
             table_df_i[column], atts.get(column), null_label, logger
         )
@@ -308,5 +313,4 @@ def map_and_convert(
         table_list.append(data)
 
     merged = pd.concat(table_list, axis=1, join="outer")
-    merged = merged.reset_index(drop=True)
-    return merged
+    return merged.reset_index(drop=True)
