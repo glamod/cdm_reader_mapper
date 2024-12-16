@@ -483,6 +483,7 @@ def _map(
             names=cdm_tables[table]["columns"],
             parse_dates=date_columns[table],
             na_values=[],
+            dtype="object",
             keep_default_na=False,
         )
         cdm_tables[table]["buffer"].close()
@@ -556,7 +557,6 @@ def map_model(
         logger.error("Input data type " f"{type(data)}" " not supported")
         return
 
-    # Map thing:
     return _map(
         imodel[0],
         *imodel[1:],
