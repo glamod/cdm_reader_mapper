@@ -181,7 +181,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
     return data, atts
 
 
-def _convert_dtype(data, atts, null_label, logger):
+def _convert_dtype(data, atts, logger):
     if atts is None:
         return np.nan
     itype = atts.get("data_type")
@@ -231,7 +231,7 @@ def _map_and_convert(
                 logger,
             )
         table_df_i[column] = _convert_dtype(
-            table_df_i[column], atts.get(column), null_label, logger
+            table_df_i[column], atts.get(column), logger
         )
 
     if "observation_value" in table_df_i:
