@@ -1,4 +1,4 @@
-"""
+﻿"""
 Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
@@ -18,7 +18,7 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
 from . import properties
-from ._map_and_convert import map_and_convert
+from ._mappings import map_and_convert
 
 
 def map_model(

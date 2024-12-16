@@ -1,375 +1,316 @@
-"""
-Common Data Model (CDM) mappings.
-
-Created on Wed Apr  3 10:31:18 2019
-
-imodel: imma1
-
-Functions to map imodel elements to CDM elements
-
-Main functions are those invoqued in the mappings files (table_name.json)
-
-Main functions need to be part of class mapping_functions()
-
-Main functions get:
-    - 1 positional argument (pd.Series or pd.DataFrame with imodel data or imodel element name)
-    - Optionally, keyword arguments
-
-Main function return: pd.Series, np.array or scalars
-
-Auxiliary functions can be used and defined in or outside class mapping_functions
-
-@author: iregon
-"""
+"""Map and convert functions."""
 
 from __future__ import annotations
 
-import datetime
-import math
-import uuid
+from copy import deepcopy
+from io import StringIO
 
 import numpy as np
 import pandas as pd
-import swifter  # noqa
-from timezonefinder import TimezoneFinder
 
-icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
-imodel_lineages = {
-    "icoads": icoads_lineage,
-    "icoads_r300_d714": icoads_lineage + " with supplemental data recovery",
-    "icoads_r302": ". Initial conversion from ICOADS R3.0.2T NRT",
-    "craid": ". Initial conversion from C-RAID",
-}
-
-c2k_methods = {
-    "gcc": "method_b",
-}
-
-k_elements = {
-    "gcc": 1,
-}
-
-tf = TimezoneFinder()
+from . import properties
+from ._conversions import converters, iconverters_kwargs
+from ._mapping_functions import mapping_functions
+from .codes.codes import get_code_table
+from .tables.tables import get_cdm_atts, get_imodel_maps
 
 
-def find_entry(imodel, d):
-    """Find entry in dict."""
-    if not imodel:
+def drop_duplicates(df):
+    """Drop duplicates from list."""
+
+    def list_to_tuple(v):
+        if isinstance(v, list):
+            v = tuple(v)
+        return v
+
+    def tuple_to_list(v):
+        if isinstance(v, tuple):
+            v = list(v)
+        return v
+
+    dtypes = df.dtypes
+    df = df.map(list_to_tuple)
+    df = df.drop_duplicates(ignore_index=True)
+    df = df.map(tuple_to_list)
+    return df.astype(dtypes)
+
+
+def _map_to_df(m, x):
+    if not isinstance(m, dict):
         return
-    if imodel in d.keys():
-        return d[imodel]
-    imodel = "_".join(imodel.split("_")[:-1])
-    return find_entry(imodel, d)
+    for x_ in x:
+        if x_ in m.keys():
+            v = m[x_]
+            if isinstance(v, dict):
+                m = v
+                continue
+            else:
+                return v
+        return
 
 
-def coord_360_to_180i(long3):
-    """
-    Convert longitudes within -180 and 180 degrees.
+def _decimal_places(
+    entry,
+    decimal_places,
+):
+    if decimal_places is not None:
 
-    Converts longitudes from degrees express in 0 to 360
-    to decimal degrees between -180 to 180.
-    According to
-    https://confluence.ecmwf.int/pages/viewpage.action?pageId=149337515
+        if isinstance(decimal_places, int):
+            entry["decimal_places"] = decimal_places
+        else:
+            entry["decimal_places"] = properties.default_decimal_places
 
-    Parameters
-    ----------
-    long3: longitude or latitude in degrees
-
-    Returns
-    -------
-    long1: longitude in decimal degrees
-    """
-    return (long3 + 180.0) % 360.0 - 180.0
+    return entry
 
 
-def coord_dmh_to_90i(deg, min, hemis):
-    """
-    Convert latitudes within -90 and 90 degrees.
-
-    Converts latitudes from degrees, minutes and hemisphere
-    to decimal degrees between -90 to 90.
-
-    Parameters
-    ----------
-    deg: longitude or latitude in degrees
-    min: longitude or latitude in minutes
-    hemis: Hemisphere N or S
-
-    Returns
-    -------
-    var: latitude in decimal degrees
-    """
-    hemisphere = 1
-    min_df = min / 60
-    if hemis == "S":
-        hemisphere = -1
-    return np.round((deg + min_df), 2) * hemisphere
+def _transform(
+    to_map,
+    imodel_functions,
+    transform,
+    kwargs,
+    logger,
+):
+    logger.debug(f"\ttransform: {transform}")
+    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+    trans = getattr(imodel_functions, transform)
+    return trans(to_map, **kwargs)
 
 
-def convert_to_utc_i(date, zone):
-    """
-    Convert local time zone to utc.
+def _code_table(
+    to_map,
+    data_model,
+    code_table,
+    logger,
+):
+    # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
+    # Approach that does not work when it is not nested...so just try and assume not nested if fails
+    # Prepare code_table
+    table_map = get_code_table(*data_model.split("_"), code_table=code_table)
+    try:
+        to_map = to_map.to_frame()
+    except Exception:
+        logger.warning(f"Could not convert {to_map} to frame.")
 
-    Parameters
-    ----------
-    date: datetime.series object
-    zone: timezone as a string
+    to_map_str = to_map.astype(str)
 
-    Returns
-    -------
-    date.time_index.obj in utc
-    """
-    datetime_index_aware = date.tz_localize(tz=zone)
-    return datetime_index_aware.tz_convert("UTC")
-
-
-def time_zone_i(lat, lon):
-    """Return time zone."""
-    return tf.timezone_at(lng=lon, lat=lat)
-
-
-def longitude_360to180_i(lon):
-    """Convert latitudes within 1-80 and 180 degrees."""
-    if lon > 180:
-        return -180 + math.fmod(lon, 180)
-    else:
-        return lon
+    to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
+    return to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
 
 
-def location_accuracy_i(li, lat):
-    """Calculate location accuracy."""
-    degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
-    deg_km = 111
-    accuracy = degrees.get(int(li), np.nan) * math.sqrt(
-        (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
-    )
-    return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
+def _default(
+    default,
+    length,
+):
+    if isinstance(default, list):
+        return [default] * length
+    return default
 
 
-def convert_to_str(a):
-    """Convert to string."""
-    if a:
-        a = str(a)
-    return a
+def _fill_value(data, fill_value):
+    if data is None:
+        return fill_value
+    return data.fillna(value=fill_value)
 
 
-def string_add_i(a, b, c, sep):
-    """Add string."""
-    a = convert_to_str(a)
-    b = convert_to_str(b)
-    c = convert_to_str(c)
-    if b:
-        return sep.join(filter(None, [a, b, c]))
+def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
+    isEmpty = False
+    elements = imapping.get("elements")
+    transform = imapping.get("transform")
+    kwargs = imapping.get("kwargs", {})
+    code_table = imapping.get("code_table")
+    default = imapping.get("default")
+    fill_value = imapping.get("fill_value")
+    decimal_places = imapping.get("decimal_places")
 
+    if codes_subset:
+        if code_table not in codes_subset:
+            code_table = None
 
-class mapping_functions:
-    """Class for mapping Common Data Model (CDM)."""
-
-    def __init__(self, imodel):
-        self.imodel = imodel
-        self.utc = datetime.timezone.utc
-
-    def datetime_decimalhour_to_hm(self, df):
-        """Convert datetime object to hours and minutes."""
-        hr = df.values[4]
-        if not isinstance(hr, (int, float)):
-            df = df.apply(lambda x: None)
-            return df
-        timedelta = datetime.timedelta(hours=hr)
-        seconds = timedelta.total_seconds()
-        df["HR"] = int(seconds / 3600)
-        df["M"] = int(seconds / 60) % 60
-        return df
-
-    def datetime_imma1(self, df):  # TZ awareness?
-        """Convert to pandas datetime object."""
-        date_format = "%Y-%m-%d-%H-%M"
-        hr_ = df.columns[-1]
-        df = df.assign(HR=df.iloc[:, -1])
-        df["M"] = df["HR"].copy()
-        df = df.drop(columns=hr_, axis=1)
-        df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
-        df = df.astype(int, errors="ignore")
-        return pd.to_datetime(
-            df.astype(str).apply("-".join, axis=1).values,
-            format=date_format,
-            errors="coerce",
-        )
-
-    def datetime_utcnow(self, df):
-        """Get actual UTC time."""
-        return datetime.datetime.now(self.utc)
-
-    def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f"):
-        """Convert string to datetime object."""
-        return pd.to_datetime(df.values, format=format, errors="coerce")
-
-    def datetime_to_cdm_time(self, df):
-        """
-        Convert time object to datetime object.
-
-        Converts year, month, day and time indicator to
-        a datetime obj with a 24hrs format '%Y-%m-%d-%H'
-
-        Parameters
-        ----------
-        dates: list of elements from a date array
-
-        Returns
-        -------
-        date: datetime obj
-        """
-        df = df["core"].dropna(how="any")
-        date_format = "%Y-%m-%d-%H-%M"
-
-        df_dates = df.iloc[:, 0:3].astype(str)
-        df_dates["H"] = "12"
-        df_dates["M"] = "0"
-        df_coords = df.iloc[:, 3:5].astype(float)
-
-        # Convert long to -180 to 180 for time zone finding
-        df_coords["lon_converted"] = coord_360_to_180i(df_coords["LON"])
-        time_zone = df_coords.swifter.apply(
-            lambda x: time_zone_i(x["LAT"], x["lon_converted"]),
-            axis=1,
-        )
-
-        data = pd.to_datetime(
-            df_dates.swifter.apply("-".join, axis=1).values,
-            format=date_format,
-            errors="coerce",
-        )
-
-        d = {"Dates": data, "Time_zone": time_zone.values}
-        df_time = pd.DataFrame(data=d)
-
-        return df_time.swifter.apply(
-            lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
-        )
-
-    def df_col_join(self, df, sep):
-        """Join pandas Dataframe."""
-        joint = df.iloc[:, 0].astype(str)
-        for i in range(1, len(df.columns)):
-            joint = joint + sep + df.iloc[:, i].astype(str)
-        return joint
-
-    def float_opposite(self, df):
-        """Return float opposite."""
-        return -df
-
-    def select_column(self, df):
-        """Select columns."""
-        c = df.columns.to_list()
-        c.reverse()
-        s = df[c[0]].copy()
-        if len(c) > 1:
-            for ci in c[1:]:
-                s.update(df[ci])
-        return s
-
-    def float_scale(self, df, factor=1):
-        """Multiply with scale factor."""
-        return df * factor
-
-    def integer_to_float(self, df):
-        """Convert integer to float."""
-        return df.astype(float)
-
-    def icoads_wd_conversion(self, df):
-        """Convert ICOADS WD."""
-        df = df.mask(df == 361, 0)
-        df = df.mask(df == 362, np.nan)
-        return df
-
-    def icoads_wd_integer_to_float(self, df):
-        """Convert ICOADS WD integer to float."""
-        notna = df.notna()
-        df[notna] = self.icoads_wd_conversion(df[notna])
-        return self.integer_to_float(df)
-
-    def lineage(self, df):
-        """Get lineage."""
-        strf = datetime.datetime.now(self.utc).strftime("%Y-%m-%d %H:%M:%S")
-        imodel_lineage = find_entry(self.imodel, imodel_lineages)
-        if imodel_lineage:
-            strf = strf + imodel_lineage
-        return strf
-
-    def longitude_360to180(self, df):
-        """Convert longitudes within -180 and 180 degrees."""
-        return np.vectorize(longitude_360to180_i)(df)
-
-    def location_accuracy(self, df):  # (li_core,lat_core) math.radians(lat_core)
-        """Calculate location accuracy."""
-        return np.vectorize(location_accuracy_i, otypes="f")(
-            df.iloc[:, 0], df.iloc[:, 1]
-        )  # last minute tweak so that is does no fail on nans!
-
-    def observing_programme(self, df):
-        """Map observing programme."""
-        op = {str(i): [5, 7, 56] for i in range(0, 6)}
-        op.update({"7": [5, 7, 9]})
-        return df.map(op, na_action="ignore")
-
-    def string_add(
-        self, df, prepend="", append="", separator="", zfill_col=None, zfill=None
-    ):
-        """Add string."""
-        if zfill_col and zfill:
-            for col, width in zip(zfill_col, zfill):
-                df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
-        return np.vectorize(string_add_i)(prepend, df, append, separator)
-
-    def string_join_add(
-        self, df, prepend=None, append=None, separator="", zfill_col=None, zfill=None
-    ):
-        """Join string."""
-        if zfill_col and zfill:
-            for col, width in zip(zfill_col, zfill):
-                df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
-        joint = self.df_col_join(df, separator)
-        return np.vectorize(string_add_i)(prepend, joint, append, sep=separator)
-
-    def temperature_celsius_to_kelvin(self, df):
-        """Convert temperature from degrre Ceslius to Kelvin."""
-        method = find_entry(self.imodel, c2k_methods)
-        if not method:
-            method = "method_a"
-        if method == "method_a":
-            return df + 273.15
-        if method == "method_b":
-            df.iloc[:, 0] = np.where((df.iloc[:, 0] == 0) | (df.iloc[:, 0] == 5), 1, -1)
-            return df.iloc[:, 0] * df.iloc[:, 1] + 273.15
-
-    def time_accuracy(self, df):  # ti_core
-        """Calculate time accuracy."""
-        # Shouldn't we use the code_table mapping for this? see CDM!
-        secs = {
-            "0": 3600,
-            "1": int(round(3600 / 10)),
-            "2": int(round(3600 / 60)),
-            "3": int(round(3600 / 100)),
-        }
-        return df.map(secs, na_action="ignore")
-
-    def feet_to_m(self, df):
-        """Convert feet into meter."""
-        df.astype(float)
-        return np.round(df / 3.2808, 2)
-
-    def guid(self, df, prepend="", append=""):
-        """DOCUMENTATION."""
-        df = df.copy()
-        df["YR"] = df["YR"].apply(lambda x: f"{x:04d}")
-        df["MO"] = df["MO"].apply(lambda x: f"{x:02d}")
-        df["DY"] = df["DY"].apply(lambda x: f"{x:02d}")
-        df["GG"] = df["GG"].astype("int64").apply(lambda x: f"{x:02d}")
-        name = df.apply(lambda x: "".join(x), axis=1)
-        uid = np.empty(np.shape(df["YR"]), dtype="U126")
-        for i, n in enumerate(name):
-            uid[i] = (
-                str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)
+    to_map = None
+    if elements:
+        # make sure they are clean and conform to their atts (tie dtypes)
+        # we'll only let map if row complete so mapping functions do not need to worry about handling NA
+        logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
+        missing_els = [x for x in elements if x not in cols]
+        if len(missing_els) > 0:
+            logger.warning(
+                "Following elements from data model missing from input data: {} to map.".format(
+                    ",".join([str(x) for x in missing_els])
+                )
             )
-        df["UUID"] = uid
-        return df["UUID"]
+            return _default(None, len(idata)), atts
+
+        to_map = idata[elements]
+        if len(elements) == 1:
+            to_map = to_map.iloc[:, 0]
+
+        if len(to_map) == 0:
+            isEmpty = True
+
+    if transform and not isEmpty:
+        data = _transform(
+            to_map,
+            imodel_functions,
+            transform,
+            kwargs,
+            logger=logger,
+        )
+    elif code_table and not isEmpty:
+        data = _code_table(
+            to_map,
+            imodel_functions.imodel,
+            code_table,
+            logger=logger,
+        )
+    elif elements and not isEmpty:
+        data = to_map
+    elif default is not None:  # (value = 0 evals to False!!)
+        data = _default(
+            default,
+            len(idata),
+        )
+    else:
+        data = _default(
+            None,
+            len(idata),
+        )
+
+    if fill_value is not None:
+        data = _fill_value(data, fill_value)
+    atts = _decimal_places(atts, decimal_places)
+    return data, atts
+
+
+def _convert_dtype(data, atts, logger):
+    if atts is None:
+        return np.nan
+    itype = atts.get("data_type")
+    if converters.get(itype):
+        iconverter_kwargs = iconverters_kwargs.get(itype)
+        if iconverter_kwargs:
+            kwargs = {x: atts.get(x) for x in iconverter_kwargs}
+        else:
+            kwargs = {}
+        return converters.get(itype)(data, np.nan, **kwargs)
+    return data
+
+
+def _map_and_convert(
+    idata,
+    mapping,
+    table,
+    cols,
+    null_label,
+    imodel_functions,
+    codes_subset,
+    cdm_tables,
+    cdm_complete,
+    logger,
+):
+    atts = deepcopy(cdm_tables[table]["atts"])
+    columns = (
+        [x for x in atts.keys() if x in idata.columns]
+        if not cdm_complete
+        else list(atts.keys())
+    )
+    table_df_i = pd.DataFrame(index=idata.index, columns=columns)
+
+    logger.debug(f"Table: {table}")
+    for column in columns:
+        if column not in mapping.keys():
+            continue
+        else:
+            logger.debug(f"\tElement: {column}")
+            table_df_i[column], atts[column] = _mapping(
+                idata,
+                mapping[column],
+                imodel_functions,
+                atts[column],
+                codes_subset,
+                cols,
+                logger,
+            )
+        table_df_i[column] = _convert_dtype(
+            table_df_i[column], atts.get(column), logger
+        )
+
+    if "observation_value" in table_df_i:
+        table_df_i = table_df_i.dropna(subset=["observation_value"])
+
+    table_df_i.columns = pd.MultiIndex.from_product([[table], columns])
+    table_df_i = drop_duplicates(table_df_i)
+    table_df_i = table_df_i.fillna(null_label)
+    table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
+    cdm_tables[table]["columns"] = table_df_i.columns
+    return cdm_tables
+
+
+def map_and_convert(
+    data_model,
+    *sub_models,
+    data=pd.DataFrame(),
+    cdm_subset=None,
+    codes_subset=None,
+    cdm_complete=True,
+    null_label="null",
+    logger=None,
+):
+    if not cdm_subset:
+        cdm_subset = properties.cdm_tables
+
+    cdm_atts = get_cdm_atts(cdm_subset)
+
+    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
+
+    imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
+
+    # Initialize dictionary to store temporal tables (buffer) and table attributes
+    cdm_tables = {
+        k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
+    }
+
+    date_columns = {}
+    for table, values in imodel_maps.items():
+        date_columns[table] = [
+            i
+            for i, x in enumerate(list(values))
+            if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
+        ]
+
+    for idata in data:
+        cols = [x for x in idata]
+        for table, mapping in imodel_maps.items():
+            cdm_tables = _map_and_convert(
+                idata,
+                mapping,
+                table,
+                cols,
+                null_label,
+                imodel_functions,
+                codes_subset,
+                cdm_tables,
+                cdm_complete,
+                logger,
+            )
+
+    table_list = []
+    for table in cdm_tables.keys():
+        # Convert dtime to object to be parsed by the reader
+        logger.debug(
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+        )
+        cdm_tables[table]["buffer"].seek(0)
+        data = pd.read_csv(
+            cdm_tables[table]["buffer"],
+            names=cdm_tables[table]["columns"],
+            parse_dates=date_columns[table],
+            na_values=[],
+            dtype="object",
+            keep_default_na=False,
+        )
+        cdm_tables[table]["buffer"].close()
+        cdm_tables[table].pop("buffer")
+        table_list.append(data)
+
+    merged = pd.concat(table_list, axis=1, join="outer")
+    return merged.reset_index(drop=True)
