@@ -29,9 +29,8 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
-from .tables.tables import get_cdm_atts
-
 from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
+from .tables.tables import get_cdm_atts
 
 
 def table_to_ascii(
@@ -71,12 +70,12 @@ def table_to_ascii(
         Name of the output file name(s).
     """
     data = data.dropna(how="all")
-    
+
     if col_subset:
-       if isinstance(col_subset, dict):
+        if isinstance(col_subset, dict):
             col_subset = dict_to_tuple_list(col_subset)
-       cdm_complete = False
-       data = data[col_subset]
+        cdm_complete = False
+        data = data[col_subset]
 
     header = True
     wmode = "w"
@@ -87,6 +86,7 @@ def table_to_ascii(
         header=header,
         mode=wmode,
     )
+
 
 def write_tables(
     cdm_table,
@@ -106,7 +106,7 @@ def write_tables(
     Parameters
     ----------
     cdm_tables: pandas.DataFrame
-        pandas.DataFrame to export. 
+        pandas.DataFrame to export.
     out_dir: str
         Path to the output directory.
         Default: current directory
@@ -116,7 +116,7 @@ def write_tables(
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
     suffix: str, optional
-        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``. 
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
     extension: str
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Default: psv
@@ -154,13 +154,13 @@ def write_tables(
     Use this function after reading CDM tables.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    
+
     cdm_subset = get_cdm_subset(cdm_subset)
-    
+
     if cdm_tables.empty:
         logger.warning("All CDM tables are empty")
         return
-      
+
     if isinstance(filename, str):
         filename = {table_name: filename}
     elif filename is None:
@@ -171,7 +171,7 @@ def write_tables(
             cdm_table = pd.DataFrame(columns=cdm_atts.keys())
         else:
             cdm_table = cdm_tables[table]
-            
+
         filename_ = filename.get(table)
         if not filename_:
             filename_ = get_filename(
@@ -182,6 +182,6 @@ def write_tables(
             cdm_table,
             delimiter=delimiter,
             col_subset=col_subset,
-            cdm_complete = cdm_complete,
+            cdm_complete=cdm_complete,
             filename=filename_,
         )
