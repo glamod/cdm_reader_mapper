@@ -22,13 +22,10 @@ of the imodel, the number of decimal places used comes from a default tool defin
 
 from __future__ import annotations
 
-import os
-
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from . import properties
 from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
 from .tables.tables import get_cdm_atts
 
@@ -37,7 +34,6 @@ def table_to_ascii(
     data,
     delimiter="|",
     col_subset=None,
-    cdm_complete=True,
     filename=None,
 ):
     """
@@ -63,9 +59,6 @@ def table_to_ascii(
         - For a single section:
           e.g. ``list type object col_subset = [columns]``
           This variable assumes that the column names are all conform to the cdm field names.
-    cdm_complete: bool
-        If True extract the all CDM columns.
-        Default: True
     filename: str
         Name of the output file name(s).
     """
@@ -74,12 +67,11 @@ def table_to_ascii(
     if col_subset:
         if isinstance(col_subset, dict):
             col_subset = dict_to_tuple_list(col_subset)
-        cdm_complete = False
         data = data[col_subset]
 
     header = True
     wmode = "w"
-    table.to_csv(
+    data.to_csv(
         filename,
         index=False,
         sep=delimiter,
@@ -89,7 +81,7 @@ def table_to_ascii(
 
 
 def write_tables(
-    cdm_table,
+    cdm_tables,
     out_dir=".",
     table_name=None,
     prefix=None,
@@ -98,7 +90,6 @@ def write_tables(
     filename=None,
     cdm_subset=None,
     col_subset=None,
-    cdm_complete=True,
     delimiter="|",
 ):
     """Write pandas.DataFrame to CDM-table file on file system.
@@ -142,9 +133,6 @@ def write_tables(
         - For a single section:
           e.g. ``list type object col_subset = [columns]``
           This variable assumes that the column names are all conform to the cdm field names.
-    cdm_complete: bool
-        If True extract the all CDM columns.
-        Default: True
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
         Default: '|'
@@ -168,6 +156,7 @@ def write_tables(
 
     for table in cdm_subset:
         if table not in cdm_tables:
+            cdm_atts = get_cdm_atts(table)
             cdm_table = pd.DataFrame(columns=cdm_atts.keys())
         else:
             cdm_table = cdm_tables[table]
@@ -177,11 +166,10 @@ def write_tables(
             filename_ = get_filename(
                 [prefix, table, suffix], path=out_dir, extension=extension
             )
-        logger.info(f"Writing table {table}: {filepath}")
+        logger.info(f"Writing table {table}: {filename_}")
         table_to_ascii(
             cdm_table,
             delimiter=delimiter,
             col_subset=col_subset,
-            cdm_complete=cdm_complete,
             filename=filename_,
         )
