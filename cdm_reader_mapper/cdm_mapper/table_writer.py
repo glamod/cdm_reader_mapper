@@ -31,10 +31,14 @@ from cdm_reader_mapper.common import logging_hdlr
 from . import properties
 from .tables.tables import get_cdm_atts
 
+from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
+
 
 def table_to_ascii(
-    table,
+    data,
     delimiter="|",
+    col_subset=None,
+    cdm_complete=True,
     filename=None,
 ):
     """
@@ -46,21 +50,33 @@ def table_to_ascii(
 
     Parameters
     ----------
-    table:
+    data: pandas.DataFrame
         pandas.Dataframe to export
-    table_atts: attributes of the pandas.Dataframe stored as a python dictionary.
-            This contains all element names, characteristics and types encoding,
-            as well as other characteristics e.g. decimal places, etc.
-    delimiter:
-        default '|'
-    filename:
-        the name of the file to stored the data
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
 
-    Returns
-    -------
-    Saves cdm tables as ascii files
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
+
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
+    cdm_complete: bool
+        If True extract the all CDM columns.
+        Default: True
+    filename: str
+        Name of the output file name(s).
     """
-    table = table.dropna(how="all")
+    data = data.dropna(how="all")
+    
+    if col_subset:
+       if isinstance(col_subset, dict):
+            col_subset = dict_to_tuple_list(col_subset)
+       cdm_complete = False
+       data = data[col_subset]
 
     header = True
     wmode = "w"
@@ -72,63 +88,100 @@ def table_to_ascii(
         mode=wmode,
     )
 
-
-def cdm_to_ascii(
-    cdm_tables,
-    delimiter="|",
-    extension="psv",
-    out_dir=None,
-    suffix=None,
+def write_tables(
+    cdm_table,
+    out_dir=".",
+    table_name=None,
     prefix=None,
-    log_level="INFO",
+    suffix=None,
+    extension="psv",
+    filename=None,
+    cdm_subset=None,
+    col_subset=None,
+    cdm_complete=True,
+    delimiter="|",
 ):
-    """
-    Export a complete cdm file with multiple tables to an ascii file.
-
-    Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)
-    format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    """Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
-    cdm_tables:
-        common data model tables to export
-    delimiter:
-        default '|'
-    extension:
-        default 'psv'
-    out_dir:
-        where to stored the ascii file
-    suffix:
-        file suffix
-    prefix:
-        file prefix
-    log_level:
-        level of logging information
+    cdm_tables: pandas.DataFrame
+        pandas.DataFrame to export. 
+    out_dir: str
+        Path to the output directory.
+        Default: current directory
+    table_name: str, optional
+        Name of the CDM table in `cdm_table`.
+        Note: This is necessary if ``cdm_table`` contains only one single table with single-index columns.
+    prefix: str, optional
+        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    suffix: str, optional
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``. 
+    extension: str
+        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Default: psv
+    filename: str or dict, optional
+        Name of the output file name(s).
+        List one filename for each table name in ``cdm_table`` ({<table>:<filename>}).
+        Default: Automatically create file name from table name, ``prefix`` and ``suffix``.
+    cdm_subset: str or list, optional
+        Specifies a subset of tables or a single table.
 
-    Returns
-    -------
-    Saves the cdm tables as ascii files in the given directory with a psv extension.
+        - For multiple subsets of tables:
+          This function returns a pandas.DataFrame that is multi-index at
+          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+
+        - For a single table:
+          This function returns a pandas.DataFrame with a simple indexing for the columns.
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
+
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
+
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
+    cdm_complete: bool
+        If True extract the all CDM columns.
+        Default: True
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
+
+    Note
+    ----
+    Use this function after reading CDM tables.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    # Because how the printers are written, they modify the original data frame!,
-    # also removing rows with empty observation_value in observation_tables
-    extension = "." + extension
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    
+    cdm_subset = get_cdm_subset(cdm_subset)
+    
     if cdm_tables.empty:
         logger.warning("All CDM tables are empty")
         return
-    for table in properties.cdm_tables:
+      
+    if isinstance(filename, str):
+        filename = {table_name: filename}
+    elif filename is None:
+        filename = {}
+
+    for table in cdm_subset:
         if table not in cdm_tables:
-            cdm_atts = get_cdm_atts(table)
             cdm_table = pd.DataFrame(columns=cdm_atts.keys())
         else:
             cdm_table = cdm_tables[table]
-        filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-        filepath = filename if not out_dir else os.path.join(out_dir, filename)
+            
+        filename_ = filename.get(table)
+        if not filename_:
+            filename_ = get_filename(
+                [prefix, table, suffix], path=out_dir, extension=extension
+            )
         logger.info(f"Writing table {table}: {filepath}")
         table_to_ascii(
             cdm_table,
             delimiter=delimiter,
-            filename=filepath,
+            col_subset=col_subset,
+            cdm_complete = cdm_complete,
+            filename=filename_,
         )
