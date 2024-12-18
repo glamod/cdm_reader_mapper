@@ -19,6 +19,7 @@ from cdm_reader_mapper.common import logging_hdlr
 from . import properties
 from ._mappings import map_and_convert
 
+
 def _map(
     data_model,
     *sub_models,
