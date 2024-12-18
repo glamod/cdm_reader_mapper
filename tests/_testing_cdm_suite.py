@@ -91,7 +91,6 @@ def _testing_suite(
     imodel=None,
     cdm_subset=None,
     codes_subset=None,
-    suffix="exp",
     mapping=True,
     out_path=None,
     drops=None,
@@ -173,14 +172,14 @@ def _testing_suite(
 
     col_subset = get_col_subset(read_.cdm, codes_subset)
 
-    read_.write_tables(suffix=imodel)
-    output = read_tables(".", tb_id=imodel, cdm_subset=cdm_subset).cdm
+    read._write_tables(suffix=imodel)
+    output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
 
     output_exp = read_tables(
-        expected_data["cdm_table"], tb_id=f"{imodel}*", cdm_subset=cdm_subset
-    ).cdm
+        expected_data["cdm_table"], suffix=f"{imodel}*", cdm_subset=cdm_subset
+    )
 
-    output, output_exp = remove_datetime_columns(output, output_exp, col_subset)
-
+    output, output_exp = remove_datetime_columns(output.cdm, output_exp.cdm, col_subset)
     output_exp = drop_rows(output_exp, drops)
     pd.testing.assert_frame_equal(output, output_exp)
+
