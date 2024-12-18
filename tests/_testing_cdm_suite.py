@@ -74,11 +74,12 @@ def drop_rows(df, drops):
 
 def get_col_subset(output, codes_subset):
     col_subset = []
-    if codes_subset is not None:
-        for key in output.keys():
-            for att in output[key]["atts"].keys():
-                if att in codes_subset:
-                    col_subset.append((key, att))
+    if codes_subset is None:
+        return col_subset
+    for subset in codes_subset:
+        for column in output.columns:
+            if subset in column:
+                col_subset.append(column)
     return col_subset
 
 
@@ -218,23 +219,3 @@ def _testing_suite(
 
     output_ = drop_rows(output_, drops)
     pd.testing.assert_frame_equal(output, output_)
-
-
-def _testing_writers(imodel):
-
-    exp = f"expected_{imodel}"
-    expected_data = getattr(result_data, exp)
-    output = read_tables(
-        expected_data["cdm_table"],
-        suffix=f"{imodel}*",
-    )
-
-    write_tables(output, suffix=f"{imodel}_all")
-    output_ = read_tables(".", suffix=f"{imodel}_all")
-    pd.testing.assert_frame_equal(output, output_)
-
-    for table in ["header", "observations-sst"]:
-        write_tables(output[table], suffix=f"{imodel}_{table}_all", table_name=table)
-        output_table = read_tables(".", suffix=f"{imodel}_{table}_all")
-        output_origi = output[table].dropna(how="all").reset_index(drop=True)
-        pd.testing.assert_frame_equal(output_origi, output_table[table])

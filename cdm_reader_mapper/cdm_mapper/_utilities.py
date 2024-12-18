@@ -42,5 +42,14 @@ def get_filename(pattern, path=".", extension="psv"):
     """Get file name."""
     if extension[0] != ".":
         extension = f".{extension}"
-    files_ = "-".join(filter(bool, pattern)) + extension
-    return os.path.join(path, files_)
+    filename = "-".join(filter(bool, pattern)) + extension
+    return os.path.join(path, filename)
+
+
+def adjust_filename(filename, table="", extension="psv"):
+    """Adjust filename."""
+    if table not in filename:
+        filename = f"{table}-{filename}"
+    if "." not in filename:
+        filename = f"{filename}.{extension}"
+    return filename
