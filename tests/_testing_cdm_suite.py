@@ -182,6 +182,6 @@ def _testing_suite(
 
     output = output.cdm
     output_exp = output_exp.cdm
-    output, output_exp = remove_datetime_columns(output output_exp, col_subset)
+    output, output_exp = remove_datetime_columns(output, output_exp, col_subset)
     output_exp = drop_rows(output_exp, drops)
     pd.testing.assert_frame_equal(output, output_exp)
