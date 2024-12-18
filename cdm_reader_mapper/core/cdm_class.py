@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
-from cdm_reader_mapper.cdm_mapper.table_writer import cdm_to_ascii
+from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
@@ -113,7 +113,7 @@ class CDM:
 
     def write_tables(self, **kwargs):
         """Write CDM tables on disk."""
-        cdm_to_ascii(self.cdm, **kwargs)
+        write_tables(self.cdm, **kwargs)
 
     def duplicate_check(self, **kwargs):
         """Duplicate check."""
