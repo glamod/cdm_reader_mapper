@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest  # noqa
 
-from cdm_reader_mapper import read_tables, write_tables
+from cdm_reader_mapper import read_tables
 
 from ._results import result_data
 
