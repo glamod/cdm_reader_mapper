@@ -392,7 +392,7 @@ def write_tables(
 
     if isinstance(cdm_table, pd.DataFrame):
         if table_name:
-            cdm_table = {table_name: {"data": cdm_table}}
+            cdm_table = {table_name: {"data": cdm_table[table_name]}}
         else:
             data = cdm_table.copy()
             cdm_table = {}
