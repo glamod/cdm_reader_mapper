@@ -303,7 +303,6 @@ def map_and_convert(
         data = pd.read_csv(
             cdm_tables[table]["buffer"],
             names=cdm_tables[table]["columns"],
-            parse_dates=date_columns[table],
             na_values=[],
             dtype="object",
             keep_default_na=False,
