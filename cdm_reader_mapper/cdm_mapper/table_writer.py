@@ -26,7 +26,12 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
+from ._utilities import (
+    adjust_filename,
+    dict_to_tuple_list,
+    get_cdm_subset,
+    get_filename,
+)
 from .tables.tables import get_cdm_atts
 
 
@@ -50,24 +55,10 @@ def table_to_ascii(
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
         Default: '|'
-    col_subset: str, list or dict, optional
-        Specify the section or sections of the file to read.
-
-        - For multiple sections of the tables:
-          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
-
-        - For a single section:
-          e.g. ``list type object col_subset = [columns]``
-          This variable assumes that the column names are all conform to the cdm field names.
     filename: str
         Name of the output file name(s).
     """
     data = data.dropna(how="all")
-
-    if col_subset:
-        if isinstance(col_subset, dict):
-            col_subset = dict_to_tuple_list(col_subset)
-        data = data[col_subset]
 
     header = True
     wmode = "w"
@@ -83,7 +74,6 @@ def table_to_ascii(
 def write_tables(
     cdm_tables,
     out_dir=".",
-    table_name=None,
     prefix=None,
     suffix=None,
     extension="psv",
@@ -101,9 +91,6 @@ def write_tables(
     out_dir: str
         Path to the output directory.
         Default: current directory
-    table_name: str, optional
-        Name of the CDM table in `cdm_table`.
-        Note: This is necessary if ``cdm_table`` contains only one single table with single-index columns.
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
     suffix: str, optional
@@ -145,12 +132,17 @@ def write_tables(
 
     cdm_subset = get_cdm_subset(cdm_subset)
 
+    if col_subset:
+        if isinstance(col_subset, dict):
+            col_subset = dict_to_tuple_list(col_subset)
+        cdm_tables = cdm_tables[col_subset]
+
     if cdm_tables.empty:
         logger.warning("All CDM tables are empty")
         return
 
     if isinstance(filename, str):
-        filename = {table_name: filename}
+        filename = {table_name: filename for table_name in cdm_subset}
     elif filename is None:
         filename = {}
 
@@ -166,10 +158,10 @@ def write_tables(
             filename_ = get_filename(
                 [prefix, table, suffix], path=out_dir, extension=extension
             )
+        filename_ = adjust_filename(filename_, table=table, extension=extension)
         logger.info(f"Writing table {table}: {filename_}")
         table_to_ascii(
             cdm_table,
             delimiter=delimiter,
-            col_subset=col_subset,
             filename=filename_,
         )
