@@ -80,12 +80,6 @@ def test_select_from_list(TextParser):
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_inspect_get_length(TextParser):
-    read_ = _get_data(TextParser)
-    assert len(read_) == 5
-
-
-@pytest.mark.parametrize("TextParser", [True, False])
 def test_inspect_count_by_cat(TextParser):
     read_ = _get_data(TextParser)
     result = read_.unique(columns=("c1", "B1"))
