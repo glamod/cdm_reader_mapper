@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pandas as pd
+
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
@@ -33,7 +35,7 @@ class CDM:
         Name of the CDM input model.
     """
 
-    def __init__(self, MDFFileReader=None, cdm_tables=None):
+    def __init__(self, MDFFileReader=None, cdm_tables=None, data=None, mask=None):
         if MDFFileReader is not None:
             self.data = MDFFileReader.data
             self.columns = MDFFileReader.columns
@@ -44,10 +46,46 @@ class CDM:
             self.imodel = MDFFileReader.imodel
         if cdm_tables is not None:
             self.cdm = cdm_tables
+        if data is not None:
+            self.data = data
+            self.columns = data.columns
+            self.dtypes = data.dtypes
+        if mask is not None:
+            self.mask = mask
 
     def __len__(self):
         """Length of ``data``."""
         return inspect.get_length(self.data)
+
+    def append(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+        """Append multiple CDM's."""
+        if not isinstance(other, list):
+            other = [other]
+        for data in datasets:
+            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
+            to_concat = [
+                getattr(concat, data) for concat in other if hasattr(concat, data)
+            ]
+            if not to_concat:
+                continue
+            self_data.append(to_concat, ignore_index=True, **kwargs)
+            setattr(self, data, self_data.reset_index(drop=True))
+        return self
+
+    def merge(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+        """Merge multiple CDM's."""
+        if not isinstance(other, list):
+            other = [other]
+        for data in datasets:
+            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
+            to_concat = [
+                getattr(concat, data) for concat in other if hasattr(concat, data)
+            ]
+            if not to_concat:
+                continue
+            self_data.merge(to_concat, axis=1, join="outer", **kwargs)
+            setattr(self, data, self_data.reset_index(drop=True))
+        return self
 
     def select_true(self, overwrite=True, **kwargs):
         """Select valid values from ``data`` via ``mask``."""
