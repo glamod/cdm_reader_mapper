@@ -7,14 +7,12 @@ import pandas as pd
 
 from cdm_reader_mapper import cdm_mapper, mdf_reader
 from cdm_reader_mapper.cdm_mapper import read_tables, write_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
     correct_pt,
     validate_datetime,
     validate_id,
 )
-from cdm_reader_mapper.operations.inspect import get_length
 
 from ._results import result_data
 
@@ -130,14 +128,8 @@ def _testing_suite(
         imodel=imodel,
     )
 
-    if not isinstance(data, pd.DataFrame):
-        data_pd = make_copy(data).read()
-    else:
-        data_pd = data.copy()
-    if not isinstance(mask, pd.DataFrame):
-        mask_pd = make_copy(mask).read()
-    else:
-        mask_pd = mask.copy()
+    data_pd = data.copy()
+    mask_pd = mask.copy()
 
     val_dt = validate_datetime.validate(
         data=data_pd,
@@ -170,9 +162,6 @@ def _testing_suite(
 
     if isinstance(data, pd.DataFrame):
         if data.empty:
-            return
-    else:
-        if get_length(data) == 0:
             return
 
     if val_dt is not None:

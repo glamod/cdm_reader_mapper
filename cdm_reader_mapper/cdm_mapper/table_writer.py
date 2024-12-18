@@ -4,8 +4,7 @@ Write Common Data Model (CDM) mapping tables.
 Created on Thu Apr 11 13:45:38 2019
 
 Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files,
-The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame
-(or pd.io.parsers.TextFileReader).
+The tables format is contained in a python dictionary, stored as an attribute in a pandas.DataFrame.
 
 This module uses a set of printer functions to "print" element values to a
 string object before exporting them to a final ascii file.
@@ -45,8 +44,7 @@ def table_to_ascii(
     Export a cdm table to an ascii file.
 
     Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
 
     Parameters
     ----------
