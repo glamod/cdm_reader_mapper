@@ -20,14 +20,6 @@ from . import properties
 from ._mappings import map_and_convert
 
 
-def _map(
-    data_model,
-    *sub_models,
-    data=pd.DataFrame(),
-=======
-from ._mappings import map_and_convert
-
-
 def map_model(
     data,
     imodel,
