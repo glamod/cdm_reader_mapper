@@ -52,48 +52,35 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
-
-
-def get_cdm_subset(cdm_subset):
-    """Return cdm_subset."""
-    if cdm_subset is None:
-        return properties.cdm_tables
-    elif not isinstance(cdm_subset, list):
-        return [cdm_subset]
-    return cdm_subset
-
-
-def get_usecols(tb, col_subset=None):
-    """Return usecols for pandas.read_csv function."""
-    if isinstance(col_subset, str):
-        return [col_subset]
-    elif isinstance(col_subset, list):
-        return col_subset
-    elif isinstance(col_subset, dict):
-        return col_subset.get(tb)
+from ._utilities import get_cdm_subset, get_filename, get_usecols
 
 
 def read_tables(
-    tb_path,
-    tb_id="*",
-    cdm_subset=None,
-    delimiter="|",
+    inp_dir,
+    prefix=None,
+    suffix=None,
     extension="psv",
+    cdm_subset=None,
     col_subset=None,
-    log_level="INFO",
-    na_values=[],
+    delimiter="|",
+    na_values=None,
 ):
     """
-    Read CDM table like files from file system to a pandas data frame.
+    Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
-    tb_path:
-        path to the file
-    tb_id:
-        any identifier including wildcards if required extension, defaulting to 'psv'
-    cdm_subset:
-        specifies a subset of tables or a single table.
+    inp_dir: str
+        Path to the input file(s).
+    prefix: str, optional
+        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    suffix: str, optional
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    extension: str
+        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Default: psv
+    cdm_subset: str or list, optional
+        Specifies a subset of tables or a single table.
 
         - For multiple subsets of tables:
           This function returns a pandas.DataFrame that is multi-index at
@@ -101,66 +88,68 @@ def read_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
-
-    delimiter:
-        default is '|'
-    extension:
-        default is psv
-    col_subset:
-        a python dictionary specifying the section or sections of the file to read
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
 
         - For multiple sections of the tables:
-          e.g ``col_subset = {table0:[columns],...tablen:[columns]}``
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
 
         - For a single section:
           e.g. ``list type object col_subset = [columns]``
           This variable assumes that the column names are all conform to the cdm field names.
-
-    log_level: Level of logging messages to save
-    na_values: specifies the format of NaN values
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
+    na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
+        Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
+        For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
 
     Returns
     -------
-    pandas.DataFrame: either the entire file or a subset of it.
+    pandas.DataFrame
 
     Note
     ----
     Logs specific messages if there is any error.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
-    if not os.path.isdir(tb_path):
-        logger.error(f"Data path not found {tb_path}: ")
+    if not os.path.isdir(inp_dir):
+        logger.error(f"Data path not found {inp_dir}: ")
         return pd.DataFrame()
 
+    if suffix is None:
+        suffix = ""
+
     # See if there's anything at all:
-    files = glob.glob(os.path.join(tb_path, f"*{tb_id}*.{extension}"))
+    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
+    files = glob.glob(pattern)
+
     if len(files) == 0:
-        logger.error(f"No files found matching pattern {tb_id}")
+        logger.error(f"No files found matching pattern {pattern}")
         return pd.DataFrame()
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    for tb in cdm_subset:
-        if tb not in properties.cdm_tables:
-            logger.error(f"Requested table {tb} not defined in CDM")
-            return pd.DataFrame()
-
     file_paths = {}
-    for tb in cdm_subset:
-        logger.info(f"Getting file path for pattern {tb}")
-        patterns_ = os.path.join(tb_path, f"{tb}-{tb_id}.{extension}")
-        paths_ = glob.glob(patterns_)
+    for table in cdm_subset:
+        if table not in properties.cdm_tables:
+            logger.error(f"Requested table {table} not defined in CDM")
+            return pd.DataFrame()
+        logger.info(f"Getting file path for pattern {table}")
+        pattern_ = get_filename(
+            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
+        )
+        paths_ = glob.glob(pattern_)
         if len(paths_) == 1:
-            file_paths[tb] = paths_[0]
+            file_paths[table] = paths_[0]
             continue
-        logger.error(
-            f"Pattern {tb_id} resulted in multiple files for table {tb}. "
+        logger.warning(
+            f"Pattern {pattern_} resulted in multiple files for table {table}. "
             "Cannot securely retrieve cdm table(s)"
         )
-        return pd.DataFrame()
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
@@ -178,11 +167,11 @@ def read_tables(
         indexing = True
 
     df_list = []
-    for tb, tb_file in file_paths.items():
-        usecols = get_usecols(tb, col_subset)
+    for table, table_file in file_paths.items():
+        usecols = get_usecols(table, col_subset)
 
         dfi = pd.read_csv(
-            tb_file,
+            table_file,
             delimiter=delimiter,
             usecols=usecols,
             dtype="object",
@@ -191,7 +180,7 @@ def read_tables(
         )
         if len(dfi) == 0:
             logger.warning(
-                f"Table {tb} empty in file system, not added to the final DF"
+                f"Table {table} empty in file system, not added to the final DF"
             )
             continue
 
@@ -199,7 +188,7 @@ def read_tables(
             return dfi
 
         dfi = dfi.set_index("report_id", drop=False)
-        dfi.columns = pd.MultiIndex.from_product([[tb], dfi.columns])
+        dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
         df_list.append(dfi)
 
     if len(df_list) == 0:
