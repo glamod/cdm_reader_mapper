@@ -151,7 +151,6 @@ def read_tables(
             f"Pattern {pattern_} resulted in multiple files for table {table}. "
             "Cannot securely retrieve cdm table(s)"
         )
-        return CDM(cdm_tables=pd.DataFrame())
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
