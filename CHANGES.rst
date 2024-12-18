@@ -15,6 +15,7 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * ``cdm_mapper``: rename function ``cdm_to_ascii`` to ``write_tables`` (:issue:`182`, :pull:`185`)
 * ``cdm_mapper``: update parameter names and list of functions ``read_tables`` and ``write_tables`` (:pull:`185`)
+* main ``cdm_mapper``, ``mdf_reader`` and ``duplicates`` modules are directly callable from ``cdm_reader_mapper`` (:pull:`188`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
