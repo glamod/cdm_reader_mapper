@@ -132,8 +132,12 @@ def read_tables(
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
+    if len(cdm_subset) == 1:
+        indexing = False
+    else:
+        indexing = True
 
-    file_paths = {}
+    df_list = []
     for table in cdm_subset:
         if table not in properties.cdm_tables:
             logger.error(f"Requested table {table} not defined in CDM")
@@ -143,35 +147,16 @@ def read_tables(
             [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
         )
         paths_ = glob.glob(pattern_)
-        if len(paths_) == 1:
-            file_paths[table] = paths_[0]
+        if len(paths_) != 1:
+            logger.warning(
+                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
+                "Cannot securely retrieve cdm table(s)"
+            )
             continue
-        logger.warning(
-            f"Pattern {pattern_} resulted in multiple files for table {table}. "
-            "Cannot securely retrieve cdm table(s)"
-        )
 
-    if len(file_paths) == 0:
-        logger.error(f"No cdm table files found for search patterns: {files}")
-        return pd.DataFrame()
-
-    logger.info(
-        "Reading into dataframe data files {}: ".format(
-            ",".join(list(file_paths.values()))
-        )
-    )
-
-    if len(cdm_subset) == 1:
-        indexing = False
-    else:
-        indexing = True
-
-    df_list = []
-    for table, table_file in file_paths.items():
         usecols = get_usecols(table, col_subset)
-
         dfi = pd.read_csv(
-            table_file,
+            paths_[0],
             delimiter=delimiter,
             usecols=usecols,
             dtype="object",
