@@ -179,7 +179,7 @@ def _testing_suite(
     output_exp = read_tables(
         expected_data["cdm_table"], suffix=f"{imodel}*", cdm_subset=cdm_subset
     )
-    
+
     output = output.cdm
     output_ = output_.cdm
     output, output_exp = remove_datetime_columns(output.cdm, output_exp.cdm, col_subset)
