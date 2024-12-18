@@ -23,12 +23,13 @@ of the imodel, the number of decimal places used comes from a default tool defin
 from __future__ import annotations
 
 import ast
-import os
 
 import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
+
+from ._utilities import dict_to_tuple_list, get_cdm_subset, get_filename
 
 
 def print_integer(data, null_label):
@@ -141,17 +142,6 @@ def print_integer_array(data, null_label):
     return data.apply(print_integer_array_i, null_label=null_label)
 
 
-# TODO: tell this to dave and delete them... put error messages in functions above
-def print_float_array(data, null_label, decimal_places=None):
-    """Print a series of float objects as array."""
-    return "float array not defined in printers"
-
-
-def print_datetime_array(data, null_label):
-    """Print a series of datetime objects as array."""
-    return "datetime tz array not defined in printers"
-
-
 def print_varchar_array(data, null_label):
     """
     Print a series of string objects as array.
@@ -212,14 +202,48 @@ def print_varchar_array_i(row, null_label=None):
     return null_label
 
 
+def print_values(table, table_atts, null_label=None, logger=None):
+    """
+    NEED DOCUMENTATION.
+
+    Parameters
+    ----------
+    table
+    table_atts
+    null_label
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    ascii_table = pd.DataFrame(
+        index=table.index, columns=table_atts.keys(), dtype="object"
+    )
+    for iele in table_atts.keys():
+        if iele in table:
+            itype = table_atts.get(iele).get("data_type")
+            if printers.get(itype):
+                iprinter_kwargs = iprinters_kwargs.get(itype)
+                if iprinter_kwargs:
+                    kwargs = {x: table_atts.get(iele).get(x) for x in iprinter_kwargs}
+                else:
+                    kwargs = {}
+                ascii_table[iele] = printers.get(itype)(
+                    table[iele], null_label, **kwargs
+                )
+            else:
+                logger.error(f"No printer defined for element {iele}")
+    return ascii_table
+
+
 def table_to_ascii(
-    table,
-    table_atts,
+    data,
+    atts={},
     delimiter="|",
     null_label="null",
+    col_subset=None,
     cdm_complete=True,
     filename=None,
-    log_level="INFO",
 ):
     """
     Export a cdm table to an ascii file.
@@ -243,128 +267,167 @@ def table_to_ascii(
         default is ``True``
     filename:
         the name of the file to stored the data
-    log_level:
-        level of logging information to be saved
 
     Returns
     -------
     Saves cdm tables as ascii files
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    empty_table = False
-    if "observation_value" in table:
-        table = table.dropna(subset=["observation_value"])
-        empty_table = True if len(table) == 0 else False
-    elif "observation_value" in table_atts.keys():
-        empty_table = True
-    else:
-        empty_table = True if len(table) == 0 else False
-    if empty_table:
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+
+    if "observation_value" in data:
+        data = data.dropna(subset=["observation_value"])
+    elif "observation_value" in atts.keys():
+        data = pd.DataFrame()
+
+    csv_kwargs = {
+        "index": False,
+        "sep": delimiter,
+        "header": True,
+        "mode": "w",
+    }
+
+    if data.empty:
         logger.warning("No observation values in table")
-        ascii_table = pd.DataFrame(columns=table_atts.keys(), dtype="object")
-        ascii_table.to_csv(filename, index=False, sep=delimiter, header=True, mode="w")
+        ascii_table = pd.DataFrame(columns=atts.keys(), dtype="object")
+        ascii_table.to_csv(filename, **csv_kwargs)
         return
 
-    ascii_table = pd.DataFrame(
-        index=table.index, columns=table_atts.keys(), dtype="object"
-    )
-    for iele in table_atts.keys():
-        if iele in table:
-            itype = table_atts.get(iele).get("data_type")
-            if printers.get(itype):
-                iprinter_kwargs = iprinters_kwargs.get(itype)
-                if iprinter_kwargs:
-                    kwargs = {x: table_atts.get(iele).get(x) for x in iprinter_kwargs}
-                else:
-                    kwargs = {}
-                ascii_table[iele] = printers.get(itype)(
-                    table[iele], null_label, **kwargs
-                )
-            else:
-                logger.error(f"No printer defined for element {iele}")
-        else:
-            ascii_table[iele] = null_label
+    if col_subset:
+        if isinstance(col_subset, dict):
+            col_subset = dict_to_tuple_list(col_subset)
+        cdm_complete = False
+        data = data[col_subset]
 
-    header = True
-    wmode = "w"
-    columns_to_ascii = (
-        [x for x in table_atts.keys() if x in table.columns]
-        if not cdm_complete
-        else table_atts.keys()
-    )
-    ascii_table.to_csv(
+    if atts:
+        data = print_values(data, atts, null_label=null_label, logger=logger)
+        columns_to_ascii = (
+            [x for x in atts.keys() if x in data.columns]
+            if not cdm_complete
+            else atts.keys()
+        )
+    else:
+        data = data.fillna(null_label)
+        columns_to_ascii = data.columns
+
+    data.to_csv(
         filename,
-        index=False,
-        sep=delimiter,
         columns=columns_to_ascii,
-        header=header,
-        mode=wmode,
+        na_rep=null_label,
+        **csv_kwargs,
     )
 
 
-def cdm_to_ascii(
+def write_tables(
     cdm_table,
+    out_dir=".",
+    table_name=None,
+    prefix=None,
+    suffix=None,
+    extension="psv",
+    filename=None,
+    cdm_subset=None,
+    col_subset=None,
+    cdm_complete=True,
     delimiter="|",
     null_label="null",
-    cdm_complete=True,
-    extension="psv",
-    out_dir=None,
-    suffix=None,
-    prefix=None,
-    log_level="INFO",
 ):
-    """
-    Export a complete cdm file with multiple tables to an ascii file.
-
-    Exports a complete cdm file with multiple tables written in the C3S Climate Data Store Common Data Model (CDM)
-    format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``
-    (or ``pd.io.parsers.TextFileReader``).
+    """Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
-    cdm_table:
-        common data model tables to export
-    delimiter:
-        default '|'
-    null_label:
-        specified how nan are represented
-    cdm_complete:
-        extract the entire cdm file
-    extension:
-        default 'psv'
-    out_dir:
-        where to stored the ascii file
-    suffix:
-        file suffix
-    prefix:
-        file prefix
-    log_level:
-        level of logging information
+    cdm_table: pandas.DataFrame
+        Dataframe to export.
+    out_dir: str
+        Path of the output directory.
+        Default: current directory
+    table_name: str, optional
+        Name of the CDM table in `cdm_table`.
+        Note: This is necessary if ``cdm_table`` contains only one single table with single-index columns.
+    prefix: str, optional
+        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    suffix: str, optional
+        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    extension: str
+        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Default: psv
+    filename: str or dict, optional
+        Name of the output file name(s).
+        List one filename for each table name in ``cdm_table`` ({<table>:<filename>}).
+        Default: Automatically create file name from table name, ``prefix`` and ``suffix``.
+    null_label: str
+        Specifies how NaN values are represented in the DataFrame.
+        Default: null
+    cdm_subset: str or list, optional
+        Specifies a subset of tables or a single table.
 
-    Returns
-    -------
-    Saves the cdm tables as ascii files in the given directory with a psv extension.
+        - For multiple subsets of tables:
+          This function returns a pandas.DataFrame that is multi-index at
+          the columns, with (table-name, field) as column names. Tables are merged via the report_id field.
+
+        - For a single table:
+          This function returns a pandas.DataFrame with a simple indexing for the columns.
+    col_subset: str, list or dict, optional
+        Specify the section or sections of the file to read.
+
+        - For multiple sections of the tables:
+          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
+
+        - For a single section:
+          e.g. ``list type object col_subset = [columns]``
+          This variable assumes that the column names are all conform to the cdm field names.
+    cdm_complete: bool
+        If True extract the all available CDM columns.
+        Default: True
+    delimiter: str
+        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Default: '|'
+
+    Note
+    ----
+    Use this function after reading CDM tables.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    # Because how the printers are written, they modify the original data frame!,
-    # also removing rows with empty observation_value in observation_tables
-    extension = "." + extension
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+
+    cdm_subset = get_cdm_subset(cdm_subset)
+
+    if isinstance(cdm_table, pd.DataFrame):
+        if table_name:
+            cdm_table = {table_name: {"data": cdm_table}}
+        else:
+            data = cdm_table.copy()
+            cdm_table = {}
+            for table in cdm_subset:
+                if table in data.columns:
+                    cdm_table[table] = {"data": data[table]}
+
     if not cdm_table:
         logger.warning("All CDM tables are empty")
         return
-    for table in cdm_table.keys():
+
+    if isinstance(filename, str):
+        filename = {table_name: filename}
+    elif filename is None:
+        filename = {}
+
+    for table in cdm_subset:
+        if table not in cdm_table.keys():
+            logger.warning(f"No file for table {table} found.")
+            continue
         logger.info(f"Printing table {table}")
-        filename = "-".join(filter(bool, [prefix, table, suffix])) + extension
-        filepath = filename if not out_dir else os.path.join(out_dir, filename)
+
+        filename_ = filename.get(table)
+        if not filename_:
+            filename_ = get_filename(
+                [prefix, table, suffix], path=out_dir, extension=extension
+            )
+
         table_to_ascii(
-            cdm_table[table]["data"],
-            cdm_table[table]["atts"],
+            **cdm_table[table],
             delimiter=delimiter,
             null_label=null_label,
+            filename=filename_,
+            col_subset=col_subset,
             cdm_complete=cdm_complete,
-            filename=filepath,
-            log_level=log_level,
         )
 
 
@@ -374,9 +437,7 @@ printers = {
     "varchar": print_varchar,
     "timestamp with timezone": print_datetime,
     "int[]": print_integer_array,
-    "numeric[]": print_float_array,
     "varchar[]": print_varchar_array,
-    "timestamp with timezone[]": print_datetime_array,
 }
 
 iprinters_kwargs = {
