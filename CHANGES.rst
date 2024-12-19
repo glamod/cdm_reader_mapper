@@ -17,6 +17,14 @@ Breaking changes
 * ``cdm_mapper``: rename function ``cdm_to_ascii`` to ``write_tables`` (:issue:`182`, :pull:`185`)
 * ``cdm_mapper``: update parameter names and list of functions ``read_tables`` and ``write_tables`` (:pull:`185`)
 * main ``cdm_mapper``, ``mdf_reader`` and ``duplicates`` modules are directly callable from ``cdm_reader_mapper`` (:pull:`188`)
+* new list of imported submodules: [``map_model``, ``cdm_tables``, ``read_tables``, ``write_tables``, ``duplicate_check`` and ``read_mdf``] (:pull:`188`)
+* removed list of imported submodules: [``cdm_mapper``, ``common``, ``mdf_reader``, ``metmetpy``, ``operations``] (:pull:`188`)
+* remove imported submodules from ``cdm_mapper``, ``mdf_reader`` (:pull:`188`)
+* ``read_tables``: returning ``DataBundle`` object (:pull:`188`)
+* ``read_tables``: resulting dataframe always includes multi-indexed columns (:pull:`188`)
+* ``duplicates`` is now a direct submodule of ``cdm_reader_mapper`` (:pull:`188`)
+* import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
+* ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -28,18 +36,6 @@ Internal changes
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
-
-Breaking changes
-^^^^^^^^^^^^^^^^
-* new list of imported submodules: [``map_model``, ``cdm_tables``, ``read_tables``, ``write_tables``, ``duplicate_check`` and ``read_mdf``] (:pull:`188`)
-* removed list of imported submodules: [``cdm_mapper``, ``common``, ``mdf_reader``, ``metmetpy``, ``operations``] (:pull:`188`)
-* remove imported submodules from ``cdm_mapper``, ``mdf_reader`` (:pull:`188`)
-* ``read_tables``: returning ``DataBundle`` object (:pull:`188`)
-* ``read_tables``: resulting dataframe always includes multi-indexed columns (:pull:`188`)
-* ``duplicates`` is now a direct submodule of ``cdm_reader_mapper`` (:pull:`188`)
-* import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
-* ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
-
 
 1.0.2 (2024-11-13)
 ------------------
