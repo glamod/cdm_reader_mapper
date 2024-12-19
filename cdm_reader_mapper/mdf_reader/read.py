@@ -9,7 +9,7 @@ from io import StringIO as StringIO
 import pandas as pd
 
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-from cdm_reader_mapper.core.cdm_class import CDM
+from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .schemas import schemas
@@ -260,7 +260,7 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        return CDM(self)
+        return DataBundle(self)
 
 
 # END AUX FUNCTIONS -----------------------------------------------------------
