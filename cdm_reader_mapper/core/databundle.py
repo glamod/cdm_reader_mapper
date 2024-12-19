@@ -16,8 +16,8 @@ from cdm_reader_mapper.metmetpy.station_id.validate import validate as validate_
 from cdm_reader_mapper.operations import inspect, replace, select
 
 
-class CDM:
-    """Class for mapping to the CDM and manipulating the data.
+class DataBundle:
+    """Class for manipulating the MDF data and mapping it to the CDM.
 
     Attributes
     ----------
@@ -60,13 +60,13 @@ class CDM:
         return inspect.get_length(self.data)
 
     def add(self, addition):
-        """Adding information to CDM."""
+        """Adding information to a DataBundle."""
         for name, data in addition.items():
             setattr(self, name, data)
         return self
 
     def stack_v(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Stack multiple CDM's vertically."""
+        """Stack multiple DataBundle's vertically."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
@@ -82,8 +82,8 @@ class CDM:
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
-    def stack_v(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Stack multiple CDM's horizontally."""
+    def stack_h(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+        """Stack multiple DataBundle's horizontally."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
@@ -100,7 +100,7 @@ class CDM:
         return self
 
     def copy(self):
-        """Make deep copy of CDM."""
+        """Make deep copy of a DataBundle."""
         return deepcopy(self)
 
     def select_true(self, overwrite=True, **kwargs):

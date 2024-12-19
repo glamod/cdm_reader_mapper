@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import CDM, read_mdf, read_tables, test_data
+from cdm_reader_mapper import DataBundle, read_mdf, read_tables, test_data
 
 from ._results import result_data
 from ._utilities import read_result_data
@@ -15,8 +15,8 @@ def get_result_data(imodel):
     results_ = getattr(result_data, f"expected_{imodel}")
     data_ = read_result_data(results_["data"], columns)
     mask_ = read_result_data(results_["mask"], columns)
-    CDM_ = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
-    return CDM_.add({"data": data_, "mask": mask_})
+    db = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
+    return db.add({"data": data_, "mask": mask_})
 
 
 def update_columns(list_of):
@@ -28,7 +28,7 @@ def update_columns(list_of):
         columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].cdm.columns]
         updated_cdm = list_of[i].copy()
         updated_cdm.cdm.columns = pd.MultiIndex.from_tuples(columns)
-        updated.append(CDM(cdm_tables=updated_cdm.cdm))
+        updated.append(DataBundle(cdm_tables=updated_cdm.cdm))
         i += 1
     return updated
 

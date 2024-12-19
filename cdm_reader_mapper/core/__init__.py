@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-from .cdm_class import CDM
+from .databundle import DataBundle
