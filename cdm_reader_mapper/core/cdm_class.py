@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
@@ -57,8 +59,14 @@ class CDM:
         """Length of ``data``."""
         return inspect.get_length(self.data)
 
+    def add(self, addition):
+        """Adding information to CDM."""
+        for name, data in addition.items():
+            setattr(self, name, data)
+        return self
+
     def append(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Append multiple CDM's."""
+        """Append two CDM's."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
@@ -68,24 +76,32 @@ class CDM:
             ]
             if not to_concat:
                 continue
-            self_data.append(to_concat, ignore_index=True, **kwargs)
+            if not self_data.empty:
+                to_concat = [self_data] + to_concat
+            self_data = pd.concat(to_concat, **kwargs)
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
     def merge(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Merge multiple CDM's."""
+        """Merge two CDM's."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
-            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
+            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame()
             to_concat = [
                 getattr(concat, data) for concat in other if hasattr(concat, data)
             ]
             if not to_concat:
                 continue
-            self_data.merge(to_concat, axis=1, join="outer", **kwargs)
+            if not self_data.empty:
+                to_concat = [self_data] + to_concat
+            self_data = pd.concat(to_concat, axis=1, join="outer")
             setattr(self, data, self_data.reset_index(drop=True))
         return self
+
+    def copy(self):
+        """Make deep copy of CDM."""
+        return deepcopy(self)
 
     def select_true(self, overwrite=True, **kwargs):
         """Select valid values from ``data`` via ``mask``."""

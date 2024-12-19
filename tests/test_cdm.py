@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pandas as pd
 import pytest
 
 from cdm_reader_mapper import CDM, read_mdf, read_tables, test_data
@@ -14,8 +15,22 @@ def get_result_data(imodel):
     results_ = getattr(result_data, f"expected_{imodel}")
     data_ = read_result_data(results_["data"], columns)
     mask_ = read_result_data(results_["mask"], columns)
-    cdm_ = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
-    return CDM(data=data_, mask=mask_, cdm_tables=cdm_)
+    CDM_ = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
+    return CDM_.add({"data": data_, "mask": mask_})
+
+
+def update_columns(list_of):
+    if not isinstance(list_of, list):
+        list_of = [list_of]
+    i = 0
+    updated = []
+    while i < len(list_of):
+        columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].cdm.columns]
+        updated_cdm = list_of[i].copy()
+        updated_cdm.cdm.columns = pd.MultiIndex.from_tuples(columns)
+        updated.append(CDM(cdm_tables=updated_cdm.cdm))
+        i += 1
+    return updated
 
 
 data = {
@@ -34,16 +49,19 @@ def test_len(test_data):
 
 @pytest.mark.parametrize(
     "test_data",
-    [data["data_700"], data["data_703"], [data["data_703"], data["data_201"]]],
+    [[data["data_703"]], [data["data_703"], data["data_201"]]],
 )
 def test_append(test_data):
-    data["data_700"].append(test_data)
+    orig_data = data["data_700"].copy()
+    test_data = [data.copy() for data in test_data]
+    orig_data.append(test_data)
 
 
 @pytest.mark.parametrize(
     "test_data",
-    [data["data_700"], data["data_703"], [data["data_703"], data["data_201"]]],
+    [data["data_703"], [data["data_703"], data["data_201"]]],
 )
 def test_merge(test_data):
-    test_data.cdm.columns = [("test", c) for c in test_data.cdm.columns]
-    data["data_700"].append(test_data, datasets=["cdm"])
+    orig_data = data["data_700"].copy()
+    test_data = update_columns(test_data)
+    orig_data.merge(test_data, datasets=["cdm"])
