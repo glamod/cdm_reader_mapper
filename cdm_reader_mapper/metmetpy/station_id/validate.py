@@ -36,7 +36,7 @@ import re
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from .. import properties
@@ -53,7 +53,9 @@ def validate(data, imodel, blank=False, log_level="INFO"):
         return
     dck = mrd[2]
 
-    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        data = pandas_TextParser_hdlr.make_copy(data).read()
+    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"

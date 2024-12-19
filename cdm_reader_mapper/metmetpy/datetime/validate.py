@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
 from . import model_datetimes
 
@@ -45,7 +45,9 @@ def validate(data, imodel, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     model = imodel.split("_")[0]
 
-    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        data = pandas_TextParser_hdlr.make_copy(data).read()
+    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"
