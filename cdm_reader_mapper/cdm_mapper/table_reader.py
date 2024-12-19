@@ -118,7 +118,7 @@ def read_tables(
     # also removing rows with empty observation_value in observation_tables
     if not os.path.isdir(inp_dir):
         logger.error(f"Data path not found {inp_dir}: ")
-        return DataBunlde(tables=pd.DataFrame())
+        return DataBundle(tables=pd.DataFrame())
 
     if suffix is None:
         suffix = ""
@@ -154,7 +154,7 @@ def read_tables(
 
     if len(file_paths) == 0:
         logger.error(f"No cdm table files found for search patterns: {files}")
-        return DataBunlde(tables=pd.DataFrame())
+        return DataBundle(tables=pd.DataFrame())
 
     logger.info(
         "Reading into dataframe data files {}: ".format(
