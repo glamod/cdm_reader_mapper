@@ -101,7 +101,7 @@ def _testing_suite(
         log_level="DEBUG",
     )
 
-    col_subset = get_col_subset(read_.cdm, codes_subset)
+    col_subset = get_col_subset(read_.tables, codes_subset)
 
     read_.write_tables(suffix=imodel)
     output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
@@ -110,8 +110,8 @@ def _testing_suite(
         expected_data["cdm_table"], suffix=f"{imodel}*", cdm_subset=cdm_subset
     )
 
-    output = output.cdm
-    output_exp = output_exp.cdm
+    output = output.tables
+    output_exp = output_exp.tables
     output, output_exp = remove_datetime_columns(output, output_exp, col_subset)
     output_exp = drop_rows(output_exp, drops)
     pd.testing.assert_frame_equal(output, output_exp)

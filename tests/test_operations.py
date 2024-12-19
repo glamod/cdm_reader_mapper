@@ -87,7 +87,7 @@ def test_inspect_count_by_cat(TextParser):
 
 
 def test_replace():
-    table_df = cdm_header.cdm["header"]
+    table_df = cdm_header.tables["header"]
     result = replace.replace_columns(
         table_df,
         correction_df,

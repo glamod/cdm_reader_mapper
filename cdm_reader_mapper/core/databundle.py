@@ -1,4 +1,4 @@
-"""Common Data Model (CDM) class."""
+"""Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class DataBundle:
         Name of the CDM input model.
     """
 
-    def __init__(self, MDFFileReader=None, cdm_tables=None, data=None, mask=None):
+    def __init__(self, MDFFileReader=None, tables=None, data=None, mask=None):
         if MDFFileReader is not None:
             self.data = MDFFileReader.data
             self.columns = MDFFileReader.columns
@@ -46,8 +46,8 @@ class DataBundle:
             self.parse_dates = MDFFileReader.parse_dates
             self.mask = MDFFileReader.mask
             self.imodel = MDFFileReader.imodel
-        if cdm_tables is not None:
-            self.cdm = cdm_tables
+        if tables is not None:
+            self.tables = tables
         if data is not None:
             self.data = data
             self.columns = data.columns
@@ -65,7 +65,7 @@ class DataBundle:
             setattr(self, name, data)
         return self
 
-    def stack_v(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+    def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
         """Stack multiple DataBundle's vertically."""
         if not isinstance(other, list):
             other = [other]
@@ -82,7 +82,7 @@ class DataBundle:
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
-    def stack_h(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+    def stack_h(self, other, datasets=["data", "mask", "tables"], **kwargs):
         """Stack multiple DataBundle's horizontally."""
         if not isinstance(other, list):
             other = [other]
@@ -162,41 +162,41 @@ class DataBundle:
 
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model."""
-        self.cdm = map_model(self.data, self.imodel, **kwargs)
+        self.tables = map_model(self.data, self.imodel, **kwargs)
         return self
 
     def write_tables(self, **kwargs):
         """Write CDM tables on disk."""
-        write_tables(self.cdm, **kwargs)
+        write_tables(self.tables, **kwargs)
 
     def duplicate_check(self, **kwargs):
         """Duplicate check."""
-        self.DupDetect = duplicate_check(self.cdm["header"], **kwargs)
+        self.DupDetect = duplicate_check(self.tables["header"], **kwargs)
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):
-        """Flag detected duplicates in ``cdm``."""
+        """Flag detected duplicates in ``tables``."""
         self.DupDetect.flag_duplicates(**kwargs)
-        df_ = self.cdm.copy()
+        df_ = self.tables.copy()
         df_["header"] = self.DupDetect.result
         if overwrite is True:
-            self.cdm = df_
+            self.tables = df_
         else:
-            self.cdm_dups_flagged = df_
+            self.tables_dups_flagged = df_
         return self
 
     def get_duplicates(self, **kwargs):
-        """Get duplicate matches in ``cdm``."""
+        """Get duplicate matches in ``tables``."""
         return self.DupDetect.get_duplicates(**kwargs)
 
     def remove_duplicates(self, overwrite=True, **kwargs):
-        """Remove detected duplicates in ``cdm``."""
+        """Remove detected duplicates in ``tables``."""
         self.DupDetect.remove_duplicates(**kwargs)
-        df_ = self.cdm.copy()
+        df_ = self.tables.copy()
         header_ = self.DupDetect.result
         df_ = df_[df_.index.isin(header_.index)]
         if overwrite is True:
-            self.cdm = df_
+            self.tables = df_
         else:
-            self.cdm_dups_removed = df_
+            self.tables_dups_removed = df_
         return self

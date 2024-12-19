@@ -25,10 +25,10 @@ def update_columns(list_of):
     i = 0
     updated = []
     while i < len(list_of):
-        columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].cdm.columns]
-        updated_cdm = list_of[i].copy()
-        updated_cdm.cdm.columns = pd.MultiIndex.from_tuples(columns)
-        updated.append(DataBundle(cdm_tables=updated_cdm.cdm))
+        columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].tables.columns]
+        updated_tables = list_of[i].copy()
+        updated_tables.tables.columns = pd.MultiIndex.from_tuples(columns)
+        updated.append(DataBundle(tables=updated_tables.tables))
         i += 1
     return updated
 
@@ -64,4 +64,4 @@ def test_stack_v(test_data):
 def test_stack_h(test_data):
     orig_data = data["data_700"].copy()
     test_data = update_columns(test_data)
-    orig_data.stack_h(test_data, datasets=["cdm"])
+    orig_data.stack_h(test_data, datasets=["tables"])

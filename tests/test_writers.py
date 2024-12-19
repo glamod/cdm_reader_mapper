@@ -19,15 +19,15 @@ output = read_tables(
 def test_write_data():
     output.write_tables(suffix=f"{imodel}_all")
     output_ = read_tables(".", suffix=f"{imodel}_all")
-    pd.testing.assert_frame_equal(output.cdm, output_.cdm)
+    pd.testing.assert_frame_equal(output.tables, output_.tables)
 
 
 @pytest.mark.parametrize("table", ["header", "observations-sst"])
 def test_write_tables(table):
     output.write_tables(suffix=f"{imodel}_{table}_all", cdm_subset=table)
     output_table = read_tables(".", suffix=f"{imodel}_{table}_all", cdm_subset=table)
-    output_origi = output.cdm[table].dropna(how="all").reset_index(drop=True)
-    pd.testing.assert_frame_equal(output_origi, output_table.cdm[table])
+    output_origi = output.tables[table].dropna(how="all").reset_index(drop=True)
+    pd.testing.assert_frame_equal(output_origi, output_table.tables[table])
 
 
 def test_write_fns():
@@ -37,13 +37,13 @@ def test_write_fns():
     output_ = read_tables(
         ".", prefix="prefix", suffix=f"{imodel}_all", extension="csv", delimiter=","
     )
-    pd.testing.assert_frame_equal(output.cdm, output_.cdm)
+    pd.testing.assert_frame_equal(output.tables, output_.tables)
 
 
 def test_write_filename():
     output.write_tables(filename=f"{imodel}_filename_all")
     output_ = read_tables(".", suffix=f"{imodel}_filename_all")
-    pd.testing.assert_frame_equal(output.cdm, output_.cdm)
+    pd.testing.assert_frame_equal(output.tables, output_.tables)
 
 
 def test_write_filename_dict():
@@ -53,7 +53,7 @@ def test_write_filename_dict():
     }
     output.write_tables(filename=filename_dict)
     output_ = read_tables(".", suffix=f"{imodel}_filename_dict_all")
-    pd.testing.assert_frame_equal(output.cdm[filename_dict.keys()], output_.cdm)
+    pd.testing.assert_frame_equal(output.tables[filename_dict.keys()], output_.tables)
 
 
 def test_write_col_subset():
@@ -65,5 +65,7 @@ def test_write_col_subset():
         col_subset={table: columns},
     )
     output_table = read_tables(".", suffix=f"{imodel}_{table}_all")
-    output_origi = output.cdm[table][columns].dropna(how="all").reset_index(drop=True)
-    pd.testing.assert_frame_equal(output_origi, output_table.cdm[table])
+    output_origi = (
+        output.tables[table][columns].dropna(how="all").reset_index(drop=True)
+    )
+    pd.testing.assert_frame_equal(output_origi, output_table.tables[table])
