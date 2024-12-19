@@ -38,7 +38,7 @@ Breaking changes
 * ``read_tables``: resulting dataframe always includes multi-indexed columns (:pull:`188`)
 * ``duplicates`` is now a direct submodule of ``cdm_reader_mapper`` (:pull:`188`)
 * import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
-* ``read_mdf``: returning ``CDM`` object (:pull:`188`)
+* ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 
 
 1.0.2 (2024-11-13)
