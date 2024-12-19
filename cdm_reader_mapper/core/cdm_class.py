@@ -65,8 +65,8 @@ class CDM:
             setattr(self, name, data)
         return self
 
-    def append(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Append two CDM's."""
+    def stack_v(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+        """Stack multiple CDM's vertically."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
@@ -82,8 +82,8 @@ class CDM:
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
-    def merge(self, other, datasets=["data", "mask", "cdm"], **kwargs):
-        """Merge two CDM's."""
+    def stack_v(self, other, datasets=["data", "mask", "cdm"], **kwargs):
+        """Stack multiple CDM's horizontally."""
         if not isinstance(other, list):
             other = [other]
         for data in datasets:

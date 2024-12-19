@@ -51,17 +51,17 @@ def test_len(test_data):
     "test_data",
     [[data["data_703"]], [data["data_703"], data["data_201"]]],
 )
-def test_append(test_data):
+def test_stack_v(test_data):
     orig_data = data["data_700"].copy()
     test_data = [data.copy() for data in test_data]
-    orig_data.append(test_data)
+    orig_data.stack_v(test_data)
 
 
 @pytest.mark.parametrize(
     "test_data",
     [data["data_703"], [data["data_703"], data["data_201"]]],
 )
-def test_merge(test_data):
+def test_stack_h(test_data):
     orig_data = data["data_700"].copy()
     test_data = update_columns(test_data)
-    orig_data.merge(test_data, datasets=["cdm"])
+    orig_data.stack_h(test_data, datasets=["cdm"])
