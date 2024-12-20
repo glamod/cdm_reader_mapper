@@ -30,6 +30,7 @@ class DataBundle:
     mask: pd.DataFrame, optional
         MDF validation mask
 
+
     Attributes
     ----------
     data: pd.DataFrame or pd.io.parsers.TextFileReader
@@ -46,29 +47,6 @@ class DataBundle:
         MDF validation mask
     imodel: str
         Name of the CDM input model.
-
-    Methods
-    -------
-    add
-    copy
-    correct_datetime
-    correct_pt
-    duplicate_check
-    flag_duplicates
-    get_duplicates
-    map_model
-    remove_duplicates
-    replace_columns
-    select_from_index
-    select_from_list
-    select_true
-    stack_h
-    stack_v
-    unique
-    validate_datetime
-    validate_id
-    write_tables
-
 
     Examples
     --------

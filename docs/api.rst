@@ -1,38 +1,55 @@
 .. currentmodule:: cdm_reader_mapper
 
+.. _api:
+
 """""""""""""
 API reference
 """""""""""""
 
 This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
-.. autofunction:: cdm_reader_mapper.mdf_reader.read
-   :noindex:
+Read data from disk
+===================
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.map_model
-   :noindex:
+.. autosummary::
+   :toctree: generated/
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.read_tables
-   :noindex:
+   read_mdf
+   read_tables
+   duplicate_check
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.write_tables
-   :noindex:
+DataBundle
+==========
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.duplicate_check
-   :noindex:
+.. autosummary::
+   :toctree: generated/
 
-.. autoclass:: cdm_reader_mapper.cdm_mapper.duplicates.DupDetect
-   :members: get_duplicates, flag_duplicates, remove_duplicates
-   :noindex:
+   DataBundle
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_pt.correct
-   :noindex:
+DupDetect
+=========
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime.correct
-   :noindex:
+.. autosummary::
+   :toctree: generated/
 
-.. autofunction:: cdm_reader_mapper.operations.inspect.get_length
-   :noindex:
+   DupDetect
 
-.. autofunction:: cdm_reader_mapper.operations.inspect.count_by_cat
-   :noindex:
+
+Useful functions
+================
+
+.. autosummary::
+   :toctree: generated/
+
+
+   map_model
+   write_tables
+   correct_datetime
+   correct_pt
+   unique
+   replace_columns
+   validate_datetime
+   validate_id
+   select_true
+   select_from_index
+   select_from_list

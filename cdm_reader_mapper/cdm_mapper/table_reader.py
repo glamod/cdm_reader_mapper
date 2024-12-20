@@ -107,11 +107,7 @@ def read_tables(
 
     Returns
     -------
-    pandas.DataFrame
-
-    Note
-    ----
-    Logs specific messages if there is any error.
+    cdm_reader_mapper.DataBundle
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,

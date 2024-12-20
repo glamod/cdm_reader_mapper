@@ -308,10 +308,7 @@ def read(
 
     Returns
     -------
-    MDFFileReader
-        Containing data (``data``), validation mask (``mask``)
-        and attributes (``attrs``) corresponding to the information
-        from ``source``.
+    cdm_reader_mapper.DataBundle
     """
 
     def get_list_element(lst, idx):

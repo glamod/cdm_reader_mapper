@@ -28,7 +28,7 @@ Breaking changes
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* ``cdm_mapper``: dtype conversion from ``write_tables`` to ``map_model``'s new submodule ``_conversions```(:pull:`189`)
+* ``cdm_mapper``: dtype conversion from ``write_tables`` to new submodule ``_conversions`` of ``map_model`` (:pull:`189`)
 * ``cdm_mapper``: rename ``mappings`` to ``_mapping_functions`` (:pull:`189`)
 * ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_mappings`` (:pull:`189`)
 * ``cdm_mapper``: save utility functions from ``table_reader.py`` and ``table_writer.py`` to ``_utilities.py`` (:pull:`185`)

@@ -468,7 +468,7 @@ def duplicate_check(
 
     Returns
     -------
-        DupDetect object
+        cdm_reader_mapper.DupDetect
     """
     data = data.reset_index(drop=True)
 
