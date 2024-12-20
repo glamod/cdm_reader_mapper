@@ -7,15 +7,28 @@ Changelog
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`)
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * ``cdm_mapper``: ``map_model`` returns pandas.DataFrame instead of CDM dictionary (:pull:`189`)
 * ``cdm_mapper``: rename function ``cdm_to_ascii`` to ``write_tables`` (:issue:`182`, :pull:`185`)
 * ``cdm_mapper``: update parameter names and list of functions ``read_tables`` and ``write_tables`` (:pull:`185`)
+* main ``cdm_mapper``, ``mdf_reader`` and ``duplicates`` modules are directly callable from ``cdm_reader_mapper`` (:pull:`188`)
+* new list of imported submodules: [``map_model``, ``cdm_tables``, ``read_tables``, ``write_tables``, ``duplicate_check`` and ``read_mdf``] (:pull:`188`)
+* removed list of imported submodules: [``cdm_mapper``, ``common``, ``mdf_reader``, ``metmetpy``, ``operations``] (:pull:`188`)
+* remove imported submodules from ``cdm_mapper``, ``mdf_reader`` (:pull:`188`)
+* ``read_tables``: returning ``DataBundle`` object (:pull:`188`)
+* ``read_tables``: resulting dataframe always includes multi-indexed columns (:pull:`188`)
+* ``duplicates`` is now a direct submodule of ``cdm_reader_mapper`` (:pull:`188`)
+* import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
+* ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
-* ``cdm_mapper``: dtype conversion from ``write_tables`` to ``map_model``'s new submodule ``_conversions```(:pull:`189`)
+* ``cdm_mapper``: dtype conversion from ``write_tables`` to new submodule ``_conversions`` of ``map_model`` (:pull:`189`)
 * ``cdm_mapper``: rename ``mappings`` to ``_mapping_functions`` (:pull:`189`)
 * ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_mappings`` (:pull:`189`)
 * ``cdm_mapper``: save utility functions from ``table_reader.py`` and ``table_writer.py`` to ``_utilities.py`` (:pull:`185`)

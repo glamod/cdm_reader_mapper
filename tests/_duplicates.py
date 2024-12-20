@@ -1,11 +1,20 @@
 from __future__ import annotations
 
-from cdm_reader_mapper.cdm_mapper import read_tables
+import pandas as pd
+
+from cdm_reader_mapper import read_tables
 
 from ._results import result_data
 
 
 def _manipulate_header(df):
+    df_ = _manipulation(df["header"])
+    df_.columns = pd.MultiIndex.from_product([["header"], df_.columns])
+    return df_
+
+
+def _manipulation(df):
+    df = df.copy()
     # Duplicate : Different report_id's
     # Failure in data set;
     # each report needs a specific report_id
@@ -364,7 +373,7 @@ compare_kwargs_ = {
         "kwargs": {"method": "gauss", "offset": 60.0},
     },
 }
-df_icoads = _get_test_data("icoads_r302_d792")
-df_icoads = _manipulate_header(df_icoads)
+cdm_icoads = _get_test_data("icoads_r302_d792")
+cdm_icoads.tables = _manipulate_header(cdm_icoads.tables)
 
-df_craid = _get_test_data("craid")
+cdm_craid = _get_test_data("craid")

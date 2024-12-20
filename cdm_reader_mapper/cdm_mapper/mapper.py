@@ -78,7 +78,6 @@ def map_model(
         if not not_empty:
             logger.error("Input data is empty")
             return
-
     else:
         logger.error("Input data type " f"{type(data)}" " not supported")
         return
