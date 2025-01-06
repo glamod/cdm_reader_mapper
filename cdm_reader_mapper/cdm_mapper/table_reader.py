@@ -129,10 +129,6 @@ def read_tables(
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
-    if len(cdm_subset) == 1:
-        indexing = False
-    else:
-        indexing = True
 
     df_list = []
     for table in cdm_subset:
