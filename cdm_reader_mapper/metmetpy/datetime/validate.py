@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import model_datetimes
 
@@ -45,9 +45,7 @@ def validate(data, imodel, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     model = imodel.split("_")[0]
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"
@@ -61,7 +59,7 @@ def validate(data, imodel, log_level="INFO"):
             f'Data model "{model}" datetime conversor not defined in model_datetimes module"'
         )
         return
-    elif len(data_model_datetime) == 0:
+    elif data_model_datetime.empty:
         data_columns = list(data.columns)
         logger.info(
             f"No columns found for datetime conversion. Selected columns are {data_columns}"
