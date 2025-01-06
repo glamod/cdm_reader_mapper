@@ -22,10 +22,11 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 |                            | |noc| |ukmcas|                                                 |
 +----------------------------+----------------------------------------------------------------+
 
-The ``cdm_reader_mapper`` toolbox is a python_ tool designed for both:
+The ``cdm_reader_mapper`` toolbox is a python_ tool designed for:
 
 * to read data files compliant with a user specified `data model`_
-* map observed variables and its associated metadata from a `data model`_ or models combination to the `C3S CDS Common Data Model`_ (CDM) format
+* to map observed variables and its associated metadata from a `data model`_ or models combination to the `C3S CDS Common Data Model`_ (CDM) format
+* detect and flag or remove duplicated observations
 
 It was developed to read the IMMA_ (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of:
 
@@ -86,35 +87,38 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 Run a test
 ----------
 
-Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy the data attributes:
+Read imma data with the `cdm_reader_mapper.read_mdf` function:
 
 .. code-block:: python
 
-    from cdm_reader_mapper.mdf_reader import read
+    from cdm_reader_mapper import read_mdf
     from cdm_reader_mapper.data import test_data
 
+    imodel = "icoads_r300_d701"
     data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_data = read(
-        filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"]
+    imma_bundle = read(
+        filepath, imodel=imodel, sections=["core", "c1", "c98"]
     )
-
-    data_raw = imma_data.data.copy()
 
 
 Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):
 
 .. code-block:: python
 
-    from cdm_reader_mapper.cdm_mapper import map_model
-
-    name_of_model = "icoads_r300_d704"
-
-    cdm_dict = map_model(
+    imma_bundle.map_model(
         data_raw,
-        imodel=name_of_model,
+        imodel=imodel,
         log_level="DEBUG",
     )
+    
+Detect and flag duplicated observations:
+
+.. code-block:: python
+
+    imma_bundle.duplicate_check()
+    
+    imma_bundle.flag_duplicates(overwrite=False)
 
 
 For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
