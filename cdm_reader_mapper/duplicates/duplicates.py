@@ -184,7 +184,10 @@ class DupDetect:
         return self.matches
 
     def flag_duplicates(
-        self, keep="first", limit="default", equal_musts=None, overwrite=True
+        self,
+        keep="first",
+        limit="default",
+        equal_musts=None,
     ):
         r"""Get result dataset with flagged duplicates.
 
@@ -198,8 +201,6 @@ class DupDetect:
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
-        overwrite: bool
-            If True overwrite find duplicates again.
 
         Returns
         -------
@@ -283,7 +284,10 @@ class DupDetect:
         return self.result
 
     def remove_duplicates(
-        self, keep="first", limit="default", equal_musts=None, overwrite=True
+        self,
+        keep="first",
+        limit="default",
+        equal_musts=None,
     ):
         """Get result dataset with deleted matches.
 
@@ -297,8 +301,6 @@ class DupDetect:
         equal_musts: str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
-        overwrite: bool
-            If True overwrite find duplicates again.
 
         Returns
         -------
@@ -466,7 +468,7 @@ def duplicate_check(
 
     Returns
     -------
-        DupDetect object
+        cdm_reader_mapper.DupDetect
     """
     data = data.reset_index(drop=True)
 

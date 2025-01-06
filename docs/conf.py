@@ -16,10 +16,13 @@ import os
 import sys
 import warnings
 
+import sphinx_autosummary_accessors
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
+
 
 sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath("."))
@@ -36,19 +39,18 @@ import cdm_reader_mapper  # noqa
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
+    "sphinx.ext.extlinks",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.coverage",
     "sphinx.ext.todo",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.extlinks",
+    "sphinx_autosummary_accessors",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
-    # "sphinxcontrib.bibtex",
-    # "sphinxcontrib.cairosvgconverter",
-    # sphinx_autodoc_typehints must always be listed after sphinx.ext.napoleon
     "sphinx_autodoc_typehints",
     "sphinx_codeautolink",
     "sphinx_copybutton",
@@ -62,6 +64,7 @@ extlinks = {
     "user": ("https://github.com/%s", "@%s"),
 }
 
+autosummary_generate = True
 autodoc_typehints = "description"
 autodoc_typehints_format = "fully-qualified"
 autodoc_typehints_description_target = "documented_params"
@@ -73,9 +76,12 @@ napoleon_numpy_docstring = True
 napoleon_use_rtype = False
 napoleon_use_param = False
 napoleon_use_ivar = True
+napoleon_type_aliases = {
+    "DataBundle": "~cdm_reader_mapper.DataBundle",
+}
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The suffix of source filenames.
 source_suffix = {".rst": "restructuredtext"}
@@ -85,6 +91,8 @@ source_suffix = {".rst": "restructuredtext"}
 
 # The master toctree document.
 master_doc = "index"
+
+remove_from_toctrees = ["generated/*"]
 
 # General information about the project.
 project = "cdm_reader_mapper"
@@ -142,7 +150,8 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "sphinx_rtd_theme"
+# html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

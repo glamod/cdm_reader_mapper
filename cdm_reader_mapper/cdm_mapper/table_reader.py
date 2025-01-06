@@ -50,6 +50,7 @@ import os
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from ._utilities import get_cdm_subset, get_filename, get_usecols
@@ -106,18 +107,14 @@ def read_tables(
 
     Returns
     -------
-    pandas.DataFrame
-
-    Note
-    ----
-    Logs specific messages if there is any error.
+    cdm_reader_mapper.DataBundle
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
     if not os.path.isdir(inp_dir):
         logger.error(f"Data path not found {inp_dir}: ")
-        return pd.DataFrame()
+        return DataBundle(tables=pd.DataFrame())
 
     if suffix is None:
         suffix = ""
@@ -128,7 +125,7 @@ def read_tables(
 
     if len(files) == 0:
         logger.error(f"No files found matching pattern {pattern}")
-        return pd.DataFrame()
+        return DataBundle(tables=pd.DataFrame())
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
@@ -141,7 +138,7 @@ def read_tables(
     for table in cdm_subset:
         if table not in properties.cdm_tables:
             logger.error(f"Requested table {table} not defined in CDM")
-            return pd.DataFrame()
+            return DataBundle(tables=pd.DataFrame())
         logger.info(f"Getting file path for pattern {table}")
         pattern_ = get_filename(
             [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
@@ -169,17 +166,14 @@ def read_tables(
             )
             continue
 
-        if indexing is False:
-            return dfi
-
         dfi = dfi.set_index("report_id", drop=False)
         dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
         df_list.append(dfi)
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
-        return pd.DataFrame()
+        return DataBundle(tables=pd.DataFrame())
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return merged
+    return DataBundle(tables=merged)
