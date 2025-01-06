@@ -18,23 +18,12 @@ class MDFFileReader(_FileReader):
 
     Attributes
     ----------
-<<<<<<< HEAD
-    data : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data
-    mask : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data validation mask
-    attrs : dict
-        a dictionary with the output data elements attributes
-=======
     data : pd.DataFrame
         a pd.DataFrame with the output data
     attrs : dict
         a dictionary with the output data elements attributes
     mask : pd.DataFrame
         a pd.DataFrame with the output data validation mask
->>>>>>> 5f7478324694635da833d0bd12da03ecaa29a8c1
     """
 
     def __init__(self, *args, **kwargs):

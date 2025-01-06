@@ -4,7 +4,7 @@ import pandas as pd
 import pytest  # noqa
 
 from cdm_reader_mapper import read_mdf, test_data
-from cdm_reader_mapper.operations import inspect, replace, select
+from cdm_reader_mapper.operations import replace
 
 from ._results import cdm_header, correction_df
 
@@ -60,7 +60,7 @@ def test_select_from_list():
 
 
 def test_inspect_count_by_cat():
-    read_ = _get_data(TextParser)
+    read_ = _get_data()
     result = read_.unique(columns=("c1", "B1"))
     assert result == {("c1", "B1"): {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 

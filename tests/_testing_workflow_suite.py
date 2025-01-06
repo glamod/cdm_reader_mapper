@@ -5,7 +5,6 @@ import os
 import pandas as pd
 
 from cdm_reader_mapper import read_mdf, read_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 from ._results import result_data
 from ._utilities import (
@@ -59,12 +58,8 @@ def _testing_suite(
     data_exp = drop_rows(data_exp, drops)
     mask_exp = drop_rows(mask_exp, drops)
 
-    if isinstance(read_.data, pd.io.parsers.TextFileReader):
-        data = make_copy(read_.data).read()
-        mask = make_copy(read_.mask).read()
-    else:
-        data = read_.data.copy()
-        mask = read_.mask.copy()
+    data = read_.data.copy()
+    mask = read_.mask.copy()
 
     pd.testing.assert_frame_equal(data, data_exp)
     pd.testing.assert_frame_equal(mask, mask_exp, check_dtype=False)
