@@ -86,35 +86,32 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 Run a test
 ----------
 
-Read imma data with the `cdm_reader_mapper.mdf_reader.read()` function and copy the data attributes:
+Read imma data with the `cdm_reader_mapper.read_mdf()` function and copy the data attributes:
 
 .. code-block:: python
 
-    from cdm_reader_mapper.mdf_reader import read
+    from cdm_reader_mapper import read_mdf
     from cdm_reader_mapper.data import test_data
 
-    data = test_data.test_icoads_r300_d701.get("source")
+    imodel = "icoads_r300_d704"
+    data = test_data[imodel].get("source")
 
-    imma_data = read(
-        filepath, imodel="icoads_r300_d701", sections=["core", "c1", "c98"]
-    )
+    imma_data = read_mdf(filepath, imodel=imodel, sections=["core", "c1", "c98"])
 
-    data_raw = imma_data.data.copy()
+    data_raw = imma_data.copy()
 
 
 Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):
 
 .. code-block:: python
 
-    from cdm_reader_mapper.cdm_mapper import map_model
-
-    name_of_model = "icoads_r300_d704"
-
-    cdm_dict = map_model(
+    data_raw.map_model(
         data_raw,
-        imodel=name_of_model,
+        imodel=imodel,
         log_level="DEBUG",
     )
+
+    data_mapped = data.raw.tables
 
 
 For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.

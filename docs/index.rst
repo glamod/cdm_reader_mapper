@@ -10,8 +10,8 @@ Marine data file reader-mapper toolbox documentation
 
 The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
 
-* to read data files compliant with a user specified data model (**mdf_reader**).
-* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool (**cdm_mapper**)
+* to read data files compliant with a user specified data model.
+* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool.
 
 It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format. In the meanwhile, it can read data C-RAID_ Copernicus in situ project too.
 
@@ -25,7 +25,14 @@ The tool has been further enhanced to account for any marine meteorological data
 -	Reports can be organized in sections, in which case each section can be of different types (fixed width of delimited).
 
 
-The **mdf_reader** uses the information provided in a `data model`_ to read meteorological data into a python pandas.DataFrame_, with the column names and data types set according to each data element’s description specified in the data model or **schema**. In addition to reading, the **mdf_reader** validates data elements against the **schema** provided.
+The **cdm_reader_mapper** uses the information provided in a `data model`_ to read meteorological data into a so-called **cdm_reader_mapper.DataBundle** object. This object includes several attributes:
+
+* data: pandas.DataFrame_ including the meteorological data
+* columns: column labels of `data`
+* dtypes: data types of `data`
+* mask: validation mask of `data`
+
+, with `columns` and `dtypes` set according to each data element’s description specified in the data model or **schema**. In addition to reading, `data` is validated against the **schema** provided.
 
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
@@ -33,7 +40,7 @@ Several data models have been added to the tool including both the IMMA and the 
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
-After reading the data into a pandas.DataFrame, the **cdm_mapper** will map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
+After reading the data, it can be mapped to the standardized C3S CDS Common Data Model (CDM_) format.
 
 .. toctree::
    :maxdepth: 2
