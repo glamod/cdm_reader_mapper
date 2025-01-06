@@ -3,9 +3,8 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
-the C3S Climate Data Store Common Data Model (CDM) header and observational
-tables using the mapping information available in the tool's mapping library
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
+header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 
 @author: iregon
@@ -15,7 +14,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
 from ._mappings import map_and_convert
@@ -63,23 +62,12 @@ def map_model(
         return
 
     # Check input data type and content (empty?)
-    # Make sure data is an iterable: this is to homogenize how we handle
-    # dataframes and textreaders
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if len(data) == 0:
-            logger.error("Input data is empty")
-            return
-        else:
-            data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-    else:
+    if not isinstance(data, pd.DataFrame):
         logger.error("Input data type " f"{type(data)}" " not supported")
+        return
+
+    if data.empty:
+        logger.error("Input data is empty")
         return
 
     return map_and_convert(
