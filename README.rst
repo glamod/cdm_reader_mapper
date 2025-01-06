@@ -97,9 +97,7 @@ Read imma data with the `cdm_reader_mapper.read_mdf` function:
     imodel = "icoads_r300_d701"
     data = test_data.test_icoads_r300_d701.get("source")
 
-    imma_bundle = read(
-        filepath, imodel=imodel, sections=["core", "c1", "c98"]
-    )
+    imma_bundle = read(filepath, imodel=imodel, sections=["core", "c1", "c98"])
 
 
 Map this data to a CDM build for the same deck (in this case deck 704: US Marine Metereological Journal collection of data):
@@ -111,13 +109,13 @@ Map this data to a CDM build for the same deck (in this case deck 704: US Marine
         imodel=imodel,
         log_level="DEBUG",
     )
-    
+
 Detect and flag duplicated observations:
 
 .. code-block:: python
 
     imma_bundle.duplicate_check()
-    
+
     imma_bundle.flag_duplicates(overwrite=False)
 
 
