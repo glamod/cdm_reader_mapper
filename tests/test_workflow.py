@@ -6,7 +6,7 @@ import pytest  # noqa
 
 from cdm_reader_mapper import test_data
 
-from ._testing_cdm_suite import _testing_suite
+from ._testing_workflow_suite import _testing_suite
 
 
 @pytest.mark.parametrize(
