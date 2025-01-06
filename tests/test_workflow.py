@@ -6,7 +6,7 @@ import pytest  # noqa
 
 from cdm_reader_mapper import test_data
 
-from ._testing_workflow_suite import _testing_suite
+from ._testing_cdm_suite import _testing_suite
 
 
 @pytest.mark.parametrize(
@@ -58,16 +58,6 @@ from ._testing_workflow_suite import _testing_suite
             True,
             None,
             {},
-        ),
-        ("icoads_r300_d714", None, None, None, True, None, {"chunksize": 3}),
-        (
-            "icoads_r300_d714",
-            None,
-            None,
-            None,
-            False,
-            None,
-            {"sections": ["c99"], "chunksize": 3},
         ),
         (
             "icoads_r300_d702",

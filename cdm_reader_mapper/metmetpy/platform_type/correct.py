@@ -39,10 +39,6 @@ invocation) logging an error.
 
 from __future__ import annotations
 
-from io import StringIO
-
-import pandas as pd
-
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
@@ -136,23 +132,4 @@ def correct(data, imodel, log_level="INFO"):
         )
         return data
 
-    if isinstance(data, pd.DataFrame):
-        data = correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
-        return data
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data.orig_options.get(x) for x in read_params}
-        buffer = StringIO()
-        for df in data:
-            df = correct_it(df, imodel, dck, pt_col, fix_methods, log_level="INFO")
-            df.to_csv(buffer, header=False, index=False, mode="a")
-
-        buffer.seek(0)
-        return pd.read_csv(buffer, **read_dict)
+    return correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
