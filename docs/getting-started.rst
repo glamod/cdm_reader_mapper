@@ -23,11 +23,6 @@ You can test the tool very easy by using a sample data set that comes with the r
 
    data_bundle = read_mdf(filepath, imodel=imodel)
 
-or simplify the command by passing `test_data`:
-
-.. code-block:: console
-
-  data_bundle = read_mdf(**test_data)
 
 2. Read subsection of an IMMA file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +31,7 @@ You can also read subsections from the IMMA test file:
 
 .. code-block:: console
 
-   subdata_bundle = read_mdf(**test_data, sections = ["core", "c1", "c98"])
+   subdata_bundle = read_mdf(filepath, imodel=imodel, sections = ["core", "c1", "c98"])
 
 3. Map this data to a CDM build for the same deck
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
