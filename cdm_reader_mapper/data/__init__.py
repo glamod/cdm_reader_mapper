@@ -190,6 +190,7 @@ class test_data:
         drs = "/".join(data_model.split("_"))
         return {
             "source": load_file(f"{drs}/input/{data_model}_{data_file}"),
+            "imodel": data_model,
         }
 
 
