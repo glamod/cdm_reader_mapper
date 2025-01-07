@@ -37,8 +37,8 @@ The **mdf_reader** supports reading and validation of both internal and external
 
 - An **external data model** is a data format that is unknown to the tool. If the data model meets the specifications for which the tool was built, then a model can be built externally and fed into it for both functions data reading and model validation using the argument ``data_model_path``::
 
-   from cdm_reader_mapper import mdf_reader
-   data = mdf_reader.read(<your_data_file_path>, data_model_path=<path_to_yout_data_model>)
+   from cdm_reader_mapper import read_mdf
+   data_bundle = read_mdf(<your_data_file_path>, data_model_path=<path_to_yout_data_model>)
 
 .. _code-tables:
 

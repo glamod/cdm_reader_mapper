@@ -15,19 +15,19 @@ You can test the tool very easy by using a sample data set that comes with the r
 
 .. code-block:: console
 
-   from cdm_reader_mapper import mdf_reader
-   from cdm_reader_mapper.test_data import test_069_701 as test_data
+   from cdm_reader_mapper import read_mdf
+   from cdm_reader_mapper.test_data import test_icoads_r300_d704 as test_data
 
    filepath = test_data.source
-   data_model = test_data.data_model
+   imodel = "icoads_r300_d704"
 
-   data = mdf_reader.read(filepath, data_model=data_model)
+   data_bundle = read_mdf(filepath, imodel=imodel)
 
 or simplify the command by passing `test_data`:
 
 .. code-block:: console
 
-  data = mdf_reader.read(**test_data)
+  data_bundle = read_mdf(**test_data)
 
 2. Read subsection of an IMMA file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +36,7 @@ You can also read subsections from the IMMA test file:
 
 .. code-block:: console
 
-   imma_data = mfd_reader.read(filepath, data_model=data_model, sections = ["core", "c1", "c98"])
+   subdata_bundle = read_mdf(**test_data, sections = ["core", "c1", "c98"])
 
 3. Map this data to a CDM build for the same deck
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,26 +45,30 @@ In this case deck 704: US Marine Meteorological Journal collection of data code:
 
 .. code-block:: console
 
-    from cdm_reader_mapper import cdm_mapper
+    data_bundle.map_model()
 
-    name_of_model = 'icoads_r3000_d704'
+    cdm_tables = data_bundle.tables.copy()
 
-    cdm_dict = cdm_mapper.map_model(
-                  name_of_model,
-                  data_raw.data,
-                  attributes,
-                  cdm_subset = None,
-                  log_level = 'DEBUG',
-    )
+4. Detect duplicated observations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-4. Write the output
+Detect and flag duplicated observations without overwriting the original CDM tables:
+
+.. code-block:: console
+
+    data_bundle.duplicate_check()
+    data_bundle.flag_duplicates(overwrite=False)
+
+    flagged_tables = data_bundle.tables_dups_flagged.copy()
+
+    data_bundle.remove_duplicates(overwrite=False)
+
+    removed_tables = data_bundle.tables_dups_removed.copy()
+
+5. Write the output
 ~~~~~~~~~~~~~~~~~~~
 This writes the output to an ascii file with a pipe delimited format using the following function:
 
 .. code-block:: console
 
-    from cdm_reader_mapper import cdm_mapper
-
-    cdm_mapper.cdm_to_ascii(
-            cdm_dict,
-    )
+    data_bundle.write_tables()
