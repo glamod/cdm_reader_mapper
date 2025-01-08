@@ -17,7 +17,7 @@ def convert_series(df, conversion):
 
     Parameters
     ----------
-    df: pd.DataFrame
+    df: pandas.DataFrame
         Input DataFrame
     conversion: dict
         Conversion dictionary conating columns and
@@ -25,7 +25,7 @@ def convert_series(df, conversion):
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
     """
 
     def convert_date_to_float(date):
@@ -93,9 +93,9 @@ class DupDetect:
 
     Parameters
     ----------
-    data: pd.DataFrame
+    data: pandas.DataFrame
         Original dataset
-    compared: pd.DataFrame
+    compared: pandas.DataFrame
         Dataset after duplicate check.
     method: str
         Duplicate check method for recordlinkage.
@@ -204,7 +204,7 @@ class DupDetect:
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             Input DataFrame with flagged duplicates.
             Flags for ``duplicate_status``: see `duplicate_status`_
             Flags for ``report_quality``: see `quality_flag`_
@@ -304,7 +304,7 @@ class DupDetect:
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             Input DataFrame without duplicates.
         """
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
@@ -439,7 +439,7 @@ def duplicate_check(
 
     Parameters
     ----------
-    data: pd.DataFrame
+    data: pandas.DataFrame
         Dataset for duplicate check.
     method: str
         Duplicate check method for recordlinkage.

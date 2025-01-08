@@ -1,7 +1,7 @@
-``cdm_mapper`` overview
-=======================
+How to map data to the Common Data Model (CDM)
+==============================================
 
-After reading ICOADS or C-RAID data with the ``mdf_reader``, this data can be mapped to the standardized C3S Common Data Model (CDM) format.
+After reading ICOADS or C-RAID data with the ``cdm_reader_mapper.read_mdf`` function, this data can be mapped to the standardized C3S Common Data Model (CDM) format.
 
 Workflow
 --------
@@ -9,7 +9,7 @@ Workflow
 .. figure:: _static/images/cdm_mapper_diagram.svg
     :width: 100%
 
-    Simplified workflow of the ``cdm_mapper``
+    Simplified workflow how to map data to the CDM
 
 Input data
 ----------

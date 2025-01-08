@@ -115,10 +115,10 @@ def write_tables(
         Specify the section or sections of the file to read.
 
         - For multiple sections of the tables:
-          e.g ``col_subset = {table0:[columns0],...tableN:[columnsN]}``
+          e.g col_subset = {table0:[columns0],...tableN:[columnsN]}
 
         - For a single section:
-          e.g. ``list type object col_subset = [columns]``
+          e.g. list type object col_subset = [columns]
           This variable assumes that the column names are all conform to the cdm field names.
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.

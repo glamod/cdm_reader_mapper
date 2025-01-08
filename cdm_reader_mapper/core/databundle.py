@@ -21,23 +21,27 @@ class DataBundle:
 
     Parameters
     ----------
-    MDFFileReader: MDFFileReader object, optional
-        MDF object
-    tables: pd.DataFrame, optional
-        CDM tables
-    data: pd.DataFrame, optional
-        MDF DataFrame
-    mask: pd.DataFrame, optional
+    data: pandas.DataFrame, optional
+        MDF DataFrame.
+    columns: list, optional
+        Column labels of ``data``
+    dtypes: list, optional
+        Data types of ``data``.
+    mask: pandas.DataFrame, optional
         MDF validation mask
+    imodel: str, optional
+        Name of the MFD/CDM data model.
+    tables: pandas.DataFrame, optional
+        CDM tables.
 
     Examples
     --------
-    Getting a DataBundle while reading data from disk.
+    Getting a :py:class:`cdm_reader_mapper.DataBundle` while reading data from disk.
 
     >>> from cdm_reader_mapper import read_mdf
     >>> db = read_mdf(source="file_on_disk", imodel="custom_model_name")
 
-    Constructing a DataBundle from already read MDf data.
+    Constructing a :py:class:`cdm_reader_mapper.DataBundle` from already read MDf data.
 
     >>> from cdm_reader_mapper import DataBundle
     >>> read = read_mdf(source="file_on_disk", imodel="custom_model_name")
@@ -45,30 +49,32 @@ class DataBundle:
     >>> mask_ = read.mask
     >>> db = DataBundle(data=data_, mask=mask_)
 
-    Constructing a DataBundle from already read CDM data.
+    Constructing a :py:class:`cdm_reader_mapper.DataBundle` from already read CDM data.
 
     >>> from cdm_reader_mapper import read_tables
     >>> tables = read_tables("path_to_files")
     >>> db = DataBundle(tables=tables)
     """
 
-    def __init__(self, MDFFileReader=None, tables=None, data=None, mask=None):
-        if MDFFileReader is not None:
-            self._data = MDFFileReader.data
-            self._columns = MDFFileReader.columns
-            self._dtypes = MDFFileReader.dtypes
-            self._attrs = MDFFileReader.attrs
-            self._parse_dates = MDFFileReader.parse_dates
-            self._mask = MDFFileReader.mask
-            self._imodel = MDFFileReader.imodel
-        if tables is not None:
-            self._tables = tables
-        if data is not None:
-            self._data = data
-            self._columns = data.columns
-            self._dtypes = data.dtypes
-        if mask is not None:
-            self._mask = mask
+    def __init__(
+        self,
+        data=None,
+        columns=None,
+        dtypes=None,
+        attrs=None,
+        parse_dates=None,
+        mask=None,
+        imodel=None,
+        tables=None,
+    ):
+        self._data = data
+        self._columns = columns
+        self._dtypes = dtypes
+        self._attrs = attrs
+        self._parse_dates = parse_dates
+        self._mask = mask
+        self._imodel = imodel
+        self._tables = tables
 
     def __len__(self):
         """Length of :py:attr:`data`."""
@@ -171,12 +177,12 @@ class DataBundle:
         return self._return_property("_tables_dups_removed")
 
     def add(self, addition):
-        """Adding information to a DataBundle.
+        """Adding information to a :py:class:`~DataBundle`.
 
         Parameters
         ----------
         addition: dict
-             Additional elements to add to the DataBundle.
+             Additional elements to add to the :py:class:`cdm_reader_mapper.DataBundle`.
 
         Examples
         --------
@@ -200,7 +206,7 @@ class DataBundle:
 
         Note
         ----
-        The DataFrames in the DataBundles have to have the same data columns!
+        The DataFrames in the :py:class:`cdm_reader_mapper.DataBundle` have to have the same data columns!
 
         Examples
         --------
@@ -225,19 +231,19 @@ class DataBundle:
         return self
 
     def stack_h(self, other, datasets=["data", "mask", "tables"], **kwargs):
-        """Stack multiple DataBundle's horizontally.
+        """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s horizontally.
 
         Parameters
         ----------
         other: str, list
-            List of other DataBundles to stack horizontally.
+            List of other :py:class:`cdm_reader_mapper.DataBundle` to stack horizontally.
         datasets: str, list
             List of datasets to be stacked
             Default: ['data', 'mask', 'tables']
 
         Note
         ----
-        The DataFrames in the DataBundles may have different data columns!
+        The DataFrames in the :py:class:`cdm_reader_mapper.DataBundle` may have different data columns!
 
         Examples
         --------
@@ -260,7 +266,7 @@ class DataBundle:
         return self
 
     def copy(self):
-        """Make deep copy of a DataBundle.
+        """Make deep copy of a :py:class:`cdm_reader_mapper.DataBundle`.
 
         Examples
         --------
@@ -274,8 +280,8 @@ class DataBundle:
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in DataBundle
-            Else set new attribute both :py:attr:`selected` containing valid value
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else set new attribute both :py:attr:`selected` containing valid value
             and :py:attr:`deselected` containing invalid data.
             Default: True
 
@@ -313,8 +319,8 @@ class DataBundle:
             Keys: columns to be selected.
             Values: values in keys to be selected
         overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in DataBundle
-            Else set new attribute both :py:attr:`selected` containing valid value
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else set new attribute both :py:attr:`selected` containing valid value
             and :py:attr:`deselected` containing invalid data.
             Default: True
 
@@ -351,8 +357,8 @@ class DataBundle:
         index: list
             Indexes to be selected.
         overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in DataBundle
-            Else set new attribute both :py:attr:`selected` containing valid value
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else set new attribute both :py:attr:`selected` containing valid value
             and :py:attr:`deselected` containing invalid data.
             Default: True
 
@@ -399,7 +405,7 @@ class DataBundle:
 
         Parameters
         ----------
-        df_corr: pd.DataFrame
+        df_corr: pandas.DataFrame
             Data to be inplaced.
 
         Examples
@@ -427,7 +433,7 @@ class DataBundle:
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             DataFrame containing True and False values for each index in :py:attr:`data`.
             True: All datetime information in :py:attr:`data` row are valid.
             False: At least one datetime information in :py:attr:`data` row is invalid.
@@ -454,7 +460,7 @@ class DataBundle:
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             DataFrame containing True and False values for each index in :py:attr:`data`.
             True: All station ID information in :py:attr:`data` row are valid.
             False: At least one station ID information in :py:attr:`data` row is invalid.
@@ -481,11 +487,12 @@ class DataBundle:
 
         Note
         ----
-        Before writing CDM tables on disk, they have to be provided in DataBundle, e.g. with :py:func:`DataBundle.map_model`.
+        Before writing CDM tables on disk, they have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
+        e.g. with :py:func:`DataBundle.map_model`.
 
         Examples
         --------
-        >>> db.map_model()
+        >>> db.write_tables()
         """
         write_tables(self._tables, **kwargs)
 
@@ -494,7 +501,8 @@ class DataBundle:
 
         Note
         ----
-        Before processing the duplicate check, CDM tables have to be provided in DataBundle, e.g. with :py:func:`DataBundle.map_model`.
+        Before processing the duplicate check, CDM tables have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
+        e.g. with :py:func:`DataBundle.map_model`.
 
         Examples
         --------
@@ -510,7 +518,7 @@ class DataBundle:
         ----------
         overwrite: bool
             If ``True`` overwrite :py:attr:`tables` in DataBundle.
-            Else set new attribute :py:attr:`tables_flag_dups` containing flagged duplicates.
+            Else set new attribute :py:attr:`tables_dups_flagged` containing flagged duplicates.
             Default: True
 
         Note
@@ -562,7 +570,7 @@ class DataBundle:
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite :py:attr:`tables` in DataBundle.
+            If ``True`` overwrite :py:attr:`tables` in :py:class:`cdm_reader_mapper.DataBundle`.
             Else set new attribute :py:attr:`tables_dups_removed` containing flagged duplicates.
             Default: True
 

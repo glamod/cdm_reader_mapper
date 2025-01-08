@@ -76,8 +76,12 @@ napoleon_numpy_docstring = True
 napoleon_use_rtype = False
 napoleon_use_param = False
 napoleon_use_ivar = True
+napoleon_preprocess_types = True
 napoleon_type_aliases = {
     "DataBundle": "~cdm_reader_mapper.DataBundle",
+    "DupDetect": "~cdm_reader_mapper.DupDetect",
+    "Iterable": ":term:`iterable`",
+    "Hashable": ":term:`hashable`",
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -245,3 +249,22 @@ htmlhelp_basename = "cdm-reader-mapperdoc"
 
 # disable warnings
 warnings.filterwarnings("ignore")
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "cftime": ("https://unidata.github.io/cftime", None),
+    "cubed": ("https://cubed-dev.github.io/cubed/", None),
+    "dask": ("https://docs.dask.org/en/latest", None),
+    "flox": ("https://flox.readthedocs.io/en/latest/", None),
+    "hypothesis": ("https://hypothesis.readthedocs.io/en/latest/", None),
+    "iris": ("https://scitools-iris.readthedocs.io/en/latest", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "numba": ("https://numba.readthedocs.io/en/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "python": ("https://docs.python.org/3/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "sparse": ("https://sparse.pydata.org/en/latest/", None),
+    "xarray-tutorial": ("https://tutorial.xarray.dev/", None),
+    "zarr": ("https://zarr.readthedocs.io/en/stable/", None),
+}
