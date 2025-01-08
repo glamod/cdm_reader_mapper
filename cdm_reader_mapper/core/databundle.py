@@ -54,21 +54,21 @@ class DataBundle:
 
     def __init__(self, MDFFileReader=None, tables=None, data=None, mask=None):
         if MDFFileReader is not None:
-            self.data = MDFFileReader.data
-            self.columns = MDFFileReader.columns
-            self.dtypes = MDFFileReader.dtypes
-            self.attrs = MDFFileReader.attrs
-            self.parse_dates = MDFFileReader.parse_dates
-            self.mask = MDFFileReader.mask
-            self.imodel = MDFFileReader.imodel
+            self._data = MDFFileReader.data
+            self._columns = MDFFileReader.columns
+            self._dtypes = MDFFileReader.dtypes
+            self._attrs = MDFFileReader.attrs
+            self._parse_dates = MDFFileReader.parse_dates
+            self._mask = MDFFileReader.mask
+            self._imodel = MDFFileReader.imodel
         if tables is not None:
-            self.tables = tables
+            self._tables = tables
         if data is not None:
-            self.data = data
-            self.columns = data.columns
-            self.dtypes = data.dtypes
+            self._data = data
+            self._columns = data.columns
+            self._dtypes = data.dtypes
         if mask is not None:
-            self.mask = mask
+            self._mask = mask
 
     def __len__(self):
         """Length of ``data``."""
@@ -76,37 +76,51 @@ class DataBundle:
 
     def _return_property(self, property):
         if hasattr(self, property):
-            return property
+            return getattr(self, property)
 
     @property
     def data(self):
         """MDF pandas.DataFrame data."""
-        return self.return_property("data")
+        return self._return_property("_data")
+
+    @data.setter
+    def data(self, value):
+        self._data = value
 
     @property
     def columns(self):
         """Column labels of ``data``."""
-        return self.return_property("columns")
+        data = self._return_property("_data")
+        if data is not None:
+            return data.columns
 
     @property
     def dtypes(self):
         """Dictionary of data types on ``data``."""
-        return self.return_property("dtypes")
+        return self._return_property("_dtypes")
 
     @property
     def attrs(self):
         """Dictionary of attributes on ``data``."""
-        return self.return_property("attrs")
+        return self._return_property("_attrs")
 
     @property
     def mask(self):
         """MDF pandas.DataFrame validation mask."""
-        return self.return_property("mask")
+        return self._return_property("_mask")
+
+    @mask.setter
+    def mask(self, value):
+        self._mask = value
 
     @property
     def imodel(self):
         """Name of the MDF/CDM input model."""
-        return self.return_property("imodel")
+        return self._return_property("_imodel")
+
+    @imodel.setter
+    def imodel(self, value):
+        self._imodel = value
 
     @property
     def selected(self):
@@ -118,7 +132,7 @@ class DataBundle:
         * ``select_from_list``
         * ``select_from_index``
         """
-        return self.return_property("selected")
+        return self._return_property("_selected")
 
     @property
     def deselected(self):
@@ -129,12 +143,16 @@ class DataBundle:
         * ``select_true``
         * ``select_from_list``
         """
-        return self.return_property("deselected")
+        return self._return_property("_deselected")
 
     @property
     def tables(self):
         """CDM tables."""
-        return self.return_property("tables")
+        return self._return_property("_tables")
+
+    @tables.setter
+    def tables(self, value):
+        self._tables = value
 
     @property
     def tables_dups_flagged(self):
@@ -142,7 +160,7 @@ class DataBundle:
 
         This property is set if overwrite is False in ``flag_duplicates``.
         """
-        return self.return_property("tables_dups_flagged")
+        return self._return_property("_tables_dups_flagged")
 
     @property
     def tables_dups_removed(self):
@@ -150,7 +168,7 @@ class DataBundle:
 
         This property is set if overwrite is False in ``remove_duplicates``.
         """
-        return self.return_property("tables_dups_removed")
+        return self._return_property("_tables_dups_removed")
 
     def add(self, addition):
         """Adding information to a DataBundle.
@@ -166,7 +184,7 @@ class DataBundle:
         >>> db = db.add({"tables": tables})
         """
         for name, data in addition.items():
-            setattr(self, name, data)
+            setattr(self, f"_{name}", data)
         return self
 
     def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
@@ -193,6 +211,7 @@ class DataBundle:
         if not isinstance(datasets, list):
             datasets = [datasets]
         for data in datasets:
+            data = f"_{data}"
             self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
             to_concat = [
                 getattr(concat, data) for concat in other if hasattr(concat, data)
@@ -227,6 +246,7 @@ class DataBundle:
         if not isinstance(other, list):
             other = [other]
         for data in datasets:
+            data = f"_{data}"
             self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame()
             to_concat = [
                 getattr(concat, data) for concat in other if hasattr(concat, data)
@@ -276,12 +296,12 @@ class DataBundle:
         >>> true_values = db.selected
         >>> false_values = db.deselected
         """
-        selected = select.select_true(self.data, self.mask, **kwargs)
+        selected = select.select_true(self._data, self._mask, **kwargs)
         if overwrite is True:
-            self.data = selected[0]
+            self._data = selected[0]
         else:
-            self.selected = selected[0]
-        self.deselected = selected[1]
+            self._selected = selected[0]
+        self._deselected = selected[1]
         return self
 
     def select_from_list(self, selection, overwrite=True, **kwargs):
@@ -315,12 +335,12 @@ class DataBundle:
         >>> true_values = db.selected
         >>> false_values = db.deselected
         """
-        selected = select.select_from_list(self.data, selection, **kwargs)
+        selected = select.select_from_list(self._data, selection, **kwargs)
         if overwrite is True:
-            self.data = selected[0]
+            self._data = selected[0]
         else:
-            self.selected = selected[0]
-        self.deselected = selected[1]
+            self._selected = selected[0]
+        self._deselected = selected[1]
         return self
 
     def select_from_index(self, index, overwrite=True, **kwargs):
@@ -353,11 +373,11 @@ class DataBundle:
         >>> true_values = db.selected
         >>> false_values = db.deselected
         """
-        selected = select.select_from_index(self.data, index, **kwargs)
+        selected = select.select_from_index(self._data, index, **kwargs)
         if overwrite is True:
-            self.data = selected
+            self._data = selected
         else:
-            self.selected = selected
+            self._selected = selected
         return self
 
     def unique(self, **kwargs):
@@ -372,7 +392,7 @@ class DataBundle:
         --------
         >>> db.unique(columns=("c1", "B1"))
         """
-        return inspect.count_by_cat(self.data, **kwargs)
+        return inspect.count_by_cat(self._data, **kwargs)
 
     def replace_columns(self, df_corr, **kwargs):
         """Replace columns in ``data``.
@@ -388,8 +408,8 @@ class DataBundle:
         >>> df_corr = pr.read_csv("corecction_file_on_disk")
         >>> db.replace_columns(df_corr)
         """
-        self.data = replace.replace_columns(df_l=self.data, df_r=df_corr, **kwargs)
-        self.columns = self.data.columns
+        self._data = replace.replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+        self._columns = self._data.columns
         return self
 
     def correct_datetime(self):
@@ -399,7 +419,7 @@ class DataBundle:
         --------
         >>> db.correct_datetime()
         """
-        self.data = correct_datetime(self.data, self.imodel)
+        self._data = correct_datetime(self._data, self._imodel)
         return self
 
     def validate_datetime(self):
@@ -416,7 +436,7 @@ class DataBundle:
         --------
         >>> val_dt = db.validate_datetime()
         """
-        return validate_datetime(self.data, self.imodel)
+        return validate_datetime(self._data, self._imodel)
 
     def correct_pt(self):
         """Correct platform type information in ``data``.
@@ -426,7 +446,7 @@ class DataBundle:
         --------
         >>> db.correct_pt()
         """
-        self.data = correct_pt(self.data, self.imodel)
+        self._data = correct_pt(self._data, self._imodel)
         return self
 
     def validate_id(self, **kwargs):
@@ -443,7 +463,7 @@ class DataBundle:
         --------
         >>> val_dt = db.validate_id()
         """
-        return validate_id(self.data, self.imodel, **kwargs)
+        return validate_id(self._data, self._imodel, **kwargs)
 
     def map_model(self, **kwargs):
         """Map ``data`` to the Common Data Model.
@@ -453,7 +473,7 @@ class DataBundle:
         --------
         >>> db.map_model()
         """
-        self.tables = map_model(self.data, self.imodel, **kwargs)
+        self._tables = map_model(self._data, self._imodel, **kwargs)
         return self
 
     def write_tables(self, **kwargs):
@@ -467,7 +487,7 @@ class DataBundle:
         --------
         >>> db.map_model()
         """
-        write_tables(self.tables, **kwargs)
+        write_tables(self._tables, **kwargs)
 
     def duplicate_check(self, **kwargs):
         """Duplicate check.
@@ -480,7 +500,7 @@ class DataBundle:
         --------
         >>> db.duplicate_check()
         """
-        self.DupDetect = duplicate_check(self.tables["header"], **kwargs)
+        self.DupDetect = duplicate_check(self._tables["header"], **kwargs)
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):
@@ -510,12 +530,12 @@ class DataBundle:
         >>> flagged_tables = db.tables_dups_flagged
         """
         self.DupDetect.flag_duplicates(**kwargs)
-        df_ = self.tables.copy()
+        df_ = self._tables.copy()
         df_["header"] = self.DupDetect.result
         if overwrite is True:
-            self.tables = df_
+            self._tables = df_
         else:
-            self.tables_dups_flagged = df_
+            self._tables_dups_flagged = df_
         return self
 
     def get_duplicates(self, **kwargs):
@@ -563,11 +583,11 @@ class DataBundle:
         >>> removed_tables = db.tables_dups_removed
         """
         self.DupDetect.remove_duplicates(**kwargs)
-        df_ = self.tables.copy()
+        df_ = self._tables.copy()
         header_ = self.DupDetect.result
         df_ = df_[df_.index.isin(header_.index)]
         if overwrite is True:
-            self.tables = df_
+            self._tables = df_
         else:
-            self.tables_dups_removed = df_
+            self._tables_dups_removed = df_
         return self
