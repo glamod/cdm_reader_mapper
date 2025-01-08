@@ -130,7 +130,7 @@ class DupDetect:
                     equal_musts.append(v)
         return equal_musts
 
-    def total_score(self):
+    def _total_score(self):
         """Get total score of duplicate check."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
@@ -171,7 +171,7 @@ class DupDetect:
         elif not isinstance(keep, int):
             raise ValueError("keep has to be one of 'first', 'last' of integer value.")
         if overwrite is True:
-            self.total_score()
+            self._total_score()
             self.limit = self._get_limit(limit)
             cond = self.score >= self.limit
             if equal_musts is None:
