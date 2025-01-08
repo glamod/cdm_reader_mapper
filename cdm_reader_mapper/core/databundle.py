@@ -96,9 +96,7 @@ class DataBundle:
     @property
     def columns(self):
         """Column labels of :py:attr:`data`."""
-        data = self._return_property("_data")
-        if data is not None:
-            return data.columns
+        return self._return_property("_columns")
 
     @property
     def dtypes(self):
