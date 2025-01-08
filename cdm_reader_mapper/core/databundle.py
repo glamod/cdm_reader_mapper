@@ -71,7 +71,7 @@ class DataBundle:
             self._mask = mask
 
     def __len__(self):
-        """Length of ``data``."""
+        """Length of :py:attr:`data`."""
         return inspect.get_length(self.data)
 
     def _return_property(self, property):
@@ -89,19 +89,19 @@ class DataBundle:
 
     @property
     def columns(self):
-        """Column labels of ``data``."""
+        """Column labels of :py:attr:`data`."""
         data = self._return_property("_data")
         if data is not None:
             return data.columns
 
     @property
     def dtypes(self):
-        """Dictionary of data types on ``data``."""
+        """Dictionary of data types on :py:attr:`data`."""
         return self._return_property("_dtypes")
 
     @property
     def attrs(self):
-        """Dictionary of attributes on ``data``."""
+        """Dictionary of attributes on :py:attr:`data`."""
         return self._return_property("_attrs")
 
     @property
@@ -124,24 +124,24 @@ class DataBundle:
 
     @property
     def selected(self):
-        """Selection of ``data``.
+        """Selection of :py:attr:`data`.
 
-        This property is set if overwrite is False in one of the selection methods:
+        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
 
-        * ``select_true``
-        * ``select_from_list``
-        * ``select_from_index``
+        * :py:func:`DataBundle.select_true`
+        * :py:func:`DataBundle.select_from_list`
+        * :py:func:`DataBundle.select_from_index`
         """
         return self._return_property("_selected")
 
     @property
     def deselected(self):
-        """Non-selection of ``data``.
+        """Non-selection of :py:attr:`data`.
 
-        This property is set if overwrite is False in one of the selection methods:
+        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
 
-        * ``select_true``
-        * ``select_from_list``
+        * :py:func:`DataBundle.select_true`
+        * :py:func:`DataBundle.select_from_list`
         """
         return self._return_property("_deselected")
 
@@ -156,17 +156,17 @@ class DataBundle:
 
     @property
     def tables_dups_flagged(self):
-        """Flagged duplicates of `tables``.
+        """Flagged duplicates of :py:attr:`tables`.
 
-        This property is set if overwrite is False in ``flag_duplicates``.
+        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.flag_duplicates`.
         """
         return self._return_property("_tables_dups_flagged")
 
     @property
     def tables_dups_removed(self):
-        """Removed duplicates of `tables``.
+        """Removed duplicates of :py:attr:`tables`.
 
-        This property is set if overwrite is False in ``remove_duplicates``.
+        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.remove_duplicates`.
         """
         return self._return_property("_tables_dups_removed")
 
@@ -176,7 +176,7 @@ class DataBundle:
         Parameters
         ----------
         addition: dict
-             Additional elements to add to the ``DataBundle``.
+             Additional elements to add to the DataBundle.
 
         Examples
         --------
@@ -269,19 +269,19 @@ class DataBundle:
         return deepcopy(self)
 
     def select_true(self, overwrite=True, **kwargs):
-        """Select valid values from ``data`` via ``mask``.
+        """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite ``data`` in ``DataBundle
-            Else set new attribute both ``selected`` containing valid value
-            and ``deselected`` containing invalid data.
+            If ``True`` overwrite :py:attr:`data` in DataBundle
+            Else set new attribute both :py:attr:`selected` containing valid value
+            and :py:attr:`deselected` containing invalid data.
             Default: True
 
         Note
         ----
-        Use this for ``data`` only. It does not work for ``tables```.
+        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
 
         Examples
         --------
@@ -305,7 +305,7 @@ class DataBundle:
         return self
 
     def select_from_list(self, selection, overwrite=True, **kwargs):
-        """Select columns from ``data`` with specific values.
+        """Select columns from :py:attr:`data` with specific values.
 
         Parameters
         ----------
@@ -313,14 +313,14 @@ class DataBundle:
             Keys: columns to be selected.
             Values: values in keys to be selected
         overwrite: bool
-            If ``True`` overwrite ``data`` in ``DataBundle
-            Else set new attribute both ``selected`` containing valid value
-            and ``deselected`` containing invalid data.
+            If ``True`` overwrite :py:attr:`data` in DataBundle
+            Else set new attribute both :py:attr:`selected` containing valid value
+            and :py:attr:`deselected` containing invalid data.
             Default: True
 
         Note
         ----
-        Use this for ``data`` only. It does not work for ``tables```.
+        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
 
         Examples
         --------
@@ -344,21 +344,21 @@ class DataBundle:
         return self
 
     def select_from_index(self, index, overwrite=True, **kwargs):
-        """Select rows of ``data`` with specific indexes.
+        """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
         overwrite: bool
-            If ``True`` overwrite ``data`` in ``DataBundle``
-            Else set new attribute both ``selected`` containing valid value
-            and ``deselected`` containing invalid data.
+            If ``True`` overwrite :py:attr:`data` in DataBundle
+            Else set new attribute both :py:attr:`selected` containing valid value
+            and :py:attr:`deselected` containing invalid data.
             Default: True
 
         Note
         ----
-        Use this for ``data`` only. It does not work for ``tables```.
+        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
 
         Examples
         --------
@@ -381,7 +381,7 @@ class DataBundle:
         return self
 
     def unique(self, **kwargs):
-        """Get unique values of ``data``.
+        """Get unique values of :py:attr:`data`.
 
         Returns
         -------
@@ -395,7 +395,7 @@ class DataBundle:
         return inspect.count_by_cat(self._data, **kwargs)
 
     def replace_columns(self, df_corr, **kwargs):
-        """Replace columns in ``data``.
+        """Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
@@ -413,7 +413,7 @@ class DataBundle:
         return self
 
     def correct_datetime(self):
-        """Correct datetime information in ``data``.
+        """Correct datetime information in :py:attr:`data`.
 
         Examples
         --------
@@ -423,14 +423,14 @@ class DataBundle:
         return self
 
     def validate_datetime(self):
-        """Validate datetime information in ``data``.
+        """Validate datetime information in :py:attr:`data`.
 
         Returns
         -------
         pd.DataFrame
-            DataFrame containing True and False values for each index in ``data``.
-            True: All datetime information in ``data`` row are valid.
-            False: At least one datetime information in ``data`` row is invalid.
+            DataFrame containing True and False values for each index in :py:attr:`data`.
+            True: All datetime information in :py:attr:`data` row are valid.
+            False: At least one datetime information in :py:attr:`data` row is invalid.
 
         Examples
         --------
@@ -439,7 +439,7 @@ class DataBundle:
         return validate_datetime(self._data, self._imodel)
 
     def correct_pt(self):
-        """Correct platform type information in ``data``.
+        """Correct platform type information in :py:attr:`data`.
 
 
         Examples
@@ -450,14 +450,14 @@ class DataBundle:
         return self
 
     def validate_id(self, **kwargs):
-        """Validate station id information in ``data``.
+        """Validate station id information in :py:attr:`data`.
 
         Returns
         -------
         pd.DataFrame
-            DataFrame containing True and False values for each index in ``data``.
-            True: All station ID information in ``data`` row are valid.
-            False: At least one station ID information in ``data`` row is invalid.
+            DataFrame containing True and False values for each index in :py:attr:`data`.
+            True: All station ID information in :py:attr:`data` row are valid.
+            False: At least one station ID information in :py:attr:`data` row is invalid.
 
         Examples
         --------
@@ -466,8 +466,8 @@ class DataBundle:
         return validate_id(self._data, self._imodel, **kwargs)
 
     def map_model(self, **kwargs):
-        """Map ``data`` to the Common Data Model.
-        Write output in ``DataBundle.tables``.
+        """Map :py:attr:`data` to the Common Data Model.
+        Write output to :py:attr:`tables`.
 
         Examples
         --------
@@ -481,7 +481,7 @@ class DataBundle:
 
         Note
         ----
-        Before writing CDM tables on disk, they have to be provided in ``DataBundle``, e.g. with ``map_model``.
+        Before writing CDM tables on disk, they have to be provided in DataBundle, e.g. with :py:func:`DataBundle.map_model`.
 
         Examples
         --------
@@ -490,11 +490,11 @@ class DataBundle:
         write_tables(self._tables, **kwargs)
 
     def duplicate_check(self, **kwargs):
-        """Duplicate check.
+        """Duplicate check in :py:attr:`tables`.
 
         Note
         ----
-        Before processing the duplicate check, CDM tables have to be provided in ``DataBundle``, e.g. with ``map_model``.
+        Before processing the duplicate check, CDM tables have to be provided in DataBundle, e.g. with :py:func:`DataBundle.map_model`.
 
         Examples
         --------
@@ -504,27 +504,27 @@ class DataBundle:
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):
-        """Flag detected duplicates in ``tables``.
+        """Flag detected duplicates in :py:attr:`tables`.
 
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite ``tables`` in ``DataBundle``.
-            Else set new attribute ``tables_dups_flagged`` containing flagged duplicates.
+            If ``True`` overwrite :py:attr:`tables` in DataBundle.
+            Else set new attribute :py:attr:`tables_flag_dups` containing flagged duplicates.
             Default: True
 
         Note
         ----
-        Before flagging duplicates, a duplictate check has to be done, ``duplicate_check``.
+        Before flagging duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
         Examples
         --------
-        Flag duplicates with overwriting ``tables``.
+        Flag duplicates with overwriting :py:attr:`tables`.
 
         >>> db.flag_duplicates()
         >>> flagged_tables = db.tables
 
-        Flag duplicates without overwriting ``tables``.
+        Flag duplicates without overwriting :py:attr:`tables`.
 
         >>> db.flag_duplicates()
         >>> flagged_tables = db.tables_dups_flagged
@@ -539,7 +539,7 @@ class DataBundle:
         return self
 
     def get_duplicates(self, **kwargs):
-        """Get duplicate matches in ``tables``.
+        """Get duplicate matches in :py:attr:`tables`.
 
         Returns
         -------
@@ -548,7 +548,7 @@ class DataBundle:
 
         Note
         ----
-        Before getting duplicates, a duplictate check has to be done, ``duplicate_check``.
+        Before getting duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
         Examples
         --------
@@ -557,27 +557,27 @@ class DataBundle:
         return self.DupDetect.get_duplicates(**kwargs)
 
     def remove_duplicates(self, overwrite=True, **kwargs):
-        """Remove detected duplicates in ``tables``.
+        """Remove detected duplicates in :py:attr:`tables`.
 
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite ``tables`` in ``DataBundle``.
-            Else set new attribute ``tables_dups_removed`` containing flagged duplicates.
+            If ``True`` overwrite :py:attr:`tables` in DataBundle.
+            Else set new attribute :py:attr:`tables_dups_removed` containing flagged duplicates.
             Default: True
 
         Note
         ----
-        Before removing duplicates, a duplictate check has to be done, ``duplicate_check``.
+        Before removing duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
         Examples
         --------
-        Remove duplicates with overwriting ``tables``.
+        Remove duplicates with overwriting :py:attr:`tables`.
 
         >>> db.remove_duplicates()
         >>> removed_tables = db.tables
 
-        Remove duplicates without overwriting ``tables``.
+        Remove duplicates without overwriting :py:attr:`tables`.
 
         >>> db.remove_duplicates()
         >>> removed_tables = db.tables_dups_removed
