@@ -9,7 +9,7 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`)
+* New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`, :pull:`197`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
