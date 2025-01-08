@@ -16,8 +16,6 @@ import os
 import sys
 import warnings
 
-import sphinx_autosummary_accessors
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -48,7 +46,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
-    "sphinx_autosummary_accessors",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autodoc_typehints",
@@ -85,7 +82,7 @@ napoleon_type_aliases = {
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {".rst": "restructuredtext"}
@@ -252,19 +249,6 @@ warnings.filterwarnings("ignore")
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "cftime": ("https://unidata.github.io/cftime", None),
-    "cubed": ("https://cubed-dev.github.io/cubed/", None),
-    "dask": ("https://docs.dask.org/en/latest", None),
-    "flox": ("https://flox.readthedocs.io/en/latest/", None),
-    "hypothesis": ("https://hypothesis.readthedocs.io/en/latest/", None),
-    "iris": ("https://scitools-iris.readthedocs.io/en/latest", None),
-    "matplotlib": ("https://matplotlib.org/stable/", None),
-    "numba": ("https://numba.readthedocs.io/en/stable/", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "python": ("https://docs.python.org/3/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy", None),
-    "sparse": ("https://sparse.pydata.org/en/latest/", None),
-    "xarray-tutorial": ("https://tutorial.xarray.dev/", None),
-    "zarr": ("https://zarr.readthedocs.io/en/stable/", None),
 }
