@@ -30,24 +30,6 @@ class DataBundle:
     mask: pd.DataFrame, optional
         MDF validation mask
 
-
-    Attributes
-    ----------
-    data: pd.DataFrame or pd.io.parsers.TextFileReader
-        MDF data
-    columns:
-        The column labels of ``data``.
-    dtypes: dict
-        Data types of ``data``.
-    attrs: dict
-        ``data`` elements attributes.
-    parse_dates: bool, list of Hashable, list of lists or dict of {Hashable : list}
-        Parameter used in pandas.read_csv.
-    mask: pd.DataFrame or pd.io.parsers.TextFileReader
-        MDF validation mask
-    imodel: str
-        Name of the CDM input model.
-
     Examples
     --------
     Getting a DataBundle while reading data from disk.
@@ -91,6 +73,84 @@ class DataBundle:
     def __len__(self):
         """Length of ``data``."""
         return inspect.get_length(self.data)
+
+    def _return_property(self, property):
+        if hasattr(self, property):
+            return property
+
+    @property
+    def data(self):
+        """MDF pandas.DataFrame data."""
+        return self.return_property("data")
+
+    @property
+    def columns(self):
+        """Column labels of ``data``."""
+        return self.return_property("columns")
+
+    @property
+    def dtypes(self):
+        """Dictionary of data types on ``data``."""
+        return self.return_property("dtypes")
+
+    @property
+    def attrs(self):
+        """Dictionary of attributes on ``data``."""
+        return self.return_property("attrs")
+
+    @property
+    def mask(self):
+        """MDF pandas.DataFrame validation mask."""
+        return self.return_property("mask")
+
+    @property
+    def imodel(self):
+        """Name of the MDF/CDM input model."""
+        return self.return_property("imodel")
+
+    @property
+    def selected(self):
+        """Selection of ``data``.
+
+        This property is set if overwrite is False in one of the selection methods:
+
+        * ``select_true``
+        * ``select_from_list``
+        * ``select_from_index``
+        """
+        return self.return_property("selected")
+
+    @property
+    def deselected(self):
+        """Non-selection of ``data``.
+
+        This property is set if overwrite is False in one of the selection methods:
+
+        * ``select_true``
+        * ``select_from_list``
+        """
+        return self.return_property("deselected")
+
+    @property
+    def tables(self):
+        """CDM tables."""
+        return self.return_property("tables")
+
+    @property
+    def tables_dups_flagged(self):
+        """Flagged duplicates of `tables``.
+
+        This property is set if overwrite is False in ``flag_duplicates``.
+        """
+        return self.return_property("tables_dups_flagged")
+
+    @property
+    def tables_dups_removed(self):
+        """Removed duplicates of `tables``.
+
+        This property is set if overwrite is False in ``remove_duplicates``.
+        """
+        return self.return_property("tables_dups_removed")
 
     def add(self, addition):
         """Adding information to a DataBundle.
