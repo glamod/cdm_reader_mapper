@@ -205,8 +205,8 @@ class DupDetect:
         Returns
         -------
         pd.DataFrame
-            Input DataFrame with flagged duplicates. \n
-            Flags for ``duplicate_status``: see `duplicate_status`_  \n
+            Input DataFrame with flagged duplicates.
+            Flags for ``duplicate_status``: see `duplicate_status`_
             Flags for ``report_quality``: see `quality_flag`_
 
 
