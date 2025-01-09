@@ -1,5 +1,7 @@
-``metmetpy`` overview
-=======================
+Overview over the :py:class:`cdm_reader_mapper.DataBundle` class
+================================================================
+
+
 
 After mapping to the CDM format, in some cases, it is desired that the final CDM set of tables is composed of a combination of different data models/sources. Based on the IMMA1 reprocessing experience so far. This can be the case of adding data elements from a different data source (like adding WMO PUB 47 metadata). It is recommended to map both things separately and then make the appropriate replacements/additions based on the corresponding CDM element matching (i.e. ``primary_station_id``). This part is taken over from **metmetpy**.
 

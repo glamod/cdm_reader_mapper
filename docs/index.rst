@@ -54,13 +54,13 @@ In addition, the **cdm_reader_mapper.DataBundle** object has several main method
    tool-set-up
    tool-overview_reader
    tool-overview_mapper
-   tool-overview_metmetpy
+   tool-overview_databundle
    getting-started
    data-models
    how-to-build-a-data-model
    how_to_read_csv
-   how-to-register-a-new-data-model-mapping.rst
-   cdm-tables-mapping-files-and-descriptors.rst
+   how-to-register-a-new-data-model-mapping
+   cdm-tables-mapping-files-and-descriptors
    example_notebooks/read_overview.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb

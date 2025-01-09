@@ -1,5 +1,5 @@
-How to map data to the Common Data Model (CDM)
-==============================================
+Overview of the mapping to the Common Data Model (CDM_)
+=======================================================
 
 After reading ICOADS or C-RAID data with the :py:func:`cdm_reader_mapper.read_mdf` function, this data can be mapped to the standardized C3S Common Data Model (CDM) format.
 

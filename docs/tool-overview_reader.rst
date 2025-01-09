@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-How to read data
-================
+Overview of the :py:func:`cdm_reader_mapper.read_mdf` function
+==============================================================
 
 Source data like ICOADS or C-RAID data can be read by the ``cdm_reader_mapper.read_mdf`` function.
 
