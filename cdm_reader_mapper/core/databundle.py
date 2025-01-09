@@ -417,13 +417,13 @@ class DataBundle:
         return self
 
     def correct_datetime(self):
-        """Correct datetime information in :py:attr:`data`.
+        """Correct datetime information in :py:attr:`tables`.
 
         Examples
         --------
         >>> db.correct_datetime()
         """
-        self._data = correct_datetime(self._data, self._imodel)
+        self._data = correct_datetime(self._tables, self._imodel)
         return self
 
     def validate_datetime(self):
@@ -443,14 +443,14 @@ class DataBundle:
         return validate_datetime(self._data, self._imodel)
 
     def correct_pt(self):
-        """Correct platform type information in :py:attr:`data`.
+        """Correct platform type information in :py:attr:`tables`.
 
 
         Examples
         --------
         >>> db.correct_pt()
         """
-        self._data = correct_pt(self._data, self._imodel)
+        self._data = correct_pt(self._tables, self._imodel)
         return self
 
     def validate_id(self, **kwargs):
