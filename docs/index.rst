@@ -61,7 +61,7 @@ In addition, the **cdm_reader_mapper.DataBundle** object has several main method
    how_to_read_csv
    how-to-register-a-new-data-model-mapping.rst
    cdm-tables-mapping-files-and-descriptors.rst
-   example_notebooks/mdf_reader_test_overview.ipynb
+   example_notebooks/read_overview.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
    contributing
