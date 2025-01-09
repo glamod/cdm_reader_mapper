@@ -12,7 +12,7 @@ Data Models
 Schema
 ======
 
-The schema file gathers a collection of descriptors that enables the **mdf_reader** to access and extract meaningful units of information for each element.
+The schema file gathers a collection of descriptors that enables the :py:func:**cdm_reader_mapper.read** function to access and extract meaningful units of information for each element.
 
 Valid schemas files are json files that the tool accesses and stores internally as dictionaries. The basename of the schema file must be the same as the data model directory and its extension ``.json``
 
@@ -28,12 +28,12 @@ There are two levels of information in the schema:
 
     Content inside a ``schema.json`` file.
 
-The **mdf_reader** supports reading and validation of both internal and external schemas:
+The :py:func:**cdm_reader_mapper.read** function supports reading and validation of both internal and external schemas:
 
 - An **internal data model** has its schema registered within the tool. To read and validate data from these models, we only need to pass its reference name to the reader and validation modules, using the argument ``data_model``. A list of the reference names for internally supported data models can be access via the tool's function::
 
-   from cdm_reader_mapper import mdf_reader
-   mdf_reader.properties.supported_data_models()
+   from cdm_reader_mapper import properties
+   properties.supported_data_models
 
 - An **external data model** is a data format that is unknown to the tool. If the data model meets the specifications for which the tool was built, then a model can be built externally and fed into it for both functions data reading and model validation using the argument ``data_model_path``::
 
@@ -72,7 +72,7 @@ Code tables can be imported as python dictionaries directly using the json packa
 
 Common features
 ---------------
-As code tables are stored as ``.json`` files, the json syntax rules must be met when they are generated. See the following `link <https://www.w3schools.com/js/js_json_syntax.asp>`_ to a basic introduction to json syntax.
+As code tables are stored as ``.json`` files, the json syntax rules must be met when they are generated. For more information see basic introduction to `json syntax <https://www.w3schools.com/js/js_json_syntax.asp>`_.
 
 To create code tables it is important to highlight that:
 
