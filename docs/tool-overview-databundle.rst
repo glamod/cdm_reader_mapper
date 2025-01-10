@@ -57,8 +57,8 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
 
     cdm_tables = db.tables
 
-The mapped data will be stored as a class attribute called :py:attr:`DataBundle.tables`.
-For more information how the mapping is working, please see :ref:`tool-overview-mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
+The mapped data will be stored as a class attribute called :py:attr:`DataBundel.tables`.
+For more information how the mapping is working, please see :ref:`tool-overview_mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
 
 CDM_ correction
 ^^^^^^^^^^^^^^^
