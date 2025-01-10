@@ -40,6 +40,26 @@ Another validation method is to validate ``data`` against station id names with 
 
     val_id = db.validate_id()
 
+Correct ``data``
+^^^^^^^^^^^^^^^^
+
+After reading the data, in some cases, it is desired that the final CDM set of tables is composed of a combination of different data models/sources. Based on the IMMA1 reprocessing experience so far. This can be the case of adding data elements from a different data source (like adding WMO PUB 47 metadata). It is recommended to map both things separately and then make the appropriate replacements/additions based on the corresponding CDM element matching (i.e. ``primary_station_id``).
+
+.. note:: Correcting data in the CDM format is only necessary for ICOADS data.
+
+**cdm_reader_mapper.DataBundle** provides two functions for correcting data in the CDM format:
+
+1. :py:func:`DataBundle.correct_pt`
+2. :py:func:`DataBundle.correct_datetime`
+
+The first function applies ICOADS deck specific platform ID corrections to the data, the second one ICOADS deck specific datetime corrections.
+
+.. code-block:: console
+
+    db.correct_pt()
+
+    db.correct_datetime()
+
 Manipulate ``data`` and select subsets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -57,28 +77,8 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
 
     cdm_tables = db.tables
 
-The mapped data will be stored as a class attribute called :py:attr:`DataBundel.tables`.
-For more information how the mapping is working, please see :ref:`tool-overview_mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
-
-CDM_ correction
-^^^^^^^^^^^^^^^
-
-After mapping to the CDM format, in some cases, it is desired that the final CDM set of tables is composed of a combination of different data models/sources. Based on the IMMA1 reprocessing experience so far. This can be the case of adding data elements from a different data source (like adding WMO PUB 47 metadata). It is recommended to map both things separately and then make the appropriate replacements/additions based on the corresponding CDM element matching (i.e. ``primary_station_id``).
-
-.. note:: Correcting data in the CDM format is only necessary for ICOADS data.
-
-**cdm_reader_mapper.DataBundle** provides two functions for correcting data in the CDM format:
-
-1. :py:func:`DataBundle.correct_pt`
-2. :py:func:`DataBundle.correct_datetime`
-
-The first function applies ICOADS deck specific platform ID corrections to the data, the second one ICOADS deck specific datetime corrections.
-
-.. code-block:: console
-
-    db.correct_pt()
-
-    db.correct_datetime()
+The mapped data will be stored as a class attribute called :py:attr:`DataBundle.tables`.
+For more information how the mapping is working, please see :ref:`tool-overview-mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
 
 :ref:`dupdetect`
 ^^^^^^^^^^^^^^^^
