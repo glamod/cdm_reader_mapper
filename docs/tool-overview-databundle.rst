@@ -1,3 +1,5 @@
+.. currentmodule:: cdm_reader_mapper
+
 Overview over the :py:class:`cdm_reader_mapper.DataBundle` class
 ================================================================
 
@@ -39,7 +41,7 @@ Another validation method is to validate ``data`` against station id names with 
 Manipulate ``data`` and select subsets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For more details how to manipulate :py:class:`cdm_reader_mapper.DataBundle`s see :ref:`api:Manipualtion`.
+For more details how to manipulate :py:class:`cdm_reader_mapper.DataBundle` see :ref:`api:Manipualtion`.
 For more details how to select subsets of :py:class:`cdm_reader_mapper.DataBundle` see and :ref:`api:Selection`.
 
 Map ``data`` to the CDM_
@@ -53,8 +55,8 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
     
     cdm_tables = db.tables
 
-The mapped data will be stored as a class attribute called :py:attr:`DataBundel.tables`.
-For more information how the mapping is working, please see :ref:`tool-overview_mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
+The mapped data will be stored as a class attribute called :py:attr:`DataBundle.tables`.
+For more information how the mapping is working, please see :ref:`tool-overview-mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
     
 CDM_ correction
 ^^^^^^^^^^^^^^^

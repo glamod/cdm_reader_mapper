@@ -52,13 +52,13 @@ In addition, the **cdm_reader_mapper.DataBundle** object has several main method
 
    About <readme>
    tool-set-up
-   tool-overview_reader
-   tool-overview_mapper
-   tool-overview_databundle
+   tool-overview-reader
+   tool-overview-mapper
+   tool-overview-databundle
    getting-started
    data-models
    how-to-build-a-data-model
-   how_to_read_csv
+   how-to-read-csv
    how-to-register-a-new-data-model-mapping
    cdm-tables-mapping-files-and-descriptors
    example_notebooks/read_overview.ipynb

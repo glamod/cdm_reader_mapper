@@ -63,17 +63,7 @@ Selection
    DataBundle.select_from_list
 
    DataBundle.select_true
-
-Correction
-^^^^^^^^^^
-
-.. autosummary::
-   :toctree: generated/
-
-   DataBundle.correct_datetime
-
-   DataBundle.correct_pt
-
+   
 Validation
 ^^^^^^^^^^
 
@@ -82,7 +72,7 @@ Validation
 
    DataBundle.validate_datetime
 
-   DataBundle.validate_id
+   DataBundle.validate_id   
 
 CDM tables
 ^^^^^^^^^^
@@ -93,6 +83,16 @@ CDM tables
    DataBundle.map_model
 
    DataBundle.write_tables
+
+Correction
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.correct_datetime
+
+   DataBundle.correct_pt
 
 Duplicate check
 ^^^^^^^^^^^^^^^^
