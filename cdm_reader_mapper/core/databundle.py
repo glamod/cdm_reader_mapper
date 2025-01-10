@@ -192,7 +192,7 @@ class DataBundle:
         return self
 
     def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
-        """Stack multiple DataBundle's vertically.
+        """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s vertically.
 
         Parameters
         ----------
@@ -209,6 +209,10 @@ class DataBundle:
         Examples
         --------
         >>> db = db1.stack_v(db2, datasets=["data", "mask"])
+
+        See Also
+        --------
+        DataBundle.stack_h : Stack multiple DataBundle's horizontally.
         """
         if not isinstance(other, list):
             other = [other]
@@ -246,6 +250,10 @@ class DataBundle:
         Examples
         --------
         >>> db = db1.stack_h(db2, datasets=["data", "mask"])
+
+        See Also
+        --------
+        DataBundle.stack_v : Stack multiple DataBundle's vertically.
         """
         if not isinstance(other, list):
             other = [other]
@@ -299,6 +307,15 @@ class DataBundle:
         >>> db.select_true(overwrite=False)
         >>> true_values = db.selected
         >>> false_values = db.deselected
+
+        See Also
+        --------
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+
+        Note
+        ----
+        For more information see :py:func:`select_true`
         """
         selected = select.select_true(self._data, self._mask, **kwargs)
         if overwrite is True:
@@ -338,6 +355,15 @@ class DataBundle:
         >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, overwrite=False)
         >>> true_values = db.selected
         >>> false_values = db.deselected
+
+        See Also
+        --------
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+
+        Note
+        ----
+        For more information see :py:func:`select_from_list`
         """
         selected = select.select_from_list(self._data, selection, **kwargs)
         if overwrite is True:
@@ -376,6 +402,15 @@ class DataBundle:
         >>> db.select_from_index([0, 2, 4], overwrite=False)
         >>> true_values = db.selected
         >>> false_values = db.deselected
+
+        See Also
+        --------
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+
+        Note
+        ----
+        For more information see :py:func:`select_from_index`
         """
         selected = select.select_from_index(self._data, index, **kwargs)
         if overwrite is True:
@@ -395,6 +430,10 @@ class DataBundle:
         Examples
         --------
         >>> db.unique(columns=("c1", "B1"))
+
+        Note
+        ----
+        For more information see :py:func:`unique`
         """
         return inspect.count_by_cat(self._data, **kwargs)
 
@@ -411,6 +450,10 @@ class DataBundle:
         >>> import pandas as pd
         >>> df_corr = pr.read_csv("corecction_file_on_disk")
         >>> db.replace_columns(df_corr)
+
+        Note
+        ----
+        For more information see :py:func:`replace_columns`
         """
         self._data = replace.replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
         self._columns = self._data.columns
@@ -422,6 +465,16 @@ class DataBundle:
         Examples
         --------
         >>> db.correct_datetime()
+
+        See Also
+        --------
+        DataBundle.correct_pt : Correct platform type information in `tables`.
+        DataBundle.validate_datetime: Validate datetime information in `data`.
+        DataBundle.validate_id : Validate station id information in `data`.
+
+        Note
+        ----
+        For more information see :py:func:`correct_datetime`
         """
         self._data = correct_datetime(self._tables, self._imodel)
         return self
@@ -439,6 +492,16 @@ class DataBundle:
         Examples
         --------
         >>> val_dt = db.validate_datetime()
+
+        See Also
+        --------
+        DataBundle.validate_id : Validate station id information in `data`.
+        DataBundle.correct_datetime : Correct datetime information in `tables`.
+        DataBundle.correct_pt : Correct platform type information in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`validate_datetime`
         """
         return validate_datetime(self._data, self._imodel)
 
@@ -449,6 +512,16 @@ class DataBundle:
         Examples
         --------
         >>> db.correct_pt()
+
+        See Also
+        --------
+        DataBundle.correct_datetime : Correct datetime information in `tables`.
+        DataBundle.validate_id : Validate station id information in `data`.
+        DataBundle.validate_datetime : Validate datetime information in `data`.
+
+        Note
+        ----
+        For more information see :py:func:`correct_pt`
         """
         self._data = correct_pt(self._tables, self._imodel)
         return self
@@ -466,6 +539,16 @@ class DataBundle:
         Examples
         --------
         >>> val_dt = db.validate_id()
+
+        See Also
+        --------
+        DataBundle.validate_datetime : Validate datetime information in `data`.
+        DataBundle.correct_pt : Correct platform type information in `tables`.
+        DataBundle.correct_datetime : Correct datetime information in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`validate_id`
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
@@ -476,6 +559,10 @@ class DataBundle:
         Examples
         --------
         >>> db.map_model()
+
+        Note
+        ----
+        For more information see :py:func:`map_model`
         """
         self._tables = map_model(self._data, self._imodel, **kwargs)
         return self
@@ -491,6 +578,15 @@ class DataBundle:
         Examples
         --------
         >>> db.write_tables()
+
+        See Also
+        --------
+        read_tables : Read CDM tables from disk.
+        read_mdf : Read original marine-meteorological data from disk.
+
+        Note
+        ----
+        For more information see :py:func:`write_tables`
         """
         write_tables(self._tables, **kwargs)
 
@@ -505,6 +601,16 @@ class DataBundle:
         Examples
         --------
         >>> db.duplicate_check()
+
+        See Also
+        --------
+        DataBundle.get_duplicates : Get duplicate matches in `tables`.
+        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
+        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`duplicate_check`
         """
         self.DupDetect = duplicate_check(self._tables["header"], **kwargs)
         return self
@@ -534,6 +640,16 @@ class DataBundle:
 
         >>> db.flag_duplicates()
         >>> flagged_tables = db.tables_dups_flagged
+
+        See Also
+        --------
+        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
+        DataBundle.get_duplicates : Get duplicate matches in `tables`.
+        DataBundle.duplicate_check : Duplicate check in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`DupDetect.flag_duplicates`
         """
         self.DupDetect.flag_duplicates(**kwargs)
         df_ = self._tables.copy()
@@ -559,6 +675,16 @@ class DataBundle:
         Examples
         --------
         >>> matches = db.get_duplicates()
+
+        See Also
+        --------
+        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
+        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
+        DataBundle.duplicate_check : Duplicate check in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`DupDetect.get_duplicates`
         """
         return self.DupDetect.get_duplicates(**kwargs)
 
@@ -587,6 +713,16 @@ class DataBundle:
 
         >>> db.remove_duplicates()
         >>> removed_tables = db.tables_dups_removed
+
+        See Also
+        --------
+        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
+        DataBundle.get_duplicates : Get duplicate matches in `tables`.
+        DataBundle.duplicate_check : Duplicate check in `tables`.
+
+        Note
+        ----
+        For more information see :py:func:`DupDetect.remove_duplicates`
         """
         self.DupDetect.remove_duplicates(**kwargs)
         df_ = self._tables.copy()

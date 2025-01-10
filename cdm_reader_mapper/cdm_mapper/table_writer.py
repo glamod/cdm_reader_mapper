@@ -124,6 +124,11 @@ def write_tables(
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
         Default: '|'
 
+    See Also
+    --------
+    read_tables : Read CDM tales from disk.
+    read_mdf : Read original marine-meteorological data from disk.
+
     Note
     ----
     Use this function after reading CDM tables.

@@ -317,6 +317,11 @@ def read(
     Returns
     -------
     cdm_reader_mapper.DataBundle
+
+    See Also
+    --------
+    read_tables : Read CDM tables from disk.
+    write_tables : Write CDM tables to disk.
     """
 
     def get_list_element(lst, idx):

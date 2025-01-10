@@ -108,6 +108,11 @@ def read_tables(
     Returns
     -------
     cdm_reader_mapper.DataBundle
+
+    See Also
+    --------
+    read_mdf : Read original marine-meteorological data from disk.
+    write_tables : Write CDM tables to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
