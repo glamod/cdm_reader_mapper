@@ -460,7 +460,7 @@ class DataBundle:
         return self
 
     def correct_datetime(self):
-        """Correct datetime information in :py:attr:`tables`.
+        """Correct datetime information in :py:attr:`data`.
 
         Examples
         --------
@@ -468,7 +468,7 @@ class DataBundle:
 
         See Also
         --------
-        DataBundle.correct_pt : Correct platform type information in `tables`.
+        DataBundle.correct_pt : Correct platform type information in `data`.
         DataBundle.validate_datetime: Validate datetime information in `data`.
         DataBundle.validate_id : Validate station id information in `data`.
 
@@ -476,7 +476,7 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_datetime`
         """
-        self._data = correct_datetime(self._tables, self._imodel)
+        self._data = correct_datetime(self._data, self._imodel)
         return self
 
     def validate_datetime(self):
@@ -496,7 +496,7 @@ class DataBundle:
         See Also
         --------
         DataBundle.validate_id : Validate station id information in `data`.
-        DataBundle.correct_datetime : Correct datetime information in `tables`.
+        DataBundle.correct_datetime : Correct datetime information in `data`.
         DataBundle.correct_pt : Correct platform type information in `tables`.
 
         Note
@@ -506,7 +506,7 @@ class DataBundle:
         return validate_datetime(self._data, self._imodel)
 
     def correct_pt(self):
-        """Correct platform type information in :py:attr:`tables`.
+        """Correct platform type information in :py:attr:`data`.
 
 
         Examples
@@ -515,7 +515,7 @@ class DataBundle:
 
         See Also
         --------
-        DataBundle.correct_datetime : Correct datetime information in `tables`.
+        DataBundle.correct_datetime : Correct datetime information in `data`.
         DataBundle.validate_id : Validate station id information in `data`.
         DataBundle.validate_datetime : Validate datetime information in `data`.
 
@@ -523,7 +523,7 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_pt`
         """
-        self._data = correct_pt(self._tables, self._imodel)
+        self._data = correct_pt(self._data, self._imodel)
         return self
 
     def validate_id(self, **kwargs):
