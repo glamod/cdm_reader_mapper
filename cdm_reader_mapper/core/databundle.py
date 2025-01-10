@@ -80,6 +80,10 @@ class DataBundle:
         """Length of :py:attr:`data`."""
         return inspect.get_length(self.data)
 
+    def __getitem__(self, item):
+        """Make class subscriptable."""
+        return getattr(self, item)
+
     def _return_property(self, property):
         if hasattr(self, property):
             return getattr(self, property)
