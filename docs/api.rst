@@ -8,6 +8,8 @@ API reference
 
 This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
+.. _read_data:
+
 Read data from disk
 ===================
 
@@ -17,6 +19,8 @@ Read data from disk
    read_mdf
    read_tables
 
+.. _databundle:
+
 DataBundle
 ==========
 
@@ -24,6 +28,8 @@ DataBundle
    :toctree: generated/
 
    DataBundle
+
+.. _information
 
 DataBundle's method functions
 ------------------------------
@@ -35,6 +41,8 @@ Information
    :toctree: generated/
 
    DataBundle.unique
+
+.. _manipulation:
 
 Manipulation
 ^^^^^^^^^^^^
@@ -52,6 +60,8 @@ Manipulation
 
    DataBundle.stack_v
 
+.. _selection:
+
 Selection
 ^^^^^^^^^
 
@@ -63,7 +73,9 @@ Selection
    DataBundle.select_from_list
 
    DataBundle.select_true
-   
+
+.. _validation:
+
 Validation
 ^^^^^^^^^^
 
@@ -72,7 +84,9 @@ Validation
 
    DataBundle.validate_datetime
 
-   DataBundle.validate_id   
+   DataBundle.validate_id
+
+.. _cdm_tables:
 
 CDM tables
 ^^^^^^^^^^
@@ -84,6 +98,8 @@ CDM tables
 
    DataBundle.write_tables
 
+.. _cdm_correction
+
 Correction
 ^^^^^^^^^^
 
@@ -93,6 +109,8 @@ Correction
    DataBundle.correct_datetime
 
    DataBundle.correct_pt
+
+.. _duplicate_check:
 
 Duplicate check
 ^^^^^^^^^^^^^^^^
@@ -108,6 +126,8 @@ Duplicate check
 
    DataBundle.remove_duplicates
 
+
+.. _properties
 
 DataBundle's property attributes
 --------------------------------
@@ -146,6 +166,7 @@ CDM tables
 
    DataBundle.tables_dups_removed
 
+.. _useful_func:
 
 Useful functions
 ================
@@ -165,6 +186,8 @@ Useful functions
    select_true
    select_from_index
    select_from_list
+
+.. _dupdetect:
 
 DupDetect
 =========

@@ -1,3 +1,5 @@
+.. _tool-overview-mapper:
+
 Overview of the mapping to the Common Data Model (CDM_)
 =======================================================
 
@@ -16,7 +18,7 @@ Input data
 
 An ``imodel`` consist of a collection of `.json` files (or :py:class:`dict`) and python functions (``imodel.py``) that specify how a given :py:class:`pandas.DataFrame` containing marine meteorological data, should be organise and map to the CDM_ format.
 
-The `CDM <https://github.com/glamod/cdm_reader_mapper/blob/main/docs/cdm_latest.pdf>`_ format splits meteorological reports into **header** and **observational records**, separating the data into different tables/files and column order. An ``imodel`` therefore consist of the following files:
+The CDM_ format splits meteorological reports into **header** and **observational records**, separating the data into different tables/files and column order. An ``imodel`` therefore consist of the following files:
 
 1. ``header.json``: maps variables in the data that can provide information about the source of each meteorological report (e.g. profile configuration, station configuration and source configuration)
 
@@ -44,3 +46,5 @@ With the above settings this tool supports mapping to the CDM format by:
          - From ``imodel`` key to **CDM** key
          - From ``imodel`` key to **CDM** value: done by transforming functions in ``imodel.py``
          - From ``imodel`` value to **CDM** key: also done by transforming functions in ``imodel.py``
+
+.. include:: hyperlinks.rst
