@@ -70,7 +70,7 @@ def correct(data, imodel, log_level="INFO"):
 
     Parameters
     ----------
-    data: pd.DataFrame or pd.io.parsers.TextFileReader
+    data: pandas.DataFrame or pandas.io.parsers.TextFileReader
         Input dataset.
     imodel: str
         Name of internally available data model.
@@ -81,7 +81,7 @@ def correct(data, imodel, log_level="INFO"):
 
     Returns
     -------
-    pd.DataFrame or pd.io.parsers.TextFileReader
+    pandas.DataFrame or pandas.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the adjusted data
     """

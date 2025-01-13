@@ -5,13 +5,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-Marine data file reader-mapper toolbox documentation
-----------------------------------------------------
+Marine ``cdm_reader_mapper`` toolbox documentation
+--------------------------------------------------
 
 The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
 
-* to read data files compliant with a user specified data model (**mdf_reader**).
-* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool (**cdm_mapper**)
+* to read data files compliant with a user specified data model.
+* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool.
+* to detect and flag or remove duplicated observations
 
 It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format. In the meanwhile, it can read data C-RAID_ Copernicus in situ project too.
 
@@ -25,7 +26,10 @@ The tool has been further enhanced to account for any marine meteorological data
 -	Reports can be organized in sections, in which case each section can be of different types (fixed width of delimited).
 
 
-The **mdf_reader** uses the information provided in a `data model`_ to read meteorological data into a python pandas.DataFrame_, with the column names and data types set according to each data element’s description specified in the data model or **schema**. In addition to reading, the **mdf_reader** validates data elements against the **schema** provided.
+The **read_mdf** function uses the information provided in a `data model`_ to read meteorological data into a so-called **cdm_reader_mapper.DataBundle** object. This object includes several main attributes:
+
+* `data`: meteorogical data stored as a pandas.DataFrame_, with the column names and data types set according to each data element’s description specified in the data model or **schema**.
+* `mask`: mask of `data` that validates data elements against the **schema** provided.
 
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
@@ -33,7 +37,13 @@ Several data models have been added to the tool including both the IMMA and the 
 
 .. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
-After reading the data into a pandas.DataFrame, the **cdm_mapper** will map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
+In addition, the **cdm_reader_mapper.DataBundle** object has several main method functions:
+
+* `map_model`: map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
+* `duplicate_check`: detect duplicated observations
+* `flag_duplicates`: flag detected duplicated observations
+* `remove_duplicates`: remove detected duplicated observations
+* `write_tables`: save observational standardized CDM tables as pipe-seperated list
 
 .. toctree::
    :maxdepth: 2
@@ -42,16 +52,16 @@ After reading the data into a pandas.DataFrame, the **cdm_mapper** will map obse
 
    About <readme>
    tool-set-up
-   tool-overview_reader
-   tool-overview_mapper
-   tool-overview_metmetpy
+   tool-overview-reader
+   tool-overview-mapper
+   tool-overview-databundle
    getting-started
    data-models
    how-to-build-a-data-model
-   how_to_read_csv
-   how-to-register-a-new-data-model-mapping.rst
-   cdm-tables-mapping-files-and-descriptors.rst
-   example_notebooks/mdf_reader_test_overview.ipynb
+   how-to-read-csv
+   how-to-register-a-new-data-model-mapping
+   cdm-tables-mapping-files-and-descriptors
+   example_notebooks/read_overview.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
    contributing

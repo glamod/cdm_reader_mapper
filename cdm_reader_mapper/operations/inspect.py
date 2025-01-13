@@ -26,7 +26,7 @@ def get_length(data):
 
     Parameters
     ----------
-    data: pd.DataFrame, pd.io.parsers.TextFileReader
+    data: pandas.DataFrame, pd.io.parsers.TextFileReader
         Input dataset
 
     Returns
@@ -45,7 +45,7 @@ def count_by_cat(data, columns=None):
 
     Parameters
     ----------
-    data: pd.DataFrame, pd.io.parsers.TextFileReader
+    data: pandas.DataFrame, pd.io.parsers.TextFileReader
         Input dataset.
     col: str, list or tuple
         Name of the data column to be selected.

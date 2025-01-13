@@ -52,7 +52,7 @@ def _testing_suite(
         result_data_file,
         read_.columns,
         dtype=read_.dtypes,
-        parse_dates=read_.parse_dates,
+        parse_dates=read_._parse_dates,
     )
     mask_exp = read_result_data(expected_data["mask"], read_.columns)
 

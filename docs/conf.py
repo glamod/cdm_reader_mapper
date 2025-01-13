@@ -16,8 +16,6 @@ import os
 import sys
 import warnings
 
-import sphinx_autosummary_accessors
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -48,7 +46,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
-    "sphinx_autosummary_accessors",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autodoc_typehints",
@@ -76,12 +73,16 @@ napoleon_numpy_docstring = True
 napoleon_use_rtype = False
 napoleon_use_param = False
 napoleon_use_ivar = True
+napoleon_preprocess_types = True
 napoleon_type_aliases = {
     "DataBundle": "~cdm_reader_mapper.DataBundle",
+    "DupDetect": "~cdm_reader_mapper.DupDetect",
+    "Iterable": ":term:`iterable`",
+    "Hashable": ":term:`hashable`",
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {".rst": "restructuredtext"}
@@ -245,3 +246,9 @@ htmlhelp_basename = "cdm-reader-mapperdoc"
 
 # disable warnings
 warnings.filterwarnings("ignore")
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "python": ("https://docs.python.org/3/", None),
+}
