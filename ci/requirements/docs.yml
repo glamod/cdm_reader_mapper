@@ -23,7 +23,6 @@ dependencies:
     - pip
     - sphinx
     - sphinx-autodoc-typehints
-    - sphinx-codeautolink
     - sphinx-copybutton
     - sphinx-book-theme >=1.0
 
