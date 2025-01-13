@@ -260,7 +260,15 @@ class MDFFileReader(_FileReader):
         if out_path:
             self._dump_atts(out_atts, out_path)
         self.attrs = out_atts
-        return DataBundle(self)
+        return DataBundle(
+            data=self.data,
+            columns=self.columns,
+            dtypes=self.dtypes,
+            attrs=self.attrs,
+            parse_dates=self.parse_dates,
+            mask=self.mask,
+            imodel=self.imodel,
+        )
 
 
 # END AUX FUNCTIONS -----------------------------------------------------------
@@ -309,6 +317,11 @@ def read(
     Returns
     -------
     cdm_reader_mapper.DataBundle
+
+    See Also
+    --------
+    read_tables : Read CDM tables from disk.
+    write_tables : Write CDM tables to disk.
     """
 
     def get_list_element(lst, idx):

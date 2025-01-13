@@ -3,13 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
 
-``mdf_reader`` overview
-=======================
+.. _tool-overview-reader:
+
+Overview of the :py:func:`cdm_reader_mapper.read_mdf` function
+==============================================================
+
+Source data like ICOADS or C-RAID data can be read by the :py:func:`cdm_reader_mapper.read_mdf` function.
 
 In the tool's context, a data model is the combination of a **schema file** with information on the file format and its contents and, optionally, the data model contains a set of code tables with ``key:value`` pairs, to translate encoded information in some data elements:
 
    e.g. Temperature units might be store as numeric values 1 or 2 and this translates to ``1:Celsius`` and ``2:Fahrenheit``.
-
 
 Workflow
 --------
@@ -17,7 +20,17 @@ Workflow
 .. figure:: _static/images/mdf_reader_diagram.svg
     :width: 100%
 
-    Simplified workflow of the ``mdf_reader``
+    Simplified workflow of the :py:func:`cdm_reader_mapper.read_mdf` function
+
+.. code-block:: console
+
+   from cdm_reader_mapper import read_mdf
+   from cdm_reader_mapper.test_data import test_icoads_r300_d704 as test_data
+
+   filepath = test_data.source
+   imodel = "icoads_r300_d704"
+
+   db = read_mdf(filepath, imodel=imodel)
 
 Input data
 ----------
@@ -26,7 +39,7 @@ The tool has been created to read meteorological data from both ICOADS_3_ stored
 
 Each meteorological report in ICOADS can come from multiple countries, sources and platforms and each report has a source ID (SID) and a deck (DCK) number assigned. “Deck” was originally referred to a punched card deck, but is now used as the primary field to track ICOADS data **collections**. Each deck may contain a single Source ID (SID) or a mixture of SIDs.
 
-The data stored in the ``.imma`` format is stored as a fixed width and/or a field delimited file. The **mdf_reader** reads the data using python tool pandas_, organises it into sections and validates them against a declared data model (also referred here as **schema**) which can be source ID and deck dependent.
+The data stored in the ``.imma`` format is stored as a fixed width and/or a field delimited file. The **read_mdf** function reads the data using python tool pandas_, organises it into sections and validates them against a declared data model (also referred here as **schema**) which can be source ID and deck dependent.
 
 The **core** meteorological variables stored in the ``.imma`` format can be read by using the general ``imma1`` schema included in this tool.
 
@@ -34,17 +47,18 @@ The **core** meteorological variables stored in the ``.imma`` format can be read
 
 .. note:: For each SID-DCK number the data model or schema use to read supplemental metadata will different. e.g. to read metadata from the `US Maury`_ Ship data collection SID 69 and DCK 701, we will use the schema ``imma_d701``)
 
-The C-RAID containing in-situ platform data is stored in the ``.netcdf``. The **mdf_reader** reads the data using the python tool xarray_ and organises and validates them in the same way as for ICOADS data. The data can be read by using the ``c_raid`` schema included in this tool.
+The C-RAID containing in-situ platform data is stored in the ``.netcdf`` format. The :py:func:`cdm_reader_mapper.read_mdf` function reads the data using the python tool xarray_ and organises and validates them in the same way as for ICOADS data. The data can be read by using the ``c_raid`` schema included in this tool.
 
 Output data
 -----------
 
-The output of the **mdf_reader** is a python object with three attributes:
+The output is a so-called :py:class:`cdm_reader_mapper.DataBundle` python object with three attributes:
 
 • **data**: python pandas.DataFrame_ with data values.
 • **attrs**: `python dictionary`_ with attributes of each of the output elements inherited from the input data model **schema**.
 • **mask**: boolean pandas.DataFrame with the results of the validation of each of the data model elements in its columns.
 
+For more information see chapter :ref:`tool-overview-databundle`.
 
 Processing of the data elements
 -------------------------------
@@ -67,9 +81,9 @@ The data element extraction and transformation from the initial string to the ou
 
 1. **Elements extraction and missing data tagging**:
 
-   Done using ``mdf_reader.read``, where individual data elements are extracted as 'objects' from the full report string and missing data is recognised as ``NA/NaN`` values in the resulting dataframe.
+   Done using :py:func:`cdm_reader_mapper.read_mdf`, where individual data elements are extracted as 'objects' from the full report string and missing data is recognised as ``NA/NaN`` values in the resulting dataframe.
 
-   Strings that are recognised as missing from the source are ``pandas`` defaults, plus:
+   Strings that are recognised as missing from the source are pandas_ defaults, plus:
 
       * Those defined in the data model's/schema as NaN by making use of the ``missing_value`` attribute.
       * Those defined as blanks if ``disable_white_strip`` is set to not ``True``
