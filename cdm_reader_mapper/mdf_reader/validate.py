@@ -124,10 +124,11 @@ def _get_elements(elements, element_atts, key):
 
 
 def _element_tuples(numeric_elements, datetime_elements, coded_elements):
-    return [
+    ele_tpl = [
         isinstance(x, tuple)
         for x in numeric_elements + datetime_elements + coded_elements
     ]
+    return any(ele_tpl)
 
 
 def validate(
@@ -184,7 +185,7 @@ def validate(
     coded_elements = _get_elements(elements, element_atts, "key")
     str_elements = _get_elements(elements, element_atts, "str")
 
-    if any(_element_tuples(numeric_elements, datetime_elements, coded_elements)):
+    if _element_tuples(numeric_elements, datetime_elements, coded_elements):
         validated_columns = pd.MultiIndex.from_tuples(
             list(set(numeric_elements + coded_elements + datetime_elements))
         )
