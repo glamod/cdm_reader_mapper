@@ -6,7 +6,11 @@
 
 .. _C-RAID: https://www.coriolis.eu.org/Observing-the-Ocean/DBCP-E-SURFMAR/C-RAID-Copernicus-in-situ-project
 
-.. _CDM: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
+.. _CDM: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/cdm_latest.pdf
+
+.. _CDM code tables for duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
+
+.. _CDM code tables for report_quality: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
 
 .. _conda: https://docs.conda.io/en/latest/
 
@@ -47,6 +51,8 @@
 .. _python3: https://www.python.org/download/releases/3.0
 
 .. _python dictionary: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
+
+.. _RecordLinkage: https://recordlinkage.readthedocs.io/en/latest/?badge=latest
 
 .. _schema: https://mdf-reader.readthedocs.io/en/mdf_reader/data-models.html#data-models
 

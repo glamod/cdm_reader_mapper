@@ -33,7 +33,7 @@ def map_model(
 
     Parameters
     ----------
-    data: pd.DataFrame, pd.parser.TextFileReader or io.String
+    data: pandas.DataFrame, pd.parser.TextFileReader or io.String
       input data to map.
     imodel: str
       A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
@@ -51,8 +51,8 @@ def map_model(
 
     Returns
     -------
-    cdm_tables: dict
-      a python dictionary with the ``{cdm_table_name: cdm_table_object}`` pairs.
+    cdm_tables: pandas.DataFrame
+      DataFrame with MultiIndex columns (cdm_table, column_name).
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     imodel = imodel.split("_")

@@ -19,7 +19,18 @@ def count_by_cat_i(series):
 
 
 def get_length(data):
-    """Get length of pandas object."""
+    """Get length of pandas object.
+
+    Parameters
+    ----------
+    data: pandas.DataFrame, pd.io.parsers.TextFileReader
+        Input dataset
+
+    Returns
+    -------
+    int
+        Total row count
+    """
     return len(data)
 
 
@@ -28,7 +39,7 @@ def count_by_cat(data, columns=None):
 
     Parameters
     ----------
-    data: pd.DataFrame, pd.io.parsers.TextFileReader
+    data: pandas.DataFrame, pd.io.parsers.TextFileReader
         Input dataset.
     col: str, list or tuple
         Name of the data column to be selected.

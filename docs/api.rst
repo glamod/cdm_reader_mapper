@@ -8,6 +8,8 @@ API reference
 
 This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
+.. _read_data:
+
 Read data from disk
 ===================
 
@@ -16,7 +18,8 @@ Read data from disk
 
    read_mdf
    read_tables
-   duplicate_check
+
+.. _databundle:
 
 DataBundle
 ==========
@@ -26,14 +29,144 @@ DataBundle
 
    DataBundle
 
-DupDetect
-=========
+.. _information
+
+DataBundle's method functions
+------------------------------
+
+Information
+^^^^^^^^^^^
 
 .. autosummary::
    :toctree: generated/
 
-   DupDetect
+   DataBundle.unique
 
+.. _manipulation:
+
+Manipulation
+^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.add
+
+   DataBundle.copy
+
+   DataBundle.replace_columns
+
+   DataBundle.stack_h
+
+   DataBundle.stack_v
+
+.. _selection:
+
+Selection
+^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.select_from_index
+
+   DataBundle.select_from_list
+
+   DataBundle.select_true
+
+.. _validation:
+
+Validation
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.validate_datetime
+
+   DataBundle.validate_id
+
+.. _cdm_tables:
+
+CDM tables
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.map_model
+
+   DataBundle.write_tables
+
+.. _cdm_correction
+
+Correction
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.correct_datetime
+
+   DataBundle.correct_pt
+
+.. _duplicate_check:
+
+Duplicate check
+^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.duplicate_check
+
+   DataBundle.get_duplicates
+
+   DataBundle.flag_duplicates
+
+   DataBundle.remove_duplicates
+
+
+.. _properties
+
+DataBundle's property attributes
+--------------------------------
+
+MDF data
+^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.data
+
+   DataBundle.columns
+
+   DataBundle.dtypes
+
+   DataBundle.attrs
+
+   DataBundle.mask
+
+   DataBundle.imodel
+
+   DataBundle.selected
+
+   DataBundle.deselected
+
+CDM tables
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.tables
+
+   DataBundle.tables_dups_flagged
+
+   DataBundle.tables_dups_removed
+
+.. _useful_func:
 
 Useful functions
 ================
@@ -41,7 +174,7 @@ Useful functions
 .. autosummary::
    :toctree: generated/
 
-
+   duplicate_check
    map_model
    write_tables
    correct_datetime
@@ -53,3 +186,25 @@ Useful functions
    select_true
    select_from_index
    select_from_list
+
+.. _dupdetect:
+
+DupDetect
+=========
+
+.. autosummary::
+   :toctree: generated/
+
+   DupDetect
+
+Check Duplicates
+^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DupDetect.get_duplicates
+
+   DupDetect.flag_duplicates
+
+   DupDetect.remove_duplicates
