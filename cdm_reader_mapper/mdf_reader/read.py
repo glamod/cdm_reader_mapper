@@ -75,6 +75,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
         if dtype is None:
             dtype = self.configurations["convert_decode"]["dtype"]
+        if not (convert and decode):
+            return
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
@@ -129,16 +131,15 @@ class MDFFileReader(_FileReader):
             )
         return self
 
-    def validate_entries(
-        self,
-    ):
+    def validate_entries(self, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
-        if isinstance(self.data, pd.DataFrame):
+        if validate is not True:
+            self.mask = pd.DataFrame()
+        elif isinstance(self.data, pd.DataFrame):
             self.mask = self._validate_df(self.data, isna=self.isna)
-
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
@@ -236,16 +237,12 @@ class MDFFileReader(_FileReader):
         # 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
-        if convert or decode:
-            self.convert_and_decode_entries(
-                convert=convert,
-                decode=decode,
-            )
+        self.convert_and_decode_entries(
+            convert=convert,
+            decode=decode,
+        )
 
-        if validate is True:
-            self.validate_entries()
-        else:
-            self.mask = pd.DataFrame()
+        self.validate_entries(validate)
 
         # 3. CREATE OUTPUT DATA ATTRIBUTES
         logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
