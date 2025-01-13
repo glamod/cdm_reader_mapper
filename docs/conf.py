@@ -49,7 +49,6 @@ extensions = [
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autodoc_typehints",
-    "sphinx_codeautolink",
     "sphinx_copybutton",
     "sphinx_book_theme",
 ]
