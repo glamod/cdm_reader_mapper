@@ -85,7 +85,7 @@ For more information how the mapping is working, please see :ref:`tool-overview-
 
 After mapping to the CDM format it is useful to check if :py:attr:`DataBundle.tables` contains any duplicates. The duplicate checker included in the ``cdm_reader_mapper`` toolbos is based on python record linkage toolkit RecordLinkage_.
 
-The first step is to call the method function :py:func:`DataBundle.duplicate_check`. This function scans :py:attr:`DataBundle.tables` for any duplicates and stores the result to :py:attr:`DataBundle.DupDetect`.
+The first step is to call the method function :py:func:`DataBundle.duplicate_check`. This function scans :py:attr:`DataBundle.tables` for any duplicates.
 
 .. code-block:: console
 

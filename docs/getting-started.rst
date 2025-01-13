@@ -21,7 +21,7 @@ You can test the tool very easy by using a sample data set that comes with the r
    filepath = test_data.source
    imodel = "icoads_r300_d704"
 
-   data_bundle = read_mdf(filepath, imodel=imodel)
+   db = read_mdf(filepath, imodel=imodel)
 
 
 2. Read subsection of an IMMA file
@@ -31,7 +31,7 @@ You can also read subsections from the IMMA test file:
 
 .. code-block:: console
 
-   subdata_bundle = read_mdf(filepath, imodel=imodel, sections = ["core", "c1", "c98"])
+   db_sub = read_mdf(filepath, imodel=imodel, sections = ["core", "c1", "c98"])
 
 3. Map this data to a CDM build for the same deck
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,9 +40,9 @@ In this case deck 704: US Marine Meteorological Journal collection of data code:
 
 .. code-block:: console
 
-    data_bundle.map_model()
+    db.map_model()
 
-    cdm_tables = data_bundle.tables.copy()
+    cdm_tables = db.tables.copy()
 
 4. Detect duplicated observations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,14 +51,14 @@ Detect and flag duplicated observations without overwriting the original CDM tab
 
 .. code-block:: console
 
-    data_bundle.duplicate_check()
-    data_bundle.flag_duplicates(overwrite=False)
+    db.duplicate_check()
+    db.flag_duplicates(overwrite=False)
 
-    flagged_tables = data_bundle.tables_dups_flagged.copy()
+    flagged_tables = db.tables_dups_flagged.copy()
 
-    data_bundle.remove_duplicates(overwrite=False)
+    db.remove_duplicates(overwrite=False)
 
-    removed_tables = data_bundle.tables_dups_removed.copy()
+    removed_tables = db.tables_dups_removed.copy()
 
 5. Write the output
 ~~~~~~~~~~~~~~~~~~~
@@ -66,4 +66,4 @@ This writes the output to an ascii file with a pipe delimited format using the f
 
 .. code-block:: console
 
-    data_bundle.write_tables()
+    db.write_tables()
