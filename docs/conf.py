@@ -51,7 +51,7 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_codeautolink",
     "sphinx_copybutton",
-    "sphinx_rtd_theme",
+    "sphinx_book_theme",
 ]
 
 
