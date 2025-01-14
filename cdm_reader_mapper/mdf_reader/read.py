@@ -13,10 +13,11 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .schemas import schemas
-from .utils.auxiliary import _FileReader, adjust_dtype, validate_arg, validate_path
+from .utils.filereader import FileReader
+from .utils.utilities import adjust_dtype, validate_arg, validate_path
 
 
-class MDFFileReader(_FileReader):
+class MDFFileReader(FileReader):
     """Class to represent reader output.
 
     Attributes
@@ -32,7 +33,7 @@ class MDFFileReader(_FileReader):
     """
 
     def __init__(self, *args, **kwargs):
-        _FileReader.__init__(self, *args, **kwargs)
+        FileReader.__init__(self, *args, **kwargs)
 
     def convert_and_decode_entries(
         self,
