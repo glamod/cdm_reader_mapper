@@ -64,8 +64,6 @@ class MDFFileReader(FileReader):
             converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if dtype is None:
-            dtype = self.configurations["convert_decode"]["dtype"]
         if not (convert and decode):
             return self
         if convert is not True:
@@ -74,6 +72,7 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
+        dtype = self.configurations["convert_decode"]["dtype"]
         dtype = adjust_dtype(dtype, self.data)
         data = self.convert_and_decode_df(
             self.data,
