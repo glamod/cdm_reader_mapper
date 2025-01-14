@@ -115,7 +115,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
 
 def _get_elements(elements, element_atts, key):
     def _condition(x):
-        column_types = element_atts.get(x).get("column_types")
+        column_types = element_atts.get(x).get("column_type")
         if key == "numeric_types":
             return column_types in properties.numeric_types
         return column_types == key
@@ -233,4 +233,5 @@ def validate(
     )
     for column in disables:
         mask[column] = np.nan
+
     return mask
