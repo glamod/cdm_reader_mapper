@@ -22,7 +22,7 @@ def _get_data(**kwargs):
 def test_select_true():
     read_ = _get_data(sections=["c99_data"])
     read_.select_true(overwrite=False, out_rejected=True)
-    data = read_.data
+    data = read_.data.copy()
     selected = read_.selected
     deselected = read_.deselected
 
@@ -35,7 +35,7 @@ def test_select_true():
 def test_select_from_index():
     read_ = _get_data()
     read_.select_from_index([0, 2, 4], overwrite=False)
-    data = read_.data
+    data = read_.data.copy()
     result = read_.selected
 
     idx = data.index.isin([0, 2, 4])
@@ -47,7 +47,7 @@ def test_select_from_list():
     read_ = _get_data()
     selection = {("c1", "B1"): [26, 41]}
     read_.select_from_list(selection, overwrite=False, out_rejected=True, in_index=True)
-    data = read_.data
+    data = read_.data.copy()
     selected = read_.selected
     deselected = read_.deselected
 
