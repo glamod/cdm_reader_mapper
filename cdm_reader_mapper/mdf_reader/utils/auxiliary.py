@@ -78,6 +78,48 @@ def validate_path(arg_name, arg_value):
     return True
 
 
+def convert_entries(series, converter_func, **kwargs):
+    """DOCUMENTATION."""
+    return converter_func(series, **kwargs)
+
+
+def decode_entries(series, decoder_func):
+    """DOCUMENTATION."""
+    return decoder_func(series)
+
+
+def set_missing_values(df, ref):
+    """DOCUMENTATION."""
+    explode_ = df.explode("missing_values")
+    explode_["index"] = explode_.index
+    explode_["values"] = True
+    pivots_ = explode_.pivot_table(
+        columns="missing_values",
+        index="index",
+        values="values",
+    )
+    missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
+    return missing_values.notna()
+
+
+def create_mask(df, isna, missing_values=[]):
+    """DOCUMENTATION."""
+    if isna is None:
+        isna = df.isna()
+    valid = df.notna()
+    mask = isna | valid
+    if len(missing_values) > 0:
+        mask[missing_values] = False
+    return mask
+
+
+def adjust_dtype(dtype, df):
+    """DOCUMENTATION."""
+    if not isinstance(dtype, dict):
+        return dtype
+    return {k: v for k, v in dtype.items() if k in df.columns}
+
+
 class Configurator:
     """Class for configuring MDF reader information."""
 
@@ -176,10 +218,10 @@ class Configurator:
             j = k + self.length
         return j, k
 
-    def _get_dtypes(self):
+    def _get_dtype(self):
         return properties.pandas_dtypes.get(self.sections_dict.get("column_type"))
 
-    def _get_converters(self):
+    def _get_converter(self):
         return converters.get(self.sections_dict.get("column_type"))
 
     def _get_conv_kwargs(self):
@@ -196,19 +238,36 @@ class Configurator:
             self.sections_dict.get("column_type")
         )
 
-    def _convert_entries(self, series, converter_func, **kwargs):
-        return converter_func(series, **kwargs)
+    def _update_dtypes(self, dtypes, index):
+        dtype = self._get_dtype()
+        if dtype:
+            dtypes[index] = dtype
+        return dtypes
 
-    def _decode_entries(self, series, decoder_func):
-        return decoder_func(series)
+    def _update_converters(self, converters, index):
+        converter = self._get_converter()
+        if converter:
+            converters[index] = converter
+        return converters
+
+    def _update_kwargs(self, kwargs, index):
+        conv_kwargs = self._get_conv_kwargs()
+        if conv_kwargs:
+            kwargs[index] = conv_kwargs
+        return kwargs
+
+    def _update_decoders(self, decoders, index):
+        if self.encoding is not None:
+            decoders[index] = self.encoding
+        return decoders
 
     def get_configuration(self):
         """Get ICOADS data model specific information."""
         disable_reads = []
         dtypes = {}
-        convert = {}
+        converters = {}
         kwargs = {}
-        decode = {}
+        decoders = {}
         for order in self.orders:
             self.order = order
             header = self.schema["sections"][order]["header"]
@@ -219,28 +278,22 @@ class Configurator:
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
                 self.sections_dict = sections[section]
-                encoding = sections[section].get("encoding")
+                self.encoding = sections[section].get("encoding")
                 index = self._get_index(section)
                 ignore = self._get_ignore()
-                if ignore is not True:
-                    dtype = self._get_dtypes()
-                    if dtype:
-                        dtypes[index] = dtype
-                    converters = self._get_converters()
-                    if converters:
-                        convert[index] = converters
-                    conv_kwargs = self._get_conv_kwargs()
-                    if conv_kwargs:
-                        kwargs[index] = conv_kwargs
-                    if encoding is not None:
-                        decode[index] = self._get_decoders()
+                if ignore is True:
+                    continue
+                dtypes = self._update_dtypes(dtypes, index)
+                converters = self._get_converters(converters, index)
+                kwargs = self._update_kwargs(kwargs, index)
+                decoders = self._update_decoders(decoders, index)
 
         dtypes, parse_dates = convert_dtypes(dtypes)
         return {
             "convert_decode": {
-                "converter_dict": convert,
+                "converter_dict": converters,
                 "converter_kwargs": kwargs,
-                "decoder_dict": decode,
+                "decoder_dict": decoders,
                 "dtype": dtypes,
             },
             "self": {
@@ -331,15 +384,16 @@ class Configurator:
                 self.sections_dict = sections[section]
                 index = self._get_index(section)
                 ignore = self._get_ignore()
-                if ignore is not True:
-                    if section in self.df.data_vars:
-                        renames[section] = index
-                    elif section in self.df.dims:
-                        renames[section] = index
-                    elif section in self.df.attrs:
-                        attrs[index] = self.df.attrs[index]
-                    else:
-                        missing_values.append(index)
+                if ignore is True:
+                    continue
+                if section in self.df.data_vars:
+                    renames[section] = index
+                elif section in self.df.dims:
+                    renames[section] = index
+                elif section in self.df.attrs:
+                    attrs[index] = self.df.attrs[index]
+                else:
+                    missing_values.append(index)
 
         df = self.df[renames.keys()].to_dataframe().reset_index()
         attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
@@ -393,17 +447,6 @@ class _FileReader:
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
-    def _adjust_dtype(self, dtype, df):
-        if not isinstance(dtype, dict):
-            return dtype
-        return {k: v for k, v in dtype.items() if k in df.columns}
-
-    def _convert_entries(self, series, converter_func, **kwargs):
-        return converter_func(series, **kwargs)
-
-    def _decode_entries(self, series, decoder_func):
-        return decoder_func(series)
-
     def _adjust_schema(self, ds, dtypes):
         sections = deepcopy(self.schema["sections"])
         for section in sections.keys():
@@ -450,29 +493,6 @@ class _FileReader:
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
-    def _get_configurations(self, order, valid):
-        config_dict = Configurator(
-            schema=self.schema, order=order, valid=valid
-        ).get_configuration()
-        for attr, val in config_dict["self"].items():
-            setattr(self, attr, val)
-        del config_dict["self"]
-        return config_dict
-
-    def _set_missing_values(self, df, ref):
-        explode_ = df.explode("missing_values")
-        explode_["index"] = explode_.index
-        explode_["values"] = True
-        pivots_ = explode_.pivot_table(
-            columns="missing_values",
-            index="index",
-            values="values",
-        )
-        missing_values = pd.DataFrame(
-            data=pivots_, columns=ref.columns, index=ref.index
-        )
-        return missing_values.notna()
-
     def _read_pandas(self, **kwargs):
         return pd.read_fwf(
             self.source,
@@ -513,12 +533,97 @@ class _FileReader:
         missing_values_ = df["missing_values"]
         del df["missing_values"]
         df = self._select_years(df)
-        missing_values = self._set_missing_values(pd.DataFrame(missing_values_), df)
+        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
         df = df.where(df.notnull(), np.nan)
         return df, missing_values
 
-    def _open_data(
+    def get_configurations(self, order, valid):
+        config_dict = Configurator(
+            schema=self.schema, order=order, valid=valid
+        ).get_configuration()
+        for attr, val in config_dict["self"].items():
+            setattr(self, attr, val)
+        del config_dict["self"]
+        return config_dict
+
+    def convert_and_decode_df(
+        self,
+        df,
+        converter_dict,
+        converter_kwargs,
+        decoder_dict,
+    ):
+        for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
+            if section in decoder_dict.keys():
+                decoded = decode_entries(
+                    df[section],
+                    decoder_dict[section],
+                )
+                decoded.index = df[section].index
+                df[section] = decoded
+
+            converted = convert_entries(
+                df[section],
+                converter_dict[section],
+                **converter_kwargs[section],
+            )
+            converted.index = df[section].index
+            df[section] = converted
+        return df
+
+    def validate_df(self, df, isna=None):
+        mask = create_mask(df, isna, missing_values=self.missing_values)
+        return validate(
+            data=df,
+            mask0=mask,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
+            schema=self.schema,
+            disables=self.disable_reads,
+        )
+
+    def dump_atts(self, out_atts, out_path):
+        """Dump attributes to atts.json."""
+        if not isinstance(self.data, pd.io.parsers.TextFileReader):
+            data = [self.data]
+            valid = [self.mask]
+        else:
+            data = pandas_TextParser_hdlr.make_copy(self.data)
+            valid = pandas_TextParser_hdlr.make_copy(self.mask)
+        logging.info(f"WRITING DATA TO FILES IN: {out_path}")
+        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
+            header = False
+            mode = "a"
+            out_atts_json = {}
+            if i == 0:
+                mode = "w"
+                cols = [x for x in data_df]
+                if isinstance(cols[0], tuple):
+                    header = [":".join(x) for x in cols]
+                    out_atts_json = {
+                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
+                    }
+                else:
+                    header = cols
+                    out_atts_json = out_atts
+            kwargs = {
+                "header": header,
+                "mode": mode,
+                "encoding": "utf-8",
+                "index": True,
+                "index_label": "index",
+                "escapechar": "\0",
+            }
+            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
+            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
+
+            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
+                json.dump(out_atts_json, fileObj, indent=4)
+
+    def open_data(
         self,
         order,
         valid,
@@ -606,88 +711,3 @@ class _FileReader:
                 escapechar="\0",
             )
             return data, isna
-
-    def _convert_and_decode_df(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ):
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = self._decode_entries(
-                    df[section],
-                    decoder_dict[section],
-                )
-                decoded.index = df[section].index
-                df[section] = decoded
-
-            converted = self._convert_entries(
-                df[section],
-                converter_dict[section],
-                **converter_kwargs[section],
-            )
-            converted.index = df[section].index
-            df[section] = converted
-        return df
-
-    def _create_mask(self, df, isna, missing_values=[]):
-        if isna is None:
-            isna = df.isna()
-        valid = df.notna()
-        mask = isna | valid
-        if len(missing_values) > 0:
-            mask[missing_values] = False
-        return mask
-
-    def _validate_df(self, df, isna=None):
-        mask = self._create_mask(df, isna, missing_values=self.missing_values)
-        return validate(
-            data=df,
-            mask0=mask,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
-        )
-
-    def _dump_atts(self, out_atts, out_path):
-        """Dump attributes to atts.json."""
-        if not isinstance(self.data, pd.io.parsers.TextFileReader):
-            data = [self.data]
-            valid = [self.mask]
-        else:
-            data = pandas_TextParser_hdlr.make_copy(self.data)
-            valid = pandas_TextParser_hdlr.make_copy(self.mask)
-        logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-            header = False
-            mode = "a"
-            out_atts_json = {}
-            if i == 0:
-                mode = "w"
-                cols = [x for x in data_df]
-                if isinstance(cols[0], tuple):
-                    header = [":".join(x) for x in cols]
-                    out_atts_json = {
-                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
-                    }
-                else:
-                    header = cols
-                    out_atts_json = out_atts
-            kwargs = {
-                "header": header,
-                "mode": mode,
-                "encoding": "utf-8",
-                "index": True,
-                "index_label": "index",
-                "escapechar": "\0",
-            }
-            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
-
-            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-                json.dump(out_atts_json, fileObj, indent=4)

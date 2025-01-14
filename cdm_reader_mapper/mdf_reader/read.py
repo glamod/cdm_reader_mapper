@@ -13,7 +13,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .schemas import schemas
-from .utils.auxiliary import _FileReader, validate_arg, validate_path
+from .utils.auxiliary import _FileReader, adjust_dtype, validate_arg, validate_path
 
 
 class MDFFileReader(_FileReader):
@@ -84,8 +84,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
-            dtype = self._adjust_dtype(dtype, self.data)
-            data = self._convert_and_decode_df(
+            dtype = adjust_dtype(dtype, self.data)
+            data = self.convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
@@ -96,7 +96,7 @@ class MDFFileReader(_FileReader):
             data_buffer = StringIO()
             TextParser = make_copy(self.data)
             for i, df_ in enumerate(TextParser):
-                df = self._convert_and_decode_df(
+                df = self.convert_and_decode_df(
                     df_,
                     converter_dict,
                     converter_kwargs,
@@ -117,7 +117,7 @@ class MDFFileReader(_FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
-            dtype = self._adjust_dtype(dtype, df)
+            dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
             self.data = pd.read_csv(
                 data_buffer,
@@ -139,13 +139,13 @@ class MDFFileReader(_FileReader):
         if validate is not True:
             self.mask = pd.DataFrame()
         elif isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data, isna=self.isna)
+            self.mask = self.validate_df(self.data, isna=self.isna)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
             TextParser_isna_ = make_copy(self.isna)
             for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self._validate_df(df_, isna=isna_)
+                mask_ = self.validate_df(df_, isna=isna_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -225,8 +225,8 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data, self.isna = self._open_data(
+        self.configurations = self.get_configurations(read_sections_list, sections)
+        self.data, self.isna = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -255,7 +255,7 @@ class MDFFileReader(_FileReader):
 
         # 4. OUTPUT TO FILES IF REQUESTED
         if out_path:
-            self._dump_atts(out_atts, out_path)
+            self.dump_atts(out_atts, out_path)
         self.attrs = out_atts
         return DataBundle(
             data=self.data,
