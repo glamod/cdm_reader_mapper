@@ -13,10 +13,11 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .schemas import schemas
-from .utils.auxiliary import _FileReader, validate_arg, validate_path
+from .utils.filereader import FileReader
+from .utils.utilities import adjust_dtype, validate_arg, validate_path
 
 
-class MDFFileReader(_FileReader):
+class MDFFileReader(FileReader):
     """Class to represent reader output.
 
     Attributes
@@ -32,7 +33,7 @@ class MDFFileReader(_FileReader):
     """
 
     def __init__(self, *args, **kwargs):
-        _FileReader.__init__(self, *args, **kwargs)
+        FileReader.__init__(self, *args, **kwargs)
 
     def convert_and_decode_entries(
         self,
@@ -75,6 +76,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
         if dtype is None:
             dtype = self.configurations["convert_decode"]["dtype"]
+        if not (convert and decode):
+            return self
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
@@ -82,8 +85,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
-            dtype = self._adjust_dtype(dtype, self.data)
-            data = self._convert_and_decode_df(
+            dtype = adjust_dtype(dtype, self.data)
+            data = self.convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
@@ -94,7 +97,7 @@ class MDFFileReader(_FileReader):
             data_buffer = StringIO()
             TextParser = make_copy(self.data)
             for i, df_ in enumerate(TextParser):
-                df = self._convert_and_decode_df(
+                df = self.convert_and_decode_df(
                     df_,
                     converter_dict,
                     converter_kwargs,
@@ -115,7 +118,7 @@ class MDFFileReader(_FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
-            dtype = self._adjust_dtype(dtype, df)
+            dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
             self.data = pd.read_csv(
                 data_buffer,
@@ -129,22 +132,21 @@ class MDFFileReader(_FileReader):
             )
         return self
 
-    def validate_entries(
-        self,
-    ):
+    def validate_entries(self, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
-        if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data, isna=self.isna)
-
+        if validate is not True:
+            self.mask = pd.DataFrame()
+        elif isinstance(self.data, pd.DataFrame):
+            self.mask = self.validate_df(self.data, isna=self.isna)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
             TextParser_isna_ = make_copy(self.isna)
             for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self._validate_df(df_, isna=isna_)
+                mask_ = self.validate_df(df_, isna=isna_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -224,8 +226,8 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data, self.isna = self._open_data(
+        self.configurations = self.get_configurations(read_sections_list, sections)
+        self.data, self.isna = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -236,16 +238,12 @@ class MDFFileReader(_FileReader):
         # 2.3. Extract, read and validate data in same loop
         # logging.info("Extracting and reading sections")
 
-        if convert or decode:
-            self.convert_and_decode_entries(
-                convert=convert,
-                decode=decode,
-            )
+        self.convert_and_decode_entries(
+            convert=convert,
+            decode=decode,
+        )
 
-        if validate is True:
-            self.validate_entries()
-        else:
-            self.mask = pd.DataFrame()
+        self.validate_entries(validate)
 
         # 3. CREATE OUTPUT DATA ATTRIBUTES
         logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
@@ -258,7 +256,7 @@ class MDFFileReader(_FileReader):
 
         # 4. OUTPUT TO FILES IF REQUESTED
         if out_path:
-            self._dump_atts(out_atts, out_path)
+            self.dump_atts(out_atts, out_path)
         self.attrs = out_atts
         return DataBundle(
             data=self.data,

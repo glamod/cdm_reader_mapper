@@ -107,9 +107,54 @@ def _default(
 
 
 def _fill_value(data, fill_value):
+    if fill_value is None:
+        return data
     if data is None:
         return fill_value
     return data.fillna(value=fill_value)
+
+
+def _map_data(
+    to_map,
+    transform,
+    code_table,
+    elements,
+    default,
+    fill_value,
+    isEmpty,
+    imodel_functions,
+    kwargs,
+    length,
+    logger,
+):
+    if transform and not isEmpty:
+        data = _transform(
+            to_map,
+            imodel_functions,
+            transform,
+            kwargs,
+            logger=logger,
+        )
+    elif code_table and not isEmpty:
+        data = _code_table(
+            to_map,
+            imodel_functions.imodel,
+            code_table,
+            logger=logger,
+        )
+    elif elements and not isEmpty:
+        data = to_map
+    elif default is not None:  # (value = 0 evals to False!!)
+        data = _default(
+            default,
+            length,
+        )
+    else:
+        data = _default(
+            None,
+            length,
+        )
+    return _fill_value(data, fill_value)
 
 
 def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
@@ -147,36 +192,19 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
         if len(to_map) == 0:
             isEmpty = True
 
-    if transform and not isEmpty:
-        data = _transform(
-            to_map,
-            imodel_functions,
-            transform,
-            kwargs,
-            logger=logger,
-        )
-    elif code_table and not isEmpty:
-        data = _code_table(
-            to_map,
-            imodel_functions.imodel,
-            code_table,
-            logger=logger,
-        )
-    elif elements and not isEmpty:
-        data = to_map
-    elif default is not None:  # (value = 0 evals to False!!)
-        data = _default(
-            default,
-            len(idata),
-        )
-    else:
-        data = _default(
-            None,
-            len(idata),
-        )
-
-    if fill_value is not None:
-        data = _fill_value(data, fill_value)
+    data = _map_data(
+        to_map,
+        transform,
+        code_table,
+        elements,
+        default,
+        fill_value,
+        isEmpty,
+        imodel_functions,
+        kwargs,
+        len(idata),
+        logger,
+    )
     atts = _decimal_places(atts, decimal_places)
     return data, atts
 
