@@ -47,6 +47,13 @@ _base = f"{properties._base}.station_id"
 def validate(data, imodel, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+        logger.error(
+            f"Input data must be a pd.DataFrame or pd.Series.\
+                     Input data type is {type(data)}"
+        )
+        return
+
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.error(f"Dataset {imodel} has to deck information.")
@@ -55,12 +62,6 @@ def validate(data, imodel, blank=False, log_level="INFO"):
 
     if isinstance(data, pd.io.parsers.TextFileReader):
         data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
-        logger.error(
-            f"Input data must be a pd.DataFrame or pd.Series.\
-                     Input data type is {type(data)}"
-        )
-        return
 
     id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
@@ -69,7 +70,8 @@ def validate(data, imodel, blank=False, log_level="INFO"):
                      properties file"
         )
         return
-    elif not isinstance(id_col, list):
+
+    if not isinstance(id_col, list):
         id_col = [id_col]
 
     id_col = [col for col in id_col if col in data.columns]
@@ -78,7 +80,8 @@ def validate(data, imodel, blank=False, log_level="INFO"):
         data_columns = list(data.columns)
         logger.info(f"No ID columns found. Selected columns are {data_columns}")
         return
-    elif len(id_col) == 1:
+
+    if len(id_col) == 1:
         id_col = id_col[0]
 
     idSeries = data[id_col]
