@@ -120,16 +120,20 @@ class Configurator:
     def _get_conv_kwargs(self):
         column_type = self.sections_dict.get("column_type")
         if column_type is None:
-            return {}
+            return
         return {
             converter_arg: self.sections_dict.get(converter_arg)
             for converter_arg in properties.data_type_conversion_args.get(column_type)
         }
 
-    def _get_decoders(self):
-        return decoders.get(self.sections_dict["encoding"]).get(
-            self.sections_dict.get("column_type")
-        )
+    def _get_decoder(self):
+        encoding = self.sections_dict.get("encoding")
+        if encoding is None:
+            return
+        column_type = self.sections_dict.get("column_type")
+        if column_type is None:
+            return
+        return decoders.get(encoding).get(column_type)
 
     def _update_dtypes(self, dtypes, index):
         dtype = self._get_dtype()
@@ -150,8 +154,9 @@ class Configurator:
         return kwargs
 
     def _update_decoders(self, decoders, index):
-        if self.encoding is not None:
-            decoders[index] = self.encoding
+        decoder = self._get_decoder()
+        if decoder:
+            decoders[index] = decoder
         return decoders
 
     def get_configuration(self):
@@ -171,13 +176,12 @@ class Configurator:
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
                 self.sections_dict = sections[section]
-                self.encoding = sections[section].get("encoding")
                 index = self._get_index(section)
                 ignore = self._get_ignore()
                 if ignore is True:
                     continue
                 dtypes = self._update_dtypes(dtypes, index)
-                converters = self._get_converters(converters, index)
+                converters = self._update_converters(converters, index)
                 kwargs = self._update_kwargs(kwargs, index)
                 decoders = self._update_decoders(decoders, index)
 

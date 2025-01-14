@@ -184,6 +184,7 @@ class FileReader:
             if section not in df.columns:
                 continue
             if section in decoder_dict.keys():
+                print(decoder_dict)
                 decoded = decode_entries(
                     df[section],
                     decoder_dict[section],
