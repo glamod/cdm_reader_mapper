@@ -33,6 +33,15 @@ Internal changes
 * ``cdm_mapper``: rename ``mappings`` to ``_mapping_functions`` (:pull:`189`)
 * ``cdm_mapper``: mapping functions from ``mapper`` to new submodule ``_mappings`` (:pull:`189`)
 * ``cdm_mapper``: save utility functions from ``table_reader.py`` and ``table_writer.py`` to ``_utilities.py`` (:pull:`185`)
+* reduce complexity of several functions (:issue:`25`, :pull:`200`):
+
+  * ``mdf_reader.read.read``
+  * ``mdf_reader.validate.validate``
+  * ``mfd_reader.utils.decoders.signed_overpunch``
+  * ``cdm_mapper._mappings._mapping``
+  * ``metmetmpy.station_id.validate.validate``
+
+* split ``mdf_reader.utils.auxiliary`` into ``mdf_reader.utils.filereader``, ``mdf_reader.utils.configurator`` and ``mdf_reader.utils.utilities`` (:issue:`25`, :pull:`200`)
 
 Bug fixes
 ^^^^^^^^^
