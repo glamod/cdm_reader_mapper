@@ -44,6 +44,45 @@ from .. import properties
 _base = f"{properties._base}.station_id"
 
 
+def _get_id_col(data, imodel, logger):
+    id_col = properties.metadata_datamodels["id"].get(imodel)
+    if not id_col:
+        logger.error(
+            f"Data model {imodel} ID column not defined in\
+                     properties file"
+        )
+        return
+    if not isinstance(id_col, list):
+        id_col = [id_col]
+
+    id_col = [col for col in id_col if col in data.columns]
+    if not id_col:
+        logger.error(f"No ID columns found. Selected columns are {list(data.columns)}")
+        return
+    if len(id_col) == 1:
+        id_col = id_col[0]
+    return id_col
+
+
+def _get_patterns(dck_id_model, blank, dck, data_model_files, logger):
+    pattern_dict = dck_id_model.get("valid_patterns")
+
+    if pattern_dict == {}:
+        logger.warning(
+            f'Input dck "{dck}" validation patterns are empty in file {data_model_files}'
+        )
+        logger.warning("Adding match-all regex to validation patterns")
+        patterns = [".*?"]
+    else:
+        patterns = list(pattern_dict.values())
+
+    if blank:
+        patterns.append("^$")
+        logger.warning("Setting valid blank pattern option to true")
+        logger.warning("NaN values will validate to True")
+    return patterns
+
+
 def validate(data, imodel, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
@@ -63,26 +102,9 @@ def validate(data, imodel, blank=False, log_level="INFO"):
     if isinstance(data, pd.io.parsers.TextFileReader):
         data = pandas_TextParser_hdlr.make_copy(data).read()
 
-    id_col = properties.metadata_datamodels["id"].get(imodel)
-    if not id_col:
-        logger.error(
-            f"Data model {imodel} ID column not defined in\
-                     properties file"
-        )
+    id_col = _get_id_col(data, imodel, logger)
+    if id_col is None:
         return
-
-    if not isinstance(id_col, list):
-        id_col = [id_col]
-
-    id_col = [col for col in id_col if col in data.columns]
-
-    if not id_col:
-        data_columns = list(data.columns)
-        logger.info(f"No ID columns found. Selected columns are {data_columns}")
-        return
-
-    if len(id_col) == 1:
-        id_col = id_col[0]
 
     idSeries = data[id_col]
 
@@ -99,21 +121,7 @@ def validate(data, imodel, blank=False, log_level="INFO"):
         logger.error(f'Input dck "{dck}" not defined in file {data_model_files}')
         return
 
-    pattern_dict = dck_id_model.get("valid_patterns")
-
-    if pattern_dict == {}:
-        logger.warning(
-            f'Input dck "{dck}" validation patterns are empty in file {data_model_files}'
-        )
-        logger.warning("Adding match-all regex to validation patterns")
-        patterns = [".*?"]
-    else:
-        patterns = list(pattern_dict.values())
-
-    if blank:
-        patterns.append("^$")
-        logger.warning("Setting valid blank pattern option to true")
-        logger.warning("NaN values will validate to True")
+    patterns = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
 
     na_values = True if "^$" in patterns else False
     combined_compiled = re.compile("|".join(patterns))
