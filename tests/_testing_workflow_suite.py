@@ -32,7 +32,6 @@ def _testing_suite(
     read_ = read_mdf(
         source=source,
         imodel=imodel,
-        out_path=out_path,
         **kwargs,
     )
 

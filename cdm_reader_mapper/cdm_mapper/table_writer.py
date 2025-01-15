@@ -24,14 +24,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from ._utilities import (
-    adjust_filename,
-    dict_to_tuple_list,
-    get_cdm_subset,
-    get_filename,
-)
+from ._utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 from .tables.tables import get_cdm_atts
 
 
@@ -112,7 +107,7 @@ def write_tables(
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
     col_subset: str, list or dict, optional
-        Specify the section or sections of the file to read.
+        Specify the section or sections of the file to write.
 
         - For multiple sections of the tables:
           e.g col_subset = {table0:[columns0],...tableN:[columnsN]}
@@ -121,12 +116,13 @@ def write_tables(
           e.g. list type object col_subset = [columns]
           This variable assumes that the column names are all conform to the cdm field names.
     delimiter: str
-        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
+        Character or regex pattern to treat as the delimiter while reading with df.to_csv.
         Default: '|'
 
     See Also
     --------
-    read_tables : Read CDM tales from disk.
+    write_data : Write MDF data and validation mask to disk.
+    read_tables : Read CDM tables from disk.
     read_mdf : Read original marine-meteorological data from disk.
 
     Note
