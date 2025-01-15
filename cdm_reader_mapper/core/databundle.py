@@ -9,6 +9,7 @@ import pandas as pd
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
+from cdm_reader_mapper.mdf_reader.write import write as write_mdf
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
@@ -61,7 +62,6 @@ class DataBundle:
         data=None,
         columns=None,
         dtypes=None,
-        attrs=None,
         parse_dates=None,
         mask=None,
         imodel=None,
@@ -70,7 +70,6 @@ class DataBundle:
         self._data = data
         self._columns = columns
         self._dtypes = dtypes
-        self._attrs = attrs
         self._parse_dates = parse_dates
         self._mask = mask
         self._imodel = imodel
@@ -106,11 +105,6 @@ class DataBundle:
     def dtypes(self):
         """Dictionary of data types on :py:attr:`data`."""
         return self._return_property("_dtypes")
-
-    @property
-    def attrs(self):
-        """Dictionary of attributes on :py:attr:`data`."""
-        return self._return_property("_attrs")
 
     @property
     def mask(self):
@@ -556,6 +550,25 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
+    def write_mdf(self, **kwargs):
+        """Write MDF data on disk.
+
+        Examples
+        --------
+        >>> db.write_mdf()
+
+        See Also
+        --------
+        DataBundle.write_tables : Write MDF data on disk.
+        read_mdf : Read original marine-meteorological data from disk.
+        read_tables : Read CDM tables from disk.
+
+        Note
+        ----
+        For more information see :py:func:`write_mdf`
+        """
+        write_mdf(self._data, mask=self._mask, **kwargs)
+
     def map_model(self, **kwargs):
         """Map :py:attr:`data` to the Common Data Model.
         Write output to :py:attr:`tables`.
@@ -585,6 +598,7 @@ class DataBundle:
 
         See Also
         --------
+        DataBundle.write_mdf : Write MDF data on disk.
         read_tables : Read CDM tables from disk.
         read_mdf : Read original marine-meteorological data from disk.
 
