@@ -12,9 +12,8 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
-from .schemas import schemas
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, validate_arg, validate_path
+from .utils.utilities import adjust_dtype, validate_arg
 
 
 class MDFFileReader(FileReader):
@@ -167,7 +166,6 @@ class MDFFileReader(FileReader):
         chunksize=None,
         sections=None,
         skiprows=0,
-        out_path=None,
         convert=True,
         decode=True,
         converter_dict=None,
@@ -186,8 +184,6 @@ class MDFFileReader(FileReader):
           If None read pre-defined data model sections.
         skiprows : int
           Number of initial rows to skip from file, default: 0
-        out_path : str, optional
-          Path to dump output data, valid mask and attributes.
         convert: bool, default: True
           If True convert entries by using a pre-defined data model.
         decode: bool, default: True
@@ -207,8 +203,6 @@ class MDFFileReader(FileReader):
         if not validate_arg("chunksize", chunksize, int):
             return
         if not validate_arg("skiprows", skiprows, int):
-            return
-        if not validate_path("out_path", out_path):
             return
 
         self.chunksize = chunksize
@@ -245,24 +239,12 @@ class MDFFileReader(FileReader):
 
         self.validate_entries(validate)
 
-        # 3. CREATE OUTPUT DATA ATTRIBUTES
-        logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
-        data_columns = (
-            [x for x in self.data]
-            if isinstance(self.data, pd.DataFrame)
-            else self.data.orig_options["names"]
-        )
-        out_atts = schemas.df_schema(data_columns, self.schema)
+        # 3. Create output DataBundle object
 
-        # 4. OUTPUT TO FILES IF REQUESTED
-        if out_path:
-            self.dump_atts(out_atts, out_path)
-        self.attrs = out_atts
         return DataBundle(
             data=self.data,
             columns=self.columns,
             dtypes=self.dtypes,
-            attrs=self.attrs,
             parse_dates=self.parse_dates,
             mask=self.mask,
             imodel=self.imodel,
@@ -319,6 +301,7 @@ def read(
     See Also
     --------
     read_tables : Read CDM tables from disk.
+    write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
 
