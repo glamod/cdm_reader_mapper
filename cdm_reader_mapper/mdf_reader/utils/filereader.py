@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import json
 import logging
 import os
 from copy import deepcopy
@@ -12,8 +11,6 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
 from .. import properties
 from ..schemas import schemas
@@ -184,7 +181,6 @@ class FileReader:
             if section not in df.columns:
                 continue
             if section in decoder_dict.keys():
-                print(decoder_dict)
                 decoded = decode_entries(
                     df[section],
                     decoder_dict[section],
@@ -212,44 +208,6 @@ class FileReader:
             schema=self.schema,
             disables=self.disable_reads,
         )
-
-    def dump_atts(self, out_atts, out_path):
-        """Dump attributes to atts.json."""
-        if not isinstance(self.data, pd.io.parsers.TextFileReader):
-            data = [self.data]
-            valid = [self.mask]
-        else:
-            data = pandas_TextParser_hdlr.make_copy(self.data)
-            valid = pandas_TextParser_hdlr.make_copy(self.mask)
-        logging.info(f"WRITING DATA TO FILES IN: {out_path}")
-        for i, (data_df, valid_df) in enumerate(zip(data, valid)):
-            header = False
-            mode = "a"
-            out_atts_json = {}
-            if i == 0:
-                mode = "w"
-                cols = [x for x in data_df]
-                if isinstance(cols[0], tuple):
-                    header = [":".join(x) for x in cols]
-                    out_atts_json = {
-                        ":".join(x): out_atts.get(x) for x in out_atts.keys()
-                    }
-                else:
-                    header = cols
-                    out_atts_json = out_atts
-            kwargs = {
-                "header": header,
-                "mode": mode,
-                "encoding": "utf-8",
-                "index": True,
-                "index_label": "index",
-                "escapechar": "\0",
-            }
-            data_df.to_csv(os.path.join(out_path, "data.csv"), **kwargs)
-            valid_df.to_csv(os.path.join(out_path, "mask.csv"), **kwargs)
-
-            with open(os.path.join(out_path, "atts.json"), "w") as fileObj:
-                json.dump(out_atts_json, fileObj, indent=4)
 
     def open_data(
         self,
