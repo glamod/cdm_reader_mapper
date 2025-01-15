@@ -23,7 +23,6 @@ def _testing_suite(
     cdm_subset=None,
     codes_subset=None,
     mapping=True,
-    out_path=None,
     drops=None,
     **kwargs,
 ):
