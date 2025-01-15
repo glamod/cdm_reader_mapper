@@ -49,11 +49,11 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.common import get_filename, logging_hdlr
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
-from ._utilities import get_cdm_subset, get_filename, get_usecols
+from ._utilities import get_cdm_subset, get_usecols
 
 
 def read_tables(
@@ -113,6 +113,7 @@ def read_tables(
     --------
     read_mdf : Read original marine-meteorological data from disk.
     write_tables : Write CDM tables to disk.
+    write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
