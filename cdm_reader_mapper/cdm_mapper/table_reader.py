@@ -111,6 +111,7 @@ def read_tables(
 
     See Also
     --------
+    read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
     write_tables : Write CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 from io import StringIO as StringIO
@@ -12,9 +13,11 @@ from cdm_reader_mapper.common import get_filename
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
-def write(
+def write_data(
     data,
     mask=None,
+    dtypes=None,
+    parse_dates=None,
     out_dir=".",
     prefix=None,
     suffix=None,
@@ -31,6 +34,13 @@ def write(
         pandas.DataFrame to export.
     mask: pandas.DataFrame
         validation mask to export.
+    dtypes: dict, optional
+        Dictionary of data types on ``data``.
+        Dump ``dtypes`` and ``parse_dates`` to json information file.
+    parse_dates:
+        Information of how to parse dates in :py:attr:`data`.
+        Dump ``dtypes`` and ``parse_dates`` to json information file.
+        For more information see :py:func:`pandas.read_csv`.
     out_dir: str
         Path to the output directory.
         Default: current directory
@@ -57,11 +67,12 @@ def write(
         Column labels could be both string or tuple.
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with df.to_csv.
-        Default: '|'
+        Default: ","
 
     See Also
     --------
     write_tables : Write CDM tables to disk.
+    read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
 
@@ -82,31 +93,49 @@ def write(
     else:
         mask = make_copy(mask)
 
+    info = {}
+    if dtypes is not None:
+        info["dtypes"] = dtypes
+    if parse_dates is not None:
+        info["parse_dates"] = parse_dates
+
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     filename_data = get_filename(
         [prefix, "data", suffix], path=out_dir, extension=extension
     )
     filename_mask = get_filename(
-        [prefix, "data", suffix], path=out_dir, extension=extension
+        [prefix, "mask", suffix], path=out_dir, extension=extension
+    )
+    filename_info = get_filename(
+        [prefix, "info", suffix], path=out_dir, extension="json"
     )
     for i, (data_df, mask_df) in enumerate(zip(data, mask)):
-        header = False
+        header = True
         mode = "a"
         if i == 0:
             mode = "w"
-            cols = [x for x in data_df]
-            if isinstance(cols[0], tuple):
-                header = [":".join(x) for x in cols]
-            else:
-                header = cols
+            header = []
+            for col in data_df.columns:
+                if isinstance(col, tuple):
+                    col_ = ":".join(col)
+                else:
+                    col_ = col
+                header.append(col_)
+                if "dtypes" in info.keys():
+                    if col in info["dtypes"]:
+                        info["dtypes"][col_] = info["dtypes"][col]
+                        del info["dtypes"][col]
 
         kwargs = {
             "header": header,
             "mode": mode,
             "encoding": "utf-8",
-            "index": True,
-            "index_label": "index",
+            "index": False,
             "sep": delimiter,
         }
         data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
         mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+
+    if info:
+        with open(os.path.join(out_dir, filename_info), "w") as fileObj:
+            json.dump(info, fileObj, indent=4)

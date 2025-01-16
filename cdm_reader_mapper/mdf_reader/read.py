@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 from io import StringIO as StringIO
 
 import pandas as pd
 
+from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.core.databundle import DataBundle
 
@@ -230,7 +232,7 @@ class MDFFileReader(FileReader):
         )
 
         # 2.3. Extract, read and validate data in same loop
-        # logging.info("Extracting and reading sections")
+        logging.info("Extracting and reading sections")
 
         self.convert_and_decode_entries(
             convert=convert,
@@ -240,6 +242,7 @@ class MDFFileReader(FileReader):
         self.validate_entries(validate)
 
         # 3. Create output DataBundle object
+        logging.info("Creata output DataBundle object")
 
         return DataBundle(
             data=self.data,
@@ -251,10 +254,7 @@ class MDFFileReader(FileReader):
         )
 
 
-# END AUX FUNCTIONS -----------------------------------------------------------
-
-
-def read(
+def read_mdf(
     source,
     imodel=None,
     ext_schema_path=None,
@@ -276,7 +276,7 @@ def read(
     Parameters
     ----------
     source: str
-        The file (including path) to be read
+        The file (including path) to be read.
     imodel: str, optional
         Name of internally available input data model.
         e.g. icoads_r300_d704
@@ -300,6 +300,7 @@ def read(
 
     See Also
     --------
+    read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
@@ -326,3 +327,81 @@ def read(
         year_init=year_init,
         year_end=year_end,
     ).read(**kwargs)
+
+
+def read_data(
+    data,
+    mask=None,
+    info=None,
+    imodel=None,
+    **kwargs,
+):
+    """Read MDF data which is already on a pre-defined data model.
+
+    Parameters
+    ----------
+    data: str
+        The data file (including path) to be read.
+    mask: str, optional
+        The validation file (including path) to be read.
+    info: str, optional
+        The information file (including path) to be read.
+    imodel: str, optional
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
+
+    Returns
+    -------
+    cdm_reader_mapper.DataBundle
+
+    Note
+    ----
+    :py:func:`cdm_reader_mapper.write_data` dumps ``data``, ``mask`` and ``info`` on file system.
+
+    See Also
+    --------
+    read_mdf : Read original marine-meteorological data from disk.
+    read_tables : Read CDM tables from disk.
+    write_data : Write MDF data and validation mask to disk.
+    write_tables : Write CDM tables to disk.
+    """
+
+    def _update_column_labels(columns):
+        columns_ = []
+        for col in columns:
+            try:
+                col_ = ast.literal_eval(col)
+            except SyntaxError:
+                col_ = tuple(col.split(":"))
+            except ValueError:
+                col_ = col
+            columns_.append(col_)
+        return columns_
+
+    def _read_csv(ifile, **kwargs):
+        df = pd.read_csv(ifile, delimiter=",", **kwargs)
+        df.columns = _update_column_labels(df.columns)
+        return df
+
+    info_dict = open_json_file(info)
+    if "dtypes" in info_dict.keys():
+        dtype = info_dict["dtypes"]
+    else:
+        dtype = None
+    if "parse_dates" in info_dict.keys():
+        parse_dates = info_dict["parse_dates"]
+    else:
+        parse_dates = False
+
+    data = _read_csv(data, dtype=dtype, parse_dates=parse_dates)
+    if mask is not None:
+        mask = _read_csv(mask)
+
+    return DataBundle(
+        data=data,
+        columns=data.columns,
+        dtypes=dtype,
+        parse_dates=parse_dates,
+        mask=mask,
+        imodel=imodel,
+    )

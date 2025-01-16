@@ -9,7 +9,7 @@ import pandas as pd
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
-from cdm_reader_mapper.mdf_reader.write import write as write_mdf
+from cdm_reader_mapper.mdf_reader.write import write_data
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
@@ -26,8 +26,10 @@ class DataBundle:
         MDF DataFrame.
     columns: list, optional
         Column labels of ``data``
-    dtypes: list, optional
+    dtypes: dict, optional
         Data types of ``data``.
+    parse_dates: list, optional
+        Information how to parse dates on ``data``
     mask: pandas.DataFrame, optional
         MDF validation mask
     imodel: str, optional
@@ -105,6 +107,16 @@ class DataBundle:
     def dtypes(self):
         """Dictionary of data types on :py:attr:`data`."""
         return self._return_property("_dtypes")
+
+    @property
+    def parse_dates(self):
+        """Information of how to parse dates in :py:attr:`data`.
+
+        See Also
+        --------
+        :py:func:pandas.`read_csv`
+        """
+        return self._return_property("_parse_dates")
 
     @property
     def mask(self):
@@ -550,12 +562,12 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
-    def write_mdf(self, **kwargs):
+    def write_data(self, **kwargs):
         """Write MDF data on disk.
 
         Examples
         --------
-        >>> db.write_mdf()
+        >>> db.write_data()
 
         See Also
         --------
@@ -567,7 +579,13 @@ class DataBundle:
         ----
         For more information see :py:func:`write_mdf`
         """
-        write_mdf(self._data, mask=self._mask, **kwargs)
+        write_data(
+            self._data,
+            mask=self._mask,
+            dtypes=self._dtypes,
+            parse_dates=self._parse_dates,
+            **kwargs,
+        )
 
     def map_model(self, **kwargs):
         """Map :py:attr:`data` to the Common Data Model.
