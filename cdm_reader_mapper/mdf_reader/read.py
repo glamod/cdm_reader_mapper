@@ -1,4 +1,4 @@
-"""Common Data Model (CDM) reader."""
+"""Common Data Model (CDM) MDF reader."""
 
 from __future__ import annotations
 
@@ -334,6 +334,7 @@ def read_data(
     mask=None,
     info=None,
     imodel=None,
+    col_subset=None,
     **kwargs,
 ):
     """Read MDF data which is already on a pre-defined data model.
@@ -349,6 +350,16 @@ def read_data(
     imodel: str, optional
         Name of internally available input data model.
         e.g. icoads_r300_d704
+    col_subset: str, tuple or list, optional
+        Specify the section or sections of the file to write.
+
+        - For multiple sections of the tables:
+          e.g col_subset = [columns0,...,columnsN]
+
+        - For a single section:
+          e.g. list type object col_subset = [columns]
+
+        Column labels could be both string or tuple.
 
     Returns
     -------
@@ -378,12 +389,17 @@ def read_data(
             columns_.append(col_)
         return columns_
 
-    def _read_csv(ifile, **kwargs):
+    def _read_csv(ifile, col_subset=None, **kwargs):
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
         df.columns = _update_column_labels(df.columns)
+        if col_subset is not None:
+            df = df[col_subset]
         return df
 
-    info_dict = open_json_file(info)
+    if info is not None:
+        info_dict = open_json_file(info)
+    else:
+        info_dict = {}
     if "dtypes" in info_dict.keys():
         dtype = info_dict["dtypes"]
     else:
@@ -392,10 +408,10 @@ def read_data(
         parse_dates = info_dict["parse_dates"]
     else:
         parse_dates = False
-
-    data = _read_csv(data, dtype=dtype, parse_dates=parse_dates)
+    print(data)
+    data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
     if mask is not None:
-        mask = _read_csv(mask)
+        mask = _read_csv(mask, col_subset=col_subset)
 
     return DataBundle(
         data=data,

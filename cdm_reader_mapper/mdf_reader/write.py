@@ -1,4 +1,4 @@
-"""Common Data Model (CDM) reader."""
+"""Common Data Model (CDM) MDF writer."""
 
 from __future__ import annotations
 
@@ -80,6 +80,12 @@ def write_data(
     ----
     Use this function after reading MDF data.
     """
+
+    def _join(col):
+        if isinstance(col, (list, tuple)):
+            return ":".join(col)
+        return col
+
     if not isinstance(data, pd.io.parsers.TextFileReader):
         data = [data]
     else:
@@ -95,7 +101,7 @@ def write_data(
 
     info = {}
     info["dtypes"] = dtypes
-    info["parse_dates"] = parse_dates
+    info["parse_dates"] = [_join(parse_date) for parse_date in parse_dates]
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     filename_data = get_filename(
@@ -108,7 +114,10 @@ def write_data(
         [prefix, "info", suffix], path=out_dir, extension="json"
     )
     for i, (data_df, mask_df) in enumerate(zip(data, mask)):
-        header = True
+        if col_subset is not None:
+            data_df = data_df[col_subset]
+            mask_df = mask_df[col_subset]
+        header = False
         mode = "a"
         if i == 0:
             mode = "w"
@@ -117,15 +126,15 @@ def write_data(
                 k: v for k, v in info["dtypes"].items() if k in data_df.columns
             }
             for col in data_df.columns:
-                if isinstance(col, tuple):
-                    col_ = ":".join(col)
-                else:
-                    col_ = col
+                col_ = _join(col)
                 header.append(col_)
 
                 if col in info["dtypes"]:
                     info["dtypes"][col_] = info["dtypes"][col]
                     del info["dtypes"][col]
+            info["parse_dates"] = [
+                parse_date for parse_date in info["parse_dates"] if parse_date in header
+            ]
 
         kwargs = {
             "header": header,
