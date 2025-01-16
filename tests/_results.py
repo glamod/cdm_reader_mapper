@@ -194,10 +194,15 @@ class result_data:
             name = cdm_table.format(data_file)
             path = load_file(os.path.join(*drs, "cdm_tables", name)).parent
 
+        try:
+            info = (load_file(os.path.join(*drs, "output", info)).parent,)
+        except Exception:
+            info = None
+
         return {
             "data": self._load_file(os.path.join(*drs, "output", data)),
             "mask": self._load_file(os.path.join(*drs, "output", mask)),
-            "info": self._load_file(os.path.join(*drs, "output", info)),
+            "info": info,
             "cdm_table": path,
             "vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
             "vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
