@@ -144,7 +144,7 @@ MDF data
 
    DataBundle.dtypes
 
-   DataBundle.attrs
+   DataBundle.parse_dates
 
    DataBundle.mask
 
