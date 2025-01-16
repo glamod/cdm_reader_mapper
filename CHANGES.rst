@@ -11,6 +11,8 @@ New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`, :pull:`197`)
 * Update readthedocs documentation (:issue:`191`, :pull:`197`)
+* new function: ``write_data`` to write MDF data and validation mask according to ``write_tables`` for writing CDM tables (:pull:`201`)
+* new function: ``read_data`` to read MDF data and validation mask according to ``read_tables`` for reading CDM tables (:pull:`201`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -26,6 +28,7 @@ Breaking changes
 * ``duplicates`` is now a direct submodule of ``cdm_reader_mapper`` (:pull:`188`)
 * import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
 * ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
+* ``read_mdf``: remove parameter ``out_path`` to dump attribute information on disk (:pull:`201`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
