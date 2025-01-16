@@ -16,8 +16,8 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 def write_data(
     data,
     mask=None,
-    dtypes=None,
-    parse_dates=None,
+    dtypes={},
+    parse_dates=False,
     out_dir=".",
     prefix=None,
     suffix=None,
@@ -34,7 +34,7 @@ def write_data(
         pandas.DataFrame to export.
     mask: pandas.DataFrame
         validation mask to export.
-    dtypes: dict, optional
+    dtypes: dict
         Dictionary of data types on ``data``.
         Dump ``dtypes`` and ``parse_dates`` to json information file.
     parse_dates:
@@ -94,10 +94,8 @@ def write_data(
         mask = make_copy(mask)
 
     info = {}
-    if dtypes is not None:
-        info["dtypes"] = dtypes
-    if parse_dates is not None:
-        info["parse_dates"] = parse_dates
+    info["dtypes"] = dtypes
+    info["parse_dates"] = parse_dates
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     filename_data = get_filename(
@@ -115,16 +113,19 @@ def write_data(
         if i == 0:
             mode = "w"
             header = []
+            info["dtypes"] = {
+                k: v for k, v in info["dtypes"].items() if k in data_df.columns
+            }
             for col in data_df.columns:
                 if isinstance(col, tuple):
                     col_ = ":".join(col)
                 else:
                     col_ = col
                 header.append(col_)
-                if "dtypes" in info.keys():
-                    if col in info["dtypes"]:
-                        info["dtypes"][col_] = info["dtypes"][col]
-                        del info["dtypes"][col]
+
+                if col in info["dtypes"]:
+                    info["dtypes"][col_] = info["dtypes"][col]
+                    del info["dtypes"][col]
 
         kwargs = {
             "header": header,
