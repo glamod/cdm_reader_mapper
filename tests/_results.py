@@ -185,6 +185,7 @@ class result_data:
 
         data_file = f"{data_model}_{data_file}"
         data = f"data_{data_file}.csv"
+        info = f"info_{data_file}.json"
         mask = f"mask_{data_file}.csv"
         vaid = f"vaid_{data_file}.csv"
         vadt = f"vadt_{data_file}.csv"
@@ -196,6 +197,7 @@ class result_data:
         return {
             "data": self._load_file(os.path.join(*drs, "output", data)),
             "mask": self._load_file(os.path.join(*drs, "output", mask)),
+            "info": self._load_file(os.path.join(*drs, "output", info)),
             "cdm_table": path,
             "vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
             "vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
