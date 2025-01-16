@@ -408,7 +408,7 @@ def read_data(
         parse_dates = info_dict["parse_dates"]
     else:
         parse_dates = False
-    print(data)
+
     data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
     if mask is not None:
         mask = _read_csv(mask, col_subset=col_subset)
