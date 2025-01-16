@@ -160,7 +160,7 @@ class result_data:
     @property
     def expected_gcc(self):
         return self._get_data_dict(
-            "20030201",
+            "2003-02-01_subset",
             "gcc",
         )
 
