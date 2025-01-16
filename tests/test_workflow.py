@@ -17,7 +17,6 @@ from ._testing_workflow_suite import _testing_suite
             "icoads_r300_d714",
             None,
             None,
-            None,
             False,
             None,
             {"sections": ["core", "c99"]},
@@ -57,7 +56,7 @@ from ._testing_workflow_suite import _testing_suite
             None,
             {},
         ),
-        ("icoads_r300_d714", None, None, None, True, None, {"chunksize": 3}),
+        ("icoads_r300_d714", None, None, True, None, {"chunksize": 3}),
         (
             "icoads_r300_d714",
             None,
