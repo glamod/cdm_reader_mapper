@@ -54,7 +54,10 @@ def _testing_suite(
         return
 
     db_exp = read_data(
-        result_data_file, mask=expected_data["mask"], info=expected_data["info"]
+        result_data_file,
+        mask=expected_data["mask"],
+        info=expected_data["info"],
+        col_subset=data_res.columns,
     )
     data_exp = db_exp.data.copy()
     mask_exp = db_exp.mask.copy()
