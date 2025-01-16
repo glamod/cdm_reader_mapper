@@ -167,7 +167,7 @@ class test_data:
     def test_gcc(self):
         """IMMAT deck ??? test data."""
         return self._get_data_dict(
-            "20030201.immt",
+            "2003-02-01_subset.immt",
             "gcc",
         )
 

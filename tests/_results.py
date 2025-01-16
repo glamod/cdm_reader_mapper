@@ -195,7 +195,7 @@ class result_data:
             path = load_file(os.path.join(*drs, "cdm_tables", name)).parent
 
         try:
-            info = (load_file(os.path.join(*drs, "output", info)).parent,)
+            info = load_file(os.path.join(*drs, "output", info))
         except Exception:
             info = None
 
