@@ -577,7 +577,7 @@ class DataBundle:
 
         Note
         ----
-        For more information see :py:func:`write_mdf`
+        For more information see :py:func:`write_data`
         """
         write_data(
             self._data,
