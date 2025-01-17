@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-
 from . import properties
 
 
@@ -36,14 +34,6 @@ def get_usecols(tb, col_subset=None):
         return col_subset
     elif isinstance(col_subset, dict):
         return col_subset.get(tb)
-
-
-def get_filename(pattern, path=".", extension="psv"):
-    """Get file name."""
-    if extension[0] != ".":
-        extension = f".{extension}"
-    filename = "-".join(filter(bool, pattern)) + extension
-    return os.path.join(path, filename)
 
 
 def adjust_filename(filename, table="", extension="psv"):

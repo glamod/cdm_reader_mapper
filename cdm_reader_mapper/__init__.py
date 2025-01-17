@@ -10,7 +10,8 @@ from .core import DataBundle  # noqa
 from .data import test_data  # noqa
 from .duplicates.duplicates import DupDetect  # noqa
 from .duplicates.duplicates import duplicate_check  # noqa
-from .mdf_reader.read import read as read_mdf  # noqa
+from .mdf_reader.read import read_data, read_mdf  # noqa
+from .mdf_reader.write import write_data  # noqa
 from .metmetpy.datetime.correct import correct as correct_datetime  # noqa
 from .metmetpy.datetime.validate import validate as validate_datetime  # noqa
 from .metmetpy.platform_type.correct import correct as correct_pt  # noqa

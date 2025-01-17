@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-import ast
-
 import pandas as pd
-
-from cdm_reader_mapper import mdf_reader
 
 
 def drop_rows(df, drops):
@@ -38,46 +34,20 @@ def remove_datetime_columns(output, output_, col_subset):
     return output, output_
 
 
-def pandas_read_csv(
+def read_validation(
     *args,
-    delimiter=mdf_reader.properties.internal_delimiter,
-    squeeze=False,
     name=False,
     **kwargs,
 ):
     df = pd.read_csv(
         *args,
+        header=None,
         **kwargs,
-        quotechar="\0",
-        escapechar="\0",
-        delimiter=delimiter,
     )
-    if squeeze is True:
-        df = df.squeeze()
+
+    df = df.squeeze()
 
     if name is not False:
         df.name = name
 
     return df
-
-
-def evaluate_columns(columns):
-    columns_ = []
-    for col in columns:
-        try:
-            columns_.append(ast.literal_eval(col))
-        except ValueError:
-            columns_.append(col)
-    return columns_
-
-
-def read_result_data(data_file, columns, **kwargs):
-    columns_ = pandas_read_csv(data_file, nrows=0).columns
-    columns_ = evaluate_columns(columns_)
-    data_ = pandas_read_csv(
-        data_file,
-        names=columns_,
-        skiprows=1,
-        **kwargs,
-    )
-    return data_[columns]

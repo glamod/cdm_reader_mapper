@@ -3,18 +3,20 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import DataBundle, read_mdf, read_tables, test_data
+from cdm_reader_mapper import DataBundle, read_data, read_tables
 
 from ._results import result_data
-from ._utilities import read_result_data
 
 
 def get_result_data(imodel):
-    test_ = read_mdf(**dict(getattr(test_data, f"test_{imodel}")), imodel=imodel)
-    columns = test_.data.columns
     results_ = getattr(result_data, f"expected_{imodel}")
-    data_ = read_result_data(results_["data"], columns)
-    mask_ = read_result_data(results_["mask"], columns)
+    db_ = read_data(
+        results_["data"],
+        mask=results_["mask"],
+        info=results_["info"],
+    )
+    data_ = db_.data.copy()
+    mask_ = db_.mask.copy()
     db = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
     return db.add({"data": data_, "mask": mask_})
 

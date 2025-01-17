@@ -5,14 +5,13 @@ import os
 import pandas as pd
 
 from cdm_reader_mapper import read_mdf, read_tables
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.mdf_reader.read import read_data
 
 from ._results import result_data
 from ._utilities import (
     drop_rows,
     get_col_subset,
-    pandas_read_csv,
-    read_result_data,
+    read_validation,
     remove_datetime_columns,
 )
 
@@ -23,70 +22,66 @@ def _testing_suite(
     cdm_subset=None,
     codes_subset=None,
     mapping=True,
-    out_path=None,
     drops=None,
     **kwargs,
 ):
     exp = f"expected_{imodel}"
 
-    read_ = read_mdf(
+    db_mdf = read_mdf(
         source=source,
         imodel=imodel,
-        out_path=out_path,
         **kwargs,
     )
 
-    read_.correct_datetime()
-    read_.correct_pt()
+    db_mdf.correct_datetime()
+    db_mdf.correct_pt()
 
-    val_dt = read_.validate_datetime()
+    val_dt = db_mdf.validate_datetime()
 
-    val_id = read_.validate_id()
+    val_id = db_mdf.validate_id()
+
+    db_mdf.write_data(suffix=imodel)
+
+    db_res = read_data(
+        f"data-{imodel}.csv", mask=f"mask-{imodel}.csv", info=f"info-{imodel}.json"
+    )
+    data_res = db_res.data.copy()
+    mask_res = db_res.mask.copy()
 
     expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
     if not os.path.isfile(result_data_file):
         return
 
-    data_exp = read_result_data(
+    db_exp = read_data(
         result_data_file,
-        read_.columns,
-        dtype=read_.dtypes,
-        parse_dates=read_._parse_dates,
+        mask=expected_data["mask"],
+        info=expected_data["info"],
+        col_subset=data_res.columns,
     )
-    mask_exp = read_result_data(expected_data["mask"], read_.columns)
+    data_exp = db_exp.data.copy()
+    mask_exp = db_exp.mask.copy()
 
     data_exp = drop_rows(data_exp, drops)
     mask_exp = drop_rows(mask_exp, drops)
 
-    if isinstance(read_.data, pd.io.parsers.TextFileReader):
-        data = make_copy(read_.data).read()
-        mask = make_copy(read_.mask).read()
-    else:
-        data = read_.data.copy()
-        mask = read_.mask.copy()
-
-    pd.testing.assert_frame_equal(data, data_exp)
-    pd.testing.assert_frame_equal(mask, mask_exp, check_dtype=False)
-
-    if len(read_) == 0:
+    if data_res.empty and data_exp.empty:
         return
 
+    pd.testing.assert_frame_equal(data_res, data_exp)
+    pd.testing.assert_frame_equal(mask_res, mask_exp, check_dtype=False)
+
     if val_dt is not None:
-        val_dt_ = pandas_read_csv(
+        val_dt_ = read_validation(
             expected_data["vadt"],
-            header=None,
-            squeeze=True,
             name=None,
         )
         val_dt_ = drop_rows(val_dt_, drops)
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
 
     if val_id is not None:
-        val_id_ = pandas_read_csv(
+        val_id_ = read_validation(
             expected_data["vaid"],
-            header=None,
-            squeeze=True,
             name=val_id.name,
         )
         val_id_ = drop_rows(val_id_, drops)
@@ -95,15 +90,15 @@ def _testing_suite(
     if mapping is False:
         return
 
-    read_.map_model(
+    db_mdf.map_model(
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",
     )
 
-    col_subset = get_col_subset(read_.tables, codes_subset)
+    col_subset = get_col_subset(db_mdf.tables, codes_subset)
 
-    read_.write_tables(suffix=imodel)
+    db_mdf.write_tables(suffix=imodel)
     output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
 
     output_exp = read_tables(
