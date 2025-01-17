@@ -113,12 +113,12 @@ def write_data(
         col_ = _join(col)
         header.append(col_)
 
-    if col in info["dtypes"]:
-        info["dtypes"][col_] = info["dtypes"][col]
-        del info["dtypes"][col]
-    info["parse_dates"] = [
-        parse_date for parse_date in info["parse_dates"] if parse_date in header
-    ]
+        if col in info["dtypes"]:
+            info["dtypes"][col_] = info["dtypes"][col]
+            del info["dtypes"][col]
+        info["parse_dates"] = [
+            parse_date for parse_date in info["parse_dates"] if parse_date in header
+        ]
 
     kwargs = {
         "header": header,
