@@ -45,6 +45,7 @@ Internal changes
   * ``metmetmpy.station_id.validate.validate``
 
 * split ``mdf_reader.utils.auxiliary`` into ``mdf_reader.utils.filereader``, ``mdf_reader.utils.configurator`` and ``mdf_reader.utils.utilities`` (:issue:`25`, :pull:`200`)
+* simplify ``cdm_mapper.read_tables`` function (:pull:`192`)
 
 Bug fixes
 ^^^^^^^^^
