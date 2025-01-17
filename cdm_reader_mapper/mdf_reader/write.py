@@ -10,7 +10,6 @@ from io import StringIO as StringIO
 import pandas as pd
 
 from cdm_reader_mapper.common import get_filename
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
 def write_data(
@@ -86,18 +85,8 @@ def write_data(
             return ":".join(col)
         return col
 
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        data = [data]
-    else:
-        data = make_copy(data)
-
     if mask is None:
         mask = pd.DataFrame()
-
-    if not isinstance(mask, pd.io.parsers.TextFileReader):
-        mask = [mask]
-    else:
-        mask = make_copy(mask)
 
     info = {}
     info["dtypes"] = dtypes
@@ -113,38 +102,33 @@ def write_data(
     filename_info = get_filename(
         [prefix, "info", suffix], path=out_dir, extension="json"
     )
-    for i, (data_df, mask_df) in enumerate(zip(data, mask)):
-        if col_subset is not None:
-            data_df = data_df[col_subset]
-            mask_df = mask_df[col_subset]
-        header = False
-        mode = "a"
-        if i == 0:
-            mode = "w"
-            header = []
-            info["dtypes"] = {
-                k: v for k, v in info["dtypes"].items() if k in data_df.columns
-            }
-            for col in data_df.columns:
-                col_ = _join(col)
-                header.append(col_)
 
-                if col in info["dtypes"]:
-                    info["dtypes"][col_] = info["dtypes"][col]
-                    del info["dtypes"][col]
-            info["parse_dates"] = [
-                parse_date for parse_date in info["parse_dates"] if parse_date in header
-            ]
+    if col_subset is not None:
+        data = data[col_subset]
+        mask = mask[col_subset]
 
-        kwargs = {
-            "header": header,
-            "mode": mode,
-            "encoding": "utf-8",
-            "index": False,
-            "sep": delimiter,
-        }
-        data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
-        mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+    header = []
+    info["dtypes"] = {k: v for k, v in info["dtypes"].items() if k in data.columns}
+    for col in data.columns:
+        col_ = _join(col)
+        header.append(col_)
+
+    if col in info["dtypes"]:
+        info["dtypes"][col_] = info["dtypes"][col]
+        del info["dtypes"][col]
+    info["parse_dates"] = [
+        parse_date for parse_date in info["parse_dates"] if parse_date in header
+    ]
+
+    kwargs = {
+        "header": header,
+        "mode": "w",
+        "encoding": "utf-8",
+        "index": False,
+        "sep": delimiter,
+    }
+    data.to_csv(os.path.join(out_dir, filename_data), **kwargs)
+    mask.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
 
     if info:
         with open(os.path.join(out_dir, filename_info), "w") as fileObj:
