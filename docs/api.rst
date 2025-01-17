@@ -17,6 +17,7 @@ Read data from disk
    :toctree: generated/
 
    read_mdf
+   read_data
    read_tables
 
 .. _databundle:
@@ -88,6 +89,14 @@ Validation
 
 .. _cdm_tables:
 
+MDF data
+^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.write_data
+
 CDM tables
 ^^^^^^^^^^
 
@@ -144,7 +153,7 @@ MDF data
 
    DataBundle.dtypes
 
-   DataBundle.attrs
+   DataBundle.parse_dates
 
    DataBundle.mask
 
@@ -174,9 +183,6 @@ Useful functions
 .. autosummary::
    :toctree: generated/
 
-   duplicate_check
-   map_model
-   write_tables
    correct_datetime
    correct_pt
    unique
@@ -186,6 +192,10 @@ Useful functions
    select_true
    select_from_index
    select_from_list
+   write_data
+   map_model
+   duplicate_check
+   write_tables
 
 .. _dupdetect:
 
