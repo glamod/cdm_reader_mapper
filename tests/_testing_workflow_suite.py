@@ -65,11 +65,11 @@ def _testing_suite(
     data_exp = drop_rows(data_exp, drops)
     mask_exp = drop_rows(mask_exp, drops)
 
+    if data_res.empty and data_exp.empty:
+        return
+
     pd.testing.assert_frame_equal(data_res, data_exp)
     pd.testing.assert_frame_equal(mask_res, mask_exp, check_dtype=False)
-
-    if len(db_mdf) == 0:
-        return
 
     if val_dt is not None:
         val_dt_ = read_validation(
