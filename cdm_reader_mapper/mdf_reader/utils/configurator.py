@@ -10,7 +10,7 @@ import pandas as pd
 
 from .. import properties
 from . import converters, decoders
-from .utilities import convert_dtypes
+from .utilities import convert_dtypes, convert_value, decode_value, validate_value
 
 
 class Configurator:
@@ -187,12 +187,10 @@ class Configurator:
 
         dtypes, parse_dates = convert_dtypes(dtypes)
         return {
-            "convert_decode": {
-                "converter_dict": converters,
-                "converter_kwargs": kwargs,
-                "decoder_dict": decoders,
-                "dtype": dtypes,
-            },
+            "converter_dict": converters,
+            "converter_kwargs": kwargs,
+            "decoder_dict": decoders,
+            "dtype": dtypes,
             "self": {
                 "dtypes": dtypes,
                 "disable_reads": disable_reads,
@@ -200,13 +198,21 @@ class Configurator:
             },
         }
 
-    def open_pandas(self):
+    def open_pandas(self, configurations):
         """Open TextParser to pd.DataSeries."""
-        missing_values = []
         self.delimiter = None
         i = 0
         j = 0
         data_dict = {}
+        mask_dict = {}
+        convert = configurations.get("convert", False)
+        converter_dict = configurations.get("converter_dict", {})
+        converter_kwargs = configurations.get("converter_kwargs", {})
+        decode = configurations.get("decode", False)
+        decoder_dict = configurations.get("decoder_dict", {})
+        # dtype = configurations.get("dtype", {})
+        validate = configurations.get("validate", False)
+
         for order in self.orders:
             self.order = order
             header = self.schema["sections"][order]["header"]
@@ -239,24 +245,37 @@ class Configurator:
 
                 j, k = self._adjust_right_borders(j, k)
 
-                if ignore is not True:
-                    data_dict[index] = self.str_line[i:j]
+                if ignore is True:
+                    i = j
+                    continue
 
-                    if not data_dict[index].strip():
-                        data_dict[index] = None
-                    if data_dict[index] == na_value:
-                        data_dict[index] = None
+                value = self.str_line[i:j]
+                if not value.strip():
+                    value = None
+                if value == na_value:
+                    value = None
+                isna = not value
+                if decode is True:
+                    value = decode_value(value, index, decoder_dict)
+                if convert is True:
+                    value = convert_value(
+                        value, index, converter_dict, converter_kwargs
+                    )
 
-                if i == j and self.missing is True:
-                    missing_values.append(index)
+                if validate is True:
+                    missing = False
+                    if i == j and self.missing is True:
+                        missing = True
+                    mask_dict[index] = validate_value(value, isna, missing)
+                data_dict[index] = value
 
                 i = j
 
         df = pd.Series(data_dict)
-        df["missing_values"] = missing_values
-        return df
+        mask = pd.Series(mask_dict)
+        return pd.concat([df, mask])
 
-    def open_netcdf(self):
+    def open_netcdf(self, configurations):
         """Open netCDF to pd.Series."""
 
         def replace_empty_strings(series):

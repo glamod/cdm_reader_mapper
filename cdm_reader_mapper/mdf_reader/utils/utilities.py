@@ -64,14 +64,25 @@ def validate_path(arg_name, arg_value):
     return True
 
 
-def convert_entries(series, converter_func, **kwargs):
+def convert_value(value, index, converter_dict, converter_kwargs):
     """DOCUMENTATION."""
-    return converter_func(series, **kwargs)
+    if index not in converter_dict.keys():
+        return value
+    kwargs = converter_kwargs.get(index, {})
+    return converter_dict[index](value, **kwargs)
 
 
-def decode_entries(series, decoder_func):
+def decode_value(value, index, decoder_dict):
     """DOCUMENTATION."""
-    return decoder_func(series)
+    if index not in decoder_dict.keys():
+        return value
+    return decoder_dict[index](value)
+
+
+def validate_value(value, isna, missing):
+    """DOCUMENTATION."""
+    mask = mask_value(value, isna, missing)
+    return mask
 
 
 def set_missing_values(df, ref):
@@ -88,15 +99,14 @@ def set_missing_values(df, ref):
     return missing_values.notna()
 
 
-def create_mask(df, isna, missing_values=[]):
+def mask_value(value, isna, missing):
     """DOCUMENTATION."""
+    if missing:
+        return False
     if isna is None:
-        isna = df.isna()
-    valid = df.notna()
-    mask = isna | valid
-    if len(missing_values) > 0:
-        mask[missing_values] = False
-    return mask
+        isna = not value
+    valid = bool(value)
+    return isna | valid
 
 
 def adjust_dtype(dtype, df):

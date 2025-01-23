@@ -97,11 +97,10 @@ class df_decoders:
     def base36(self, data):
         """DOCUMENTATION."""
         # Caution: int(str(np.nan),36) ==> 30191
-        data = data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+        data = (
+            np.nan if isinstance(data, str) and (data.isspace() or not data) else data
         )
-        data = [str(int(str(i), 36)) if i == i and i else np.nan for i in data]
-        return pd.Series(data, dtype=self.dtype)
+        return str(int(str(data), 36)) if data == data and data else np.nan
 
 
 decoders = dict()

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import numpy as np
-import pandas as pd
 
 from .. import properties
 
@@ -18,6 +19,7 @@ class df_converters:
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
+        return data.decode("utf-8")
         decoded = data.str.decode("utf-8")
         if decoded.dtype != "object":
             return data
@@ -25,21 +27,15 @@ class df_converters:
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
-        data = data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
-        )
-
-        # str method fails if all nan, pd.Series.replace method is not the same
-        # as pd.Series.str.replace!
-        if data.count() > 0:
-            data = self.decode(data)
-            data = data.str.strip()
-            data = data.str.replace(" ", "0")
-
-        #  Convert to numeric, then scale (?!) and give it's actual int type
-        return pd.to_numeric(
-            data, errors="coerce"
-        )  # astype fails on strings, to_numeric manages errors....!
+        data = None if isinstance(data, str) and (data.isspace() or not data) else data
+        if not data:
+            return
+        data = data.strip()
+        data = data.replace(" ", "0")
+        try:
+            return int(data)
+        except ValueError:
+            return
 
     def object_to_numeric(self, data, scale=None, offset=None):
         """
@@ -69,36 +65,36 @@ class df_converters:
             Data series of type self.dtype
 
         """
+        if not isinstance(data, str):
+            return data
         scale = scale if scale else self.numeric_scale
         offset = offset if offset else self.numeric_offset
-        if data.dtype == "object":
-            data = self.to_numeric(data)
-
-        data = offset + data * scale
-        return pd.Series(data, dtype=self.dtype)
+        data = self.to_numeric(data)
+        if data is None:
+            return np.nan
+        return offset + data * scale
 
     def object_to_object(self, data, disable_white_strip=False):
         """DOCUMENTATION."""
         # With strip() an empty element after stripping, is just an empty element, no NaN...
-        if data.dtype != "object":
+        if not isinstance(data, str):
             return data
-        data = self.decode(data)
         if not disable_white_strip:
-            data = data.str.strip()
+            data = data.strip()
         else:
             if disable_white_strip == "l":
-                data = data.str.rstrip()
+                data = data.rstrip()
             elif disable_white_strip == "r":
-                data = data.str.lstrip()
-        return data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+                data = data.lstrip()
+        return (
+            np.nan if isinstance(data, str) and (data.isspace() or not data) else data
         )
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
-        if data.dtype != "object":
+        if not isinstance(data, str):
             return data
-        return pd.to_datetime(data, format=datetime_format, errors="coerce")
+        return datetime.strptime(data, datetime_format)
 
 
 converters = dict()

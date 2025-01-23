@@ -10,12 +10,11 @@ from io import StringIO as StringIO
 import pandas as pd
 
 from cdm_reader_mapper.common.json_dict import open_json_file
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, validate_arg
+from .utils.utilities import validate_arg
 
 
 class MDFFileReader(FileReader):
@@ -35,133 +34,6 @@ class MDFFileReader(FileReader):
 
     def __init__(self, *args, **kwargs):
         FileReader.__init__(self, *args, **kwargs)
-
-    def convert_and_decode_entries(
-        self,
-        convert=True,
-        decode=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-        dtype=None,
-    ):
-        """Convert and decode data entries by using a pre-defined data model.
-
-        Overwrite attribute `data` with converted and/or decoded data.
-
-        Parameters
-        ----------
-        convert: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        decoder_dict: dict, optional
-          Functions for decoding values in specific columns.
-          If None use information from a pre-defined data model.
-        dtype: dtype or dict of {Hashable: dtype}, optional
-          Data type(s) to apply to either the whole dataset or individual columns.
-          If None use information from a pre-defined data model.
-          Use only if data is read with chunksizes.
-        """
-        if converter_dict is None:
-            converter_dict = self.configurations["convert_decode"]["converter_dict"]
-        if converter_kwargs is None:
-            converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
-        if decoder_dict is None:
-            decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if dtype is None:
-            dtype = self.configurations["convert_decode"]["dtype"]
-        if not (convert and decode):
-            return self
-        if convert is not True:
-            converter_dict = {}
-            converter_kwargs = {}
-        if decode is not True:
-            decoder_dict = {}
-
-        if isinstance(self.data, pd.DataFrame):
-            dtype = adjust_dtype(dtype, self.data)
-            data = self.convert_and_decode_df(
-                self.data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-            )
-            self.data = data.astype(dtype)
-        else:
-            data_buffer = StringIO()
-            TextParser = make_copy(self.data)
-            for i, df_ in enumerate(TextParser):
-                df = self.convert_and_decode_df(
-                    df_,
-                    converter_dict,
-                    converter_kwargs,
-                    decoder_dict,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            date_columns = []
-            for i, element in enumerate(list(dtype)):
-                if dtype.get(element) == "datetime":
-                    date_columns.append(i)
-            dtype = adjust_dtype(dtype, df)
-            data_buffer.seek(0)
-            self.data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=dtype,
-                parse_dates=date_columns,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-        return self
-
-    def validate_entries(self, validate):
-        """Validate data entries by using a pre-defined data model.
-
-        Fill attribute `valid` with boolean mask.
-        """
-        if validate is not True:
-            self.mask = pd.DataFrame()
-        elif isinstance(self.data, pd.DataFrame):
-            self.mask = self.validate_df(self.data, isna=self.isna)
-        else:
-            data_buffer = StringIO()
-            TextParser_ = make_copy(self.data)
-            TextParser_isna_ = make_copy(self.isna)
-            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self.validate_df(df_, isna=isna_)
-                mask_.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-            data_buffer.seek(0)
-            self.mask = pd.read_csv(
-                data_buffer,
-                names=df_.columns,
-                chunksize=self.chunksize,
-            )
-        return self
 
     def read(
         self,
@@ -223,23 +95,17 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
-        self.data, self.isna = self.open_data(
+        self.data, self.mask = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
             chunksize=chunksize,
-        )
-
-        # 2.3. Extract, read and validate data in same loop
-        logging.info("Extracting and reading sections")
-
-        self.convert_and_decode_entries(
             convert=convert,
             decode=decode,
+            validate=validate,
+            configurations=self.configurations,
         )
-
-        self.validate_entries(validate)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")

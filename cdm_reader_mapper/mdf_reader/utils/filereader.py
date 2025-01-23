@@ -16,13 +16,7 @@ from .. import properties
 from ..schemas import schemas
 from ..validate import validate
 from .configurator import Configurator
-from .utilities import (
-    convert_entries,
-    create_mask,
-    decode_entries,
-    set_missing_values,
-    validate_path,
-)
+from .utilities import validate_path
 
 
 class FileReader:
@@ -136,28 +130,32 @@ class FileReader:
         order,
         valid,
         open_with,
+        configurations={},
     ):
         if open_with == "pandas":
-            df = TextParser.apply(
+            df_total = TextParser.apply(
                 lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_pandas(),
+                    df=x,
+                    schema=self.schema,
+                    order=order,
+                    valid=valid,
+                ).open_pandas(configurations),
                 axis=1,
             )
         elif open_with == "netcdf":
-            df = Configurator(
+            df_total = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_netcdf()
+            ).open_netcdf(configurations)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        missing_values_ = df["missing_values"]
-        del df["missing_values"]
-        df = self._select_years(df)
-        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
+        columns = df_total.columns
+        half = len(columns) / 2
+        df = df_total.iloc[:, : int(half)]
+        mask = df_total.iloc[:, int(half) :]
         self.columns = df.columns
         df = df.where(df.notnull(), np.nan)
-        return df, missing_values
+        return df, mask
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -169,40 +167,12 @@ class FileReader:
         del config_dict["self"]
         return config_dict
 
-    def convert_and_decode_df(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ):
-        """DOCUMENTATION."""
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = decode_entries(
-                    df[section],
-                    decoder_dict[section],
-                )
-                decoded.index = df[section].index
-                df[section] = decoded
-
-            converted = convert_entries(
-                df[section],
-                converter_dict[section],
-                **converter_kwargs[section],
-            )
-            converted.index = df[section].index
-            df[section] = converted
-        return df
-
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        mask = create_mask(df, isna, missing_values=self.missing_values)
+        #mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
-            mask0=mask,
+            #mask0=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -214,9 +184,16 @@ class FileReader:
         order,
         valid,
         chunksize,
+        convert=True,
+        decode=True,
+        validate=True,
+        configurations={},
         open_with="pandas",
     ):
         """DOCUMENTATION."""
+        configurations["convert"] = convert
+        configurations["decode"] = decode
+        configurations["validate"] = validate
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         elif open_with == "pandas":
@@ -231,7 +208,11 @@ class FileReader:
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
             df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
+                TextParser,
+                order,
+                valid,
+                open_with=open_with,
+                configurations=configurations,
             )
             return df, df.isna()
         else:
