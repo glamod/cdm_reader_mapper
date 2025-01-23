@@ -113,6 +113,24 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
     return mask
 
 
+def _get_elements(elements, element_atts, key):
+    def _condition(x):
+        column_types = element_atts.get(x).get("column_type")
+        if key == "numeric_types":
+            return column_types in properties.numeric_types
+        return column_types == key
+
+    return [x for x in elements if _condition(x)]
+
+
+def _element_tuples(numeric_elements, datetime_elements, coded_elements):
+    ele_tpl = [
+        isinstance(x, tuple)
+        for x in numeric_elements + datetime_elements + coded_elements
+    ]
+    return any(ele_tpl)
+
+
 def validate(
     data,
     mask0,
@@ -162,27 +180,12 @@ def validate(
     element_atts = schemas.df_schema(elements, schema)
 
     # See what elements we need to validate
-    numeric_elements = [
-        x
-        for x in elements
-        if element_atts.get(x).get("column_type") in properties.numeric_types
-    ]
-    datetime_elements = [
-        x for x in elements if element_atts.get(x).get("column_type") == "datetime"
-    ]
-    coded_elements = [
-        x for x in elements if element_atts.get(x).get("column_type") == "key"
-    ]
-    str_elements = [
-        x for x in elements if element_atts.get(x).get("column_type") == "str"
-    ]
+    numeric_elements = _get_elements(elements, element_atts, "numeric_types")
+    datetime_elements = _get_elements(elements, element_atts, "datetime")
+    coded_elements = _get_elements(elements, element_atts, "key")
+    str_elements = _get_elements(elements, element_atts, "str")
 
-    if any(
-        [
-            isinstance(x, tuple)
-            for x in numeric_elements + datetime_elements + coded_elements
-        ]
-    ):
+    if _element_tuples(numeric_elements, datetime_elements, coded_elements):
         validated_columns = pd.MultiIndex.from_tuples(
             list(set(numeric_elements + coded_elements + datetime_elements))
         )
@@ -230,4 +233,5 @@ def validate(
     )
     for column in disables:
         mask[column] = np.nan
+
     return mask

@@ -500,6 +500,24 @@
          clip-rule="evenodd"
          id="path71" />
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath66-4">
+      <path
+         d="M 1.4305e-5,0 H 960.00001 V 540 H 1.4305e-5 Z"
+         transform="matrix(1,0,0,-1,-676.44002,188.69001)"
+         clip-rule="evenodd"
+         id="path66-5" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath67-9">
+      <path
+         d="M 1.4305e-5,0 H 960.00001 V 540 H 1.4305e-5 Z"
+         transform="matrix(1,0,0,-1,-657.60002,174.29001)"
+         clip-rule="evenodd"
+         id="path67-0" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="namedview1"
@@ -515,7 +533,7 @@
      inkscape:cy="350.9224"
      inkscape:window-width="1920"
      inkscape:window-height="1137"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="g1"
@@ -1256,35 +1274,22 @@
          transform="matrix(1.3333333,0,0,-1.3333333,0,720)" />
     </g>
     <g
-       id="g60"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
-      <text
-         id="text60"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,627.90667,464.13333)"
-         clip-path="url(#clipPath61)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0"
-           y="0"
-           id="tspan60">m</tspan></text>
-    </g>
-    <g
        id="g61"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
+       transform="matrix(1.51192,0,0,1.380903,-322.92397,-145.12372)">
       <text
          id="text61"
          xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,641.98667,464.13333)"
+         transform="matrix(1.3333333,0,0,1.3333333,648.87301,470.16508)"
          clip-path="url(#clipPath62)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.8520002 10.668 16.068001 20.268 26.868 33.48 40.332001 46.908001 50.268002 53.736 57.936001 64.536003 71.148003"
-           y="0"
+           x="0"
            sodipodi:role="line"
-           id="tspan61">df_reader.read</tspan></text>
+           y="0"
+           id="tspan1">read_mdf</tspan></text>
     </g>
     <g
        id="g62"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
+       transform="matrix(1.6602508,0,0,2.4275399,-452.99682,-555.15151)">
       <path
          id="path63"
          d="m 648.44,153.07 h 144.83 v 86.25 H 648.44 Z"
@@ -1307,100 +1312,77 @@
     </g>
     <g
        id="g64"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
-      <text
-         id="text64"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,892.8,468.41333)"
-         clip-path="url(#clipPath65)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0"
-           y="0"
-           id="tspan64">p</tspan></text>
-    </g>
+       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)" />
     <g
        id="g65"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
+       transform="matrix(1.51192,0,0,1.380903,-406.21663,-126.38288)">
       <text
          id="text65"
          xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,901.92,468.41333)"
+         transform="matrix(1.3333333,0,0,1.3333333,920.5131,448.05616)"
          clip-path="url(#clipPath66)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.612 13.452 20.304001 26.879999 32.507999 35.987999 44.268002 50.880001 55.068001 61.68 67.068001 71.508003 78.120003 88.655998"
+           x="0"
            y="0"
            sodipodi:role="line"
-           id="tspan65">andas.DataFrame</tspan></text>
+           id="tspan65">DataBundle attribute: data</tspan></text>
+    </g>
+    <g
+       id="g65-9"
+       transform="matrix(1.51192,0,0,1.380903,-406.25027,-26.074395)">
+      <text
+         id="text65-9"
+         xml:space="preserve"
+         transform="matrix(1.3333333,0,0,1.3333333,920.5131,448.05616)"
+         clip-path="url(#clipPath66-4)"><tspan
+           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           x="0"
+           y="0"
+           sodipodi:role="line"
+           id="tspan65-7">DataBundle attribute: mask</tspan></text>
     </g>
     <g
        id="g66"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
+       transform="matrix(1.51192,0,0,1.380903,-337.50019,-151.37068)">
       <text
          id="text66"
          xml:space="preserve"
          transform="matrix(1.3333333,0,0,1.3333333,876.8,487.61333)"
          clip-path="url(#clipPath67)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 5.6279998 9.8640003 14.304 21.143999 27 31.236 38.040001 42.240002 48.84"
+           x="0"
            y="0"
            sodipodi:role="line"
-           id="tspan66">structured</tspan></text>
+           id="tspan2">pandas.DataFrame </tspan><tspan
+           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           x="0"
+           y="15"
+           sodipodi:role="line"
+           id="tspan3">according to schema</tspan></text>
     </g>
     <g
-       id="g67"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
+       id="g66-5"
+       transform="matrix(1.51192,0,0,1.380903,-337.73194,-52.098069)">
       <text
-         id="text67"
+         id="text66-2"
          xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,955.68,487.61333)"
-         clip-path="url(#clipPath68)"><tspan
+         transform="matrix(1.3333333,0,0,1.3333333,876.8,487.61333)"
+         clip-path="url(#clipPath67-9)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.612 12.48 18.360001 24.959999 29.16 36.012001 39.012001 45.852001"
+           x="0"
            y="0"
            sodipodi:role="line"
-           id="tspan67">according</tspan></text>
-    </g>
-    <g
-       id="g68"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
-      <text
-         id="text68"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,1030.56,487.61333)"
-         clip-path="url(#clipPath69)"><tspan
+           id="tspan2-6">pandas.DataFrame </tspan><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 4.1999998"
-           y="0"
+           x="0"
+           y="15"
            sodipodi:role="line"
-           id="tspan68">to</tspan></text>
-    </g>
-    <g
-       id="g69"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
-      <text
-         id="text69"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,918.72,506.81333)"
-         clip-path="url(#clipPath70)"><tspan
+           id="tspan3-1">validation mask according </tspan><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 4.2360001 11.04"
-           y="0"
+           x="0"
+           y="30"
            sodipodi:role="line"
-           id="tspan69">the</tspan></text>
-    </g>
-    <g
-       id="g70"
-       transform="matrix(1.51192,0,0,1.380903,-327.0886,-135.7533)">
-      <text
-         id="text70"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,946.88,506.81333)"
-         clip-path="url(#clipPath71)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 5.6279998 11.52 18.360001 24.959999 35.507999"
-           y="0"
-           sodipodi:role="line"
-           id="tspan70">schema</tspan></text>
+           id="tspan6">to data</tspan></text>
     </g>
   </g>
 </svg>
