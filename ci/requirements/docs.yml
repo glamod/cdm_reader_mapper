@@ -7,7 +7,7 @@ channels:
 dependencies:
     #cdm_reader_mapper
     - python>=3.9
-    - numba>=0.61    
+    - numba>=0.61
     - pandas>=2.1.0
     - matplotlib
     - datashader
