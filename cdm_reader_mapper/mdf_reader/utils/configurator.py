@@ -212,7 +212,6 @@ class Configurator:
 
         df = pd.Series(data_dict)
         df["missing_values"] = missing_values
-        print(missing_values)
         return df
 
     def open_netcdf(self):
