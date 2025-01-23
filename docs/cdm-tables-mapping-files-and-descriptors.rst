@@ -4,7 +4,7 @@
 CDM tables mapping files and descriptors
 ========================================
 
-The following section details the mapping sequence that the ``cdm_mapper`` tool follows to map meteorological data to a CDM element.
+The following section details the mapping sequence that the ``cdm_reader_mapper`` tool follows to map meteorological data to a CDM element.
 
 We will use **part** of the ``header.json`` python dictionary from the ``icoads_r300`` IMMA1 model to explain how we map an element. In the table below we explain all **elements** attributes and/or descriptors, that are needed in each python dictionary or ``.json`` file, for a successful mapping of the input meteorological data.
 
@@ -118,11 +118,11 @@ d. **Define the number of decimal places in the CDM element attributes, so this 
 Defining mapping functions
 ==========================
 
-In the file ``imodel.py`` the user can define any function to **transform** any element in the data model. The python file needs to be accompanied with ``__init__.py`` file so all the functions written in ``imodel.py`` can be imported by the **cdm_mapper** toolbox.
+In the file ``imodel.py`` the user can define any function to **transform** any element in the data model. The python file needs to be accompanied with ``__init__.py`` file so all the functions written in ``imodel.py`` can be imported by the **cdm_readr_mapper** toolbox.
 
 .. note:: Remember that any new python dependency that you ``import`` the top of your ``imodel.py`` must be installed also in your python environment.
 
-The **cdm_mapper** follows a set of rules that need to be taken into account when it comes to adding functions to the ``imodel.py`` script.
+The **cdm_reader_mapper** follows a set of rules that need to be taken into account when it comes to adding functions to the ``imodel.py`` script.
 
 - The **cdm-mapper** only parses elements to the transforming function (e.g. Year, day or hour) or ``code_table`` mapping (e.g. platform_subtype), where none of the elements to be map (e.g. Year, day, hour or platform_subtype) have missing values.
 
@@ -149,7 +149,7 @@ The following range of code table structures are currently supported:
 - Nested code tables: code tables with multiple (2 or more) keys mapping to a value ``-> key(1):…:key(n):value.``
 - Range-keyed code tables: code tables (simple or multi-keyed) where one or more keys is a (integer) range of values.
 
-For more information on code tables and their structure check out the `cdm_reader_mapper tool - code tables <https://cdm-reader-mapper.readthedocs.io/en/mdf_reader/data-models.html#code-tables>`_ information.
+For more information on code tables and their structure check out :ref:`data-models`.
 
 The code table above, is use by the ``icoads_r300`` imodel to map ``platform_sub_type`` information to the C3s CDM format, this is done in  the following section of the ``header.json`` file::
 

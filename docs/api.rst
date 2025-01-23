@@ -1,38 +1,220 @@
 .. currentmodule:: cdm_reader_mapper
 
+.. _api:
+
 """""""""""""
 API reference
 """""""""""""
 
 This page provides an auto-generated summary of the ``cdm_reader_mapper`` API.
 
-.. autofunction:: cdm_reader_mapper.mdf_reader.read
-   :noindex:
+.. _read_data:
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.map_model
-   :noindex:
+Read data from disk
+===================
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.read_tables
-   :noindex:
+.. autosummary::
+   :toctree: generated/
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.cdm_to_ascii
-   :noindex:
+   read_mdf
+   read_data
+   read_tables
 
-.. autofunction:: cdm_reader_mapper.cdm_mapper.duplicate_check
-   :noindex:
+.. _databundle:
 
-.. autoclass:: cdm_reader_mapper.cdm_mapper.duplicates.DupDetect
-   :members: get_duplicates, flag_duplicates, remove_duplicates
-   :noindex:
+DataBundle
+==========
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_pt.correct
-   :noindex:
+.. autosummary::
+   :toctree: generated/
 
-.. autofunction:: cdm_reader_mapper.metmetpy.correct_datetime.correct
-   :noindex:
+   DataBundle
 
-.. autofunction:: cdm_reader_mapper.operations.inspect.get_length
-   :noindex:
+.. _information
 
-.. autofunction:: cdm_reader_mapper.operations.inspect.count_by_cat
-   :noindex:
+DataBundle's method functions
+------------------------------
+
+Information
+^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.unique
+
+.. _manipulation:
+
+Manipulation
+^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.add
+
+   DataBundle.copy
+
+   DataBundle.replace_columns
+
+   DataBundle.stack_h
+
+   DataBundle.stack_v
+
+.. _selection:
+
+Selection
+^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.select_from_index
+
+   DataBundle.select_from_list
+
+   DataBundle.select_true
+
+.. _validation:
+
+Validation
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.validate_datetime
+
+   DataBundle.validate_id
+
+.. _cdm_tables:
+
+MDF data
+^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.write_data
+
+CDM tables
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.map_model
+
+   DataBundle.write_tables
+
+.. _cdm_correction
+
+Correction
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.correct_datetime
+
+   DataBundle.correct_pt
+
+.. _duplicate_check:
+
+Duplicate check
+^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.duplicate_check
+
+   DataBundle.get_duplicates
+
+   DataBundle.flag_duplicates
+
+   DataBundle.remove_duplicates
+
+
+.. _properties
+
+DataBundle's property attributes
+--------------------------------
+
+MDF data
+^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.data
+
+   DataBundle.columns
+
+   DataBundle.dtypes
+
+   DataBundle.parse_dates
+
+   DataBundle.mask
+
+   DataBundle.imodel
+
+   DataBundle.selected
+
+   DataBundle.deselected
+
+CDM tables
+^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.tables
+
+   DataBundle.tables_dups_flagged
+
+   DataBundle.tables_dups_removed
+
+.. _useful_func:
+
+Useful functions
+================
+
+.. autosummary::
+   :toctree: generated/
+
+   correct_datetime
+   correct_pt
+   unique
+   replace_columns
+   validate_datetime
+   validate_id
+   select_true
+   select_from_index
+   select_from_list
+   write_data
+   map_model
+   duplicate_check
+   write_tables
+
+.. _dupdetect:
+
+DupDetect
+=========
+
+.. autosummary::
+   :toctree: generated/
+
+   DupDetect
+
+Check Duplicates
+^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DupDetect.get_duplicates
+
+   DupDetect.flag_duplicates
+
+   DupDetect.remove_duplicates

@@ -38,7 +38,7 @@ jobs:
           echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
 
       - name: Create conda environment
-        uses: mamba-org/setup-micromamba@ab6bf8bf7403e8023a094abeec19d6753bdc143e # v2.0.1
+        uses: mamba-org/setup-micromamba@0dea6379afdaffa5d528b3d1dabc45da37f443fc # v2.0.4
         with:
           cache-downloads: true
           cache-downloads-key: "${{runner.os}}-${{runner.arch}}-py${{matrix.python-version}}-${{hashFiles(env.CONDA_ENV_FILE)}}"
@@ -67,9 +67,9 @@ jobs:
           --junitxml=test-results/${{ runner.os }}-${{ matrix.python-version }}.xml
 
       - name: Upload code coverage to Codecov
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
           env_vars: RUNNER_OS,PYTHON_VERSION
           name: codecov-umbrella

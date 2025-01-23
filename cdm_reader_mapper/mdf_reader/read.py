@@ -1,21 +1,24 @@
-"""Common Data Model (CDM) reader."""
+"""Common Data Model (CDM) MDF reader."""
 
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 from io import StringIO as StringIO
 
 import pandas as pd
 
+from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
-from .schemas import schemas
-from .utils.auxiliary import _FileReader, validate_arg, validate_path
+from .utils.filereader import FileReader
+from .utils.utilities import adjust_dtype, validate_arg
 
 
-class MDFFileReader(_FileReader):
+class MDFFileReader(FileReader):
     """Class to represent reader output.
 
     Attributes
@@ -23,15 +26,15 @@ class MDFFileReader(_FileReader):
     data : pd.DataFrame or pd.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the output data
-    attrs : dict
-        a dictionary with the output data elements attributes
     mask : pd.DataFrame or pd.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the output data validation mask
+    attrs : dict
+        a dictionary with the output data elements attributes
     """
 
     def __init__(self, *args, **kwargs):
-        _FileReader.__init__(self, *args, **kwargs)
+        FileReader.__init__(self, *args, **kwargs)
 
     def convert_and_decode_entries(
         self,
@@ -74,6 +77,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
         if dtype is None:
             dtype = self.configurations["convert_decode"]["dtype"]
+        if not (convert and decode):
+            return self
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
@@ -81,8 +86,8 @@ class MDFFileReader(_FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
-            dtype = self._adjust_dtype(dtype, self.data)
-            data = self._convert_and_decode_df(
+            dtype = adjust_dtype(dtype, self.data)
+            data = self.convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
@@ -93,7 +98,7 @@ class MDFFileReader(_FileReader):
             data_buffer = StringIO()
             TextParser = make_copy(self.data)
             for i, df_ in enumerate(TextParser):
-                df = self._convert_and_decode_df(
+                df = self.convert_and_decode_df(
                     df_,
                     converter_dict,
                     converter_kwargs,
@@ -114,7 +119,7 @@ class MDFFileReader(_FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
-            dtype = self._adjust_dtype(dtype, df)
+            dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
             self.data = pd.read_csv(
                 data_buffer,
@@ -128,22 +133,21 @@ class MDFFileReader(_FileReader):
             )
         return self
 
-    def validate_entries(
-        self,
-    ):
+    def validate_entries(self, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
-        if isinstance(self.data, pd.DataFrame):
-            self.mask = self._validate_df(self.data, isna=self.isna)
-
+        if validate is not True:
+            self.mask = pd.DataFrame()
+        elif isinstance(self.data, pd.DataFrame):
+            self.mask = self.validate_df(self.data, isna=self.isna)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
             TextParser_isna_ = make_copy(self.isna)
             for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self._validate_df(df_, isna=isna_)
+                mask_ = self.validate_df(df_, isna=isna_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -164,7 +168,6 @@ class MDFFileReader(_FileReader):
         chunksize=None,
         sections=None,
         skiprows=0,
-        out_path=None,
         convert=True,
         decode=True,
         converter_dict=None,
@@ -183,8 +186,6 @@ class MDFFileReader(_FileReader):
           If None read pre-defined data model sections.
         skiprows : int
           Number of initial rows to skip from file, default: 0
-        out_path : str, optional
-          Path to dump output data, valid mask and attributes.
         convert: bool, default: True
           If True convert entries by using a pre-defined data model.
         decode: bool, default: True
@@ -205,8 +206,6 @@ class MDFFileReader(_FileReader):
             return
         if not validate_arg("skiprows", skiprows, int):
             return
-        if not validate_path("out_path", out_path):
-            return
 
         self.chunksize = chunksize
         self.skiprows = skiprows
@@ -223,8 +222,8 @@ class MDFFileReader(_FileReader):
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        self.configurations = self._get_configurations(read_sections_list, sections)
-        self.data, self.isna = self._open_data(
+        self.configurations = self.get_configurations(read_sections_list, sections)
+        self.data, self.isna = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -233,39 +232,29 @@ class MDFFileReader(_FileReader):
         )
 
         # 2.3. Extract, read and validate data in same loop
-        # logging.info("Extracting and reading sections")
+        logging.info("Extracting and reading sections")
 
-        if convert or decode:
-            self.convert_and_decode_entries(
-                convert=convert,
-                decode=decode,
-            )
-
-        if validate is True:
-            self.validate_entries()
-        else:
-            self.mask = pd.DataFrame()
-
-        # 3. CREATE OUTPUT DATA ATTRIBUTES
-        logging.info("CREATING OUTPUT DATA ATTRIBUTES FROM DATA MODEL")
-        data_columns = (
-            [x for x in self.data]
-            if isinstance(self.data, pd.DataFrame)
-            else self.data.orig_options["names"]
+        self.convert_and_decode_entries(
+            convert=convert,
+            decode=decode,
         )
-        out_atts = schemas.df_schema(data_columns, self.schema)
 
-        # 4. OUTPUT TO FILES IF REQUESTED
-        if out_path:
-            self._dump_atts(out_atts, out_path)
-        self.attrs = out_atts
-        return self
+        self.validate_entries(validate)
+
+        # 3. Create output DataBundle object
+        logging.info("Creata output DataBundle object")
+
+        return DataBundle(
+            data=self.data,
+            columns=self.columns,
+            dtypes=self.dtypes,
+            parse_dates=self.parse_dates,
+            mask=self.mask,
+            imodel=self.imodel,
+        )
 
 
-# END AUX FUNCTIONS -----------------------------------------------------------
-
-
-def read(
+def read_mdf(
     source,
     imodel=None,
     ext_schema_path=None,
@@ -287,7 +276,7 @@ def read(
     Parameters
     ----------
     source: str
-        The file (including path) to be read
+        The file (including path) to be read.
     imodel: str, optional
         Name of internally available input data model.
         e.g. icoads_r300_d704
@@ -307,10 +296,14 @@ def read(
 
     Returns
     -------
-    MDFFileReader
-        Containing data (``data``), validation mask (``mask``)
-        and attributes (``attrs``) corresponding to the information
-        from ``source``.
+    cdm_reader_mapper.DataBundle
+
+    See Also
+    --------
+    read_data : Read MDF data and validation mask from disk.
+    read_tables : Read CDM tables from disk.
+    write_data : Write MDF data and validation mask to disk.
+    write_tables : Write CDM tables to disk.
     """
 
     def get_list_element(lst, idx):
@@ -334,3 +327,97 @@ def read(
         year_init=year_init,
         year_end=year_end,
     ).read(**kwargs)
+
+
+def read_data(
+    data,
+    mask=None,
+    info=None,
+    imodel=None,
+    col_subset=None,
+    **kwargs,
+):
+    """Read MDF data which is already on a pre-defined data model.
+
+    Parameters
+    ----------
+    data: str
+        The data file (including path) to be read.
+    mask: str, optional
+        The validation file (including path) to be read.
+    info: str, optional
+        The information file (including path) to be read.
+    imodel: str, optional
+        Name of internally available input data model.
+        e.g. icoads_r300_d704
+    col_subset: str, tuple or list, optional
+        Specify the section or sections of the file to write.
+
+        - For multiple sections of the tables:
+          e.g col_subset = [columns0,...,columnsN]
+
+        - For a single section:
+          e.g. list type object col_subset = [columns]
+
+        Column labels could be both string or tuple.
+
+    Returns
+    -------
+    cdm_reader_mapper.DataBundle
+
+    Note
+    ----
+    :py:func:`cdm_reader_mapper.write_data` dumps ``data``, ``mask`` and ``info`` on file system.
+
+    See Also
+    --------
+    read_mdf : Read original marine-meteorological data from disk.
+    read_tables : Read CDM tables from disk.
+    write_data : Write MDF data and validation mask to disk.
+    write_tables : Write CDM tables to disk.
+    """
+
+    def _update_column_labels(columns):
+        columns_ = []
+        for col in columns:
+            try:
+                col_ = ast.literal_eval(col)
+            except SyntaxError:
+                col_ = tuple(col.split(":"))
+            except ValueError:
+                col_ = col
+            columns_.append(col_)
+        return columns_
+
+    def _read_csv(ifile, col_subset=None, **kwargs):
+        df = pd.read_csv(ifile, delimiter=",", **kwargs)
+        df.columns = _update_column_labels(df.columns)
+        if col_subset is not None:
+            df = df[col_subset]
+        return df
+
+    if info is not None:
+        info_dict = open_json_file(info)
+    else:
+        info_dict = {}
+    if "dtypes" in info_dict.keys():
+        dtype = info_dict["dtypes"]
+    else:
+        dtype = None
+    if "parse_dates" in info_dict.keys():
+        parse_dates = info_dict["parse_dates"]
+    else:
+        parse_dates = False
+
+    data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
+    if mask is not None:
+        mask = _read_csv(mask, col_subset=col_subset)
+
+    return DataBundle(
+        data=data,
+        columns=data.columns,
+        dtypes=dtype,
+        parse_dates=parse_dates,
+        mask=mask,
+        imodel=imodel,
+    )

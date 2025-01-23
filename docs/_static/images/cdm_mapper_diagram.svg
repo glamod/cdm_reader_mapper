@@ -7,7 +7,7 @@
    width="1280"
    height="720"
    viewBox="0 0 1280 720"
-   sodipodi:docname="cdm_mapper_diagram.svg"
+   sodipodi:docname="cdm_mapper_diagram - Kopie.svg"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -374,6 +374,33 @@
          clip-rule="evenodd"
          id="path57" />
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath44-9">
+      <path
+         d="M 1.4305e-5,0 H 960.00001 V 540 H 1.4305e-5 Z"
+         transform="matrix(1,0,0,-1,-587.18002,109.2)"
+         clip-rule="evenodd"
+         id="path44-8" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath43-7">
+      <path
+         d="M 1.4305e-5,0 H 960.00001 V 540 H 1.4305e-5 Z"
+         transform="matrix(1,0,0,-1,-576.38002,109.2)"
+         clip-rule="evenodd"
+         id="path43-6" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath43-7-2">
+      <path
+         d="M 1.4305e-5,0 H 960.00001 V 540 H 1.4305e-5 Z"
+         transform="matrix(1,0,0,-1,-576.38002,109.2)"
+         clip-rule="evenodd"
+         id="path43-6-0" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="namedview1"
@@ -385,14 +412,14 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.0671875"
-     inkscape:cx="823.66032"
+     inkscape:cx="822.72328"
      inkscape:cy="361.22987"
      inkscape:window-width="1920"
      inkscape:window-height="1137"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g5">
+     inkscape:current-layer="g1">
     <inkscape:page
        x="0"
        y="0"
@@ -715,31 +742,18 @@
          transform="matrix(1.3333333,0,0,-1.3333333,0,720)" />
     </g>
     <g
-       id="g31"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text31"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,247.22667,540.89333)"
-         clip-path="url(#clipPath32)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0"
-           y="0"
-           id="tspan31">p</tspan></text>
-    </g>
-    <g
        id="g32"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
+       transform="matrix(1.3035789,0,0,1.2973266,-122.57234,-166.20253)">
       <text
          id="text32"
          xml:space="preserve"
          transform="matrix(1.3333333,0,0,1.3333333,256.34667,540.89333)"
          clip-path="url(#clipPath33)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.612 13.452 20.304001 26.879999 32.507999 35.987999 44.268002 50.880001 55.068001 61.68 65.496002 69.935997 76.547997 87.084"
+           x="0"
            y="0"
            sodipodi:role="line"
-           id="tspan32">andas.Dataframe</tspan></text>
+           id="tspan32">pandas.DataFrame</tspan></text>
     </g>
     <g
        id="g33"
@@ -808,38 +822,35 @@
     </g>
     <g
        id="g38"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
+       transform="matrix(1.3035789,0,0,1.2973266,-112.26487,-132.46901)">
       <text
          id="text38"
          xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,483.90667,570.14667)"
+         transform="matrix(1.3333333,0,0,1.3333333,491.0949,544.86662)"
          clip-path="url(#clipPath39)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 5.8800001 12.732 23.243999 28.643999 39.228001 45.84 52.692001 59.543999 66.108002 69.468002 72.935997 83.484001 90.096001 96.947998 102.348 112.86 119.46 126.312"
-           y="0"
-           sodipodi:role="line"
-           id="tspan38">cdm_mapper.map_mode</tspan></text>
-    </g>
-    <g
-       id="g39"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text39"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,661.21333,570.14667)"
-         clip-path="url(#clipPath40)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
            x="0"
-           y="0"
-           id="tspan39">l</tspan></text>
+           sodipodi:role="line"
+           id="tspan38"
+           y="0">DataBundle.map_model</tspan></text>
     </g>
     <g
        id="g40"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
+       transform="matrix(1.3028128,0,0,1.8330738,-109.6934,-435.74388)">
       <path
          id="path41"
          d="m 567.68,73.628 h 230.19 v 86.25 H 567.68 Z"
          style="fill:#e8eaf6;fill-opacity:1;fill-rule:evenodd;stroke:#333333;stroke-width:0.72;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+         transform="matrix(1.3333333,0,0,-1.3333333,0,720)" />
+    </g>
+    <g
+       id="g40-7"
+       transform="matrix(1.3035789,0,0,1.2973266,-131.67968,-640.35435)"
+       style="stroke:#000000;stroke-opacity:1;fill:#e8e757;fill-opacity:1">
+      <path
+         id="path41-7"
+         d="m 567.68,73.628 h 230.19 v 86.25 H 567.68 Z"
+         style="fill:#e8e757;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.72;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
          transform="matrix(1.3333333,0,0,-1.3333333,0,720)" />
     </g>
     <g
@@ -857,212 +868,87 @@
            id="tspan41">Output</tspan></text>
     </g>
     <g
-       id="g42"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
+       id="g43-7"
+       transform="matrix(1.3035789,0,0,1.2973266,-151.44829,-696.71684)">
       <text
-         id="text42"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,768.50667,574.4)"
-         clip-path="url(#clipPath43)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0"
-           y="0"
-           id="tspan42">A</tspan></text>
-    </g>
-    <g
-       id="g43"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text43"
+         id="text43-1"
          xml:space="preserve"
          transform="matrix(1.3333333,0,0,1.3333333,782.90667,574.4)"
-         clip-path="url(#clipPath44)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.8520002 13.2 17.436001 24.24 30.84"
-           y="0"
-           sodipodi:role="line"
-           id="tspan43">python</tspan></text>
-    </g>
-    <g
-       id="g44"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text44"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,837.78667,574.4)"
-         clip-path="url(#clipPath45)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.8520002 9.8520002 15.72 19.955999 22.955999 29.556 36.360001 42.972 47.411999"
-           y="0"
-           sodipodi:role="line"
-           id="tspan44">dictionary</tspan></text>
-    </g>
-    <g
-       id="g45"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text45"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,914.14667,574.4)"
-         clip-path="url(#clipPath46)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 3.8280001 10.428"
-           y="0"
-           sodipodi:role="line"
-           id="tspan45">for</tspan></text>
-    </g>
-    <g
-       id="g46"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text46"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,938.30667,574.4)"
-         clip-path="url(#clipPath47)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.5999999 13.212 19.08"
-           y="0"
-           sodipodi:role="line"
-           id="tspan46">each</tspan></text>
-    </g>
-    <g
-       id="g47"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text47"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,977.50667,574.4)"
-         clip-path="url(#clipPath48)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 7.5359998 15.852"
-           y="0"
-           sodipodi:role="line"
-           id="tspan47">CDM</tspan></text>
-    </g>
-    <g
-       id="g48"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text48"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,1015.7467,574.4)"
-         clip-path="url(#clipPath49)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 4.2360001 10.8 17.652 20.652"
-           y="0"
-           sodipodi:role="line"
-           id="tspan48">table</tspan></text>
-    </g>
-    <g
-       id="g49"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text49"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,828.50667,593.6)"
-         clip-path="url(#clipPath50)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 5.6279998 12.48 19.08 24.959999 27.959999 31.788 34.787998 41.388"
-           y="0"
-           sodipodi:role="line"
-           id="tspan49">specified</tspan></text>
-    </g>
-    <g
-       id="g50"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text50"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,897.34667,593.6)"
-         clip-path="url(#clipPath51)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 3"
-           y="0"
-           sodipodi:role="line"
-           id="tspan50">in</tspan></text>
-    </g>
-    <g
-       id="g51"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text51"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,915.10667,593.6)"
-         clip-path="url(#clipPath52)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 4.2360001 11.04"
-           y="0"
-           sodipodi:role="line"
-           id="tspan51">the</tspan></text>
-    </g>
-    <g
-       id="g52"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text52"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,943.26667,593.6)"
-         clip-path="url(#clipPath53)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 3 13.548 20.148001 27 33.588001"
-           y="0"
-           sodipodi:role="line"
-           id="tspan52">imodel</tspan></text>
-    </g>
-    <g
-       id="g53"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text53"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,818.42667,612.8)"
-         clip-path="url(#clipPath54)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.5999999 10.068 16.92"
-           y="0"
-           sodipodi:role="line"
-           id="tspan53">e.g.</tspan></text>
-    </g>
-    <g
-       id="g54"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text54"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,849.94667,612.8)"
-         clip-path="url(#clipPath55)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.8400002 13.44 20.052 26.903999 33.48"
-           y="0"
-           sodipodi:role="line"
-           id="tspan54">header</tspan></text>
-    </g>
-    <g
-       id="g55"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
-      <text
-         id="text55"
-         xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,900.54667,612.8)"
-         clip-path="url(#clipPath56)"><tspan
+         clip-path="url(#clipPath44-9)"><tspan
            style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
            x="0"
-           y="0"
-           id="tspan55">,</tspan></text>
+           sodipodi:role="line"
+           id="tspan43-0"
+           y="0">Note: Mapping information and Data</tspan><tspan
+           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           x="0"
+           sodipodi:role="line"
+           y="15"
+           id="tspan2">are already included in DataBundle</tspan><tspan
+           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           x="0"
+           sodipodi:role="line"
+           y="30"
+           id="tspan3">object if marine-meteoroginal input </tspan><tspan
+           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           x="0"
+           sodipodi:role="line"
+           y="45"
+           id="tspan6">data is read by read_mdf function!</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="fill:#000000"
+       x="958.59442"
+       y="61.844803"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"></tspan></text>
+    <g
+       id="g42-1"
+       transform="matrix(1.3035789,0,0,1.2973266,-113.92531,-154.95696)">
+      <text
+         id="text42-7"
+         xml:space="preserve"
+         transform="matrix(1.3333333,0,0,1.3333333,768.50667,574.4)"
+         clip-path="url(#clipPath43-7)"><tspan
+           sodipodi:role="line"
+           id="tspan7"
+           x="0"
+           y="0"><tspan
+             style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             x="0"
+             y="0"
+             id="tspan42-9">A pandas.DataFrame with MultiIndex</tspan></tspan><tspan
+           sodipodi:role="line"
+           id="tspan10"
+           x="0"
+           y="15">column labels for each CDM table</tspan><tspan
+           sodipodi:role="line"
+           x="0"
+           y="30"
+           id="tspan11">specified in the imodel</tspan><tspan
+           sodipodi:role="line"
+           x="0"
+           y="45"
+           id="tspan12">e.g. (header, report id) or</tspan><tspan
+           sodipodi:role="line"
+           x="0"
+           y="60"
+           id="tspan13">(observation-sst, observation_value)</tspan></text>
     </g>
     <g
-       id="g56"
-       transform="matrix(1.3035789,0,0,1.2973266,-110.39079,-164.32845)">
+       id="g42-1-4"
+       transform="matrix(1.3035789,0,0,1.2973266,-113.92531,-187.79737)">
       <text
-         id="text56"
+         id="text42-7-7"
          xml:space="preserve"
-         transform="matrix(1.3333333,0,0,1.3333333,909.66667,612.8)"
-         clip-path="url(#clipPath57)"><tspan
-           style="font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:12px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           x="0 6.5999999 13.452 19.08 25.68 30.120001 36.504002 43.080002 47.316002 50.316002 56.916 63.720001"
-           y="0"
+         transform="matrix(1.3333333,0,0,1.3333333,768.50667,574.4)"
+         clip-path="url(#clipPath43-7-2)"><tspan
            sodipodi:role="line"
-           id="tspan56">observations</tspan></text>
+           x="0"
+           y="0"
+           id="tspan13-7">DataBundle attribute: tables</tspan></text>
     </g>
   </g>
 </svg>

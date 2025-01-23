@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 
 import pandas as pd
 
-from cdm_reader_mapper.cdm_mapper import read_tables
+from cdm_reader_mapper import read_tables
 from cdm_reader_mapper.common import load_file
 
 cdm_tables = [
@@ -160,7 +160,7 @@ class result_data:
     @property
     def expected_gcc(self):
         return self._get_data_dict(
-            "20030201",
+            "2003-02-01_subset",
             "gcc",
         )
 
@@ -185,6 +185,7 @@ class result_data:
 
         data_file = f"{data_model}_{data_file}"
         data = f"data_{data_file}.csv"
+        info = f"info_{data_file}.json"
         mask = f"mask_{data_file}.csv"
         vaid = f"vaid_{data_file}.csv"
         vadt = f"vadt_{data_file}.csv"
@@ -193,9 +194,15 @@ class result_data:
             name = cdm_table.format(data_file)
             path = load_file(os.path.join(*drs, "cdm_tables", name)).parent
 
+        try:
+            info = load_file(os.path.join(*drs, "output", info))
+        except Exception:
+            info = None
+
         return {
             "data": self._load_file(os.path.join(*drs, "output", data)),
             "mask": self._load_file(os.path.join(*drs, "output", mask)),
+            "info": info,
             "cdm_table": path,
             "vaid": self._load_file(os.path.join(*drs, "validation", vaid)),
             "vadt": self._load_file(os.path.join(*drs, "validation", vadt)),
@@ -204,7 +211,7 @@ class result_data:
 
 result_data = result_data()
 
-table_df = read_tables(
+cdm_header = read_tables(
     result_data.expected_icoads_r302_d792["cdm_table"], cdm_subset=["header"]
 )
 correction_file = list((_base / "corrections").glob("2022-02.txt.gz"))[0]
