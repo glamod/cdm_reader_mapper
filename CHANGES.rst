@@ -7,6 +7,10 @@ Changelog
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Announcements
+^^^^^^^^^^^^^
+This release adds support for Python 3.13 (:pull:`157`)
+
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`, :pull:`197`)
