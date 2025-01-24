@@ -100,7 +100,6 @@ def validate(
     index,
     ext_table_path,
     schema,
-    disable=None,
 ):
     """Validate data.
 
@@ -117,8 +116,6 @@ def validate(
         Path to the code tables for an external data model
     schema: dict
         Data model schema.
-    disables: list, optional
-        List of column names to be ignored.
 
     Returns
     -------
@@ -131,8 +128,6 @@ def validate(
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
-    if disable is True:
-        return np.nan
 
     element_atts = schemas.df_schema([index], schema)
 
