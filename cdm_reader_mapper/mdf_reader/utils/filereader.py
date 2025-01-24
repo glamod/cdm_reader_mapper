@@ -40,7 +40,9 @@ class FileReader:
     ):
         # 0. VALIDATE INPUT
         if not imodel and not ext_schema_path:
-            logging.error("A valid input data model name or path to data model must be provided")
+            logging.error(
+                "A valid input data model name or path to data model must be provided"
+            )
             return
         if not os.path.isfile(source):
             logging.error(f"Can't find input data file {source}")
@@ -60,7 +62,9 @@ class FileReader:
         # multiple_reports_per_line error also while reading schema
         logging.info("READING DATA MODEL SCHEMA FILE...")
         if ext_schema_path or ext_schema_file:
-            self.schema = schemas.read_schema(ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file)
+            self.schema = schemas.read_schema(
+                ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
+            )
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
@@ -78,9 +82,13 @@ class FileReader:
                 for attr, value in elements[data_var].items():
                     if value == "__from_file__":
                         if attr in ds[data_var].attrs:
-                            self.schema["sections"][section]["elements"][data_var][attr] = ds[data_var].attrs[attr]
+                            self.schema["sections"][section]["elements"][data_var][
+                                attr
+                            ] = ds[data_var].attrs[attr]
                         else:
-                            del self.schema["sections"][section]["elements"][data_var][attr]
+                            del self.schema["sections"][section]["elements"][data_var][
+                                attr
+                            ]
 
     def _select_years(self, df):
         def get_years_from_datetime(date):
@@ -130,9 +138,13 @@ class FileReader:
         open_with,
     ):
         if open_with == "pandas":
-            df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_pandas()
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_pandas()
         elif open_with == "netcdf":
-            df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_netcdf()
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_netcdf()
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
@@ -146,7 +158,9 @@ class FileReader:
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
-        config_dict = Configurator(schema=self.schema, order=order, valid=valid).get_configuration()
+        config_dict = Configurator(
+            schema=self.schema, order=order, valid=valid
+        ).get_configuration()
         for attr, val in config_dict["self"].items():
             setattr(self, attr, val)
         del config_dict["self"]
@@ -213,14 +227,18 @@ class FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(TextParser, order, valid, open_with=open_with)
+            df, self.missing_values = self._read_sections(
+                TextParser, order, valid, open_with=open_with
+            )
             return df, df.isna()
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()
             isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(df_, order, valid, open_with=open_with)
+                df, missing_values = self._read_sections(
+                    df_, order, valid, open_with=open_with
+                )
                 df_isna = df.isna()
                 missing_values.to_csv(
                     missings_buffer,

@@ -34,7 +34,9 @@ class Configurator:
                 self.str_line = df.iloc[0]
 
     def _add_field_length(self, index, sections_dict):
-        field_length = sections_dict.get("field_length", properties.MAX_FULL_REPORT_WIDTH)
+        field_length = sections_dict.get(
+            "field_length", properties.MAX_FULL_REPORT_WIDTH
+        )
         return index + field_length
 
     def _validate_sentinal(self, i, line, sentinal):
@@ -64,7 +66,10 @@ class Configurator:
         column_type = self.sections_dict.get("column_type")
         if column_type is None:
             return
-        return {converter_arg: self.sections_dict.get(converter_arg) for converter_arg in properties.data_type_conversion_args.get(column_type)}
+        return {
+            converter_arg: self.sections_dict.get(converter_arg)
+            for converter_arg in properties.data_type_conversion_args.get(column_type)
+        }
 
     def _get_decoder(self):
         encoding = self.sections_dict.get("encoding")
@@ -117,7 +122,9 @@ class Configurator:
             for section in sections.keys():
                 self.sections_dict = sections[section]
                 index = self._get_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(self.sections_dict)
+                ignore = (order not in self.valid) or self._get_ignore(
+                    self.sections_dict
+                )
                 if ignore is True:
                     continue
                 dtypes = self._update_dtypes(dtypes, index)
@@ -157,7 +164,9 @@ class Configurator:
                 continue
 
             sentinal = header.get("sentinal")
-            bad_sentinal = sentinal is not None and not self._validate_sentinal(i, line, sentinal)
+            bad_sentinal = sentinal is not None and not self._validate_sentinal(
+                i, line, sentinal
+            )
 
             section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
             sections = self.schema["sections"][order]["elements"]
@@ -188,7 +197,9 @@ class Configurator:
                 index = self._get_index(section, order)
                 ignore = (order not in self.valid) or self._get_ignore(section_dict)
                 na_value = section_dict.get("missing_value")
-                field_length = section_dict.get("field_length", properties.MAX_FULL_REPORT_WIDTH)
+                field_length = section_dict.get(
+                    "field_length", properties.MAX_FULL_REPORT_WIDTH
+                )
 
                 j = (i + field_length) if not bad_sentinal else i
                 if j > k:
@@ -238,7 +249,9 @@ class Configurator:
             for section in sections.keys():
                 self.sections_dict = sections[section]
                 index = self._get_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(self.sections_dict)
+                ignore = (order not in self.valid) or self._get_ignore(
+                    self.sections_dict
+                )
                 if ignore is True:
                     continue
                 if section in self.df.data_vars:
