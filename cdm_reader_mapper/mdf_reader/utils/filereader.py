@@ -8,13 +8,11 @@ import os
 from copy import deepcopy
 from io import StringIO
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
 from .. import properties
 from ..schemas import schemas
-from ..validate import validate
 from .configurator import Configurator
 from .utilities import validate_path
 
@@ -139,7 +137,7 @@ class FileReader:
                     schema=self.schema,
                     order=order,
                     valid=valid,
-                ).open_pandas(configurations),
+                ).open_pandas(configurations, self.imodel, self.ext_table_path),
                 axis=1,
             )
         elif open_with == "netcdf":
@@ -154,7 +152,7 @@ class FileReader:
         df = df_total.iloc[:, : int(half)]
         mask = df_total.iloc[:, int(half) :]
         self.columns = df.columns
-        df = df.where(df.notnull(), np.nan)
+        df = df.where(df.notnull(), None)
         return df, mask
 
     def get_configurations(self, order, valid):
@@ -166,18 +164,6 @@ class FileReader:
             setattr(self, attr, val)
         del config_dict["self"]
         return config_dict
-
-    def validate_df(self, df, isna=None):
-        """DOCUMENTATION."""
-        #mask = create_mask(df, isna, missing_values=self.missing_values)
-        return validate(
-            data=df,
-            #mask0=mask,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
-        )
 
     def open_data(
         self,
@@ -207,14 +193,14 @@ class FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(
+            df, mask = self._read_sections(
                 TextParser,
                 order,
                 valid,
                 open_with=open_with,
                 configurations=configurations,
             )
-            return df, df.isna()
+            return df, mask
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()

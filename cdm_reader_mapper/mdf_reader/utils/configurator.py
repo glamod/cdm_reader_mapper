@@ -5,7 +5,6 @@ from __future__ import annotations
 import ast
 import logging
 
-import numpy as np
 import pandas as pd
 
 from .. import properties
@@ -161,7 +160,6 @@ class Configurator:
 
     def get_configuration(self):
         """Get ICOADS data model specific information."""
-        disable_reads = []
         dtypes = {}
         converters = {}
         kwargs = {}
@@ -171,7 +169,6 @@ class Configurator:
             header = self.schema["sections"][order]["header"]
             disable_read = header.get("disable_read")
             if disable_read is True:
-                disable_reads.append(order)
                 continue
             sections = self.schema["sections"][order]["elements"]
             for section in sections.keys():
@@ -193,12 +190,11 @@ class Configurator:
             "dtype": dtypes,
             "self": {
                 "dtypes": dtypes,
-                "disable_reads": disable_reads,
                 "parse_dates": parse_dates,
             },
         }
 
-    def open_pandas(self, configurations):
+    def open_pandas(self, configurations, imodel, ext_table_path):
         """Open TextParser to pd.DataSeries."""
         self.delimiter = None
         i = 0
@@ -210,7 +206,6 @@ class Configurator:
         converter_kwargs = configurations.get("converter_kwargs", {})
         decode = configurations.get("decode", False)
         decoder_dict = configurations.get("decoder_dict", {})
-        # dtype = configurations.get("dtype", {})
         validate = configurations.get("validate", False)
 
         for order in self.orders:
@@ -266,7 +261,16 @@ class Configurator:
                     missing = False
                     if i == j and self.missing is True:
                         missing = True
-                    mask_dict[index] = validate_value(value, isna, missing)
+                    mask_dict[index] = validate_value(
+                        value,
+                        isna,
+                        missing,
+                        imodel,
+                        index,
+                        ext_table_path,
+                        self.schema,
+                        disable_read,
+                    )
                 data_dict[index] = value
 
                 i = j
@@ -316,7 +320,7 @@ class Configurator:
         df = df.rename(columns=renames)
         df = df.assign(**attrs)
         for column in disables:
-            df[column] = np.nan
+            df[column] = None
         df = df.apply(lambda x: replace_empty_strings(x))
         df["missing_values"] = [missing_values] * len(df)
         return df

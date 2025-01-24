@@ -7,6 +7,8 @@ import os
 
 import pandas as pd
 
+from ..validate import validate
+
 
 def convert_dtypes(dtypes):
     """DOCUMENTATION."""
@@ -79,10 +81,20 @@ def decode_value(value, index, decoder_dict):
     return decoder_dict[index](value)
 
 
-def validate_value(value, isna, missing):
+def validate_value(
+    value, isna, missing, imodel, index, ext_table_path, schema, disable
+):
     """DOCUMENTATION."""
     mask = mask_value(value, isna, missing)
-    return mask
+    return validate(
+        data=value,
+        mask0=mask,
+        index=index,
+        imodel=imodel,
+        ext_table_path=ext_table_path,
+        schema=schema,
+        disable=disable,
+    )
 
 
 def set_missing_values(df, ref):
@@ -105,7 +117,10 @@ def mask_value(value, isna, missing):
         return False
     if isna is None:
         isna = not value
-    valid = bool(value)
+    if value is None:
+        valid = False
+    else:
+        valid = True
     return isna | valid
 
 
