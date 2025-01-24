@@ -219,6 +219,7 @@ class Configurator:
             disable_read = header.get("disable_read")
             if disable_read is True:
                 data_dict[order] = self.str_line[i : properties.MAX_FULL_REPORT_WIDTH]
+                mask_dict[order] = None
                 continue
             sections = self.schema["sections"][order]["elements"]
             k = i
@@ -271,7 +272,6 @@ class Configurator:
                         disable_read,
                     )
                 data_dict[index] = value
-
                 i = j
 
         df = pd.Series(data_dict)
