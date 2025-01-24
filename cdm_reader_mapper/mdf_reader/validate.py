@@ -33,13 +33,13 @@ def validate_numeric(element, data, schema):
     # Find thresholds in schema. Flag if not available -> warn
     lower = schema.get(element).get("valid_min", -np.inf)
     upper = schema.get(element).get("valid_max", np.inf)
-    if lower == -np.inf or upper == np.inf:
-        logging.warning(
-            f"Data numeric elements with missing upper or lower threshold: {element}"
-        )
-        logging.warning(
-            "Corresponding upper and/or lower bounds set to +/-inf for validation"
-        )
+    #if lower == -np.inf or upper == np.inf:
+    #    logging.warning(
+    #        f"Data numeric elements with missing upper or lower threshold: {element}"
+    #    )
+    #    logging.warning(
+    #        "Corresponding upper and/or lower bounds set to +/-inf for validation"
+    #    )
     return (data >= lower) & (data <= upper) | (data == np.nan)
 
 
@@ -47,8 +47,8 @@ def validate_codes(element, data, schema, imodel, ext_table_path):
     """DOCUMENTATION."""
     code_table_name = schema.get(element).get("codetable")
     if not code_table_name:
-        logging.error(f"Code table not defined for element {element}")
-        logging.warning("Element mask set to False")
+        #logging.error(f"Code table not defined for element {element}")
+        #logging.warning("Element mask set to False")
         return False
 
     table = codes.read_table(
@@ -132,7 +132,7 @@ def validate(
         filename=None,
     )
     if disable is True:
-        return None  # np.nan
+        return np.nan
 
     element_atts = schemas.df_schema([index], schema)
 
@@ -144,7 +144,6 @@ def validate(
     element = element_dict["element"]
     etype = element_dict["etype"]
 
-    mask = False
     if isnan(data):
         mask = True
     elif etype == "numeric_types":
@@ -157,7 +156,9 @@ def validate(
         mask = True
     else:
         logging.error(f"{etype} is not a valid data type")
-    print(mask0)
-    # if mask0 is None:
-    #    mask = False
+        
+    if etype in ["numeric_types", "key", "datetime"]:
+        if mask0 is False:
+            mask = False
+
     return mask
