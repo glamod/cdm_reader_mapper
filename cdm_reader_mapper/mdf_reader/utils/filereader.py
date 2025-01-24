@@ -147,10 +147,13 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        columns = df_total.columns
-        half = len(columns) / 2
-        df = df_total.iloc[:, : int(half)]
-        mask = df_total.iloc[:, int(half) :]
+        if configuration.get("validate") is True:
+            columns = df_total.columns
+            half = len(columns) / 2
+            df = df_total.iloc[:, : int(half)]
+            mask = df_total.iloc[:, int(half) :]
+        else:
+            mask = pd.DataFrame()
         self.columns = df.columns
         df = df.where(df.notnull(), None)
         return df, mask
