@@ -82,7 +82,13 @@ def decode_value(value, index, decoder_dict):
 
 
 def validate_value(
-    value, isna, missing, imodel, index, ext_table_path, schema,
+    value,
+    isna,
+    missing,
+    imodel,
+    index,
+    ext_table_path,
+    schema,
 ):
     """DOCUMENTATION."""
     mask = mask_value(value, isna, missing)

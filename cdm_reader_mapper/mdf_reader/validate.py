@@ -61,6 +61,10 @@ def validate_codes(element, data, schema, imodel, ext_table_path):
 
     table_keys = get_table_keys(table)
     table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
+    for table_key_str in table_keys_str:
+        if "~" in table_key_str:
+            logging.warning(f"Cross checks for {element} not implemented now!")
+            return True
 
     if isinstance(data, (list, tuple)):
         data = "~".join(data)
