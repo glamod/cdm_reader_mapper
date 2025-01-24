@@ -256,7 +256,6 @@ class Configurator:
                     value = convert_value(
                         value, index, converter_dict, converter_kwargs
                     )
-
                 if validate is True:
                     missing = False
                     if i == j and self.missing is True:

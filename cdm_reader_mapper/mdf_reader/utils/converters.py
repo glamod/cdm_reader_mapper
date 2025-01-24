@@ -15,13 +15,13 @@ class df_converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
-    def decode(self, data):
-        """Decode object type elements of a pandas series to UTF-8."""
-        return data.decode("utf-8")
-        #decoded = data.str.decode("utf-8")
-        #if decoded.dtype != "object":
-        #    return data
-        #return decoded
+    #def decode(self, data):
+    #    """Decode object type elements of a pandas series to UTF-8."""
+    #    return data.decode("utf-8")
+    #    #decoded = data.str.decode("utf-8")
+    #    #if decoded.dtype != "object":
+    #    #    return data
+    #    #return decoded
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
@@ -31,7 +31,7 @@ class df_converters:
         data = data.strip()
         data = data.replace(" ", "0")
         try:
-            return int(data)
+            return float(data)
         except ValueError:
             return
 
