@@ -5,10 +5,11 @@ Changelog
 
 1.1.0 (unreleased)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`)
 * New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`, :pull:`197`)
 * Update readthedocs documentation (:issue:`191`, :pull:`197`)
 * new function: ``write_data`` to write MDF data and validation mask according to ``write_tables`` for writing CDM tables (:pull:`201`)
