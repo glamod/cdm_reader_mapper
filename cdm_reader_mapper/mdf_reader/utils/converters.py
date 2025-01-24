@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-import numpy as np
-
 from .. import properties
 
 
@@ -20,10 +18,10 @@ class df_converters:
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
         return data.decode("utf-8")
-        decoded = data.str.decode("utf-8")
-        if decoded.dtype != "object":
-            return data
-        return decoded
+        #decoded = data.str.decode("utf-8")
+        #if decoded.dtype != "object":
+        #    return data
+        #return decoded
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
@@ -71,7 +69,7 @@ class df_converters:
         offset = offset if offset else self.numeric_offset
         data = self.to_numeric(data)
         if data is None:
-            return np.nan
+            return
         return offset + data * scale
 
     def object_to_object(self, data, disable_white_strip=False):
@@ -86,9 +84,7 @@ class df_converters:
                 data = data.rstrip()
             elif disable_white_strip == "r":
                 data = data.lstrip()
-        return (
-            np.nan if isinstance(data, str) and (data.isspace() or not data) else data
-        )
+        return None if isinstance(data, str) and (data.isspace() or not data) else data
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):
         """DOCUMENTATION."""
