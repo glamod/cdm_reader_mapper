@@ -131,7 +131,7 @@ class FileReader:
         configurations={},
     ):
         if open_with == "pandas":
-            df = Configurator(
+            df_total = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_pandas(configurations, self.imodel, self.ext_table_path)
         elif open_with == "netcdf":

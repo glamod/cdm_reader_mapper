@@ -134,12 +134,15 @@ class Configurator:
 
     def open_pandas(self, configurations, imodel, ext_table_path):
         """Open TextParser to pd.DataSeries."""
+        return self.df.apply(
+            lambda x: self._read_line(x[0], configurations, imodel, ext_table_path),
+            axis=1,
+        )
 
-        return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
-
-    def _read_line(self, line: str):
+    def _read_line(
+        self, line: str, configurations: dict, imodel: str, ext_table_path: str
+    ):
         i = j = 0
-        missing_values = []
         data_dict = {}
         mask_dict = {}
         convert = configurations.get("convert", False)
