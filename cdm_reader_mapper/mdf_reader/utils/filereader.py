@@ -138,12 +138,9 @@ class FileReader:
         open_with,
     ):
         if open_with == "pandas":
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_pandas(),
-                axis=1,
-            )
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_pandas()
         elif open_with == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
