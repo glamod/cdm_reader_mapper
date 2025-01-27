@@ -28,16 +28,6 @@ class Configurator:
         self.orders = order or []
         self.valid = valid or []
         self.schema = schema or {}
-        self.str_line = ""
-        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
-            if len(df) > 0:
-                self.str_line = df.iloc[0]
-
-    def _add_field_length(self, index, sections_dict):
-        field_length = sections_dict.get(
-            "field_length", properties.MAX_FULL_REPORT_WIDTH
-        )
-        return index + field_length
 
     def _validate_sentinal(self, i, line, sentinal):
         slen = len(sentinal)
