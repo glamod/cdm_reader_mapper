@@ -234,7 +234,7 @@ class Configurator:
 
                 if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
                     j += len(delimiter)
-                    
+
                 i = j
 
         df = pd.Series(data_dict)
