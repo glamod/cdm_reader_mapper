@@ -131,6 +131,17 @@ class Configurator:
             masked = "NOMASK"
         return value, masked
 
+    def _in_years(self, year):
+        if self.year_init is None:
+            pass
+        elif year < self.year_init:
+            return False
+        if self.year_end is None:
+            pass
+        elif year > self.year_end:
+            return False
+        return True
+
     def _read_line(
         self,
         line: str,
@@ -138,6 +149,8 @@ class Configurator:
         i = j = 0
         data_dict = {}
         mask_dict = {}
+        data_model = self.imodel.split("_")[0]
+        year_column = properties.year_column[data_model]
 
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
@@ -205,6 +218,10 @@ class Configurator:
                     continue
 
                 value = line[i:j]
+                if index == year_column:
+                    if not self._in_years(int(value)):
+                        return pd.Series()
+
                 if value == na_value:
                     value = None
 
@@ -235,6 +252,9 @@ class Configurator:
         self.validate = configurations.get("validate", False)
         self.imodel = imodel
         self.ext_table_path = ext_table_path
+        self.year_init = configurations["year_init"]
+        self.year_end = configurations["year_end"]
+
         return self.df.apply(
             lambda x: self._read_line(x[0]),
             axis=1,

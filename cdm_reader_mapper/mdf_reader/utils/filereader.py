@@ -82,30 +82,6 @@ class FileReader:
                                 attr
                             ]
 
-    def _select_years(self, df):
-        def get_years_from_datetime(date):
-            try:
-                return date.year
-            except AttributeError:
-                return date
-
-        if self.year_init is None and self.year_end is None:
-            return df
-
-        data_model = self.imodel.split("_")[0]
-        dates = df[properties.year_column[data_model]]
-        years = dates.apply(lambda x: get_years_from_datetime(x))
-        years = years.astype(int)
-
-        mask = pd.Series([True] * len(years))
-        if self.year_init:
-            mask[years < self.year_init] = False
-        if self.year_end:
-            mask[years > self.year_end] = False
-
-        index = mask[mask].index
-        return df.iloc[index].reset_index(drop=True)
-
     def _read_pandas(self, **kwargs):
         return pd.read_fwf(
             self.source,
@@ -141,6 +117,8 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
+        df_total = df_total.dropna(how="all")
+
         if configurations.get("validate") is True:
             columns = df_total.columns
             half = len(columns) / 2
@@ -149,6 +127,7 @@ class FileReader:
         else:
             df = df_total
             mask = pd.DataFrame()
+
         self.columns = df.columns
         df = df.where(df.notnull(), None)
         df = df.astype(configurations["dtype"])
@@ -179,6 +158,8 @@ class FileReader:
         configurations["convert"] = convert
         configurations["decode"] = decode
         configurations["validate"] = validate
+        configurations["year_init"] = self.year_init
+        configurations["year_end"] = self.year_end
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         elif open_with == "pandas":
