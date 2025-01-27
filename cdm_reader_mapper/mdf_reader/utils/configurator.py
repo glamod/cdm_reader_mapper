@@ -120,31 +120,24 @@ class Configurator:
             isna = not value
             masked = validate_value(
                 value,
-                isna,
-                missing,
-                self.imodel,
-                index,
-                self.ext_table_path,
-                self.schema,
+                index=index,
+                isna=isna,
+                missing=missing,
+                imodel=self.imodel,
+                ext_table_path=self.ext_table_path,
+                schema=self.schema,
             )
         else:
             masked = "NOMASK"
         return value, masked
 
     def _read_line(
-        self, line: str, configurations: dict, imodel: str, ext_table_path: str
+        self,
+        line: str,
     ):
         i = j = 0
         data_dict = {}
         mask_dict = {}
-        self.convert = configurations.get("convert", False)
-        self.converter_dict = configurations.get("converter_dict", {})
-        self.converter_kwargs = configurations.get("converter_kwargs", {})
-        self.decode = configurations.get("decode", False)
-        self.decoder_dict = configurations.get("decoder_dict", {})
-        self.validate = configurations.get("validate", False)
-        self.imodel = imodel
-        self.ext_table_path = ext_table_path
 
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
@@ -234,8 +227,16 @@ class Configurator:
 
     def open_pandas(self, configurations, imodel, ext_table_path):
         """Open TextParser to pd.DataSeries."""
+        self.convert = configurations.get("convert", False)
+        self.converter_dict = configurations.get("converter_dict", {})
+        self.converter_kwargs = configurations.get("converter_kwargs", {})
+        self.decode = configurations.get("decode", False)
+        self.decoder_dict = configurations.get("decoder_dict", {})
+        self.validate = configurations.get("validate", False)
+        self.imodel = imodel
+        self.ext_table_path = ext_table_path
         return self.df.apply(
-            lambda x: self._read_line(x[0], configurations, imodel, ext_table_path),
+            lambda x: self._read_line(x[0]),
             axis=1,
         )
 

@@ -9,9 +9,9 @@ import pandas as pd
 
 from cdm_reader_mapper.common.json_dict import get_table_keys
 
-from . import properties
-from .codes import codes
-from .schemas import schemas
+from .. import properties
+from ..codes import codes
+from ..schemas import schemas
 
 
 def validate_datetime(elements, data):

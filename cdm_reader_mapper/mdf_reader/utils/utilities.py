@@ -5,9 +5,7 @@ from __future__ import annotations
 import logging
 import os
 
-import pandas as pd
-
-from ..validate import validate
+from .validators import validate
 
 
 def convert_dtypes(dtypes):
@@ -100,20 +98,6 @@ def validate_value(
         ext_table_path=ext_table_path,
         schema=schema,
     )
-
-
-def set_missing_values(df, ref):
-    """DOCUMENTATION."""
-    explode_ = df.explode("missing_values")
-    explode_["index"] = explode_.index
-    explode_["values"] = True
-    pivots_ = explode_.pivot_table(
-        columns="missing_values",
-        index="index",
-        values="values",
-    )
-    missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
-    return missing_values.notna()
 
 
 def mask_value(value, isna, missing):
