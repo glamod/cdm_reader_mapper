@@ -10,6 +10,7 @@ from io import StringIO
 
 import numpy as np
 import pandas as pd
+import polars as pl
 import xarray as xr
 
 from .. import properties
@@ -125,6 +126,17 @@ class FileReader:
             **kwargs,
         )
 
+    def _read_polars(self, **kwargs):
+        return pl.read_csv(
+            self.source,
+            has_header=False,
+            separator="\0",
+            new_columns=["full_str"],
+            quote_char="\0",
+            infer_schema=False,
+            **kwargs,
+        )
+
     def _read_netcdf(self, **kwargs):
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
@@ -137,7 +149,15 @@ class FileReader:
         valid,
         open_with,
     ):
-        if open_with == "pandas":
+        if open_with == "polars":
+            print(TextParser.head)
+            df = Configurator(
+                df=pl.from_pandas(TextParser).rename({"0": "full_str"}),
+                schema=self.schema,
+                order=order,
+                valid=valid,
+            ).open_polars()
+        elif open_with == "pandas":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_pandas()
@@ -146,10 +166,22 @@ class FileReader:
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            raise ValueError(
+                "open_with has to be one of ['pandas', 'polars', 'netcdf']"
+            )
 
-        missing_values_ = df["missing_values"]
-        del df["missing_values"]
+        if isinstance(df, pl.DataFrame):
+            missing_values_ = df.get_column("missing_values").to_pandas()
+            df = df.drop("missing_values").to_pandas()
+            df.columns = pd.MultiIndex.from_tuples(
+                [
+                    tuple(x.split(properties.internal_delimiter, maxsplit=1))
+                    for x in df.columns
+                ]
+            )
+        else:
+            missing_values_ = df["missing_values"]
+            del df["missing_values"]
         df = self._select_years(df)
         missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
@@ -216,17 +248,26 @@ class FileReader:
         """DOCUMENTATION."""
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
-        elif open_with == "pandas":
+        elif open_with == "pandas" or open_with == "polars":
             TextParser = self._read_pandas(
                 encoding=self.schema["header"].get("encoding"),
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
                 chunksize=chunksize,
             )
+        # elif open_with == "polars":
+        #     TextParser = self._read_polars(
+        #         # encoding=self.schema["header"].get("encoding"),
+        #         # widths=[properties.MAX_FULL_REPORT_WIDTH],
+        #         # skiprows=self.skiprows,
+        #         # chunksize=chunksize,
+        #     )
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
+        if isinstance(TextParser, (pd.DataFrame, pl.DataFrame)) or isinstance(
+            TextParser, xr.Dataset
+        ):
             df, self.missing_values = self._read_sections(
                 TextParser, order, valid, open_with=open_with
             )

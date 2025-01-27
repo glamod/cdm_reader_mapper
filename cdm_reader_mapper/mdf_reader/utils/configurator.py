@@ -8,10 +8,12 @@ import logging
 
 import numpy as np
 import pandas as pd
+import polars as pl
 
 from .. import properties
 from . import converters, decoders
 from .utilities import convert_dtypes
+from ..properties import internal_delimiter
 
 
 class Configurator:
@@ -49,6 +51,12 @@ class Configurator:
             return section
         else:
             return (order, section)
+
+    def _get_polars_index(self, section, order):
+        if len(self.orders) == 1:
+            return section
+        else:
+            return internal_delimiter.join([order, section])
 
     def _get_ignore(self, section_dict):
         ignore = section_dict.get("ignore")
@@ -146,6 +154,136 @@ class Configurator:
                 "parse_dates": parse_dates,
             },
         }
+
+    def open_polars(self):
+        """Open TextParser to a pl.DataFrame"""
+        self.df = self.df.with_columns(pl.lit([]).alias("missing_values"))
+        for order in self.orders:
+            header = self.schema["sections"][order]["header"]
+
+            disable_read = header.get("disable_read", False)
+            if disable_read is True:
+                break
+
+            sentinal = header.get("sentinal")
+
+            section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
+            sections = self.schema["sections"][order]["elements"]
+
+            # OPTIM: Is it more efficient to create the two columns or use the
+            #        regex matching?
+            if sentinal is not None:
+                self.df = self.df.with_columns(
+                    [
+                        (
+                            pl.when(pl.col("full_str").str.starts_with(sentinal))
+                            .then(pl.col("full_str").str.slice(0, section_length))
+                            .otherwise(pl.lit(None))
+                            .alias(order)
+                        ),
+                        (
+                            pl.when(pl.col("full_str").str.starts_with(sentinal))
+                            .then(pl.col("full_str").str.slice(section_length))
+                            .otherwise(pl.col("full_str"))
+                            .alias("full_str")
+                        ),
+                    ]
+                )
+            else:
+                self.df = self.df.with_columns(
+                    [
+                        pl.col("full_str").str.slice(0, section_length).alias(order),
+                        pl.col("full_str").str.slice(section_length).alias("full_str"),
+                    ]
+                )
+
+            field_layout = header.get("field_layout")
+            delimiter = header.get("delimiter")
+
+            # Handle delimited section
+            if delimiter is not None:
+                delimiter_format = header.get("format")
+                if delimiter_format == "delimited":
+                    # Read as CSV
+                    field_names = sections.keys()
+                    field_names = [
+                        self._get_polars_index(order, x) for x in field_names
+                    ]
+                    n_fields = len(field_names)
+                    self.df = self.df.with_columns(
+                        pl.col(order)
+                        .str.splitn(delimiter, n_fields)
+                        .struct.rename_fields(field_names)
+                        .struct.unnest()
+                    )
+                    for field in field_names:
+                        self.df = self.df.with_columns(
+                            pl.col(field).str.strip_chars(" ").name.keep()
+                        ).with_columns(
+                            pl.when(pl.col(field).eq("") | pl.col(field).is_null())
+                            .then(pl.col("missing_values").list.concat(pl.lit([field])))
+                            .otherwise(pl.col("missing_values"))
+                            .alias("missing_values")
+                        )
+
+                    continue
+                elif field_layout != "fixed_width":
+                    logging.error(
+                        f"Delimiter for {order} is set to {delimiter}. "
+                        + f"Please specify either format or field_layout in your header schema {header}."
+                    )
+                    raise ValueError(
+                        f"Delimiter for {order} is set to {delimiter}. "
+                        + f"Please specify either format or field_layout in your header schema {header}."
+                    )
+
+            for section, section_dict in sections.items():
+                index = self._get_polars_index(section, order)
+                ignore = (order not in self.valid) or self._get_ignore(section_dict)
+                field_length = section_dict.get(
+                    "field_length", properties.MAX_FULL_REPORT_WIDTH
+                )
+                na_value = section_dict.get("missing_value")
+
+                if ignore:
+                    self.df = self.df.with_columns(
+                        [
+                            pl.col(order).str.slice(field_length).name.keep(),
+                            pl.col("missing_values")
+                            .list.concat(pl.lit([index]))
+                            .name.keep(),
+                        ]
+                    )
+                    continue
+
+                missing_expr = pl.col(index).eq("") | pl.col(index).is_null()
+                if na_value is not None:
+                    missing_expr = missing_expr | pl.col("index").eq(na_value)
+
+                self.df = self.df.with_columns(
+                    [
+                        pl.col(order)
+                        .str.slice(0, field_length)
+                        .str.strip_chars(" ")
+                        .alias(index),
+                        pl.col(order).str.slice(field_length).name.keep(),
+                    ]
+                ).with_columns(
+                    pl.when(missing_expr)
+                    .then(pl.col("missing_values").list.concat(pl.lit([index])))
+                    .otherwise(pl.col("missing_values"))
+                    .alias("missing_values")
+                )
+
+                if delimiter is not None:
+                    self.df = self.df.with_columns(
+                        pl.col(order).str.strip_prefix(delimiter).name.keep()
+                    )
+
+            self.df = self.df.drop([order])
+
+            continue
+        return self.df.drop("full_str")
 
     def open_pandas(self):
         """Open TextParser to pd.DataSeries."""

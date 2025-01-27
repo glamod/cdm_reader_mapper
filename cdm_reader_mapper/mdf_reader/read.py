@@ -227,7 +227,8 @@ class MDFFileReader(FileReader):
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
-            open_with=properties.open_file.get(self.imodel, "pandas"),
+            # open_with=properties.open_file.get(self.imodel, "pandas"),
+            open_with=properties.open_file.get(self.imodel, "polars"),
             chunksize=chunksize,
         )
 
