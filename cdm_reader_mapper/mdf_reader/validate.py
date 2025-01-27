@@ -13,7 +13,7 @@ from . import properties
 from .codes import codes
 from .schemas import schemas
 
-column = ("c99_journal", "SST_I")
+
 def validate_datetime(elements, data):
     """DOCUMENTATION."""
 
@@ -33,21 +33,13 @@ def validate_numeric(element, data, schema):
     # Find thresholds in schema. Flag if not available -> warn
     lower = schema.get(element).get("valid_min", -np.inf)
     upper = schema.get(element).get("valid_max", np.inf)
-    #if lower == -np.inf or upper == np.inf:
-    #    logging.warning(
-    #        f"Data numeric elements with missing upper or lower threshold: {element}"
-    #    )
-    #    logging.warning(
-    #        "Corresponding upper and/or lower bounds set to +/-inf for validation"
-    #    )
-    #print(element)
-    #if element == column:
-    #    print(data)
-    #    print(lower)
-    #    print(upper)
-    #    print(data >= lower)
-    #    print(data <= upper)
-    #    exit()
+    if lower == -np.inf or upper == np.inf:
+        logging.warning(
+            f"Data numeric elements with missing upper or lower threshold: {element}"
+        )
+        logging.warning(
+            "Corresponding upper and/or lower bounds set to +/-inf for validation"
+        )
     return (data >= lower) & (data <= upper) | (data == np.nan)
 
 
@@ -150,11 +142,7 @@ def validate(
 
     element = element_dict["element"]
     etype = element_dict["etype"]
-    #if index == column:
-    #    print(element)
-    #    print(etype)
-    #    print(data)
-    #    #exit()
+
     if isnan(data):
         mask = True
     elif etype == "numeric_types":
@@ -168,13 +156,7 @@ def validate(
     else:
         logging.error(f"{etype} is not a valid data type")
         return
-    #if index == column:
-    #    print(element)
-    #    print(etype)
-    #    print(data)
-    #    print(mask)
-    #    print(mask0)
-    #    exit()
+
     if etype in ["numeric_types", "key", "datetime"]:
         if mask0 is False:
             mask = False

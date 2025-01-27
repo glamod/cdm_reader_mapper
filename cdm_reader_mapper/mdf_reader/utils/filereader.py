@@ -147,6 +147,7 @@ class FileReader:
             df = df_total.iloc[:, : int(half)]
             mask = df_total.iloc[:, int(half) :]
         else:
+            df = df_total
             mask = pd.DataFrame()
         self.columns = df.columns
         df = df.where(df.notnull(), None)

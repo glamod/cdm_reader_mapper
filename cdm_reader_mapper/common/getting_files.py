@@ -175,5 +175,4 @@ def get_path(path):
     try:
         return get_files(path)
     except ModuleNotFoundError:
-        #logging.warning(f"No module named {path}")
-        pass
+        logging.warning(f"No module named {path}")
