@@ -177,11 +177,36 @@ class Configurator:
                     # Read as CSV
                     field_names = sections.keys()
                     fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
+                    print(field_names)
+                    print(len(field_names))
+                    print()
+                    print(fields)
+                    print(len(fields))
+                    exit()
                     for field_name, field in zip(field_names, fields):
+                        print(field_name, field)
                         index = self._get_index(field_name, order)
-                        data_dict[index] = field.strip()
+                        #data_dict[index] = field.strip()
+                        value = field.strip()
+                        isna = not value
+                        if decode is True:
+                            value = decode_value(value, index, decoder_dict)
+                        if convert is True:
+                            value = convert_value(
+                                value, index, converter_dict, converter_kwargs,
+                            )
+                        if validate is True:
+                            missing = False
+                            if i == j:
+                                missing = True
+                            mask_dict[index] = validate_value(
+                                value, isna, missing, imodel, index, ext_table_path, self.schema,
+                            )
+                        data_dict[index] = value
+                        #print(index)
                         i += len(field)
                     j = i
+                    exit()
                     continue
                 elif field_layout != "fixed_width":
                     logging.error(
@@ -193,6 +218,7 @@ class Configurator:
             for section, section_dict in sections.items():
                 missing = True
                 index = self._get_index(section, order)
+                #print(index)
                 ignore = (order not in self.valid) or self._get_ignore(section_dict)
                 na_value = section_dict.get("missing_value")
                 field_length = section_dict.get(
@@ -203,6 +229,10 @@ class Configurator:
                 if j > k:
                     missing = False
                     j = k
+                elif i == j:
+                    missing = True
+                else:
+                    missing = False
 
                 if ignore is True:
                     i = j
@@ -218,12 +248,18 @@ class Configurator:
                     value = decode_value(value, index, decoder_dict)
                 if convert is True:
                     value = convert_value(
-                        value, index, converter_dict, converter_kwargs
+                        value, index, converter_dict, converter_kwargs,
                     )
+                column = ("c99_journal", "SST_I")
+                #if index == column:
+                #    print(value)
+                #    print(i)
+                #    print(j)
+                #    exit()
                 if validate is True:
-                    missing = False
-                    if i == j and self.missing is True:
-                        missing = True
+                    #missing = False
+                    #if i == j:
+                    #    missing = True
                     mask_dict[index] = validate_value(
                         value,
                         isna,
@@ -242,6 +278,14 @@ class Configurator:
 
         df = pd.Series(data_dict)
         mask = pd.Series(mask_dict)
+        #for c in df:
+        #    print(df[c])
+        #for c in mask:
+        #    print(mask[c])
+        #print(df)
+        #print(mask)
+        #print('-------------------------------------------------------------')        
+        exit()
         return pd.concat([df, mask])
 
     def open_netcdf(self, configurations):
