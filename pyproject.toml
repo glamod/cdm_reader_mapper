@@ -29,6 +29,7 @@ dynamic = ["version"]
 dependencies = [
   "matplotlib",
   "pandas>=2.1.0",
+  "polars",
   "dask",
   "distributed",
   "datashader",
@@ -216,6 +217,7 @@ check-typed-exception = true
 "matplotlib.pyplot" = "plt"
 numpy = "np"
 pandas = "pd"
+polars = "pl"
 scipy = "sp"
 xarray = "xr"
 
