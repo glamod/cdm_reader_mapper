@@ -9,7 +9,6 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and J
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`)
 * New core ``DataBundle`` object including callable ``cdm_mapper``, ``metmemtpy`` and ``operations`` methods (:issue:`84`,  :pull:`188`, :pull:`197`)
 * Update readthedocs documentation (:issue:`191`, :pull:`197`)
 * new function: ``write_data`` to write MDF data and validation mask according to ``write_tables`` for writing CDM tables (:pull:`201`)
@@ -47,6 +46,7 @@ Internal changes
 
 * split ``mdf_reader.utils.auxiliary`` into ``mdf_reader.utils.filereader``, ``mdf_reader.utils.configurator`` and ``mdf_reader.utils.utilities`` (:issue:`25`, :pull:`200`)
 * simplify ``cdm_mapper.read_tables`` function (:pull:`192`)
+* Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`, :pull:`210`)
 
 Bug fixes
 ^^^^^^^^^
