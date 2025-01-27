@@ -94,50 +94,42 @@ class Configurator:
             decoders[index] = decoder
         return decoders
 
-    def get_configuration(self):
-        """Get ICOADS data model specific information."""
-        dtypes = {}
-        converters = {}
-        kwargs = {}
-        decoders = {}
-        for order in self.orders:
-            self.order = order
-            header = self.schema["sections"][order]["header"]
-            disable_read = header.get("disable_read")
-            if disable_read is True:
-                continue
-            sections = self.schema["sections"][order]["elements"]
-            for section in sections.keys():
-                self.sections_dict = sections[section]
-                index = self._get_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(
-                    self.sections_dict
-                )
-                if ignore is True:
-                    continue
-                dtypes = self._update_dtypes(dtypes, index)
-                converters = self._update_converters(converters, index)
-                kwargs = self._update_kwargs(kwargs, index)
-                decoders = self._update_decoders(decoders, index)
+    def _decode_convert_validate(
+        self,
+        value,
+        index,
+        missing=False,
+    ):
+        if value is None:
+            pass
+        elif not value.strip():
+            value = None
+        else:
+            value = value.strip()
 
-        dtypes, parse_dates = convert_dtypes(dtypes)
-        return {
-            "converter_dict": converters,
-            "converter_kwargs": kwargs,
-            "decoder_dict": decoders,
-            "dtype": dtypes,
-            "self": {
-                "dtypes": dtypes,
-                "parse_dates": parse_dates,
-            },
-        }
-
-    def open_pandas(self, configurations, imodel, ext_table_path):
-        """Open TextParser to pd.DataSeries."""
-        return self.df.apply(
-            lambda x: self._read_line(x[0], configurations, imodel, ext_table_path),
-            axis=1,
-        )
+        if self.decode is True:
+            value = decode_value(value, index, self.decoder_dict)
+        if self.convert is True:
+            value = convert_value(
+                value,
+                index,
+                self.converter_dict,
+                self.converter_kwargs,
+            )
+        if self.validate is True:
+            isna = not value
+            masked = validate_value(
+                value,
+                isna,
+                missing,
+                self.imodel,
+                index,
+                self.ext_table_path,
+                self.schema,
+            )
+        else:
+            masked = "NOMASK"
+        return value, masked
 
     def _read_line(
         self, line: str, configurations: dict, imodel: str, ext_table_path: str
@@ -145,12 +137,14 @@ class Configurator:
         i = j = 0
         data_dict = {}
         mask_dict = {}
-        convert = configurations.get("convert", False)
-        converter_dict = configurations.get("converter_dict", {})
-        converter_kwargs = configurations.get("converter_kwargs", {})
-        decode = configurations.get("decode", False)
-        decoder_dict = configurations.get("decoder_dict", {})
-        validate = configurations.get("validate", False)
+        self.convert = configurations.get("convert", False)
+        self.converter_dict = configurations.get("converter_dict", {})
+        self.converter_kwargs = configurations.get("converter_kwargs", {})
+        self.decode = configurations.get("decode", False)
+        self.decoder_dict = configurations.get("decoder_dict", {})
+        self.validate = configurations.get("validate", False)
+        self.imodel = imodel
+        self.ext_table_path = ext_table_path
 
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
@@ -179,33 +173,13 @@ class Configurator:
                     fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
                     fields.extend([""] * (len(field_names) - len(fields)))
                     for field_name, field in zip(field_names, fields):
-                        print(field_name, field)
                         index = self._get_index(field_name, order)
-                        value = field.strip()
-                        isna = not value
-                        if decode is True:
-                            value = decode_value(value, index, decoder_dict)
-                        if convert is True:
-                            value = convert_value(
-                                value,
-                                index,
-                                converter_dict,
-                                converter_kwargs,
-                            )
-                        if validate is True:
-                            missing = False
-                            if i == j:
-                                missing = True
-                            mask_dict[index] = validate_value(
-                                value,
-                                isna,
-                                missing,
-                                imodel,
-                                index,
-                                ext_table_path,
-                                self.schema,
-                            )
-                        data_dict[index] = value
+                        data_dict[index], masked = self._decode_convert_validate(
+                            field,
+                            index,
+                        )
+                        if masked != "NOMASK":
+                            mask_dict[index] = masked
                         i += len(field)
                     j = i
                     continue
@@ -217,7 +191,6 @@ class Configurator:
 
             k = i + section_length
             for section, section_dict in sections.items():
-                missing = True
                 index = self._get_index(section, order)
                 ignore = (order not in self.valid) or self._get_ignore(section_dict)
                 na_value = section_dict.get("missing_value")
@@ -239,31 +212,16 @@ class Configurator:
                     continue
 
                 value = line[i:j]
-                if not value.strip():
-                    value = None
                 if value == na_value:
                     value = None
-                isna = not value
-                if decode is True:
-                    value = decode_value(value, index, decoder_dict)
-                if convert is True:
-                    value = convert_value(
-                        value,
-                        index,
-                        converter_dict,
-                        converter_kwargs,
-                    )
-                if validate is True:
-                    mask_dict[index] = validate_value(
-                        value,
-                        isna,
-                        missing,
-                        imodel,
-                        index,
-                        ext_table_path,
-                        self.schema,
-                    )
-                data_dict[index] = value
+
+                data_dict[index], masked = self._decode_convert_validate(
+                    value,
+                    index,
+                    missing=missing,
+                )
+                if masked != "NOMASK":
+                    mask_dict[index] = masked
 
                 if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
                     j += len(delimiter)
@@ -273,6 +231,13 @@ class Configurator:
         df = pd.Series(data_dict)
         mask = pd.Series(mask_dict)
         return pd.concat([df, mask])
+
+    def open_pandas(self, configurations, imodel, ext_table_path):
+        """Open TextParser to pd.DataSeries."""
+        return self.df.apply(
+            lambda x: self._read_line(x[0], configurations, imodel, ext_table_path),
+            axis=1,
+        )
 
     def open_netcdf(self, configurations):
         """Open netCDF to pd.Series."""
@@ -321,3 +286,41 @@ class Configurator:
         df = df.apply(lambda x: replace_empty_strings(x))
         df["missing_values"] = [missing_values] * len(df)
         return df
+
+    def get_configuration(self):
+        """Get ICOADS data model specific information."""
+        dtypes = {}
+        converters = {}
+        kwargs = {}
+        decoders = {}
+        for order in self.orders:
+            self.order = order
+            header = self.schema["sections"][order]["header"]
+            disable_read = header.get("disable_read")
+            if disable_read is True:
+                continue
+            sections = self.schema["sections"][order]["elements"]
+            for section in sections.keys():
+                self.sections_dict = sections[section]
+                index = self._get_index(section, order)
+                ignore = (order not in self.valid) or self._get_ignore(
+                    self.sections_dict
+                )
+                if ignore is True:
+                    continue
+                dtypes = self._update_dtypes(dtypes, index)
+                converters = self._update_converters(converters, index)
+                kwargs = self._update_kwargs(kwargs, index)
+                decoders = self._update_decoders(decoders, index)
+
+        dtypes, parse_dates = convert_dtypes(dtypes)
+        return {
+            "converter_dict": converters,
+            "converter_kwargs": kwargs,
+            "decoder_dict": decoders,
+            "dtype": dtypes,
+            "self": {
+                "dtypes": dtypes,
+                "parse_dates": parse_dates,
+            },
+        }
