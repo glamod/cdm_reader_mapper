@@ -243,7 +243,7 @@ class MDFFileReader(FileReader):
         self.validate_entries(validate)
 
         # 3. Create output DataBundle object
-        logging.info("Creata output DataBundle object")
+        logging.info("Create output DataBundle object")
 
         return DataBundle(
             data=self.data,
