@@ -11,9 +11,9 @@ import pandas as pd
 import polars as pl
 
 from .. import properties
+from ..properties import internal_delimiter
 from . import converters, decoders
 from .utilities import convert_dtypes
-from ..properties import internal_delimiter
 
 
 class Configurator:
