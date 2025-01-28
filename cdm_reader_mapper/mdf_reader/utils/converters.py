@@ -18,10 +18,13 @@ class df_converters:
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
-        decoded = data.str.decode("utf-8")
-        if decoded.dtype != "object":
-            return data
-        return decoded
+        def _decode(x):
+            if not isinstance(x, str):
+                return x
+            encoded = x.endode("latin1")
+            return encoded.decode("utf-8")
+            
+        return data.apply(lambda x: _decode(x))
 
     def to_numeric(self, data):
         """Convert object type elements of a pandas series to numeric type."""
