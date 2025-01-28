@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import logging
+import os
 from io import StringIO as StringIO
 
 import pandas as pd
@@ -13,7 +14,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import validate_arg
+from .utils.utilities import update_dtypes, validate_arg
 
 
 class MDFFileReader(FileReader):
@@ -105,6 +106,12 @@ class MDFFileReader(FileReader):
             validate=validate,
             configurations=self.configurations,
         )
+        if not all([decode, convert]):
+            dtypes = "object"
+        else:
+            dtypes = update_dtypes(self.data, self.configurations["dtype"])
+
+        self.data = self.data.astype(dtypes)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
@@ -112,7 +119,7 @@ class MDFFileReader(FileReader):
         return DataBundle(
             data=self.data,
             columns=self.columns,
-            dtypes=self.dtypes,
+            dtypes=dtypes,
             parse_dates=self.parse_dates,
             mask=self.mask,
             imodel=self.imodel,
@@ -255,6 +262,11 @@ def read_data(
         return columns_
 
     def _read_csv(ifile, col_subset=None, **kwargs):
+        if ifile is None:
+            return pd.DataFrame()
+        if not os.path.isfile(ifile):
+            logging.warning(f"{ifile} not available.")
+            return pd.DataFrame()
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
         df.columns = _update_column_labels(df.columns)
         if col_subset is not None:
@@ -275,8 +287,7 @@ def read_data(
         parse_dates = False
 
     data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
-    if mask is not None:
-        mask = _read_csv(mask, col_subset=col_subset)
+    mask = _read_csv(mask, col_subset=col_subset)
 
     return DataBundle(
         data=data,

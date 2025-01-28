@@ -130,7 +130,6 @@ class FileReader:
 
         self.columns = df.columns
         df = df.where(df.notnull(), None)
-        df = df.astype(configurations["dtype"])
         return df, mask
 
     def get_configurations(self, order, valid):

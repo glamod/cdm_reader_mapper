@@ -341,7 +341,6 @@ class Configurator:
             "decoder_dict": decoders,
             "dtype": dtypes,
             "self": {
-                "dtypes": dtypes,
                 "parse_dates": parse_dates,
             },
         }

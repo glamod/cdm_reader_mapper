@@ -113,8 +113,8 @@ def mask_value(value, isna, missing):
     return isna | valid
 
 
-def adjust_dtype(dtype, df):
+def update_dtypes(df, dtypes):
     """DOCUMENTATION."""
-    if not isinstance(dtype, dict):
-        return dtype
-    return {k: v for k, v in dtype.items() if k in df.columns}
+    if not isinstance(dtypes, dict):
+        return dtypes
+    return {k: v for k, v in dtypes.items() if k in df.columns}
