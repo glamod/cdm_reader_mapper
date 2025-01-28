@@ -150,7 +150,6 @@ class FileReader:
         open_with,
     ):
         if open_with == "polars":
-            print(TextParser.head)
             df = Configurator(
                 df=pl.from_pandas(TextParser).rename({"0": "full_str"}),
                 schema=self.schema,
