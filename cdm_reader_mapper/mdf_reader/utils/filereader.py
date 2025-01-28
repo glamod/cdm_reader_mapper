@@ -115,6 +115,27 @@ class FileReader:
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
+    # def _select_years(self, df: pl.DataFrame):
+    #     if self.year_init is None and self.year_end is None:
+    #         return df
+    #
+    #     data_model = self.imodel.split("_")[0]
+    #     dates = df.get_column(properties.year_column[data_model])
+    #     if dates.dtype == pl.Datetime:
+    #         years = dates.dt.year()
+    #     else:
+    #         years = dates.cast(pl.Int64, strict=False)
+    #
+    #     mask = pl.repeat(True, df.height, eager=True)
+    #     if self.year_init and self.year_end:
+    #         mask = years.is_between(self.year_init, self.year_end, closed="both")
+    #     elif self.year_init:
+    #         mask = years.ge(self.year_init)
+    #     elif self.year_end:
+    #         mask = years.le(self.year_end)
+    #
+    #     return df.filter(mask)
+
     def _read_pandas(self, **kwargs):
         return pd.read_fwf(
             self.source,
@@ -151,7 +172,7 @@ class FileReader:
     ):
         if open_with == "polars":
             df = Configurator(
-                df=pl.from_pandas(TextParser).rename({"0": "full_str"}),
+                df=TextParser,
                 schema=self.schema,
                 order=order,
                 valid=valid,
@@ -181,6 +202,7 @@ class FileReader:
         else:
             missing_values_ = df["missing_values"]
             del df["missing_values"]
+
         df = self._select_years(df)
         missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
@@ -247,20 +269,20 @@ class FileReader:
         """DOCUMENTATION."""
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
-        elif open_with == "pandas" or open_with == "polars":
+        elif open_with == "pandas":
             TextParser = self._read_pandas(
                 encoding=self.schema["header"].get("encoding"),
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
                 chunksize=chunksize,
             )
-        # elif open_with == "polars":
-        #     TextParser = self._read_polars(
-        #         # encoding=self.schema["header"].get("encoding"),
-        #         # widths=[properties.MAX_FULL_REPORT_WIDTH],
-        #         # skiprows=self.skiprows,
-        #         # chunksize=chunksize,
-        #     )
+        elif open_with == "polars":
+            TextParser = self._read_polars(
+                # encoding=self.schema["header"].get("encoding"),
+                # widths=[properties.MAX_FULL_REPORT_WIDTH],
+                # skiprows=self.skiprows,
+                # chunksize=chunksize,
+            )
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 

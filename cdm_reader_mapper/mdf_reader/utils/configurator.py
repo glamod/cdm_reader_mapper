@@ -155,23 +155,18 @@ class Configurator:
             },
         }
 
-    def open_polars(self):
+    def open_polars(self) -> pl.DataFrame:
         """Open TextParser to a pl.DataFrame"""
         self.df = self.df.with_columns(pl.lit([]).alias("missing_values"))
-        for order in self.orders:
-            header = self.schema["sections"][order]["header"]
-
-            disable_read = header.get("disable_read", False)
-            if disable_read is True:
-                break
+        for section in self.orders:
+            header = self.schema["sections"][section]["header"]
 
             sentinal = header.get("sentinal")
 
             section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
-            sections = self.schema["sections"][order]["elements"]
+            fields = self.schema["sections"][section]["elements"]
 
-            # OPTIM: Is it more efficient to create the two columns or use the
-            #        regex matching?
+            # Get data associated with current section
             if sentinal is not None:
                 self.df = self.df.with_columns(
                     [
@@ -179,7 +174,7 @@ class Configurator:
                             pl.when(pl.col("full_str").str.starts_with(sentinal))
                             .then(pl.col("full_str").str.slice(0, section_length))
                             .otherwise(pl.lit(None))
-                            .alias(order)
+                            .alias(section)
                         ),
                         (
                             pl.when(pl.col("full_str").str.starts_with(sentinal))
@@ -192,10 +187,15 @@ class Configurator:
             else:
                 self.df = self.df.with_columns(
                     [
-                        pl.col("full_str").str.slice(0, section_length).alias(order),
+                        pl.col("full_str").str.slice(0, section_length).alias(section),
                         pl.col("full_str").str.slice(section_length).alias("full_str"),
                     ]
                 )
+
+            # Don't read fields
+            disable_read = header.get("disable_read", False)
+            if disable_read is True:
+                continue
 
             field_layout = header.get("field_layout")
             delimiter = header.get("delimiter")
@@ -205,13 +205,13 @@ class Configurator:
                 delimiter_format = header.get("format")
                 if delimiter_format == "delimited":
                     # Read as CSV
-                    field_names = sections.keys()
+                    field_names = fields.keys()
                     field_names = [
-                        self._get_polars_index(order, x) for x in field_names
+                        self._get_polars_index(section, x) for x in field_names
                     ]
                     n_fields = len(field_names)
                     self.df = self.df.with_columns(
-                        pl.col(order)
+                        pl.col(section)
                         .str.splitn(delimiter, n_fields)
                         .struct.rename_fields(field_names)
                         .struct.unnest()
@@ -219,70 +219,66 @@ class Configurator:
                     for field in field_names:
                         self.df = self.df.with_columns(
                             pl.col(field).str.strip_chars(" ").name.keep()
-                        ).with_columns(
-                            pl.when(pl.col(field).eq("") | pl.col(field).is_null())
-                            .then(pl.col("missing_values").list.concat(pl.lit([field])))
-                            .otherwise(pl.col("missing_values"))
-                            .alias("missing_values")
                         )
 
                     continue
                 elif field_layout != "fixed_width":
-                    logging.error(
-                        f"Delimiter for {order} is set to {delimiter}. "
-                        + f"Please specify either format or field_layout in your header schema {header}."
-                    )
+                    # logging.error(
+                    #     f"Delimiter for {order} is set to {delimiter}. "
+                    #     + f"Please specify either format or field_layout in your header schema {header}."
+                    # )
                     raise ValueError(
-                        f"Delimiter for {order} is set to {delimiter}. "
+                        f"Delimiter for {section} is set to {delimiter}. "
                         + f"Please specify either format or field_layout in your header schema {header}."
                     )
 
-            for section, section_dict in sections.items():
-                index = self._get_polars_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(section_dict)
-                field_length = section_dict.get(
+            # Loop through fixed-width fields
+            for field, field_dict in fields.items():
+                index = self._get_polars_index(field, section)
+                ignore = (section not in self.valid) or self._get_ignore(field_dict)
+                field_length = field_dict.get(
                     "field_length", properties.MAX_FULL_REPORT_WIDTH
                 )
-                na_value = section_dict.get("missing_value")
+                na_value = field_dict.get("missing_value")
 
                 if ignore:
                     self.df = self.df.with_columns(
-                        [
-                            pl.col(order).str.slice(field_length).name.keep(),
-                            pl.col("missing_values")
-                            .list.concat(pl.lit([index]))
-                            .name.keep(),
-                        ]
+                        pl.col(section)
+                        .str.slice(field_length)
+                        .str.strip_prefix(delimiter)
+                        .name.keep(),
                     )
                     continue
 
-                missing_expr = pl.col(index).eq("") | pl.col(index).is_null()
+                missing_map = {"": None}
                 if na_value is not None:
-                    missing_expr = missing_expr | pl.col("index").eq(na_value)
+                    missing_map[na_value] = None
 
                 self.df = self.df.with_columns(
                     [
-                        pl.col(order)
+                        # If section not present in a row, then both these are null
+                        pl.col(section)
                         .str.slice(0, field_length)
                         .str.strip_chars(" ")
+                        .replace(missing_map)
                         .alias(index),
-                        pl.col(order).str.slice(field_length).name.keep(),
+                        pl.col(section).str.slice(field_length).name.keep(),
+                        (
+                            # Handle missing sections
+                            pl.when(pl.col(section).is_null())
+                            .then(pl.col("missing_values").list.concat(pl.lit([index])))
+                            .otherwise(pl.col("missing_values"))
+                            .alias("missing_values")
+                        ),
                     ]
-                ).with_columns(
-                    pl.when(missing_expr)
-                    .then(pl.col("missing_values").list.concat(pl.lit([index])))
-                    .otherwise(pl.col("missing_values"))
-                    .alias("missing_values")
                 )
-
                 if delimiter is not None:
                     self.df = self.df.with_columns(
-                        pl.col(order).str.strip_prefix(delimiter).name.keep()
+                        pl.col(section).str.strip_prefix(delimiter).name.keep()
                     )
 
-            self.df = self.df.drop([order])
+            self.df = self.df.drop([section])
 
-            continue
         return self.df.drop("full_str")
 
     def open_pandas(self):
