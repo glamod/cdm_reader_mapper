@@ -122,13 +122,11 @@ def write_data(
         if i == 0:
             mode = "w"
             header = []
-            info["dtypes"] = {
-                k: v for k, v in info["dtypes"].items() if k in data_df.columns
-            }
             for col in data_df.columns:
                 col_ = _join(col)
                 header.append(col_)
-
+                if isinstance(info["dtypes"], str):
+                    continue
                 if col in info["dtypes"]:
                     info["dtypes"][col_] = info["dtypes"][col]
                     del info["dtypes"][col]
@@ -143,8 +141,10 @@ def write_data(
             "index": False,
             "sep": delimiter,
         }
-        data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
-        mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+        if not data_df.empty:
+            data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
+        if not mask_df.empty:
+            mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
 
     if info:
         with open(os.path.join(out_dir, filename_info), "w") as fileObj:
