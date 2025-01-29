@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 
-import pandas as pd
+import polars as pl
 
 
 def convert_dtypes(dtypes):
@@ -74,18 +74,15 @@ def decode_entries(series, decoder_func):
     return decoder_func(series)
 
 
-def set_missing_values(df, ref):
+def set_missing_values(df: pl.DataFrame) -> pl.DataFrame:
     """DOCUMENTATION."""
-    explode_ = df.explode("missing_values")
-    explode_["index"] = explode_.index
-    explode_["values"] = True
-    pivots_ = explode_.pivot_table(
-        columns="missing_values",
-        index="index",
-        values="values",
+    # QUESTION: Do I need to re-order the columns here?
+    return (
+        df.explode(columns="missing_values")
+        .with_columns(pl.lit(True).alias("values"))
+        .pivot("missing_values", index="index", values="values")
+        .fill_null(False)
     )
-    missing_values = pd.DataFrame(data=pivots_, columns=ref.columns, index=ref.index)
-    return missing_values.notna()
 
 
 def create_mask(df, isna, missing_values=[]):
