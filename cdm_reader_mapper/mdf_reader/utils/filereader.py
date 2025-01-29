@@ -15,11 +15,7 @@ from .. import properties
 from ..schemas import schemas
 from ..validate import validate
 from .configurator import Configurator
-from .utilities import (
-    convert_entries,
-    decode_entries,
-    validate_path,
-)
+from .utilities import convert_entries, decode_entries, validate_path
 
 
 class FileReader:
