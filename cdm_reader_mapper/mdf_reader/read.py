@@ -19,13 +19,12 @@ from .utils.utilities import adjust_dtype, validate_arg
 
 
 def _remove_boolean_values(x):
-    # print(x, type(x))
+    if isinstance(x, str):
+        x = ast.literal_eval(x)
     if x is True:
-        # print("    ", 1)
-        return None
+        return
     if x is False:
-        # print("    ", 2)
-        return None
+        return
     return x
 
 
@@ -132,11 +131,13 @@ class MDFFileReader(FileReader):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
 
+            dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
             data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
+                dtype=dtype,
                 parse_dates=date_columns,
                 delimiter=properties.internal_delimiter,
                 quotechar="\0",
