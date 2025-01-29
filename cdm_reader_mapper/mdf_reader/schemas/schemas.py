@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
+import polars as pl
 from pathlib import Path
 
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
@@ -21,22 +22,49 @@ from .. import properties
 def convert_dtype_to_default(dtype, section, element):
     """Convert data type to defaults (int, float)."""
     if dtype is None:
-        return
-    elif dtype == "float":
-        return dtype
-    elif dtype == "int":
-        return properties.pandas_int
-    elif "float" in dtype.lower():
+        return  # pl.String
+    # TODO: replace with match-case statement?
+    dtype = dtype.lower()
+    if dtype == "float" or dtype == "float64":
+        return pl.Float64
+    elif dtype == "float32":
+        return pl.Float32
+    elif "float" in dtype:
         logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to float."
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to float 32."
         )
-        return "float"
-    elif "int" in dtype.lower():
+        return pl.Float32
+    elif dtype == "int" or dtype == "int64":
+        return pl.Int64
+    elif dtype == "int32":
+        return pl.Int32
+    elif dtype == "int16":
+        return pl.Int16
+    elif dtype == "int8":
+        return pl.Int8
+    elif dtype == "uint" or dtype == "uint64":
+        return pl.UInt64
+    elif dtype == "uint32":
+        return pl.Int32
+    elif dtype == "uint16":
+        return pl.Int16
+    elif dtype == "uint8":
+        return pl.Int8
+    elif "uint" in dtype:
         logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to int."
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to uint 32."
         )
-        return properties.pandas_int
-    return dtype
+        return pl.UInt32
+    elif "int" in dtype:
+        logging.warning(
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to int 32."
+        )
+        return pl.Int32
+    elif dtype in ["datetime", "time", "date"]:
+        return pl.Datetime
+    elif dtype == "key":
+        return pl.Categorical
+    return pl.String
 
 
 def _read_schema(schema):
@@ -154,7 +182,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
     else:
         imodel = imodel.split("_")
         if imodel[0] not in properties.supported_data_models:
-            logging.error("Input data model " f"{imodel[0]}" " not supported")
+            logging.error(f"Input data model {imodel[0]} not supported")
             return
         schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
 
