@@ -86,14 +86,12 @@ class MDFFileReader(FileReader):
             decoder_dict = {}
 
         if isinstance(self.data, pd.DataFrame):
-            dtype = adjust_dtype(dtype, self.data)
-            data = self.convert_and_decode_df(
+            self.data = self.convert_and_decode_df(
                 self.data,
                 converter_dict,
                 converter_kwargs,
                 decoder_dict,
             )
-            self.data = data.astype(dtype)
         else:
             data_buffer = StringIO()
             TextParser = make_copy(self.data)
@@ -233,17 +231,18 @@ class MDFFileReader(FileReader):
 
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
-
         self.convert_and_decode_entries(
             convert=convert,
             decode=decode,
         )
 
         self.validate_entries(validate)
-        self.data = self.data.replace({False: None})
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
+        self.data = self.data.replace({True: None, False: None})
+        dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], self.data)
+        self.data = self.data.astype(dtype)
         return DataBundle(
             data=self.data,
             columns=self.columns,
