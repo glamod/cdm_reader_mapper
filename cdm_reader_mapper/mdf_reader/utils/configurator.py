@@ -11,7 +11,6 @@ import pandas as pd
 import polars as pl
 
 from .. import properties
-from ..properties import internal_delimiter
 from . import converters, decoders
 from .utilities import convert_dtypes
 
@@ -50,13 +49,7 @@ class Configurator:
         if len(self.orders) == 1:
             return section
         else:
-            return (order, section)
-
-    def _get_polars_index(self, section, order):
-        if len(self.orders) == 1:
-            return section
-        else:
-            return internal_delimiter.join([order, section])
+            return ":".join([order, section])
 
     def _get_ignore(self, section_dict):
         ignore = section_dict.get("ignore")
@@ -157,7 +150,9 @@ class Configurator:
 
     def open_polars(self) -> pl.DataFrame:
         """Open TextParser to a pl.DataFrame"""
-        self.df = self.df.with_columns(pl.lit([]).alias("missing_values"))
+        self.df = self.df.with_columns(
+            pl.lit([]).alias("missing_values")
+        ).with_row_index("index")
         for section in self.orders:
             header = self.schema["sections"][section]["header"]
 
@@ -206,9 +201,7 @@ class Configurator:
                 if delimiter_format == "delimited":
                     # Read as CSV
                     field_names = fields.keys()
-                    field_names = [
-                        self._get_polars_index(section, x) for x in field_names
-                    ]
+                    field_names = [self._get_index(section, x) for x in field_names]
                     n_fields = len(field_names)
                     self.df = self.df.with_columns(
                         pl.col(section)
@@ -223,10 +216,6 @@ class Configurator:
 
                     continue
                 elif field_layout != "fixed_width":
-                    # logging.error(
-                    #     f"Delimiter for {order} is set to {delimiter}. "
-                    #     + f"Please specify either format or field_layout in your header schema {header}."
-                    # )
                     raise ValueError(
                         f"Delimiter for {section} is set to {delimiter}. "
                         + f"Please specify either format or field_layout in your header schema {header}."
@@ -234,7 +223,7 @@ class Configurator:
 
             # Loop through fixed-width fields
             for field, field_dict in fields.items():
-                index = self._get_polars_index(field, section)
+                index = self._get_index(field, section)
                 ignore = (section not in self.valid) or self._get_ignore(field_dict)
                 field_length = field_dict.get(
                     "field_length", properties.MAX_FULL_REPORT_WIDTH
@@ -242,6 +231,7 @@ class Configurator:
                 na_value = field_dict.get("missing_value")
 
                 if ignore:
+                    # Move to next field
                     self.df = self.df.with_columns(
                         pl.col(section)
                         .str.slice(field_length)
