@@ -218,30 +218,8 @@ class FileReader:
             return self._read_sections(TextParser, order, valid, open_with=open_with)
         else:
             data_buffer = StringIO()
-            missings_buffer = StringIO()
-            isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(
-                    df_, order, valid, open_with=open_with
-                )
-                df_isna = df.isna()
-                missing_values.to_csv(
-                    missings_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-                df_isna.to_csv(
-                    isna_buffer,
-                    header=False,
-                    mode="a",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
+                df = self._read_sections(df_, order, valid, open_with=open_with)
                 df.to_csv(
                     data_buffer,
                     header=False,
@@ -253,12 +231,6 @@ class FileReader:
                     quotechar="\0",
                     escapechar="\0",
                 )
-            missings_buffer.seek(0)
-            self.missing_values = pd.read_csv(
-                missings_buffer,
-                names=missing_values.columns,
-                chunksize=None,
-            )
             data_buffer.seek(0)
             data = pd.read_csv(
                 data_buffer,
@@ -270,13 +242,4 @@ class FileReader:
                 quotechar="\0",
                 escapechar="\0",
             )
-            isna_buffer.seek(0)
-            isna = pd.read_csv(
-                isna_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data, isna
+            return data

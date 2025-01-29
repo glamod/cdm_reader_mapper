@@ -19,9 +19,12 @@ from .utils.utilities import adjust_dtype, validate_arg
 
 
 def _remove_boolean_values(x):
+    # print(x, type(x))
     if x is True:
+        # print("    ", 1)
         return None
     if x is False:
+        # print("    ", 2)
         return None
     return x
 
@@ -128,13 +131,12 @@ class MDFFileReader(FileReader):
             for i, element in enumerate(list(dtype)):
                 if dtype.get(element) == "datetime":
                     date_columns.append(i)
-            dtype = adjust_dtype(dtype, df)
+
             data_buffer.seek(0)
             data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
-                dtype=dtype,
                 parse_dates=date_columns,
                 delimiter=properties.internal_delimiter,
                 quotechar="\0",
@@ -170,6 +172,48 @@ class MDFFileReader(FileReader):
                 chunksize=self.chunksize,
             )
         return mask
+
+    def remove_boolean_values(self, data):
+        """DOCUMENTATION"""
+        if isinstance(data, pd.DataFrame):
+            data = data.map(_remove_boolean_values)
+            dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], data)
+            return data.astype(dtype)
+        else:
+            data_buffer = StringIO()
+            TextParser = make_copy(data)
+            for i, df_ in enumerate(TextParser):
+                df = df_.map(_remove_boolean_values)
+                dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], df)
+                date_columns = []
+                df.to_csv(
+                    data_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+            date_columns = []
+            for i, element in enumerate(list(dtype)):
+                if dtype.get(element) == "datetime":
+                    date_columns.append(i)
+            dtype = adjust_dtype(dtype, df)
+            data_buffer.seek(0)
+            data = pd.read_csv(
+                data_buffer,
+                names=df.columns,
+                chunksize=self.chunksize,
+                dtype=dtype,
+                parse_dates=date_columns,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
+        return data
 
     def read(
         self,
@@ -250,9 +294,7 @@ class MDFFileReader(FileReader):
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
-        data = data.map(_remove_boolean_values)
-        dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], data)
-        data = data.astype(dtype)
+        data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
             columns=self.columns,
@@ -314,18 +356,7 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    # import pandas as pd
 
-    # Sample DataFrame
-    # data = {'A': [True, False, 0, 1],
-    #    'B': [0, True, False, 1]}
-    # df = pd.DataFrame(data)
-
-    # Replace True and False values
-    # df = df.replace({True: 'True Replaced', False: 'False Replaced'})
-
-    # print(df)
-    # exit()
     def get_list_element(lst, idx):
         try:
             return lst[idx]
