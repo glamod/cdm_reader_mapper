@@ -91,63 +91,57 @@ class FileReader:
                                 attr
                             ]
 
-    def _select_years(self, df):
-        def get_years_from_datetime(date):
-            try:
-                return date.year
-            except AttributeError:
-                return date
-
+    def _select_years(self, df: pl.DataFrame) -> pl.DataFrame:
         if self.year_init is None and self.year_end is None:
             return df
 
+        if self.imodel is None:
+            logging.error("Selection of years is not supported for custom schema")
+            return df
+
         data_model = self.imodel.split("_")[0]
-        dates = df[properties.year_column[data_model]]
-        years = dates.apply(lambda x: get_years_from_datetime(x))
-        years = years.astype(int)
+        dates = df.get_column(properties.year_column[data_model])
+        if dates.dtype == pl.Datetime:
+            years = dates.dt.year()
+        else:
+            years = dates.cast(pl.Int64, strict=False)
 
-        mask = pd.Series([True] * len(years))
-        if self.year_init:
-            mask[years < self.year_init] = False
-        if self.year_end:
-            mask[years > self.year_end] = False
+        mask = pl.repeat(True, df.height, eager=True)
+        if self.year_init and self.year_end:
+            mask = years.is_between(self.year_init, self.year_end, closed="both")
+        elif self.year_init:
+            mask = years.ge(self.year_init)
+        elif self.year_end:
+            mask = years.le(self.year_end)
 
-        index = mask[mask].index
-        return df.iloc[index].reset_index(drop=True)
+        return df.filter(mask)
 
-    # def _select_years(self, df: pl.DataFrame):
-    #     if self.year_init is None and self.year_end is None:
-    #         return df
+    # def _read_pandas(self, **kwargs):
+    #     return pd.read_fwf(
+    #         self.source,
+    #         header=None,
+    #         quotechar="\0",
+    #         escapechar="\0",
+    #         dtype=object,
+    #         skip_blank_lines=False,
+    #         **kwargs,
+    #     )
     #
-    #     data_model = self.imodel.split("_")[0]
-    #     dates = df.get_column(properties.year_column[data_model])
-    #     if dates.dtype == pl.Datetime:
-    #         years = dates.dt.year()
-    #     else:
-    #         years = dates.cast(pl.Int64, strict=False)
-    #
-    #     mask = pl.repeat(True, df.height, eager=True)
-    #     if self.year_init and self.year_end:
-    #         mask = years.is_between(self.year_init, self.year_end, closed="both")
-    #     elif self.year_init:
-    #         mask = years.ge(self.year_init)
-    #     elif self.year_end:
-    #         mask = years.le(self.year_end)
-    #
-    #     return df.filter(mask)
-
-    def _read_pandas(self, **kwargs):
-        return pd.read_fwf(
-            self.source,
-            header=None,
-            quotechar="\0",
-            escapechar="\0",
-            dtype=object,
-            skip_blank_lines=False,
-            **kwargs,
-        )
-
-    def _read_polars(self, **kwargs):
+    def _read_fwf_polars(self, **kwargs):
+        if "chunksize" in kwargs:
+            logging.warn("Chunking not supported by polars reader")
+            batch_size = kwargs["chunksize"]
+            del kwargs["chunksize"]
+            # return pl.read_csv_batched(
+            #     self.source,
+            #     has_header=False,
+            #     separator="\0",
+            #     new_columns=["full_str"],
+            #     quote_char="\0",
+            #     infer_schema_length=0,
+            #     batch_size=batch_size,
+            #     **kwargs,
+            # )
         return pl.read_csv(
             self.source,
             has_header=False,
@@ -172,41 +166,23 @@ class FileReader:
     ):
         if open_with == "polars":
             df = Configurator(
-                df=TextParser,
-                schema=self.schema,
-                order=order,
-                valid=valid,
-            ).open_polars()
-        elif open_with == "pandas":
-            df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_pandas()
+            ).open_polars()
+        # elif open_with == "pandas":
+        #     df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_pandas()
         elif open_with == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
         else:
-            raise ValueError(
-                "open_with has to be one of ['pandas', 'polars', 'netcdf']"
-            )
+            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
 
-        if isinstance(df, pl.DataFrame):
-            missing_values_ = df.get_column("missing_values").to_pandas()
-            df = df.drop("missing_values").to_pandas()
-            df.columns = pd.MultiIndex.from_tuples(
-                [
-                    tuple(x.split(properties.internal_delimiter, maxsplit=1))
-                    for x in df.columns
-                ]
-            )
-        else:
-            missing_values_ = df["missing_values"]
-            del df["missing_values"]
+        missing_values = df.select(["index", "missing_values"]).pipe(set_missing_values)
+        df = df.drop("missing_values").pipe(self._select_years)
 
-        df = self._select_years(df)
-        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
-        df = df.where(df.notnull(), np.nan)
+        # Replace None with NaN - is this necessary for polars?
+        # df = df.where(df.notnull(), np.nan)
         return df, missing_values
 
     def get_configurations(self, order, valid):
@@ -263,97 +239,76 @@ class FileReader:
         self,
         order,
         valid,
-        chunksize,
-        open_with="pandas",
+        # chunksize,
+        open_with="polars",
     ):
         """DOCUMENTATION."""
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
-        elif open_with == "pandas":
-            TextParser = self._read_pandas(
-                encoding=self.schema["header"].get("encoding"),
-                widths=[properties.MAX_FULL_REPORT_WIDTH],
-                skiprows=self.skiprows,
-                chunksize=chunksize,
-            )
+        # TODO: Chunk? polars does have pl.read_csv_batched, but batch_size is
+        #       not respected: https://github.com/pola-rs/polars/issues/19978
+        #       alternative: lazy?
         elif open_with == "polars":
-            TextParser = self._read_polars(
-                # encoding=self.schema["header"].get("encoding"),
-                # widths=[properties.MAX_FULL_REPORT_WIDTH],
-                # skiprows=self.skiprows,
+            TextParser = self._read_fwf_polars(
+                encoding=self.schema["header"].get("encoding"),
+                skip_rows=self.skiprows,
                 # chunksize=chunksize,
             )
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
 
-        if isinstance(TextParser, (pd.DataFrame, pl.DataFrame)) or isinstance(
-            TextParser, xr.Dataset
-        ):
-            df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
-            )
-            return df, df.isna()
-        else:
-            data_buffer = StringIO()
-            missings_buffer = StringIO()
-            isna_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(
-                    df_, order, valid, open_with=open_with
-                )
-                df_isna = df.isna()
-                missing_values.to_csv(
-                    missings_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-                df_isna.to_csv(
-                    isna_buffer,
-                    header=False,
-                    mode="a",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            missings_buffer.seek(0)
-            self.missing_values = pd.read_csv(
-                missings_buffer,
-                names=missing_values.columns,
-                chunksize=None,
-            )
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            isna_buffer.seek(0)
-            isna = pd.read_csv(
-                isna_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data, isna
+        # if isinstance(TextParser, (pl.DataFrame, xr.Dataset)):
+        df, self.missing_values = self._read_sections(
+            TextParser, order, valid, open_with=open_with
+        )
+        return df, df.select(pl.all().is_null())
+        # else:
+        #     data_buffer = StringIO()
+        #     missings_buffer = StringIO()
+        #     isna_buffer = StringIO()
+        #     df = pl.DataFrame()
+        #     missing_values = pl.DataFrame()
+        #     for _, df_ in enumerate(TextParser):
+        #         df, missing_values = self._read_sections(df_, order, valid, open_with=open_with)
+        #         df_isna = df.select(pl.all().is_null())
+        #         # utf-8 is default for polars
+        #         missing_values.drop("index").write_csv(
+        #             missings_buffer,
+        #             include_header=False,
+        #         )
+        #         df_isna.drop("index").write_csv(
+        #             isna_buffer,
+        #             include_header=False,
+        #             separator=properties.internal_delimiter,
+        #             quote_char="\0",
+        #         )
+        #         df.drop("index").write_csv(
+        #             data_buffer,
+        #             include_header=False,
+        #             separator=properties.internal_delimiter,
+        #             quote_char="\0",
+        #         )
+        #     missings_buffer.seek(0)
+        #     self.missing_values = pl.read_csv(
+        #         missings_buffer,
+        #         columns=missing_values.columns,
+        #     )
+        #     data_buffer.seek(0)
+        #     data = pl.read_csv(
+        #         data_buffer,
+        #         names=df.columns,
+        #         chunksize=self.chunksize,
+        #         dtype=object,
+        #         parse_dates=self.parse_dates,
+        #         delimiter=properties.internal_delimiter,
+        #         quotechar="\0",
+        #         escapechar="\0",
+        #     )
+        #     isna_buffer.seek(0)
+        #     isna = pl.read_csv(
+        #         isna_buffer,
+        #         columns=df.columns,
+        #         separator=properties.internal_delimiter,
+        #         quote_char="\0",
+        #     )
+        #     return data, isna
