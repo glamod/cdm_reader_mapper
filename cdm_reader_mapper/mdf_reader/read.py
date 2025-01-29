@@ -141,7 +141,7 @@ class MDFFileReader(FileReader):
         if validate is not True:
             self.mask = pd.DataFrame()
         elif isinstance(self.data, pd.DataFrame):
-            self.mask = self.validate_df(self.data, isna=self.isna)
+            self.mask = self.validate_df(self.data)#, isna=self.isna)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(self.data)
@@ -223,14 +223,16 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
-        self.data, self.isna = self.open_data(
+        #self.data, self.isna = self.open_data(
+        self.data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
             chunksize=chunksize,
         )
-
+        #print(self.data)
+        #exit()
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
 
@@ -240,10 +242,12 @@ class MDFFileReader(FileReader):
         )
 
         self.validate_entries(validate)
-
+        self.data[self.data == False] = None
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
-
+        #print(self.data)
+        #print(self.mask)
+        #exit()
         return DataBundle(
             data=self.data,
             columns=self.columns,

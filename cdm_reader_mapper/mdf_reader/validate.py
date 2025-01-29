@@ -48,6 +48,10 @@ def validate_numeric(elements, data, schema):
         logging.warning(
             "Corresponding upper and/or lower bounds set to +/-inf for validation"
         )
+    #print(data[elements])
+    #for c in data[elements].columns:
+    #    if data[c].dtype == "object":
+    #        print(data[c])
     mask[elements] = (
         (data[elements] >= [lower.get(x) for x in elements])
         & (data[elements] <= [upper.get(x) for x in elements])
@@ -133,7 +137,7 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
 
 def validate(
     data,
-    mask0,
+    #mask0,
     imodel,
     ext_table_path,
     schema,
@@ -145,8 +149,8 @@ def validate(
     ----------
     data: pd.DataFrame
         DataFrame for validation.
-    mask0: pd.DataFrame
-        Boolean mask.
+    #mask0: pd.DataFrame
+    #    Boolean mask.
     imodel: str
         Name of internally available input data model.
         e.g. icoads_r300_d704
@@ -169,8 +173,9 @@ def validate(
         filename=None,
     )
     # Check input
-    if not isinstance(data, pd.DataFrame) or not isinstance(mask0, pd.DataFrame):
-        logging.error("Input data and mask must be a pandas data frame object")
+    if not isinstance(data, pd.DataFrame):# or not isinstance(mask0, pd.DataFrame):
+        #logging.error("Input data and mask must be a pandas data frame object")
+        logging.error("input data must be a pandas DataFrame.")
         return
 
     # Get the data elements from the input data: might be just a subset of
@@ -226,12 +231,17 @@ def validate(
     mask[str_elements] = validate_str(str_elements, data)
 
     # 5. Set False values
-    mask0_n = mask0[validated_columns].fillna(False)
-    mask[validated_columns] = mask[validated_columns].mask(
-        ~mask0_n,
-        False,
-    )
+    #mask0_n = mask0[validated_columns].fillna(False)
+    #mask[validated_columns] = mask[validated_columns].mask(
+    #    ~mask0_n,
+    #    False,
+    #)
+    #print(data[validated_columns])
+    #print([data[validated_columns] == False])
+    #print(mask[validated_columns])
+    mask[validated_columns] = mask[validated_columns].mask(data[validated_columns] == False, False)
     for column in disables:
         mask[column] = np.nan
-
+    #print(mask)
+    #exit()
     return mask

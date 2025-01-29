@@ -148,13 +148,13 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        missing_values_ = df["missing_values"]
-        del df["missing_values"]
+        #missing_values_ = df["missing_values"]
+        #del df["missing_values"]
         df = self._select_years(df)
-        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
+        #missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
         df = df.where(df.notnull(), np.nan)
-        return df, missing_values
+        return df#, missing_values
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -196,10 +196,10 @@ class FileReader:
 
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        mask = create_mask(df, isna, missing_values=self.missing_values)
+        #mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
-            mask0=mask,
+            #mask0=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -227,10 +227,12 @@ class FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
-            )
-            return df, df.isna()
+            #df, self.missing_values = self._read_sections(
+            #    TextParser, order, valid, open_with=open_with
+            #)
+            #return df, df.isna()
+            df = self._read_sections(TextParser, order, valid, open_with=open_with)
+            return df
         else:
             data_buffer = StringIO()
             missings_buffer = StringIO()
