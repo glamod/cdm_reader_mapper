@@ -143,7 +143,6 @@ class Configurator:
 
     def _read_line(self, line: str):
         i = j = 0
-        #missing_values = []
         data_dict = {}
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
@@ -198,22 +197,15 @@ class Configurator:
 
                 if ignore is not True:
                     value = line[i:j]
-                    #data_dict[index] = line[i:j]
 
-                    #if not data_dict[index].strip():
                     if not value.strip():
-                        value = False#None
+                        value = False
                     if value == na_value:
-                        value = False#None
-                    #mask = value.isna() | value.notna()
-                    #if mask is False:
-                    #    value = False
-                    #data_dict[index] = value                    
+                        value = False
 
                     if i == j and missing is True:
-                        #data_dict[index] = False
                         value = False
-                    
+
                     data_dict[index] = value
 
                 if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
@@ -221,7 +213,6 @@ class Configurator:
                 i = j
 
         df = pd.Series(data_dict)
-        #df["missing_values"] = missing_values
         return df
 
     def open_netcdf(self):
