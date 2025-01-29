@@ -46,6 +46,7 @@ class MDFFileReader(FileReader):
 
     def convert_and_decode_entries(
         self,
+        data,
         convert=True,
         decode=True,
         converter_dict=None,
@@ -59,6 +60,8 @@ class MDFFileReader(FileReader):
 
         Parameters
         ----------
+        data: pd.DataFrame or pd.io.parsers.TextFileReader
+          Data to convert and decode.
         convert: bool, default: True
           If True convert entries by using a pre-defined data model.
         decode: bool, default: True
@@ -93,16 +96,16 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        if isinstance(self.data, pd.DataFrame):
-            self.data = self.convert_and_decode_df(
-                self.data,
+        if isinstance(data, pd.DataFrame):
+            return self.convert_and_decode_df(
+                data,
                 converter_dict,
                 converter_kwargs,
                 decoder_dict,
             )
         else:
             data_buffer = StringIO()
-            TextParser = make_copy(self.data)
+            TextParser = make_copy(data)
             for i, df_ in enumerate(TextParser):
                 df = self.convert_and_decode_df(
                     df_,
@@ -127,7 +130,7 @@ class MDFFileReader(FileReader):
                     date_columns.append(i)
             dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
-            self.data = pd.read_csv(
+            data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
@@ -137,23 +140,22 @@ class MDFFileReader(FileReader):
                 quotechar="\0",
                 escapechar="\0",
             )
-        return self
+        return data
 
-    def validate_entries(self, validate):
+    def validate_entries(self, data, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            self.mask = pd.DataFrame()
-        elif isinstance(self.data, pd.DataFrame):
-            self.mask = self.validate_df(self.data)
+            mask = pd.DataFrame()
+        elif isinstance(data, pd.DataFrame):
+            mask = self.validate_df(data)
         else:
             data_buffer = StringIO()
-            TextParser_ = make_copy(self.data)
-            TextParser_isna_ = make_copy(self.isna)
-            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self.validate_df(df_, isna=isna_)
+            TextParser_ = make_copy(data)
+            for i, df_ in enumerate(TextParser_):
+                mask_ = self.validate_df(df_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -162,12 +164,12 @@ class MDFFileReader(FileReader):
                     index=False,
                 )
             data_buffer.seek(0)
-            self.mask = pd.read_csv(
+            mask = pd.read_csv(
                 data_buffer,
                 names=df_.columns,
                 chunksize=self.chunksize,
             )
-        return self
+        return mask
 
     def read(
         self,
@@ -229,7 +231,7 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
-        self.data = self.open_data(
+        data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -239,23 +241,24 @@ class MDFFileReader(FileReader):
 
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
-        self.convert_and_decode_entries(
+        data = self.convert_and_decode_entries(
+            data,
             convert=convert,
             decode=decode,
         )
-        self.validate_entries(validate)
+        mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
-        self.data = self.data.map(_remove_boolean_values)
-        dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], self.data)
-        self.data = self.data.astype(dtype)
+        data = data.map(_remove_boolean_values)
+        dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], data)
+        data = data.astype(dtype)
         return DataBundle(
-            data=self.data,
+            data=data,
             columns=self.columns,
             dtypes=self.dtypes,
             parse_dates=self.parse_dates,
-            mask=self.mask,
+            mask=mask,
             imodel=self.imodel,
         )
 
