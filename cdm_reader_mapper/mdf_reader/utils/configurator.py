@@ -405,4 +405,4 @@ class Configurator:
             df[column] = np.nan
         df = df.apply(lambda x: replace_empty_strings(x))
         df["missing_values"] = [missing_values] * len(df)
-        return df
+        return pl.from_pandas(df)
