@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import ast
-import csv
 import logging
 from io import StringIO as StringIO
 
 import pandas as pd
+import polars as pl
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
@@ -85,52 +85,14 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        if isinstance(self.data, pd.DataFrame):
-            dtype = adjust_dtype(dtype, self.data)
-            data = self.convert_and_decode_df(
-                self.data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-            )
-            self.data = data.astype(dtype)
-        else:
-            data_buffer = StringIO()
-            TextParser = make_copy(self.data)
-            for i, df_ in enumerate(TextParser):
-                df = self.convert_and_decode_df(
-                    df_,
-                    converter_dict,
-                    converter_kwargs,
-                    decoder_dict,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            date_columns = []
-            for i, element in enumerate(list(dtype)):
-                if dtype.get(element) == "datetime":
-                    date_columns.append(i)
-            dtype = adjust_dtype(dtype, df)
-            data_buffer.seek(0)
-            self.data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=dtype,
-                parse_dates=date_columns,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
+        dtype = adjust_dtype(dtype, self.data)
+        data = self.convert_and_decode_df(
+            self.data,
+            converter_dict,
+            converter_kwargs,
+            decoder_dict,
+        )
+        self.data = data.cast(dtype)
         return self
 
     def validate_entries(self, validate):
@@ -229,7 +191,6 @@ class MDFFileReader(FileReader):
             # INFO: Set default as "pandas" to account for custom schema
             # open_with=properties.open_file.get(self.imodel, "pandas"),
             open_with=properties.open_file.get(self.imodel, "polars"),
-            chunksize=chunksize,
         )
 
         # 2.3. Extract, read and validate data in same loop
