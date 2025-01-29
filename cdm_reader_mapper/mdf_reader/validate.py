@@ -131,6 +131,13 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
     return any(ele_tpl)
 
 
+def _mask_boolean(x, boolean):
+
+    if x is boolean:
+        return True
+    return False
+
+
 def validate(
     data,
     imodel,
@@ -191,7 +198,6 @@ def validate(
         validated_columns = list(
             set(numeric_elements + coded_elements + datetime_elements)
         )
-
     mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
 
     mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)
@@ -223,8 +229,16 @@ def validate(
 
     # 5. Set False values
     mask[validated_columns] = mask[validated_columns].mask(
-        data[validated_columns] == False, False
+        data[validated_columns].map(_mask_boolean, boolean=False),
+        False,
     )
+
+    mask[validated_columns] = mask[validated_columns].mask(
+        data[validated_columns].map(_mask_boolean, boolean=True),
+        True,
+    )
+
     for column in disables:
         mask[column] = np.nan
+
     return mask

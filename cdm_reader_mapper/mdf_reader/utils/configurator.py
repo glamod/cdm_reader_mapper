@@ -199,9 +199,9 @@ class Configurator:
                     value = line[i:j]
 
                     if not value.strip():
-                        value = False
+                        value = True
                     if value == na_value:
-                        value = False
+                        value = True
 
                     if i == j and missing is True:
                         value = False
