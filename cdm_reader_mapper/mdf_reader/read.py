@@ -18,6 +18,14 @@ from .utils.filereader import FileReader
 from .utils.utilities import adjust_dtype, validate_arg
 
 
+def _remove_boolean_values(x):
+    if x is True:
+        return None
+    if x is False:
+        return None
+    return x
+
+
 class MDFFileReader(FileReader):
     """Class to represent reader output.
 
@@ -235,12 +243,11 @@ class MDFFileReader(FileReader):
             convert=convert,
             decode=decode,
         )
-
         self.validate_entries(validate)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
-        self.data = self.data.replace({True: None, False: None})
+        self.data = self.data.map(_remove_boolean_values)
         dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], self.data)
         self.data = self.data.astype(dtype)
         return DataBundle(
@@ -304,7 +311,18 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
+    # import pandas as pd
 
+    # Sample DataFrame
+    # data = {'A': [True, False, 0, 1],
+    #    'B': [0, True, False, 1]}
+    # df = pd.DataFrame(data)
+
+    # Replace True and False values
+    # df = df.replace({True: 'True Replaced', False: 'False Replaced'})
+
+    # print(df)
+    # exit()
     def get_list_element(lst, idx):
         try:
             return lst[idx]

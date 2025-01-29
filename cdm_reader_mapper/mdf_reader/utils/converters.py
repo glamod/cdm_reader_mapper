@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from .. import properties
@@ -31,7 +32,10 @@ class df_converters:
             if isinstance(x, str):
                 x = x.strip()
                 x.replace(" ", "0")
-            return offset + float(x) * scale
+            try:
+                return offset + float(x) * scale
+            except ValueError:
+                return np.nan
 
         return data.apply(lambda x: _to_numeric(x))
 
