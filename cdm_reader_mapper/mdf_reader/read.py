@@ -7,7 +7,6 @@ import logging
 from io import StringIO as StringIO
 
 import pandas as pd
-import polars as pl
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy

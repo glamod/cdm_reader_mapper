@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-import csv
 import logging
 import os
 from copy import deepcopy
-from io import StringIO
 
-import numpy as np
-import pandas as pd
 import polars as pl
 import xarray as xr
 
@@ -129,8 +125,8 @@ class FileReader:
     #
     def _read_fwf_polars(self, **kwargs):
         if "chunksize" in kwargs:
-            logging.warn("Chunking not supported by polars reader")
-            batch_size = kwargs["chunksize"]
+            logging.warning("Chunking not supported by polars reader")
+            # batch_size = kwargs["chunksize"]
             del kwargs["chunksize"]
             # return pl.read_csv_batched(
             #     self.source,
