@@ -15,12 +15,11 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, validate_arg
+from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
 
 
 def _remove_boolean_values(x):
-    if isinstance(x, str):
-        x = ast.literal_eval(x)
+    x = convert_str_boolean(x)
     if x is True:
         return
     if x is False:
@@ -54,7 +53,6 @@ class MDFFileReader(FileReader):
         converter_dict=None,
         converter_kwargs=None,
         decoder_dict=None,
-        dtype=None,
     ):
         """Convert and decode data entries by using a pre-defined data model.
 
@@ -77,10 +75,6 @@ class MDFFileReader(FileReader):
         decoder_dict: dict, optional
           Functions for decoding values in specific columns.
           If None use information from a pre-defined data model.
-        dtype: dtype or dict of {Hashable: dtype}, optional
-          Data type(s) to apply to either the whole dataset or individual columns.
-          If None use information from a pre-defined data model.
-          Use only if data is read with chunksizes.
         """
         if converter_dict is None:
             converter_dict = self.configurations["convert_decode"]["converter_dict"]
@@ -88,8 +82,6 @@ class MDFFileReader(FileReader):
             converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if dtype is None:
-            dtype = self.configurations["convert_decode"]["dtype"]
         if not (convert and decode):
             return self
         if convert is not True:
@@ -99,7 +91,7 @@ class MDFFileReader(FileReader):
             decoder_dict = {}
 
         if isinstance(data, pd.DataFrame):
-            return self.convert_and_decode_df(
+            data = self.convert_and_decode_df(
                 data,
                 converter_dict,
                 converter_kwargs,
@@ -126,19 +118,13 @@ class MDFFileReader(FileReader):
                     quotechar="\0",
                     escapechar="\0",
                 )
-            date_columns = []
-            for i, element in enumerate(list(dtype)):
-                if dtype.get(element) == "datetime":
-                    date_columns.append(i)
 
-            dtype = adjust_dtype(dtype, df)
             data_buffer.seek(0)
             data = pd.read_csv(
                 data_buffer,
                 names=df.columns,
                 chunksize=self.chunksize,
-                dtype=dtype,
-                parse_dates=date_columns,
+                dtype=object,
                 delimiter=properties.internal_delimiter,
                 quotechar="\0",
                 escapechar="\0",

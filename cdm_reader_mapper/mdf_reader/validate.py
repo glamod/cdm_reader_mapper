@@ -12,6 +12,7 @@ from cdm_reader_mapper.common.json_dict import get_table_keys
 from . import properties
 from .codes import codes
 from .schemas import schemas
+from .utils.utilities import convert_str_boolean
 
 
 def validate_datetime(elements, data):
@@ -30,7 +31,17 @@ def validate_datetime(elements, data):
 
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
+
     # Find thresholds in schema. Flag if not available -> warn
+    def _to_numeric(x):
+        if x is None:
+            return np.nan
+        x = convert_str_boolean(x)
+        if isinstance(x, bool):
+            return x
+        return float(x)
+
+    data[elements] = data[elements].map(_to_numeric)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
@@ -132,7 +143,7 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
 
 
 def _mask_boolean(x, boolean):
-
+    x = convert_str_boolean(x)
     if x is boolean:
         return True
     return False

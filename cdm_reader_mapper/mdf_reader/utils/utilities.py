@@ -77,3 +77,12 @@ def adjust_dtype(dtype, df):
     if not isinstance(dtype, dict):
         return dtype
     return {k: v for k, v in dtype.items() if k in df.columns}
+
+
+def convert_str_boolean(x):
+    """DOCUMENTATION."""
+    if x == "True":
+        x = True
+    if x == "False":
+        x = False
+    return x

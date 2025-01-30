@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 def _get_overpunch_number():
@@ -98,6 +99,7 @@ class df_decoders:
         """DOCUMENTATION."""
 
         def _base36(x):
+            x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
             return str(int(str(x), 36))
