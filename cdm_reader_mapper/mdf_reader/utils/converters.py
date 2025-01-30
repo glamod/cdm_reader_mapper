@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 class df_converters:
@@ -27,6 +27,7 @@ class df_converters:
         """Convert object type elements of a pandas series to numeric type."""
 
         def _to_numeric(x):
+            x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
             if isinstance(x, str):
@@ -35,7 +36,7 @@ class df_converters:
             try:
                 return offset + float(x) * scale
             except ValueError:
-                return np.nan
+                return False
 
         return data.apply(lambda x: _to_numeric(x))
 
