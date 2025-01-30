@@ -6,7 +6,7 @@ pylint==3.3.1
 tox==4.23.0
 tox-gh==1.4.4
 matplotlib
-numba>=0.61
+numba
 pandas>=2.1.0
 dask
 distributed

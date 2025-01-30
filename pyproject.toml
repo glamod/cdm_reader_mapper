@@ -28,7 +28,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "numba>=0.61",
+  "numba",
   "matplotlib",
   "pandas>=2.1.0",
   "dask",

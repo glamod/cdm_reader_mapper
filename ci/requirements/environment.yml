@@ -5,7 +5,7 @@ channels:
     - nodefaults
 
 dependencies:
-    - numba>=0.61
+    - numba
     - pandas>=2.1.0
     - dask
     - matplotlib
