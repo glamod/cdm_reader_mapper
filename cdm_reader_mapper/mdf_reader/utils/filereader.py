@@ -245,9 +245,9 @@ class FileReader:
         """DOCUMENTATION."""
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
-        # TODO: Chunk? polars does have pl.read_csv_batched, but batch_size is
-        #       not respected: https://github.com/pola-rs/polars/issues/19978
-        #       alternative: lazy?
+        # NOTE: Chunking - polars does have pl.read_csv_batched, but batch_size
+        # is not respected: https://github.com/pola-rs/polars/issues/19978
+        # alternative: lazy?
         elif open_with == "polars":
             TextParser = self._read_fwf_polars(
                 encoding=self.schema["header"].get("encoding"),
