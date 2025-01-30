@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import logging
 import os
-import polars as pl
 from pathlib import Path
+
+import polars as pl
 
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 

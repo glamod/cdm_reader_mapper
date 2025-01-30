@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, object_types, supported_data_models  # noqa
 import polars as pl
+
+from ..properties import numeric_types, object_types, supported_data_models  # noqa
 
 _base = "cdm_reader_mapper.mdf_reader"
 

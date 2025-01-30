@@ -1,6 +1,7 @@
 """Common Data Model (CDM) reader and mapper common properties."""
 
 from __future__ import annotations
+
 import polars as pl
 
 # numeric_types = ["Int64", "int", "float"]
