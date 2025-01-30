@@ -20,37 +20,46 @@ from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 from .. import properties
 
 
+def _get_type_map():
+    return {
+        "float": pl.Float64,
+        "float64": pl.Float64,
+        "float32": pl.Float32,
+        "int": pl.Int64,
+        "int64": pl.Int64,
+        "int32": pl.Int32,
+        "int16": pl.Int16,
+        "int8": pl.Int8,
+        "uint": pl.UInt64,
+        "uint64": pl.UInt64,
+        "uint32": pl.UInt32,
+        "uint16": pl.UInt16,
+        "uint8": pl.UInt8,
+        "str": pl.String,
+        "object": pl.String,
+        "key": pl.String,
+        "date": pl.Datetime,
+        "datetime": pl.Datetime,
+        "time": pl.Datetime,
+    }
+
+
 def convert_dtype_to_default(dtype, section, element):
     """Convert data type to defaults (int, float)."""
     if dtype is None:
         return  # pl.String
-    # TODO: replace with match-case statement?
+    dtype_map = _get_type_map()
     dtype = dtype.lower()
-    if dtype == "float" or dtype == "float64":
-        return pl.Float64
-    elif dtype == "float32":
-        return pl.Float32
-    elif "float" in dtype:
+
+    polars_dtype = dtype_map.get(dtype)
+    if polars_dtype is not None:
+        return polars_dtype
+
+    if "float" in dtype:
         logging.warning(
             f"Set column type of ({section}, {element}) from deprecated {dtype} to float 32."
         )
         return pl.Float32
-    elif dtype == "int" or dtype == "int64":
-        return pl.Int64
-    elif dtype == "int32":
-        return pl.Int32
-    elif dtype == "int16":
-        return pl.Int16
-    elif dtype == "int8":
-        return pl.Int8
-    elif dtype == "uint" or dtype == "uint64":
-        return pl.UInt64
-    elif dtype == "uint32":
-        return pl.Int32
-    elif dtype == "uint16":
-        return pl.Int16
-    elif dtype == "uint8":
-        return pl.Int8
     elif "uint" in dtype:
         logging.warning(
             f"Set column type of ({section}, {element}) from deprecated {dtype} to uint 32."
@@ -61,10 +70,6 @@ def convert_dtype_to_default(dtype, section, element):
             f"Set column type of ({section}, {element}) from deprecated {dtype} to int 32."
         )
         return pl.Int32
-    elif dtype in ["datetime", "time", "date"]:
-        return pl.Datetime
-    elif dtype == "key" or dtype == "str" or dtype == "object":
-        return pl.String
     return pl.String
 
 
