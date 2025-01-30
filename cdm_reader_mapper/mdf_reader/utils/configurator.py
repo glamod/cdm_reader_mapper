@@ -159,7 +159,6 @@ class Configurator:
             sentinal = header.get("sentinal")
 
             section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
-            fields = self.schema["sections"][section]["elements"]
 
             # Get data associated with current section
             if sentinal is not None:
@@ -192,6 +191,7 @@ class Configurator:
             if disable_read is True:
                 continue
 
+            fields = self.schema["sections"][section]["elements"]
             field_layout = header.get("field_layout")
             delimiter = header.get("delimiter")
 
