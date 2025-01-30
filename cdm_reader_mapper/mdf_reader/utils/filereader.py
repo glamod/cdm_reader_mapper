@@ -211,16 +211,16 @@ class FileReader:
                     df[section],
                     decoder_dict[section],
                 )
-                decoded.index = df[section].index
-                df[section] = decoded
+                # decoded.index = df[section].index
+                df = df.with_columns(decoded.alias(section))
 
             converted = convert_entries(
                 df[section],
                 converter_dict[section],
                 **converter_kwargs[section],
             )
-            converted.index = df[section].index
-            df[section] = converted
+            # converted.index = df[section].index
+            df = df.with_columns(converted.alias(section))
         return df
 
     def validate_df(self, df, isna=None):

@@ -62,8 +62,8 @@ def convert_dtype_to_default(dtype, section, element):
         return pl.Int32
     elif dtype in ["datetime", "time", "date"]:
         return pl.Datetime
-    elif dtype == "key":
-        return pl.Categorical
+    elif dtype == "key" or dtype == "str" or dtype == "object":
+        return pl.String
     return pl.String
 
 

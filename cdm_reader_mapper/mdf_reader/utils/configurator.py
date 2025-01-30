@@ -58,7 +58,7 @@ class Configurator:
         return ignore
 
     def _get_dtype(self):
-        return properties.pandas_dtypes.get(self.sections_dict.get("column_type"))
+        return properties.polars_dtypes.get(self.sections_dict.get("column_type"))
 
     def _get_converter(self):
         return converters.get(self.sections_dict.get("column_type"))
@@ -233,11 +233,12 @@ class Configurator:
                 if ignore:
                     # Move to next field
                     self.df = self.df.with_columns(
-                        pl.col(section)
-                        .str.slice(field_length)
-                        .str.strip_prefix(delimiter)
-                        .name.keep(),
+                        pl.col(section).str.slice(field_length).name.keep(),
                     )
+                    if delimiter is not None:
+                        self.df = self.df.with_columns(
+                            pl.col(section).str.strip_prefix(delimiter).name.keep()
+                        )
                     continue
 
                 missing_map = {"": None}

@@ -102,7 +102,7 @@ class df_decoders:
         """DOCUMENTATION."""
         # Caution: int(str(np.nan),36) ==> 30191
         decoded = (
-            data.fill_nan(None)
+            data.replace({"NaN": None})
             .str.strip_chars(" ")
             .replace({"": None})
             .str.to_integer(base=36, strict=False)
@@ -118,9 +118,11 @@ decoders = dict()
 decoders["signed_overpunch"] = dict()
 for dtype in properties.numeric_types:
     decoders["signed_overpunch"][dtype] = df_decoders(dtype).signed_overpunch
-decoders["signed_overpunch"]["key"] = df_decoders("key").signed_overpunch
+decoders["signed_overpunch"][pl.Categorical] = df_decoders(
+    pl.Categorical
+).signed_overpunch
 
 decoders["base36"] = dict()
 for dtype in properties.numeric_types:
     decoders["base36"][dtype] = df_decoders(dtype).base36
-decoders["base36"]["key"] = df_decoders("key").base36
+decoders["base36"][pl.Categorical] = df_decoders(pl.Categorical).base36

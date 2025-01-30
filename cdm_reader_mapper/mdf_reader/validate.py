@@ -90,7 +90,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
                 else list(table["_keys"].get(element))
             )
         dtypes = {
-            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
+            x: properties.polars_dtypes.get(schema.get(x).get("column_type"))
             for x in key_elements
         }
 

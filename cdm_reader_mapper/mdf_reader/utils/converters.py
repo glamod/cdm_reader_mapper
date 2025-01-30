@@ -93,7 +93,7 @@ class df_converters:
         """
         scale = scale if scale else self.numeric_scale
         offset = offset if offset else self.numeric_offset
-        if data.dtype == "object":
+        if not data.dtype.is_numeric():
             data = self.to_numeric(data)
 
         data = offset + data * scale
@@ -126,7 +126,8 @@ class df_converters:
 converters = dict()
 for dtype in properties.numeric_types:
     converters[dtype] = df_converters(dtype).object_to_numeric
-converters["datetime"] = df_converters("datetime").object_to_datetime
-converters["str"] = df_converters("str").object_to_object
-converters["object"] = df_converters("object").object_to_object
-converters["key"] = df_converters("key").object_to_object
+converters[pl.Datetime] = df_converters(pl.Datetime).object_to_datetime
+converters[pl.String] = df_converters(pl.String).object_to_object
+converters[pl.Utf8] = df_converters(pl.Utf8).object_to_object
+converters[pl.Object] = df_converters(pl.Object).object_to_object
+converters[pl.Categorical] = df_converters(pl.Categorical).object_to_object

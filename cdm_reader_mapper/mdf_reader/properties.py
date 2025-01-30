@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ..properties import numeric_types, object_types, supported_data_models  # noqa
+import polars as pl
 
 _base = "cdm_reader_mapper.mdf_reader"
 
@@ -16,22 +17,23 @@ year_column = {
     "craid": ("drifter_measurements", "JULD"),
 }
 
-pandas_dtypes = {}
+polars_dtypes = {}
 for dtype in object_types:
-    pandas_dtypes[dtype] = "object"
-pandas_dtypes.update({x: x for x in numeric_types})
-pandas_dtypes["datetime"] = "datetime"
+    polars_dtypes[dtype] = pl.String
+polars_dtypes.update({x: x for x in numeric_types})
+polars_dtypes[pl.Datetime] = pl.Datetime
 
-pandas_int = "Int64"
+polars_int = pl.Int64
 
 # ....and how they are managed
 data_type_conversion_args = {}
 for dtype in numeric_types:
     data_type_conversion_args[dtype] = ["scale", "offset"]
-data_type_conversion_args["str"] = ["disable_white_strip"]
-data_type_conversion_args["object"] = ["disable_white_strip"]
-data_type_conversion_args["key"] = ["disable_white_strip"]
-data_type_conversion_args["datetime"] = ["datetime_format"]
+data_type_conversion_args[pl.Utf8] = ["disable_white_strip"]
+data_type_conversion_args[pl.String] = ["disable_white_strip"]
+data_type_conversion_args[pl.Categorical] = ["disable_white_strip"]
+data_type_conversion_args[pl.Object] = ["disable_white_strip"]
+data_type_conversion_args[pl.Datetime] = ["datetime_format"]
 
 # Misc ------------------------------------------------------------------------
 dummy_level = "_SECTION_"
