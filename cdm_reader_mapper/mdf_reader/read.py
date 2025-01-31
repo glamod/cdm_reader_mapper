@@ -137,6 +137,7 @@ class MDFFileReader(FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
+            self.dtypes = "object"
             mask = pd.DataFrame()
         elif isinstance(data, pd.DataFrame):
             mask = self.validate_df(data)
@@ -164,14 +165,14 @@ class MDFFileReader(FileReader):
         """DOCUMENTATION"""
         if isinstance(data, pd.DataFrame):
             data = data.map(_remove_boolean_values)
-            dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], data)
+            dtype = adjust_dtype(self.dtypes, data)
             return data.astype(dtype)
         else:
             data_buffer = StringIO()
             TextParser = make_copy(data)
             for i, df_ in enumerate(TextParser):
                 df = df_.map(_remove_boolean_values)
-                dtype = adjust_dtype(self.configurations["convert_decode"]["dtype"], df)
+                dtype = adjust_dtype(self.dtypes, df)
                 date_columns = []
                 df.to_csv(
                     data_buffer,
