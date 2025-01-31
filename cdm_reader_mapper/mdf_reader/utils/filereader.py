@@ -120,6 +120,7 @@ class FileReader:
     #         escapechar="\0",
     #         dtype=object,
     #         skip_blank_lines=False,
+    #         widths=[properties.MAX_FULL_REPORT_WIDTH],
     #         **kwargs,
     #     )
     #
@@ -146,6 +147,8 @@ class FileReader:
             quote_char="\0",
             infer_schema=False,
             **kwargs,
+        ).select(
+            pl.col("full_str").str.head(properties.MAX_FULL_REPORT_WIDTH).name.keep()
         )
 
     def _read_netcdf(self, **kwargs):
@@ -165,7 +168,9 @@ class FileReader:
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_polars()
         # elif open_with == "pandas":
-        #     df = Configurator(df=TextParser, schema=self.schema, order=order, valid=valid).open_pandas()
+        #     df = Configurator(
+        #         df=TextParser, schema=self.schema, order=order, valid=valid
+        #     ).open_pandas()
         elif open_with == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid

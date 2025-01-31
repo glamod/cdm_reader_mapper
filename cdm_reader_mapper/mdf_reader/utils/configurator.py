@@ -166,25 +166,31 @@ class Configurator:
                     [
                         (
                             pl.when(pl.col("full_str").str.starts_with(sentinal))
-                            .then(pl.col("full_str").str.slice(0, section_length))
+                            .then(pl.col("full_str").str.head(section_length))
                             .otherwise(pl.lit(None))
                             .alias(section)
                         ),
                         (
                             pl.when(pl.col("full_str").str.starts_with(sentinal))
-                            .then(pl.col("full_str").str.slice(section_length))
+                            .then(pl.col("full_str").str.tail(-section_length))
                             .otherwise(pl.col("full_str"))
                             .alias("full_str")
                         ),
                     ]
                 )
             else:
+                # Sentinal is None, the section is always present
                 self.df = self.df.with_columns(
                     [
-                        pl.col("full_str").str.slice(0, section_length).alias(section),
-                        pl.col("full_str").str.slice(section_length).alias("full_str"),
+                        pl.col("full_str").str.head(section_length).alias(section),
+                        pl.col("full_str").str.tail(-section_length).alias("full_str"),
                     ]
                 )
+
+            # Used for validation
+            self.df = self.df.with_columns(
+                pl.col(section).is_null().alias(f"_{section}_missing")
+            )
 
             # Don't read fields
             disable_read = header.get("disable_read", False)
@@ -248,12 +254,14 @@ class Configurator:
                 self.df = self.df.with_columns(
                     [
                         # If section not present in a row, then both these are null
-                        pl.col(section)
-                        .str.slice(0, field_length)
-                        .str.strip_chars(" ")
-                        .replace(missing_map)
-                        .alias(index),
-                        pl.col(section).str.slice(field_length).name.keep(),
+                        (
+                            pl.col(section)
+                            .str.head(field_length)
+                            .str.strip_chars(" ")
+                            .replace(missing_map)
+                            .alias(index)
+                        ),
+                        pl.col(section).str.tail(-field_length).name.keep(),
                         (
                             # Handle missing sections
                             pl.when(pl.col(section).is_null())
