@@ -128,7 +128,7 @@ class Configurator:
                 "converter_dict": converters,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decoders,
-                "dtype": dtypes,
+                # "dtype": dtypes,
             },
             "self": {
                 "dtypes": dtypes,
@@ -221,7 +221,8 @@ class Configurator:
         def replace_empty_strings(series):
             if series.dtype == "object":
                 series = series.str.decode("utf-8")
-                series = series.str.strip().replace("", None)
+                series = series.str.strip()
+                series = series.map(lambda x: True if x == "" else x)
             return series
 
         missing_values = []
@@ -260,5 +261,5 @@ class Configurator:
         for column in disables:
             df[column] = np.nan
         df = df.apply(lambda x: replace_empty_strings(x))
-        df["missing_values"] = [missing_values] * len(df)
+        df[missing_values] = False
         return df
