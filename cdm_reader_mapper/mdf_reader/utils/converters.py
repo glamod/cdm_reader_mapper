@@ -44,10 +44,18 @@ class df_converters:
     # May not be needed?
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
-        decoded = data.str.decode("utf-8")
-        if decoded.dtype != "object":
-            return data
-        return decoded
+
+        def _decode(x):
+            if not isinstance(x, str):
+                return x
+
+            try:
+                encoded = x.encode("latin1")
+                return encoded.decode("utf-8")
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                return x
+
+        return data.apply(lambda x: _decode(x))
 
     def to_numeric(self, data: pl.Series):
         """Convert object type elements of a pandas series to numeric type."""
