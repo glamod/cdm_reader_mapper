@@ -175,14 +175,10 @@ python_files = "test_*.py"
 testpaths = ["./tests"]
 
 [tool.ruff]
-src = ["xclim"]
-line-length = 150
-target-version = "py39"
-exclude = [
-  ".git",
-  "build",
-  ".eggs"
-]
+line-length = 88
+indent-width = 4
+target-version = "py311"
+exclude = [".eggs", ".git", ".venv", "build", "venv"]
 extend-include = [
   "*.ipynb" # Include notebooks
 ]
