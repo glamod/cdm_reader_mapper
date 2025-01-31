@@ -9,6 +9,7 @@ import numpy as np
 import polars as pl
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 def _get_overpunch_number():

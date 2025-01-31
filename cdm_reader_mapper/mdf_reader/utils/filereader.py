@@ -11,15 +11,14 @@ import xarray as xr
 
 from .. import properties
 from ..schemas import schemas
-from ..validate import validate
 from .configurator import Configurator
 from .utilities import (
     convert_entries,
-    create_mask,
     decode_entries,
-    set_missing_values,
     validate_path,
+    set_missing_values,
 )
+from .validators import validate
 
 
 class FileReader:
@@ -178,13 +177,13 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['polars', 'netcdf']")
 
-        missing_values = df.select(["index", "missing_values"]).pipe(set_missing_values)
+        # missing_values = df.select(["index", "missing_values"]).pipe(set_missing_values)
         df = df.drop("missing_values").pipe(self._select_years)
 
         self.columns = df.columns
         # Replace None with NaN - is this necessary for polars?
         # df = df.where(df.notnull(), np.nan)
-        return df, missing_values
+        return df
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -226,10 +225,8 @@ class FileReader:
 
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
-            mask0=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -259,43 +256,25 @@ class FileReader:
             raise ValueError("open_with has to be one of ['polars', 'netcdf']")
 
         # if isinstance(TextParser, (pl.DataFrame, xr.Dataset)):
-        df, self.missing_values = self._read_sections(
-            TextParser, order, valid, open_with=open_with
-        )
-        return df, df.select(pl.all().is_null())
+        df = self._read_sections(TextParser, order, valid, open_with=open_with)
+        return df
         # else:
         #     data_buffer = StringIO()
-        #     missings_buffer = StringIO()
-        #     isna_buffer = StringIO()
-        #     df = pl.DataFrame()
-        #     missing_values = pl.DataFrame()
-        #     for _, df_ in enumerate(TextParser):
-        #         df, missing_values = self._read_sections(df_, order, valid, open_with=open_with)
-        #         df_isna = df.select(pl.all().is_null())
-        #         # utf-8 is default for polars
-        #         missing_values.drop("index").write_csv(
-        #             missings_buffer,
-        #             include_header=False,
-        #         )
-        #         df_isna.drop("index").write_csv(
-        #             isna_buffer,
-        #             include_header=False,
-        #             separator=properties.internal_delimiter,
-        #             quote_char="\0",
-        #         )
-        #         df.drop("index").write_csv(
+        #     for i, df_ in enumerate(TextParser):
+        #         df = self._read_sections(df_, order, valid, open_with=open_with)
+        #         df.to_csv(
         #             data_buffer,
-        #             include_header=False,
-        #             separator=properties.internal_delimiter,
-        #             quote_char="\0",
+        #             header=False,
+        #             mode="a",
+        #             encoding="utf-8",
+        #             index=False,
+        #             quoting=csv.QUOTE_NONE,
+        #             sep=properties.internal_delimiter,
+        #             quotechar="\0",
+        #             escapechar="\0",
         #         )
-        #     missings_buffer.seek(0)
-        #     self.missing_values = pl.read_csv(
-        #         missings_buffer,
-        #         columns=missing_values.columns,
-        #     )
         #     data_buffer.seek(0)
-        #     data = pl.read_csv(
+        #     data = pd.read_csv(
         #         data_buffer,
         #         names=df.columns,
         #         chunksize=self.chunksize,
@@ -305,11 +284,4 @@ class FileReader:
         #         quotechar="\0",
         #         escapechar="\0",
         #     )
-        #     isna_buffer.seek(0)
-        #     isna = pl.read_csv(
-        #         isna_buffer,
-        #         columns=df.columns,
-        #         separator=properties.internal_delimiter,
-        #         quote_char="\0",
-        #     )
-        #     return data, isna
+        #     return data

@@ -29,16 +29,6 @@ class Configurator:
         self.orders = order or []
         self.valid = valid or []
         self.schema = schema or {}
-        self.str_line = ""
-        if isinstance(df, pd.Series) or isinstance(df, pd.DataFrame):
-            if len(df) > 0:
-                self.str_line = df.iloc[0]
-
-    def _add_field_length(self, index, sections_dict):
-        field_length = sections_dict.get(
-            "field_length", properties.MAX_FULL_REPORT_WIDTH
-        )
-        return index + field_length
 
     def _validate_sentinal(self, i, line, sentinal):
         slen = len(sentinal)
@@ -139,7 +129,7 @@ class Configurator:
                 "converter_dict": converters,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decoders,
-                "dtype": dtypes,
+                # "dtype": dtypes,
             },
             "self": {
                 "dtypes": dtypes,
@@ -286,7 +276,6 @@ class Configurator:
 
     def _read_line(self, line: str):
         i = j = 0
-        missing_values = []
         data_dict = {}
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
@@ -340,22 +329,23 @@ class Configurator:
                     j = k
 
                 if ignore is not True:
-                    data_dict[index] = line[i:j]
+                    value = line[i:j]
 
-                    if not data_dict[index].strip():
-                        data_dict[index] = None
-                    if data_dict[index] == na_value:
-                        data_dict[index] = None
+                    if not value.strip():
+                        value = True
+                    if value == na_value:
+                        value = True
 
-                if i == j and missing is True:
-                    missing_values.append(index)
+                    if i == j and missing is True:
+                        value = False
+
+                    data_dict[index] = value
 
                 if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
                     j += len(delimiter)
                 i = j
 
         df = pd.Series(data_dict)
-        df["missing_values"] = missing_values
         return df
 
     def open_netcdf(self):
@@ -364,7 +354,8 @@ class Configurator:
         def replace_empty_strings(series):
             if series.dtype == "object":
                 series = series.str.decode("utf-8")
-                series = series.str.strip().replace("", None)
+                series = series.str.strip()
+                series = series.map(lambda x: True if x == "" else x)
             return series
 
         missing_values = []
@@ -403,5 +394,5 @@ class Configurator:
         for column in disables:
             df[column] = np.nan
         df = df.apply(lambda x: replace_empty_strings(x))
-        df["missing_values"] = [missing_values] * len(df)
+        df[missing_values] = False
         return pl.from_pandas(df).with_row_index("index")

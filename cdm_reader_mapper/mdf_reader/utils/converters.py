@@ -7,6 +7,7 @@ import logging
 import polars as pl
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 class df_converters:

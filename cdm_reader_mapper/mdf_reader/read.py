@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import ast
+import csv
 import logging
 from io import StringIO as StringIO
 
 import pandas as pd
+import polars as pl
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
@@ -14,7 +16,16 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, validate_arg
+from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
+
+
+def _remove_boolean_values(x):
+    x = convert_str_boolean(x)
+    if x is True:
+        return
+    if x is False:
+        return
+    return x
 
 
 class MDFFileReader(FileReader):
@@ -37,12 +48,12 @@ class MDFFileReader(FileReader):
 
     def convert_and_decode_entries(
         self,
+        data,
         convert=True,
         decode=True,
         converter_dict=None,
         converter_kwargs=None,
         decoder_dict=None,
-        dtype=None,
     ):
         """Convert and decode data entries by using a pre-defined data model.
 
@@ -50,6 +61,8 @@ class MDFFileReader(FileReader):
 
         Parameters
         ----------
+        data: pd.DataFrame or pd.io.parsers.TextFileReader
+          Data to convert and decode.
         convert: bool, default: True
           If True convert entries by using a pre-defined data model.
         decode: bool, default: True
@@ -63,10 +76,6 @@ class MDFFileReader(FileReader):
         decoder_dict: dict, optional
           Functions for decoding values in specific columns.
           If None use information from a pre-defined data model.
-        dtype: dtype or dict of {Hashable: dtype}, optional
-          Data type(s) to apply to either the whole dataset or individual columns.
-          If None use information from a pre-defined data model.
-          Use only if data is read with chunksizes.
         """
         if converter_dict is None:
             converter_dict = self.configurations["convert_decode"]["converter_dict"]
@@ -74,8 +83,6 @@ class MDFFileReader(FileReader):
             converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if dtype is None:
-            dtype = self.configurations["convert_decode"]["dtype"]
         if not (convert and decode):
             return self
         if convert is not True:
@@ -84,31 +91,29 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        dtype = adjust_dtype(dtype, self.data)
         data = self.convert_and_decode_df(
-            self.data,
+            data,
             converter_dict,
             converter_kwargs,
             decoder_dict,
         )
-        self.data = data.cast(dtype)
-        return self
+        return data
 
-    def validate_entries(self, validate):
+    def validate_entries(self, data, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            self.mask = pd.DataFrame()
-        elif isinstance(self.data, pd.DataFrame):
-            self.mask = self.validate_df(self.data, isna=self.isna)
+            self.dtypes = "object"
+            mask = pd.DataFrame()
+        elif isinstance(data, pd.DataFrame):
+            mask = self.validate_df(data)
         else:
             data_buffer = StringIO()
-            TextParser_ = make_copy(self.data)
-            TextParser_isna_ = make_copy(self.isna)
-            for i, (df_, isna_) in enumerate(zip(TextParser_, TextParser_isna_)):
-                mask_ = self.validate_df(df_, isna=isna_)
+            TextParser_ = make_copy(data)
+            for i, df_ in enumerate(TextParser_):
+                mask_ = self.validate_df(df_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -117,12 +122,56 @@ class MDFFileReader(FileReader):
                     index=False,
                 )
             data_buffer.seek(0)
-            self.mask = pd.read_csv(
+            mask = pd.read_csv(
                 data_buffer,
                 names=df_.columns,
                 chunksize=self.chunksize,
             )
-        return self
+        return mask
+
+    def remove_boolean_values(self, data):
+        """DOCUMENTATION"""
+        if isinstance(data, pl.DataFrame):
+            return data
+        if isinstance(data, pd.DataFrame):
+            data = data.map(_remove_boolean_values)
+            dtype = adjust_dtype(self.dtypes, data)
+            return data.astype(dtype)
+        else:
+            data_buffer = StringIO()
+            TextParser = make_copy(data)
+            for i, df_ in enumerate(TextParser):
+                df = df_.map(_remove_boolean_values)
+                dtype = adjust_dtype(self.dtypes, df)
+                date_columns = []
+                df.to_csv(
+                    data_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+            date_columns = []
+            for i, element in enumerate(list(dtype)):
+                if dtype.get(element) == "datetime":
+                    date_columns.append(i)
+            dtype = adjust_dtype(dtype, df)
+            data_buffer.seek(0)
+            data = pd.read_csv(
+                data_buffer,
+                names=df.columns,
+                chunksize=self.chunksize,
+                dtype=dtype,
+                parse_dates=date_columns,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
+        return data
 
     def read(
         self,
@@ -184,7 +233,7 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
-        self.data, self.isna = self.open_data(
+        data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -194,23 +243,22 @@ class MDFFileReader(FileReader):
 
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
-
-        self.convert_and_decode_entries(
+        data = self.convert_and_decode_entries(
+            data,
             convert=convert,
             decode=decode,
         )
-
-        self.validate_entries(validate)
+        mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
         logging.info("Create output DataBundle object")
-
+        data = self.remove_boolean_values(data)
         return DataBundle(
-            data=self.data,
+            data=data,
             columns=self.columns,
             dtypes=self.dtypes,
             parse_dates=self.parse_dates,
-            mask=self.mask,
+            mask=mask,
             imodel=self.imodel,
         )
 
