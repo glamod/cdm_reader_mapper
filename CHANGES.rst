@@ -46,7 +46,9 @@ Internal changes
 
 * split ``mdf_reader.utils.auxiliary`` into ``mdf_reader.utils.filereader``, ``mdf_reader.utils.configurator`` and ``mdf_reader.utils.utilities`` (:issue:`25`, :pull:`200`)
 * simplify ``cdm_mapper.read_tables`` function (:pull:`192`)
-* Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`, :pull:`210`)
+* ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`, :pull:`210`)
+* ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_data`` method, to avoid creating a pre-validation missing_value mask (:pull:`216`)
+* ``mdf_reader``: move ``validate`` to ``utils.validators`` (:pull:`216`)
 
 Bug fixes
 ^^^^^^^^^
