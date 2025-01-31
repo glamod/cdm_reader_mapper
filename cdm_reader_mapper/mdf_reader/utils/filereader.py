@@ -15,7 +15,7 @@ from .. import properties
 from ..schemas import schemas
 from .configurator import Configurator
 from .utilities import convert_entries, decode_entries, validate_path
-from .validator import validate
+from .validators import validate
 
 
 class FileReader:
@@ -185,7 +185,6 @@ class FileReader:
 
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        # mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
             imodel=self.imodel,

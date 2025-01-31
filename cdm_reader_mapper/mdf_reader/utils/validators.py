@@ -189,6 +189,10 @@ def validate(
         logging.error("input data must be a pandas DataFrame.")
         return
 
+    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
+    if data.empty:
+        return mask
+
     # Get the data elements from the input data: might be just a subset of
     # data model and flatten the schema to get a simple and sequential list
     # of elements included in the input data
@@ -209,7 +213,6 @@ def validate(
         validated_columns = list(
             set(numeric_elements + coded_elements + datetime_elements)
         )
-    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
 
     mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)
 
