@@ -74,17 +74,6 @@ def decode_entries(series, decoder_func):
     return decoder_func(series)
 
 
-def set_missing_values(df: pl.DataFrame) -> pl.DataFrame:
-    """DOCUMENTATION."""
-    # QUESTION: Do I need to re-order the columns here?
-    return (
-        df.explode(columns="missing_values")
-        .with_columns(pl.lit(True).alias("values"))
-        .pivot("missing_values", index="index", values="values")
-        .fill_null(False)
-    )
-
-
 def adjust_dtype(dtype, df):
     """DOCUMENTATION."""
     if not isinstance(dtype, dict):
