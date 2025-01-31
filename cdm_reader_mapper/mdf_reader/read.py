@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import csv
 import logging
+import os
 from io import StringIO as StringIO
 
 import pandas as pd
@@ -83,7 +84,8 @@ class MDFFileReader(FileReader):
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
         if not (convert and decode):
-            return self
+            self.dtypes = "object"
+            return data
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
@@ -137,7 +139,6 @@ class MDFFileReader(FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            self.dtypes = "object"
             mask = pd.DataFrame()
         elif isinstance(data, pd.DataFrame):
             mask = self.validate_df(data)
@@ -430,6 +431,8 @@ def read_data(
         return columns_
 
     def _read_csv(ifile, col_subset=None, **kwargs):
+        if not os.path.isfile(ifile):
+            return pd.DataFrame()
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
         df.columns = _update_column_labels(df.columns)
         if col_subset is not None:
@@ -450,8 +453,7 @@ def read_data(
         parse_dates = False
 
     data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
-    if mask is not None:
-        mask = _read_csv(mask, col_subset=col_subset)
+    mask = _read_csv(mask, col_subset=col_subset)
 
     return DataBundle(
         data=data,

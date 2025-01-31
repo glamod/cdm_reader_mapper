@@ -13,6 +13,21 @@ from cdm_reader_mapper.common import get_filename
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
+def _update_dtypes(dtypes, columns):
+    if isinstance(dtypes, dict):
+        dtypes = {k: v for k, v in dtypes.items() if k in columns}
+    return dtypes
+
+
+def _update_col_names(dtypes, col_o, col_n):
+    if isinstance(dtypes, str):
+        return dtypes
+    if col_o in dtypes.keys():
+        dtypes[col_n] = dtypes[col_o]
+        del dtypes[col_o]
+    return dtypes
+
+
 def write_data(
     data,
     mask=None,
@@ -122,16 +137,12 @@ def write_data(
         if i == 0:
             mode = "w"
             header = []
-            info["dtypes"] = {
-                k: v for k, v in info["dtypes"].items() if k in data_df.columns
-            }
+            info["dtypes"] = _update_dtypes(info["dtypes"], data_df.columns)
             for col in data_df.columns:
                 col_ = _join(col)
                 header.append(col_)
+                info["dtypes"] = _update_col_names(info["dtypes"], col, col_)
 
-                if col in info["dtypes"]:
-                    info["dtypes"][col_] = info["dtypes"][col]
-                    del info["dtypes"][col]
             info["parse_dates"] = [
                 parse_date for parse_date in info["parse_dates"] if parse_date in header
             ]
@@ -144,7 +155,8 @@ def write_data(
             "sep": delimiter,
         }
         data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
-        mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+        if not mask_df.empty:
+            mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
 
     if info:
         with open(os.path.join(out_dir, filename_info), "w") as fileObj:
