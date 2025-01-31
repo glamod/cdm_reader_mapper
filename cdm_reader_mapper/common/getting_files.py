@@ -111,7 +111,7 @@ def load_file(
     branch: str = "umlauts", #"main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
-    clear_cache: bool = True, #False,
+    clear_cache: bool = False,
     within_drs: bool = True,
 ):
     """Load file from the online Github-like repository.
