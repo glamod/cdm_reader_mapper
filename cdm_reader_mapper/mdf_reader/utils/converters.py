@@ -18,10 +18,18 @@ class df_converters:
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
-        decoded = data.str.decode("utf-8")
-        if decoded.dtype != "object":
-            return data
-        return decoded
+
+        def _decode(x):
+            if not isinstance(x, str):
+                return x
+
+            try:
+                encoded = x.encode("latin1")
+                return encoded.decode("utf-8")
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                return x
+
+        return data.apply(lambda x: _decode(x))
 
     def to_numeric(self, data, offset, scale):
         """Convert object type elements of a pandas series to numeric type."""
@@ -81,6 +89,7 @@ class df_converters:
         if data.dtype != "object":
             return data
         data = self.decode(data)
+
         if not disable_white_strip:
             data = data.str.strip()
         else:
@@ -88,6 +97,7 @@ class df_converters:
                 data = data.str.rstrip()
             elif disable_white_strip == "r":
                 data = data.str.lstrip()
+
         return data.apply(
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
         )

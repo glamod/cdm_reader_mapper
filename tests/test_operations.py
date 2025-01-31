@@ -35,8 +35,8 @@ def test_select_true(TextParser):
         selected = make_copy(selected).read()
         deselected = make_copy(deselected).read()
 
-    exp1 = data[:4].reset_index(drop=True)
-    exp2 = data[4:].reset_index(drop=True)
+    exp1 = data[:5].reset_index(drop=True)
+    exp2 = data[5:].reset_index(drop=True)
     pd.testing.assert_frame_equal(exp1, selected)
     pd.testing.assert_frame_equal(exp2, deselected)
 

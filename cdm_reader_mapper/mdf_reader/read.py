@@ -279,6 +279,7 @@ class MDFFileReader(FileReader):
             convert=convert,
             decode=decode,
         )
+
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object

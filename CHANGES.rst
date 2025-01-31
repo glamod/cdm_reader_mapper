@@ -53,6 +53,8 @@ Internal changes
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
+* ``mdf_reader``: ``utils.converters.decode`` returns values not only None (:pull:`214`)
+* ``mdf_reader``: solving misleading reading due to German "umlauts"(:issue:`212`, :pull:`214`)
 
 1.0.2 (2024-11-13)
 ------------------
