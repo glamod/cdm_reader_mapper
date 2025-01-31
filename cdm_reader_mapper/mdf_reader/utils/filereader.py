@@ -15,8 +15,8 @@ from .configurator import Configurator
 from .utilities import (
     convert_entries,
     decode_entries,
-    validate_path,
     set_missing_values,
+    validate_path,
 )
 from .validators import validate
 
