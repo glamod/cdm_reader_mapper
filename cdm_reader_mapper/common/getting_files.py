@@ -108,10 +108,10 @@ def _get_file(
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
-    branch: str = "umlauts", #"main",
+    branch: str = "umlauts",  # "main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
-    clear_cache: bool = True, #False,
+    clear_cache: bool = True,  # False,
     within_drs: bool = True,
 ):
     """Load file from the online Github-like repository.
