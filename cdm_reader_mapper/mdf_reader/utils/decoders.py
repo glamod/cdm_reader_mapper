@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 def _get_overpunch_number():
@@ -92,16 +93,18 @@ class df_decoders:
     def signed_overpunch(self, data):
         """DOCUMENTATION."""
         decoded_numeric = np.vectorize(signed_overpunch_i, otypes=[float])(data)
-        return pd.Series(decoded_numeric, dtype=self.dtype)
+        return pd.Series(decoded_numeric)
 
     def base36(self, data):
         """DOCUMENTATION."""
-        # Caution: int(str(np.nan),36) ==> 30191
-        data = data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
-        )
-        data = [str(int(str(i), 36)) if i == i and i else np.nan for i in data]
-        return pd.Series(data, dtype=self.dtype)
+
+        def _base36(x):
+            x = convert_str_boolean(x)
+            if isinstance(x, bool):
+                return x
+            return str(int(str(x), 36))
+
+        return data.apply(lambda x: _base36(x))
 
 
 decoders = dict()

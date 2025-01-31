@@ -8,21 +8,14 @@ import os
 from copy import deepcopy
 from io import StringIO
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
 from .. import properties
 from ..schemas import schemas
-from ..validate import validate
 from .configurator import Configurator
-from .utilities import (
-    convert_entries,
-    create_mask,
-    decode_entries,
-    set_missing_values,
-    validate_path,
-)
+from .utilities import convert_entries, decode_entries, validate_path
+from .validators import validate
 
 
 class FileReader:
@@ -148,13 +141,9 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        missing_values_ = df["missing_values"]
-        del df["missing_values"]
         df = self._select_years(df)
-        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
-        df = df.where(df.notnull(), np.nan)
-        return df, missing_values
+        return df
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -196,10 +185,8 @@ class FileReader:
 
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
-            mask0=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -227,36 +214,11 @@ class FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            df, self.missing_values = self._read_sections(
-                TextParser, order, valid, open_with=open_with
-            )
-            return df, df.isna()
+            return self._read_sections(TextParser, order, valid, open_with=open_with)
         else:
             data_buffer = StringIO()
-            missings_buffer = StringIO()
-            isna_buffer = StringIO()
             for i, df_ in enumerate(TextParser):
-                df, missing_values = self._read_sections(
-                    df_, order, valid, open_with=open_with
-                )
-                df_isna = df.isna()
-                missing_values.to_csv(
-                    missings_buffer,
-                    header=False,
-                    mode="a",
-                    encoding="utf-8",
-                    index=False,
-                )
-                df_isna.to_csv(
-                    isna_buffer,
-                    header=False,
-                    mode="a",
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
+                df = self._read_sections(df_, order, valid, open_with=open_with)
                 df.to_csv(
                     data_buffer,
                     header=False,
@@ -268,12 +230,6 @@ class FileReader:
                     quotechar="\0",
                     escapechar="\0",
                 )
-            missings_buffer.seek(0)
-            self.missing_values = pd.read_csv(
-                missings_buffer,
-                names=missing_values.columns,
-                chunksize=None,
-            )
             data_buffer.seek(0)
             data = pd.read_csv(
                 data_buffer,
@@ -285,13 +241,4 @@ class FileReader:
                 quotechar="\0",
                 escapechar="\0",
             )
-            isna_buffer.seek(0)
-            isna = pd.read_csv(
-                isna_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data, isna
+            return data
