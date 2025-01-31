@@ -122,14 +122,16 @@ def write_data(
         if i == 0:
             mode = "w"
             header = []
-            info["dtypes"] = {
-                k: v for k, v in info["dtypes"].items() if k in data_df.columns
-            }
+            if isinstance(info["dtypes"], dict):
+                info["dtypes"] = {
+                    k: v for k, v in info["dtypes"].items() if k in data_df.columns
+                }
             for col in data_df.columns:
                 col_ = _join(col)
                 header.append(col_)
-
-                if col in info["dtypes"]:
+                if isinstance(info["dtypes"], str):
+                    continue
+                if col in info["dtypes"].keys():
                     info["dtypes"][col_] = info["dtypes"][col]
                     del info["dtypes"][col]
             info["parse_dates"] = [
@@ -144,7 +146,8 @@ def write_data(
             "sep": delimiter,
         }
         data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
-        mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+        if not mask_df.empty:
+            mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
 
     if info:
         with open(os.path.join(out_dir, filename_info), "w") as fileObj:
