@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 import pandas as pd
+from unidecode import unidecode
 
 from .. import properties
 from .utilities import convert_str_boolean
+
+mappings = {
+    "Aoe": "U",
+    "aoe": "u",
+}
 
 
 class df_converters:
@@ -22,12 +28,13 @@ class df_converters:
         def _decode(x):
             if not isinstance(x, str):
                 return x
-
-            try:
-                encoded = x.encode("latin1")
-                return encoded.decode("utf-8")
-            except (UnicodeDecodeError, UnicodeEncodeError):
+            if x.isascii():
                 return x
+            decoded = unidecode(x)
+
+            for char, char_new in mappings.items():
+                decoded = decoded.replace(char, char_new)
+            return decoded
 
         return data.apply(lambda x: _decode(x))
 
@@ -92,11 +99,10 @@ class df_converters:
 
         if not disable_white_strip:
             data = data.str.strip()
-        else:
-            if disable_white_strip == "l":
-                data = data.str.rstrip()
-            elif disable_white_strip == "r":
-                data = data.str.lstrip()
+        elif disable_white_strip == "l":
+            data = data.str.rstrip()
+        elif disable_white_strip == "r":
+            data = data.str.lstrip()
 
         return data.apply(
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
