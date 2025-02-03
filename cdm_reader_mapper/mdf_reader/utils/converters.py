@@ -44,13 +44,12 @@ class df_converters:
             try:
                 return offset + float(x) * scale
             except ValueError:
-                return False
+                return x  # False
 
         return data.apply(lambda x: _to_numeric(x))
 
     def object_to_numeric(self, data, scale=None, offset=None):
-        """
-        Convert the object type elements of a pandas series to numeric type.
+        """Convert the object type elements of a pandas series to numeric type.
 
         Right spaces are trated as ceros. Scale and offset can optionally be applied.
         The final data type according to the class dtype.
@@ -92,11 +91,10 @@ class df_converters:
 
         if not disable_white_strip:
             data = data.str.strip()
-        else:
-            if disable_white_strip == "l":
-                data = data.str.rstrip()
-            elif disable_white_strip == "r":
-                data = data.str.lstrip()
+        elif disable_white_strip == "l":
+            data = data.str.rstrip()
+        elif disable_white_strip == "r":
+            data = data.str.lstrip()
 
         return data.apply(
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
