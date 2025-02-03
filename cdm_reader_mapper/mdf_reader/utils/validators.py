@@ -46,7 +46,7 @@ def validate_numeric(elements, data, schema):
     for element in elements:
         lower = schema.get(element).get("valid_min", -np.inf)
         upper = schema.get(element).get("valid_max", np.inf)
-        if not lower.isfinite() or not upper.isfinite():
+        if lower == -np.inf or upper == np.inf:
             logging.warning(
                 f"Data numeric elements with missing upper or lower threshold: {element}"
             )
