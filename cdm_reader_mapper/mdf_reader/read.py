@@ -167,7 +167,7 @@ class MDFFileReader(FileReader):
         if isinstance(data, pd.DataFrame):
             data = data.map(_remove_boolean_values)
             dtype = adjust_dtype(self.dtypes, data)
-            return data.astype(dtype)
+            return data.astype(dtype, errors="ignore")
         else:
             data_buffer = StringIO()
             TextParser = make_copy(data)
@@ -430,10 +430,11 @@ def read_data(
             columns_.append(col_)
         return columns_
 
-    def _read_csv(ifile, col_subset=None, **kwargs):
+    def _read_csv(ifile, col_subset=None, dtype="object", **kwargs):
         if not os.path.isfile(ifile):
             return pd.DataFrame()
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
+        df = df.astype(dtype, errors="ignore")
         df.columns = _update_column_labels(df.columns)
         if col_subset is not None:
             df = df[col_subset]
