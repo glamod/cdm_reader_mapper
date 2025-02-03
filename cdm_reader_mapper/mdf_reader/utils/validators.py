@@ -32,43 +32,46 @@ def validate_datetime(elements, data):
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
 
-    # Find thresholds in schema. Flag if not available -> warn
-    def _to_numeric(x):
-        if x is None:
-            return np.nan
+    def _isnumeric(x, lower, upper):
         x = convert_str_boolean(x)
         if isinstance(x, bool):
             return x
-        return float(x)
+        if isinstance(x, str):
+            if x.isnumeric():
+                return True
+            return False
+        return True
 
-    data[elements] = data[elements].map(_to_numeric)
-    mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
-    upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
-
-    set_elements = [
-        x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
-    ]
-
-    if len([x for x in elements if x not in set_elements]) > 0:
-        logging.warning(
-            "Data numeric elements with missing upper or lower threshold: {}".format(
-                ",".join([str(x) for x in elements if x not in set_elements])
+    mask = pd.DataFrame(columns=elements)
+    for element in elements:
+        lower = schema.get(element).get("valid_min", -np.inf)
+        upper = schema.get(element).get("valid_max", np.inf)
+        if not lower.isfinite() or not upper.isfinite():
+            logging.warning(
+                f"Data numeric elements with missing upper or lower threshold: {element}"
             )
+            logging.warning(
+                "Corresponding upper and/or lower bounds set to +/-inf for validation"
+            )
+        mask[element] = data[element].apply(
+            _isnumeric,
+            lower=lower,
+            upper=upper,
         )
-        logging.warning(
-            "Corresponding upper and/or lower bounds set to +/-inf for validation"
-        )
-    mask[elements] = (
-        (data[elements] >= [lower.get(x) for x in elements])
-        & (data[elements] <= [upper.get(x) for x in elements])
-    ) | data[elements].isna()
+
     return mask
 
 
 def validate_str(elements, data):
     """DOCUMENTATION."""
-    return pd.DataFrame(index=data.index, data=True, columns=elements)
+
+    def _isascii(x):
+        if isinstance(x, str):
+            if not x.isascii():
+                return False
+        return True
+
+    return data[elements].map(_isascii)
 
 
 def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
@@ -100,10 +103,6 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
                 if not table.get("_keys")
                 else list(table["_keys"].get(element))
             )
-        dtypes = {
-            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
-            for x in key_elements
-        }
 
         table_keys = get_table_keys(table)
         table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
@@ -114,7 +113,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
         masked = np.where(val)
         masked = masked[0]
         value = validation_df.iloc[masked, :]
-        value = value.astype(dtypes).astype("str")
+        value = value.astype("str")
         value = value.apply("~".join, axis=1)
         value = value.isin(table_keys_str)
         if masked.size != 0:
