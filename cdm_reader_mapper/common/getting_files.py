@@ -104,11 +104,11 @@ def _get_file(
     return local_file
 
 
-# idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
+# idea borrowed from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
     name: str | os.PathLike,
     github_url: str = "https://github.com/glamod/cdm-testdata",
-    branch: str = "main",
+    branch: str = "ascii_decode",  # "main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
     clear_cache: bool = False,
