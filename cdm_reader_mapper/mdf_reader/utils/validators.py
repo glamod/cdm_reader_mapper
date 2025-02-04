@@ -36,9 +36,11 @@ def validate_numeric(elements, data, schema):
         x = convert_str_boolean(x)
         if isinstance(x, bool):
             return x
-        if isinstance(x, str):
-            if x.isnumeric():
-                return True
+        try:
+            x = float(x)
+        except ValueError:
+            return False
+        if x < lower or x > upper:
             return False
         return True
 
@@ -58,7 +60,6 @@ def validate_numeric(elements, data, schema):
             lower=lower,
             upper=upper,
         )
-
     return mask
 
 
@@ -74,7 +75,7 @@ def validate_str(elements, data):
     return data[elements].map(_isascii)
 
 
-def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
+def validate_codes(elements, data, schema, imodel, ext_table_path):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -91,35 +92,22 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
         )
         if not table:
             continue
-        if supp:
-            key_elements = (
-                [element[1]]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element[1]))
-            )
-        else:
-            key_elements = (
-                [element]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element))
-            )
 
+        key_elements = (
+            [element] if not table.get("_keys") else list(table["_keys"].get(element))
+        )
+        dtypes = {
+            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
+            for x in key_elements
+        }
         table_keys = get_table_keys(table)
-        table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
-        validation_df = data[key_elements]
-        imask = pd.Series(index=data.index, data=True)
-        val = validation_df.notna()
-        val = val.all(axis=1)
-        masked = np.where(val)
-        masked = masked[0]
-        value = validation_df.iloc[masked, :]
-        value = value.astype("str")
-        value = value.apply("~".join, axis=1)
-        value = value.isin(table_keys_str)
-        if masked.size != 0:
-            imask.iloc[masked] = value
-        mask[element] = imask
 
+        validation_df = data[key_elements]
+        value = validation_df.astype(dtypes, errors="ignore").astype("str")
+        valid = validation_df.notna().all(axis=1)
+        value = value.apply("~".join, axis=1)
+        mask_ = value.isin(table_keys)
+        mask[element] = mask_.where(valid, True)
     return mask
 
 

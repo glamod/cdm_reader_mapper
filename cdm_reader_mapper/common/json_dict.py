@@ -10,11 +10,6 @@ from copy import deepcopy
 
 from .getting_files import get_path
 
-try:
-    from pandas.io.json._normalize import nested_to_record
-except Exception:
-    from pandas.io.json.normalize import nested_to_record
-
 
 def open_json_file(ifile, encoding="utf-8"):
     """Open JSON file.
@@ -133,15 +128,23 @@ def combine_dicts(list_of_files, base=None):
     return combined_dict
 
 
+def _get_table_keys(table):
+    keys = []
+    for key, kdict in table.items():
+        if not isinstance(kdict, dict):
+            keys.append("~".join([key, kdict]))
+            continue
+        for k, v in kdict.items():
+            keys.append("~".join([key, k]))
+    return keys
+
+
 def get_table_keys(table):
     """DOCUMENTATION."""
-    separator = "?"  # something hopefully not in keys...
     if table.get("_keys"):
         _table = deepcopy(table)
         _table.pop("_keys")
-        keys = list(nested_to_record(_table, sep=separator).keys())
-
-        return [x.split(separator) for x in keys]
+        return _get_table_keys(_table)
     else:
         return list(table.keys())
 
