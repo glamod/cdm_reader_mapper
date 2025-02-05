@@ -70,8 +70,8 @@ def _transform(
     kwargs,
     logger,
 ):
-    # logger.debug(f"\ttransform: {transform}")
-    # logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+    logger.debug(f"\ttransform: {transform}")
+    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
     trans = getattr(imodel_functions, transform)
     return trans(to_map, **kwargs)
 
@@ -82,9 +82,6 @@ def _code_table(
     code_table,
     logger,
 ):
-    # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
-    # Approach that does not work when it is not nested...so just try and assume not nested if fails
-    # Prepare code_table
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
     try:
         to_map = to_map.to_frame()
@@ -144,7 +141,7 @@ def _map_data(
         )
     elif elements and not isEmpty:
         data = to_map
-    elif default is not None:  # (value = 0 evals to False!!)
+    elif default is not None:
         data = _default(
             default,
             length,
@@ -173,9 +170,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
 
     to_map = None
     if elements:
-        # make sure they are clean and conform to their atts (tie dtypes)
-        # we'll only let map if row complete so mapping functions do not need to worry about handling NA
-        # logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
+        logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
         missing_els = [x for x in elements if x not in cols]
         if len(missing_els) > 0:
             logger.warning(
@@ -243,12 +238,12 @@ def _map_and_convert(
     )
     table_df_i = pd.DataFrame(index=idata.index, columns=columns)
 
-    # logger.debug(f"Table: {table}")
+    logger.debug(f"Table: {table}")
     for column in columns:
         if column not in mapping.keys():
             continue
         else:
-            # logger.debug(f"\tElement: {column}")
+            logger.debug(f"\tElement: {column}")
             table_df_i[column], atts[column] = _mapping(
                 idata,
                 mapping[column],
@@ -324,9 +319,9 @@ def map_and_convert(
     table_list = []
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
-        # logger.debug(
-        #    f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
-        # )
+        logger.debug(
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+        )
         cdm_tables[table]["buffer"].seek(0)
         data = pd.read_csv(
             cdm_tables[table]["buffer"],
