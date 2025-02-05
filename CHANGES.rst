@@ -5,7 +5,7 @@ Changelog
 
 1.1.0 (unreleased)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -29,6 +29,7 @@ Breaking changes
 * import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
 * ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 * ``read_mdf``: remove parameter ``out_path`` to dump attribute information on disk (:pull:`201`)
+* move function ``open_code_table`` from ``common.json_dict`` to ``cdm_mapper.codes.codes`` (:pull:``221`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -46,10 +47,19 @@ Internal changes
 
 * split ``mdf_reader.utils.auxiliary`` into ``mdf_reader.utils.filereader``, ``mdf_reader.utils.configurator`` and ``mdf_reader.utils.utilities`` (:issue:`25`, :pull:`200`)
 * simplify ``cdm_mapper.read_tables`` function (:pull:`192`)
+* ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`, :pull:`210`)
+* ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_data`` method, to avoid creating a pre-validation missing_value mask (:pull:`216`)
+* ``mdf_reader``: move ``validate`` to ``utils.validators`` (:pull:`216`)
+* ``mdf_reader``: no need for multi-column key codes (e.g. ``("core", "VS")``) (:pull:`221`)
+* ``mdf_reader.utils.validator``: simplify function ``code_validation`` (:pull:`221`)
+* ``cdm_mapper.codes.common``: convert range-key properties to list (:pull:`221`)
+
 
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
+* ``mdf_reader``: ``utils.converters.decode`` returns values not only None (:pull:`214`)
+* ``mdf_reader``: solving misleading reading due to German "umlauts"(:issue:`212`, :pull:`214`)
 
 1.0.2 (2024-11-13)
 ------------------

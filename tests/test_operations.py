@@ -26,8 +26,8 @@ def test_select_true():
     selected = read_.selected
     deselected = read_.deselected
 
-    exp1 = data[:4].reset_index(drop=True)
-    exp2 = data[4:].reset_index(drop=True)
+    exp1 = data[:5].reset_index(drop=True)
+    exp2 = data[5:].reset_index(drop=True)
     pd.testing.assert_frame_equal(exp1, selected)
     pd.testing.assert_frame_equal(exp2, deselected)
 

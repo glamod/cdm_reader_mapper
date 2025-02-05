@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import logging
+import os
 
 import pandas as pd
 
@@ -12,7 +13,16 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, validate_arg
+from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
+
+
+def _remove_boolean_values(x):
+    x = convert_str_boolean(x)
+    if x is True:
+        return
+    if x is False:
+        return
+    return x
 
 
 class MDFFileReader(FileReader):
@@ -33,6 +43,7 @@ class MDFFileReader(FileReader):
 
     def convert_and_decode_entries(
         self,
+        data,
         convert=True,
         decode=True,
         converter_dict=None,
@@ -45,6 +56,8 @@ class MDFFileReader(FileReader):
 
         Parameters
         ----------
+        data: pd.DataFrame or pd.io.parsers.TextFileReader
+          Data to convert and decode.
         convert: bool, default: True
           If True convert entries by using a pre-defined data model.
         decode: bool, default: True
@@ -66,33 +79,29 @@ class MDFFileReader(FileReader):
         if decoder_dict is None:
             decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
         if not (convert and decode):
-            return self
+            return data
         if convert is not True:
             converter_dict = {}
             converter_kwargs = {}
         if decode is not True:
             decoder_dict = {}
 
-        dtype = self.configurations["convert_decode"]["dtype"]
-        dtype = adjust_dtype(dtype, self.data)
         data = self.convert_and_decode_df(
             self.data,
             converter_dict,
             converter_kwargs,
             decoder_dict,
         )
-        self.data = data.astype(dtype)
-        return self
+        return data
 
-    def validate_entries(self, validate):
+    def validate_entries(self, data, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            self.mask = pd.DataFrame()
-        self.mask = self.validate_df(self.data, isna=self.isna)
-        return self
+            return self.validate_df(data)
+        return pd.DataFrame()
 
     def read(
         self,
@@ -148,7 +157,7 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
-        self.data, self.isna = self.open_data(
+        data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
@@ -157,23 +166,22 @@ class MDFFileReader(FileReader):
 
         # 2.3. Extract, read and validate data in same loop
         logging.info("Extracting and reading sections")
-
-        self.convert_and_decode_entries(
+        data = self.convert_and_decode_entries(
+            data,
             convert=convert,
             decode=decode,
         )
 
-        self.validate_entries(validate)
+        mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
-
         return DataBundle(
-            data=self.data,
+            data=data,
             columns=self.columns,
             dtypes=self.dtypes,
             parse_dates=self.parse_dates,
-            mask=self.mask,
+            mask=mask,
             imodel=self.imodel,
         )
 
@@ -314,6 +322,8 @@ def read_data(
         return columns_
 
     def _read_csv(ifile, col_subset=None, **kwargs):
+        if not os.path.isfile(ifile):
+            return pd.DataFrame()
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
         df.columns = _update_column_labels(df.columns)
         if col_subset is not None:
@@ -334,8 +344,7 @@ def read_data(
         parse_dates = False
 
     data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
-    if mask is not None:
-        mask = _read_csv(mask, col_subset=col_subset)
+    mask = _read_csv(mask, col_subset=col_subset)
 
     return DataBundle(
         data=data,

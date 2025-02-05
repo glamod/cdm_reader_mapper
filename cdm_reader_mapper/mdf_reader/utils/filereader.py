@@ -6,21 +6,14 @@ import logging
 import os
 from copy import deepcopy
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
 from .. import properties
 from ..schemas import schemas
-from ..validate import validate
 from .configurator import Configurator
-from .utilities import (
-    convert_entries,
-    create_mask,
-    decode_entries,
-    set_missing_values,
-    validate_path,
-)
+from .utilities import convert_entries, decode_entries, validate_path
+from .validators import validate
 
 
 class FileReader:
@@ -136,12 +129,9 @@ class FileReader:
         open_with,
     ):
         if open_with == "pandas":
-            df = TextParser.apply(
-                lambda x: Configurator(
-                    df=x, schema=self.schema, order=order, valid=valid
-                ).open_pandas(),
-                axis=1,
-            )
+            df = Configurator(
+                df=TextParser, schema=self.schema, order=order, valid=valid
+            ).open_pandas()
         elif open_with == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
@@ -149,13 +139,9 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        missing_values_ = df["missing_values"]
-        del df["missing_values"]
         df = self._select_years(df)
-        missing_values = set_missing_values(pd.DataFrame(missing_values_), df)
         self.columns = df.columns
-        df = df.where(df.notnull(), np.nan)
-        return df, missing_values
+        return df
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -197,10 +183,8 @@ class FileReader:
 
     def validate_df(self, df, isna=None):
         """DOCUMENTATION."""
-        mask = create_mask(df, isna, missing_values=self.missing_values)
         return validate(
             data=df,
-            mask0=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -225,7 +209,4 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        df, self.missing_values = self._read_sections(
-            TextParser, order, valid, open_with=open_with
-        )
-        return df, df.isna()
+        return self._read_sections(TextParser, order, valid, open_with=open_with)

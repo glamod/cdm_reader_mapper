@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from .. import properties
+from .utilities import convert_str_boolean
 
 
 class df_converters:
@@ -18,28 +18,35 @@ class df_converters:
 
     def decode(self, data):
         """Decode object type elements of a pandas series to UTF-8."""
-        decoded = data.str.decode("utf-8")
-        if decoded.dtype != "object":
-            return data
-        return decoded
 
-    def to_numeric(self, data):
+        def _decode(x):
+            if not isinstance(x, str):
+                return x
+
+            try:
+                encoded = x.encode("latin1")
+                return encoded.decode("utf-8")
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                return x
+
+        return data.apply(lambda x: _decode(x))
+
+    def to_numeric(self, data, offset, scale):
         """Convert object type elements of a pandas series to numeric type."""
-        data = data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
-        )
 
-        # str method fails if all nan, pd.Series.replace method is not the same
-        # as pd.Series.str.replace!
-        if data.count() > 0:
-            data = self.decode(data)
-            data = data.str.strip()
-            data = data.str.replace(" ", "0")
+        def _to_numeric(x):
+            x = convert_str_boolean(x)
+            if isinstance(x, bool):
+                return x
+            if isinstance(x, str):
+                x = x.strip()
+                x.replace(" ", "0")
+            try:
+                return offset + float(x) * scale
+            except ValueError:
+                return False
 
-        #  Convert to numeric, then scale (?!) and give it's actual int type
-        return pd.to_numeric(
-            data, errors="coerce"
-        )  # astype fails on strings, to_numeric manages errors....!
+        return data.apply(lambda x: _to_numeric(x))
 
     def object_to_numeric(self, data, scale=None, offset=None):
         """
@@ -72,10 +79,9 @@ class df_converters:
         scale = scale if scale else self.numeric_scale
         offset = offset if offset else self.numeric_offset
         if data.dtype == "object":
-            data = self.to_numeric(data)
+            data = self.to_numeric(data, offset, scale)
 
-        data = offset + data * scale
-        return pd.Series(data, dtype=self.dtype)
+        return data
 
     def object_to_object(self, data, disable_white_strip=False):
         """DOCUMENTATION."""
@@ -83,6 +89,7 @@ class df_converters:
         if data.dtype != "object":
             return data
         data = self.decode(data)
+
         if not disable_white_strip:
             data = data.str.strip()
         else:
@@ -90,8 +97,9 @@ class df_converters:
                 data = data.str.rstrip()
             elif disable_white_strip == "r":
                 data = data.str.lstrip()
+
         return data.apply(
-            lambda x: np.nan if isinstance(x, str) and (x.isspace() or not x) else x
+            lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
         )
 
     def object_to_datetime(self, data, datetime_format="%Y%m%d"):

@@ -7,11 +7,10 @@ import logging
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common.json_dict import get_table_keys
-
-from . import properties
-from .codes import codes
-from .schemas import schemas
+from .. import properties
+from ..codes import codes
+from ..schemas import schemas
+from .utilities import convert_str_boolean
 
 
 def validate_datetime(elements, data):
@@ -30,7 +29,17 @@ def validate_datetime(elements, data):
 
 def validate_numeric(elements, data, schema):
     """DOCUMENTATION."""
+
     # Find thresholds in schema. Flag if not available -> warn
+    def _to_numeric(x):
+        if x is None:
+            return np.nan
+        x = convert_str_boolean(x)
+        if isinstance(x, bool):
+            return x
+        return float(x)
+
+    data[elements] = data[elements].map(_to_numeric)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
     upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
@@ -60,7 +69,7 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
+def validate_codes(elements, data, schema, imodel, ext_table_path):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -77,38 +86,15 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
         )
         if not table:
             continue
-        if supp:
-            key_elements = (
-                [element[1]]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element[1]))
-            )
-        else:
-            key_elements = (
-                [element]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element))
-            )
-        dtypes = {
-            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
-            for x in key_elements
-        }
 
-        table_keys = get_table_keys(table)
-        table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
-        validation_df = data[key_elements]
-        imask = pd.Series(index=data.index, data=True)
-        val = validation_df.notna()
-        val = val.all(axis=1)
-        masked = np.where(val)
-        masked = masked[0]
-        value = validation_df.iloc[masked, :]
-        value = value.astype(dtypes).astype("str")
-        value = value.apply("~".join, axis=1)
-        value = value.isin(table_keys_str)
-        if masked.size != 0:
-            imask.iloc[masked] = value
-        mask[element] = imask
+        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
+
+        table_keys = list(table.keys())
+        validation_df = data[element]
+        value = validation_df.astype(dtype).astype("str")
+        valid = validation_df.notna()
+        mask_ = value.isin(table_keys)
+        mask[element] = mask_.where(valid, True)
 
     return mask
 
@@ -131,9 +117,15 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
     return any(ele_tpl)
 
 
+def _mask_boolean(x, boolean):
+    x = convert_str_boolean(x)
+    if x is boolean:
+        return True
+    return False
+
+
 def validate(
     data,
-    mask0,
     imodel,
     ext_table_path,
     schema,
@@ -145,8 +137,6 @@ def validate(
     ----------
     data: pd.DataFrame
         DataFrame for validation.
-    mask0: pd.DataFrame
-        Boolean mask.
     imodel: str
         Name of internally available input data model.
         e.g. icoads_r300_d704
@@ -169,9 +159,14 @@ def validate(
         filename=None,
     )
     # Check input
-    if not isinstance(data, pd.DataFrame) or not isinstance(mask0, pd.DataFrame):
-        logging.error("Input data and mask must be a pandas data frame object")
+    if not isinstance(data, pd.DataFrame):  # or not isinstance(mask0, pd.DataFrame):
+        # logging.error("Input data and mask must be a pandas data frame object")
+        logging.error("input data must be a pandas DataFrame.")
         return
+
+    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
+    if data.empty:
+        return mask
 
     # Get the data elements from the input data: might be just a subset of
     # data model and flatten the schema to get a simple and sequential list
@@ -193,8 +188,6 @@ def validate(
         validated_columns = list(
             set(numeric_elements + coded_elements + datetime_elements)
         )
-
-    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
 
     mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)
 
@@ -218,19 +211,22 @@ def validate(
         )
 
     # 3. Datetime elements
-    mask[datetime_elements] = validate_datetime(
-        datetime_elements, data
-    )  # data[datetime_elements].notna()
+    mask[datetime_elements] = validate_datetime(datetime_elements, data)
 
     # 4. str elements
     mask[str_elements] = validate_str(str_elements, data)
 
     # 5. Set False values
-    mask0_n = mask0[validated_columns].fillna(False)
     mask[validated_columns] = mask[validated_columns].mask(
-        ~mask0_n,
+        data[validated_columns].map(_mask_boolean, boolean=False),
         False,
     )
+
+    mask[validated_columns] = mask[validated_columns].mask(
+        data[validated_columns].map(_mask_boolean, boolean=True),
+        True,
+    )
+
     for column in disables:
         mask[column] = np.nan
 
