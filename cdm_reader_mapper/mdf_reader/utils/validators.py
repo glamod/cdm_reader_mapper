@@ -7,8 +7,6 @@ import logging
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common.json_dict import get_table_keys
-
 from .. import properties
 from ..codes import codes
 from ..schemas import schemas
@@ -93,21 +91,15 @@ def validate_codes(elements, data, schema, imodel, ext_table_path):
         if not table:
             continue
 
-        key_elements = (
-            [element] if not table.get("_keys") else list(table["_keys"].get(element))
-        )
-        dtypes = {
-            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
-            for x in key_elements
-        }
-        table_keys = get_table_keys(table)
+        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
 
-        validation_df = data[key_elements]
-        value = validation_df.astype(dtypes, errors="ignore").astype("str")
-        valid = validation_df.notna().all(axis=1)
-        value = value.apply("~".join, axis=1)
+        table_keys = list(table.keys())
+        validation_df = data[element]
+        value = validation_df.astype(dtype).astype("str")
+        valid = validation_df.notna()
         mask_ = value.isin(table_keys)
         mask[element] = mask_.where(valid, True)
+
     return mask
 
 

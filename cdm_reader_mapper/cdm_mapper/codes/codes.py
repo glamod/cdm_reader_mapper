@@ -9,13 +9,66 @@ Common Data Model (CMD) tables within the cdm tool.
 
 from __future__ import annotations
 
+import ast
+import datetime
+
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
-    open_code_table,
+    open_json_file,
 )
 
 from .. import properties
+
+
+def _eval(s):
+    try:
+        return ast.literal_eval(s)
+    except (SyntaxError, ValueError):
+        return s
+
+
+def _isvalid(x):
+    try:
+        return int(x)
+    except ValueError:
+        None
+
+
+def _expand_integer_range_key(d):
+    if not isinstance(d, dict):
+        return d
+    d_ = {}
+    for k, v in d.items():
+        k_ = _eval(k)
+        if not isinstance(k_, list):
+            d_[k] = _expand_integer_range_key(v)
+            continue
+        if len(k_) < 2:
+            continue
+        lower = _isvalid(k_[0])
+        upper = k_[1]
+        if upper == "yyyy":
+            upper = datetime.date.today().year
+        upper = _isvalid(upper)
+
+        if len(k_) < 2:
+            step = _isvalid(k[2])
+        else:
+            step = 1
+
+        if None in [lower, upper, step]:
+            continue
+
+        for yr in range(lower, upper + 1, step):
+            d_[str(yr)] = v
+    return d_
+
+
+def open_code_table(ifile):
+    """Open code table from json file on disk."""
+    json_dict = open_json_file(ifile)
+    return _expand_integer_range_key(json_dict)
 
 
 def get_code_table(data_model, *sub_models, code_table=None):

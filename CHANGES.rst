@@ -29,6 +29,7 @@ Breaking changes
 * import ``read`` function from ``mdf_reader.read`` as ``read_mdf`` (:pull:`188`)
 * ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 * ``read_mdf``: remove parameter ``out_path`` to dump attribute information on disk (:pull:`201`)
+* move function ``open_code_table`` from ``common.json_dict`` to ``cdm_mapper.codes.codes`` (:pull:``221`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -49,6 +50,10 @@ Internal changes
 * ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_pandas`` method, to handle looping through rows (:pull:`208`, :pull:`210`)
 * ``mdf_reader``: Refactored ``Configurator`` class, ``Configurator.open_data`` method, to avoid creating a pre-validation missing_value mask (:pull:`216`)
 * ``mdf_reader``: move ``validate`` to ``utils.validators`` (:pull:`216`)
+* ``mdf_reader``: no need for multi-column key codes (e.g. ``("core", "VS")``) (:pull:`221`)
+* ``mdf_reader.utils.validator``: simplify function ``code_validation`` (:pull:`221`)
+* ``cdm_mapper.codes.common``: convert range-key properties to list (:pull:`221`)
+
 
 Bug fixes
 ^^^^^^^^^
