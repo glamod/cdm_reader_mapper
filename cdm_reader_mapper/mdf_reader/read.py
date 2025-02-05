@@ -13,7 +13,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
+from .utils.utilities import convert_str_boolean, validate_arg
 
 
 def _remove_boolean_values(x):
