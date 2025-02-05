@@ -82,9 +82,6 @@ def _code_table(
     code_table,
     logger,
 ):
-    # https://stackoverflow.com/questions/45161220/how-to-map-a-pandas-dataframe-column-to-a-nested-dictionary?rq=1
-    # Approach that does not work when it is not nested...so just try and assume not nested if fails
-    # Prepare code_table
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
     try:
         to_map = to_map.to_frame()
@@ -144,7 +141,7 @@ def _map_data(
         )
     elif elements and not isEmpty:
         data = to_map
-    elif default is not None:  # (value = 0 evals to False!!)
+    elif default is not None:
         data = _default(
             default,
             length,
@@ -173,8 +170,6 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
 
     to_map = None
     if elements:
-        # make sure they are clean and conform to their atts (tie dtypes)
-        # we'll only let map if row complete so mapping functions do not need to worry about handling NA
         logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
         missing_els = [x for x in elements if x not in cols]
         if len(missing_els) > 0:

@@ -16,7 +16,7 @@ from pathlib import Path
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
-    open_code_table,
+    open_json_file,
 )
 
 from .. import properties
@@ -69,7 +69,7 @@ def read_table(
     if isinstance(table_files, Path):
         table_files = [table_files]
     # 2. Get tables
-    tables = [open_code_table(ifile) for ifile in table_files]
+    tables = [open_json_file(ifile) for ifile in table_files]
 
     # 3. Combine tables
     return combine_dicts(tables)
