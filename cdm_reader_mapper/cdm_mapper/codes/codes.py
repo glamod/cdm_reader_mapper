@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import ast
 import datetime
+import logging
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
@@ -20,57 +21,60 @@ from cdm_reader_mapper.common.json_dict import (
 
 from .. import properties
 
+
 def _eval(s):
     try:
-      return ast.literal_eval(s)
-    except SyntaxError:
-      return s
+        return ast.literal_eval(s)
+    except (SyntaxError, ValueError):
+        return s
+
 
 def expand_integer_range_key(d):
-        """DOCUMENTATION."""
-        # Looping based on print_nested above
-        if not isinstance(d, dict):
-            return d
-        d_ = {}
-        for k, v in d.items():
-            k_ = _eval(k)
-            if not isinstance(k_ ,list):
-                return {k: expand_integer_range_key(v)}
+    """DOCUMENTATION."""
+    # Looping based on print_nested above
+    if not isinstance(d, dict):
+        return d
+    d_ = {}
+    for k, v in d.items():
+        k_ = _eval(k)
+        if not isinstance(k_, list):
+            d_[k] = expand_integer_range_key(v)
+            continue
+        try:
+            lower = int(k_[0])
+        except Exception as e:
+            logging.error(f"Lower bound parsing error in range key: {k}")
+            logging.error(e)
+            return
+        upper = k_[1]
+        if upper == "yyyy":
+            upper = datetime.date.today().year
+        else:
             try:
-              lower = int(k_[0])
+                upper = int(upper)
             except Exception as e:
                 logging.error(f"Lower bound parsing error in range key: {k}")
                 logging.error(e)
                 return
-            upper = k_[1]
-            if upper == "yyyy":
-                upper = datetime.date.today().year
-            else:
-                try:
-                    upper = int(upper)
-                except Exception as e:
-                    logging.error(f"Lower bound parsing error in range key: {k}")
-                    logging.error(e)
-                    return
-            if len(k_) > 2:
-                try:
-                    step = int(k_[2])
-                except Exception as e:
-                    logging.error(f"Range step parsing error in range key: {k}")
-                    logging.error(e)
-                    return
-            else:
-                step = 1
-                
-            for yr in range(lower, upper + 1, step):
-                d_[str(yr)] = v
-        return d_
+        if len(k_) > 2:
+            try:
+                step = int(k_[2])
+            except Exception as e:
+                logging.error(f"Range step parsing error in range key: {k}")
+                logging.error(e)
+                return
+        else:
+            step = 1
+
+        for yr in range(lower, upper + 1, step):
+            d_[str(yr)] = v
+    return d_
 
 
 def _open_code_table(ifile):
     json_dict = open_json_file(ifile)
     return expand_integer_range_key(json_dict)
-        
+
 
 def get_code_table(data_model, *sub_models, code_table=None):
     """Load code tables into dictionary.
