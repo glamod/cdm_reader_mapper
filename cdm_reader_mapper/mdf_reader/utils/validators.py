@@ -7,8 +7,6 @@ import logging
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common.json_dict import get_table_keys
-
 from .. import properties
 from ..codes import codes
 from ..schemas import schemas
@@ -71,7 +69,7 @@ def validate_str(elements, data):
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
+def validate_codes(elements, data, schema, imodel, ext_table_path):
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -88,38 +86,15 @@ def validate_codes(elements, data, schema, imodel, ext_table_path, supp=False):
         )
         if not table:
             continue
-        if supp:
-            key_elements = (
-                [element[1]]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element[1]))
-            )
-        else:
-            key_elements = (
-                [element]
-                if not table.get("_keys")
-                else list(table["_keys"].get(element))
-            )
-        dtypes = {
-            x: properties.pandas_dtypes.get(schema.get(x).get("column_type"))
-            for x in key_elements
-        }
 
-        table_keys = get_table_keys(table)
-        table_keys_str = ["~".join(x) if isinstance(x, list) else x for x in table_keys]
-        validation_df = data[key_elements]
-        imask = pd.Series(index=data.index, data=True)
-        val = validation_df.notna()
-        val = val.all(axis=1)
-        masked = np.where(val)
-        masked = masked[0]
-        value = validation_df.iloc[masked, :]
-        value = value.astype(dtypes).astype("str")
-        value = value.apply("~".join, axis=1)
-        value = value.isin(table_keys_str)
-        if masked.size != 0:
-            imask.iloc[masked] = value
-        mask[element] = imask
+        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
+
+        table_keys = list(table.keys())
+        validation_df = data[element]
+        value = validation_df.astype(dtype).astype("str")
+        valid = validation_df.notna()
+        mask_ = value.isin(table_keys)
+        mask[element] = mask_.where(valid, True)
 
     return mask
 
