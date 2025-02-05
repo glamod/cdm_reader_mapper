@@ -128,7 +128,7 @@ def write_data(
         col_ = _join(col)
         header.append(col_)
         info["dtypes"] = _update_col_names(info["dtypes"], col, col_)
-   
+
     info["parse_dates"] = [
         parse_date for parse_date in info["parse_dates"] if parse_date in header
     ]
@@ -143,7 +143,6 @@ def write_data(
     data.to_csv(os.path.join(out_dir, filename_data), **kwargs)
     if not mask.empty:
         mask.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
-
 
     if info:
         with open(os.path.join(out_dir, filename_info), "w") as fileObj:
