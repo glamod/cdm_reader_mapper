@@ -123,7 +123,7 @@ def write_data(
         mask = mask[col_subset]
 
     header = []
-    info["dtypes"] = _update_dtypes(info["dtypes"], data_df.columns)
+    info["dtypes"] = _update_dtypes(info["dtypes"], data.columns)
     for col in data.columns:
         col_ = _join(col)
         header.append(col_)
