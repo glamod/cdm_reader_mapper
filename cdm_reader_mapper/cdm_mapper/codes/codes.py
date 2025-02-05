@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import ast
 import datetime
-import logging
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
@@ -29,51 +28,47 @@ def _eval(s):
         return s
 
 
-def expand_integer_range_key(d):
-    """DOCUMENTATION."""
-    # Looping based on print_nested above
+def _isvalid(x):
+    try:
+        return int(x)
+    except ValueError:
+        None
+
+
+def _expand_integer_range_key(d):
     if not isinstance(d, dict):
         return d
     d_ = {}
     for k, v in d.items():
         k_ = _eval(k)
         if not isinstance(k_, list):
-            d_[k] = expand_integer_range_key(v)
+            d_[k] = _expand_integer_range_key(v)
             continue
-        try:
-            lower = int(k_[0])
-        except Exception as e:
-            logging.error(f"Lower bound parsing error in range key: {k}")
-            logging.error(e)
-            return
+        if len(k_) < 2:
+            continue
+        lower = _isvalid(k_[0])
         upper = k_[1]
         if upper == "yyyy":
             upper = datetime.date.today().year
-        else:
-            try:
-                upper = int(upper)
-            except Exception as e:
-                logging.error(f"Lower bound parsing error in range key: {k}")
-                logging.error(e)
-                return
-        if len(k_) > 2:
-            try:
-                step = int(k_[2])
-            except Exception as e:
-                logging.error(f"Range step parsing error in range key: {k}")
-                logging.error(e)
-                return
+        upper = _isvalid(upper)
+
+        if len(k_) < 2:
+            step = _isvalid(k[2])
         else:
             step = 1
+
+        if None in [lower, upper, step]:
+            continue
 
         for yr in range(lower, upper + 1, step):
             d_[str(yr)] = v
     return d_
 
 
-def _open_code_table(ifile):
+def open_code_table(ifile):
+    """Open code table from json file on disk."""
     json_dict = open_json_file(ifile)
-    return expand_integer_range_key(json_dict)
+    return _expand_integer_range_key(json_dict)
 
 
 def get_code_table(data_model, *sub_models, code_table=None):
@@ -97,5 +92,5 @@ def get_code_table(data_model, *sub_models, code_table=None):
         data_model, *sub_models, base=f"{properties._base}.codes", name=code_table
     )
     table_files = common_files + table_files
-    tables = [_open_code_table(ifile) for ifile in table_files]
+    tables = [open_code_table(ifile) for ifile in table_files]
     return combine_dicts(tables)
