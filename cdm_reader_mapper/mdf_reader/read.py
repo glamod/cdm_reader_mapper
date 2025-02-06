@@ -279,7 +279,6 @@ class MDFFileReader(FileReader):
             convert=convert,
             decode=decode,
         )
-
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
@@ -290,6 +289,7 @@ class MDFFileReader(FileReader):
             columns=self.columns,
             dtypes=self.dtypes,
             parse_dates=self.parse_dates,
+            encoding=self.encoding,
             mask=mask,
             imodel=self.imodel,
         )
@@ -439,20 +439,23 @@ def read_data(
             df = df[col_subset]
         return df
 
-    if info is not None:
-        info_dict = open_json_file(info)
-    else:
+    if info is None:
         info_dict = {}
-    if "dtypes" in info_dict.keys():
-        dtype = info_dict["dtypes"]
     else:
-        dtype = None
-    if "parse_dates" in info_dict.keys():
-        parse_dates = info_dict["parse_dates"]
-    else:
-        parse_dates = False
+        info_dict = open_json_file(info)
 
-    data = _read_csv(data, col_subset=col_subset, dtype=dtype, parse_dates=parse_dates)
+    dtype = info_dict.get("dtypes", "object")
+    parse_dates = info_dict.get("parse_dates", False)
+    encoding = info_dict.get("encoding", "utf-8")
+    print(encoding)
+
+    data = _read_csv(
+        data,
+        col_subset=col_subset,
+        dtype=dtype,
+        parse_dates=parse_dates,
+        encoding=encoding,
+    )
     mask = _read_csv(mask, col_subset=col_subset)
 
     return DataBundle(
@@ -460,6 +463,7 @@ def read_data(
         columns=data.columns,
         dtypes=dtype,
         parse_dates=parse_dates,
+        encoding=encoding,
         mask=mask,
         imodel=imodel,
     )

@@ -128,12 +128,12 @@ class Configurator:
                 "converter_dict": converters,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decoders,
-                # "dtype": dtypes,
             },
             "self": {
                 "dtypes": dtypes,
                 "disable_reads": disable_reads,
                 "parse_dates": parse_dates,
+                "encoding": self.schema["header"].get("encoding", "utf-8"),
             },
         }
 
@@ -142,6 +142,7 @@ class Configurator:
         return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
 
     def _read_line(self, line: str):
+        # print(line)
         i = j = 0
         data_dict = {}
         for order in self.orders:

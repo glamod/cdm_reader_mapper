@@ -64,6 +64,7 @@ def read_tables(
     cdm_subset=None,
     col_subset=None,
     delimiter="|",
+    encoding="utf-8",
     na_values=None,
 ):
     """
@@ -101,6 +102,8 @@ def read_tables(
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
         Default: '|'
+    encoding: str
+        A string representing the encoding to use in the output file, defaults to utf-8.
     na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
         Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
         For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
@@ -162,6 +165,7 @@ def read_tables(
             dtype="object",
             na_values=na_values,
             keep_default_na=False,
+            encoding=encoding,
         )
         if len(dfi) == 0:
             logger.warning(
@@ -179,4 +183,4 @@ def read_tables(
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return DataBundle(tables=merged)
+    return DataBundle(tables=merged, encoding=encoding)

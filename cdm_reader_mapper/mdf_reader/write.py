@@ -33,6 +33,7 @@ def write_data(
     mask=None,
     dtypes={},
     parse_dates=False,
+    encoding="utf-8",
     out_dir=".",
     prefix=None,
     suffix=None,
@@ -56,6 +57,8 @@ def write_data(
         Information of how to parse dates in :py:attr:`data`.
         Dump ``dtypes`` and ``parse_dates`` to json information file.
         For more information see :py:func:`pandas.read_csv`.
+    encoding: str
+        A string representing the encoding to use in the output file, defaults to utf-8.
     out_dir: str
         Path to the output directory.
         Default: current directory
@@ -117,6 +120,7 @@ def write_data(
     info = {}
     info["dtypes"] = dtypes
     info["parse_dates"] = [_join(parse_date) for parse_date in parse_dates]
+    info["encoding"] = encoding
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     filename_data = get_filename(
@@ -150,7 +154,7 @@ def write_data(
         kwargs = {
             "header": header,
             "mode": mode,
-            "encoding": "utf-8",
+            "encoding": encoding,
             "index": False,
             "sep": delimiter,
         }
