@@ -5,7 +5,6 @@ from __future__ import annotations
 import pandas as pd
 
 from .. import properties
-from .utilities import convert_str_boolean
 
 
 class df_converters:
@@ -35,7 +34,6 @@ class df_converters:
         """Convert object type elements of a pandas series to numeric type."""
 
         def _to_numeric(x):
-            x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
             if isinstance(x, str):
@@ -76,11 +74,10 @@ class df_converters:
             Data series of type self.dtype
 
         """
-        scale = scale if scale else self.numeric_scale
-        offset = offset if offset else self.numeric_offset
         if data.dtype == "object":
+            scale = scale if scale else self.numeric_scale
+            offset = offset if offset else self.numeric_offset
             data = self.to_numeric(data, offset, scale)
-
         return data
 
     def object_to_object(self, data, disable_white_strip=False):

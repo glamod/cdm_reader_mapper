@@ -13,11 +13,10 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import convert_str_boolean, validate_arg
+from .utils.utilities import adjust_dtypes, validate_arg
 
 
 def _remove_boolean_values(x):
-    x = convert_str_boolean(x)
     if x is True:
         return
     if x is False:
@@ -86,22 +85,27 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        data = self.convert_and_decode_df(
-            self.data,
+        return self.convert_and_decode_df(
+            data,
             converter_dict,
             converter_kwargs,
             decoder_dict,
         )
-        return data
 
     def validate_entries(self, data, validate):
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
-        if validate is not True:
+        if validate is True:
             return self.validate_df(data)
-        return pd.DataFrame()
+        return pd.DataFrame(columns=data.columns)
+
+    def remove_boolean_values(self, data):
+        """DOCUMENTATION."""
+        data = data.map(_remove_boolean_values)
+        dtypes = adjust_dtypes(self.dtypes, self.columns)
+        return data.astype(dtypes, errors="ignore")
 
     def read(
         self,
@@ -171,11 +175,11 @@ class MDFFileReader(FileReader):
             convert=convert,
             decode=decode,
         )
-
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
         logging.info("Creata output DataBundle object")
+        data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
             columns=self.columns,

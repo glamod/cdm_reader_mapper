@@ -128,7 +128,6 @@ class Configurator:
                 "converter_dict": converters,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decoders,
-                # "dtype": dtypes,
             },
             "self": {
                 "dtypes": dtypes,

@@ -72,17 +72,8 @@ def decode_entries(series, decoder_func):
     return decoder_func(series)
 
 
-def adjust_dtype(dtype, df):
+def adjust_dtypes(dtypes, columns):
     """DOCUMENTATION."""
-    if not isinstance(dtype, dict):
-        return dtype
-    return {k: v for k, v in dtype.items() if k in df.columns}
-
-
-def convert_str_boolean(x):
-    """DOCUMENTATION."""
-    if x == "True":
-        x = True
-    if x == "False":
-        x = False
-    return x
+    if not isinstance(dtypes, dict):
+        return dtypes
+    return {k: v for k, v in dtypes.items() if k in columns}

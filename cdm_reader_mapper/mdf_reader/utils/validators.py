@@ -10,7 +10,6 @@ import pandas as pd
 from .. import properties
 from ..codes import codes
 from ..schemas import schemas
-from .utilities import convert_str_boolean
 
 
 def validate_datetime(elements, data):
@@ -34,7 +33,6 @@ def validate_numeric(elements, data, schema):
     def _to_numeric(x):
         if x is None:
             return np.nan
-        x = convert_str_boolean(x)
         if isinstance(x, bool):
             return x
         return float(x)
@@ -87,11 +85,9 @@ def validate_codes(elements, data, schema, imodel, ext_table_path):
         if not table:
             continue
 
-        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
-
         table_keys = list(table.keys())
         validation_df = data[element]
-        value = validation_df.astype(dtype).astype("str")
+        value = validation_df.astype(str)
         valid = validation_df.notna()
         mask_ = value.isin(table_keys)
         mask[element] = mask_.where(valid, True)
@@ -118,7 +114,6 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
 
 
 def _mask_boolean(x, boolean):
-    x = convert_str_boolean(x)
     if x is boolean:
         return True
     return False
@@ -159,8 +154,7 @@ def validate(
         filename=None,
     )
     # Check input
-    if not isinstance(data, pd.DataFrame):  # or not isinstance(mask0, pd.DataFrame):
-        # logging.error("Input data and mask must be a pandas data frame object")
+    if not isinstance(data, pd.DataFrame):
         logging.error("input data must be a pandas DataFrame.")
         return
 
