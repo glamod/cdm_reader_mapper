@@ -6,10 +6,10 @@ from copy import deepcopy
 
 import pandas as pd
 
-from cdm_reader_mapper.cdm_mapper.map_model import map_model
-from cdm_reader_mapper.cdm_mapper.write import write_tables
+from cdm_reader_mapper.cdm_mapper.mapper import map_model
+from cdm_reader_mapper.cdm_mapper.writer import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
-from cdm_reader_mapper.mdf_reader.write import write_data
+from cdm_reader_mapper.mdf_reader.writer import write_data
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
