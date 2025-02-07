@@ -47,7 +47,7 @@ def _table_to_ascii(
         sep=delimiter,
         header=header,
         mode=wmode,
-        encoding="cp1252",
+        encoding=encoding,
     )
 
 

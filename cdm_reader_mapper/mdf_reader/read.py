@@ -113,7 +113,7 @@ class MDFFileReader(FileReader):
                     data_buffer,
                     header=False,
                     mode="a",
-                    encoding="utf-8",
+                    encoding=self.encoding,
                     index=False,
                     quoting=csv.QUOTE_NONE,
                     sep=properties.internal_delimiter,
@@ -151,7 +151,7 @@ class MDFFileReader(FileReader):
                     data_buffer,
                     header=False,
                     mode="a",
-                    encoding="utf-8",
+                    encoding=self.encoding,
                     index=False,
                 )
             data_buffer.seek(0)
@@ -179,7 +179,7 @@ class MDFFileReader(FileReader):
                     data_buffer,
                     header=False,
                     mode="a",
-                    encoding="utf-8",
+                    encoding=self.encoding,
                     index=False,
                     quoting=csv.QUOTE_NONE,
                     sep=properties.internal_delimiter,
@@ -447,7 +447,6 @@ def read_data(
     dtype = info_dict.get("dtypes", "object")
     parse_dates = info_dict.get("parse_dates", False)
     encoding = info_dict.get("encoding", "utf-8")
-    print(encoding)
 
     data = _read_csv(
         data,
@@ -457,7 +456,6 @@ def read_data(
         encoding=encoding,
     )
     mask = _read_csv(mask, col_subset=col_subset)
-
     return DataBundle(
         data=data,
         columns=data.columns,

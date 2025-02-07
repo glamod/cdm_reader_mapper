@@ -142,7 +142,6 @@ class Configurator:
         return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
 
     def _read_line(self, line: str):
-        # print(line)
         i = j = 0
         data_dict = {}
         for order in self.orders:
