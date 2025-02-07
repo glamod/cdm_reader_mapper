@@ -431,6 +431,8 @@ def read_data(
         return columns_
 
     def _read_csv(ifile, col_subset=None, **kwargs):
+        if ifile is None:
+            return pd.DataFrame()
         if not os.path.isfile(ifile):
             return pd.DataFrame()
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
@@ -446,14 +448,12 @@ def read_data(
 
     dtype = info_dict.get("dtypes", "object")
     parse_dates = info_dict.get("parse_dates", False)
-    encoding = info_dict.get("encoding", "utf-8")
 
     data = _read_csv(
         data,
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,
-        encoding=encoding,
     )
     mask = _read_csv(mask, col_subset=col_subset)
     return DataBundle(
@@ -461,7 +461,6 @@ def read_data(
         columns=data.columns,
         dtypes=dtype,
         parse_dates=parse_dates,
-        encoding=encoding,
         mask=mask,
         imodel=imodel,
     )

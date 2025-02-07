@@ -120,7 +120,6 @@ def write_data(
     info = {}
     info["dtypes"] = dtypes
     info["parse_dates"] = [_join(parse_date) for parse_date in parse_dates]
-    info["encoding"] = encoding
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     filename_data = get_filename(
