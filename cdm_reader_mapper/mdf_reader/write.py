@@ -139,7 +139,7 @@ def write_data(
     kwargs = {
         "header": header,
         "mode": "w",
-        "encoding": "utf-8",
+        "encoding": encoding,
         "index": False,
         "sep": delimiter,
     }
