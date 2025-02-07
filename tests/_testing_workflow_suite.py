@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper import read_mdf, read_tables, read_data
+from cdm_reader_mapper import read_data, read_mdf, read_tables
 
 from ._results import result_data
 from ._utilities import (
