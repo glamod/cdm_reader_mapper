@@ -13,6 +13,7 @@ New features and enhancements
 * Update readthedocs documentation (:issue:`191`, :pull:`197`)
 * new function: ``write_data`` to write MDF data and validation mask according to ``write_tables`` for writing CDM tables (:pull:`201`)
 * new function: ``read_data`` to read MDF data and validation mask according to ``read_tables`` for reading CDM tables (:pull:`201`)
+* new property: DataBundle.encoding (:pull:`222`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -53,13 +54,15 @@ Internal changes
 * ``mdf_reader``: no need for multi-column key codes (e.g. ``("core", "VS")``) (:pull:`221`)
 * ``mdf_reader.utils.validator``: simplify function ``code_validation`` (:pull:`221`)
 * ``cdm_mapper.codes.common``: convert range-key properties to list (:pull:`221`)
+* ``testing_suite``: new chunksize test with icoads_r300_d721 (:pull:`222`)
+* ``mdf_reader``, ``cdm_nmapper``: use model-depending encoding while writing data on disk (:pull:`222`)
 
 
 Bug fixes
 ^^^^^^^^^
 * Solve SettingWithCopyWarning (:issue:`151`, :pull:`184`)
 * ``mdf_reader``: ``utils.converters.decode`` returns values not only None (:pull:`214`)
-* ``mdf_reader``: solving misleading reading due to German "umlauts"(:issue:`212`, :pull:`214`)
+* ``mdf_reader``: solving misleading reading due to German "umlauts"(:issue:`212`, :pull:`214`, :pull:`222`)
 
 1.0.2 (2024-11-13)
 ------------------
