@@ -8,11 +8,11 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-from . import properties
-from ._conversions import converters, iconverters_kwargs
-from ._mapping_functions import mapping_functions
-from .codes.codes import get_code_table
-from .tables.tables import get_cdm_atts, get_imodel_maps
+from .. import properties
+from .conversions import converters, iconverters_kwargs
+from .mapping_functions import mapping_functions
+from ..codes.codes import get_code_table
+from ..tables.tables import get_cdm_atts, get_imodel_maps
 
 
 def drop_duplicates(df):

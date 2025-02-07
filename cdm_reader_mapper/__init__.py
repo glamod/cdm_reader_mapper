@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from .cdm_mapper.mapper import map_model  # noqa
+from .cdm_mapper.map_model import map_model  # noqa
 from .cdm_mapper.properties import cdm_tables  # noqa
-from .cdm_mapper.table_reader import read_tables  # noqa
-from .cdm_mapper.table_writer import write_tables  # noqa
+from .cdm_mapper.read import read_tables  # noqa
+from .cdm_mapper.write import write_tables  # noqa
 from .core import DataBundle  # noqa
 from .data import test_data  # noqa
 from .duplicates.duplicates import DupDetect  # noqa

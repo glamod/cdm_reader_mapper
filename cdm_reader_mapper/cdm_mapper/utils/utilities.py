@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import properties
+from .. import properties
 
 
 def dict_to_tuple_list(dic):

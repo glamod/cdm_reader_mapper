@@ -18,7 +18,7 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
 from . import properties
-from ._mappings import map_and_convert
+from .utils.mappings import map_and_convert
 
 
 def map_model(

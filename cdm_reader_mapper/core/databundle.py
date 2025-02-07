@@ -6,8 +6,8 @@ from copy import deepcopy
 
 import pandas as pd
 
-from cdm_reader_mapper.cdm_mapper.mapper import map_model
-from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
+from cdm_reader_mapper.cdm_mapper.map_model import map_model
+from cdm_reader_mapper.cdm_mapper.write import write_tables
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.mdf_reader.write import write_data
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime

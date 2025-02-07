@@ -53,7 +53,7 @@ from cdm_reader_mapper.common import get_filename, logging_hdlr
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
-from ._utilities import get_cdm_subset, get_usecols
+from .utils.utilities import get_cdm_subset, get_usecols
 
 
 def read_tables(

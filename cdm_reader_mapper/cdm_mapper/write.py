@@ -26,7 +26,7 @@ import pandas as pd
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from ._utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
+from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 from .tables.tables import get_cdm_atts
 
 
