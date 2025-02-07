@@ -278,6 +278,7 @@ def map_and_convert(
     null_label="null",
     logger=None,
 ):
+    """Map and convert MDF data to CDM tables."""
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
 
