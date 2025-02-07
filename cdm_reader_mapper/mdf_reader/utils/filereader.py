@@ -201,11 +201,12 @@ class FileReader:
         open_with="pandas",
     ):
         """DOCUMENTATION."""
+        encoding = self.schema["header"].get("encoding")
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         elif open_with == "pandas":
             TextParser = self._read_pandas(
-                encoding=self.schema["header"].get("encoding"),
+                encoding=encoding,
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
                 chunksize=chunksize,
@@ -223,7 +224,7 @@ class FileReader:
                     data_buffer,
                     header=False,
                     mode="a",
-                    encoding="utf-8",
+                    encoding=encoding,
                     index=False,
                     quoting=csv.QUOTE_NONE,
                     sep=properties.internal_delimiter,

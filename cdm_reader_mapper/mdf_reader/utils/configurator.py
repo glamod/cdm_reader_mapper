@@ -128,12 +128,12 @@ class Configurator:
                 "converter_dict": converters,
                 "converter_kwargs": kwargs,
                 "decoder_dict": decoders,
-                # "dtype": dtypes,
             },
             "self": {
                 "dtypes": dtypes,
                 "disable_reads": disable_reads,
                 "parse_dates": parse_dates,
+                "encoding": self.schema["header"].get("encoding", "utf-8"),
             },
         }
 

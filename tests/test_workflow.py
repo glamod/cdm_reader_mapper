@@ -65,6 +65,7 @@ from ._testing_workflow_suite import _testing_suite
             None,
             {"sections": ["c99"], "chunksize": 3},
         ),
+        ("icoads_r300_d721", None, None, True, None, {"chunksize": 3}),
         (
             "icoads_r300_d702",
             None,
