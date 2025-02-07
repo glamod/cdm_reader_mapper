@@ -4,8 +4,7 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper import read_mdf, read_tables
-from cdm_reader_mapper.mdf_reader.read import read_data
+from cdm_reader_mapper import read_mdf, read_tables, read_data
 
 from ._results import result_data
 from ._utilities import (
@@ -50,6 +49,7 @@ def _testing_suite(
 
     expected_data = getattr(result_data, exp)
     result_data_file = expected_data["data"]
+
     if not os.path.isfile(result_data_file):
         return
 
