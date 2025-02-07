@@ -133,6 +133,7 @@ class Configurator:
                 "dtypes": dtypes,
                 "disable_reads": disable_reads,
                 "parse_dates": parse_dates,
+                "encoding": self.schema["header"].get("encoding", "utf-8"),
             },
         }
 

@@ -29,28 +29,13 @@ from ._utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 from .tables.tables import get_cdm_atts
 
 
-def table_to_ascii(
+def _table_to_ascii(
     data,
     delimiter="|",
+    encoding="utf-8",
     col_subset=None,
     filename=None,
 ):
-    """
-    Export a cdm table to an ascii file.
-
-    Exports tables written in the C3S Climate Data Store Common Data Model (CDM) format to ascii files.
-    The tables format is contained in a python dictionary, stored as an attribute in a ``pandas.DataFrame``.
-
-    Parameters
-    ----------
-    data: pandas.DataFrame
-        pandas.Dataframe to export
-    delimiter: str
-        Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
-        Default: '|'
-    filename: str
-        Name of the output file name(s).
-    """
     data = data.dropna(how="all")
 
     header = True
@@ -61,6 +46,7 @@ def table_to_ascii(
         sep=delimiter,
         header=header,
         mode=wmode,
+        encoding=encoding,
     )
 
 
@@ -74,6 +60,7 @@ def write_tables(
     cdm_subset=None,
     col_subset=None,
     delimiter="|",
+    encoding="utf-8",
 ):
     """Write pandas.DataFrame to CDM-table file on file system.
 
@@ -116,6 +103,8 @@ def write_tables(
     delimiter: str
         Character or regex pattern to treat as the delimiter while reading with df.to_csv.
         Default: '|'
+    encoding: str
+        A string representing the encoding to use in the output file, defaults to utf-8.
 
     See Also
     --------
@@ -160,8 +149,9 @@ def write_tables(
             )
         filename_ = adjust_filename(filename_, table=table, extension=extension)
         logger.info(f"Writing table {table}: {filename_}")
-        table_to_ascii(
+        _table_to_ascii(
             cdm_table,
             delimiter=delimiter,
+            encoding=encoding,
             filename=filename_,
         )
