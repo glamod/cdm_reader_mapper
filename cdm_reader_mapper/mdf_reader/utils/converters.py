@@ -16,21 +16,6 @@ class df_converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
-    def decode(self, data):
-        """Decode object type elements of a pandas series to UTF-8."""
-
-        def _decode(x):
-            if not isinstance(x, str):
-                return x
-
-            try:
-                encoded = x.encode("latin1")
-                return encoded.decode("utf-8")
-            except (UnicodeDecodeError, UnicodeEncodeError):
-                return x
-
-        return data.apply(lambda x: _decode(x))
-
     def to_numeric(self, data, offset, scale):
         """Convert object type elements of a pandas series to numeric type."""
 
@@ -80,24 +65,19 @@ class df_converters:
         offset = offset if offset else self.numeric_offset
         if data.dtype == "object":
             data = self.to_numeric(data, offset, scale)
-
         return data
 
     def object_to_object(self, data, disable_white_strip=False):
         """DOCUMENTATION."""
-        # With strip() an empty element after stripping, is just an empty element, no NaN...
         if data.dtype != "object":
             return data
-        data = self.decode(data)
 
         if not disable_white_strip:
             data = data.str.strip()
-        else:
-            if disable_white_strip == "l":
-                data = data.str.rstrip()
-            elif disable_white_strip == "r":
-                data = data.str.lstrip()
-
+        elif disable_white_strip == "l":
+            data = data.str.rstrip()
+        elif disable_white_strip == "r":
+            data = data.str.lstrip()
         return data.apply(
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
         )
