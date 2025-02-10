@@ -62,16 +62,6 @@ def validate_path(arg_name, arg_value):
     return True
 
 
-def convert_entries(series, converter_func, **kwargs):
-    """DOCUMENTATION."""
-    return converter_func(series, **kwargs)
-
-
-def decode_entries(series, decoder_func):
-    """DOCUMENTATION."""
-    return decoder_func(series)
-
-
 def adjust_dtype(dtype, df):
     """DOCUMENTATION."""
     if not isinstance(dtype, dict):

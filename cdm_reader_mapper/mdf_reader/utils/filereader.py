@@ -14,7 +14,7 @@ import xarray as xr
 from .. import properties
 from ..schemas import schemas
 from .configurator import Configurator
-from .utilities import convert_entries, decode_entries, validate_path
+from .utilities import validate_path
 from .validators import validate
 
 
@@ -167,17 +167,12 @@ class FileReader:
             if section not in df.columns:
                 continue
             if section in decoder_dict.keys():
-                decoded = decode_entries(
-                    df[section],
-                    decoder_dict[section],
-                )
+                decoded = decoder_dict[section](df[section])
                 decoded.index = df[section].index
                 df[section] = decoded
 
-            converted = convert_entries(
-                df[section],
-                converter_dict[section],
-                **converter_kwargs[section],
+            converted = converter_dict[section](
+                df[section], **converter_kwargs[section]
             )
             converted.index = df[section].index
             df[section] = converted
