@@ -73,15 +73,14 @@ class FileReader:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
                 for attr, value in elements[data_var].items():
-                    if value == "__from_file__":
-                        if attr in ds[data_var].attrs:
-                            self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ] = ds[data_var].attrs[attr]
-                        else:
-                            del self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ]
+                    if value != "__from_file__":
+                        continue
+                    if attr in ds[data_var].attrs:
+                        self.schema["sections"][section]["elements"][data_var][attr] = (
+                            ds[data_var].attrs[attr]
+                        )
+                    else:
+                        del self.schema["sections"][section]["elements"][data_var][attr]
 
     def _select_years(self, df):
         def get_years_from_datetime(date):
@@ -141,9 +140,8 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        df = self._select_years(df)
         self.columns = df.columns
-        return df
+        return self._select_years(df)
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
