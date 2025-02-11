@@ -123,6 +123,7 @@ def correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
 
     return data
 
+
 def correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
@@ -162,6 +163,7 @@ def correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
             )
         )
     return data
+
 
 def correct_datetime(data, imodel, log_level="INFO"):
     """Apply ICOADS deck specific datetime corrections.
@@ -220,6 +222,7 @@ def correct_datetime(data, imodel, log_level="INFO"):
             df.to_csv(buffer, header=False, index=False, mode="a")
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)
+
 
 def correct_pt(data, imodel, log_level="INFO"):
     """Apply ICOADS deck specific platform ID corrections.

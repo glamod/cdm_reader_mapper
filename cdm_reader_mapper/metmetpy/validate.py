@@ -60,11 +60,11 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
+from . import properties
 from .datetime import model_datetimes
 
-from . import properties
-
 _base = f"{properties._base}.station_id"
+
 
 def _get_id_col(data, imodel, logger):
     id_col = properties.metadata_datamodels["id"].get(imodel)
@@ -149,6 +149,7 @@ def validate_id(data, imodel, blank=False, log_level="INFO"):
     combined_compiled = re.compile("|".join(patterns))
 
     return idSeries.str.match(combined_compiled, na=na_values)
+
 
 def validate_datetime(data, imodel, log_level="INFO"):
     """DOCUMENTATiON."""
