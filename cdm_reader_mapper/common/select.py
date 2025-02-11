@@ -119,10 +119,7 @@ def select_true(data, mask, out_rejected=False, in_index=False):
     else:
         output = parser(data, mask, out_rejected=out_rejected, in_index=in_index)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output
 
 
 def select_from_list(data, selection, out_rejected=False, in_index=False):
@@ -205,10 +202,7 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
     else:
         output = parser(data, col, values, out_rejected=out_rejected, in_index=in_index)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output
 
 
 def select_from_index(data, index, out_rejected=False):
@@ -256,7 +250,4 @@ def select_from_index(data, index, out_rejected=False):
     else:
         output = parser(data, index, out_rejected=out_rejected)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output
