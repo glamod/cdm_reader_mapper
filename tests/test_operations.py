@@ -4,8 +4,8 @@ import pandas as pd
 import pytest
 
 from cdm_reader_mapper import read_mdf, test_data
+from cdm_reader_mapper.common import replace_columns
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-from cdm_reader_mapper.operations import replace
 
 from ._results import cdm_header, correction_df
 
@@ -89,7 +89,7 @@ def test_inspect_count_by_cat(TextParser):
 def test_replace():
     tables = cdm_header.tables.copy()
     table_df = tables["header"]
-    result = replace.replace_columns(
+    result = replace_columns(
         table_df,
         correction_df,
         pivot_c="report_id",
