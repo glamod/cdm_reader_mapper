@@ -15,7 +15,6 @@ from .. import properties
 from ..schemas import schemas
 from .configurator import Configurator
 from .utilities import validate_path
-from .validators import validate
 
 
 class FileReader:
@@ -152,39 +151,6 @@ class FileReader:
             setattr(self, attr, val)
         del config_dict["self"]
         return config_dict
-
-    def convert_and_decode_df(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ):
-        """DOCUMENTATION."""
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = decoder_dict[section](df[section])
-                decoded.index = df[section].index
-                df[section] = decoded
-
-            converted = converter_dict[section](
-                df[section], **converter_kwargs[section]
-            )
-            converted.index = df[section].index
-            df[section] = converted
-        return df
-
-    def validate_df(self, df, isna=None):
-        """DOCUMENTATION."""
-        return validate(
-            data=df,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
-        )
 
     def open_data(
         self,

@@ -16,16 +16,8 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
-
-
-def _remove_boolean_values(x):
-    x = convert_str_boolean(x)
-    if x is True:
-        return
-    if x is False:
-        return
-    return x
+from .utils.utilities import adjust_dtype, remove_boolean_values, validate_arg
+from .utils.validators import validate
 
 
 class MDFFileReader(FileReader):
@@ -45,6 +37,37 @@ class MDFFileReader(FileReader):
 
     def __init__(self, *args, **kwargs):
         FileReader.__init__(self, *args, **kwargs)
+
+    def _convert_and_decode(
+        self,
+        df,
+        converter_dict,
+        converter_kwargs,
+        decoder_dict,
+    ):
+        for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
+            if section in decoder_dict.keys():
+                decoded = decoder_dict[section](df[section])
+                decoded.index = df[section].index
+                df[section] = decoded
+
+            converted = converter_dict[section](
+                df[section], **converter_kwargs[section]
+            )
+            converted.index = df[section].index
+            df[section] = converted
+        return df
+
+    def _validate(self, df):
+        return validate(
+            data=df,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
+            schema=self.schema,
+            disables=self.disable_reads,
+        )
 
     def convert_and_decode_entries(
         self,
@@ -93,7 +116,7 @@ class MDFFileReader(FileReader):
             decoder_dict = {}
 
         if isinstance(data, pd.DataFrame):
-            data = self.convert_and_decode_df(
+            data = self._convert_and_decode(
                 data,
                 converter_dict,
                 converter_kwargs,
@@ -103,7 +126,7 @@ class MDFFileReader(FileReader):
             data_buffer = StringIO()
             TextParser = make_copy(data)
             for i, df_ in enumerate(TextParser):
-                df = self.convert_and_decode_df(
+                df = self._convert_and_decode(
                     df_,
                     converter_dict,
                     converter_kwargs,
@@ -141,12 +164,12 @@ class MDFFileReader(FileReader):
         if validate is not True:
             mask = pd.DataFrame()
         elif isinstance(data, pd.DataFrame):
-            mask = self.validate_df(data)
+            mask = self._validate(data)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(data)
             for i, df_ in enumerate(TextParser_):
-                mask_ = self.validate_df(df_)
+                mask_ = self._validate(df_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -165,14 +188,14 @@ class MDFFileReader(FileReader):
     def remove_boolean_values(self, data):
         """DOCUMENTATION"""
         if isinstance(data, pd.DataFrame):
-            data = data.map(_remove_boolean_values)
+            data = data.map(remove_boolean_values)
             dtype = adjust_dtype(self.dtypes, data)
             return data.astype(dtype)
         else:
             data_buffer = StringIO()
             TextParser = make_copy(data)
             for i, df_ in enumerate(TextParser):
-                df = df_.map(_remove_boolean_values)
+                df = df_.map(remove_boolean_values)
                 dtype = adjust_dtype(self.dtypes, df)
                 date_columns = []
                 df.to_csv(
