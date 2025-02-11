@@ -111,8 +111,7 @@ def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
 
     pt_col = [col for col in pt_col if col in data.columns]
     if not pt_col:
-        data_columns = list(data.columns)
-        logger.info(f"No platform type found. Selected columns are {data_columns}")
+        logger.info(f"No platform type found. Selected columns are {data.columns}")
         return data
     elif len(pt_col) == 1:
         pt_col = pt_col[0]
@@ -128,12 +127,9 @@ def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
         logger.info(f"Applying fix function {transform}")
         trans = getattr(corr_f_pt.fix_function, transform)
         return trans(data)
-    else:
-        logger.error(
-            'Platform type fix method "{}" not implemented'.format(
-                deck_fix.get("method")
-            )
-        )
+    logger.error(
+        'Platform type fix method "{}" not implemented'.format(deck_fix.get("method"))
+    )
     return data
 
 
@@ -175,8 +171,7 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base):
     correction_method = combine_dicts(replacements_method_files, base=_base)
 
     if isinstance(data, pd.DataFrame):
-        data = _correct_dt(data, imodel, dck, correction_method, log_level="INFO")
-        return data
+        return _correct_dt(data, imodel, dck, correction_method, log_level="INFO")
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
             "chunksize",
@@ -241,8 +236,7 @@ def correct_pt(data, imodel, log_level="INFO", _base=_base):
         return data
 
     if isinstance(data, pd.DataFrame):
-        data = _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
-        return data
+        return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
             "chunksize",

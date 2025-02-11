@@ -90,8 +90,6 @@ def icoads(data, conversion):
         return to_datetime(data)
     elif conversion == "from_datetime":
         return from_datetime(data)
-    else:
-        return
 
 
 # ---------------- Send input to appropriate function -------------------------
@@ -99,13 +97,9 @@ def to_datetime(data, model):
     """DOCUMENTATiON."""
     if model == "icoads":
         return icoads(data, "to_datetime")
-    else:
-        return
 
 
 def from_datetime(data, model):
     """DOCUMENTATiON."""
     if model == "icoads":
         return icoads(data, "from_datetime")
-    else:
-        return
