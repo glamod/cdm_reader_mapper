@@ -56,9 +56,12 @@ will warn and validate all to True, with NaN to False
 
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
 from .datetime import model_datetimes

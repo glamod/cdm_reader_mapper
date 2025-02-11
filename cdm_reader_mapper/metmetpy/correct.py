@@ -54,34 +54,6 @@ If the data model is not available in ./lib or in metadata_models, the module
 will return with no output (will break full processing downstream of its
 invocation) logging an error.
 
-Validate ID field in a pandas DataFrame.
-
-Created on Tue Jun 25 09:00:19 2019
-
-Validates ID field in a pandas dataframe against a list of regex patterns.
-Output is a boolean series.
-
-Does not account for input dataframes/series stored in TextParsers: as opposed
-to correction modules, the output is only a boolean series which is external
-to the input data ....
-
-Validations are dataset and deck specific following patterns stored in
- ./lib/dataset.json.: multiple decks in input data are not supported.
-
-If the dataset is not available in the lib, the module
-will return with no output (will break full processing downstream of its
-invocation) logging an error.
-
-ID corrections assume that the id field read from the source has
-been white space stripped. Care must be taken that the way a data model
-is read before input to this module, is coherent to the way patterns are
-defined for that data model.
-
-NaN: will validate to true if blank pattern ('^$') in list, otherwise to False.
-
-If patterns:{} for dck (empty but defined in data model file),
-will warn and validate all to True, with NaN to False
-
 @author: iregon
 """
 
@@ -101,7 +73,7 @@ from .platform_type import correction_functions as corr_f_pt
 _base = f"{properties._base}"
 
 
-def correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
+def _correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -124,7 +96,7 @@ def correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
     return data
 
 
-def correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
+def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -165,7 +137,7 @@ def correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     return data
 
 
-def correct_datetime(data, imodel, log_level="INFO"):
+def correct_datetime(data, imodel, log_level="INFO", _base=_base):
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
@@ -203,7 +175,7 @@ def correct_datetime(data, imodel, log_level="INFO"):
     correction_method = combine_dicts(replacements_method_files, base=_base)
 
     if isinstance(data, pd.DataFrame):
-        data = correct_dt(data, imodel, dck, correction_method, log_level="INFO")
+        data = _correct_dt(data, imodel, dck, correction_method, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -218,13 +190,13 @@ def correct_datetime(data, imodel, log_level="INFO"):
         buffer = StringIO()
         data_ = pandas_TextParser_hdlr.make_copy(data)
         for df in data_:
-            df = correct_it(df, imodel, dck, correction_method, log_level="INFO")
+            df = _correct_dt(df, imodel, dck, correction_method, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)
 
 
-def correct_pt(data, imodel, log_level="INFO"):
+def correct_pt(data, imodel, log_level="INFO", _base=_base):
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
@@ -269,7 +241,7 @@ def correct_pt(data, imodel, log_level="INFO"):
         return data
 
     if isinstance(data, pd.DataFrame):
-        data = correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
+        data = _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
         return data
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
@@ -283,7 +255,7 @@ def correct_pt(data, imodel, log_level="INFO"):
         read_dict = {x: data.orig_options.get(x) for x in read_params}
         buffer = StringIO()
         for df in data:
-            df = correct_it(df, imodel, dck, pt_col, fix_methods, log_level="INFO")
+            df = _correct_pt(df, imodel, dck, pt_col, fix_methods, log_level="INFO")
             df.to_csv(buffer, header=False, index=False, mode="a")
 
         buffer.seek(0)
