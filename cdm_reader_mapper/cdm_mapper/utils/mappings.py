@@ -106,13 +106,13 @@ def _default(
 def _fill_value(data, fill_value):
     if fill_value is None:
         return data
-    if data is None:
-        return fill_value
+    # if data is None:
+    #    return fill_value
     return data.fillna(value=fill_value)
 
 
 def _map_data(
-    to_map,
+    series,
     transform,
     code_table,
     elements,
@@ -126,7 +126,7 @@ def _map_data(
 ):
     if transform and not isEmpty:
         data = _transform(
-            to_map,
+            series,
             imodel_functions,
             transform,
             kwargs,
@@ -134,23 +134,15 @@ def _map_data(
         )
     elif code_table and not isEmpty:
         data = _code_table(
-            to_map,
+            series,
             imodel_functions.imodel,
             code_table,
             logger=logger,
         )
     elif elements and not isEmpty:
-        data = to_map
-    elif default is not None:
-        data = _default(
-            default,
-            length,
-        )
+        data = series
     else:
-        data = _default(
-            None,
-            length,
-        )
+        data = _default(default, length)
     return _fill_value(data, fill_value)
 
 
@@ -186,7 +178,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
 
         if len(to_map) == 0:
             isEmpty = True
-
+    print(to_map)
     data = _map_data(
         to_map,
         transform,
@@ -200,6 +192,8 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
         len(idata),
         logger,
     )
+    print(data)
+    print("-------------------------------------")
     atts = _decimal_places(atts, decimal_places)
     return data, atts
 
@@ -242,17 +236,16 @@ def _map_and_convert(
     for column in columns:
         if column not in mapping.keys():
             continue
-        else:
-            logger.debug(f"\tElement: {column}")
-            table_df_i[column], atts[column] = _mapping(
-                idata,
-                mapping[column],
-                imodel_functions,
-                atts[column],
-                codes_subset,
-                cols,
-                logger,
-            )
+        logger.debug(f"\tElement: {column}")
+        table_df_i[column], atts[column] = _mapping(
+            idata,
+            mapping[column],
+            imodel_functions,
+            atts[column],
+            codes_subset,
+            cols,
+            logger,
+        )
         table_df_i[column] = _convert_dtype(
             table_df_i[column], atts.get(column), logger
         )
@@ -265,6 +258,7 @@ def _map_and_convert(
     table_df_i = table_df_i.fillna(null_label)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
     cdm_tables[table]["columns"] = table_df_i.columns
+    # exit()
     return cdm_tables
 
 

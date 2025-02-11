@@ -8,13 +8,20 @@ import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.cdm_mapper.writer import write_tables
+from cdm_reader_mapper.common import (
+    count_by_cat,
+    get_length,
+    replace_columns,
+    select_from_index,
+    select_from_list,
+    select_true,
+)
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.mdf_reader.writer import write_data
 from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
 from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
 from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
 from cdm_reader_mapper.metmetpy.station_id.validate import validate as validate_id
-from cdm_reader_mapper.operations import inspect, replace, select
 
 
 class DataBundle:
@@ -81,7 +88,7 @@ class DataBundle:
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        return inspect.get_length(self.data)
+        return get_length(self.data)
 
     def __getitem__(self, item):
         """Make class subscriptable."""
@@ -339,7 +346,7 @@ class DataBundle:
         ----
         For more information see :py:func:`select_true`
         """
-        selected = select.select_true(self._data, self._mask, **kwargs)
+        selected = select_true(self._data, self._mask, **kwargs)
         if overwrite is True:
             self._data = selected[0]
         else:
@@ -387,7 +394,7 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_list`
         """
-        selected = select.select_from_list(self._data, selection, **kwargs)
+        selected = select_from_list(self._data, selection, **kwargs)
         if overwrite is True:
             self._data = selected[0]
         else:
@@ -434,7 +441,7 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_index`
         """
-        selected = select.select_from_index(self._data, index, **kwargs)
+        selected = select_from_index(self._data, index, **kwargs)
         if overwrite is True:
             self._data = selected
         else:
@@ -457,7 +464,7 @@ class DataBundle:
         ----
         For more information see :py:func:`unique`
         """
-        return inspect.count_by_cat(self._data, **kwargs)
+        return count_by_cat(self._data, **kwargs)
 
     def replace_columns(self, df_corr, **kwargs):
         """Replace columns in :py:attr:`data`.
@@ -477,7 +484,7 @@ class DataBundle:
         ----
         For more information see :py:func:`replace_columns`
         """
-        self._data = replace.replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+        self._data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
         self._columns = self._data.columns
         return self
 
