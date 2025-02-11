@@ -64,7 +64,7 @@ def _decimal_places(
 
 
 def _transform(
-    to_map,
+    series,
     imodel_functions,
     transform,
     kwargs,
@@ -73,25 +73,25 @@ def _transform(
     logger.debug(f"\ttransform: {transform}")
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
     trans = getattr(imodel_functions, transform)
-    return trans(to_map, **kwargs)
+    return trans(series, **kwargs)
 
 
 def _code_table(
-    to_map,
+    series,
     data_model,
     code_table,
     logger,
 ):
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
     try:
-        to_map = to_map.to_frame()
+        series = series.to_frame()
     except Exception:
-        logger.warning(f"Could not convert {to_map} to frame.")
+        logger.warning(f"Could not convert {series} to frame.")
 
-    to_map_str = to_map.astype(str)
+    series_str = series.astype(str)
 
-    to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
-    return to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+    series_str.columns = ["_".join(col) for col in series_str.columns.values]
+    return series_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
 
 
 def _default(
@@ -103,51 +103,48 @@ def _default(
     return default
 
 
-def _fill_value(data, fill_value):
+def _fill_value(series, fill_value):
     if fill_value is None:
-        return data
-    # if data is None:
-    #    return fill_value
-    return data.fillna(value=fill_value)
+        return series
+    if series is None:
+        return fill_value
+    return series.fillna(value=fill_value)
 
 
 def _map_data(
     series,
     transform,
     code_table,
-    elements,
     default,
     fill_value,
-    isEmpty,
     imodel_functions,
     kwargs,
     length,
     logger,
 ):
-    if transform and not isEmpty:
-        data = _transform(
+    if series is None:
+        series = _default(default, length)
+    elif series.empty:
+        series = _default(default, length)
+    elif transform:
+        series = _transform(
             series,
             imodel_functions,
             transform,
             kwargs,
             logger=logger,
         )
-    elif code_table and not isEmpty:
-        data = _code_table(
+    elif code_table:
+        series = _code_table(
             series,
             imodel_functions.imodel,
             code_table,
             logger=logger,
         )
-    elif elements and not isEmpty:
-        data = series
-    else:
-        data = _default(default, length)
-    return _fill_value(data, fill_value)
+    return _fill_value(series, fill_value)
 
 
 def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
-    isEmpty = False
     elements = imapping.get("elements")
     transform = imapping.get("transform")
     kwargs = imapping.get("kwargs", {})
@@ -176,24 +173,17 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
         if len(elements) == 1:
             to_map = to_map.iloc[:, 0]
 
-        if len(to_map) == 0:
-            isEmpty = True
-    print(to_map)
     data = _map_data(
         to_map,
         transform,
         code_table,
-        elements,
         default,
         fill_value,
-        isEmpty,
         imodel_functions,
         kwargs,
         len(idata),
         logger,
     )
-    print(data)
-    print("-------------------------------------")
     atts = _decimal_places(atts, decimal_places)
     return data, atts
 
@@ -258,7 +248,6 @@ def _map_and_convert(
     table_df_i = table_df_i.fillna(null_label)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
     cdm_tables[table]["columns"] = table_df_i.columns
-    # exit()
     return cdm_tables
 
 
