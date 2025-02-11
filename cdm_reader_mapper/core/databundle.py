@@ -158,29 +158,6 @@ class DataBundle:
         self._imodel = value
 
     @property
-    def selected(self):
-        """Selection of :py:attr:`data`.
-
-        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
-
-        * :py:func:`DataBundle.select_true`
-        * :py:func:`DataBundle.select_from_list`
-        * :py:func:`DataBundle.select_from_index`
-        """
-        return self._return_property("_selected")
-
-    @property
-    def deselected(self):
-        """Non-selection of :py:attr:`data`.
-
-        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
-
-        * :py:func:`DataBundle.select_true`
-        * :py:func:`DataBundle.select_from_list`
-        """
-        return self._return_property("_deselected")
-
-    @property
     def tables(self):
         """CDM tables."""
         return self._return_property("_tables")
@@ -318,8 +295,7 @@ class DataBundle:
         ----------
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
+            else return list containing both DataFrame with true and DataFrame with invalid rows.
             Default: True
 
         Note
@@ -335,9 +311,7 @@ class DataBundle:
 
         Select valid values only without overwriting the old data.
 
-        >>> db.select_true(overwrite=False)
-        >>> true_values = db.selected
-        >>> false_values = db.deselected
+        >>> true_values, false_values = db.select_true(overwrite=False)
 
         See Also
         --------
@@ -351,10 +325,8 @@ class DataBundle:
         selected = select_true(self._data, self._mask, **kwargs)
         if overwrite is True:
             self._data = selected[0]
-        else:
-            self._selected = selected[0]
-        self._deselected = selected[1]
-        return self
+            return self
+        return selected
 
     def select_from_list(self, selection, overwrite=True, **kwargs):
         """Select columns from :py:attr:`data` with specific values.
@@ -366,8 +338,7 @@ class DataBundle:
             Values: values in keys to be selected
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
+            else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: True
 
         Note
@@ -383,9 +354,9 @@ class DataBundle:
 
         Select specific columns without overwriting the old data.
 
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, overwrite=False)
-        >>> true_values = db.selected
-        >>> false_values = db.deselected
+        >>> true_values, false_values = db.select_from_list(
+        ...     selection={("c1", "B1"): [26, 41]}, overwrite=False
+        ... )
 
         See Also
         --------
@@ -399,10 +370,8 @@ class DataBundle:
         selected = select_from_list(self._data, selection, **kwargs)
         if overwrite is True:
             self._data = selected[0]
-        else:
-            self._selected = selected[0]
-        self._deselected = selected[1]
-        return self
+            return self
+        return selected
 
     def select_from_index(self, index, overwrite=True, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
@@ -413,8 +382,7 @@ class DataBundle:
             Indexes to be selected.
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
+            else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: True
 
         Note
@@ -430,9 +398,7 @@ class DataBundle:
 
         Select specific columns without overwriting the old data.
 
-        >>> db.select_from_index([0, 2, 4], overwrite=False)
-        >>> true_values = db.selected
-        >>> false_values = db.deselected
+        >>> true_values, false_values = db.select_from_index([0, 2, 4], overwrite=False)
 
         See Also
         --------
@@ -445,10 +411,9 @@ class DataBundle:
         """
         selected = select_from_index(self._data, index, **kwargs)
         if overwrite is True:
-            self._data = selected
-        else:
-            self._selected = selected
-        return self
+            self._data = selected[0]
+            return self
+        return selected
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
@@ -679,8 +644,8 @@ class DataBundle:
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite :py:attr:`tables` in DataBundle.
-            Else set new attribute :py:attr:`tables_dups_flagged` containing flagged duplicates.
+            If ``True`` overwrite :py:attr:`tables` in DataBundle
+            else return DataFrame containing flagged duplicates.
             Default: True
 
         Note
@@ -696,8 +661,7 @@ class DataBundle:
 
         Flag duplicates without overwriting :py:attr:`tables`.
 
-        >>> db.flag_duplicates()
-        >>> flagged_tables = db.tables_dups_flagged
+        >>> flagged_tables = db.flag_duplicates(overwrite=False)
 
         See Also
         --------
@@ -714,9 +678,8 @@ class DataBundle:
         df_["header"] = self.DupDetect.result
         if overwrite is True:
             self._tables = df_
-        else:
-            self._tables_dups_flagged = df_
-        return self
+            return self
+        return df_
 
     def get_duplicates(self, **kwargs):
         """Get duplicate matches in :py:attr:`tables`.
@@ -752,8 +715,8 @@ class DataBundle:
         Parameters
         ----------
         overwrite: bool
-            If ``True`` overwrite :py:attr:`tables` in :py:class:`cdm_reader_mapper.DataBundle`.
-            Else set new attribute :py:attr:`tables_dups_removed` containing flagged duplicates.
+            If ``True`` overwrite :py:attr:`tables` in :py:class:`cdm_reader_mapper.DataBundle`
+            else return DataFrame containing non-duplicate rows.
             Default: True
 
         Note
@@ -769,8 +732,7 @@ class DataBundle:
 
         Remove duplicates without overwriting :py:attr:`tables`.
 
-        >>> db.remove_duplicates()
-        >>> removed_tables = db.tables_dups_removed
+        >>> removed_tables = db.remove_duplicates(overwrite=False)
 
         See Also
         --------
@@ -788,6 +750,5 @@ class DataBundle:
         df_ = df_[df_.index.isin(header_.index)]
         if overwrite is True:
             self._tables = df_
-        else:
-            self._tables_dups_removed = df_
-        return self
+            return self
+        return df_

@@ -25,10 +25,10 @@ def _get_data(TextParser, **kwargs):
 @pytest.mark.parametrize("TextParser", [True, False])
 def test_select_true(TextParser):
     read_ = _get_data(TextParser, sections=["c99_data"])
-    read_.select_true(overwrite=False, out_rejected=True)
+    result = read_.select_true(overwrite=False, out_rejected=True)
+    selected = result[0]
+    deselected = result[1]
     data = read_.data
-    selected = read_.selected
-    deselected = read_.deselected
 
     if TextParser is True:
         data = make_copy(data).read()
@@ -44,27 +44,29 @@ def test_select_true(TextParser):
 @pytest.mark.parametrize("TextParser", [False, True])
 def test_select_from_index(TextParser):
     read_ = _get_data(TextParser)
-    read_.select_from_index([0, 2, 4], overwrite=False)
+    result = read_.select_from_index([0, 2, 4], overwrite=False)
     data = read_.data
-    result = read_.selected
+    selected = result[0]
 
     if TextParser is True:
         data = make_copy(data).read()
-        result = make_copy(result).read()
+        selected = make_copy(selected).read()
 
     idx = data.index.isin([0, 2, 4])
     exp = data[idx].reset_index(drop=True)
-    pd.testing.assert_frame_equal(exp, result)
+    pd.testing.assert_frame_equal(exp, selected)
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
 def test_select_from_list(TextParser):
     read_ = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
-    read_.select_from_list(selection, overwrite=False, out_rejected=True, in_index=True)
+    result = read_.select_from_list(
+        selection, overwrite=False, out_rejected=True, in_index=True
+    )
+    selected = result[0]
+    deselected = result[1]
     data = read_.data
-    selected = read_.selected
-    deselected = read_.deselected
 
     if TextParser is True:
         data = make_copy(data).read()

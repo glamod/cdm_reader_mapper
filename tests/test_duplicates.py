@@ -89,8 +89,8 @@ def test_duplicates_flag(
         ignore_entries=ignore_entries,
         offsets=offsets,
     )
-    cdm_icoads.flag_duplicates(overwrite=False)
-    result = cdm_icoads.tables_dups_flagged["header"]
+    tables_dups_flagged = cdm_icoads.flag_duplicates(overwrite=False)
+    result = tables_dups_flagged["header"]
     assert_array_equal(result["duplicate_status"], expected["duplicate_status"])
     assert_array_equal(result["report_quality"], expected["report_quality"])
     assert_array_equal(result["duplicates"], expected["duplicates"])
@@ -104,9 +104,9 @@ def test_duplicates_remove():
             "station_course": "null",
         },
     )
-    cdm_icoads.remove_duplicates(overwrite=False)
+    tables_dups_removed = cdm_icoads.remove_duplicates(overwrite=False)
     expected = cdm_icoads.tables.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
-    assert_frame_equal(expected, cdm_icoads.tables_dups_removed)
+    assert_frame_equal(expected, tables_dups_removed)
 
 
 def test_duplicates_craid():
