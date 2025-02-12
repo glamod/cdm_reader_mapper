@@ -7,12 +7,12 @@ import os
 
 
 def convert_dtypes(dtypes):
-    """DOCUMENTATION."""
+    """Convert datetime to object."""
     parse_dates = []
-    for i, element in enumerate(list(dtypes)):
-        if dtypes[element] == "datetime":
-            parse_dates.append(element)
-            dtypes[element] = "object"
+    for key, value in dtypes.items():
+        if value == "datetime":
+            parse_dates.append(key)
+            dtypes[key] = "object"
     return dtypes, parse_dates
 
 
@@ -62,27 +62,27 @@ def validate_path(arg_name, arg_value):
     return True
 
 
-def convert_entries(series, converter_func, **kwargs):
-    """DOCUMENTATION."""
-    return converter_func(series, **kwargs)
-
-
-def decode_entries(series, decoder_func):
-    """DOCUMENTATION."""
-    return decoder_func(series)
-
-
 def adjust_dtype(dtype, df):
-    """DOCUMENTATION."""
+    """Adjust dtypes to DataFrame."""
     if not isinstance(dtype, dict):
         return dtype
     return {k: v for k, v in dtype.items() if k in df.columns}
 
 
 def convert_str_boolean(x):
-    """DOCUMENTATION."""
+    """Convert str boolean value to boolean value."""
     if x == "True":
         x = True
     if x == "False":
         x = False
+    return x
+
+
+def remove_boolean_values(x):
+    """Remove boolean values."""
+    x = convert_str_boolean(x)
+    if x is True:
+        return
+    if x is False:
+        return
     return x

@@ -14,8 +14,7 @@ import xarray as xr
 from .. import properties
 from ..schemas import schemas
 from .configurator import Configurator
-from .utilities import convert_entries, decode_entries, validate_path
-from .validators import validate
+from .utilities import validate_path
 
 
 class FileReader:
@@ -73,15 +72,14 @@ class FileReader:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
                 for attr, value in elements[data_var].items():
-                    if value == "__from_file__":
-                        if attr in ds[data_var].attrs:
-                            self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ] = ds[data_var].attrs[attr]
-                        else:
-                            del self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ]
+                    if value != "__from_file__":
+                        continue
+                    if attr in ds[data_var].attrs:
+                        self.schema["sections"][section]["elements"][data_var][attr] = (
+                            ds[data_var].attrs[attr]
+                        )
+                    else:
+                        del self.schema["sections"][section]["elements"][data_var][attr]
 
     def _select_years(self, df):
         def get_years_from_datetime(date):
@@ -141,9 +139,8 @@ class FileReader:
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        df = self._select_years(df)
         self.columns = df.columns
-        return df
+        return self._select_years(df)
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -154,44 +151,6 @@ class FileReader:
             setattr(self, attr, val)
         del config_dict["self"]
         return config_dict
-
-    def convert_and_decode_df(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ):
-        """DOCUMENTATION."""
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = decode_entries(
-                    df[section],
-                    decoder_dict[section],
-                )
-                decoded.index = df[section].index
-                df[section] = decoded
-
-            converted = convert_entries(
-                df[section],
-                converter_dict[section],
-                **converter_kwargs[section],
-            )
-            converted.index = df[section].index
-            df[section] = converted
-        return df
-
-    def validate_df(self, df, isna=None):
-        """DOCUMENTATION."""
-        return validate(
-            data=df,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
-        )
 
     def open_data(
         self,

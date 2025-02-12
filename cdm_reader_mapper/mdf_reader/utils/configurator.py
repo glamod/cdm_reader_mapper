@@ -212,8 +212,7 @@ class Configurator:
                     j += len(delimiter)
                 i = j
 
-        df = pd.Series(data_dict)
-        return df
+        return pd.Series(data_dict)
 
     def open_netcdf(self):
         """Open netCDF to pd.Series."""
@@ -258,8 +257,7 @@ class Configurator:
         attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
         df = df.rename(columns=renames)
         df = df.assign(**attrs)
-        for column in disables:
-            df[column] = np.nan
+        df[disables] = np.nan
         df = df.apply(lambda x: replace_empty_strings(x))
         df[missing_values] = False
         return df
