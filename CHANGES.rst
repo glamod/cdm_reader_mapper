@@ -14,6 +14,7 @@ New features and enhancements
 * new function: ``write_data`` to write MDF data and validation mask according to ``write_tables`` for writing CDM tables (:pull:`201`)
 * new function: ``read_data`` to read MDF data and validation mask according to ``read_tables`` for reading CDM tables (:pull:`201`)
 * new property: DataBundle.encoding (:pull:`222`)
+* add overwrite option to some DataBundel method functions (:pull:`224`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -31,6 +32,11 @@ Breaking changes
 * ``read_mdf``: returning ``DataBundle`` object (:pull:`188`)
 * ``read_mdf``: remove parameter ``out_path`` to dump attribute information on disk (:pull:`201`)
 * move function ``open_code_table`` from ``common.json_dict`` to ``cdm_mapper.codes.codes`` (:pull:``221`)
+* ``operations`` to ``common`` (:pull:`224`)
+* ``cdm_mapper``: rename table_writer to writer and table_reader to reader (:pull:`224`)
+* ``mdf_reader``: rename write to writer and read to reader (:pull:`224`)
+* ``metmetpy``: gather correction functions to correct module and validation functions to validate module (:pull:`224`)
+* ``DataBundle``: remove properties selected, deselected, tables_dup_flagged and tables_dups_removed (:pull:`224`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -56,6 +62,7 @@ Internal changes
 * ``cdm_mapper.codes.common``: convert range-key properties to list (:pull:`221`)
 * ``testing_suite``: new chunksize test with icoads_r300_d721 (:pull:`222`)
 * ``mdf_reader``, ``cdm_nmapper``: use model-depending encoding while writing data on disk (:pull:`222`)
+* code restructuring (:pull:``224`)
 
 
 Bug fixes
