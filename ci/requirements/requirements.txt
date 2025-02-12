@@ -1,5 +1,6 @@
 matplotlib
 pandas>=2.1.0
+polars
 dask
 distributed
 datashader

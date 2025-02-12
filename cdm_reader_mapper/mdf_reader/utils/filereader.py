@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import csv
 import logging
 import os
 from copy import deepcopy
-from io import StringIO
 
-import pandas as pd
+import polars as pl
 import xarray as xr
 
 from .. import properties
@@ -83,39 +81,68 @@ class FileReader:
                                 attr
                             ]
 
-    def _select_years(self, df):
-        def get_years_from_datetime(date):
-            try:
-                return date.year
-            except AttributeError:
-                return date
-
+    def _select_years(self, df: pl.DataFrame) -> pl.DataFrame:
         if self.year_init is None and self.year_end is None:
             return df
 
+        if self.imodel is None:
+            logging.error("Selection of years is not supported for custom schema")
+            return df
+
         data_model = self.imodel.split("_")[0]
-        dates = df[properties.year_column[data_model]]
-        years = dates.apply(lambda x: get_years_from_datetime(x))
-        years = years.astype(int)
+        dates = df.get_column(properties.year_column[data_model])
+        if dates.dtype == pl.Datetime:
+            years = dates.dt.year()
+        else:
+            years = dates.cast(pl.Int64, strict=False)
 
-        mask = pd.Series([True] * len(years))
-        if self.year_init:
-            mask[years < self.year_init] = False
-        if self.year_end:
-            mask[years > self.year_end] = False
+        mask = pl.repeat(True, df.height, eager=True)
+        if self.year_init and self.year_end:
+            mask = years.is_between(self.year_init, self.year_end, closed="both")
+        elif self.year_init:
+            mask = years.ge(self.year_init)
+        elif self.year_end:
+            mask = years.le(self.year_end)
 
-        index = mask[mask].index
-        return df.iloc[index].reset_index(drop=True)
+        return df.filter(mask)
 
-    def _read_pandas(self, **kwargs):
-        return pd.read_fwf(
+    # def _read_pandas(self, **kwargs):
+    #     return pd.read_fwf(
+    #         self.source,
+    #         header=None,
+    #         quotechar="\0",
+    #         escapechar="\0",
+    #         dtype=object,
+    #         skip_blank_lines=False,
+    #         widths=[properties.MAX_FULL_REPORT_WIDTH],
+    #         **kwargs,
+    #     )
+    #
+    def _read_fwf_polars(self, **kwargs):
+        if "chunksize" in kwargs:
+            logging.warning("Chunking not supported by polars reader")
+            # batch_size = kwargs["chunksize"]
+            del kwargs["chunksize"]
+            # return pl.read_csv_batched(
+            #     self.source,
+            #     has_header=False,
+            #     separator="\0",
+            #     new_columns=["full_str"],
+            #     quote_char="\0",
+            #     infer_schema_length=0,
+            #     batch_size=batch_size,
+            #     **kwargs,
+            # )
+        return pl.read_csv(
             self.source,
-            header=None,
-            quotechar="\0",
-            escapechar="\0",
-            dtype=object,
-            skip_blank_lines=False,
+            has_header=False,
+            separator="\0",
+            new_columns=["full_str"],
+            quote_char="\0",
+            infer_schema=False,
             **kwargs,
+        ).select(
+            pl.col("full_str").str.head(properties.MAX_FULL_REPORT_WIDTH).name.keep()
         )
 
     def _read_netcdf(self, **kwargs):
@@ -130,19 +157,27 @@ class FileReader:
         valid,
         open_with,
     ):
-        if open_with == "pandas":
+        if open_with == "polars":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_pandas()
+            ).open_polars()
+        # elif open_with == "pandas":
+        #     df = Configurator(
+        #         df=TextParser, schema=self.schema, order=order, valid=valid
+        #     ).open_pandas()
         elif open_with == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
 
-        df = self._select_years(df)
+        # missing_values = df.select(["index", "missing_values"]).pipe(set_missing_values)
+        df = df.drop("missing_values").pipe(self._select_years)
+
         self.columns = df.columns
+        # Replace None with NaN - is this necessary for polars?
+        # df = df.where(df.notnull(), np.nan)
         return df
 
     def get_configurations(self, order, valid):
@@ -171,16 +206,16 @@ class FileReader:
                     df[section],
                     decoder_dict[section],
                 )
-                decoded.index = df[section].index
-                df[section] = decoded
+                # decoded.index = df[section].index
+                df = df.with_columns(decoded.alias(section))
 
             converted = convert_entries(
                 df[section],
                 converter_dict[section],
                 **converter_kwargs[section],
             )
-            converted.index = df[section].index
-            df[section] = converted
+            # converted.index = df[section].index
+            df = df.with_columns(converted.alias(section))
         return df
 
     def validate_df(self, df, isna=None):
@@ -197,49 +232,51 @@ class FileReader:
         self,
         order,
         valid,
-        chunksize,
-        open_with="pandas",
+        # chunksize,
+        open_with="polars",
     ):
         """DOCUMENTATION."""
         encoding = self.schema["header"].get("encoding")
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
-        elif open_with == "pandas":
-            TextParser = self._read_pandas(
+        # NOTE: Chunking - polars does have pl.read_csv_batched, but batch_size
+        # is not respected: https://github.com/pola-rs/polars/issues/19978
+        # alternative: lazy?
+        elif open_with == "polars":
+            TextParser = self._read_fwf_polars(
                 encoding=encoding,
-                widths=[properties.MAX_FULL_REPORT_WIDTH],
-                skiprows=self.skiprows,
-                chunksize=chunksize,
+                skip_rows=self.skiprows,
+                # chunksize=chunksize,
             )
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
-
-        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            return self._read_sections(TextParser, order, valid, open_with=open_with)
-        else:
-            data_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df = self._read_sections(df_, order, valid, open_with=open_with)
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data
+            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
+        # if isinstance(TextParser, (pl.DataFrame, xr.Dataset)):
+        df = self._read_sections(TextParser, order, valid, open_with=open_with)
+        return df
+        # else:
+        #     data_buffer = StringIO()
+        #     for i, df_ in enumerate(TextParser):
+        #         df = self._read_sections(df_, order, valid, open_with=open_with)
+        #         df.to_csv(
+        #             data_buffer,
+        #             header=False,
+        #             mode="a",
+        #             encoding="utf-8",
+        #             index=False,
+        #             quoting=csv.QUOTE_NONE,
+        #             sep=properties.internal_delimiter,
+        #             quotechar="\0",
+        #             escapechar="\0",
+        #         )
+        #     data_buffer.seek(0)
+        #     data = pd.read_csv(
+        #         data_buffer,
+        #         names=df.columns,
+        #         chunksize=self.chunksize,
+        #         dtype=object,
+        #         parse_dates=self.parse_dates,
+        #         delimiter=properties.internal_delimiter,
+        #         quotechar="\0",
+        #         escapechar="\0",
+        #     )
+        #     return data

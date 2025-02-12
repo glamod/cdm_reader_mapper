@@ -87,7 +87,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path):
         if not table:
             continue
 
-        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
+        dtype = properties.polars_dtypes.get(schema.get(element).get("column_type"))
 
         table_keys = list(table.keys())
         validation_df = data[element]

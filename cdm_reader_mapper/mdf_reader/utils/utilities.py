@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 import os
 
+import polars as pl
+
 
 def convert_dtypes(dtypes):
     """DOCUMENTATION."""

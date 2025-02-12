@@ -9,6 +9,7 @@ import os
 from io import StringIO as StringIO
 
 import pandas as pd
+import polars as pl
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
@@ -92,45 +93,12 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        if isinstance(data, pd.DataFrame):
-            data = self.convert_and_decode_df(
-                data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-            )
-        else:
-            data_buffer = StringIO()
-            TextParser = make_copy(data)
-            for i, df_ in enumerate(TextParser):
-                df = self.convert_and_decode_df(
-                    df_,
-                    converter_dict,
-                    converter_kwargs,
-                    decoder_dict,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
+        data = self.convert_and_decode_df(
+            data,
+            converter_dict,
+            converter_kwargs,
+            decoder_dict,
+        )
         return data
 
     def validate_entries(self, data, validate):
@@ -164,6 +132,8 @@ class MDFFileReader(FileReader):
 
     def remove_boolean_values(self, data):
         """DOCUMENTATION"""
+        if isinstance(data, pl.DataFrame):
+            return data
         if isinstance(data, pd.DataFrame):
             data = data.map(_remove_boolean_values)
             dtype = adjust_dtype(self.dtypes, data)
@@ -268,8 +238,8 @@ class MDFFileReader(FileReader):
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
-            open_with=properties.open_file.get(self.imodel, "pandas"),
-            chunksize=chunksize,
+            # open_with=properties.open_file.get(self.imodel, "pandas"),
+            open_with=properties.open_file.get(self.imodel, "polars"),
         )
 
         # 2.3. Extract, read and validate data in same loop
@@ -282,7 +252,7 @@ class MDFFileReader(FileReader):
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
-        logging.info("Creata output DataBundle object")
+        logging.info("Create output DataBundle object")
         data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
