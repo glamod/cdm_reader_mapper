@@ -7,7 +7,7 @@ from .cdm_mapper.properties import cdm_tables  # noqa
 from .cdm_mapper.reader import read_tables  # noqa
 from .cdm_mapper.writer import write_tables  # noqa
 from .common import count_by_cat as unique  # noqa
-from .common import (  # # noqa
+from .common import (  # noqa
     replace_columns,
     select_from_index,
     select_from_list,

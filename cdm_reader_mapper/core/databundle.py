@@ -166,22 +166,6 @@ class DataBundle:
     def tables(self, value):
         self._tables = value
 
-    @property
-    def tables_dups_flagged(self):
-        """Flagged duplicates of :py:attr:`tables`.
-
-        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.flag_duplicates`.
-        """
-        return self._return_property("_tables_dups_flagged")
-
-    @property
-    def tables_dups_removed(self):
-        """Removed duplicates of :py:attr:`tables`.
-
-        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.remove_duplicates`.
-        """
-        return self._return_property("_tables_dups_removed")
-
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
 
@@ -455,8 +439,15 @@ class DataBundle:
         self._columns = self._data.columns
         return self
 
-    def correct_datetime(self):
+    def correct_datetime(self, overwrite=True):
         """Correct datetime information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        overwrite: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else return datetime-corretcted DataFrame.
+            Default: True
 
         Examples
         --------
@@ -472,8 +463,11 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_datetime`
         """
-        self._data = correct_datetime(self._data, self._imodel)
-        return self
+        _data = correct_datetime(self._data, self._imodel)
+        if overwrite is True:
+            self._data = _data
+            return self
+        return _data
 
     def validate_datetime(self):
         """Validate datetime information in :py:attr:`data`.
@@ -501,9 +495,15 @@ class DataBundle:
         """
         return validate_datetime(self._data, self._imodel)
 
-    def correct_pt(self):
+    def correct_pt(self, overwrite=True):
         """Correct platform type information in :py:attr:`data`.
 
+        Parameters
+        ----------
+        overwrite: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else return platform-corretcted DataFrame.
+            Default: True
 
         Examples
         --------
@@ -519,8 +519,11 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_pt`
         """
-        self._data = correct_pt(self._data, self._imodel)
-        return self
+        _data = correct_pt(self._data, self._imodel)
+        if overwrite is True:
+            self._data = _data
+            return self
+        return _data
 
     def validate_id(self, **kwargs):
         """Validate station id information in :py:attr:`data`.
