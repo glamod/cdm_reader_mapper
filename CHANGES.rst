@@ -63,6 +63,7 @@ Internal changes
 * ``testing_suite``: new chunksize test with icoads_r300_d721 (:pull:`222`)
 * ``mdf_reader``, ``cdm_nmapper``: use model-depending encoding while writing data on disk (:pull:`222`)
 * code restructuring (:pull:``224`)
+* remove unused functions and methods (:pull:`224`)
 
 
 Bug fixes
