@@ -236,6 +236,7 @@ class FileReader:
         open_with="polars",
     ):
         """DOCUMENTATION."""
+        encoding = self.schema["header"].get("encoding")
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         # NOTE: Chunking - polars does have pl.read_csv_batched, but batch_size
@@ -243,13 +244,12 @@ class FileReader:
         # alternative: lazy?
         elif open_with == "polars":
             TextParser = self._read_fwf_polars(
-                encoding=self.schema["header"].get("encoding"),
+                encoding=encoding,
                 skip_rows=self.skiprows,
                 # chunksize=chunksize,
             )
         else:
             raise ValueError("open_with has to be one of ['polars', 'netcdf']")
-
         # if isinstance(TextParser, (pl.DataFrame, xr.Dataset)):
         df = self._read_sections(TextParser, order, valid, open_with=open_with)
         return df

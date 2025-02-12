@@ -65,6 +65,7 @@ class DataBundle:
         columns=None,
         dtypes=None,
         parse_dates=None,
+        encoding=None,
         mask=None,
         imodel=None,
         tables=None,
@@ -73,6 +74,7 @@ class DataBundle:
         self._columns = columns
         self._dtypes = dtypes
         self._parse_dates = parse_dates
+        self._encoding = encoding
         self._mask = mask
         self._imodel = imodel
         self._tables = tables
@@ -117,6 +119,16 @@ class DataBundle:
         :py:func:pandas.`read_csv`
         """
         return self._return_property("_parse_dates")
+
+    @property
+    def encoding(self):
+        """A string representing the encoding to use in the :py:attr:`data`.
+
+        See Also
+        --------
+        :py:func:pandas.`to_csv`
+        """
+        return self._return_property("_encoding")
 
     @property
     def mask(self):
@@ -584,6 +596,7 @@ class DataBundle:
             mask=self._mask,
             dtypes=self._dtypes,
             parse_dates=self._parse_dates,
+            encoding=self._encoding,
             **kwargs,
         )
 
@@ -624,7 +637,7 @@ class DataBundle:
         ----
         For more information see :py:func:`write_tables`
         """
-        write_tables(self._tables, **kwargs)
+        write_tables(self._tables, encoding=self._encoding, **kwargs)
 
     def duplicate_check(self, **kwargs):
         """Duplicate check in :py:attr:`tables`.
