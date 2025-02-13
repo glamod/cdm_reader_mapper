@@ -8,15 +8,6 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-# Need to define a general thing for the parser() functions, like we did with
-# the dataframe_apply_index(), because they are all the same but for the
-# selection applied!!!!!
-
-#    The index of the resulting dataframe(s) is reinitialized here, it does not
-#    inherit from parent df
-#
-#    data is a dataframe
-
 
 def dataframe_apply_index(
     df,
