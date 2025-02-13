@@ -107,4 +107,4 @@ def select_from_index(data, index, out_rejected=False):
             idx_out_offset=idx_out_offset,
         )
 
-    return dataframe(data, index, out_rejected=out_rejected)[0]
+    return dataframe(data, index, out_rejected=out_rejected)

@@ -4,7 +4,7 @@ import pandas as pd
 import pytest  # noqa
 
 from cdm_reader_mapper import read_mdf, test_data
-from cdm_reader_mapper.operations import replace
+from cdm_reader_mapper.common import replace_columns
 
 from ._results import cdm_header, correction_df
 
@@ -21,10 +21,10 @@ def _get_data(**kwargs):
 
 def test_select_true():
     read_ = _get_data(sections=["c99_data"])
-    read_.select_true(overwrite=False, out_rejected=True)
+    result = read_.select_true(overwrite=False, out_rejected=True)
     data = read_.data.copy()
-    selected = read_.selected
-    deselected = read_.deselected
+    selected = result[0]
+    deselected = result[1]
 
     exp1 = data[:5].reset_index(drop=True)
     exp2 = data[5:].reset_index(drop=True)
@@ -34,22 +34,24 @@ def test_select_true():
 
 def test_select_from_index():
     read_ = _get_data()
-    read_.select_from_index([0, 2, 4], overwrite=False)
+    result = read_.select_from_index([0, 2, 4], overwrite=False)
     data = read_.data.copy()
-    result = read_.selected
+    selected = result[0]
 
     idx = data.index.isin([0, 2, 4])
     exp = data[idx].reset_index(drop=True)
-    pd.testing.assert_frame_equal(exp, result)
+    pd.testing.assert_frame_equal(exp, selected)
 
 
 def test_select_from_list():
     read_ = _get_data()
     selection = {("c1", "B1"): [26, 41]}
-    read_.select_from_list(selection, overwrite=False, out_rejected=True, in_index=True)
+    result = read_.select_from_list(
+        selection, overwrite=False, out_rejected=True, in_index=True
+    )
     data = read_.data.copy()
-    selected = read_.selected
-    deselected = read_.deselected
+    selected = result[0]
+    deselected = result[1]
 
     idx1 = data.index.isin([1, 3])
     idx2 = data.index.isin([0, 2, 4])
@@ -68,7 +70,7 @@ def test_inspect_count_by_cat():
 def test_replace():
     tables = cdm_header.tables.copy()
     table_df = tables["header"]
-    result = replace.replace_columns(
+    result = replace_columns(
         table_df,
         correction_df,
         pivot_c="report_id",

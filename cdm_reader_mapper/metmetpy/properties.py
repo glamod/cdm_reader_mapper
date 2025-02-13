@@ -44,19 +44,3 @@ metadata_datamodels["day"]["gcc"] = "DY"
 metadata_datamodels["hour"] = {}
 metadata_datamodels["hour"]["icoads"] = ("core", "HR")
 metadata_datamodels["hour"]["gcc"] = "GG"
-
-metadata_datamodels["datetime"] = {}
-metadata_datamodels["datetime"]["cdm"] = ("header", "report_timestamp")
-
-metadata_datamodels["lon"] = {}
-metadata_datamodels["lon"]["icoads"] = ("core", "LON")
-metadata_datamodels["lon"]["gcc"] = "LON"
-metadata_datamodels["lon"]["craid"] = ("drifter_measurements", "LONGITUDE")
-
-metadata_datamodels["lat"] = {}
-metadata_datamodels["lat"]["icoads"] = ("core", "LAT")
-metadata_datamodels["lat"]["gcc"] = "LAT"
-metadata_datamodels["lat"]["craid"] = ("drifter_measurements", "LATITUDE")
-
-metadata_datamodels["uid"] = {}
-metadata_datamodels["uid"]["icoads"] = ("c98", "UID")

@@ -1,7 +1,27 @@
 """
-metmetpy platfrom_type correction package.
+metmetpy correction package.
 
 Created on Tue Jun 25 09:00:19 2019
+
+Corrects datetime fields from a given deck in a data model.
+
+To account for dataframes stored in TextParsers and for eventual use of data columns other
+than those to be fixed in this or other metmetpy modules,
+the input and output are the full data set.
+
+Correctionsare data model and deck specific and are registered
+in ./lib/data_model.json: multiple decks in the same input data are not
+supported.
+
+Reference names of different metadata fields used in the metmetpy modules
+and its location column|(section,column) in a data model are
+registered in ../properties.py in metadata_datamodels.
+
+If the data model is not available in ./lib it is assumed to no corrections are
+needed.
+If the data model is not available in metadata_models, the module
+will return with no output (will break full processing downstream of its
+invocation) logging an error.
 
 Corrects the platform type field of data from a given data model. To account
 for dataframes stored in TextParsers and for eventual use of data columns other
@@ -42,13 +62,37 @@ from __future__ import annotations
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
-from .. import properties
-from . import correction_functions
+from . import properties
+from .datetime import correction_functions as corr_f_dt
+from .platform_type import correction_functions as corr_f_pt
 
-_base = f"{properties._base}.platform_type"
+_base = f"{properties._base}"
 
 
-def correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
+def _correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
+    """DOCUMENTATION."""
+    logger = logging_hdlr.init_logger(__name__, level=log_level)
+
+    # 1. Optional deck specific corrections
+    datetime_correction = correction_method.get(dck, {}).get("function")
+    if not datetime_correction:
+        logger.info(
+            f"No datetime correction to apply to deck {dck} data from data\
+                        model {data_model}"
+        )
+    else:
+        logger.info(f'Applying "{datetime_correction}" datetime correction')
+        try:
+            trans = getattr(corr_f_dt, datetime_correction)
+            trans(data)
+        except Exception:
+            logger.error("Applying correction ", exc_info=True)
+            return
+
+    return data
+
+
+def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -63,8 +107,7 @@ def correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
 
     pt_col = [col for col in pt_col if col in data.columns]
     if not pt_col:
-        data_columns = list(data.columns)
-        logger.info(f"No platform type found. Selected columns are {data_columns}")
+        logger.info(f"No platform type found. Selected columns are {data.columns}")
         return data
     elif len(pt_col) == 1:
         pt_col = pt_col[0]
@@ -73,23 +116,60 @@ def correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     if deck_fix.get("method") == "fillna":
         fillvalue = deck_fix.get("fill_value")
         logger.info(f"Filling na values with {fillvalue}")
-        data[pt_col] = correction_functions.fill_value(data[pt_col], fillvalue)
+        data[pt_col] = corr_f_pt.fill_value(data[pt_col], fillvalue)
         return data
     elif deck_fix.get("method") == "function":
         transform = deck_fix.get("function")
         logger.info(f"Applying fix function {transform}")
-        trans = getattr(correction_functions.fix_function, transform)
+        trans = getattr(corr_f_pt.fix_function, transform)
         return trans(data)
-    else:
-        logger.error(
-            'Platform type fix method "{}" not implemented'.format(
-                deck_fix.get("method")
-            )
-        )
+    logger.error(
+        'Platform type fix method "{}" not implemented'.format(deck_fix.get("method"))
+    )
     return data
 
 
-def correct(data, imodel, log_level="INFO"):
+def correct_datetime(data, imodel, log_level="INFO", _base=_base):
+    """Apply ICOADS deck specific datetime corrections.
+
+    Parameters
+    ----------
+    data: pandas.DataFrame or pandas.io.parsers.TextFileReader
+        Input dataset.
+    imodel: str
+        Name of internally available data model.
+        e.g. icoads_d300_704
+    log_level: str
+      level of logging information to save.
+      Default: INFO
+
+    Returns
+    -------
+    pandas.DataFrame or pandas.io.parsers.TextFileReader
+        a pandas.DataFrame or pandas.io.parsers.TextFileReader
+        with the adjusted data
+    """
+    logger = logging_hdlr.init_logger(__name__, level=log_level)
+    _base = f"{_base}.datetime"
+    mrd = imodel.split("_")
+    if len(mrd) < 3:
+        logger.warning(f"Dataset {imodel} has to deck information.")
+        return data
+    dck = mrd[2]
+
+    replacements_method_files = collect_json_files(*mrd, base=_base)
+
+    if len(replacements_method_files) == 0:
+        logger.warning(f"Data model {imodel} has no replacements in library")
+        logger.warning("Module will proceed with no attempt to apply id replacements")
+        return data
+
+    correction_method = combine_dicts(replacements_method_files, base=_base)
+
+    return _correct_dt(data, imodel, dck, correction_method, log_level="INFO")
+
+
+def correct_pt(data, imodel, log_level="INFO", _base=_base):
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
@@ -110,6 +190,7 @@ def correct(data, imodel, log_level="INFO"):
         with the adjusted data
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+    _base = f"{_base}.platform_type"
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {imodel} has to deck information.")
@@ -132,4 +213,4 @@ def correct(data, imodel, log_level="INFO"):
         )
         return data
 
-    return correct_it(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
+    return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")

@@ -13,15 +13,8 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtypes, validate_arg
-
-
-def _remove_boolean_values(x):
-    if x is True:
-        return
-    if x is False:
-        return
-    return x
+from .utils.utilities import adjust_dtypes, remove_boolean_values, validate_arg
+from .utils.validators import validate
 
 
 class MDFFileReader(FileReader):
@@ -39,6 +32,37 @@ class MDFFileReader(FileReader):
 
     def __init__(self, *args, **kwargs):
         FileReader.__init__(self, *args, **kwargs)
+
+    def _convert_and_decode(
+        self,
+        df,
+        converter_dict,
+        converter_kwargs,
+        decoder_dict,
+    ):
+        for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
+            if section in decoder_dict.keys():
+                decoded = decoder_dict[section](df[section])
+                decoded.index = df[section].index
+                df[section] = decoded
+
+            converted = converter_dict[section](
+                df[section], **converter_kwargs[section]
+            )
+            converted.index = df[section].index
+            df[section] = converted
+        return df
+
+    def _validate(self, df):
+        return validate(
+            data=df,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
+            schema=self.schema,
+            disables=self.disable_reads,
+        )
 
     def convert_and_decode_entries(
         self,
@@ -85,7 +109,7 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        return self.convert_and_decode_df(
+        return self._convert_and_decode(
             data,
             converter_dict,
             converter_kwargs,
@@ -98,12 +122,12 @@ class MDFFileReader(FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if validate is True:
-            return self.validate_df(data)
+            return self._validate(data)
         return pd.DataFrame(columns=data.columns)
 
     def remove_boolean_values(self, data):
         """DOCUMENTATION."""
-        data = data.map(_remove_boolean_values)
+        data = data.map(remove_boolean_values)
         dtypes = adjust_dtypes(self.dtypes, self.columns)
         return data.astype(dtypes, errors="ignore")
 

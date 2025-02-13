@@ -221,7 +221,5 @@ def validate(
         True,
     )
 
-    for column in disables:
-        mask[column] = np.nan
-
+    mask[disables] = np.nan
     return mask

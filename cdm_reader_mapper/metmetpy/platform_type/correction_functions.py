@@ -19,10 +19,9 @@ from .. import properties
 def is_num(X):
     """DOCUMENTATION."""
     try:
-        a = X.isnumeric()
+        return X.isnumeric()
     except Exception:
-        a = False
-    return a
+        return False
 
 
 def overwrite_data(data, loc, pt_col, value):
@@ -92,14 +91,8 @@ def fill_value(
 
 def deck_717_immt(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==700 & sid == 147 & pt == 5
     drifters = "7"
-    # sid = "005"
-    # pt = "5"
     buoys = "9"
-    # regex = re.compile(r"^\d{5,5}$")
-    # id_col = properties.metadata_datamodels.get("id").get("immt")
-    # sid_col = properties.metadata_datamodels.get("source").get("immt")
     pt_col = properties.metadata_datamodels.get("platform").get("immt")
 
     data[pt_col].iloc[np.where(data[pt_col].isna())] = drifters
@@ -112,7 +105,6 @@ def deck_717_immt(data):
 
 def deck_700_imma1(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==700 & sid == 147 & pt == 5
     drifters = "7"
     sid = "147"
     pt = "5"
@@ -133,7 +125,6 @@ def deck_700_imma1(data):
 
 def deck_892_imma1(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==892 & sid == 29 & pt == 5
     sid = "29"
     pt = "5"
     buoys = "6"
