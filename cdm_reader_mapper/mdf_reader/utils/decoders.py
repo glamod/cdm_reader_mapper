@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from .. import properties
-from .utilities import convert_str_boolean
 
 
 class df_decoders:
@@ -17,7 +16,6 @@ class df_decoders:
         """DOCUMENTATION."""
 
         def _base36(x):
-            x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
             return str(int(str(x), 36))

@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import csv
 import logging
 import os
 from copy import deepcopy
-from io import StringIO
 
 import pandas as pd
 import xarray as xr
@@ -156,7 +154,6 @@ class FileReader:
         self,
         order,
         valid,
-        chunksize,
         open_with="pandas",
     ):
         """DOCUMENTATION."""
@@ -168,37 +165,8 @@ class FileReader:
                 encoding=encoding,
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
-                chunksize=chunksize,
             )
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
-        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            return self._read_sections(TextParser, order, valid, open_with=open_with)
-        else:
-            data_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df = self._read_sections(df_, order, valid, open_with=open_with)
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data
+        return self._read_sections(TextParser, order, valid, open_with=open_with)

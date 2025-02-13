@@ -1,27 +1,15 @@
-﻿"""
-Map Common Data Model (CDM).
-
-Created on Thu Apr 11 13:45:38 2019
-
-Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
-header and observational tables using the mapping information available in the tool's mapping library
-for the input data model.
-
-@author: iregon
-"""
+"""Map and convert functions."""
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
-
 from . import properties
+from ._conversions import converters, iconverters_kwargs
+from ._mapping_functions import mapping_functions
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps
-from .utils.conversions import converters, iconverters_kwargs
-from .utils.mapping_functions import mapping_functions
 
 
 def drop_duplicates(df):
@@ -73,7 +61,7 @@ def _decimal_places(
 
 
 def _transform(
-    series,
+    to_map,
     imodel_functions,
     transform,
     kwargs,
@@ -82,25 +70,25 @@ def _transform(
     logger.debug(f"\ttransform: {transform}")
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
     trans = getattr(imodel_functions, transform)
-    return trans(series, **kwargs)
+    return trans(to_map, **kwargs)
 
 
 def _code_table(
-    series,
+    to_map,
     data_model,
     code_table,
     logger,
 ):
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
     try:
-        series = series.to_frame()
+        to_map = to_map.to_frame()
     except Exception:
-        logger.warning(f"Could not convert {series} to frame.")
+        logger.warning(f"Could not convert {to_map} to frame.")
 
-    series_str = series.astype(str)
+    to_map_str = to_map.astype(str)
 
-    series_str.columns = ["_".join(col) for col in series_str.columns.values]
-    return series_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+    to_map_str.columns = ["_".join(col) for col in to_map_str.columns.values]
+    return to_map_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
 
 
 def _default(
@@ -112,48 +100,59 @@ def _default(
     return default
 
 
-def _fill_value(series, fill_value):
+def _fill_value(data, fill_value):
     if fill_value is None:
-        return series
-    if series is None:
+        return data
+    if data is None:
         return fill_value
-    return series.fillna(value=fill_value)
+    return data.fillna(value=fill_value)
 
 
 def _map_data(
-    series,
+    to_map,
     transform,
     code_table,
+    elements,
     default,
     fill_value,
+    isEmpty,
     imodel_functions,
     kwargs,
     length,
     logger,
 ):
-    if series is None:
-        series = _default(default, length)
-    elif series.empty:
-        series = _default(default, length)
-    elif transform:
-        series = _transform(
-            series,
+    if transform and not isEmpty:
+        data = _transform(
+            to_map,
             imodel_functions,
             transform,
             kwargs,
             logger=logger,
         )
-    elif code_table:
-        series = _code_table(
-            series,
+    elif code_table and not isEmpty:
+        data = _code_table(
+            to_map,
             imodel_functions.imodel,
             code_table,
             logger=logger,
         )
-    return _fill_value(series, fill_value)
+    elif elements and not isEmpty:
+        data = to_map
+    elif default is not None:
+        data = _default(
+            default,
+            length,
+        )
+    else:
+        data = _default(
+            None,
+            length,
+        )
+    return _fill_value(data, fill_value)
 
 
 def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
+    isEmpty = False
     elements = imapping.get("elements")
     transform = imapping.get("transform")
     kwargs = imapping.get("kwargs", {})
@@ -182,12 +181,17 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
         if len(elements) == 1:
             to_map = to_map.iloc[:, 0]
 
+        if len(to_map) == 0:
+            isEmpty = True
+
     data = _map_data(
         to_map,
         transform,
         code_table,
+        elements,
         default,
         fill_value,
+        isEmpty,
         imodel_functions,
         kwargs,
         len(idata),
@@ -235,16 +239,17 @@ def _map_and_convert(
     for column in columns:
         if column not in mapping.keys():
             continue
-        logger.debug(f"\tElement: {column}")
-        table_df_i[column], atts[column] = _mapping(
-            idata,
-            mapping[column],
-            imodel_functions,
-            atts[column],
-            codes_subset,
-            cols,
-            logger,
-        )
+        else:
+            logger.debug(f"\tElement: {column}")
+            table_df_i[column], atts[column] = _mapping(
+                idata,
+                mapping[column],
+                imodel_functions,
+                atts[column],
+                codes_subset,
+                cols,
+                logger,
+            )
         table_df_i[column] = _convert_dtype(
             table_df_i[column], atts.get(column), logger
         )
@@ -267,7 +272,6 @@ def map_and_convert(
     null_label="null",
     logger=None,
 ):
-    """Map and convert MDF data to CDM tables."""
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
 
@@ -304,65 +308,3 @@ def map_and_convert(
 
     merged = pd.concat(table_list, axis=1, join="outer")
     return merged.reset_index(drop=True)
-
-
-def map_model(
-    data,
-    imodel,
-    cdm_subset=None,
-    codes_subset=None,
-    null_label="null",
-    cdm_complete=True,
-    log_level="INFO",
-):
-    """Map a pandas DataFrame to the CDM header and observational tables.
-
-    Parameters
-    ----------
-    data: pandas.DataFrame, pd.parser.TextFileReader or io.String
-      input data to map.
-    imodel: str
-      A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
-      CDM in a specific way.
-      e.g. ``icoads_r300_d704``
-    cdm_subset: list, optional
-      subset of CDM model tables to map.
-      Defaults to the full set of CDM tables defined for the imodel.
-    codes_subset: list, optional
-      subset of code mapping tables to map.
-      Default to the full set of code mapping tables defined for the imodel.
-    log_level: str
-      level of logging information to save.
-      Defaults to ‘DEBUG’.
-
-    Returns
-    -------
-    cdm_tables: pandas.DataFrame
-      DataFrame with MultiIndex columns (cdm_table, column_name).
-    """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-    imodel = imodel.split("_")
-    # Check we have imodel registered, leave otherwise
-    if imodel[0] not in properties.supported_data_models:
-        logger.error("Input data model " f"{imodel[0]}" " not supported")
-        return
-
-    # Check input data type and content (empty?)
-    if not isinstance(data, pd.DataFrame):
-        logger.error("Input data type " f"{type(data)}" " not supported")
-        return
-
-    if data.empty:
-        logger.error("Input data is empty")
-        return
-
-    return map_and_convert(
-        imodel[0],
-        *imodel[1:],
-        data=data,
-        cdm_subset=cdm_subset,
-        codes_subset=codes_subset,
-        null_label=null_label,
-        cdm_complete=cdm_complete,
-        logger=logger,
-    )
