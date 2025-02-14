@@ -43,7 +43,8 @@ dependencies = [
   "swifter",
   "platformdirs",
   "pyarrow",
-  "recordlinkage"
+  "recordlinkage",
+  "numba>=0.60",
 ]
 
 [project.urls]
@@ -247,3 +248,10 @@ ignore_names = []
 min_confidence = 90
 paths = ["cdm_reader_mapper", "tests"]
 sort_by_size = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-env>=1.1.5",
+]
