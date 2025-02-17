@@ -20,11 +20,11 @@ dependencies:
     #development
     - black =24.10.0
     - blackdoc =0.3.9
-    - bump-my-version==0.28.0
+    - bump-my-version =0.28.0
     - codespell=2.3.0
     - coverage >=7.5.0
     - coveralls >=4.0.1  # Note: coveralls is not yet compatible with Python 3.13
-    - deptry==0.20.0
+    - deptry =0.20.0
     - distributed >=2.0
     - flake8 >=7.1.1
     - flake8-rst-docstrings >=0.3.0
@@ -32,12 +32,12 @@ dependencies:
     - isort =5.13.2
     - nbconvert >=7.16.4
     - notebook
-    - pip==24.2.0
+    - pip >=24.2.0
     - pre-commit >=3.7
-    - pylint==3.3.1
+    - pylint >=3.3.1
     - ruff >=0.7.0
-    - tox==4.23.0
-    - tox-gh==1.4.4
+    - tox =4.23.0
+    - tox-gh =1.4.4
     - vulture =2.14
 
     #documentation
