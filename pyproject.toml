@@ -9,7 +9,7 @@ authors = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"}
 ]
 readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["cdm_reader_mapper"]
 classifiers = [
@@ -20,7 +20,6 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12"
@@ -56,7 +55,6 @@ dependencies = [
 
 [tool.black]
 target-version = [
-  "py39",
   "py310",
   "py311",
   "py312"
@@ -143,12 +141,12 @@ exclude = [
 
 [tool.isort]
 profile = "black"
-py_version = 310
+py_version = 312
 append_only = true
 add_imports = "from __future__ import annotations"
 
 [tool.mypy]
-python_version = 3.10
+python_version = 3.12
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
@@ -177,7 +175,7 @@ testpaths = ["./tests"]
 [tool.ruff]
 src = ["xclim"]
 line-length = 150
-target-version = "py39"
+target-version = "py312"
 exclude = [
   ".git",
   "build",
