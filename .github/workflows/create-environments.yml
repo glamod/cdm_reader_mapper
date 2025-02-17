@@ -52,7 +52,7 @@ jobs:
           python -c "import cdm_reader_mapper"
 
   create-pip:
-    name: pip-py&{{ matrix.python-versions }}
+    name: pip-py${{ matrix.python-versions }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
