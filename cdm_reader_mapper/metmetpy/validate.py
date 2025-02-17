@@ -60,7 +60,7 @@ import re
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -124,9 +124,6 @@ def validate_id(data, imodel, blank=False, log_level="INFO"):
         return
     dck = mrd[2]
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
-
     id_col = _get_id_col(data, imodel, logger)
     if id_col is None:
         return
@@ -160,9 +157,7 @@ def validate_datetime(data, imodel, log_level="INFO"):
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     model = imodel.split("_")[0]
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"

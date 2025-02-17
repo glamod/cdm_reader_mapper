@@ -62,27 +62,17 @@ def validate_path(arg_name, arg_value):
     return True
 
 
-def adjust_dtype(dtype, df):
-    """Adjust dtypes to DataFrame."""
-    if not isinstance(dtype, dict):
-        return dtype
-    return {k: v for k, v in dtype.items() if k in df.columns}
-
-
-def convert_str_boolean(x):
-    """Convert str boolean value to boolean value."""
-    if x == "True":
-        x = True
-    if x == "False":
-        x = False
-    return x
-
-
 def remove_boolean_values(x):
     """Remove boolean values."""
-    x = convert_str_boolean(x)
     if x is True:
         return
     if x is False:
         return
     return x
+
+
+def adjust_dtypes(dtypes, columns):
+    """DOCUMENTATION."""
+    if not isinstance(dtypes, dict):
+        return dtypes
+    return {k: v for k, v in dtypes.items() if k in columns}
