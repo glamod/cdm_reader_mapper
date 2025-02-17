@@ -53,6 +53,6 @@ To create a conda environment including `cdm_reader_mapepr`'s dependencies and a
 
 .. code-block:: console
 
-    $ conda env create -n my_cdm_env python=3.12 --file=ci/requirements/environment.yml
+    $ conda env create -n my_cdm_env python=3.12 --file=environment.yml
     $ conda activate my_cdm_env
-    (my_xclim_env) $ python -m pip install -e --no-deps .
+    (my_cdm_env) $ python -m pip install -e --no-deps .
