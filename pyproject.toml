@@ -9,7 +9,7 @@ authors = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"}
 ]
 readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["cdm_reader_mapper"]
 classifiers = [
@@ -20,30 +20,29 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12"
 ]
 dynamic = ["version"]
 dependencies = [
-  "matplotlib",
-  "pandas>=2.1.0",
-  "dask",
-  "distributed",
-  "datashader",
+  "bottleneck >=1.3.1",
+  "dask >=2024.8.1",
+  "datashader >=0.15.0",
+  "distributed >=2.0",
+  "h5netcdf >= 1.3.0",
   "msgpack",
-  "requests",
-  "xarray",
   "netcdf4",
-  "h5netcdf",
-  "timezonefinder",
+  "numba >=0.60.0",
+  "pandas>=2.2.0",
+  "platformdirs >4.0.0",
+  "pyarrow >=15.0.0",
   "python-slugify",
-  "textdistance",
-  "swifter",
-  "platformdirs",
-  "pyarrow",
-  "recordlinkage"
+  "recordlinkage >= 0.15",
+  "requests",
+  "swifter >=1.3.2",
+  "timezonefinder >6.5.0",
+  "xarray >=2023.11.0,!=2024.10.0"
 ]
 
 [project.urls]
@@ -56,7 +55,6 @@ dependencies = [
 
 [tool.black]
 target-version = [
-  "py39",
   "py310",
   "py311",
   "py312"
@@ -108,7 +106,7 @@ pep621_dev_dependency_groups = ["all", "dev", "docs"]
 [tool.deptry.per_rule_ignores]
 DEP001 = ["SBCK"]
 DEP002 = ["bottleneck", "pyarrow"]
-DEP004 = ["matplotlib", "pytest_socket"]
+DEP004 = ["pytest_socket"]
 
 [tool.flit.sdist]
 include = [
@@ -118,7 +116,8 @@ include = [
   "LICENSE",
   "Makefile",
   "README.rst",
-  "ci/requirements/requirements.txt",
+  "CI/requirements_ci.txt",
+  "environment.yml",
   "docs/**/*.png",
   "docs/**/*.rst",
   "docs/**/*.txt",
@@ -142,12 +141,12 @@ exclude = [
 
 [tool.isort]
 profile = "black"
-py_version = 310
+py_version = 312
 append_only = true
 add_imports = "from __future__ import annotations"
 
 [tool.mypy]
-python_version = 3.10
+python_version = 3.12
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
@@ -176,7 +175,7 @@ testpaths = ["./tests"]
 [tool.ruff]
 src = ["xclim"]
 line-length = 150
-target-version = "py39"
+target-version = "py312"
 exclude = [
   ".git",
   "build",
@@ -213,7 +212,6 @@ select = [
 check-typed-exception = true
 
 [tool.ruff.lint.flake8-import-conventions.aliases]
-"matplotlib.pyplot" = "plt"
 numpy = "np"
 pandas = "pd"
 scipy = "sp"
