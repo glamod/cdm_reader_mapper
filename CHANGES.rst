@@ -9,7 +9,7 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and J
 
 Announcements
 ^^^^^^^^^^^^^
-This release adds support for Python 3.13 (:pull:`228`)
+This release drops support for Python 3.9 and adds support for Python 3.13 (:pull:`228`, :pull:`229`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
