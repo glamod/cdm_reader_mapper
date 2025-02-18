@@ -3,6 +3,23 @@
 Changelog
 =========
 
+2.0.1 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+Announcements
+^^^^^^^^^^^^^
+This release adds support for Python 3.13 (:pull:`228`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* add environment.yml file (:pull:`229`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* GitHub workflow for ``testing_suite`` now uses ``uv`` for environment management, replacing ``micromamba`` (:pull:`228`)
+* rename ci/requirements to CI and tidy up requirements/dependencies (:pull:`229`)
+
 2.0.0 (2025-02-14)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
