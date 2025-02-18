@@ -17,9 +17,6 @@ maintainers =  [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
   {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
 ]
-  
-  { name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de" }
-]
 readme = { file = "README.rst", content-type = "text/x-rst" }
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
