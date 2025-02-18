@@ -6,6 +6,18 @@ build-backend = "flit_core.buildapi"
 name = "cdm_reader_mapper"
 description = "Common Data Model reader and mapper toolbox"
 authors = [
+  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Axel Andersson", email = "axel.andersson@dwd.de"},
+  {name = "Tina Leiding", email = "tina.leiding@dwd.de"},
+  {name = "Richard Cornes", email = "richard.cornes@noc.ac.uk"},
+  {name = "Elizabeth Kent", email = "eck@noc.ac.uk"},
+]
+maintainers =  [
+  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+]
+  
   { name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de" }
 ]
 readme = { file = "README.rst", content-type = "text/x-rst" }
