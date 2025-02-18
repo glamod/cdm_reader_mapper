@@ -187,8 +187,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 
 .. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
 
-.. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
+.. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml/badge.svg
+        :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml
         :alt: Build Status
 
 .. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
