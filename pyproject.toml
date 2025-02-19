@@ -2,6 +2,13 @@
 requires = ["flit_core >=3.9,<4"]
 build-backend = "flit_core.buildapi"
 
+[dependency-groups]
+dev = [
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "pytest-env>=1.1.5"
+]
+
 [project]
 name = "cdm_reader_mapper"
 description = "Common Data Model reader and mapper toolbox"
@@ -11,15 +18,15 @@ authors = [
   {name = "Axel Andersson", email = "axel.andersson@dwd.de"},
   {name = "Tina Leiding", email = "tina.leiding@dwd.de"},
   {name = "Richard Cornes", email = "richard.cornes@noc.ac.uk"},
-  {name = "Elizabeth Kent", email = "eck@noc.ac.uk"},
+  {name = "Elizabeth Kent", email = "eck@noc.ac.uk"}
 ]
-maintainers =  [
+maintainers = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
-  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"}
 ]
-readme = { file = "README.rst", content-type = "text/x-rst" }
+readme = {file = "README.rst", content-type = "text/x-rst"}
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = {file = "LICENSE"}
 keywords = ["cdm_reader_mapper"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -32,7 +39,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.13"
 ]
 dynamic = ["version"]
 dependencies = [
@@ -52,14 +59,14 @@ dependencies = [
   "requests",
   "swifter >=1.3.2",
   "timezonefinder >6.5.0",
-  "xarray >=2023.11.0,!=2024.10.0",
+  "xarray >=2023.11.0,!=2024.10.0"
 ]
 
 [project.optional-dependencies]
 dev = [
   "black[jupyter] ==25.1.0",
   "blackdoc ==0.3.9",
-  "bumpy-my-version >=0.28.1",
+  "bump-my-version >=0.28.1",
   "codespell ==2.3.0",
   "coverage >=7.5.0",
   "coveralls >=4.0.1",
@@ -88,10 +95,9 @@ docs = [
   "sphinx-book-theme >=1.0"
 ]
 tests = [
-  "pytest >=8.0.0",
-  "pytest.cov >=5.0.0",
-  "pytest-socket >=0.6.0",
-  "pytest-xdist >=3.2"
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "pytest-env>=1.1.5"
 ]
 all = ["cdm_reader_mapper[dev]", "cdm_reader_mapper[docs]", "cdm_reader_mapper[tests]"]
 
@@ -118,7 +124,7 @@ allow_dirty = false
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(\\-(?P<release>[a-z]+)(\\.(?P<build>\\d+)))?"
 serialize = [
   "{major}.{minor}.{patch}-{release}.{build}",
-  "{major}.{minor}.{patch}",
+  "{major}.{minor}.{patch}"
 ]
 
 [[tool.bumpversion.files]]
@@ -178,7 +184,7 @@ include = [
   "cdm_reader_mapper/**/*.json",
   "cdm_reader_mapper/**/*.py",
   "cdm_reader_mapper/**/*.txt",
-  "cdm_reader_mapper/**/*.yml",
+  "cdm_reader_mapper/**/*.yml"
 ]
 exclude = [
   "**/*.py[co]",
@@ -186,7 +192,7 @@ exclude = [
   ".*",
   "docs/_*",
   "docs/modules.rst",
-  "pylintrc",
+  "pylintrc"
 ]
 
 [tool.isort]
@@ -214,7 +220,7 @@ module = [
   "sklearn.*",
   "statsmodels.*",
   "yamale.*",
-  "yaml.*",
+  "yaml.*"
 ]
 ignore_missing_imports = true
 
@@ -232,7 +238,7 @@ exclude = [
   ".eggs"
 ]
 extend-include = [
-  "*.ipynb", # Include notebooks
+  "*.ipynb" # Include notebooks
 ]
 
 [tool.ruff.format]
@@ -240,22 +246,22 @@ line-ending = "auto"
 
 [tool.ruff.lint]
 extend-select = [
-  "RUF022", # unsorted-dunder-all
+  "RUF022" # unsorted-dunder-all
 ]
 ignore = [
   "D205", # blank-line-after-summary
   "D400", # ends-in-period
-  "D401", # non-imperative-mood
+  "D401" # non-imperative-mood
 ]
 preview = true
 select = [
-  "C90",  # mccabe-complexity
-  "D",    # docstrings
-  "E",    # pycodestyle errors
-  "F",    # pyflakes
+  "C90", # mccabe-complexity
+  "D", # docstrings
+  "E", # pycodestyle errors
+  "F", # pyflakes
   "N802", # invalid-function-name
-  "S",    # bandit
-  "W",    # pycodestyle warnings
+  "S", # bandit
+  "W" # pycodestyle warnings
 ]
 
 [tool.ruff.lint.flake8-bandit]
@@ -296,10 +302,3 @@ ignore_names = []
 min_confidence = 90
 paths = ["cdm_reader_mapper", "tests"]
 sort_by_size = true
-
-[dependency-groups]
-dev = [
-  "pytest>=8.3.4",
-  "pytest-cov>=6.0.0",
-  "pytest-env>=1.1.5"
-]
