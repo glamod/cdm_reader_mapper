@@ -11,7 +11,7 @@ imodel = "icoads_r300_d714"
 exp = f"expected_{imodel}"
 expected_data = getattr(result_data, exp)
 db_exp = read_tables(
-    getattr(expected_data, "cdm_table"),
+    dict(expected_data)["cdm_table"],
     suffix=f"{imodel}*",
 )
 

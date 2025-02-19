@@ -27,33 +27,41 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         # Bookend python versions
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags.
       - name: Set environment variables
         run: |
-          echo "CONDA_ENV_FILE=environment.yml" >> $GITHUB_ENV
+          echo "UV_ENV_FILE=pyproject.toml" >> $GITHUB_ENV
           echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+          echo "UV_CACHE_DIR=/tmp/.uv-cache" >> $GITHUB_ENV
 
-      - name: Create conda environment
-        uses: mamba-org/setup-micromamba@0dea6379afdaffa5d528b3d1dabc45da37f443fc # v2.0.4
+      - name: Install uv
+        uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355 # v5.2.2
         with:
-          cache-downloads: true
-          cache-downloads-key: "${{runner.os}}-${{runner.arch}}-py${{matrix.python-version}}-${{hashFiles(env.CONDA_ENV_FILE)}}"
-          environment-file: environment.yml
-          create-args: >-
-            python=${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-local-path: ${{ env.UV_CACHE_DIR }}
+
+      - name: Restore uv cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.UV_CACHE_DIR }}
+          key: uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}-${{ hashFiles(env.UV_ENV_FILE) }}
+          restore-keys: |
+            uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}-${{ hashFiles(env.UV_ENV_FILE) }}
+            uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}
 
       - name: Install cdm reader mapper toolbox
         run: |
-          python -m pip install --no-deps -e .
+          uv sync --all-extras --dev
 
       - name: Version info
         run: |
-          conda info -a
-          conda list
+          uv version
+          uv pip list
 
       - name: Import cdm_reader_mapper toolbox
         run: |
@@ -61,7 +69,7 @@ jobs:
 
       - name: Run tests
         timeout-minutes: 10
-        run: python -u -m pytest
+        run: uv run pytest tests
           --cov=cdm_reader_mapper
           --cov-report=xml
           --junitxml=test-results/${{ runner.os }}-${{ matrix.python-version }}.xml
@@ -74,3 +82,6 @@ jobs:
           env_vars: RUNNER_OS,PYTHON_VERSION
           name: codecov-umbrella
           fail_ci_if_error: false
+
+      - name: Minimise uv cache
+        run: uv cache prune --ci
