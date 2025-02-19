@@ -2,13 +2,6 @@
 requires = ["flit_core >=3.9,<4"]
 build-backend = "flit_core.buildapi"
 
-[dependency-groups]
-dev = [
-  "pytest>=8.3.4",
-  "pytest-cov>=6.0.0",
-  "pytest-env>=1.1.5"
-]
-
 [project]
 name = "cdm_reader_mapper"
 description = "Common Data Model reader and mapper toolbox"

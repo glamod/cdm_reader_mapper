@@ -56,7 +56,7 @@ jobs:
 
       - name: Install cdm reader mapper toolbox
         run: |
-          uv sync --all-extras --dev
+          uv sync --extra tests
 
       - name: Version info
         run: |
