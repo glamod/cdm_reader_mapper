@@ -45,7 +45,11 @@ You can install the package directly from pip:
 
 .. code-block:: console
 
-    pip install cdm_reader_mapper
+    pip install cdm_reader_mapper           # Install minimum dependency version
+    pip install cdm_reader_mapper[dev]      # Install optional development dependencies
+    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation
+    pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite
+    pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
@@ -53,7 +57,11 @@ If you want to contribute, we recommend cloning the repository and installing th
 
     git clone https://github.com/glamod/cdm_reader_mapper
     cd cdm_reader_mapper
-    pip install -e .
+    pip install -e .           # Install minimum dependency version
+    pip install -e .[dev]      # Install optional development dependencies
+    pip install -e .[docs]     # Install optional dependencies for the documentation
+    pip install -e .[test]     # Install optional dependencies for the testing suite
+    pip install -e .[all]      # Install all the above for complete dependency version
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
