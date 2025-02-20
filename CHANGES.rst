@@ -14,6 +14,13 @@ This release drops support for Python 3.9 and adds support for Python 3.13 (:pul
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * add environment.yml file (:pull:`229`)
+* cdm_reader_mapper now separates the optional dependencies into dev, docs and tests recipes (:pull:`232`).
+
+  *  $ python -m pip install cdm_reader_mapper           # Install minimum dependency version
+  *  $ python -m pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
+  *  $ python -m pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
+  *  $ python -m pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
+  *  $ python -m pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
 Internal changes
 ^^^^^^^^^^^^^^^^
