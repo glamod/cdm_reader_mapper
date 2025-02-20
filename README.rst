@@ -72,7 +72,7 @@ To develop the package using uv, the following will create a virtual environment
 
     git clone https://github.com/glamod/cdm_reader_mapper
     cd cdm_reader_mapper
-    uv venv --python 3.11  # Create an environment with the recommended python version
+    uv venv --python 3.12  # Create an environment with the recommended python version
     source .venv/bin/activate  # Load the virtual environment (for bash or zsh)
     uv sync --all-extras  # Install the package and all dependencies for cdm_reader_mapper
 
