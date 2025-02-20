@@ -41,8 +41,8 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 Installation
 ============
 
-Using pip
----------
+Installation using pip
+----------------------
 
 You can install the package directly from pip:
 
@@ -109,7 +109,7 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 Run a test
 ==========
 
-Read imma data with the `cdm_reader_mapper.read_mdf` function:
+Read imma data with the ``cdm_reader_mapper.read_mdf`` function:
 
 .. code-block:: python
 
@@ -146,11 +146,11 @@ For more details on how to use the ``cdm_reader_mapper`` toolbox see the followi
 Contributing to cdm_reader_mapper
 =================================
 
-If you're interested in participating in the development of `cdm_reader_mapper` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
+If you're interested in participating in the development of ``cdm_reader_mapper`` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
-In addition, you can install the `cdm_reader_mapper` in development mode using pip:
+In addition, you can install the ``cdm_reader_mapper`` in development mode using pip:
 
 .. code-block:: console
 
@@ -158,7 +158,7 @@ In addition, you can install the `cdm_reader_mapper` in development mode using p
     pip install cdm_reader_mapper[docs]  # Install optional dependencies for the documentation in addition
     pip install cdm_reader_mapper[all]   # Install all the above for complete dependency version
 
-Alternatively using `uv_` you can add optional dependencies using the option `--extra`.
+Alternatively using uv you can add optional dependencies using the option ``--extra``.
 
 How to cite this library
 ========================
