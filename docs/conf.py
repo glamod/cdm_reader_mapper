@@ -46,7 +46,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
-    "nbsphinx",
+    "myst_nb",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",

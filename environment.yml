@@ -32,7 +32,6 @@ dependencies:
     - flake8-rst-docstrings >=0.3.0
     - flit >=3.9.0
     - isort =5.13.2
-    - nbconvert >=7.16.4
     - notebook
     - pip >=24.2.0
     - pre-commit >=3.7
@@ -43,7 +42,8 @@ dependencies:
     #documentation
     - ipykernel
     - ipython >= 8.5.0
-    - nbsphinx >=0.9.5
+    - myst-nb >= 1.2.0
+    - nbconvert >=7.16.4
     - numpydoc >=1.8.0
     - sphinx >=7.0.0
     - sphinx-autodoc-typehints
