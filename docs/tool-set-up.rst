@@ -46,7 +46,7 @@ or download th tarball_:
 
    curl -OJL https://github.com/glamod/cdm_reader_mapper/tarball/master
 
-Once you have a copy of the source, you caninstall it with pip_:
+Once you have a copy of the source, you can install it with pip_:
 
 .. code-block:: console
 
@@ -56,30 +56,20 @@ Or using the `uv`_ package manager to install cdm_reader_mapper:
 
 .. code-block:: console
 
-    uv add .               # Install with no extra dependencies
+    uv add .
 
 Development mode
 ~~~~~~~~~~~~~~~~
 
-If you're interested in participating in the development of the **cdm_reader_mapper** toolbox, you can install the package in development mode:
+If you're interested in participating in the development of the **cdm_reader_mapper** toolbox, you can install the package in development mode after cloning the repository from source:
 
 .. code-block:: console
 
-    pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
-    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
-    pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
+    pip install -e .[dev]      # Install optional development dependencies in addition
+    pip install -e .[docs]     # Install optional dependencies for the documentation in addition
+    pip install -e .[all]      # Install all the above for complete dependency version
 
-Alternatively, you can use the `uv_` package manager by adding option `--extra`.
-
-Or using the `uv`_ package manager to install cdm_reader_mapper:
-
-.. code-block:: console
-
-    uv add .               # Install with no extra dependencies
-    uv add . --extra dev   # Install optional development dependencies in addition
-    uv add . --extra docs  # Install optional dependencies for the documentation in addition
-    uv add . --extra test  # Install optional dependencies for the testing suite in addition
-    uv add . --extra all   # Install all the above for complete dependency version
+Alternatively, you can use the uv package manager by adding option `--extra`.
 
 Creating a Conda Environment
 ----------------------------
