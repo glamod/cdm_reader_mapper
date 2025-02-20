@@ -60,8 +60,8 @@ If you want to contribute, we recommend cloning the repository and installing th
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
-Using uv
---------
+Installation using uv
+---------------------
 
 You can install the package using `uv`_ package manager, this will add the library to your active environment:
 

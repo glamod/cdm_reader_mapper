@@ -23,7 +23,7 @@ Alternatively, it can be installed using the `uv`_ package manager:
 
 .. code-block:: console
 
-    uv add cdm_reader_mapper               # Install with no extra dependencies
+    uv add cdm_reader_mapper
 
 .. include:: hyperlinks.rst
 
@@ -70,6 +70,16 @@ If you're interested in participating in the development of the **cdm_reader_map
     pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
 Alternatively, you can use the `uv_` package manager by adding option `--extra`.
+
+Or using the `uv`_ package manager to install cdm_reader_mapper:
+
+.. code-block:: console
+
+    uv add .               # Install with no extra dependencies
+    uv add . --extra dev   # Install optional development dependencies in addition
+    uv add . --extra docs  # Install optional dependencies for the documentation in addition
+    uv add . --extra test  # Install optional dependencies for the testing suite in addition
+    uv add . --extra all   # Install all the above for complete dependency version
 
 Creating a Conda Environment
 ----------------------------
