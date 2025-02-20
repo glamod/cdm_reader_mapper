@@ -69,7 +69,13 @@ If you're interested in participating in the development of the **cdm_reader_map
     pip install -e .[docs]     # Install optional dependencies for the documentation in addition
     pip install -e .[all]      # Install all the above for complete dependency version
 
-Alternatively, you can use the uv package manager by adding option `--extra`.
+Alternatively, you can use the uv package manager:
+
+.. code-block:: console
+
+    uv sync       # Install in development mode and create a virtual environment
+
+You can specify optional dependency groups with the `--extra` option.
 
 Creating a Conda Environment
 ----------------------------
