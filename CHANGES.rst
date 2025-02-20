@@ -19,7 +19,6 @@ New features and enhancements
   *  $ python -m pip install cdm_reader_mapper           # Install minimum dependency version
   *  $ python -m pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
   *  $ python -m pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
-  *  $ python -m pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
   *  $ python -m pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
 Internal changes
