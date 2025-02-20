@@ -51,6 +51,8 @@ You can install the package directly from pip:
     pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
     pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
+:warning: Installing optional dependencies will be enabled in the next release!
+
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
 .. code-block:: console
