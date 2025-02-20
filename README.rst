@@ -150,16 +150,6 @@ If you're interested in participating in the development of ``cdm_reader_mapper`
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
-In addition, you can install the ``cdm_reader_mapper`` in development mode using pip:
-
-.. code-block:: console
-
-    pip install cdm_reader_mapper[dev]   # Install optional development dependencies in addition
-    pip install cdm_reader_mapper[docs]  # Install optional dependencies for the documentation in addition
-    pip install cdm_reader_mapper[all]   # Install all the above for complete dependency version
-
-Alternatively using uv you can add optional dependencies using the option ``--extra``.
-
 How to cite this library
 ========================
 
