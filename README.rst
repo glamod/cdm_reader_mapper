@@ -158,7 +158,7 @@ In addition, you can install the `cdm_reader_mapper` in development mode using p
     pip install cdm_reader_mapper[docs]  # Install optional dependencies for the documentation in addition
     pip install cdm_reader_mapper[all]   # Install all the above for complete dependency version
 
-Alternatively using `uv_` you can add optional dependencies using the option `--extra` or install complete dependency version using `--all-extras`.
+Alternatively using `uv_` you can add optional dependencies using the option `--extra`.
 
 How to cite this library
 ========================
