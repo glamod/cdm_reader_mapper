@@ -11,17 +11,19 @@ The **cdm_reader_mapper**  toolbox is a pure Python package, but it has a few de
 Stable release
 ~~~~~~~~~~~~~~
 
-To install the **cdm_reader_mapper** toolbox in your current conda_ environment, run this command in your terminal:
+To install the **cdm_reader_mapper** toolbox in your current environment, run this command in your terminal:
 
 .. code-block:: console
 
-    pip install cdm_reader_mapper           # Install minimum dependency version
-    pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
-    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
-    pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
-    pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
+  pip install cdm_reader_mapper
 
 This is the preferred method to install the **cdm_reader_mapper** toolbox, as it will always install the most recent stable release.
+
+Alternatively, it can be installed using the `uv`_ package manager:
+
+.. code-block:: console
+
+    uv add cdm_reader_mapper               # Install with no extra dependencies
 
 .. include:: hyperlinks.rst
 
@@ -48,17 +50,31 @@ Once you have a copy of the source, you caninstall it with pip_:
 
 .. code-block:: console
 
-    cd cdm_reader_mapper
-    pip install -e .           # Install minimum dependency version
-    pip install -e .[dev]      # Install optional development dependencies
-    pip install -e .[docs]     # Install optional dependencies for the documentation
-    pip install -e .[test]     # Install optional dependencies for the testing suite
-    pip install -e .[all]      # Install all the above for complete dependency version
+   pip install -e .
+
+Or using the `uv`_ package manager to install cdm_reader_mapper:
+
+.. code-block:: console
+
+    uv add .               # Install with no extra dependencies
+
+Development mode
+~~~~~~~~~~~~~~~~
+
+If you're interested in participating in the development of the **cdm_reader_mapper** toolbox, you can install the package in development mode:
+
+.. code-block:: console
+
+    pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
+    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
+    pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
+
+Alternatively, you can use the `uv_` package manager by adding option `--extra`.
 
 Creating a Conda Environment
 ----------------------------
 
-To create a conda environment including `cdm_reader_mapepr`'s dependencies and and development dependencies, run the following command from within your cloned repo:
+To create a conda environment including `cdm_reader_mapper`'s dependencies and and development dependencies, run the following command from within your cloned repo:
 
 .. code-block:: console
 

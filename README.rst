@@ -39,19 +39,16 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 
 
 Installation
-------------
+============
+
+Using pip
+---------
 
 You can install the package directly from pip:
 
 .. code-block:: console
 
-    pip install cdm_reader_mapper           # Install minimum dependency version
-    pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
-    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
-    pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
-    pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
-
-:warning: Installing optional dependencies will be enabled in the next release!
+    pip install cdm_reader_mapper
 
 If you want to contribute, we recommend cloning the repository and installing the package in development mode, e.g.
 
@@ -59,16 +56,31 @@ If you want to contribute, we recommend cloning the repository and installing th
 
     git clone https://github.com/glamod/cdm_reader_mapper
     cd cdm_reader_mapper
-    pip install -e .           # Install minimum dependency version
-    pip install -e .[dev]      # Install optional development dependencies in addition
-    pip install -e .[docs]     # Install optional dependencies for the documentation in addition
-    pip install -e .[test]     # Install optional dependencies for the testing suite in addition
-    pip install -e .[all]      # Install all the above for complete dependency version
+    pip install -e .
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
+Using uv
+--------
+
+You can install the package using `uv`_ package manager, this will add the library to your active environment:
+
+.. code-block:: console
+
+    uv add cdm_reader_mapper
+
+To develop the package using uv, the following will create a virtual environment, uv defaults to ``.venv``:
+
+.. code-block:: console
+
+    git clone https://github.com/glamod/cdm_reader_mapper
+    cd cdm_reader_mapper
+    uv venv --python 3.12      # Create an environment with the recommended python version
+    source .venv/bin/activate  # Load the virtual environment (for bash or zsh)
+    uv sync
+
 Documentation
--------------
+=============
 
 The official documentation is at https://cdm-reader-mapper.readthedocs.io/
 
@@ -79,7 +91,7 @@ How to make the most of cdm_reader_mapper:
 * `How to map to the Common Data Model (CDM)`_
 
 Logging
--------
+=======
 
 By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdout`. To tell :code:`cdm_reader_mapper` to output logs to a file, set the :code:`CDM_LOG_FILE` environment variable **before** loading :code:`cdm_reader_mapper`.
 
@@ -95,7 +107,7 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 
 
 Run a test
-----------
+==========
 
 Read imma data with the `cdm_reader_mapper.read_mdf` function:
 
@@ -132,24 +144,34 @@ Detect and flag duplicated observations:
 For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
 
 Contributing to cdm_reader_mapper
----------------------------------
+=================================
 
 If you're interested in participating in the development of `cdm_reader_mapper` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
+In addition, you can install the `cdm_reader_mapper` in development mode using pip:
+
+.. code-block:: console
+
+    pip install cdm_reader_mapper[dev]   # Install optional development dependencies in addition
+    pip install cdm_reader_mapper[docs]  # Install optional dependencies for the documentation in addition
+    pip install cdm_reader_mapper[all]   # Install all the above for complete dependency version
+
+Alternatively using `uv_` you can add optional dependencies using the option `--extra` or install complete dependency version using `--all-extras`.
+
 How to cite this library
-------------------------
+========================
 
 If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/14135493.
 
 License
--------
+=======
 
 This is free software: you can redistribute it and/or modify it under the terms of the `Apache License 2.0`_. A copy of this license is provided in the code repository (`LICENSE`_).
 
 Credits
--------
+=======
 
 ``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_).
 
@@ -196,6 +218,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 .. _PR #11035: https://github.com/dask/dask/pull/11035
 
 .. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
+
+.. _uv: https://docs.astral.sh/uv/
 
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml
