@@ -64,7 +64,11 @@ You can install the package using `uv`_ package manager, this will add the libra
 
 .. code-block:: console
 
-    uv add cdm_reader_mapper
+    uv add cdm_reader_mapper               # Install with no extra dependencies
+    uv add cdm_reader_mapper --extra dev   # Install optional development dependencies in addition
+    uv add cdm_reader_mapper --extra docs  # Install optional dependencies for the documentation in addition
+    uv add cdm_reader_mapper --extra test  # Install optional dependencies for the testing suite in addition
+    uv add cdm_reader_mapper --extra all   # Install all the above for complete dependency version
 
 To develop the package using uv, the following will create a virtual environment, uv defaults to ``.venv``:
 
@@ -72,9 +76,13 @@ To develop the package using uv, the following will create a virtual environment
 
     git clone https://github.com/glamod/cdm_reader_mapper
     cd cdm_reader_mapper
-    uv venv --python 3.12  # Create an environment with the recommended python version
+    uv venv --python 3.12      # Create an environment with the recommended python version
     source .venv/bin/activate  # Load the virtual environment (for bash or zsh)
-    uv sync --all-extras  # Install the package and all dependencies for cdm_reader_mapper
+    uv sync                    # Install with no extra dependencies
+    uv sync --extra dev        # Install optional development dependencies in addition
+    uv sync --extra docs       # Install optional dependencies for the documentation in addition
+    uv sync --extra test       # Install optional dependencies for the testing suite in addition
+    uv sync --all-extras       # Install all the above for complete dependency version
 
 Documentation
 -------------
