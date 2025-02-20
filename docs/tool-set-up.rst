@@ -19,6 +19,12 @@ To install the **cdm_reader_mapper** toolbox in your current conda_ environment,
 
 This is the preferred method to install the **cdm_reader_mapper** toolbox, as it will always install the most recent stable release.
 
+Alternatively, it can be installed using the `uv`_ package manager:
+
+.. code-block:: console
+
+  uv add cdm_reader_mapper
+
 .. include:: hyperlinks.rst
 
 From source
@@ -45,6 +51,12 @@ Once you have a copy of the source, you caninstall it with pip_:
 .. code-block:: console
 
    pip install -e .
+
+Or using the `uv`_ package manager:
+
+.. code-block:: console
+
+   uv add .
 
 Creating a Conda Environment
 ----------------------------

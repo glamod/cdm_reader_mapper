@@ -57,6 +57,25 @@ If you want to contribute, we recommend cloning the repository and installing th
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
+Installation using uv
+---------------------
+
+You can install the package using `uv`_ package manager, this will add the library to your active environment:
+
+.. code-block:: console
+
+    uv add cdm_reader_mapper
+
+To develop the package using uv, the following will create a virtual environment, uv defaults to ``.venv``:
+
+.. code-block:: console
+
+    git clone https://github.com/glamod/cdm_reader_mapper
+    cd cdm_reader_mapper
+    uv venv --python 3.11  # Create an environment with the recommended python version
+    source .venv/bin/activate  # Load the virtual environment (for bash or zsh)
+    uv sync --all-extras  # Install the package and all dependencies for cdm_reader_mapper
+
 Documentation
 -------------
 
@@ -186,6 +205,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 .. _PR #11035: https://github.com/dask/dask/pull/11035
 
 .. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
+
+.. _uv: https://docs.astral.sh/uv/
 
 .. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml/badge.svg
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml
