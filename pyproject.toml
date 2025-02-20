@@ -72,6 +72,9 @@ dev = [
   "pip >=24.2.0",
   "pre-commit >=3.7",
   "pylint >=3.3.1",
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "pytest-env>=1.1.5",
   "ruff >=0.7.0",
   "vulture ==2.14"
 ]
@@ -86,12 +89,7 @@ docs = [
   "sphinx-copybutton",
   "sphinx-book-theme >=1.0"
 ]
-tests = [
-  "pytest>=8.3.4",
-  "pytest-cov>=6.0.0",
-  "pytest-env>=1.1.5"
-]
-all = ["cdm_reader_mapper[dev]", "cdm_reader_mapper[docs]", "cdm_reader_mapper[tests]"]
+all = ["cdm_reader_mapper[dev]", "cdm_reader_mapper[docs]"]
 
 [project.urls]
 "Homepage" = "https://cdm-reader-mapper.readthedocs.io"
