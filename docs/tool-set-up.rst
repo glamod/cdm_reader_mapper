@@ -16,9 +16,9 @@ To install the **cdm_reader_mapper** toolbox in your current conda_ environment,
 .. code-block:: console
 
     pip install cdm_reader_mapper           # Install minimum dependency version
-    pip install cdm_reader_mapper[dev]      # Install optional development dependencies
-    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation
-    pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite
+    pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
+    pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
+    pip install cdm_reader_mapper[test]     # Install optional dependencies for the testing suite in addition
     pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
 
 This is the preferred method to install the **cdm_reader_mapper** toolbox, as it will always install the most recent stable release.
