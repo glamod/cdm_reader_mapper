@@ -61,7 +61,7 @@ Or using the `uv`_ package manager:
 Creating a Conda Environment
 ----------------------------
 
-To create a conda environment including `cdm_reader_mapepr`'s dependencies and and development dependencies, run the following command from within your cloned repo:
+To create a conda environment including `cdm_reader_mapper`'s dependencies and and development dependencies, run the following command from within your cloned repo:
 
 .. code-block:: console
 
