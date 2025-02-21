@@ -138,7 +138,7 @@ Detect and flag duplicated observations:
 
     imma_bundle.duplicate_check()
 
-    imma_bundle.flag_duplicates(overwrite=False)
+    df_flagged = imma_bundle.flag_duplicates(overwrite=False)
 
 
 For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
