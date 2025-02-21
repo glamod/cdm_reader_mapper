@@ -33,7 +33,7 @@ def test_write_tables(table):
 
 
 def test_write_fns():
-    db_exp.write_tables(
+    db_exp.write_data(
         prefix="prefix", suffix=f"{imodel}_all", extension="csv", delimiter=","
     )
     db_res = read_tables(

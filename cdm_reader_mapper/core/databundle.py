@@ -164,7 +164,7 @@ class DataBundle:
 
     @property
     def mode(self):
-        """Name of the MDF/CDM input model."""
+        """Data mode."""
         return self._return_property("_mode")
 
     @mode.setter
@@ -578,7 +578,7 @@ class DataBundle:
         _tables = map_model(self._data, self._imodel, **kwargs)
         self._mode = "tables"
         if overwrite is True:
-            self._tables = map_model(self._data, self._imodel, **kwargs)
+            self._data = _tables
             return self
         return _tables
 
@@ -608,11 +608,12 @@ class DataBundle:
                 encoding=self._encoding,
                 **kwargs,
             )
-        if self._mode == "tables":
+        elif self._mode == "tables":
             write_tables(self._data, encoding=self._encoding, **kwargs)
-        raise ValueError(
-            f"No valid mode: {self._mode}. Choose one of ['data', 'tables']"
-        )
+        else:
+            raise ValueError(
+                f"No valid mode: {self._mode}. Choose one of ['data', 'tables']"
+            )
 
     def duplicate_check(self, **kwargs):
         """Duplicate check in :py:attr:`tables`.
@@ -759,10 +760,10 @@ class DataBundle:
         For more information see :py:func:`DupDetect.remove_duplicates`
         """
         self.DupDetect.remove_duplicates(**kwargs)
-        df_ = self._tables.copy()
+        df_ = self._data.copy()
         header_ = self.DupDetect.result
         df_ = df_[df_.index.isin(header_.index)]
         if overwrite is True:
-            self._tables = df_
+            self._data = df_
             return self
         return df_
