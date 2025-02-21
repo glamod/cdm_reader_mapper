@@ -56,10 +56,15 @@ def add_history(df, indexes):
 
         return now.strftime("%Y-%m-%d %H:%M:%S")
 
+    def _add_history(x):
+        if x:
+            return f"{x}; {addition}"
+        return addition
+
     indexes = list(indexes)
     history_tstmp = _datetime_now()
-    addition = "".join([f"; {history_tstmp}. {add}" for add in _histories.items()])
-    df.loc[indexes, "history"] = df.loc[indexes, "history"] + addition
+    addition = "".join([f"{history_tstmp}. {add}" for add in _histories.items()])
+    df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(_add_history)
     return df
 
 
@@ -74,7 +79,10 @@ def add_duplicates(df, dups):
         dup_idx = dups.loc[idx].to_list()
         v_ = report_ids.iloc[dup_idx[0]]
         v_ = sorted(v_.tolist())
-        row["duplicates"] = "{" + ",".join(v_) + "}"
+        if len(v_) > 1:
+            row["duplicates"] = "{" + ",".join(v_) + "}"
+        else:
+            row["duplicates"] = v_[0]
         return row
 
     report_ids = df["report_id"]
