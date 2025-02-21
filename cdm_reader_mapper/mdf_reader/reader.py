@@ -367,7 +367,6 @@ def read_mdf(
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
     write_data : Write MDF data and validation mask to disk.
-    write_tables : Write CDM tables to disk.
     """
 
     def get_list_element(lst, idx):

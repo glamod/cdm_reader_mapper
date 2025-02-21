@@ -113,7 +113,6 @@ def read_tables(
     --------
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
-    write_tables : Write CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
@@ -121,7 +120,7 @@ def read_tables(
     # also removing rows with empty observation_value in observation_tables
     if not os.path.isdir(inp_dir):
         logger.error(f"Data path not found {inp_dir}: ")
-        return DataBundle(tables=pd.DataFrame())
+        return DataBundle(data=pd.DataFrame())
 
     if suffix is None:
         suffix = ""
@@ -132,7 +131,7 @@ def read_tables(
 
     if len(files) == 0:
         logger.error(f"No files found matching pattern {pattern}")
-        return DataBundle(tables=pd.DataFrame())
+        return DataBundle(data=pd.DataFrame())
 
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
@@ -141,7 +140,7 @@ def read_tables(
     for table in cdm_subset:
         if table not in properties.cdm_tables:
             logger.error(f"Requested table {table} not defined in CDM")
-            return DataBundle(tables=pd.DataFrame())
+            return DataBundle(data=pd.DataFrame())
         logger.info(f"Getting file path for pattern {table}")
         pattern_ = get_filename(
             [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
@@ -175,8 +174,8 @@ def read_tables(
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
-        return DataBundle(tables=pd.DataFrame())
+        return DataBundle(data=pd.DataFrame())
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return DataBundle(tables=merged)
+    return DataBundle(data=merged, mode="tables")
