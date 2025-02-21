@@ -43,8 +43,9 @@ class DataBundle:
         MDF validation mask
     imodel: str, optional
         Name of the MFD/CDM data model.
-    tables: pandas.DataFrame, optional
-        CDM tables.
+    mode: str
+        Data mode ("data" or "tables")
+        Default: "data"
 
     Examples
     --------
@@ -64,8 +65,8 @@ class DataBundle:
     Constructing a :py:class:`cdm_reader_mapper.DataBundle` from already read CDM data.
 
     >>> from cdm_reader_mapper import read_tables
-    >>> tables = read_tables("path_to_files")
-    >>> db = DataBundle(tables=tables)
+    >>> tables = read_tables("path_to_files").data
+    >>> db = DataBundle(data=tables, mode="tables")
     """
 
     def __init__(
@@ -77,7 +78,7 @@ class DataBundle:
         encoding=None,
         mask=None,
         imodel=None,
-        tables=None,
+        mode="data",
     ):
         self._data = data
         self._columns = columns
@@ -86,11 +87,15 @@ class DataBundle:
         self._encoding = encoding
         self._mask = mask
         self._imodel = imodel
-        self._tables = tables
+        self._mode = mode
 
     def __len__(self):
         """Length of :py:attr:`data`."""
         return get_length(self.data)
+
+    def __print__(self):
+        """Print :py:attr:`data`."""
+        print(self.data)
 
     def __getitem__(self, item):
         """Make class subscriptable."""
@@ -158,13 +163,13 @@ class DataBundle:
         self._imodel = value
 
     @property
-    def tables(self):
-        """CDM tables."""
-        return self._return_property("_tables")
+    def mode(self):
+        """Name of the MDF/CDM input model."""
+        return self._return_property("_mode")
 
-    @tables.setter
-    def tables(self, value):
-        self._tables = value
+    @mode.setter
+    def mode(self, value):
+        self._mode = value
 
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
@@ -183,7 +188,7 @@ class DataBundle:
             setattr(self, f"_{name}", data)
         return self
 
-    def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
+    def stack_v(self, other, datasets=["data", "mask"], **kwargs):
         """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s vertically.
 
         Parameters
@@ -224,7 +229,7 @@ class DataBundle:
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
-    def stack_h(self, other, datasets=["data", "mask", "tables"], **kwargs):
+    def stack_h(self, other, datasets=["data", "mask"], **kwargs):
         """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s horizontally.
 
         Parameters
@@ -551,35 +556,16 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
-    def write_data(self, **kwargs):
-        """Write MDF data on disk.
-
-        Examples
-        --------
-        >>> db.write_data()
-
-        See Also
-        --------
-        DataBundle.write_tables : Write MDF data on disk.
-        read_mdf : Read original marine-meteorological data from disk.
-        read_tables : Read CDM tables from disk.
-
-        Note
-        ----
-        For more information see :py:func:`write_data`
-        """
-        write_data(
-            self._data,
-            mask=self._mask,
-            dtypes=self._dtypes,
-            parse_dates=self._parse_dates,
-            encoding=self._encoding,
-            **kwargs,
-        )
-
-    def map_model(self, **kwargs):
+    def map_model(self, overwrite=True, **kwargs):
         """Map :py:attr:`data` to the Common Data Model.
         Write output to :py:attr:`tables`.
+
+        Parameters
+        ----------
+        overwrite: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else return CDM tables.
+            Default: True
 
         Examples
         --------
@@ -589,40 +575,58 @@ class DataBundle:
         ----
         For more information see :py:func:`map_model`
         """
-        self._tables = map_model(self._data, self._imodel, **kwargs)
-        return self
+        _tables = map_model(self._data, self._imodel, **kwargs)
+        self._mode = "tables"
+        if overwrite is True:
+            self._tables = map_model(self._data, self._imodel, **kwargs)
+            return self
+        return _tables
 
-    def write_tables(self, **kwargs):
-        """Write CDM tables on disk.
-
-        Note
-        ----
-        Before writing CDM tables on disk, they have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
-        e.g. with :py:func:`DataBundle.map_model`.
+    def write_data(self, **kwargs):
+        """Write MDF data on disk.
 
         Examples
         --------
-        >>> db.write_tables()
+        >>> db.write_data()
 
         See Also
         --------
-        DataBundle.write_mdf : Write MDF data on disk.
-        read_tables : Read CDM tables from disk.
         read_mdf : Read original marine-meteorological data from disk.
+        read_tables : Read CDM tables from disk.
 
         Note
         ----
-        For more information see :py:func:`write_tables`
+        If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
+        If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
         """
-        write_tables(self._tables, encoding=self._encoding, **kwargs)
+        if self._mode == "data":
+            write_data(
+                self._data,
+                mask=self._mask,
+                dtypes=self._dtypes,
+                parse_dates=self._parse_dates,
+                encoding=self._encoding,
+                **kwargs,
+            )
+        if self._mode == "tables":
+            write_tables(self._data, encoding=self._encoding, **kwargs)
+        raise ValueError(
+            f"No valid mode: {self._mode}. Choose one of ['data', 'tables']"
+        )
 
     def duplicate_check(self, **kwargs):
         """Duplicate check in :py:attr:`tables`.
 
         Note
         ----
-        Before processing the duplicate check, CDM tables have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
-        e.g. with :py:func:`DataBundle.map_model`.
+        Following columns have to be provided:
+
+          * ``longitude``
+          * ``latitude``
+          * ``primary_station_id``
+          * ``report_timestamp``
+          * ``station_course``
+          * ``station_speed``
 
         Examples
         --------
@@ -638,7 +642,11 @@ class DataBundle:
         ----
         For more information see :py:func:`duplicate_check`
         """
-        self.DupDetect = duplicate_check(self._tables["header"], **kwargs)
+        if self._mode == "tables" and "header" in self._data:
+            data = self._data["header"]
+        else:
+            data = self._data
+        self.DupDetect = duplicate_check(data, **kwargs)
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):
@@ -677,10 +685,13 @@ class DataBundle:
         For more information see :py:func:`DupDetect.flag_duplicates`
         """
         self.DupDetect.flag_duplicates(**kwargs)
-        df_ = self._tables.copy()
-        df_["header"] = self.DupDetect.result
+        df_ = self._data.copy()
+        if self._mode == "tables" and "header" in self._data:
+            df_["header"] = self.DupDetect.result
+        else:
+            df_ = self.DupDetect.result
         if overwrite is True:
-            self._tables = df_
+            self._data = df_
             return self
         return df_
 

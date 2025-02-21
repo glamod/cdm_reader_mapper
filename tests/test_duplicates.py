@@ -112,7 +112,8 @@ def test_duplicates_remove():
 def test_duplicates_craid():
     cdm_craid.duplicate_check(ignore_columns="primary_station_id")
     cdm_craid.flag_duplicates()
-    result = cdm_craid.tables["header"]
+    tables = cdm_craid.data.copy()
+    result = tables["header"]
     assert_array_equal(result["duplicate_status"], [0] * 10)
     assert_array_equal(result["report_quality"], [2] * 10)
     assert_array_equal(result["duplicates"], ["null"] * 10)

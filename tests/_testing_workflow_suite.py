@@ -98,7 +98,7 @@ def _testing_suite(
 
     col_subset = get_col_subset(db_mdf.tables, codes_subset)
 
-    db_mdf.write_tables(suffix=imodel)
+    db_mdf.write_data(suffix=imodel)
     output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
 
     output_exp = read_tables(
