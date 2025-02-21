@@ -79,10 +79,7 @@ def add_duplicates(df, dups):
         dup_idx = dups.loc[idx].to_list()
         v_ = report_ids.iloc[dup_idx[0]]
         v_ = sorted(v_.tolist())
-        if len(v_) > 1:
-            row["duplicates"] = "{" + ",".join(v_) + "}"
-        else:
-            row["duplicates"] = v_[0]
+        row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
 
     report_ids = df["report_id"]
