@@ -68,9 +68,6 @@ def _read_single_file(
     logger=None,
     **kwargs,
 ):
-    if not os.path.isfile(ifile):
-        logger.error(f"Data not found: {ifile}")
-        return [DataBundle(data=pd.DataFrame())]
     return [_read_file(ifile, table=cdm_subset[0], col_susbet=col_subset, **kwargs)]
 
 
@@ -84,11 +81,6 @@ def _read_multiple_files(
     logger=None,
     **kwargs,
 ):
-
-    if not os.path.isdir(inp_dir):
-        logger.error(f"Data path not found: {inp_dir}")
-        return [DataBundle(data=pd.DataFrame())]
-
     if suffix is None:
         suffix = ""
 
@@ -117,7 +109,9 @@ def _read_multiple_files(
             )
             continue
 
-        dfi = _read_file(paths_[0], table=table, col_subset=col_subset, **kwargs)
+        dfi = _read_single_file(
+            paths_[0], cdm_subset=[table], col_subset=col_subset, **kwargs
+        )
         if len(dfi) == 0:
             logger.warning(
                 f"Table {table} empty in file system, not added to the final DF"
@@ -131,8 +125,7 @@ def _read_multiple_files(
 
 
 def read_tables(
-    data=None,
-    inp_dir=None,
+    source,
     prefix=None,
     suffix=None,
     extension="psv",
@@ -140,26 +133,24 @@ def read_tables(
     col_subset=None,
     delimiter="|",
     na_values=None,
+    **kwargs,
 ):
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
-    data: str, optional
-        The file (including path) to be read.
-    inp_dir: str, optional
-        Path to the input file(s).
-        Use if `data` is None.
+    source: str, optional
+        The file (including path) or the path to the file(s) to be read.
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-        Use if `data` is None.
+        Could de used if `source` is a valid directory path.
     suffix: str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-        Use if `data` is None.
+        Could de used if `source` is a valid directory path.
     extension: str
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-        Use if `data` is None.
+        Could de used if `source` is a valid directory path.
         Default: psv
     cdm_subset: str or list, optional
         Specifies a subset of tables or a single table.
@@ -171,7 +162,7 @@ def read_tables(
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
 
-        Use if `data` is not None.
+        Required if `source` is a valid file name.
     col_subset: str, list or dict, optional
         Specify the section or sections of the file to read.
 
@@ -213,13 +204,17 @@ def read_tables(
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    if data is not None:
+    if os.path.isfile(source):
         df_list = _read_single_file(
-            data, cdm_subset=cdm_subset, col_subset=col_subset, logger=logger, **kwargs
+            source,
+            cdm_subset=cdm_subset,
+            col_subset=col_subset,
+            logger=logger,
+            **kwargs,
         )
-    elif inp_dir is not None:
+    elif os.path.isdir(source):
         df_list = _read_multiple_files(
-            inp_dir,
+            source,
             prefix=prefix,
             suffix=suffix,
             extension=extension,
@@ -229,8 +224,10 @@ def read_tables(
             **kwargs,
         )
     else:
-        df_list = [DataBundle(data=pd.DataFrame())]
-        logger.error("Please set one of 'data' or 'inp_dir'")
+        logger.error(
+            f"Source is neither a valid file name nor a valid directory path: {source}"
+        )
+        return DataBundle(data=pd.DataFrame())
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
@@ -238,4 +235,4 @@ def read_tables(
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return DataBundle(data=merged, mode="tables")
+    return DataBundle(data=merged, columns=merged.columns, mode="tables")

@@ -41,6 +41,7 @@ def write_data(
     filename=None,
     col_subset=None,
     delimiter=",",
+    **kwargs,
 ):
     """Write pandas.DataFrame to MDF file on file system.
 

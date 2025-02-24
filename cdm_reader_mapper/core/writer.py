@@ -8,10 +8,6 @@ from cdm_reader_mapper.mdf_reader.writer import write_data
 
 def write(
     data,
-    mask=None,
-    dtypes="object",
-    parse_dates=[],
-    encoding="utf-8",
     mode="data",
     **kwargs,
 ):
@@ -21,23 +17,6 @@ def write(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
-    mask: pandas.DataFrame, optional
-        validation mask to export.
-        Use only if ``mode`` is "data".
-    dtypes: dict
-        Dictionary of data types on ``data``.
-        Dump ``dtypes`` and ``parse_dates`` to json information file.
-        Use only if ``mode`` is "data".
-        Default: "object"
-    parse_dates:
-        Information of how to parse dates in :py:attr:`data`.
-        Dump ``dtypes`` and ``parse_dates`` to json information file.
-        For more information see :py:func:`pandas.read_csv`.
-        Use only if ``mode`` is "data".
-        Default: []
-    encoding: str
-        A string representing the encoding to use in the output file.
-        Default: utf-8.
     mode: str, ["data", "tables"]
         Data mode.
         Default: "data"
@@ -57,15 +36,8 @@ def write(
     If `mode` is "tables" write data use :py:func:`write_tables`.
     """
     if mode == "data":
-        write_data(
-            data,
-            mask=mask,
-            dtypes=dtypes,
-            parse_dates=parse_dates,
-            encoding=encoding,
-            **kwargs,
-        )
+        write_data(data, **kwargs)
     elif mode == "tables":
-        write_tables(data, encoding=encoding, **kwargs)
+        write_tables(data, **kwargs)
     else:
         raise ValueError(f"No valid mode: {mode}. Choose one of ['data', 'tables']")

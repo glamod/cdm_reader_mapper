@@ -119,6 +119,10 @@ class DataBundle:
         """Column labels of :py:attr:`data`."""
         return self._return_property("_columns")
 
+    @columns.setter
+    def columns(self, value):
+        self._columns = value
+
     @property
     def dtypes(self):
         """Dictionary of data types on :py:attr:`data`."""

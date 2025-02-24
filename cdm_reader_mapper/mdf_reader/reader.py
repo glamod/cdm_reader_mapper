@@ -319,7 +319,7 @@ class MDFFileReader(FileReader):
 
 
 def read_mdf(
-    data,
+    source,
     imodel=None,
     ext_schema_path=None,
     ext_schema_file=None,
@@ -339,7 +339,7 @@ def read_mdf(
 
     Parameters
     ----------
-    data: str
+    source: str
         The file (including path) to be read.
     imodel: str, optional
         Name of internally available input data model.
@@ -385,7 +385,7 @@ def read_mdf(
         filename=None,
     )
     return MDFFileReader(
-        source=data,
+        source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,
@@ -396,7 +396,7 @@ def read_mdf(
 
 
 def read_data(
-    data,
+    source,
     mask=None,
     info=None,
     imodel=None,
@@ -407,7 +407,7 @@ def read_data(
 
     Parameters
     ----------
-    data: str
+    source: str
         The data file (including path) to be read.
     mask: str, optional
         The validation file (including path) to be read.
@@ -430,10 +430,6 @@ def read_data(
     Returns
     -------
     cdm_reader_mapper.DataBundle
-
-    Note
-    ----
-    :py:func:`cdm_reader_mapper.write_data` dumps ``data``, ``mask`` and ``info`` on file system.
 
     See Also
     --------
@@ -477,7 +473,7 @@ def read_data(
     parse_dates = info_dict.get("parse_dates", False)
 
     data = _read_csv(
-        data,
+        source,
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,
