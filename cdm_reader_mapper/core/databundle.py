@@ -577,6 +577,7 @@ class DataBundle:
         """
         _tables = map_model(self._data, self._imodel, **kwargs)
         self._mode = "tables"
+        self._columns = _tables.columns
         if overwrite is True:
             self._data = _tables
             return self
