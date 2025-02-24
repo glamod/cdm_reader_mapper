@@ -13,7 +13,9 @@ from .common import (  # noqa
     select_from_list,
     select_true,
 )
-from .core import DataBundle, read, write  # noqa
+from .core.databundle import DataBundle  # noqa
+from .core.reader import read  # noqa
+from .core.writer import write  # noqa
 from .data import test_data  # noqa
 from .duplicates.duplicates import DupDetect  # noqa
 from .duplicates.duplicates import duplicate_check  # noqa

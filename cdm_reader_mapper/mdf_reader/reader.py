@@ -319,7 +319,7 @@ class MDFFileReader(FileReader):
 
 
 def read_mdf(
-    source,
+    data,
     imodel=None,
     ext_schema_path=None,
     ext_schema_file=None,
@@ -339,7 +339,7 @@ def read_mdf(
 
     Parameters
     ----------
-    source: str
+    data: str
         The file (including path) to be read.
     imodel: str, optional
         Name of internally available input data model.
@@ -385,7 +385,7 @@ def read_mdf(
         filename=None,
     )
     return MDFFileReader(
-        source=source,
+        source=data,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,

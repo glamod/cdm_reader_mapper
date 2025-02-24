@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper import read_data, read_mdf, read_tables
+from cdm_reader_mapper import read  # read_data, read_mdf, read_tables
 
 from ._results import result_data
 from ._utilities import (
@@ -26,9 +26,10 @@ def _testing_suite(
 ):
     exp = f"expected_{imodel}"
 
-    db_mdf = read_mdf(
-        source=source,
+    db_mdf = read(
+        data=source,
         imodel=imodel,
+        mode="mdf",
         **kwargs,
     )
 
@@ -39,10 +40,13 @@ def _testing_suite(
 
     val_id = db_mdf.validate_id()
 
-    db_mdf.write_data(suffix=imodel)
+    db_mdf.write(suffix=imodel)
 
-    db_res = read_data(
-        f"data-{imodel}.csv", mask=f"mask-{imodel}.csv", info=f"info-{imodel}.json"
+    db_res = read(
+        data=f"data-{imodel}.csv",
+        mask=f"mask-{imodel}.csv",
+        info=f"info-{imodel}.json",
+        mode="data",
     )
     data_res = db_res.data.copy()
     mask_res = db_res.mask.copy()
@@ -53,11 +57,12 @@ def _testing_suite(
     if not os.path.isfile(result_data_file):
         return
 
-    db_exp = read_data(
-        result_data_file,
+    db_exp = read(
+        data=result_data_file,
         mask=expected_data["mask"],
         info=expected_data["info"],
         col_subset=data_res.columns,
+        mode="data",
     )
     data_exp = db_exp.data.copy()
     mask_exp = db_exp.mask.copy()
@@ -98,11 +103,14 @@ def _testing_suite(
 
     col_subset = get_col_subset(db_mdf.data, codes_subset)
 
-    db_mdf.write_data(suffix=imodel)
-    output = read_tables(".", suffix=imodel, cdm_subset=cdm_subset)
+    db_mdf.write(suffix=imodel)
+    output = read(inp_dir=".", suffix=imodel, cdm_subset=cdm_subset, mode="tables")
 
-    output_exp = read_tables(
-        expected_data["cdm_table"], suffix=f"{imodel}*", cdm_subset=cdm_subset
+    output_exp = read(
+        inp_dir=expected_data["cdm_table"],
+        suffix=f"{imodel}*",
+        cdm_subset=cdm_subset,
+        mode="tables",
     )
 
     output = output.data

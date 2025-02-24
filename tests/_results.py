@@ -212,7 +212,7 @@ class result_data:
 result_data = result_data()
 
 cdm_header = read_tables(
-    result_data.expected_icoads_r302_d792["cdm_table"], cdm_subset=["header"]
+    inp_dir=result_data.expected_icoads_r302_d792["cdm_table"], cdm_subset=["header"]
 )
 correction_file = list((_base / "corrections").glob("2022-02.txt.gz"))[0]
 correction_df = pd.read_csv(
