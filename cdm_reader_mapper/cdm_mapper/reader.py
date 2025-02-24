@@ -111,8 +111,11 @@ def read_tables(
 
     See Also
     --------
+    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
+    write: Write either MDF data or CDM tables to disk.
+    write_tables: Write CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")

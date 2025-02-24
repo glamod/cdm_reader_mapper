@@ -364,9 +364,12 @@ def read_mdf(
 
     See Also
     --------
+    read: Read either original marine-meteorological or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
+    write: Write either MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
+    write_tables : Write CDM tables to disk.
     """
 
     def get_list_element(lst, idx):
@@ -434,8 +437,10 @@ def read_data(
 
     See Also
     --------
+    read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
+    write: Write both MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """

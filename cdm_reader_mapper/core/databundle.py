@@ -590,15 +590,19 @@ class DataBundle:
             return self
         return _tables
 
-    def write_data(self, **kwargs):
-        """Write MDF data on disk.
+    def write(self, **kwargs):
+        """Write :py:attr:`data` on disk.
 
         Examples
         --------
-        >>> db.write_data()
+        >>> db.write()
 
         See Also
         --------
+        write_data : Write MDF data and validation mask to disk.
+        write_tables: Write CDM tables to disk.
+        read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
+        read_data: Read MDF data and validation mask from disk.
         read_mdf : Read original marine-meteorological data from disk.
         read_tables : Read CDM tables from disk.
 
@@ -607,21 +611,14 @@ class DataBundle:
         If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
         If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
         """
-        if self._mode == "data":
-            write_data(
-                self._data,
-                mask=self._mask,
-                dtypes=self._dtypes,
-                parse_dates=self._parse_dates,
-                encoding=self._encoding,
-                **kwargs,
-            )
-        elif self._mode == "tables":
-            write_tables(self._data, encoding=self._encoding, **kwargs)
-        else:
-            raise ValueError(
-                f"No valid mode: {self._mode}. Choose one of ['data', 'tables']"
-            )
+        write(
+            data=self._data,
+            mask=self._mask,
+            dtypes=self._dtypes,
+            parse_dates=self._parse_dates,
+            encoding=self._encoding,
+            mode=self._mode,
+        )
 
     def duplicate_check(self, **kwargs):
         """Duplicate check in :py:attr:`tables`.
@@ -775,3 +772,73 @@ class DataBundle:
             self._data = df_
             return self
         return df_
+
+
+def read():
+    """Read data."""
+    return
+
+
+def write(
+    data,
+    mask=None,
+    dtypes="object",
+    parse_dates=[],
+    encoding="utf-8",
+    mode="data",
+    **kwargs,
+):
+    """Write either MDF data ord CDM tables on disk.
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        pandas.DataFrame to export.
+    mask: pandas.DataFrame, optional
+        validation mask to export.
+        Use only if ``mode`` is "data".
+    dtypes: dict
+        Dictionary of data types on ``data``.
+        Dump ``dtypes`` and ``parse_dates`` to json information file.
+        Use only if ``mode`` is "data".
+        Default: "object"
+    parse_dates:
+        Information of how to parse dates in :py:attr:`data`.
+        Dump ``dtypes`` and ``parse_dates`` to json information file.
+        For more information see :py:func:`pandas.read_csv`.
+        Use only if ``mode`` is "data".
+        Default: []
+    encoding: str
+        A string representing the encoding to use in the output file.
+        Default: utf-8.
+    mode: str
+        Data mode ("data" or "tables")
+        Default: "data"
+
+    See Also
+    --------
+    write_data : Write MDF data and validation mask to disk.
+    write_tables: Write CDM tables to disk.
+    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
+    read_mdf : Read original marine-meteorological data from disk.
+    read_data : Read MDF data and validation mask from disk.
+    read_tables : Read CDM tables from disk.
+
+    Note
+    ----
+    If `mode` is "data" write data use :py:func:`write_data`.
+    If `mode` is "tables" write data use :py:func:`write_tables`.
+    """
+    if mode == "data":
+        write_data(
+            data,
+            mask=mask,
+            dtypes=dtypes,
+            parse_dates=parse_dates,
+            encoding=encoding,
+            **kwargs,
+        )
+    elif mode == "tables":
+        write_tables(data, encoding=encoding, **kwargs)
+    else:
+        raise ValueError(f"No valid mode: {mode}. Choose one of ['data', 'tables']")
