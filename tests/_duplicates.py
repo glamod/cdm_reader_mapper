@@ -130,7 +130,7 @@ def _get_test_data(imodel):
     exp_data = getattr(result_data, exp_name)
     data_path = exp_data.get("cdm_table")
     return read(
-        inp_dir=data_path,
+        data_path,
         suffix=f"{imodel}*",
         cdm_subset="header",
         mode="tables",

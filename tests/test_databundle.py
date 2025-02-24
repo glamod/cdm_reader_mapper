@@ -11,14 +11,14 @@ from ._results import result_data
 def get_result_data(imodel):
     results_ = getattr(result_data, f"expected_{imodel}")
     db_ = read(
-        data=results_["data"],
+        results_["data"],
         mask=results_["mask"],
         info=results_["info"],
         mode="data",
     )
     data_ = db_.data.copy()
     mask_ = db_.mask.copy()
-    db = read(inp_dir=results_["cdm_table"], suffix=f"{imodel}*", mode="tables")
+    db = read(results_["cdm_table"], suffix=f"{imodel}*", mode="tables")
     return db.add({"data": data_, "mask": mask_})
 
 

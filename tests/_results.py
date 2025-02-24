@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 
 import pandas as pd
 
-from cdm_reader_mapper import read_tables
+from cdm_reader_mapper import read
 from cdm_reader_mapper.common import load_file
 
 cdm_tables = [
@@ -211,8 +211,10 @@ class result_data:
 
 result_data = result_data()
 
-cdm_header = read_tables(
-    inp_dir=result_data.expected_icoads_r302_d792["cdm_table"], cdm_subset=["header"]
+cdm_header = read(
+    result_data.expected_icoads_r302_d792["cdm_table"],
+    cdm_subset=["header"],
+    mode="tables",
 )
 correction_file = list((_base / "corrections").glob("2022-02.txt.gz"))[0]
 correction_df = pd.read_csv(
