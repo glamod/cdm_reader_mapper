@@ -56,8 +56,83 @@ from . import properties
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
-def read_tables(
+def _read_file(ifile, table, col_subset, **kwargs):
+    usecols = get_usecols(table, col_subset)
+    return pd.read_csv(ifile, usecols=usecols, **kwargs)
+
+
+def _read_single_file(
+    ifile,
+    cdm_subset=None,
+    col_subset=None,
+    logger=None,
+    **kwargs,
+):
+    if not os.path.isfile(ifile):
+        logger.error(f"Data not found: {ifile}")
+        return [DataBundle(data=pd.DataFrame())]
+    return [_read_file(ifile, table=cdm_subset[0], col_susbet=col_subset, **kwargs)]
+
+
+def _read_multiple_files(
     inp_dir,
+    prefix=None,
+    suffix=None,
+    extension="psv",
+    cdm_subset=None,
+    col_subset=None,
+    logger=None,
+    **kwargs,
+):
+
+    if not os.path.isdir(inp_dir):
+        logger.error(f"Data path not found: {inp_dir}")
+        return [DataBundle(data=pd.DataFrame())]
+
+    if suffix is None:
+        suffix = ""
+
+    # See if there's anything at all:
+    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
+    files = glob.glob(pattern)
+
+    if len(files) == 0:
+        logger.error(f"No files found matching pattern {pattern}")
+        return [DataBundle(data=pd.DataFrame())]
+
+    df_list = []
+    for table in cdm_subset:
+        if table not in properties.cdm_tables:
+            logger.error(f"Requested table {table} not defined in CDM")
+            return DataBundle(data=pd.DataFrame())
+        logger.info(f"Getting file path for pattern {table}")
+        pattern_ = get_filename(
+            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
+        )
+        paths_ = glob.glob(pattern_)
+        if len(paths_) != 1:
+            logger.warning(
+                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
+                "Cannot securely retrieve cdm table(s)"
+            )
+            continue
+
+        dfi = _read_file(paths_[0], table=table, col_subset=col_subset, **kwargs)
+        if len(dfi) == 0:
+            logger.warning(
+                f"Table {table} empty in file system, not added to the final DF"
+            )
+            continue
+
+        dfi = dfi.set_index("report_id", drop=False)
+        dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
+        df_list.append(dfi)
+    return df_list
+
+
+def read_tables(
+    data=None,
+    inp_dir=None,
     prefix=None,
     suffix=None,
     extension="psv",
@@ -71,14 +146,20 @@ def read_tables(
 
     Parameters
     ----------
-    inp_dir: str
+    data: str, optional
+        The file (including path) to be read.
+    inp_dir: str, optional
         Path to the input file(s).
+        Use if `data` is None.
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Use if `data` is None.
     suffix: str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Use if `data` is None.
     extension: str
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Use if `data` is None.
         Default: psv
     cdm_subset: str or list, optional
         Specifies a subset of tables or a single table.
@@ -89,6 +170,8 @@ def read_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
+
+        Use if `data` is not None.
     col_subset: str, list or dict, optional
         Specify the section or sections of the file to read.
 
@@ -121,59 +204,33 @@ def read_tables(
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
-    if not os.path.isdir(inp_dir):
-        logger.error(f"Data path not found {inp_dir}: ")
-        return DataBundle(data=pd.DataFrame())
-
-    if suffix is None:
-        suffix = ""
-
-    # See if there's anything at all:
-    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
-    files = glob.glob(pattern)
-
-    if len(files) == 0:
-        logger.error(f"No files found matching pattern {pattern}")
-        return DataBundle(data=pd.DataFrame())
-
+    kwargs = {
+        "delimiter": delimiter,
+        "dtype": "object",
+        "na_values": na_values,
+        "keep_default_na": False,
+    }
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    df_list = []
-    for table in cdm_subset:
-        if table not in properties.cdm_tables:
-            logger.error(f"Requested table {table} not defined in CDM")
-            return DataBundle(data=pd.DataFrame())
-        logger.info(f"Getting file path for pattern {table}")
-        pattern_ = get_filename(
-            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
+    if data is not None:
+        df_list = _read_single_file(
+            data, cdm_subset=cdm_subset, col_subset=col_subset, logger=logger, **kwargs
         )
-        paths_ = glob.glob(pattern_)
-        if len(paths_) != 1:
-            logger.warning(
-                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
-                "Cannot securely retrieve cdm table(s)"
-            )
-            continue
-
-        usecols = get_usecols(table, col_subset)
-        dfi = pd.read_csv(
-            paths_[0],
-            delimiter=delimiter,
-            usecols=usecols,
-            dtype="object",
-            na_values=na_values,
-            keep_default_na=False,
+    elif inp_dir is not None:
+        df_list = _read_multiple_files(
+            inp_dir,
+            prefix=prefix,
+            suffix=suffix,
+            extension=extension,
+            cdm_subset=cdm_subset,
+            col_subset=col_subset,
+            logger=logger,
+            **kwargs,
         )
-        if len(dfi) == 0:
-            logger.warning(
-                f"Table {table} empty in file system, not added to the final DF"
-            )
-            continue
-
-        dfi = dfi.set_index("report_id", drop=False)
-        dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
-        df_list.append(dfi)
+    else:
+        df_list = [DataBundle(data=pd.DataFrame())]
+        logger.error("Please set one of 'data' or 'inp_dir'")
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
