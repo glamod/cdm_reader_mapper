@@ -68,7 +68,7 @@ def _read_single_file(
     logger=None,
     **kwargs,
 ):
-    return [_read_file(ifile, table=cdm_subset[0], col_susbet=col_subset, **kwargs)]
+    return _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
 
 
 def _read_multiple_files(
@@ -205,13 +205,15 @@ def read_tables(
     cdm_subset = get_cdm_subset(cdm_subset)
 
     if os.path.isfile(source):
-        df_list = _read_single_file(
-            source,
-            cdm_subset=cdm_subset,
-            col_subset=col_subset,
-            logger=logger,
-            **kwargs,
-        )
+        df_list = [
+            _read_single_file(
+                source,
+                cdm_subset=cdm_subset,
+                col_subset=col_subset,
+                logger=logger,
+                **kwargs,
+            )
+        ]
     elif os.path.isdir(source):
         df_list = _read_multiple_files(
             source,
