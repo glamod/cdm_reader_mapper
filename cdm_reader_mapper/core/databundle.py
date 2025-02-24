@@ -422,13 +422,17 @@ class DataBundle:
         """
         return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(self, df_corr, **kwargs):
+    def replace_columns(self, df_corr, overwrite=True, **kwargs):
         """Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
         df_corr: pandas.DataFrame
             Data to be inplaced.
+        overwrite: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+            else return pd.DataFrame with replaced columns.
+            Default: True
 
         Examples
         --------
@@ -440,9 +444,12 @@ class DataBundle:
         ----
         For more information see :py:func:`replace_columns`
         """
-        self._data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
-        self._columns = self._data.columns
-        return self
+        _data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+        if overwrite is True:
+            self._data = _data
+            self._columns = self._data.columns
+            return self
+        return _data
 
     def correct_datetime(self, overwrite=True):
         """Correct datetime information in :py:attr:`data`.
@@ -576,9 +583,9 @@ class DataBundle:
         For more information see :py:func:`map_model`
         """
         _tables = map_model(self._data, self._imodel, **kwargs)
-        self._mode = "tables"
-        self._columns = _tables.columns
         if overwrite is True:
+            self._mode = "tables"
+            self.columns = _tables.columns
             self._data = _tables
             return self
         return _tables
