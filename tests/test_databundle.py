@@ -3,21 +3,22 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import DataBundle, read_data, read_tables
+from cdm_reader_mapper import DataBundle, read
 
 from ._results import result_data
 
 
 def get_result_data(imodel):
     results_ = getattr(result_data, f"expected_{imodel}")
-    db_ = read_data(
-        results_["data"],
+    db_ = read(
+        data=results_["data"],
         mask=results_["mask"],
         info=results_["info"],
+        mode="data",
     )
     data_ = db_.data.copy()
     mask_ = db_.mask.copy()
-    db = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
+    db = read(inp_dir=results_["cdm_table"], suffix=f"{imodel}*", mode="tables")
     return db.add({"data": data_, "mask": mask_})
 
 

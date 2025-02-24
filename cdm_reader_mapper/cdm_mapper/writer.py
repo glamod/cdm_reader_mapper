@@ -147,9 +147,12 @@ def write_tables(
 
         filename_ = filename.get(table)
         if not filename_:
+            print(filename_)
+            print(table, prefix, suffix)
             filename_ = get_filename(
                 [prefix, table, suffix], path=out_dir, extension=extension
             )
+            print(filename_)
         filename_ = adjust_filename(filename_, table=table, extension=extension)
         logger.info(f"Writing table {table}: {filename_}")
         _table_to_ascii(

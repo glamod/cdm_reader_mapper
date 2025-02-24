@@ -618,6 +618,7 @@ class DataBundle:
             parse_dates=self._parse_dates,
             encoding=self._encoding,
             mode=self._mode,
+            **kwargs,
         )
 
     def duplicate_check(self, **kwargs):

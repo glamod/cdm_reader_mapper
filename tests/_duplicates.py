@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper import read_tables
+from cdm_reader_mapper import read
 
 from ._results import result_data
 
@@ -129,10 +129,11 @@ def _get_test_data(imodel):
     exp_name = f"expected_{imodel}"
     exp_data = getattr(result_data, exp_name)
     data_path = exp_data.get("cdm_table")
-    return read_tables(
-        data_path,
+    return read(
+        inp_dir=data_path,
         suffix=f"{imodel}*",
         cdm_subset="header",
+        mode="tables",
     )
 
 
