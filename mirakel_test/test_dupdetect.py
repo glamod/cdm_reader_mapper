@@ -1,4 +1,4 @@
-"""Duplicate cechk for test data."""
+"""Duplicate check for test data."""
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper import DataBundle
