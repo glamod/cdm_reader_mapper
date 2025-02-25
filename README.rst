@@ -279,8 +279,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14871004.svg
-        :target: https://doi.org/10.5281/zenodo.14871004
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14922212.svg
+        :target: https://doi.org/10.5281/zenodo.14922212
  	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
