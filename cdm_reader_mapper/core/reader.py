@@ -17,9 +17,9 @@ def read(
     ----------
     source: str
         Source of the input data.
-    mode: str, ["mdf", "data", "tables"]
+    mode: str, {mdf, data, tables}
         Data mode.
-        Default: "mdf"
+        Default: mdf
 
     See Also
     --------
