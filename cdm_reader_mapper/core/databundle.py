@@ -638,7 +638,11 @@ class DataBundle:
         ----
         For more information see :py:func:`duplicate_check`
         """
-        self.DupDetect = duplicate_check(self._tables["header"], **kwargs)
+        if "header" in self._tables:
+            data = self._tables["header"]
+        else:
+            data = self._tables
+        self.DupDetect = duplicate_check(data, **kwargs)
         return self
 
     def flag_duplicates(self, overwrite=True, **kwargs):
@@ -678,7 +682,10 @@ class DataBundle:
         """
         self.DupDetect.flag_duplicates(**kwargs)
         df_ = self._tables.copy()
-        df_["header"] = self.DupDetect.result
+        if "header" in df_:
+            df_["header"] = self.DupDetect.result
+        else:
+            df_ = self.DupDetect.result
         if overwrite is True:
             self._tables = df_
             return self
