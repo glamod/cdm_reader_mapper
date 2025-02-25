@@ -16,6 +16,7 @@ Read data from disk
 .. autosummary::
    :toctree: generated/
 
+   read
    read_mdf
    read_data
    read_tables
@@ -89,23 +90,14 @@ Validation
 
 .. _cdm_tables:
 
-MDF data
-^^^^^^^^
 
-.. autosummary::
-   :toctree: generated/
-
-   DataBundle.write_data
-
-CDM tables
-^^^^^^^^^^
+Map data to CDM tables
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
    :toctree: generated/
 
    DataBundle.map_model
-
-   DataBundle.write_tables
 
 .. _cdm_correction
 
@@ -135,14 +127,18 @@ Duplicate check
 
    DataBundle.remove_duplicates
 
+Write data on disk
+^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   DataBundle.write
 
 .. _properties
 
 DataBundle's property attributes
 --------------------------------
-
-MDF data
-^^^^^^^^
 
 .. autosummary::
    :toctree: generated/
@@ -158,22 +154,6 @@ MDF data
    DataBundle.mask
 
    DataBundle.imodel
-
-   DataBundle.selected
-
-   DataBundle.deselected
-
-CDM tables
-^^^^^^^^^^
-
-.. autosummary::
-   :toctree: generated/
-
-   DataBundle.tables
-
-   DataBundle.tables_dups_flagged
-
-   DataBundle.tables_dups_removed
 
 .. _useful_func:
 
@@ -192,10 +172,9 @@ Useful functions
    select_true
    select_from_index
    select_from_list
-   write_data
    map_model
    duplicate_check
-   write_tables
+   write
 
 .. _dupdetect:
 
