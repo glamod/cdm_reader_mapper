@@ -2,12 +2,9 @@
 name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
-  push:
-    branches:
-      - "*"
-  pull_request:
-    branches:
-      - "*"
+  release:
+    types:
+      - published
 
 permissions:
   contents: read
