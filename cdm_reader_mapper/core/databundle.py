@@ -94,7 +94,6 @@ class DataBundle:
 
     def __getitem__(self, item):
         """Make class subscriptable."""
-        print(item)
         return getattr(self, item)
 
     def _return_property(self, property):
