@@ -94,6 +94,7 @@ class DataBundle:
 
     def __getitem__(self, item):
         """Make class subscriptable."""
+        print(item)
         return getattr(self, item)
 
     def _return_property(self, property):
@@ -113,6 +114,11 @@ class DataBundle:
     def columns(self):
         """Column labels of :py:attr:`data`."""
         return self._return_property("_columns")
+
+    @property
+    def index(self):
+        """Indexes of :py:attr:`data`."""
+        return self._return_property("_index")
 
     @property
     def dtypes(self):
@@ -272,15 +278,25 @@ class DataBundle:
         """
         return deepcopy(self)
 
-    def select_true(self, overwrite=True, **kwargs):
+    def select_true(self, data="data", return_invalid=False, overwrite=True, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
+        data: str, {'data', 'mask'}
+            Name of the data to be selected.
+            Default: data
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid rows.
             Default: True
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Note
         ----
@@ -306,13 +322,23 @@ class DataBundle:
         ----
         For more information see :py:func:`select_true`
         """
-        selected = select_true(self._data, self._mask, **kwargs)
+        _data = f"_{data}"
+        _data, _invalid, _index = select_true(
+            getattr(self, _data), self._mask, in_index=True, **kwargs
+        )
         if overwrite is True:
-            self._data = selected[0]
-            return self
-        return selected
+            setattr(self, data, _data)
+            setattr(self, "_index", _index)
+            _return = self
+        else:
+            _return = _data
+        if return_invalid is True:
+            return _return, _invalid
+        return _return
 
-    def select_from_list(self, selection, overwrite=True, **kwargs):
+    def select_from_list(
+        self, selection, data="data", return_invalid=False, overwrite=True, **kwargs
+    ):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -320,10 +346,20 @@ class DataBundle:
         selection: dict
             Keys: columns to be selected.
             Values: values in keys to be selected
+        data: str, {'data', 'mask'}
+            Name of the data to be selected.
+            Default: data
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: True
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Note
         ----
@@ -351,23 +387,43 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_list`
         """
-        selected = select_from_list(self._data, selection, **kwargs)
+        _data = f"_{data}"
+        _data, _invalid, _index = select_from_list(
+            getattr(self, _data), selection, in_index=True, **kwargs
+        )
         if overwrite is True:
-            self._data = selected[0]
-            return self
-        return selected
+            setattr(self, data, _data)
+            setattr(self, "_index", _index)
+            _return = self
+        else:
+            _return = _data
+        if return_invalid is True:
+            return _return, _invalid
+        return _return
 
-    def select_from_index(self, index, overwrite=True, **kwargs):
+    def select_from_index(
+        self, index, data="data", return_invalid=False, overwrite=True, **kwargs
+    ):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
+        data: str, {'data', 'mask'}
+            Name of the data to be selected.
+            Default: data
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         overwrite: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: True
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Note
         ----
@@ -393,11 +449,17 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_index`
         """
-        selected = select_from_index(self._data, index, **kwargs)
+        _data = f"_{data}"
+        _data, _invalid = select_from_index(getattr(self, _data), index, **kwargs)
         if overwrite is True:
-            self._data = selected[0]
-            return self
-        return selected
+            setattr(self, data, _data)
+            setattr(self, "_index", index)
+            _return = self
+        else:
+            _return = _data
+        if return_invalid is True:
+            return _return, _invalid
+        return _return
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
