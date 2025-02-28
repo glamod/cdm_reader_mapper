@@ -90,7 +90,11 @@ class DataBundle:
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        return get_length(self.data)
+        if self._data is not None:
+            return get_length(self._data)
+        if self._tables is not None:
+            return get_length(self._tables)
+        raise KeyError("Neither data nor tables are defined.")
 
     def __getitem__(self, item):
         """Make class subscriptable."""
