@@ -1,65 +1,65 @@
 {
-  "128": {
+  "d128": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "150": {
+  "d150": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "151": {
+  "d151": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "152": {
+  "d152": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "155": {
+  "d155": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "156": {
+  "d156": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "192": {
+  "d192": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "201": {
+  "d201": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "246": {
+  "d246": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "255": {
+  "d255": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "875": {
+  "d875": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "892": {
+  "d892": {
     "method": "function",
     "function": "deck_892_imma1"
   },
-  "897": {
+  "d897": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "899": {
+  "d899": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "993": {
+  "d993": {
     "method": "fillna",
     "fill_value": "5"
   },
-  "700": {
+  "d700": {
     "method": "function",
     "function": "deck_700_imma1"
   }
