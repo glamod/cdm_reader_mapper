@@ -156,6 +156,7 @@ class DupDetect:
             Default: All column names found in method_kwargs.
         overwrite: bool
             If True overwrite find duplicates again.
+            Default: True
 
         Returns
         -------
