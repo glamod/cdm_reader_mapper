@@ -41,13 +41,14 @@ def read(
     `kwargs` are the keyword arguments for the specific `mode` reader.
 
     """
-    if mode == "mdf":
-        return read_mdf(source, **kwargs)
-    elif mode == "data":
-        return read_data(source, **kwargs)
-    elif mode == "tables":
-        return read_tables(source, **kwargs)
-    else:
-        raise ValueError(
-            f"No valid mode: {mode}. Choose one of ['mdf', 'data', 'tables']"
-        )
+    match mode.lower():
+        case "mdf":
+            return read_mdf(source, **kwargs)
+        case "data":
+            return read_data(source, **kwargs)
+        case "tables":
+            return read_tables(source, **kwargs)
+        case _:
+            raise ValueError(
+                f"No valid mode: {mode}. Choose one of ['mdf', 'data', 'tables']"
+            )
