@@ -90,13 +90,13 @@ def _read_multiple_files(
 
     if len(files) == 0:
         logger.error(f"No files found matching pattern {pattern}")
-        return [DataBundle(data=pd.DataFrame())]
+        return [pd.DataFrame()]
 
     df_list = []
     for table in cdm_subset:
         if table not in properties.cdm_tables:
-            logger.error(f"Requested table {table} not defined in CDM")
-            return DataBundle(data=pd.DataFrame())
+            logger.warning(f"Requested table {table} not defined in CDM")
+            continue
         logger.info(f"Getting file path for pattern {table}")
         pattern_ = get_filename(
             [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
@@ -233,7 +233,7 @@ def read_tables(
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
-        return DataBundle(data=pd.DataFrame())
+        return DataBundle(data=pd.DataFrame(), mode="tables")
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
