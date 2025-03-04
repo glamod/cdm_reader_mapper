@@ -36,6 +36,10 @@ def read(
     If `mode` is "data" use :py:func:`read_data`.
     If `mode` is "tables" use :py:func:`read_tables`.
 
+    Note
+    ----
+    `kwargs` are the keyword arguments for the specific `mode` reader.
+
     """
     if mode == "mdf":
         return read_mdf(source, **kwargs)
