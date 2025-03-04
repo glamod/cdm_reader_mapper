@@ -35,9 +35,10 @@ def write(
     If `mode` is "data" write data use :py:func:`write_data`.
     If `mode` is "tables" write data use :py:func:`write_tables`.
     """
-    if mode == "data":
-        write_data(data, **kwargs)
-    elif mode == "tables":
-        write_tables(data, **kwargs)
-    else:
-        raise ValueError(f"No valid mode: {mode}. Choose one of ['data', 'tables']")
+    match mode.lower():
+        case "data":
+            write_data(data, **kwargs)
+        case "tables":
+            write_tables(data, **kwargs)
+        case _:
+            raise ValueError(f"No valid mode: {mode}. Choose one of ['data', 'tables']")
