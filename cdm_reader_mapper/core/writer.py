@@ -35,10 +35,6 @@ def write(
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
 
-    Note
-    ----
-    * If `mode` is "data" call :py:func:`write_data`.
-    * If `mode` is "tables" call :py:func:`write_tables`.
 
     Note
     ----
