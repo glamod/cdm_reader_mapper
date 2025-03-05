@@ -219,7 +219,7 @@ python_files = "test_*.py"
 testpaths = ["./tests"]
 
 [tool.ruff]
-src = ["xclim"]
+src = ["cdm_reader_mapper"]
 line-length = 150
 target-version = "py312"
 exclude = [
@@ -265,7 +265,7 @@ scipy = "sp"
 xarray = "xr"
 
 [tool.ruff.lint.isort]
-known-first-party = ["xclim"]
+known-first-party = ["cdm_reader_mapper"]
 case-sensitive = true
 detect-same-package = false
 lines-after-imports = 2
