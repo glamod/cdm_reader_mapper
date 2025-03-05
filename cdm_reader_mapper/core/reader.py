@@ -18,7 +18,11 @@ def read(
     source: str
         Source of the input data.
     mode: str, {mdf, data, tables}
-        Data mode.
+        Read data mode: 
+        
+          * "mdf" to read original marine-meteorological data from disk and convert them to MDF data
+          * "data" to read MDF data from disk 
+          * "tables" to read CDM tables from disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
         Default: mdf
 
     See Also
