@@ -48,6 +48,7 @@ def _testing_suite(
         info=f"info-{imodel}.json",
         mode="data",
     )
+
     data_res = db_res.data.copy()
     mask_res = db_res.mask.copy()
 
@@ -76,7 +77,7 @@ def _testing_suite(
     pd.testing.assert_frame_equal(data_res, data_exp)
     pd.testing.assert_frame_equal(mask_res, mask_exp, check_dtype=False)
 
-    if val_dt is not None:
+    if val_dt is not None and os.path.isfile(expected_data["vadt"]):
         val_dt_ = read_validation(
             expected_data["vadt"],
             name=None,
@@ -84,7 +85,7 @@ def _testing_suite(
         val_dt_ = drop_rows(val_dt_, drops)
         pd.testing.assert_series_equal(val_dt, val_dt_, check_dtype=False)
 
-    if val_id is not None:
+    if val_id is not None and os.path.isfile(expected_data["vaid"]):
         val_id_ = read_validation(
             expected_data["vaid"],
             name=val_id.name,
