@@ -175,6 +175,8 @@ Useful functions
    map_model
    duplicate_check
    write
+   write_data
+   write_tables
 
 .. _dupdetect:
 

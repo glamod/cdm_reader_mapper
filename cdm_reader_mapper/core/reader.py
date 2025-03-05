@@ -32,9 +32,9 @@ def read(
 
     Note
     ----
-    If `mode` is "mdf" use :py:func:`read_mdf`.
-    If `mode` is "data" use :py:func:`read_data`.
-    If `mode` is "tables" use :py:func:`read_tables`.
+    * If `mode` is "mdf" call :py:func:`read_mdf`.
+    * If `mode` is "data" call :py:func:`read_data`.
+    * If `mode` is "tables" call :py:func:`read_tables`.
 
     Note
     ----

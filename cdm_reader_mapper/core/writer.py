@@ -17,9 +17,9 @@ def write(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
-    mode: str, ["data", "tables"]
+    mode: str, {data, tables}
         Data mode.
-        Default: "data"
+        Default: data
 
     See Also
     --------
@@ -32,8 +32,12 @@ def write(
 
     Note
     ----
-    If `mode` is "data" write data use :py:func:`write_data`.
-    If `mode` is "tables" write data use :py:func:`write_tables`.
+    * If `mode` is "data" call :py:func:`write_data`.
+    * If `mode` is "tables" call :py:func:`write_tables`.
+
+    Note
+    ----
+    `kwargs` are the keyword arguments for the specific `mode` reader.
     """
     match mode.lower():
         case "data":
