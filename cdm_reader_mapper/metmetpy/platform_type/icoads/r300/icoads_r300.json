@@ -45,7 +45,7 @@
   },
   "d892": {
     "method": "function",
-    "function": "deck_892_imma1"
+    "function": "deck_892_icoads"
   },
   "d897": {
     "method": "fillna",
@@ -61,6 +61,6 @@
   },
   "d700": {
     "method": "function",
-    "function": "deck_700_imma1"
+    "function": "deck_700_icoads"
   }
 }

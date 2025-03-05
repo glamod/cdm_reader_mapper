@@ -1,7 +1,7 @@
 {
   "d792": {
     "method": "function",
-    "function": "deck_792_imma1"
+    "function": "deck_792_icoads"
   },
   "d793": {
     "method": "fillna",
@@ -25,7 +25,7 @@
   },
   "d992": {
     "method": "function",
-    "function": "deck_992_imma1"
+    "function": "deck_992_icoads"
   },
   "d993": {
     "method": "fillna",
