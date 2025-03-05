@@ -18,12 +18,12 @@ def write(
     data: pandas.DataFrame
         pandas.DataFrame to export.
     mode: str, {data, tables}
-        Write data mode: 
-        
-          * "data" to write MDF data to disk 
+        Write data mode:
+
+          * "data" to write MDF data to disk
           * "tables" to write CDM tables to disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
-        
-        
+
+
         Default: data
 
     See Also
