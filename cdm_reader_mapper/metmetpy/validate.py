@@ -111,7 +111,9 @@ def _get_patterns(dck_id_model, blank, dck, data_model_files, logger):
 def validate_id(data, imodel, blank=False, log_level="INFO"):
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        data = pandas_TextParser_hdlr.make_copy(data).read()
+    elif not isinstance(data, (pd.DataFrame, pd.Series)):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"
@@ -120,14 +122,14 @@ def validate_id(data, imodel, blank=False, log_level="INFO"):
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.error(f"Dataset {imodel} has to deck information.")
+        logger.error(f"Dataset {imodel} has no deck information.")
         return
     dck = mrd[2]
 
     if isinstance(data, pd.io.parsers.TextFileReader):
         data = pandas_TextParser_hdlr.make_copy(data).read()
 
-    id_col = _get_id_col(data, imodel, logger)
+    id_col = _get_id_col(data, mrd[0], logger)
     if id_col is None:
         return
 
@@ -162,7 +164,7 @@ def validate_datetime(data, imodel, log_level="INFO"):
 
     if isinstance(data, pd.io.parsers.TextFileReader):
         data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
+    elif not isinstance(data, (pd.DataFrame, pd.Series)):
         logger.error(
             f"Input data must be a pd.DataFrame or pd.Series.\
                      Input data type is {type(data)}"
