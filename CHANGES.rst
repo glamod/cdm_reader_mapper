@@ -16,7 +16,7 @@ New features and enhancements
   * `mode` == "data"; calls ``cdm_reader_mapper.read_data`` or ``cdm_reader_mapper.write_data``
   * `mode` == "tables"; calls ``cdm_reader_mapper.read_tables`` or ``cdm_reader_mapper.write_tables``
 
-* optionally, call ``cdm_reader_mapper.read_tables`` with neither source file nor source directory path (:pull:`238`)
+* optionally, call ``cdm_reader_mapper.read_tables`` with either source file or source directory path (:pull:`238`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
