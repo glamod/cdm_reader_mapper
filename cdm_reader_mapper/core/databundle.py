@@ -109,6 +109,7 @@ class DataBundle:
         attr = getattr(_df, attr)
         if not callable(attr):
             return attr
+
         return method
 
     def __print__(self):
