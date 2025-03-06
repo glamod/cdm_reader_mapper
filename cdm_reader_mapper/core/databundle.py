@@ -194,6 +194,31 @@ class DataBundle:
     def mode(self, value):
         self._mode = value
 
+    def _stack(self, other, datasets, inplace, **kwargs):
+        if not isinstance(other, list):
+            other = [other]
+        stacked = {}
+        if not isinstance(datasets, list):
+            datasets = [datasets]
+        for data in datasets:
+            _data = f"_{data}"
+            _df = getattr(self, _data) if hasattr(self, _data) else pd.DataFrame()
+            to_concat = [
+                getattr(concat, _data) for concat in other if hasattr(concat, _data)
+            ]
+            if not to_concat:
+                continue
+            if not _df.empty:
+                to_concat = [_df] + to_concat
+            _df = pd.concat(to_concat, **kwargs)
+            _df = _df.reset_index(drop=True)
+            stacked[data] = _df
+        if inplace is True:
+            for data, _df in stacked.items():
+                setattr(self, f"_{data}", _df)
+            return self
+        return stacked
+
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
 
@@ -211,7 +236,7 @@ class DataBundle:
             setattr(self, f"_{name}", data)
         return self
 
-    def stack_v(self, other, datasets=["data", "mask"], **kwargs):
+    def stack_v(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
         """Stack multiple :py:class:`~DataBundle`'s vertically.
 
         Parameters
@@ -221,6 +246,10 @@ class DataBundle:
         datasets: str, list
             List of datasets to be stacked.
             Default: ['data', 'mask']
+        inplace: bool
+            If ``True`` overwrite datasets in :py:class:`~DataBundle`
+            else return stacked datasets.
+            Default: False
 
         Note
         ----
@@ -234,25 +263,9 @@ class DataBundle:
         --------
         DataBundle.stack_h : Stack multiple DataBundle's horizontally.
         """
-        if not isinstance(other, list):
-            other = [other]
-        if not isinstance(datasets, list):
-            datasets = [datasets]
-        for data in datasets:
-            data = f"_{data}"
-            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
-            to_concat = [
-                getattr(concat, data) for concat in other if hasattr(concat, data)
-            ]
-            if not to_concat:
-                continue
-            if not self_data.empty:
-                to_concat = [self_data] + to_concat
-            self_data = pd.concat(to_concat, **kwargs)
-            setattr(self, data, self_data.reset_index(drop=True))
-        return self
+        return self._stack(other, datasets, inplace, **kwargs)
 
-    def stack_h(self, other, datasets=["data", "mask"], **kwargs):
+    def stack_h(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
         """Stack multiple :py:class:`~DataBundle`'s horizontally.
 
         Parameters
@@ -262,6 +275,10 @@ class DataBundle:
         datasets: str, list
             List of datasets to be stacked.
             Default: ['data', 'mask']
+        inplace: bool
+            If ``True`` overwrite `datasets` in :py:class:`~DataBundle`
+            else return stacked datasets.
+            Default: False
 
         Note
         ----
@@ -275,21 +292,7 @@ class DataBundle:
         --------
         DataBundle.stack_v : Stack multiple DataBundle's vertically.
         """
-        if not isinstance(other, list):
-            other = [other]
-        for data in datasets:
-            data = f"_{data}"
-            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame()
-            to_concat = [
-                getattr(concat, data) for concat in other if hasattr(concat, data)
-            ]
-            if not to_concat:
-                continue
-            if not self_data.empty:
-                to_concat = [self_data] + to_concat
-            self_data = pd.concat(to_concat, axis=1, join="outer")
-            setattr(self, data, self_data.reset_index(drop=True))
-        return self
+        return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
     def copy(self):
         """Make deep copy of a :py:class:`~DataBundle`.
