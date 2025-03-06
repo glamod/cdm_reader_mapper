@@ -23,6 +23,7 @@ def read(
           * "mdf" to read original marine-meteorological data from disk and convert them to MDF data
           * "data" to read MDF data from disk
           * "tables" to read CDM tables from disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
+
         Default: mdf
 
     See Also
@@ -33,7 +34,6 @@ def read(
     write: Write either MDF data or CDM tables on disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables: Write CDM tables to disk.
-
 
     Note
     ----
