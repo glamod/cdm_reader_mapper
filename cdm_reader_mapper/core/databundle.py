@@ -300,12 +300,12 @@ class DataBundle:
         """
         return deepcopy(self)
 
-    def select_true(self, overwrite=False, **kwargs):
+    def select_true(self, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
-        overwrite: bool
+        inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid rows.
             Default: False
@@ -318,7 +318,7 @@ class DataBundle:
 
         Select valid values only with overwriting the old data.
 
-        >>> db.select_true(overwrite=True)
+        >>> db.select_true(inplace=True)
         >>> true_values = db.data
 
         See Also
@@ -331,12 +331,12 @@ class DataBundle:
         For more information see :py:func:`select_true`
         """
         selected = select_true(self._data, self._mask, **kwargs)
-        if overwrite is True:
+        if inplace is True:
             self._data = selected[0]
             return self
         return selected
 
-    def select_from_list(self, selection, overwrite=False, **kwargs):
+    def select_from_list(self, selection, inplace=False, **kwargs):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -344,7 +344,7 @@ class DataBundle:
         selection: dict
             Keys: columns to be selected.
             Values: values in keys to be selected
-        overwrite: bool
+        inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: False
@@ -359,7 +359,7 @@ class DataBundle:
 
         Select specific columns with overwriting the old data.
 
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, overwrite=True)
+        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, inplace=True)
         >>> true_values = db.selected
 
         See Also
@@ -372,19 +372,19 @@ class DataBundle:
         For more information see :py:func:`select_from_list`
         """
         selected = select_from_list(self._data, selection, **kwargs)
-        if overwrite is True:
+        if inplace is True:
             self._data = selected[0]
             return self
         return selected
 
-    def select_from_index(self, index, overwrite=False, **kwargs):
+    def select_from_index(self, index, inplace=False, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
-        overwrite: bool
+        inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return list containing both DataFrame with true and DataFrame with invalid entries.
             Default: False
@@ -397,7 +397,7 @@ class DataBundle:
 
         Select specific columns with overwriting the old data.
 
-        >>> db.select_from_index(index=[0, 2, 4], overwrite=True)
+        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
         >>> true_values = db.selected
 
         See Also
@@ -410,7 +410,7 @@ class DataBundle:
         For more information see :py:func:`select_from_index`
         """
         selected = select_from_index(self._data, index, **kwargs)
-        if overwrite is True:
+        if inplace is True:
             self._data = selected[0]
             return self
         return selected
@@ -433,15 +433,15 @@ class DataBundle:
         """
         return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(self, df_corr, overwrite=False, **kwargs):
+    def replace_columns(self, df_corr, inplace=False, **kwargs):
         """Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
         df_corr: pandas.DataFrame
             Data to be inplaced.
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return pd.DataFrame with replaced columns.
             Default: False
 
@@ -456,18 +456,18 @@ class DataBundle:
         For more information see :py:func:`replace_columns`
         """
         _data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
-        if overwrite is True:
+        if inplace is True:
             self._data = _data
             self._columns = self._data.columns
             return self
         return _data
 
-    def correct_datetime(self, overwrite=False):
+    def correct_datetime(self, inplace=False):
         """Correct datetime information in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
+        inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return datetime-corretcted DataFrame.
             Default: False
@@ -487,7 +487,7 @@ class DataBundle:
         For more information see :py:func:`correct_datetime`
         """
         _data = correct_datetime(self._data, self._imodel)
-        if overwrite is True:
+        if inplace is True:
             self._data = _data
             return self
         return _data
@@ -518,12 +518,12 @@ class DataBundle:
         """
         return validate_datetime(self._data, self._imodel)
 
-    def correct_pt(self, overwrite=False):
+    def correct_pt(self, inplace=False):
         """Correct platform type information in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
+        inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return platform-corretcted DataFrame.
             Default: False
@@ -543,7 +543,7 @@ class DataBundle:
         For more information see :py:func:`correct_pt`
         """
         _data = correct_pt(self._data, self._imodel)
-        if overwrite is True:
+        if inplace is True:
             self._data = _data
             return self
         return _data
@@ -574,14 +574,14 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
-    def map_model(self, overwrite=False, **kwargs):
+    def map_model(self, inplace=False, **kwargs):
         """Map :py:attr:`data` to the Common Data Model.
         Write output to :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return CDM tables.
             Default: False
 
@@ -594,7 +594,7 @@ class DataBundle:
         For more information see :py:func:`map_model`
         """
         _tables = map_model(self._data, self._imodel, **kwargs)
-        if overwrite is True:
+        if inplace is True:
             self._mode = "tables"
             self.columns = _tables.columns
             self._data = _tables
@@ -667,13 +667,13 @@ class DataBundle:
         self.DupDetect = duplicate_check(data, **kwargs)
         return self
 
-    def flag_duplicates(self, overwrite=False, **kwargs):
+    def flag_duplicates(self, inplace=False, **kwargs):
         """Flag detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in DataBundle
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return DataFrame containing flagged duplicates.
             Default: False
 
@@ -689,7 +689,7 @@ class DataBundle:
 
         Flag duplicates with overwriting :py:attr:`data`.
 
-        >>> db.flag_duplicates(overwrite=True)
+        >>> db.flag_duplicates(inplace=True)
         >>> flagged_tables = db.data
 
         See Also
@@ -708,7 +708,7 @@ class DataBundle:
             df_["header"] = self.DupDetect.result
         else:
             df_ = self.DupDetect.result
-        if overwrite is True:
+        if inplace is True:
             self._data = df_
             return self
         return df_
@@ -741,13 +741,13 @@ class DataBundle:
         """
         return self.DupDetect.get_duplicates(**kwargs)
 
-    def remove_duplicates(self, overwrite=False, **kwargs):
+    def remove_duplicates(self, inplace=False, **kwargs):
         """Remove detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return DataFrame containing non-duplicate rows.
             Default: False
 
@@ -763,7 +763,7 @@ class DataBundle:
 
         Remove duplicates with overwriting :py:attr:`data`.
 
-        >>> db.remove_duplicates(overwrite=True)
+        >>> db.remove_duplicates(inplace=True)
         >>> removed_tables = db.data
 
         See Also
@@ -780,7 +780,7 @@ class DataBundle:
         df_ = self._data.copy()
         header_ = self.DupDetect.result
         df_ = df_[df_.index.isin(header_.index)]
-        if overwrite is True:
+        if inplace is True:
             self._data = df_
             return self
         return df_
