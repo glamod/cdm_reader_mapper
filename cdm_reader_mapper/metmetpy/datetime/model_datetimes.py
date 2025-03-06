@@ -65,20 +65,20 @@ def icoads(data, conversion):
         return dt_series
 
     def from_datetime(ds):
-        imma1 = pd.DataFrame(index=ds.index, columns=datetime_cols)
+        icoads = pd.DataFrame(index=ds.index, columns=datetime_cols)
         locs = ds.notna()
         # Note however that if there is missing data, the corresponding column
         # will be float despite the 'int' conversion
-        imma1[yr_col] = ds.dt.year[locs].astype("int")
-        imma1[mo_col] = ds.dt.month[locs].astype("int")
-        imma1[dd_col] = ds.dt.day[locs].astype("int")
-        imma1[hr_col] = ds.dt.hour[locs] + ds.dt.minute[locs] / 60
-        return imma1
+        icoads[yr_col] = ds.dt.year[locs].astype("int")
+        icoads[mo_col] = ds.dt.month[locs].astype("int")
+        icoads[dd_col] = ds.dt.day[locs].astype("int")
+        icoads[hr_col] = ds.dt.hour[locs] + ds.dt.minute[locs] / 60
+        return icoads
 
-    yr_col = properties.metadata_datamodels.get("year").get("imma1")
-    mo_col = properties.metadata_datamodels.get("month").get("imma1")
-    dd_col = properties.metadata_datamodels.get("day").get("imma1")
-    hr_col = properties.metadata_datamodels.get("hour").get("imma1")
+    yr_col = properties.metadata_datamodels.get("year").get("icoads")
+    mo_col = properties.metadata_datamodels.get("month").get("icoads")
+    dd_col = properties.metadata_datamodels.get("day").get("icoads")
+    hr_col = properties.metadata_datamodels.get("hour").get("icoads")
     datetime_cols = [yr_col, mo_col, dd_col, hr_col]
     datetime_cols = [dt_ for dt_ in datetime_cols if dt_ in data.columns]
 

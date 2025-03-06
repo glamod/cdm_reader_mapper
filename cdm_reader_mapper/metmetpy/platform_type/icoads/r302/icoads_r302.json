@@ -1,41 +1,41 @@
 {
-  "792": {
+  "d792": {
     "method": "function",
-    "function": "deck_792_imma1"
+    "function": "deck_792_icoads"
   },
-  "793": {
+  "d793": {
     "method": "fillna",
     "fill_value": "6"
   },
-  "794": {
+  "d794": {
     "method": "fillna",
     "fill_value": "22"
   },
-  "795": {
+  "d795": {
     "method": "fillna",
     "fill_value": "13"
   },
-  "797": {
+  "d797": {
     "method": "fillna",
     "fill_value": "13"
   },
-  "798": {
+  "d798": {
     "method": "fillna",
     "fill_value": "22"
   },
-  "992": {
+  "d992": {
     "method": "function",
-    "function": "deck_992_imma1"
+    "function": "deck_992_icoads"
   },
-  "993": {
+  "d993": {
     "method": "fillna",
     "fill_value": "6"
   },
-  "994": {
+  "d994": {
     "method": "fillna",
     "fill_value": "22"
   },
-  "995": {
+  "d995": {
     "method": "fillna",
     "fill_value": "13"
   }

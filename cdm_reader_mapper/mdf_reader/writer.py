@@ -41,6 +41,7 @@ def write_data(
     filename=None,
     col_subset=None,
     delimiter=",",
+    **kwargs,
 ):
     """Write pandas.DataFrame to MDF file on file system.
 
@@ -89,7 +90,9 @@ def write_data(
 
     See Also
     --------
+    write: Write either MDF data or CDM tables to disk.
     write_tables : Write CDM tables to disk.
+    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
