@@ -54,8 +54,6 @@
 
 .. _RecordLinkage: https://recordlinkage.readthedocs.io/en/latest/?badge=latest
 
-.. _schema: https://mdf-reader.readthedocs.io/en/mdf_reader/data-models.html#data-models
-
 .. _tarball: https://github.com/glamod/mdf_reader/tarball/master
 
 .. _US Maury: https://icoads.noaa.gov/maury.html
