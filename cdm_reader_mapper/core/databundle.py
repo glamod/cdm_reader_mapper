@@ -145,7 +145,7 @@ class DataBundle:
             setattr(self, "_data", _data)
             return self
         return _data
-     
+
     def __print__(self):
         """Print :py:attr:`data`."""
         print(self.data)
