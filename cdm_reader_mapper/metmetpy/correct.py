@@ -125,7 +125,7 @@ def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     elif deck_fix.get("method") == "function":
         transform = deck_fix.get("function")
         logger.info(f"Applying fix function {transform}")
-        trans = getattr(corr_f_pt.fix_function, transform)
+        trans = getattr(corr_f_pt, transform)
         return trans(data)
     logger.error(
         'Platform type fix method "{}" not implemented'.format(deck_fix.get("method"))

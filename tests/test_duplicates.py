@@ -89,7 +89,7 @@ def test_duplicates_flag(
         ignore_entries=ignore_entries,
         offsets=offsets,
     )
-    tables_dups_flagged = cdm_icoads.flag_duplicates(overwrite=False)
+    tables_dups_flagged = cdm_icoads.flag_duplicates()
     result = tables_dups_flagged["header"]
     assert_array_equal(result["duplicate_status"], expected["duplicate_status"])
     assert_array_equal(result["report_quality"], expected["report_quality"])
@@ -104,15 +104,16 @@ def test_duplicates_remove():
             "station_course": "null",
         },
     )
-    tables_dups_removed = cdm_icoads.remove_duplicates(overwrite=False)
-    expected = cdm_icoads.tables.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
+    tables_dups_removed = cdm_icoads.remove_duplicates()
+    expected = cdm_icoads.data.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
     assert_frame_equal(expected, tables_dups_removed)
 
 
 def test_duplicates_craid():
     cdm_craid.duplicate_check(ignore_columns="primary_station_id")
-    cdm_craid.flag_duplicates()
-    result = cdm_craid.tables["header"]
+    cdm_craid.flag_duplicates(overwrite=True)
+    tables = cdm_craid.data.copy()
+    result = tables["header"]
     assert_array_equal(result["duplicate_status"], [0] * 10)
     assert_array_equal(result["report_quality"], [2] * 10)
     assert_array_equal(result["duplicates"], ["null"] * 10)

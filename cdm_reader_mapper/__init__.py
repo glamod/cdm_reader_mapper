@@ -13,7 +13,9 @@ from .common import (  # noqa
     select_from_list,
     select_true,
 )
-from .core import DataBundle  # noqa
+from .core.databundle import DataBundle  # noqa
+from .core.reader import read  # noqa
+from .core.writer import write  # noqa
 from .data import test_data  # noqa
 from .duplicates.duplicates import DupDetect  # noqa
 from .duplicates.duplicates import duplicate_check  # noqa
@@ -28,4 +30,4 @@ from .metmetpy import (  # noqa
 
 __author__ = """Ludwig Lierhammer"""
 __email__ = "ludwiglierhammer@dwd.de"
-__version__ = "2.0.0"
+__version__ = "2.0.1"
