@@ -405,9 +405,7 @@ class DataBundle:
             return _return, _invalid
         return _return
 
-    def select_from_index(
-        self, index, return_invalid=False, overwrite=False, **kwargs
-    ):
+    def select_from_index(self, index, return_invalid=False, overwrite=False, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
