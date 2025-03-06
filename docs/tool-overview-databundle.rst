@@ -75,11 +75,11 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
 
     cdm_tables = db.map_model()
 
-.. note:: Set ``overwrite`` to True to overwrite :py:attr:`DataBundle.data`:
+.. note:: Set ``inplace`` to True to overwrite :py:attr:`DataBundle.data`:
 
 .. code-block:: console
 
-   db.map_model(overwrite=True)
+   db.map_model(inplace=True)
 
    cdm_tables = db.data
 
