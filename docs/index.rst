@@ -8,10 +8,10 @@
 Marine ``cdm_reader_mapper`` toolbox documentation
 --------------------------------------------------
 
-The **cdm_reader_mapper** toolbox is a python3_ tool designed for both
+The **cdm_reader_mapper** toolbox is a python3_ tool designed for
 
-* to read data files compliant with a user specified data model.
-* to map observed meteorological variables and its associated metadata from a data model (schema_) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool.
+* reading original marine-meteorological data files compliant with a user specified data model (:ref:`data-models`) into a Marine Data Format (MDF) file.
+* mapping observed meteorological variables and its associated metadata from a data model (:ref:`data-models`) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool.
 * to detect and flag or remove duplicated observations
 
 It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format. In the meanwhile, it can read data C-RAID_ Copernicus in situ project too.
@@ -25,6 +25,9 @@ The tool has been further enhanced to account for any marine meteorological data
 -	Reports are fixed width or field delimited types.
 -	Reports can be organized in sections, in which case each section can be of different types (fixed width of delimited).
 
+Several data models have been added to the tool including both the IMMA and the C-RAID schema.
+
+.. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
 
 The **read_mdf** function uses the information provided in a `data model`_ to read meteorological data into a so-called **cdm_reader_mapper.DataBundle** object. This object includes several main attributes:
 
@@ -33,17 +36,13 @@ The **read_mdf** function uses the information provided in a `data model`_ to re
 
 The reader allows for basic transformations of the data. This feature includes `basic numeric data decoding`_ (base36, signed_overpunch) and numeric data conversion (scale and offset).
 
-Several data models have been added to the tool including both the IMMA and the C-RAID schema.
-
-.. note:: **Data from other data models than those already available can be read, providing that this data meets the basic specifications listed above. A data model can be built externally and fed into the tool.**
-
 In addition, the **cdm_reader_mapper.DataBundle** object has several main method functions:
 
-* `map_model`: map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
-* `duplicate_check`: detect duplicated observations
-* `flag_duplicates`: flag detected duplicated observations
-* `remove_duplicates`: remove detected duplicated observations
-* `write_tables`: save observational standardized CDM tables as pipe-seperated list
+* :py:func:`DataBundle.map_model`: map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
+* :py:func:`DataBundle.duplicate_check`: detect duplicated observations
+* :py:func:`DataBundle.flag_duplicates`: flag detected duplicated observations
+* :py:func:`DataBundle.remove_duplicates`: remove detected duplicated observations
+* :py:func:`DataBundle.write`: save both observational MDF files as a coma-separated list and observational standardized CDM tables as pipe-seperated lists
 
 .. toctree::
    :maxdepth: 2

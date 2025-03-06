@@ -49,6 +49,12 @@ The **core** meteorological variables stored in the ``.imma`` format can be read
 
 The C-RAID containing in-situ platform data is stored in the ``.netcdf`` format. The :py:func:`cdm_reader_mapper.read_mdf` function reads the data using the python tool xarray_ and organises and validates them in the same way as for ICOADS data. The data can be read by using the ``c_raid`` schema included in this tool.
 
+.. note:: Instead of calling :py:func:`cdm_reader_mapper.read_mdf` you can call :py:func:`cdm_reader_mapper.read` setting parameter ``mode`` to ``mdf``:
+
+.. code-block:: console
+
+    db = read(filepath, imodel=imodel, mode="mdf")
+
 Output data
 -----------
 
@@ -59,6 +65,26 @@ The output is a so-called :py:class:`cdm_reader_mapper.DataBundle` python object
 • **mask**: boolean pandas.DataFrame with the results of the validation of each of the data model elements in its columns.
 
 For more information see chapter :ref:`tool-overview-databundle`.
+
+You can write the MDF data to disk using method function :py:func:`cdm_reader_mapper.DataBundle.write` (default filename: ""data.csv""):
+
+.. code-block:: console
+
+   db.write(mode="data")
+
+.. note:: The write function automatically dumps a json info file on disk (default name: "info.json"). This file contains information how to read the data (e.g. column names, encoding style etc).
+
+There are two options to read those data again:
+
+.. code-block:: console
+
+   db = read_data(data="data.csv", info="info.csv")
+
+or
+
+.. code-block:: console
+
+   db = read(data="data.csv", info="info.csv", mode="data")
 
 Processing of the data elements
 -------------------------------

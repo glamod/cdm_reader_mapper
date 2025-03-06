@@ -12,7 +12,7 @@ Data Models
 Schema
 ======
 
-The schema file gathers a collection of descriptors that enables the :py:func:**cdm_reader_mapper.read** function to access and extract meaningful units of information for each element.
+The schema file gathers a collection of descriptors that enables the :py:func:`cdm_reader_mapper.read_mdf` function to access and extract meaningful units of information for each element.
 
 Valid schemas files are json files that the tool accesses and stores internally as dictionaries. The basename of the schema file must be the same as the data model directory and its extension ``.json``
 
@@ -28,7 +28,7 @@ There are two levels of information in the schema:
 
     Content inside a ``schema.json`` file.
 
-The :py:func:**cdm_reader_mapper.read** function supports reading and validation of both internal and external schemas:
+The :py:func:`cdm_reader_mapper.read_mdf` function supports reading and validation of both internal and external schemas:
 
 - An **internal data model** has its schema registered within the tool. To read and validate data from these models, we only need to pass its reference name to the reader and validation modules, using the argument ``data_model``. A list of the reference names for internally supported data models can be access via the tool's function::
 

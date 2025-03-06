@@ -364,8 +364,10 @@ def read_mdf(
 
     See Also
     --------
+    read: Read either original marine-meteorological or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
+    write: Write either MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
@@ -394,7 +396,7 @@ def read_mdf(
 
 
 def read_data(
-    data,
+    source,
     mask=None,
     info=None,
     imodel=None,
@@ -405,7 +407,7 @@ def read_data(
 
     Parameters
     ----------
-    data: str
+    source: str
         The data file (including path) to be read.
     mask: str, optional
         The validation file (including path) to be read.
@@ -429,14 +431,12 @@ def read_data(
     -------
     cdm_reader_mapper.DataBundle
 
-    Note
-    ----
-    :py:func:`cdm_reader_mapper.write_data` dumps ``data``, ``mask`` and ``info`` on file system.
-
     See Also
     --------
+    read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
+    write: Write both MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
@@ -473,7 +473,7 @@ def read_data(
     parse_dates = info_dict.get("parse_dates", False)
 
     data = _read_csv(
-        data,
+        source,
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,
