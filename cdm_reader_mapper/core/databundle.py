@@ -211,7 +211,7 @@ class DataBundle:
             setattr(self, f"_{name}", data)
         return self
 
-    def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
+    def stack_v(self, other, datasets=["data", "mask"], **kwargs):
         """Stack multiple :py:class:`~DataBundle`'s vertically.
 
         Parameters
@@ -252,7 +252,7 @@ class DataBundle:
             setattr(self, data, self_data.reset_index(drop=True))
         return self
 
-    def stack_h(self, other, datasets=["data", "mask", "tables"], **kwargs):
+    def stack_h(self, other, datasets=["data", "mask"], **kwargs):
         """Stack multiple :py:class:`~DataBundle`'s horizontally.
 
         Parameters
@@ -260,7 +260,7 @@ class DataBundle:
         other: str, list
             List of other :py:class:`~DataBundle` to stack horizontally.
         datasets: str, list
-            List of datasets to be stacked
+            List of datasets to be stacked.
             Default: ['data', 'mask']
 
         Note
