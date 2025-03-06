@@ -93,62 +93,27 @@ class DataBundle:
         """Length of :py:attr:`data`."""
         return get_length(self.data)
 
-    # def __getattr__(self, name):
-    #    def method(data="data", overwrite=True, *args, **kwargs):
-    #        print(name, data, overwrite, args, kwargs)
-    #    return method
-
     def __getattr__(self, attr):
-        """Apply attribute to :py:attr:`data`, :py:attr:`mask` or :py:attr:`tables` if attribute is not defined for :py:class:`~DataBundle` ."""
+        """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
 
         def method(*args, **kwargs):
-            print(attr, args, kwargs)
-            # def method(*args, **kwargs):
-            print(attr)
-            _data = f"_{data}"
-            print(data)
-            print(overwrite)
-            if not hasattr(self, _data):
-                raise NameError(
-                    f"name {data} is not defined. Use one of [data, tables, mask]."
-                )
-            _name = getattr(self, data)
-            attr = getattr(_name, attr)
-            if not callable(attr):
-                return attr
-            _data = attr(*args, **kwargs)
-            print(_data)
-            print(overwrite)
-            if overwrite is True:
-                setattr(self, "_data", _data)
-                return self
-            return _data
+            return attr(*args, **kwargs)
 
-        # if attr.startswith("__") and attr.endswith("__"):
-        #    raise AttributeError(f"DataBundle object has no attribute {attr}.")
-        # _data = f"_{data}"
-        # if not hasattr(self, _data):
-        #    raise NameError(
-        #        f"name {data} is not defined. Use one of [data, tables, mask]."
-        #    )
+        if attr.startswith("__") and attr.endswith("__"):
+            raise AttributeError(f"DataBundle object has no attribute {attr}.")
 
-        return method
-
-        _name = getattr(self, _data)
-        attr = getattr(_name, attr)
+        _data = "_data"
+        if not hasattr(self, _data):
+            raise NameError("'data' is not defined in DataBundle object.")
+        _df = getattr(self, _data)
+        attr = getattr(_df, attr)
         if not callable(attr):
             return attr
-        _data = attr(*args, **kwargs)
-        print(_data)
-        print(overwrite)
-        if overwrite is True:
-            setattr(self, "_data", _data)
-            return self
-        return _data
-     
+        return method
+
     def __print__(self):
         """Print :py:attr:`data`."""
-        print(self.data)
+        print(self._data)
 
     def __getitem__(self, item):
         """Make class subscriptable."""
