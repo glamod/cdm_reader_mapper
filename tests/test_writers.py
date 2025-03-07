@@ -23,10 +23,8 @@ def test_write_data():
 def test_write_tables(table):
     db_exp.write(suffix=f"{imodel}_{table}_all", cdm_subset=table)
     db_res = read(".", suffix=f"{imodel}_{table}_all", cdm_subset=table, mode="tables")
-    tables_exp = db_exp.data.copy()
-    table_exp = tables_exp[table].dropna(how="all").reset_index(drop=True)
-    tables_res = db_res.data.copy()
-    pd.testing.assert_frame_equal(table_exp, tables_res[table])
+    table_exp = db_exp[table].dropna(how="all").reset_index(drop=True)
+    pd.testing.assert_frame_equal(table_exp, db_res[table])
 
 
 def test_write_fns():
@@ -57,8 +55,7 @@ def test_write_filename_dict():
     }
     db_exp.write(filename=filename_dict)
     db_res = read(".", suffix=f"{imodel}_filename_dict_all", mode="tables")
-    tables_exp = db_exp.data.copy()
-    pd.testing.assert_frame_equal(tables_exp[filename_dict.keys()], db_res.data)
+    pd.testing.assert_frame_equal(db_exp[filename_dict.keys()], db_res.data)
 
 
 def test_write_col_subset():
@@ -70,7 +67,5 @@ def test_write_col_subset():
         col_subset={table: columns},
     )
     db_res = read(".", suffix=f"{imodel}_{table}_all", mode="tables")
-    tables_exp = db_exp.data.copy()
-    table_exp = tables_exp[table][columns].dropna(how="all").reset_index(drop=True)
-    tables_res = db_res.data.copy()
-    pd.testing.assert_frame_equal(table_exp, tables_res[table])
+    table_exp = db_exp[table][columns].dropna(how="all").reset_index(drop=True)
+    pd.testing.assert_frame_equal(table_exp, db_res[table])

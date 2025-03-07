@@ -116,9 +116,20 @@ class DataBundle:
         """Return a string representation for :py:attr:`data`."""
         return self._data.__repr__()
 
+    def __setitem__(self, item, value):
+        """Make class support item assignment for :py:attr:`data`."""
+        if isinstance(item, str):
+            if hasattr(self, item):
+                setattr(self, item, value)
+        else:
+            self._data.__setitem__(item, value)
+
     def __getitem__(self, item):
         """Make class subscriptable."""
-        return getattr(self, item)
+        if isinstance(item, str):
+            if hasattr(self, item):
+                return getattr(self, item)
+        return self._data.__getitem__(item)
 
     def _return_property(self, property):
         if hasattr(self, property):
@@ -436,13 +447,15 @@ class DataBundle:
         """
         return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(self, df_corr, inplace=False, **kwargs):
+    def replace_columns(self, df_corr, subset=None, inplace=False, **kwargs):
         """Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
         df_corr: pandas.DataFrame
             Data to be inplaced.
+        subset: str, list, optional
+            Select subset by columns. This option is useful for multi-indexed :py:attr:`data`.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return pd.DataFrame with replaced columns.
@@ -458,7 +471,14 @@ class DataBundle:
         ----
         For more information see :py:func:`replace_columns`
         """
-        _data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+        _data = self._data.copy()
+        if subset is not None:
+            _data[subset] = replace_columns(
+                df_l=self._data[subset], df_r=df_corr, **kwargs
+            )
+        else:
+            _data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+
         if inplace is True:
             self._data = _data
             self._columns = self._data.columns
