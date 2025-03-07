@@ -112,9 +112,9 @@ class DataBundle:
 
         return method
 
-    def __print__(self):
-        """Print :py:attr:`data`."""
-        print(self._data)
+    def __repr__(self):
+        """Return a string representation for :py:attr:`data`."""
+        return self._data.__repr__()
 
     def __getitem__(self, item):
         """Make class subscriptable."""
