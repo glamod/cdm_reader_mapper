@@ -208,12 +208,12 @@ class DataBundle:
     def _stack(self, other, datasets, inplace, **kwargs):
         if not isinstance(other, list):
             other = [other]
-        stacked = {}
+        db = self.copy()
         if not isinstance(datasets, list):
             datasets = [datasets]
         for data in datasets:
             _data = f"_{data}"
-            _df = getattr(self, _data) if hasattr(self, _data) else pd.DataFrame()
+            _df = getattr(db, _data) if hasattr(db, _data) else pd.DataFrame()
             to_concat = [
                 getattr(concat, _data) for concat in other if hasattr(concat, _data)
             ]
@@ -223,12 +223,12 @@ class DataBundle:
                 to_concat = [_df] + to_concat
             _df = pd.concat(to_concat, **kwargs)
             _df = _df.reset_index(drop=True)
-            stacked[data] = _df
-        if inplace is True:
-            for data, _df in stacked.items():
+            if inplace is True:
                 setattr(self, f"_{data}", _df)
+
+        if inplace is True:
             return self
-        return stacked
+        return db
 
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
@@ -483,7 +483,10 @@ class DataBundle:
             self._data = _data
             self._columns = self._data.columns
             return self
-        return _data
+
+        db = self.copy()
+        db._data = _data
+        return db
 
     def correct_datetime(self, inplace=False):
         """Correct datetime information in :py:attr:`data`.
@@ -509,11 +512,13 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_datetime`
         """
-        _data = correct_datetime(self._data, self._imodel)
+        db = self.copy()
+        _data = correct_datetime(db._data, db._imodel)
         if inplace is True:
             self._data = _data
             return self
-        return _data
+        db._data = _data
+        return db
 
     def validate_datetime(self):
         """Validate datetime information in :py:attr:`data`.
@@ -565,11 +570,13 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_pt`
         """
-        _data = correct_pt(self._data, self._imodel)
+        db = self.copy()
+        _data = correct_pt(db._data, db._imodel)
         if inplace is True:
             self._data = _data
             return self
-        return _data
+        db._data = _data
+        return db
 
     def validate_id(self, **kwargs):
         """Validate station id information in :py:attr:`data`.
@@ -616,13 +623,16 @@ class DataBundle:
         ----
         For more information see :py:func:`map_model`
         """
-        _tables = map_model(self._data, self._imodel, **kwargs)
+        db = self.copy()
+        _tables = map_model(db._data, db._imodel, **kwargs)
         if inplace is True:
-            self._mode = "tables"
-            self.columns = _tables.columns
-            self._data = _tables
-            return self
-        return _tables
+            db_ = self
+        else:
+            db_ = db
+        db_._mode = "tables"
+        db_._columns = _tables.columns
+        db_._data = _tables
+        return db_
 
     def write(self, **kwargs):
         """Write :py:attr:`data` on disk.
@@ -725,16 +735,16 @@ class DataBundle:
         ----
         For more information see :py:func:`DupDetect.flag_duplicates`
         """
-        self.DupDetect.flag_duplicates(**kwargs)
-        df_ = self._data.copy()
-        if self._mode == "tables" and "header" in self._data:
-            df_["header"] = self.DupDetect.result
+        db = self.copy()
+        db.DupDetect.flag_duplicates(**kwargs)
+        if db._mode == "tables" and "header" in db._data:
+            db._data["header"] = db.DupDetect.result
         else:
-            df_ = self.DupDetect.result
+            db._data = db.DupDetect.result
         if inplace is True:
-            self._data = df_
+            self._data = db._data
             return self
-        return df_
+        return db
 
     def get_duplicates(self, **kwargs):
         """Get duplicate matches in :py:attr:`data`.
@@ -799,11 +809,11 @@ class DataBundle:
         ----
         For more information see :py:func:`DupDetect.remove_duplicates`
         """
-        self.DupDetect.remove_duplicates(**kwargs)
-        df_ = self._data.copy()
-        header_ = self.DupDetect.result
-        df_ = df_[df_.index.isin(header_.index)]
+        db = self.copy()
+        db.DupDetect.remove_duplicates(**kwargs)
+        header_ = db.DupDetect.result
+        db._data = db._data[db._data.index.isin(header_.index)]
         if inplace is True:
-            self._data = df_
+            self._data = db._data
             return self
-        return df_
+        return db
