@@ -24,6 +24,7 @@ from cdm_reader_mapper.metmetpy import (
     validate_datetime,
     validate_id,
 )
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
 class DataBundle:
@@ -96,6 +97,16 @@ class DataBundle:
     def __getattr__(self, attr):
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
 
+        class SubscriptableMethod:
+            def __init__(self, func):
+                self.func = func
+
+            def __getitem__(self, item):
+                return self.func(item)
+
+            def __call__(self, *args, **kwargs):
+                return self.func(*args, **kwargs)
+
         def method(*args, **kwargs):
             return attr(*args, **kwargs)
 
@@ -110,7 +121,7 @@ class DataBundle:
         if not callable(attr):
             return attr
 
-        return method
+        return SubscriptableMethod(method)
 
     def __repr__(self):
         """Return a string representation for :py:attr:`data`."""
@@ -312,7 +323,16 @@ class DataBundle:
         --------
         >>> db2 = db.copy()
         """
-        return deepcopy(self)
+        db = DataBundle()
+        for key, value in self.__dict__.items():
+            if isinstance(value, dict):
+                value = deepcopy(value)
+            elif isinstance(value, pd.DataFrame):
+                value = value.copy()
+            elif isinstance(value, pd.io.parsers.TextFileReader):
+                value = make_copy(value)
+            setattr(db, key, value)
+        return db
 
     def select_true(self, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
