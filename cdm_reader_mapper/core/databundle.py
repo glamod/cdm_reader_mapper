@@ -241,7 +241,7 @@ class DataBundle:
         Examples
         --------
         >>> tables = read_tables("path_to_files")
-        >>> db = db.add({"tables": tables})
+        >>> db = db.add({"data": tables})
         """
         for name, data in addition.items():
             setattr(self, f"_{name}", data)
@@ -473,11 +473,9 @@ class DataBundle:
         """
         _data = self._data.copy()
         if subset is not None:
-            _data[subset] = replace_columns(
-                df_l=self._data[subset], df_r=df_corr, **kwargs
-            )
+            _data[subset] = replace_columns(df_l=_data[subset], df_r=df_corr, **kwargs)
         else:
-            _data = replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
+            _data = replace_columns(df_l=_data, df_r=df_corr, **kwargs)
 
         if inplace is True:
             self._data = _data
@@ -486,6 +484,7 @@ class DataBundle:
 
         db = self.copy()
         db._data = _data
+        db._columns = _data.columns
         return db
 
     def correct_datetime(self, inplace=False):
