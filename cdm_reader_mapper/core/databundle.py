@@ -216,15 +216,20 @@ class DataBundle:
     def mode(self, value):
         self._mode = value
 
+    def _get_db(self, inplace):
+        if inplace is True:
+            return self
+        return self.copy()
+
     def _stack(self, other, datasets, inplace, **kwargs):
+        db_ = self._get_db(inplace)
         if not isinstance(other, list):
             other = [other]
-        db = self.copy()
         if not isinstance(datasets, list):
             datasets = [datasets]
         for data in datasets:
             _data = f"_{data}"
-            _df = getattr(db, _data) if hasattr(db, _data) else pd.DataFrame()
+            _df = getattr(db_, _data) if hasattr(db_, _data) else pd.DataFrame()
             to_concat = [
                 getattr(concat, _data) for concat in other if hasattr(concat, _data)
             ]
@@ -234,12 +239,9 @@ class DataBundle:
                 to_concat = [_df] + to_concat
             _df = pd.concat(to_concat, **kwargs)
             _df = _df.reset_index(drop=True)
-            if inplace is True:
-                setattr(self, f"_{data}", _df)
+            setattr(self, f"_{data}", _df)
 
-        if inplace is True:
-            return self
-        return db
+        return db_
 
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
@@ -484,28 +486,22 @@ class DataBundle:
         Examples
         --------
         >>> import pandas as pd
-        >>> df_corr = pr.read_csv("corecction_file_on_disk")
+        >>> df_corr = pr.read_csv("correction_file_on_disk")
         >>> df_repl = db.replace_columns(df_corr)
 
         Note
         ----
         For more information see :py:func:`replace_columns`
         """
-        _data = self._data.copy()
-        if subset is not None:
-            _data[subset] = replace_columns(df_l=_data[subset], df_r=df_corr, **kwargs)
+        db_ = self._get_db(inplace)
+        if subset is None:
+            db_._data = replace_columns(df_l=db_._data, df_r=df_corr, **kwargs)
         else:
-            _data = replace_columns(df_l=_data, df_r=df_corr, **kwargs)
-
-        if inplace is True:
-            self._data = _data
-            self._columns = self._data.columns
-            return self
-
-        db = self.copy()
-        db._data = _data
-        db._columns = _data.columns
-        return db
+            db_._data[subset] = replace_columns(
+                df_l=db_._data[subset], df_r=df_corr, **kwargs
+            )
+        db_._columns = db_._data.columns
+        return db_
 
     def correct_datetime(self, inplace=False):
         """Correct datetime information in :py:attr:`data`.
@@ -531,13 +527,9 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_datetime`
         """
-        db = self.copy()
-        _data = correct_datetime(db._data, db._imodel)
-        if inplace is True:
-            self._data = _data
-            return self
-        db._data = _data
-        return db
+        db_ = self._get_db(inplace)
+        db_._data = correct_datetime(db_._data, db_._imodel)
+        return db_
 
     def validate_datetime(self):
         """Validate datetime information in :py:attr:`data`.
@@ -589,13 +581,9 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_pt`
         """
-        db = self.copy()
-        _data = correct_pt(db._data, db._imodel)
-        if inplace is True:
-            self._data = _data
-            return self
-        db._data = _data
-        return db
+        db_ = self._get_db(inplace)
+        db_._data = correct_pt(db_._data, db_._imodel)
+        return db_
 
     def validate_id(self, **kwargs):
         """Validate station id information in :py:attr:`data`.
@@ -642,12 +630,8 @@ class DataBundle:
         ----
         For more information see :py:func:`map_model`
         """
-        db = self.copy()
-        _tables = map_model(db._data, db._imodel, **kwargs)
-        if inplace is True:
-            db_ = self
-        else:
-            db_ = db
+        db_ = self._get_db(inplace)
+        _tables = map_model(db_._data, db_._imodel, **kwargs)
         db_._mode = "tables"
         db_._columns = _tables.columns
         db_._data = _tables
@@ -754,16 +738,13 @@ class DataBundle:
         ----
         For more information see :py:func:`DupDetect.flag_duplicates`
         """
-        db = self.copy()
-        db.DupDetect.flag_duplicates(**kwargs)
-        if db._mode == "tables" and "header" in db._data:
-            db._data["header"] = db.DupDetect.result
+        db_ = self._get_db(inplace)
+        db_.DupDetect.flag_duplicates(**kwargs)
+        if db_._mode == "tables" and "header" in db_._data:
+            db_._data["header"] = db_.DupDetect.result
         else:
-            db._data = db.DupDetect.result
-        if inplace is True:
-            self._data = db._data
-            return self
-        return db
+            db_._data = db_.DupDetect.result
+        return db_
 
     def get_duplicates(self, **kwargs):
         """Get duplicate matches in :py:attr:`data`.
@@ -828,11 +809,8 @@ class DataBundle:
         ----
         For more information see :py:func:`DupDetect.remove_duplicates`
         """
-        db = self.copy()
-        db.DupDetect.remove_duplicates(**kwargs)
-        header_ = db.DupDetect.result
-        db._data = db._data[db._data.index.isin(header_.index)]
-        if inplace is True:
-            self._data = db._data
-            return self
-        return db
+        db_ = self._get_db(inplace)
+        db_.DupDetect.remove_duplicates(**kwargs)
+        header_ = db_.DupDetect.result
+        db_._data = db_._data[db_._data.index.isin(header_.index)]
+        return db_
