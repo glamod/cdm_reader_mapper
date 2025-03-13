@@ -104,8 +104,8 @@ def test_duplicates_remove():
             "station_course": "null",
         },
     )
-    tables_dups_removed = cdm_icoads.remove_duplicates()
-    expected = cdm_icoads.data[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
+    tables_dups_removed = cdm_icoads.remove_duplicates().data
+    expected = cdm_icoads.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
     assert_frame_equal(expected, tables_dups_removed)
 
 

@@ -96,4 +96,4 @@ def test_replace():
         "MASKSTID2",
         "MASKSTID2",
     ]
-    pd.testing.assert_frame_equal(cdm_header.data, result)
+    pd.testing.assert_frame_equal(cdm_header.data, result.data)
