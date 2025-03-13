@@ -108,7 +108,12 @@ class DataBundle:
                 return self.func(*args, **kwargs)
 
         def method(*args, **kwargs):
-            return attr(*args, **kwargs)
+            try:
+                return attr(*args, **kwargs)
+            except TypeError:
+                return attr[*args]
+            except Exception:
+                raise ValueError(f"{attr} is neither callable nor subscriptable.")
 
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError(f"DataBundle object has no attribute {attr}.")
