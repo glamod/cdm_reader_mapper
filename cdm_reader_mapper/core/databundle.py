@@ -92,7 +92,11 @@ class DataBundle:
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        return get_length(self.data)
+        if self._data is not None:
+            return get_length(self._data)
+        if self._tables is not None:
+            return get_length(self._tables)
+        raise KeyError("Neither data nor tables are defined.")
 
     def __getattr__(self, attr):
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
@@ -168,6 +172,11 @@ class DataBundle:
     @columns.setter
     def columns(self, value):
         self._columns = value
+
+    @property
+    def index(self):
+        """Indexes of :py:attr:`data`."""
+        return self._return_property("_index")
 
     @property
     def dtypes(self):
@@ -341,7 +350,7 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_true(self, mask=False, inplace=False, **kwargs):
+    def select_true(self, mask=False, return_invalid=False, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
@@ -349,10 +358,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -379,9 +395,13 @@ class DataBundle:
         db_._data = selected[0]
         if mask is True:
             db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
-    def select_from_list(self, selection, mask=False, inplace=False, **kwargs):
+    def select_from_list(
+        self, selection, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -392,10 +412,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -424,9 +451,13 @@ class DataBundle:
         db_._data = selected[0]
         if mask is True:
             db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
-    def select_from_index(self, index, mask=False, inplace=False, **kwargs):
+    def select_from_index(
+        self, index, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
@@ -436,10 +467,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -466,6 +504,8 @@ class DataBundle:
         db_._data = selected[0]
         if mask is True:
             db_._mask = select_from_index(db_._mask, index, **kwargs)
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
     def unique(self, **kwargs):
