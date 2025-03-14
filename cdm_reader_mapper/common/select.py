@@ -35,7 +35,7 @@ def dataframe_apply_index(
 def select_true(data, mask, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 
-    #   mask is a the full df/parser of which we only use col
+    # mask is a the full df/parser of which we only use col
     def dataframe(
         df, mask, out_rejected=False, in_index=False, idx_in_offset=0, idx_out_offset=0
     ):
@@ -58,7 +58,7 @@ def select_true(data, mask, out_rejected=False, in_index=False):
 def select_from_list(data, selection, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 
-    #   selection is a dictionary like {col_name:[values to select]}
+    # selection is a dictionary like {col_name:[values to select]}
     def dataframe(
         df,
         col,

@@ -3,21 +3,22 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import DataBundle, read_data, read_tables
+from cdm_reader_mapper import DataBundle, read
 
 from ._results import result_data
 
 
 def get_result_data(imodel):
     results_ = getattr(result_data, f"expected_{imodel}")
-    db_ = read_data(
+    db_ = read(
         results_["data"],
         mask=results_["mask"],
         info=results_["info"],
+        mode="data",
     )
     data_ = db_.data.copy()
     mask_ = db_.mask.copy()
-    db = read_tables(results_["cdm_table"], suffix=f"{imodel}*")
+    db = read(results_["cdm_table"], suffix=f"{imodel}*", mode="tables")
     return db.add({"data": data_, "mask": mask_})
 
 
@@ -27,10 +28,10 @@ def update_columns(list_of):
     i = 0
     updated = []
     while i < len(list_of):
-        columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].tables.columns]
+        columns = [(f"test{i}_{c[0]}", c[1]) for c in list_of[i].data.columns]
         updated_tables = list_of[i].copy()
-        updated_tables.tables.columns = pd.MultiIndex.from_tuples(columns)
-        updated.append(DataBundle(tables=updated_tables.tables))
+        updated_tables.data.columns = pd.MultiIndex.from_tuples(columns)
+        updated.append(DataBundle(data=updated_tables.data))
         i += 1
     return updated
 
@@ -66,4 +67,8 @@ def test_stack_v(test_data):
 def test_stack_h(test_data):
     orig_data = data["data_700"].copy()
     test_data = update_columns(test_data)
-    orig_data.stack_h(test_data, datasets=["tables"])
+    orig_data.stack_h(test_data, datasets=["data"])
+
+
+def test_print():
+    print(data["data_703"])

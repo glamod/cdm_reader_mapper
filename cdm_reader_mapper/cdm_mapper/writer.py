@@ -51,7 +51,7 @@ def _table_to_ascii(
 
 
 def write_tables(
-    cdm_tables,
+    data,
     out_dir=".",
     prefix=None,
     suffix=None,
@@ -61,12 +61,13 @@ def write_tables(
     col_subset=None,
     delimiter="|",
     encoding="utf-8",
+    **kwargs,
 ):
     """Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
-    cdm_tables: pandas.DataFrame
+    data: pandas.DataFrame
         pandas.DataFrame to export.
     out_dir: str
         Path to the output directory.
@@ -80,7 +81,7 @@ def write_tables(
         Default: psv
     filename: str or dict, optional
         Name of the output file name(s).
-        List one filename for each table name in ``cdm_table`` ({<table>:<filename>}).
+        List one filename for each table name in ``data`` ({<table>:<filename>}).
         Default: Automatically create file name from table name, ``prefix`` and ``suffix``.
     cdm_subset: str or list, optional
         Specifies a subset of tables or a single table.
@@ -108,7 +109,9 @@ def write_tables(
 
     See Also
     --------
+    write: Write either MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
+    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
     read_tables : Read CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
@@ -124,9 +127,9 @@ def write_tables(
     if col_subset:
         if isinstance(col_subset, dict):
             col_subset = dict_to_tuple_list(col_subset)
-        cdm_tables = cdm_tables[col_subset]
+        data = data[col_subset]
 
-    if cdm_tables.empty:
+    if data.empty:
         logger.warning("All CDM tables are empty")
         return
 
@@ -136,11 +139,11 @@ def write_tables(
         filename = {}
 
     for table in cdm_subset:
-        if table not in cdm_tables:
+        if table not in data:
             cdm_atts = get_cdm_atts(table)
             cdm_table = pd.DataFrame(columns=cdm_atts.keys())
         else:
-            cdm_table = cdm_tables[table]
+            cdm_table = data[table]
 
         filename_ = filename.get(table)
         if not filename_:

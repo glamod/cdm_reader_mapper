@@ -3,7 +3,66 @@
 Changelog
 =========
 
-1.1.0 (unreleased)
+2.1.0 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* implement both wrapper functions ``read`` and ``write`` that call the appropriate function based on ``mode`` argument (:pull:`238`):
+
+  * `mode` == "mdf"; calls ``cdm_reader_mapper.read_mdf``
+  * `mode` == "data"; calls ``cdm_reader_mapper.read_data`` or ``cdm_reader_mapper.write_data``
+  * `mode` == "tables"; calls ``cdm_reader_mapper.read_tables`` or ``cdm_reader_mapper.write_tables``
+
+* optionally, call ``cdm_reader_mapper.read_tables`` with either source file or source directory path (:pull:`238`).
+
+* apply attribute to ``DataBundle.data`` if attribute is nor defined in ``DataBundle`` (:pull:`248`).
+* apply pandas functions directly to ``DataBundle.data`` by calling ``DataBundle.<pandas-func>`` (:pull:`248`).
+* make ``DataBundle`` support item assignment for ``DataBundle.data`` (:pull:`248`).
+* optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
+
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+
+* remove property ``tables`` from ``DataBundle`` object. Instead, ``DataBundle.map_model`` overwrites ``.DataBundle.data`` (:pull:`238`).
+* set default ``overwrite`` values from ``True`` to ``False`` that is consistent with pandas ``inplace`` argument and rename ``overwrite`` to ``inplace`` (:pull:`238`, :pull:`248`).
+* ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
+* ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
+
+Bug fixes
+^^^^^^^^^
+
+* ``cdm_reder_mapper.metmetpy``: set deck keys from ``???`` to ``d???`` in icoads json files which makes values accessible again (:pull:`238`).
+* ``cdm_reder_mapper.metmetpy``: set ``imma1`` to ``icoads`` and ``immt`` to ``gcc`` in icoads/gcc json files which makes properties accessible again (:pull:`238`).
+* ``DataBundle.copy`` function now makes a real deepcopy of ``DataBundle`` object (:pull:`248`).
+
+2.0.1 (2025-02-25)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+Announcements
+^^^^^^^^^^^^^
+This release drops support for Python 3.9 and adds support for Python 3.13 (:pull:`228`, :pull:`229`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* add environment.yml file (:pull:`229`)
+* cdm_reader_mapper now separates the optional dependencies into dev and docs recipes (:pull:`232`).
+
+  *  $ python -m pip install cdm_reader_mapper           # Install minimum dependency version
+  *  $ python -m pip install cdm_reader_mapper[dev]      # Install optional development dependencies in addition
+  *  $ python -m pip install cdm_reader_mapper[docs]     # Install optional dependencies for the documentation in addition
+  *  $ python -m pip install cdm_reader_mapper[all]      # Install all the above for complete dependency version
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* GitHub workflow for ``testing_suite`` now uses ``uv`` for environment management, replacing ``micromamba`` (:pull:`228`)
+* rename ci/requirements to CI and tidy up requirements/dependencies (:pull:`229`)
+
+2.0.0 (2025-02-14)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 

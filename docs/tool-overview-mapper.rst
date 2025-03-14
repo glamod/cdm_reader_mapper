@@ -23,10 +23,18 @@ Workflow
 
    db = read_mdf(filepath, imodel=imodel)
 
-   db.map_model()
+   cdm_tables = db.map_model()
+
+.. note:: Set ``inplace`` to True to overwrite :py:attr:`DataBundle.data`:
+
+.. code-block:: console
+
+   db.map_model(inplace=True)
+
+   cdm_tables = db.data
 
 
-Instead of using :py:class:`cdm_reader_mapper.DataBundle`'s method function to map data, it can be mapped directly from a :py:class:`pandas.DataFrame` using py:func`cdm_reader_mapper.map_model`.
+Instead of using :py:class:`cdm_reader_mapper.DataBundle`'s method function to map data, it can be mapped directly from a :py:class:`pandas.DataFrame` using :py:func:`cdm_reader_mapper.map_model`.
 
 .. code-block:: console
 
@@ -70,5 +78,23 @@ With the above settings this tool supports mapping to the CDM format by:
          - From ``imodel`` key to **CDM** key
          - From ``imodel`` key to **CDM** value: done by transforming functions in ``imodel.py``
          - From ``imodel`` value to **CDM** key: also done by transforming functions in ``imodel.py``
+
+You can write the CDM tables to disk using method function :py:func:`cdm_reader_mapper.DataBundle.write`:
+
+.. code-block:: console
+
+   db.write(mode="tables")
+
+There are two options to read those data again:
+
+.. code-block:: console
+
+   db = read_tables(data="data.csv")
+
+or
+
+.. code-block:: console
+
+   db = read(data="data.csv", tables="data")
 
 .. include:: hyperlinks.rst
