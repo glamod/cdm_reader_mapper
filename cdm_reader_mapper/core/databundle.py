@@ -399,7 +399,9 @@ class DataBundle:
             return db_, selected[1]
         return db_
 
-    def select_from_list(self, selection, mask=False, return_invalid=False, inplace=False, **kwargs):
+    def select_from_list(
+        self, selection, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -453,7 +455,9 @@ class DataBundle:
             return db_, selected[1]
         return db_
 
-    def select_from_index(self, index, mask=False, return_invalid=False, inplace=False, **kwargs):
+    def select_from_index(
+        self, index, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
@@ -501,7 +505,7 @@ class DataBundle:
         if mask is True:
             db_._mask = select_from_index(db_._mask, index, **kwargs)
         if return_invalid is True:
-            return  db_, selected[1]
+            return db_, selected[1]
         return db_
 
     def unique(self, **kwargs):
