@@ -111,7 +111,7 @@ class DataBundle:
             try:
                 return attr(*args, **kwargs)
             except TypeError:
-                return attr[*args]
+                return attr[args]
             except Exception:
                 raise ValueError(f"{attr} is neither callable nor subscriptable.")
 
