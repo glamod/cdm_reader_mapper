@@ -56,10 +56,15 @@ def add_history(df, indexes):
 
         return now.strftime("%Y-%m-%d %H:%M:%S")
 
+    def _add_history(x):
+        if x:
+            return f"{x}; {addition}"
+        return addition
+
     indexes = list(indexes)
     history_tstmp = _datetime_now()
-    addition = "".join([f"; {history_tstmp}. {add}" for add in _histories.items()])
-    df.loc[indexes, "history"] = df.loc[indexes, "history"] + addition
+    addition = "".join([f"{history_tstmp}. {add}" for add in _histories.items()])
+    df.loc[indexes, "history"] = df.loc[indexes, "history"].apply(_add_history)
     return df
 
 
@@ -400,6 +405,21 @@ def reindex_nulls(df):
     return df.reindex(indexes_[1])
 
 
+def fill_columns(df):
+    """Fill columns if necessary for duplicate check."""
+    if "report_id" not in df.columns:
+        df["report_id"] = df.index.astype(str)
+    if "report_quality" not in df.columns:
+        df["report_quality"] = 2
+    if "history" not in df.columns:
+        df["history"] = ""
+    if "duplicate_status" not in df.columns:
+        df["duplicate_status"] = 4
+    if "duplicates" not in df.columns:
+        df["duplicates"] = ""
+    return df
+
+
 class Comparer:
     """Class to compare DataFrame with recordlinkage Comparer."""
 
@@ -472,6 +492,7 @@ def duplicate_check(
         cdm_reader_mapper.DupDetect
     """
     data = data.reset_index(drop=True)
+    data = fill_columns(data)
 
     if reindex_by_null is True:
         data = reindex_nulls(data)
