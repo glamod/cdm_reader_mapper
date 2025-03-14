@@ -277,7 +277,7 @@ class DataBundle:
             Default: ['data', 'mask']
         inplace: bool
             If ``True`` overwrite datasets in :py:class:`~DataBundle`
-            else return stacked datasets.
+            else return a copy of :py:class:`~DataBundle` with stacked datasets.
             Default: False
 
         Note
@@ -306,7 +306,7 @@ class DataBundle:
             Default: ['data', 'mask']
         inplace: bool
             If ``True`` overwrite `datasets` in :py:class:`~DataBundle`
-            else return stacked datasets.
+            else return a copy of :py:class:`~DataBundle` with stacked datasets.
             Default: False
 
         Note
@@ -341,14 +341,17 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_true(self, inplace=False, **kwargs):
+    def select_true(self, mask=False, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return list containing both DataFrame with true and DataFrame with invalid rows.
+            else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
 
         Examples
@@ -371,13 +374,14 @@ class DataBundle:
         ----
         For more information see :py:func:`select_true`
         """
-        selected = select_true(self._data, self._mask, **kwargs)
-        if inplace is True:
-            self._data = selected[0]
-            return self
-        return selected
+        db_ = self._get_db(inplace)
+        selected = select_true(db_._data, db_._mask, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        return db_
 
-    def select_from_list(self, selection, inplace=False, **kwargs):
+    def select_from_list(self, selection, mask=False, inplace=False, **kwargs):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -385,9 +389,12 @@ class DataBundle:
         selection: dict
             Keys: columns to be selected.
             Values: values in keys to be selected
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return list containing both DataFrame with true and DataFrame with invalid entries.
+            else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
 
         Examples
@@ -412,22 +419,26 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_list`
         """
-        selected = select_from_list(self._data, selection, **kwargs)
-        if inplace is True:
-            self._data = selected[0]
-            return self
-        return selected
+        db_ = self._get_db(inplace)
+        selected = select_from_list(db_._data, selection, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        return db_
 
-    def select_from_index(self, index, inplace=False, **kwargs):
+    def select_from_index(self, index, mask=False, inplace=False, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return list containing both DataFrame with true and DataFrame with invalid entries.
+            else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
 
         Examples
@@ -450,11 +461,12 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_index`
         """
-        selected = select_from_index(self._data, index, **kwargs)
-        if inplace is True:
-            self._data = selected[0]
-            return self
-        return selected
+        db_ = self._get_db(inplace)
+        selected = select_from_index(db_._data, index, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, index, **kwargs)
+        return db_
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
@@ -485,7 +497,7 @@ class DataBundle:
             Select subset by columns. This option is useful for multi-indexed :py:attr:`data`.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return pd.DataFrame with replaced columns.
+            else return a copy of :py:class:`~DataBundle` with replaced column names in :py:attr:`data`.
             Default: False
 
         Examples
@@ -515,7 +527,7 @@ class DataBundle:
         ----------
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return datetime-corretcted DataFrame.
+            else return a copy of :py:class:`~DataBundle` with datetime-corrected values in :py:attr:`data`.
             Default: False
 
         Examples
@@ -569,7 +581,7 @@ class DataBundle:
         ----------
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return platform-corretcted DataFrame.
+            else return a copy of :py:class:`~DataBundle` with platform-corrected values in :py:attr:`data`.
             Default: False
 
         Examples
@@ -624,7 +636,7 @@ class DataBundle:
         ----------
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return CDM tables.
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
             Default: False
 
         Examples
@@ -715,7 +727,7 @@ class DataBundle:
         ----------
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return DataFrame containing flagged duplicates.
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing flagged duplicates.
             Default: False
 
         Note
@@ -786,7 +798,7 @@ class DataBundle:
         ----------
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return DataFrame containing non-duplicate rows.
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing no duplicates.
             Default: False
 
         Note
