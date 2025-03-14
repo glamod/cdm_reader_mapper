@@ -33,8 +33,8 @@ def _testing_suite(
         **kwargs,
     )
 
-    db_mdf.correct_datetime(overwrite=True)
-    db_mdf.correct_pt(overwrite=True)
+    db_mdf.correct_datetime(inplace=True)
+    db_mdf.correct_pt(inplace=True)
 
     val_dt = db_mdf.validate_datetime()
 
@@ -100,7 +100,7 @@ def _testing_suite(
         cdm_subset=cdm_subset,
         codes_subset=codes_subset,
         log_level="DEBUG",
-        overwrite=True,
+        inplace=True,
     )
 
     col_subset = get_col_subset(db_mdf.data, codes_subset)
