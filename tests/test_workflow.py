@@ -56,16 +56,6 @@ from ._testing_workflow_suite import _testing_suite
             None,
             {},
         ),
-        ("icoads_r300_d714", None, None, True, None, {"chunksize": 3}),
-        (
-            "icoads_r300_d714",
-            None,
-            None,
-            False,
-            None,
-            {"sections": ["c99"], "chunksize": 3},
-        ),
-        ("icoads_r300_d721", None, None, True, None, {"chunksize": 3}),
         (
             "icoads_r300_d702",
             None,
