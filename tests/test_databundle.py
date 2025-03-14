@@ -68,3 +68,7 @@ def test_stack_h(test_data):
     orig_data = data["data_700"].copy()
     test_data = update_columns(test_data)
     orig_data.stack_h(test_data, datasets=["data"])
+
+
+def test_print():
+    print(data["data_703"])
