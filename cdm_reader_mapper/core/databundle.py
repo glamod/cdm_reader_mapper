@@ -792,7 +792,6 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_.DupDetect.flag_duplicates(**kwargs)
-        db_.DupDetect.result.set_index(db_.index, inplace=True)
         if db_._mode == "tables" and "header" in db_._data:
             db_._data["header"] = db_.DupDetect.result
         else:
@@ -864,7 +863,6 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_.DupDetect.remove_duplicates(**kwargs)
-        db_.DupDetect.result.set_index(db_.index, inplace=True)
         header_ = db_.DupDetect.result
         db_._data = db_._data[db_._data.index.isin(header_.index)]
         return db_
