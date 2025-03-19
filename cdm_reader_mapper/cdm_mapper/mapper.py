@@ -349,20 +349,25 @@ def map_model(
     Parameters
     ----------
     data: pandas.DataFrame, pd.parser.TextFileReader or io.String
-      input data to map.
+        input data to map.
     imodel: str
-      A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
-      CDM in a specific way.
-      e.g. ``icoads_r300_d704``
+        A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
+        CDM in a specific way.
+        e.g. ``icoads_r300_d704``
     cdm_subset: list, optional
-      subset of CDM model tables to map.
-      Defaults to the full set of CDM tables defined for the imodel.
+        subset of CDM model tables to map.
+        Defaults to the full set of CDM tables defined for the imodel.
     codes_subset: list, optional
-      subset of code mapping tables to map.
-      Default to the full set of code mapping tables defined for the imodel.
+        subset of code mapping tables to map.
+        Default to the full set of code mapping tables defined for the imodel.
+    null_label: str
+        String how to label non valid values in `data`.
+        Default: null
+    cdm_complete:
+        If True map entire CDM tables list.
     log_level: str
-      level of logging information to save.
-      Defaults to ‘DEBUG’.
+        level of logging information to save.
+        Default: DEBUG.
 
     Returns
     -------

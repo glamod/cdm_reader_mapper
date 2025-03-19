@@ -189,6 +189,9 @@ def read_tables(
     na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
         Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
         For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+    null_label: str
+        String how to label non valid values in `data`.
+        Default: null
 
     Returns
     -------
