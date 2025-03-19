@@ -94,8 +94,6 @@ class DataBundle:
         """Length of :py:attr:`data`."""
         if self._data is not None:
             return get_length(self._data)
-        if self._tables is not None:
-            return get_length(self._tables)
         raise KeyError("Neither data nor tables are defined.")
 
     def __getattr__(self, attr):
