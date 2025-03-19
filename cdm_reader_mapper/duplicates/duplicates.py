@@ -471,11 +471,11 @@ def duplicate_check(
     -------
         cdm_reader_mapper.DupDetect
     """
-    index = data.index
-    data = data.reset_index(drop=True)
-
     if reindex_by_null is True:
         data = reindex_nulls(data)
+
+    index = data.index
+    data.reset_index(drop=True)
 
     if table_name:
         data = data[table_name]
