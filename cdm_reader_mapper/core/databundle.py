@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import csv
+
 from copy import deepcopy
+from io import StringIO as StringIO
 
 import pandas as pd
 
@@ -25,6 +28,7 @@ from cdm_reader_mapper.metmetpy import (
     validate_id,
 )
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.mdf_reader import properties
 
 
 class DataBundle:
@@ -92,7 +96,9 @@ class DataBundle:
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        return get_length(self.data)
+        if self._data is not None:
+            return get_length(self._data)
+        raise KeyError("data is not defined.")
 
     def __getattr__(self, attr):
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
@@ -109,11 +115,52 @@ class DataBundle:
 
         def method(*args, **kwargs):
             try:
-                return attr(*args, **kwargs)
+                return attr_func(*args, **kwargs)
             except TypeError:
-                return attr[args]
+                return attr_func[args]
             except Exception:
                 raise ValueError(f"{attr} is neither callable nor subscriptable.")
+
+        def reader_method(*args, **kwargs):
+            data_buffer = StringIO()
+            TextParser = make_copy(data)
+            chunksize = TextParser.chunksize
+            inplace = kwargs.get("inplace", False)
+            for df_ in TextParser:
+                nonlocal attr_func
+                attr_func = getattr(df_, attr)
+                if not callable(attr_func):
+                    return attr_func
+                result_df = method(*args, **kwargs)
+                if result_df is None:
+                    result_df = df_
+                if result_df is None:
+                    result_df = df_
+                result_df.to_csv(
+                    data_buffer,
+                    header=False,
+                    mode="a",
+                    encoding=self.encoding,
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+                data_buffer.seek(0)
+            TextParser = pd.read_csv(
+                data_buffer,
+                names=result_df.columns,
+                chunksize=chunksize,
+                dtype=self.dtypes,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
+            if inplace:
+                self._data = TextParser
+                return self
+            return TextParser
 
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError(f"DataBundle object has no attribute {attr}.")
@@ -121,12 +168,20 @@ class DataBundle:
         _data = "_data"
         if not hasattr(self, _data):
             raise NameError("'data' is not defined in DataBundle object.")
-        _df = getattr(self, _data)
-        attr = getattr(_df, attr)
-        if not callable(attr):
-            return attr
-
-        return SubscriptableMethod(method)
+        data = getattr(self, _data)
+        if isinstance(data, pd.DataFrame):
+            attr_func = getattr(data, attr)
+            if not callable(attr_func):
+                return attr_func
+            return SubscriptableMethod(method)
+        elif isinstance(data, pd.io.parsers.TextFileReader):
+            TextParser = make_copy(data)
+            first_chunk = next(TextParser)
+            attr_func = getattr(first_chunk, attr)
+            if not callable(attr_func):
+                return attr_func
+            return SubscriptableMethod(reader_method)
+        raise TypeError("'data' is neither a DataFrame nor a TextFileReader object.")
 
     def __repr__(self):
         """Return a string representation for :py:attr:`data`."""
@@ -341,7 +396,7 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_true(self, mask=False, inplace=False, **kwargs):
+    def select_true(self, mask=False, return_invalid=False, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
@@ -349,10 +404,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -378,10 +440,14 @@ class DataBundle:
         selected = select_true(db_._data, db_._mask, **kwargs)
         db_._data = selected[0]
         if mask is True:
-            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
-    def select_from_list(self, selection, mask=False, inplace=False, **kwargs):
+    def select_from_list(
+        self, selection, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -392,10 +458,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -423,10 +496,14 @@ class DataBundle:
         selected = select_from_list(db_._data, selection, **kwargs)
         db_._data = selected[0]
         if mask is True:
-            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
-    def select_from_index(self, index, mask=False, inplace=False, **kwargs):
+    def select_from_index(
+        self, index, mask=False, return_invalid=False, inplace=False, **kwargs
+    ):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
@@ -436,10 +513,17 @@ class DataBundle:
         mask: bool
             If ``True`` select also valid values from :py:attr:`mask`
             Default: False
+        return_invalid: bool
+            If True return invalid data additionally.
+            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
+
+        Note
+        ----
+        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -465,7 +549,9 @@ class DataBundle:
         selected = select_from_index(db_._data, index, **kwargs)
         db_._data = selected[0]
         if mask is True:
-            db_._mask = select_from_index(db_._mask, index, **kwargs)
+            db_._mask = select_from_index(db_._mask, index, **kwargs)[0]
+        if return_invalid is True:
+            return db_, selected[1]
         return db_
 
     def unique(self, **kwargs):

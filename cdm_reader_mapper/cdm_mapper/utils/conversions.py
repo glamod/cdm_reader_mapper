@@ -25,9 +25,10 @@ def convert_integer(data, null_label):
     def _return_str(x, null_label):
         if pd.isna(x):
             return null_label
-        return str(
-            int(float(x))
-        )  # ValueError: invalid literal for int() with base 10: '5.0'
+        try:
+            return str(int(float(x)))
+        except ValueError:
+            return null_label
 
     return data.apply(lambda x: _return_str(x, null_label))
 
@@ -50,7 +51,10 @@ def convert_float(data, null_label, decimal_places):
     def _return_str(x, null_label, format_float):
         if pd.isna(x):
             return null_label
-        return format_float.format(float(x))
+        try:
+            return format_float.format(float(x))
+        except ValueError:
+            return null_label
 
     format_float = "{:." + str(decimal_places) + "f}"
     return data.apply(lambda x: _return_str(x, null_label, format_float))
