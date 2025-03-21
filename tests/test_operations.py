@@ -11,14 +11,10 @@ from ._results import cdm_header, correction_df
 data_dict = dict(test_data.test_icoads_r300_d721)
 
 
-def _read_data(**kwargs):
-    return read(**kwargs)
-
-
 def _get_data(TextParser, **kwargs):
     if TextParser is True:
         kwargs["chunksize"] = 10000
-    return _read_data(**data_dict, imodel="icoads_r300_d721", **kwargs)
+    return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
