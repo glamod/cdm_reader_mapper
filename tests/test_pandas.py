@@ -4,52 +4,68 @@ import numpy as np
 import pandas as pd
 import pytest  # noqa
 
-from cdm_reader_mapper import read_data
+from cdm_reader_mapper import read, test_data
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
-from ._results import result_data
-
-
-def get_result_data(imodel):
-    results_ = getattr(result_data, f"expected_{imodel}")
-    return read_data(
-        results_["data"],
-        mask=results_["mask"],
-        info=results_["info"],
-    )
+data_dict = dict(test_data.test_icoads_r300_d700)
 
 
-test_data = get_result_data("icoads_r300_d700")
+def _get_data(TextParser, **kwargs):
+    if TextParser is True:
+        kwargs["chunksize"] = 10000
+    return read(**data_dict, imodel="icoads_r300_d700", **kwargs)
 
 
-def test_index():
-    index_db = test_data.index
-    index_pd = test_data.data.index
-    np.testing.assert_equal(list(index_db), list(index_pd))
+@pytest.mark.parametrize("TextParser", [True, False])
+def test_index(TextParser):
+    data = _get_data(TextParser)
+    result = data.index
+    np.testing.assert_equal(list(result), [0, 1, 2, 3, 4])
 
 
-def test_size():
-    size_db = test_data.size
-    size_pd = test_data.data.size
-    np.testing.assert_equal(size_db, size_pd)
+@pytest.mark.parametrize("TextParser", [True, False])
+def test_size(TextParser):
+    data = _get_data(TextParser)
+    result = data.size
+    np.testing.assert_equal(result, 1430)
 
 
-def test_dropna():
-    dropna_db = test_data.dropna(how="any")
-    dropna_pd = test_data.data.dropna(how="any")
-    pd.testing.assert_frame_equal(dropna_db, dropna_pd)
+@pytest.mark.parametrize("TextParser", [True, False])
+def test_dropna(TextParser):
+    data = _get_data(TextParser)
+    result = data.dropna(how="any")
+    if TextParser:
+        result = make_copy(result).read()
+    expected = pd.DataFrame(columns=data.columns)
+    expected = expected.astype(data.dtypes)
+    pd.testing.assert_frame_equal(result, expected)
 
 
-def test_rename():
+@pytest.mark.parametrize("TextParser", [True, False])
+def test_rename(TextParser):
+    data = _get_data(TextParser)
     _renames = {("core", "MO"): ("core", "MONTH")}
-    rename_db = test_data.rename(columns=_renames)
-    rename_pd = test_data.data.rename(columns=_renames)
-    pd.testing.assert_frame_equal(rename_db, rename_pd)
+    result = data.rename(columns=_renames)
+    expected = data.data
+    if TextParser:
+        result = make_copy(result).read()
+        expected = make_copy(expected).read()
+    expected = expected.rename(columns=_renames)
+    expected = expected.astype(result.dtypes)
+    pd.testing.assert_frame_equal(result, expected)
 
 
-def test_inplace():
+@pytest.mark.parametrize("TextParser", [True])
+def test_inplace(TextParser):
+    data = _get_data(TextParser)
     _renames = {("core", "MO"): ("core", "MONTH")}
-    db1 = test_data.copy()
-    db1.rename(columns=_renames, inplace=True)
-    db2 = test_data.copy()
-    db2.data.rename(columns=_renames, inplace=True)
-    pd.testing.assert_frame_equal(db1.data, db2.data)
+    data_ = data.copy()
+    data_.rename(columns=_renames, inplace=True)
+    result = data_.data
+    expected = data.data
+    if TextParser:
+        result = make_copy(result).read()
+        expected = make_copy(expected).read()
+    expected = expected.rename(columns=_renames)
+    expected = expected.astype(result.dtypes)
+    pd.testing.assert_frame_equal(result, expected)
