@@ -31,6 +31,71 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 from cdm_reader_mapper.mdf_reader import properties
 
 
+def method(attr_func, *args, **kwargs):
+    """Handles both method calls and subscriptable attributes."""
+    try:
+        return attr_func(*args, **kwargs)
+    except TypeError:
+        return attr_func[args]
+    except Exception:
+        raise ValueError("Attribute is neither callable nor subscriptable.")
+
+
+def reader_method(DataBundle, data, attr, *args, **kwargs):
+    """Handles operations on chunked DataFrame (TextFileReader)."""
+    data_buffer = StringIO()
+    TextParser = make_copy(data)
+    chunksize = TextParser.chunksize
+    inplace = kwargs.get("inplace", False)
+    for df_ in TextParser:
+        attr_func = getattr(df_, attr)
+        if not callable(attr_func):
+            return attr_func
+        result_df = method(attr_func, *args, **kwargs)
+        if result_df is None:
+            result_df = df_
+        result_df.to_csv(
+            data_buffer,
+            header=False,
+            mode="a",
+            encoding=DataBundle.encoding,
+            index=False,
+            quoting=csv.QUOTE_NONE,
+            sep=properties.internal_delimiter,
+            quotechar="\0",
+            escapechar="\0",
+        )
+        data_buffer.seek(0)
+    TextParser = pd.read_csv(
+        data_buffer,
+        names=result_df.columns,
+        chunksize=chunksize,
+        dtype=DataBundle.dtypes,
+        delimiter=properties.internal_delimiter,
+        quotechar="\0",
+        escapechar="\0",
+    )
+    if inplace:
+        DataBundle._data = TextParser
+        return DataBundle
+    return TextParser
+
+
+class SubscriptableMethod:
+    """Allows both method calls and subscript access."""
+
+    def __init__(self, func):
+        self.func = func
+
+    def __getitem__(self, item):
+        """Ensure subscript access is handled properly."""
+        return self.func[item]
+
+    def __call__(self, *args, **kwargs):
+        """Ensure function calls work properly."""
+        return self.func(*args, **kwargs)
+
+
 class DataBundle:
     """Class for manipulating the MDF data and mapping it to the CDM.
 
@@ -96,91 +161,31 @@ class DataBundle:
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        if self._data is not None:
-            return get_length(self._data)
-        raise KeyError("data is not defined.")
+        return get_length(self._data)
 
     def __getattr__(self, attr):
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
-
-        class SubscriptableMethod:
-            def __init__(self, func):
-                self.func = func
-
-            def __getitem__(self, item):
-                return self.func(item)
-
-            def __call__(self, *args, **kwargs):
-                return self.func(*args, **kwargs)
-
-        def method(*args, **kwargs):
-            try:
-                return attr_func(*args, **kwargs)
-            except TypeError:
-                return attr_func[args]
-            except Exception:
-                raise ValueError(f"{attr} is neither callable nor subscriptable.")
-
-        def reader_method(*args, **kwargs):
-            data_buffer = StringIO()
-            TextParser = make_copy(data)
-            chunksize = TextParser.chunksize
-            inplace = kwargs.get("inplace", False)
-            for df_ in TextParser:
-                nonlocal attr_func
-                attr_func = getattr(df_, attr)
-                if not callable(attr_func):
-                    return attr_func
-                result_df = method(*args, **kwargs)
-                if result_df is None:
-                    result_df = df_
-                if result_df is None:
-                    result_df = df_
-                result_df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-                data_buffer.seek(0)
-            TextParser = pd.read_csv(
-                data_buffer,
-                names=result_df.columns,
-                chunksize=chunksize,
-                dtype=self.dtypes,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            if inplace:
-                self._data = TextParser
-                return self
-            return TextParser
-
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError(f"DataBundle object has no attribute {attr}.")
 
-        _data = "_data"
-        if not hasattr(self, _data):
-            raise NameError("'data' is not defined in DataBundle object.")
-        data = getattr(self, _data)
+        data = self._data
+
         if isinstance(data, pd.DataFrame):
             attr_func = getattr(data, attr)
             if not callable(attr_func):
                 return attr_func
-            return SubscriptableMethod(method)
+            return SubscriptableMethod(attr_func)
         elif isinstance(data, pd.io.parsers.TextFileReader):
+
+            def wrapped_reader_method(*args, **kwargs):
+                return reader_method(self, data, attr, *args, **kwargs)
+
             TextParser = make_copy(data)
             first_chunk = next(TextParser)
             attr_func = getattr(first_chunk, attr)
             if not callable(attr_func):
                 return attr_func
-            return SubscriptableMethod(reader_method)
+            return SubscriptableMethod(wrapped_reader_method)
         raise TypeError("'data' is neither a DataFrame nor a TextFileReader object.")
 
     def __repr__(self):
@@ -194,6 +199,9 @@ class DataBundle:
                 setattr(self, item, value)
         else:
             self._data.__setitem__(item, value)
+
+    def _create_reader_method(self, data, attr):
+        """Creates a reader method that processes TextFileReader in chunks."""
 
     def __getitem__(self, item):
         """Make class subscriptable."""
