@@ -7,4 +7,4 @@ from .getting_files import load_file
 from .inspect import count_by_cat, get_length
 from .io_files import get_filename
 from .replace import replace_columns
-from .select import select_from_index, select_from_list, select_true
+from .select import select_false, select_from_index, select_from_list, select_true

@@ -9,6 +9,7 @@ from .cdm_mapper.writer import write_tables  # noqa
 from .common import count_by_cat as unique  # noqa
 from .common import (  # noqa
     replace_columns,
+    select_false,
     select_from_index,
     select_from_list,
     select_true,

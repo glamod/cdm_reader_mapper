@@ -16,6 +16,7 @@ from cdm_reader_mapper.common import (
     count_by_cat,
     get_length,
     replace_columns,
+    select_false,
     select_from_index,
     select_from_list,
     select_true,
@@ -406,25 +407,15 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_true(self, mask=False, return_invalid=False, inplace=False, **kwargs):
+    def select_true(self, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
-        mask: bool
-            If ``True`` select also valid values from :py:attr:`mask`
-            Default: False
-        return_invalid: bool
-            If True return invalid data additionally.
-            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
-
-        Note
-        ----
-        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -439,6 +430,7 @@ class DataBundle:
 
         See Also
         --------
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
         DataBundle.select_from_list : Select columns from `data` with specific values.
         DataBundle.select_from_index : Select rows of `data` with specific indexes.
 
@@ -447,17 +439,47 @@ class DataBundle:
         For more information see :py:func:`select_true`
         """
         db_ = self._get_db(inplace)
-        selected = select_true(db_._data, db_._mask, **kwargs)
-        db_._data = selected[0]
-        if mask is True:
-            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
-        if return_invalid is True:
-            return self._return_db(db_, inplace), selected[1]
+        db_.data = select_true(db_._data, db_._mask, **kwargs)
+        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
         return self._return_db(db_, inplace)
 
-    def select_from_list(
-        self, selection, mask=False, return_invalid=False, inplace=False, **kwargs
-    ):
+    def select_false(self, inplace=False, **kwargs):
+        """Select invalid values from :py:attr:`data` via :py:attr:`mask`.
+
+        Parameters
+        ----------
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with invalid values only in :py:attr:`data`.
+            Default: False
+
+        Examples
+        --------
+        Select valid values only without overwriting the old data.
+
+        >>> true_values, false_values = db.select_true()
+
+        Select valid values only with overwriting the old data.
+
+        >>> db.select_true(inplace=True)
+        >>> true_values = db.data
+
+        See Also
+        --------
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+
+        Note
+        ----
+        For more information see :py:func:`select_true`
+        """
+        db_ = self._get_db(inplace)
+        db_.data = select_false(db_._data, db_._mask, **kwargs)
+        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        return self._return_db(db_, inplace)
+
+    def select_from_list(self, selection, inplace=False, **kwargs):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -465,20 +487,11 @@ class DataBundle:
         selection: dict
             Keys: columns to be selected.
             Values: values in keys to be selected
-        mask: bool
-            If ``True`` select also valid values from :py:attr:`mask`
-            Default: False
-        return_invalid: bool
-            If True return invalid data additionally.
-            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
 
-        Note
-        ----
-        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -497,43 +510,29 @@ class DataBundle:
         --------
         DataBundle.select_from_index : Select rows of `data` with specific indexes.
         DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
 
         Note
         ----
         For more information see :py:func:`select_from_list`
         """
         db_ = self._get_db(inplace)
-        selected = select_from_list(db_._data, selection, **kwargs)
-        db_._data = selected[0]
-        if mask is True:
-            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
-        if return_invalid is True:
-            return self._return_db(db_, inplace), selected[1]
+        db_.data = select_from_list(db_._data, selection, **kwargs)
+        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
         return self._return_db(db_, inplace)
 
-    def select_from_index(
-        self, index, mask=False, return_invalid=False, inplace=False, **kwargs
-    ):
+    def select_from_index(self, index, inplace=False, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
-        mask: bool
-            If ``True`` select also valid values from :py:attr:`mask`
-            Default: False
-        return_invalid: bool
-            If True return invalid data additionally.
-            Default: False
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
 
-        Note
-        ----
-        If `return_invalid` is ``True`` this function returns two values.
 
         Examples
         --------
@@ -550,18 +549,15 @@ class DataBundle:
         --------
         DataBundle.select_from_list : Select columns from `data` with specific values.
         DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
 
         Note
         ----
         For more information see :py:func:`select_from_index`
         """
         db_ = self._get_db(inplace)
-        selected = select_from_index(db_._data, index, **kwargs)
-        db_._data = selected[0]
-        if mask is True:
-            db_._mask = select_from_index(db_._mask, index, **kwargs)[0]
-        if return_invalid is True:
-            return self._return_db(db_, inplace), selected[1]
+        db_.data = select_from_index(db_._data, index, **kwargs)
+        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
         return self._return_db(db_, inplace)
 
     def unique(self, **kwargs):

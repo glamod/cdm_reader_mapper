@@ -27,47 +27,44 @@ from cdm_reader_mapper.common import pandas_TextParser_hdlr
 def dataframe_apply_index(
     df,
     index_list,
-    out_rejected=False,
-    in_index=False,
+    inverse=False,
     idx_in_offset=0,
     idx_out_offset=0,
 ):
     """Apply index to pandas DataFrame."""
     index = df.index.isin(index_list)
-    in_df = df[index]
+
+    if inverse is True:
+        in_df = df[~index]
+    else:
+        in_df = df[index]
+
     in_df.index = range(idx_in_offset, idx_in_offset + len(in_df))
-    output = [in_df]
-    if out_rejected:
-        out_df = df[~index]
-        out_df.index = range(idx_out_offset, idx_out_offset + len(out_df))
-        output.append(out_df)
-    if in_index:
-        output.append(index_list)
 
-    return output
+    return in_df
 
 
-def select_true(data, mask, out_rejected=False, in_index=False):
+def select_bool(data, mask, boolean, inverse=False):
     """DOCUMENTATION."""
 
     # mask is a the full df/parser of which we only use col
-    def dataframe(
-        df, mask, out_rejected=False, in_index=False, idx_in_offset=0, idx_out_offset=0
-    ):
+    def dataframe(df, mask, boolean, inverse=False, idx_in_offset=0, idx_out_offset=0):
         # get the index values and pass to the general function
         # If a mask is empty, assume True (...)
-        global_mask = mask.all(axis=1)
-        index = global_mask[global_mask.fillna(True)].index
+        if boolean is True:
+            global_mask = mask.all(axis=1)
+        else:
+            global_mask = ~(mask.any(axis=1))
+        index = global_mask[global_mask.fillna(boolean)].index
         return dataframe_apply_index(
             df,
             index,
-            out_rejected=out_rejected,
-            in_index=in_index,
+            inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, mask_parser, out_rejected=False, in_index=False):
+    def parser(data_parser, mask_parser, boolean, inverse=False):
         mask_cp = pandas_TextParser_hdlr.make_copy(mask_parser)
         read_params = [
             "chunksize",
@@ -79,50 +76,41 @@ def select_true(data, mask, out_rejected=False, in_index=False):
         ]
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         in_buffer = StringIO()
-        if out_rejected:
-            out_buffer = StringIO()
-        index = []
         idx_in_offset = 0
         idx_out_offset = 0
         for df, mask_df in zip(data_parser, mask_cp):
-            o = dataframe(
+            output = dataframe(
                 df,
                 mask_df,
-                out_rejected=out_rejected,
-                in_index=in_index,
+                boolean,
+                inverse=inverse,
                 idx_in_offset=idx_in_offset,
                 idx_out_offset=idx_out_offset,
             )
-            o[0].to_csv(in_buffer, header=False, index=False, mode="a")
-            if out_rejected:
-                o[1].to_csv(out_buffer, header=False, index=False, mode="a")
-                idx_out_offset += len(o[1])
-            if in_index and not out_rejected:
-                index.extend(o[1])
-            if in_index and out_rejected:
-                index.extend(o[2])
-            idx_in_offset += len(o[0])
+            output.to_csv(in_buffer, header=False, index=False, mode="a")
+            idx_in_offset += len(output)
 
         mask_cp.close()
         in_buffer.seek(0)
-        output = [pd.read_csv(in_buffer, **read_dict)]
-        if out_rejected:
-            out_buffer.seek(0)
-            output.append(pd.read_csv(out_buffer, **read_dict))
-        if in_index:
-            output.append(index)
+        return pd.read_csv(in_buffer, **read_dict)
 
-        return output
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        return parser(data, mask, boolean, inverse=inverse)
 
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(data, mask, out_rejected=out_rejected, in_index=in_index)
-    else:
-        output = parser(data, mask, out_rejected=out_rejected, in_index=in_index)
-
-    return output
+    return dataframe(data, mask, boolean, inverse=inverse)
 
 
-def select_from_list(data, selection, out_rejected=False, in_index=False):
+def select_true(data, mask, inverse=False):
+    """DOCUMENTATION."""
+    return select_bool(data, mask, True, inverse=inverse)
+
+
+def select_false(data, mask, inverse=False):
+    """DOCUMENTATION."""
+    return select_bool(data, mask, False, inverse=inverse)
+
+
+def select_from_list(data, selection, inverse=False):
     """DOCUMENTATION."""
 
     # selection is a dictionary like {col_name:[values to select]}
@@ -130,8 +118,7 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
         df,
         col,
         values,
-        out_rejected=False,
-        in_index=False,
+        inverse=False,
         idx_in_offset=0,
         idx_out_offset=0,
     ):
@@ -141,13 +128,12 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
         return dataframe_apply_index(
             df,
             index,
-            out_rejected=out_rejected,
-            in_index=in_index,
+            inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, col, values, out_rejected=False, in_index=False):
+    def parser(data_parser, col, values, inverse=False):
         read_params = [
             "chunksize",
             "names",
@@ -158,67 +144,44 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
         ]
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         in_buffer = StringIO()
-        if out_rejected:
-            out_buffer = StringIO()
-        index = []
         idx_in_offset = 0
         idx_out_offset = 0
         for df in data_parser:
-            o = dataframe(
+            output = dataframe(
                 df,
                 col,
                 values,
-                out_rejected=out_rejected,
-                in_index=in_index,
+                inverse=inverse,
                 idx_in_offset=idx_in_offset,
                 idx_out_offset=idx_out_offset,
             )
-            o[0].to_csv(in_buffer, header=False, index=False, mode="a")
-            if out_rejected:
-                o[1].to_csv(out_buffer, header=False, index=False, mode="a")
-                idx_out_offset += len(o[1])
-            if in_index and not out_rejected:
-                index.extend(o[1])
-            if in_index and out_rejected:
-                index.extend(o[2])
-            idx_in_offset += len(o[0])
+            output.to_csv(in_buffer, header=False, index=False, mode="a")
+            idx_in_offset += len(output)
 
         in_buffer.seek(0)
-        output = [pd.read_csv(in_buffer, **read_dict)]
-        if out_rejected:
-            out_buffer.seek(0)
-            output.append(pd.read_csv(out_buffer, **read_dict))
-        if in_index:
-            output.append(index)
-
-        return output
+        return pd.read_csv(in_buffer, **read_dict)
 
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(
-            data, col, values, out_rejected=out_rejected, in_index=in_index
-        )
-    else:
-        output = parser(data, col, values, out_rejected=out_rejected, in_index=in_index)
-
-    return output
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        return parser(data, col, values, inverse=inverse)
+    return dataframe(data, col, values, inverse=inverse)
 
 
-def select_from_index(data, index, out_rejected=False):
+def select_from_index(data, index, inverse=False):
     """DOCUMENTATION."""
 
     # index is a list of integer positions to select from data
-    def dataframe(df, index, out_rejected=False, idx_in_offset=0, idx_out_offset=0):
+    def dataframe(df, index, inverse=False, idx_in_offset=0, idx_out_offset=0):
         return dataframe_apply_index(
             df,
             index,
-            out_rejected=out_rejected,
+            inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, index, out_rejected=False):
+    def parser(data_parser, index, inverse=False):
         read_params = [
             "chunksize",
             "names",
@@ -229,25 +192,15 @@ def select_from_index(data, index, out_rejected=False):
         ]
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         in_buffer = StringIO()
-        if out_rejected:
-            out_buffer = StringIO()
 
         for df in data_parser:
-            o = dataframe(df, index, out_rejected=out_rejected)
-            o[0].to_csv(in_buffer, header=False, index=False, mode="a")
-            if out_rejected:
-                o[1].to_csv(out_buffer, header=False, index=False, mode="a")
+            output = dataframe(df, index, inverse=inverse)
+            output.to_csv(in_buffer, header=False, index=False, mode="a")
 
         in_buffer.seek(0)
-        output = [pd.read_csv(in_buffer, **read_dict)]
-        if out_rejected:
-            out_buffer.seek(0)
-            output.append(pd.read_csv(out_buffer, **read_dict))
-        return output
+        return pd.read_csv(in_buffer, **read_dict)
 
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        output = dataframe(data, index, out_rejected=out_rejected)
-    else:
-        output = parser(data, index, out_rejected=out_rejected)
+    if isinstance(data, pd.io.parsers.TextFileReader):
+        return parser(data, index, inverse=inverse)
 
-    return output
+    return dataframe(data, index, inverse=inverse)

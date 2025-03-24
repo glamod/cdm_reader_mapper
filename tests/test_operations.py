@@ -17,10 +17,11 @@ def _get_data(TextParser, **kwargs):
     return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
+@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_select_true(TextParser):
+def test_select_true(inverse, TextParser):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.select_true(out_rejected=True)
+    result = data.select_true(inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -28,14 +29,19 @@ def test_select_true(TextParser):
         expected = make_copy(expected).read()
         selected = make_copy(selected).read()
 
-    expected = expected[:5].reset_index(drop=True)
+    if inverse is False:
+        expected = expected[:5].reset_index(drop=True)
+    else:
+        expected = expected[:0].reset_index(drop=True)
+
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("TextParser", [False, True])
-def test_select_from_index(TextParser):
-    data = _get_data(TextParser)
-    result = data.select_from_index([0, 2, 4])
+@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [True, False])
+def test_select_false(inverse, TextParser):
+    data = _get_data(TextParser, sections=["c99_data"])
+    result = data.select_false(inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -43,16 +49,42 @@ def test_select_from_index(TextParser):
         expected = make_copy(expected).read()
         selected = make_copy(selected).read()
 
-    idx = expected.index.isin([0, 2, 4])
+    if inverse is False:
+        expected = expected[:0].reset_index(drop=True)
+    else:
+        expected = expected[:5].reset_index(drop=True)
+
+    expected = expected.reset_index(drop=True)
+    pd.testing.assert_frame_equal(expected, selected)
+
+
+@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+def test_select_from_index(inverse, TextParser):
+    data = _get_data(TextParser)
+    result = data.select_from_index([0, 2, 4], inverse=inverse)
+    expected = data.data
+    selected = result.data
+
+    if TextParser is True:
+        expected = make_copy(expected).read()
+        selected = make_copy(selected).read()
+
+    if inverse is False:
+        idx = expected.index.isin([0, 2, 4])
+    else:
+        idx = expected.index.isin([1, 3])
+
     expected = expected[idx].reset_index(drop=True)
     pd.testing.assert_frame_equal(expected, selected)
 
 
+@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_select_from_list(TextParser):
+def test_select_from_list(inverse, TextParser):
     data = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
-    result = data.select_from_list(selection, out_rejected=True, in_index=True)
+    result = data.select_from_list(selection, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -60,7 +92,10 @@ def test_select_from_list(TextParser):
         expected = make_copy(expected).read()
         selected = make_copy(selected).read()
 
-    idx = expected.index.isin([1, 3])
+    if inverse is False:
+        idx = expected.index.isin([1, 3])
+    else:
+        idx = expected.index.isin([0, 2, 4])
     expected = expected[idx].reset_index(drop=True)
     pd.testing.assert_frame_equal(expected, selected)
 
