@@ -77,7 +77,7 @@ def reader_method(DataBundle, data, attr, *args, **kwargs):
     )
     if inplace:
         DataBundle._data = TextParser
-        return DataBundle
+        return
     return TextParser
 
 
@@ -200,9 +200,6 @@ class DataBundle:
         else:
             self._data.__setitem__(item, value)
 
-    def _create_reader_method(self, data, attr):
-        """Creates a reader method that processes TextFileReader in chunks."""
-
     def __getitem__(self, item):
         """Make class subscriptable."""
         if isinstance(item, str):
@@ -289,6 +286,11 @@ class DataBundle:
             return self
         return self.copy()
 
+    def _return_db(self, db, inplace):
+        if inplace is True:
+            return
+        return db
+
     def _stack(self, other, datasets, inplace, **kwargs):
         db_ = self._get_db(inplace)
         if not isinstance(other, list):
@@ -309,7 +311,7 @@ class DataBundle:
             _df = _df.reset_index(drop=True)
             setattr(self, f"_{data}", _df)
 
-        return db_
+        return self._return_db(db_, inplace)
 
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
@@ -450,8 +452,8 @@ class DataBundle:
         if mask is True:
             db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
         if return_invalid is True:
-            return db_, selected[1]
-        return db_
+            return self._return_db(db_, inplace), selected[1]
+        return self._return_db(db_, inplace)
 
     def select_from_list(
         self, selection, mask=False, return_invalid=False, inplace=False, **kwargs
@@ -506,8 +508,8 @@ class DataBundle:
         if mask is True:
             db_._mask = select_from_index(db_._mask, db_.index, **kwargs)[0]
         if return_invalid is True:
-            return db_, selected[1]
-        return db_
+            return self._return_db(db_, inplace), selected[1]
+        return self._return_db(db_, inplace)
 
     def select_from_index(
         self, index, mask=False, return_invalid=False, inplace=False, **kwargs
@@ -559,8 +561,8 @@ class DataBundle:
         if mask is True:
             db_._mask = select_from_index(db_._mask, index, **kwargs)[0]
         if return_invalid is True:
-            return db_, selected[1]
-        return db_
+            return self._return_db(db_, inplace), selected[1]
+        return self._return_db(db_, inplace)
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
@@ -612,7 +614,7 @@ class DataBundle:
                 df_l=db_._data[subset], df_r=df_corr, **kwargs
             )
         db_._columns = db_._data.columns
-        return db_
+        return self._return_db(db_, inplace)
 
     def correct_datetime(self, inplace=False):
         """Correct datetime information in :py:attr:`data`.
@@ -640,7 +642,7 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_._data = correct_datetime(db_._data, db_._imodel)
-        return db_
+        return self._return_db(db_, inplace)
 
     def validate_datetime(self):
         """Validate datetime information in :py:attr:`data`.
@@ -694,7 +696,7 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_._data = correct_pt(db_._data, db_._imodel)
-        return db_
+        return self._return_db(db_, inplace)
 
     def validate_id(self, **kwargs):
         """Validate station id information in :py:attr:`data`.
@@ -746,7 +748,7 @@ class DataBundle:
         db_._mode = "tables"
         db_._columns = _tables.columns
         db_._data = _tables
-        return db_
+        return self._return_db(db_, inplace)
 
     def write(self, **kwargs):
         """Write :py:attr:`data` on disk.
@@ -855,7 +857,7 @@ class DataBundle:
             db_._data["header"] = db_.DupDetect.result
         else:
             db_._data = db_.DupDetect.result
-        return db_
+        return self._return_db(db_, inplace)
 
     def get_duplicates(self, **kwargs):
         """Get duplicate matches in :py:attr:`data`.
@@ -924,4 +926,4 @@ class DataBundle:
         db_.DupDetect.remove_duplicates(**kwargs)
         header_ = db_.DupDetect.result
         db_._data = db_._data[db_._data.index.isin(header_.index)]
-        return db_
+        return self._return_db(db_, inplace)
