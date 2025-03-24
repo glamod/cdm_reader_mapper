@@ -31,6 +31,7 @@ Breaking changes
 
 * remove property ``tables`` from ``DataBundle`` object. Instead, ``DataBundle.map_model`` overwrites ``.DataBundle.data`` (:pull:`238`).
 * set default ``overwrite`` values from ``True`` to ``False`` that is consistent with pandas ``inplace`` argument and rename ``overwrite`` to ``inplace`` (:pull:`238`, :pull:`248`).
+* ``inplace`` returns ``None`` that is consistent with pandas (:pull:`242`)
 * ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
 * ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
 
