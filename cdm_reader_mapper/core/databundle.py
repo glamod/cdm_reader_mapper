@@ -325,13 +325,13 @@ class DataBundle:
             If ``True`` add datasets in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with added datasets.
             Default: False
-            
+
         Returns
         -------
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None             
+            None
 
         Examples
         --------
@@ -361,13 +361,13 @@ class DataBundle:
         Note
         ----
         The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
-        
+
         Returns
         -------
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None          
+            None
 
         Examples
         --------
@@ -401,13 +401,13 @@ class DataBundle:
         Examples
         --------
         >>> db = db1.stack_h(db2, datasets=["data", "mask"])
-        
+
         Returns
         -------
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None          
+            None
 
         See Also
         --------
@@ -442,13 +442,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
-            
+
         Returns
         -------
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None              
+            None
 
         Examples
         --------
@@ -485,13 +485,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with invalid values only in :py:attr:`data`.
             Default: False
-            
+
         Returns
         -------
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None              
+            None
 
         Examples
         --------
@@ -537,7 +537,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Examples
         --------
@@ -584,7 +584,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Examples
         --------
@@ -649,7 +649,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Examples
         --------
@@ -686,8 +686,8 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
-            
+            None
+
         Examples
         --------
         >>> df_dt = db.correct_datetime()
@@ -747,7 +747,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Examples
         --------
@@ -809,7 +809,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Examples
         --------
@@ -857,8 +857,22 @@ class DataBundle:
             **kwargs,
         )
 
-    def duplicate_check(self, **kwargs):
+    def duplicate_check(self, inplace=False, **kwargs):
         """Duplicate check in :py:attr:`data`.
+
+        Parameters
+        ----------
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
+            Default: False
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None
 
         Note
         ----
@@ -870,6 +884,11 @@ class DataBundle:
           * ``report_timestamp``
           * ``station_course``
           * ``station_speed``
+
+        Note
+        ----
+        This adds a new class :py:class:`~DupDetect` to :py:class:`~DataBundle`.
+        This class is necessary for further duplicate methods.
 
         Examples
         --------
@@ -885,12 +904,13 @@ class DataBundle:
         ----
         For more information see :py:func:`duplicate_check`
         """
-        if self._mode == "tables" and "header" in self._data:
-            data = self._data["header"]
+        db_ = self._get_db(inplace)
+        if db_._mode == "tables" and "header" in db_._data:
+            data = db_._data["header"]
         else:
-            data = self._data
-        self.DupDetect = duplicate_check(data, **kwargs)
-        return self
+            data = db_._data
+        db_.DupDetect = duplicate_check(data, **kwargs)
+        return self._return_db(db_, inplace)
 
     def flag_duplicates(self, inplace=False, **kwargs):
         """Flag detected duplicates in :py:attr:`data`.
@@ -907,7 +927,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Note
         ----
@@ -985,7 +1005,7 @@ class DataBundle:
         If `inplace` is False
             :py:class:`~DataBundle`
         Else:
-            None  
+            None
 
         Note
         ----
