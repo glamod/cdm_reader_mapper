@@ -27,6 +27,7 @@ from cdm_reader_mapper.common import pandas_TextParser_hdlr
 def dataframe_apply_index(
     df,
     index_list,
+    reset_index=False,
     inverse=False,
     idx_in_offset=0,
     idx_out_offset=0,
@@ -39,16 +40,25 @@ def dataframe_apply_index(
     else:
         in_df = df[index]
 
-    in_df.index = range(idx_in_offset, idx_in_offset + len(in_df))
+    if reset_index is True:
+        in_df.index = range(idx_in_offset, idx_in_offset + len(in_df))
 
     return in_df
 
 
-def select_bool(data, mask, boolean, inverse=False):
+def select_bool(data, mask, boolean, reset_index=False, inverse=False):
     """DOCUMENTATION."""
 
     # mask is a the full df/parser of which we only use col
-    def dataframe(df, mask, boolean, inverse=False, idx_in_offset=0, idx_out_offset=0):
+    def dataframe(
+        df,
+        mask,
+        boolean,
+        reset_index=False,
+        inverse=False,
+        idx_in_offset=0,
+        idx_out_offset=0,
+    ):
         # get the index values and pass to the general function
         # If a mask is empty, assume True (...)
         if boolean is True:
@@ -59,12 +69,13 @@ def select_bool(data, mask, boolean, inverse=False):
         return dataframe_apply_index(
             df,
             index,
+            reset_index=reset_index,
             inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, mask_parser, boolean, inverse=False):
+    def parser(data_parser, mask_parser, boolean, reset_index=False, inverse=False):
         mask_cp = pandas_TextParser_hdlr.make_copy(mask_parser)
         read_params = [
             "chunksize",
@@ -83,11 +94,12 @@ def select_bool(data, mask, boolean, inverse=False):
                 df,
                 mask_df,
                 boolean,
+                reset_index=reset_index,
                 inverse=inverse,
                 idx_in_offset=idx_in_offset,
                 idx_out_offset=idx_out_offset,
             )
-            output.to_csv(in_buffer, header=False, index=False, mode="a")
+            output.to_csv(in_buffer, header=False, mode="a")
             idx_in_offset += len(output)
 
         mask_cp.close()
@@ -95,22 +107,22 @@ def select_bool(data, mask, boolean, inverse=False):
         return pd.read_csv(in_buffer, **read_dict)
 
     if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(data, mask, boolean, inverse=inverse)
+        return parser(data, mask, boolean, reset_index=reset_index, inverse=inverse)
 
-    return dataframe(data, mask, boolean, inverse=inverse)
+    return dataframe(data, mask, boolean, reset_index=reset_index, inverse=inverse)
 
 
-def select_true(data, mask, inverse=False):
+def select_true(data, mask, reset_index=False, inverse=False):
     """DOCUMENTATION."""
-    return select_bool(data, mask, True, inverse=inverse)
+    return select_bool(data, mask, True, reset_index=reset_index, inverse=inverse)
 
 
-def select_false(data, mask, inverse=False):
+def select_false(data, mask, reset_index=False, inverse=False):
     """DOCUMENTATION."""
-    return select_bool(data, mask, False, inverse=inverse)
+    return select_bool(data, mask, False, reset_index=reset_index, inverse=inverse)
 
 
-def select_from_list(data, selection, inverse=False):
+def select_from_list(data, selection, reset_index=False, inverse=False):
     """DOCUMENTATION."""
 
     # selection is a dictionary like {col_name:[values to select]}
@@ -118,6 +130,7 @@ def select_from_list(data, selection, inverse=False):
         df,
         col,
         values,
+        reset_index=False,
         inverse=False,
         idx_in_offset=0,
         idx_out_offset=0,
@@ -128,12 +141,13 @@ def select_from_list(data, selection, inverse=False):
         return dataframe_apply_index(
             df,
             index,
+            reset_index=reset_index,
             inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, col, values, inverse=False):
+    def parser(data_parser, col, values, reset_index=False, inverse=False):
         read_params = [
             "chunksize",
             "names",
@@ -151,11 +165,12 @@ def select_from_list(data, selection, inverse=False):
                 df,
                 col,
                 values,
+                reset_index=reset_index,
                 inverse=inverse,
                 idx_in_offset=idx_in_offset,
                 idx_out_offset=idx_out_offset,
             )
-            output.to_csv(in_buffer, header=False, index=False, mode="a")
+            output.to_csv(in_buffer, header=False, mode="a")
             idx_in_offset += len(output)
 
         in_buffer.seek(0)
@@ -164,24 +179,27 @@ def select_from_list(data, selection, inverse=False):
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
     if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(data, col, values, inverse=inverse)
-    return dataframe(data, col, values, inverse=inverse)
+        return parser(data, col, values, reset_index=reset_index, inverse=inverse)
+    return dataframe(data, col, values, reset_index=reset_index, inverse=inverse)
 
 
-def select_from_index(data, index, inverse=False):
+def select_from_index(data, index, reset_index=False, inverse=False):
     """DOCUMENTATION."""
 
     # index is a list of integer positions to select from data
-    def dataframe(df, index, inverse=False, idx_in_offset=0, idx_out_offset=0):
+    def dataframe(
+        df, index, reset_index=False, inverse=False, idx_in_offset=0, idx_out_offset=0
+    ):
         return dataframe_apply_index(
             df,
             index,
+            reset_index=reset_index,
             inverse=inverse,
             idx_in_offset=idx_in_offset,
             idx_out_offset=idx_out_offset,
         )
 
-    def parser(data_parser, index, inverse=False):
+    def parser(data_parser, index, reset_index=False, inverse=False):
         read_params = [
             "chunksize",
             "names",
@@ -194,13 +212,13 @@ def select_from_index(data, index, inverse=False):
         in_buffer = StringIO()
 
         for df in data_parser:
-            output = dataframe(df, index, inverse=inverse)
-            output.to_csv(in_buffer, header=False, index=False, mode="a")
+            output = dataframe(df, index, reset_index=reset_index, inverse=inverse)
+            output.to_csv(in_buffer, header=False, mode="a")
 
         in_buffer.seek(0)
         return pd.read_csv(in_buffer, **read_dict)
 
     if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(data, index, inverse=inverse)
+        return parser(data, index, reset_index=reset_index, inverse=inverse)
 
-    return dataframe(data, index, inverse=inverse)
+    return dataframe(data, index, reset_index=reset_index, inverse=inverse)

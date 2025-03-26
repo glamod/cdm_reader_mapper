@@ -34,6 +34,7 @@ Breaking changes
 * ``inplace`` returns ``None`` that is consistent with pandas (:pull:`242`)
 * ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
 * ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
+* select functions to not reset indexes by default (:pull:`242`)
 
 Bug fixes
 ^^^^^^^^^

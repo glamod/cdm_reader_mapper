@@ -17,11 +17,12 @@ def _get_data(TextParser, **kwargs):
     return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
-@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_select_true(inverse, TextParser):
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def test_select_true(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.select_true(inverse=inverse)
+    result = data.select_true(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -30,18 +31,22 @@ def test_select_true(inverse, TextParser):
         selected = make_copy(selected).read()
 
     if inverse is False:
-        expected = expected[:5].reset_index(drop=True)
+        expected = expected[:5]
     else:
-        expected = expected[:0].reset_index(drop=True)
+        expected = expected[:0]
+
+    if reset_index is True:
+        expected = expected.reset_index(drop=True)
 
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_select_false(inverse, TextParser):
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def test_select_false(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.select_false(inverse=inverse)
+    result = data.select_false(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -50,19 +55,22 @@ def test_select_false(inverse, TextParser):
         selected = make_copy(selected).read()
 
     if inverse is False:
-        expected = expected[:0].reset_index(drop=True)
+        expected = expected[:0]
     else:
-        expected = expected[:5].reset_index(drop=True)
+        expected = expected[:5]
 
-    expected = expected.reset_index(drop=True)
+    if reset_index is True:
+        expected = expected.reset_index(drop=True)
+
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [False, True])
-def test_select_from_index(inverse, TextParser):
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def test_select_from_index(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
-    result = data.select_from_index([0, 2, 4], inverse=inverse)
+    result = data.select_from_index([0, 2, 4], reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -75,16 +83,21 @@ def test_select_from_index(inverse, TextParser):
     else:
         idx = expected.index.isin([1, 3])
 
-    expected = expected[idx].reset_index(drop=True)
+    expected = expected[idx]
+
+    if reset_index is True:
+        expected = expected.reset_index(drop=True)
+
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("inverse", [True, False])
 @pytest.mark.parametrize("TextParser", [True, False])
-def test_select_from_list(inverse, TextParser):
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def test_select_from_list(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
-    result = data.select_from_list(selection, inverse=inverse)
+    result = data.select_from_list(selection, reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -96,7 +109,12 @@ def test_select_from_list(inverse, TextParser):
         idx = expected.index.isin([1, 3])
     else:
         idx = expected.index.isin([0, 2, 4])
-    expected = expected[idx].reset_index(drop=True)
+
+    expected = expected[idx]
+
+    if reset_index is True:
+        expected = expected.reset_index(drop=True)
+
     pd.testing.assert_frame_equal(expected, selected)
 
 
