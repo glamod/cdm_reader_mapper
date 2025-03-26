@@ -88,6 +88,7 @@ def test_duplicates_flag(
         ignore_columns=ignore_columns,
         ignore_entries=ignore_entries,
         offsets=offsets,
+        inplace=True,
     )
     tables_dups_flagged = cdm_icoads.flag_duplicates()
     result = tables_dups_flagged["header"]
@@ -103,6 +104,7 @@ def test_duplicates_remove():
             "station_speed": "null",
             "station_course": "null",
         },
+        inplace=True,
     )
     tables_dups_removed = cdm_icoads.remove_duplicates().data
     expected = cdm_icoads.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
@@ -110,7 +112,7 @@ def test_duplicates_remove():
 
 
 def test_duplicates_craid():
-    cdm_craid.duplicate_check(ignore_columns="primary_station_id")
+    cdm_craid.duplicate_check(ignore_columns="primary_station_id", inplace=True)
     cdm_craid.flag_duplicates(inplace=True)
     assert_array_equal(cdm_craid[("header", "duplicate_status")], [0] * 10)
     assert_array_equal(cdm_craid[("header", "report_quality")], [2] * 10)
