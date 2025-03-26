@@ -314,22 +314,27 @@ class DataBundle:
 
         return self._return_db(db_, inplace)
 
-    def add(self, addition):
+    def add(self, addition, inplace=False):
         """Adding information to a :py:class:`~DataBundle`.
 
         Parameters
         ----------
         addition: dict
              Additional elements to add to the :py:class:`~DataBundle`.
+        inplace: bool
+            If ``True`` add datasets in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with added datasets.
+            Default: False             
 
         Examples
         --------
         >>> tables = read_tables("path_to_files")
         >>> db = db.add({"data": tables})
         """
+        db_ = self._get_db(inplace)
         for name, data in addition.items():
-            setattr(self, f"_{name}", data)
-        return self
+            setattr(db_, f"_{name}", data)
+        return self._return_db(db_, inplace)
 
     def stack_v(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
         """Stack multiple :py:class:`~DataBundle`'s vertically.
