@@ -439,8 +439,8 @@ class DataBundle:
         For more information see :py:func:`select_true`
         """
         db_ = self._get_db(inplace)
-        db_.data = select_true(db_._data, db_._mask, **kwargs)
-        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        db_._data = select_true(db_._data, db_._mask, **kwargs)
+        db_._mask = select_true(db_._mask, db_._mask, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_false(self, inplace=False, **kwargs):
@@ -475,8 +475,8 @@ class DataBundle:
         For more information see :py:func:`select_true`
         """
         db_ = self._get_db(inplace)
-        db_.data = select_false(db_._data, db_._mask, **kwargs)
-        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        db_._data = select_false(db_._data, db_._mask, **kwargs)
+        db_._mask = select_false(db_._mask, db_._mask, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_from_list(self, selection, inplace=False, **kwargs):
@@ -517,8 +517,8 @@ class DataBundle:
         For more information see :py:func:`select_from_list`
         """
         db_ = self._get_db(inplace)
-        db_.data = select_from_list(db_._data, selection, **kwargs)
-        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        db_._data = select_from_list(db_._data, selection, **kwargs)
+        db_._mask = select_from_list(db_._mask, selection, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_from_index(self, index, inplace=False, **kwargs):
@@ -556,8 +556,8 @@ class DataBundle:
         For more information see :py:func:`select_from_index`
         """
         db_ = self._get_db(inplace)
-        db_.data = select_from_index(db_._data, index, **kwargs)
-        db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        db_._data = select_from_index(db_._data, index, **kwargs)
+        db_._mask = select_from_index(db_._mask, index, **kwargs)
         return self._return_db(db_, inplace)
 
     def unique(self, **kwargs):
