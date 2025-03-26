@@ -324,7 +324,14 @@ class DataBundle:
         inplace: bool
             If ``True`` add datasets in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with added datasets.
-            Default: False             
+            Default: False
+            
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None             
 
         Examples
         --------
@@ -354,6 +361,13 @@ class DataBundle:
         Note
         ----
         The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
+        
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None          
 
         Examples
         --------
@@ -387,6 +401,13 @@ class DataBundle:
         Examples
         --------
         >>> db = db1.stack_h(db2, datasets=["data", "mask"])
+        
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None          
 
         See Also
         --------
@@ -421,6 +442,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
+            
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None              
 
         Examples
         --------
@@ -457,6 +485,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with invalid values only in :py:attr:`data`.
             Default: False
+            
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None              
 
         Examples
         --------
@@ -497,6 +532,12 @@ class DataBundle:
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
 
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
 
         Examples
         --------
@@ -538,6 +579,12 @@ class DataBundle:
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
 
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
 
         Examples
         --------
@@ -597,6 +644,13 @@ class DataBundle:
             else return a copy of :py:class:`~DataBundle` with replaced column names in :py:attr:`data`.
             Default: False
 
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
+
         Examples
         --------
         >>> import pandas as pd
@@ -627,6 +681,13 @@ class DataBundle:
             else return a copy of :py:class:`~DataBundle` with datetime-corrected values in :py:attr:`data`.
             Default: False
 
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
+            
         Examples
         --------
         >>> df_dt = db.correct_datetime()
@@ -680,6 +741,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with platform-corrected values in :py:attr:`data`.
             Default: False
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
 
         Examples
         --------
@@ -735,6 +803,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
             Default: False
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
 
         Examples
         --------
@@ -827,6 +902,13 @@ class DataBundle:
             else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing flagged duplicates.
             Default: False
 
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
+
         Note
         ----
         Before flagging duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
@@ -897,6 +979,13 @@ class DataBundle:
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing no duplicates.
             Default: False
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None  
 
         Note
         ----
