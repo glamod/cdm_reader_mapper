@@ -11,13 +11,19 @@ The **cdm_reader_mapper**  toolbox is a pure Python package, but it has a few de
 Stable release
 ~~~~~~~~~~~~~~
 
-To install the **cdm_reader_mapper** toolbox in your current conda_ environment, run this command in your terminal:
+To install the **cdm_reader_mapper** toolbox in your current environment, run this command in your terminal:
 
 .. code-block:: console
 
   pip install cdm_reader_mapper
 
 This is the preferred method to install the **cdm_reader_mapper** toolbox, as it will always install the most recent stable release.
+
+Alternatively, it can be installed using the `uv`_ package manager:
+
+.. code-block:: console
+
+    uv add cdm_reader_mapper
 
 .. include:: hyperlinks.rst
 
@@ -40,19 +46,44 @@ or download th tarball_:
 
    curl -OJL https://github.com/glamod/cdm_reader_mapper/tarball/master
 
-Once you have a copy of the source, you caninstall it with pip_:
+Once you have a copy of the source, you can install it with pip_:
 
 .. code-block:: console
 
    pip install -e .
 
-Creating a Conda Environment
-----------------------------
-
-To create a conda environment including `cdm_reader_mapepr`'s dependencies and and development dependencies, run the following command from within your cloned repo:
+Or using the `uv`_ package manager to install cdm_reader_mapper:
 
 .. code-block:: console
 
-    $ conda env create -n my_cdm_env python=3.12 --file=ci/requirements/environment.yml
+    uv add .
+
+Development mode
+~~~~~~~~~~~~~~~~
+
+If you're interested in participating in the development of the **cdm_reader_mapper** toolbox, you can install the package in development mode after cloning the repository from source:
+
+.. code-block:: console
+
+    pip install -e .[dev]      # Install optional development dependencies in addition
+    pip install -e .[docs]     # Install optional dependencies for the documentation in addition
+    pip install -e .[all]      # Install all the above for complete dependency version
+
+Alternatively, you can use the uv package manager:
+
+.. code-block:: console
+
+    uv sync       # Install in development mode and create a virtual environment
+
+You can specify optional dependency groups with the `--extra` option.
+
+Creating a Conda Environment
+----------------------------
+
+To create a conda environment including **cdm_reader_mapper**'s dependencies and and development dependencies, run the following command from within your cloned repo:
+
+.. code-block:: console
+
+    $ conda env create -n my_cdm_env python=3.12 --file=environment.yml
     $ conda activate my_cdm_env
-    (my_xclim_env) $ python -m pip install -e --no-deps .
+    (my_cdm_env) $ python -m pip install -e --no-deps .

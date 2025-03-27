@@ -18,10 +18,10 @@ from cdm_reader_mapper.common import pandas_TextParser_hdlr
 # the dataframe_apply_index(), because they are all the same but for the
 # selection applied!!!!!
 
-#    The index of the resulting dataframe(s) is reinitialized here, it does not
-#    inherit from parent df
+# The index of the resulting dataframe(s) is reinitialized here, it does not
+# inherit from parent df
 #
-#    data is a dataframe or a TextFileReader
+# data is a dataframe or a TextFileReader
 
 
 def dataframe_apply_index(
@@ -50,7 +50,7 @@ def dataframe_apply_index(
 def select_true(data, mask, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 
-    #   mask is a the full df/parser of which we only use col
+    # mask is a the full df/parser of which we only use col
     def dataframe(
         df, mask, out_rejected=False, in_index=False, idx_in_offset=0, idx_out_offset=0
     ):
@@ -119,16 +119,13 @@ def select_true(data, mask, out_rejected=False, in_index=False):
     else:
         output = parser(data, mask, out_rejected=out_rejected, in_index=in_index)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output
 
 
 def select_from_list(data, selection, out_rejected=False, in_index=False):
     """DOCUMENTATION."""
 
-    #   selection is a dictionary like {col_name:[values to select]}
+    # selection is a dictionary like {col_name:[values to select]}
     def dataframe(
         df,
         col,
@@ -205,10 +202,7 @@ def select_from_list(data, selection, out_rejected=False, in_index=False):
     else:
         output = parser(data, col, values, out_rejected=out_rejected, in_index=in_index)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output
 
 
 def select_from_index(data, index, out_rejected=False):
@@ -256,7 +250,4 @@ def select_from_index(data, index, out_rejected=False):
     else:
         output = parser(data, index, out_rejected=out_rejected)
 
-    if len(output) > 1:
-        return output
-    else:
-        return output[0]
+    return output

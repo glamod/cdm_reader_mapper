@@ -8,5 +8,5 @@ sphinx:
   configuration: docs/conf.py
   fail_on_warning: false
 conda:
-  environment: ci/requirements/docs.yml
+  environment: environment.yml
 formats: []

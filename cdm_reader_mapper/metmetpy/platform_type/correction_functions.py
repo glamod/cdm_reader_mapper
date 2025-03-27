@@ -19,10 +19,9 @@ from .. import properties
 def is_num(X):
     """DOCUMENTATION."""
     try:
-        a = X.isnumeric()
+        return X.isnumeric()
     except Exception:
-        a = False
-    return a
+        return False
 
 
 def overwrite_data(data, loc, pt_col, value):
@@ -90,16 +89,10 @@ def fill_value(
     return fill_serie.mask(msk, other=fill_value)
 
 
-def deck_717_immt(data):
+def deck_717_gcc(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==700 & sid == 147 & pt == 5
     drifters = "7"
-    # sid = "005"
-    # pt = "5"
     buoys = "9"
-    # regex = re.compile(r"^\d{5,5}$")
-    # id_col = properties.metadata_datamodels.get("id").get("immt")
-    # sid_col = properties.metadata_datamodels.get("source").get("immt")
     pt_col = properties.metadata_datamodels.get("platform").get("immt")
 
     data[pt_col].iloc[np.where(data[pt_col].isna())] = drifters
@@ -110,17 +103,16 @@ def deck_717_immt(data):
     return data
 
 
-def deck_700_imma1(data):
+def deck_700_icoads(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==700 & sid == 147 & pt == 5
     drifters = "7"
     sid = "147"
     pt = "5"
     buoys = "6"
     regex = re.compile(r"^\d{5,5}$")
-    id_col = properties.metadata_datamodels.get("id").get("imma1")
-    sid_col = properties.metadata_datamodels.get("source").get("imma1")
-    pt_col = properties.metadata_datamodels.get("platform").get("imma1")
+    id_col = properties.metadata_datamodels.get("id").get("icoads")
+    sid_col = properties.metadata_datamodels.get("source").get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
     data[pt_col] = data[pt_col].fillna(drifters)
     loc = (
@@ -131,16 +123,15 @@ def deck_700_imma1(data):
     return data
 
 
-def deck_892_imma1(data):
+def deck_892_icoads(data):
     """DOCUMENTATION."""
-    # idt=="NNNNN" & dck==892 & sid == 29 & pt == 5
     sid = "29"
     pt = "5"
     buoys = "6"
     regex = re.compile(r"^\d{5,5}$")
-    id_col = properties.metadata_datamodels.get("id").get("imma1")
-    sid_col = properties.metadata_datamodels.get("source").get("imma1")
-    pt_col = properties.metadata_datamodels.get("platform").get("imma1")
+    id_col = properties.metadata_datamodels.get("id").get("icoads")
+    sid_col = properties.metadata_datamodels.get("source").get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
     loc = (
         (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
@@ -149,15 +140,15 @@ def deck_892_imma1(data):
     return data
 
 
-def deck_792_imma1(data):
+def deck_792_icoads(data):
     """DOCUMENTATION."""
     sid = "103"
     pt = "5"
     buoys = "6"
     regex = re.compile("^[0-9]+$")  # is numeric
-    id_col = properties.metadata_datamodels.get("id").get("imma1")
-    sid_col = properties.metadata_datamodels.get("source").get("imma1")
-    pt_col = properties.metadata_datamodels.get("platform").get("imma1")
+    id_col = properties.metadata_datamodels.get("id").get("icoads")
+    sid_col = properties.metadata_datamodels.get("source").get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
     loc = (
         (data[id_col].str.match(regex))
@@ -170,16 +161,16 @@ def deck_792_imma1(data):
     return overwrite_data(data, loc, pt_col, buoys)
 
 
-def deck_992_imma1(data):
+def deck_992_icoads(data):
     """DOCUMENTATION."""
     sid = "114"
     pt = "5"
     lv = "4"  # light vessels
     buoys = "6"
     regex = re.compile("^6202+$")
-    id_col = properties.metadata_datamodels.get("id").get("imma1")
-    sid_col = properties.metadata_datamodels.get("source").get("imma1")
-    pt_col = properties.metadata_datamodels.get("platform").get("imma1")
+    id_col = properties.metadata_datamodels.get("id").get("icoads")
+    sid_col = properties.metadata_datamodels.get("source").get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
     loc = (
         (data[id_col].str.match(regex))

@@ -6,15 +6,25 @@ from copy import deepcopy
 
 import pandas as pd
 
+from .writer import write
+
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
-from cdm_reader_mapper.cdm_mapper.table_writer import write_tables
+from cdm_reader_mapper.common import (
+    count_by_cat,
+    get_length,
+    replace_columns,
+    select_from_index,
+    select_from_list,
+    select_true,
+)
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
-from cdm_reader_mapper.mdf_reader.write import write_data
-from cdm_reader_mapper.metmetpy.datetime.correct import correct as correct_datetime
-from cdm_reader_mapper.metmetpy.datetime.validate import validate as validate_datetime
-from cdm_reader_mapper.metmetpy.platform_type.correct import correct as correct_pt
-from cdm_reader_mapper.metmetpy.station_id.validate import validate as validate_id
-from cdm_reader_mapper.operations import inspect, replace, select
+from cdm_reader_mapper.metmetpy import (
+    correct_datetime,
+    correct_pt,
+    validate_datetime,
+    validate_id,
+)
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
 class DataBundle:
@@ -34,17 +44,18 @@ class DataBundle:
         MDF validation mask
     imodel: str, optional
         Name of the MFD/CDM data model.
-    tables: pandas.DataFrame, optional
-        CDM tables.
+    mode: str
+        Data mode ("data" or "tables")
+        Default: "data"
 
     Examples
     --------
-    Getting a :py:class:`cdm_reader_mapper.DataBundle` while reading data from disk.
+    Getting a :py:class:`~DataBundle` while reading data from disk.
 
     >>> from cdm_reader_mapper import read_mdf
     >>> db = read_mdf(source="file_on_disk", imodel="custom_model_name")
 
-    Constructing a :py:class:`cdm_reader_mapper.DataBundle` from already read MDf data.
+    Constructing a :py:class:`~DataBundle` from already read MDf data.
 
     >>> from cdm_reader_mapper import DataBundle
     >>> read = read_mdf(source="file_on_disk", imodel="custom_model_name")
@@ -52,11 +63,11 @@ class DataBundle:
     >>> mask_ = read.mask
     >>> db = DataBundle(data=data_, mask=mask_)
 
-    Constructing a :py:class:`cdm_reader_mapper.DataBundle` from already read CDM data.
+    Constructing a :py:class:`~DataBundle` from already read CDM data.
 
     >>> from cdm_reader_mapper import read_tables
-    >>> tables = read_tables("path_to_files")
-    >>> db = DataBundle(tables=tables)
+    >>> tables = read_tables("path_to_files").data
+    >>> db = DataBundle(data=tables, mode="tables")
     """
 
     def __init__(
@@ -68,7 +79,7 @@ class DataBundle:
         encoding=None,
         mask=None,
         imodel=None,
-        tables=None,
+        mode="data",
     ):
         self._data = data
         self._columns = columns
@@ -77,15 +88,64 @@ class DataBundle:
         self._encoding = encoding
         self._mask = mask
         self._imodel = imodel
-        self._tables = tables
+        self._mode = mode
 
     def __len__(self):
         """Length of :py:attr:`data`."""
-        return inspect.get_length(self.data)
+        return get_length(self.data)
+
+    def __getattr__(self, attr):
+        """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
+
+        class SubscriptableMethod:
+            def __init__(self, func):
+                self.func = func
+
+            def __getitem__(self, item):
+                return self.func(item)
+
+            def __call__(self, *args, **kwargs):
+                return self.func(*args, **kwargs)
+
+        def method(*args, **kwargs):
+            try:
+                return attr(*args, **kwargs)
+            except TypeError:
+                return attr[args]
+            except Exception:
+                raise ValueError(f"{attr} is neither callable nor subscriptable.")
+
+        if attr.startswith("__") and attr.endswith("__"):
+            raise AttributeError(f"DataBundle object has no attribute {attr}.")
+
+        _data = "_data"
+        if not hasattr(self, _data):
+            raise NameError("'data' is not defined in DataBundle object.")
+        _df = getattr(self, _data)
+        attr = getattr(_df, attr)
+        if not callable(attr):
+            return attr
+
+        return SubscriptableMethod(method)
+
+    def __repr__(self):
+        """Return a string representation for :py:attr:`data`."""
+        return self._data.__repr__()
+
+    def __setitem__(self, item, value):
+        """Make class support item assignment for :py:attr:`data`."""
+        if isinstance(item, str):
+            if hasattr(self, item):
+                setattr(self, item, value)
+        else:
+            self._data.__setitem__(item, value)
 
     def __getitem__(self, item):
         """Make class subscriptable."""
-        return getattr(self, item)
+        if isinstance(item, str):
+            if hasattr(self, item):
+                return getattr(self, item)
+        return self._data.__getitem__(item)
 
     def _return_property(self, property):
         if hasattr(self, property):
@@ -103,7 +163,11 @@ class DataBundle:
     @property
     def columns(self):
         """Column labels of :py:attr:`data`."""
-        return self._return_property("_columns")
+        return self._data.columns
+
+    @columns.setter
+    def columns(self, value):
+        self._columns = value
 
     @property
     def dtypes(self):
@@ -149,52 +213,40 @@ class DataBundle:
         self._imodel = value
 
     @property
-    def selected(self):
-        """Selection of :py:attr:`data`.
+    def mode(self):
+        """Data mode."""
+        return self._return_property("_mode")
 
-        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
+    @mode.setter
+    def mode(self, value):
+        self._mode = value
 
-        * :py:func:`DataBundle.select_true`
-        * :py:func:`DataBundle.select_from_list`
-        * :py:func:`DataBundle.select_from_index`
-        """
-        return self._return_property("_selected")
+    def _get_db(self, inplace):
+        if inplace is True:
+            return self
+        return self.copy()
 
-    @property
-    def deselected(self):
-        """Non-selection of :py:attr:`data`.
+    def _stack(self, other, datasets, inplace, **kwargs):
+        db_ = self._get_db(inplace)
+        if not isinstance(other, list):
+            other = [other]
+        if not isinstance(datasets, list):
+            datasets = [datasets]
+        for data in datasets:
+            _data = f"_{data}"
+            _df = getattr(db_, _data) if hasattr(db_, _data) else pd.DataFrame()
+            to_concat = [
+                getattr(concat, _data) for concat in other if hasattr(concat, _data)
+            ]
+            if not to_concat:
+                continue
+            if not _df.empty:
+                to_concat = [_df] + to_concat
+            _df = pd.concat(to_concat, **kwargs)
+            _df = _df.reset_index(drop=True)
+            setattr(self, f"_{data}", _df)
 
-        This property is set if ``overwrite`` is ``False`` in one of the selection methods:
-
-        * :py:func:`DataBundle.select_true`
-        * :py:func:`DataBundle.select_from_list`
-        """
-        return self._return_property("_deselected")
-
-    @property
-    def tables(self):
-        """CDM tables."""
-        return self._return_property("_tables")
-
-    @tables.setter
-    def tables(self, value):
-        self._tables = value
-
-    @property
-    def tables_dups_flagged(self):
-        """Flagged duplicates of :py:attr:`tables`.
-
-        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.flag_duplicates`.
-        """
-        return self._return_property("_tables_dups_flagged")
-
-    @property
-    def tables_dups_removed(self):
-        """Removed duplicates of :py:attr:`tables`.
-
-        This property is set if ``overwrite`` is ``False`` in :py:func:`DataBundle.remove_duplicates`.
-        """
-        return self._return_property("_tables_dups_removed")
+        return db_
 
     def add(self, addition):
         """Adding information to a :py:class:`~DataBundle`.
@@ -202,19 +254,19 @@ class DataBundle:
         Parameters
         ----------
         addition: dict
-             Additional elements to add to the :py:class:`cdm_reader_mapper.DataBundle`.
+             Additional elements to add to the :py:class:`~DataBundle`.
 
         Examples
         --------
         >>> tables = read_tables("path_to_files")
-        >>> db = db.add({"tables": tables})
+        >>> db = db.add({"data": tables})
         """
         for name, data in addition.items():
             setattr(self, f"_{name}", data)
         return self
 
-    def stack_v(self, other, datasets=["data", "mask", "tables"], **kwargs):
-        """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s vertically.
+    def stack_v(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
+        """Stack multiple :py:class:`~DataBundle`'s vertically.
 
         Parameters
         ----------
@@ -222,11 +274,15 @@ class DataBundle:
             List of other DataBundles to stack vertically.
         datasets: str, list
             List of datasets to be stacked.
-            Default: ['data', 'mask', 'tables']
+            Default: ['data', 'mask']
+        inplace: bool
+            If ``True`` overwrite datasets in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with stacked datasets.
+            Default: False
 
         Note
         ----
-        The DataFrames in the :py:class:`cdm_reader_mapper.DataBundle` have to have the same data columns!
+        The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Examples
         --------
@@ -236,38 +292,26 @@ class DataBundle:
         --------
         DataBundle.stack_h : Stack multiple DataBundle's horizontally.
         """
-        if not isinstance(other, list):
-            other = [other]
-        if not isinstance(datasets, list):
-            datasets = [datasets]
-        for data in datasets:
-            data = f"_{data}"
-            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame
-            to_concat = [
-                getattr(concat, data) for concat in other if hasattr(concat, data)
-            ]
-            if not to_concat:
-                continue
-            if not self_data.empty:
-                to_concat = [self_data] + to_concat
-            self_data = pd.concat(to_concat, **kwargs)
-            setattr(self, data, self_data.reset_index(drop=True))
-        return self
+        return self._stack(other, datasets, inplace, **kwargs)
 
-    def stack_h(self, other, datasets=["data", "mask", "tables"], **kwargs):
-        """Stack multiple :py:class:`cdm_reader_mapper.DataBundle`'s horizontally.
+    def stack_h(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
+        """Stack multiple :py:class:`~DataBundle`'s horizontally.
 
         Parameters
         ----------
         other: str, list
-            List of other :py:class:`cdm_reader_mapper.DataBundle` to stack horizontally.
+            List of other :py:class:`~DataBundle` to stack horizontally.
         datasets: str, list
-            List of datasets to be stacked
-            Default: ['data', 'mask', 'tables']
+            List of datasets to be stacked.
+            Default: ['data', 'mask']
+        inplace: bool
+            If ``True`` overwrite `datasets` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with stacked datasets.
+            Default: False
 
         Note
         ----
-        The DataFrames in the :py:class:`cdm_reader_mapper.DataBundle` may have different data columns!
+        The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples
         --------
@@ -277,58 +321,49 @@ class DataBundle:
         --------
         DataBundle.stack_v : Stack multiple DataBundle's vertically.
         """
-        if not isinstance(other, list):
-            other = [other]
-        for data in datasets:
-            data = f"_{data}"
-            self_data = getattr(self, data) if hasattr(self, data) else pd.DataFrame()
-            to_concat = [
-                getattr(concat, data) for concat in other if hasattr(concat, data)
-            ]
-            if not to_concat:
-                continue
-            if not self_data.empty:
-                to_concat = [self_data] + to_concat
-            self_data = pd.concat(to_concat, axis=1, join="outer")
-            setattr(self, data, self_data.reset_index(drop=True))
-        return self
+        return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
     def copy(self):
-        """Make deep copy of a :py:class:`cdm_reader_mapper.DataBundle`.
+        """Make deep copy of a :py:class:`~DataBundle`.
 
         Examples
         --------
         >>> db2 = db.copy()
         """
-        return deepcopy(self)
+        db = DataBundle()
+        for key, value in self.__dict__.items():
+            if isinstance(value, dict):
+                value = deepcopy(value)
+            elif isinstance(value, pd.DataFrame):
+                value = value.copy()
+            elif isinstance(value, pd.io.parsers.TextFileReader):
+                value = make_copy(value)
+            setattr(db, key, value)
+        return db
 
-    def select_true(self, overwrite=True, **kwargs):
+    def select_true(self, mask=False, inplace=False, **kwargs):
         """Select valid values from :py:attr:`data` via :py:attr:`mask`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
-            Default: True
-
-        Note
-        ----
-        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
-        Select valid values only with overwriting the old data.
-
-        >>> db.select_true()
-        >>> true_values = db.data
-
         Select valid values only without overwriting the old data.
 
-        >>> db.select_true(overwrite=False)
-        >>> true_values = db.selected
-        >>> false_values = db.deselected
+        >>> true_values, false_values = db.select_true()
+
+        Select valid values only with overwriting the old data.
+
+        >>> db.select_true(inplace=True)
+        >>> true_values = db.data
 
         See Also
         --------
@@ -339,15 +374,14 @@ class DataBundle:
         ----
         For more information see :py:func:`select_true`
         """
-        selected = select.select_true(self._data, self._mask, **kwargs)
-        if overwrite is True:
-            self._data = selected[0]
-        else:
-            self._selected = selected[0]
-        self._deselected = selected[1]
-        return self
+        db_ = self._get_db(inplace)
+        selected = select_true(db_._data, db_._mask, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        return db_
 
-    def select_from_list(self, selection, overwrite=True, **kwargs):
+    def select_from_list(self, selection, mask=False, inplace=False, **kwargs):
         """Select columns from :py:attr:`data` with specific values.
 
         Parameters
@@ -355,28 +389,26 @@ class DataBundle:
         selection: dict
             Keys: columns to be selected.
             Values: values in keys to be selected
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
-            Default: True
-
-        Note
-        ----
-        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
-        Select specific columns with overwriting the old data.
-
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]})
-        >>> true_values = db.selected
-
         Select specific columns without overwriting the old data.
 
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, overwrite=False)
+        >>> true_values, false_values = db.select_from_list(
+        ...     selection={("c1", "B1"): [26, 41]},
+        ... )
+
+        Select specific columns with overwriting the old data.
+
+        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, inplace=True)
         >>> true_values = db.selected
-        >>> false_values = db.deselected
 
         See Also
         --------
@@ -387,43 +419,38 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_list`
         """
-        selected = select.select_from_list(self._data, selection, **kwargs)
-        if overwrite is True:
-            self._data = selected[0]
-        else:
-            self._selected = selected[0]
-        self._deselected = selected[1]
-        return self
+        db_ = self._get_db(inplace)
+        selected = select_from_list(db_._data, selection, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, db_.index, **kwargs)
+        return db_
 
-    def select_from_index(self, index, overwrite=True, **kwargs):
+    def select_from_index(self, index, mask=False, inplace=False, **kwargs):
         """Select rows of :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
         index: list
             Indexes to be selected.
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`cdm_reader_mapper.DataBundle`
-            else set new attribute both :py:attr:`selected` containing valid value
-            and :py:attr:`deselected` containing invalid data.
-            Default: True
-
-        Note
-        ----
-        Use this for :py:attr:`data` only. It does not work for :py:attr:`tables`.
+        mask: bool
+            If ``True`` select also valid values from :py:attr:`mask`
+            Default: False
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
-        Select specific columns with overwriting the old data.
-
-        >>> db.select_from_index(index=[0, 2, 4])
-        >>> true_values = db.selected
-
         Select specific columns without overwriting the old data.
 
-        >>> db.select_from_index([0, 2, 4], overwrite=False)
+         >>> true_values, false_values = db.select_from_index([0, 2, 4])
+
+        Select specific columns with overwriting the old data.
+
+        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
         >>> true_values = db.selected
-        >>> false_values = db.deselected
 
         See Also
         --------
@@ -434,12 +461,12 @@ class DataBundle:
         ----
         For more information see :py:func:`select_from_index`
         """
-        selected = select.select_from_index(self._data, index, **kwargs)
-        if overwrite is True:
-            self._data = selected
-        else:
-            self._selected = selected
-        return self
+        db_ = self._get_db(inplace)
+        selected = select_from_index(db_._data, index, **kwargs)
+        db_._data = selected[0]
+        if mask is True:
+            db_._mask = select_from_index(db_._mask, index, **kwargs)
+        return db_
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
@@ -457,36 +484,55 @@ class DataBundle:
         ----
         For more information see :py:func:`unique`
         """
-        return inspect.count_by_cat(self._data, **kwargs)
+        return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(self, df_corr, **kwargs):
+    def replace_columns(self, df_corr, subset=None, inplace=False, **kwargs):
         """Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
         df_corr: pandas.DataFrame
             Data to be inplaced.
+        subset: str, list, optional
+            Select subset by columns. This option is useful for multi-indexed :py:attr:`data`.
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with replaced column names in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
         >>> import pandas as pd
-        >>> df_corr = pr.read_csv("corecction_file_on_disk")
-        >>> db.replace_columns(df_corr)
+        >>> df_corr = pr.read_csv("correction_file_on_disk")
+        >>> df_repl = db.replace_columns(df_corr)
 
         Note
         ----
         For more information see :py:func:`replace_columns`
         """
-        self._data = replace.replace_columns(df_l=self._data, df_r=df_corr, **kwargs)
-        self._columns = self._data.columns
-        return self
+        db_ = self._get_db(inplace)
+        if subset is None:
+            db_._data = replace_columns(df_l=db_._data, df_r=df_corr, **kwargs)
+        else:
+            db_._data[subset] = replace_columns(
+                df_l=db_._data[subset], df_r=df_corr, **kwargs
+            )
+        db_._columns = db_._data.columns
+        return db_
 
-    def correct_datetime(self):
+    def correct_datetime(self, inplace=False):
         """Correct datetime information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with datetime-corrected values in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
-        >>> db.correct_datetime()
+        >>> df_dt = db.correct_datetime()
 
         See Also
         --------
@@ -498,8 +544,9 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_datetime`
         """
-        self._data = correct_datetime(self._data, self._imodel)
-        return self
+        db_ = self._get_db(inplace)
+        db_._data = correct_datetime(db_._data, db_._imodel)
+        return db_
 
     def validate_datetime(self):
         """Validate datetime information in :py:attr:`data`.
@@ -519,7 +566,7 @@ class DataBundle:
         --------
         DataBundle.validate_id : Validate station id information in `data`.
         DataBundle.correct_datetime : Correct datetime information in `data`.
-        DataBundle.correct_pt : Correct platform type information in `tables`.
+        DataBundle.correct_pt : Correct platform type information in `data`.
 
         Note
         ----
@@ -527,13 +574,19 @@ class DataBundle:
         """
         return validate_datetime(self._data, self._imodel)
 
-    def correct_pt(self):
+    def correct_pt(self, inplace=False):
         """Correct platform type information in :py:attr:`data`.
 
+        Parameters
+        ----------
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with platform-corrected values in :py:attr:`data`.
+            Default: False
 
         Examples
         --------
-        >>> db.correct_pt()
+        >>> df_pt = db.correct_pt()
 
         See Also
         --------
@@ -545,8 +598,9 @@ class DataBundle:
         ----
         For more information see :py:func:`correct_pt`
         """
-        self._data = correct_pt(self._data, self._imodel)
-        return self
+        db_ = self._get_db(inplace)
+        db_._data = correct_pt(db_._data, db_._imodel)
+        return db_
 
     def validate_id(self, **kwargs):
         """Validate station id information in :py:attr:`data`.
@@ -565,8 +619,8 @@ class DataBundle:
         See Also
         --------
         DataBundle.validate_datetime : Validate datetime information in `data`.
-        DataBundle.correct_pt : Correct platform type information in `tables`.
-        DataBundle.correct_datetime : Correct datetime information in `tables`.
+        DataBundle.correct_pt : Correct platform type information in `data`.
+        DataBundle.correct_datetime : Correct datetime information in `data`.
 
         Note
         ----
@@ -574,78 +628,76 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
-    def write_data(self, **kwargs):
-        """Write MDF data on disk.
-
-        Examples
-        --------
-        >>> db.write_data()
-
-        See Also
-        --------
-        DataBundle.write_tables : Write MDF data on disk.
-        read_mdf : Read original marine-meteorological data from disk.
-        read_tables : Read CDM tables from disk.
-
-        Note
-        ----
-        For more information see :py:func:`write_data`
-        """
-        write_data(
-            self._data,
-            mask=self._mask,
-            dtypes=self._dtypes,
-            parse_dates=self._parse_dates,
-            encoding=self._encoding,
-            **kwargs,
-        )
-
-    def map_model(self, **kwargs):
+    def map_model(self, inplace=False, **kwargs):
         """Map :py:attr:`data` to the Common Data Model.
-        Write output to :py:attr:`tables`.
+        Write output to :py:attr:`data`.
+
+        Parameters
+        ----------
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
+            Default: False
 
         Examples
         --------
-        >>> db.map_model()
+        >>> cdm_tables = db.map_model()
 
         Note
         ----
         For more information see :py:func:`map_model`
         """
-        self._tables = map_model(self._data, self._imodel, **kwargs)
-        return self
+        db_ = self._get_db(inplace)
+        _tables = map_model(db_._data, db_._imodel, **kwargs)
+        db_._mode = "tables"
+        db_._columns = _tables.columns
+        db_._data = _tables
+        return db_
 
-    def write_tables(self, **kwargs):
-        """Write CDM tables on disk.
-
-        Note
-        ----
-        Before writing CDM tables on disk, they have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
-        e.g. with :py:func:`DataBundle.map_model`.
+    def write(self, **kwargs):
+        """Write :py:attr:`data` on disk.
 
         Examples
         --------
-        >>> db.write_tables()
+        >>> db.write()
 
         See Also
         --------
-        DataBundle.write_mdf : Write MDF data on disk.
-        read_tables : Read CDM tables from disk.
+        write_data : Write MDF data and validation mask to disk.
+        write_tables: Write CDM tables to disk.
+        read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
+        read_data: Read MDF data and validation mask from disk.
         read_mdf : Read original marine-meteorological data from disk.
+        read_tables : Read CDM tables from disk.
 
         Note
         ----
-        For more information see :py:func:`write_tables`
+        If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
+        If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
         """
-        write_tables(self._tables, encoding=self._encoding, **kwargs)
+        write(
+            data=self._data,
+            mask=self._mask,
+            dtypes=self._dtypes,
+            parse_dates=self._parse_dates,
+            encoding=self._encoding,
+            mode=self._mode,
+            **kwargs,
+        )
 
     def duplicate_check(self, **kwargs):
-        """Duplicate check in :py:attr:`tables`.
+        """Duplicate check in :py:attr:`data`.
 
         Note
         ----
-        Before processing the duplicate check, CDM tables have to be provided in :py:class:`cdm_reader_mapper.DataBundle`,
-        e.g. with :py:func:`DataBundle.map_model`.
+        Following columns have to be provided:
+
+          * ``longitude``
+          * ``latitude``
+          * ``primary_station_id``
+          * ``report_timestamp``
+          * ``station_course``
+          * ``station_speed``
 
         Examples
         --------
@@ -653,26 +705,30 @@ class DataBundle:
 
         See Also
         --------
-        DataBundle.get_duplicates : Get duplicate matches in `tables`.
-        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
-        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
+        DataBundle.get_duplicates : Get duplicate matches in `data`.
+        DataBundle.flag_duplicates : Flag detected duplicates in `data`.
+        DataBundle.remove_duplicates : Remove detected duplicates in `data`.
 
         Note
         ----
         For more information see :py:func:`duplicate_check`
         """
-        self.DupDetect = duplicate_check(self._tables["header"], **kwargs)
+        if self._mode == "tables" and "header" in self._data:
+            data = self._data["header"]
+        else:
+            data = self._data
+        self.DupDetect = duplicate_check(data, **kwargs)
         return self
 
-    def flag_duplicates(self, overwrite=True, **kwargs):
-        """Flag detected duplicates in :py:attr:`tables`.
+    def flag_duplicates(self, inplace=False, **kwargs):
+        """Flag detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`tables` in DataBundle.
-            Else set new attribute :py:attr:`tables_dups_flagged` containing flagged duplicates.
-            Default: True
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing flagged duplicates.
+            Default: False
 
         Note
         ----
@@ -680,37 +736,35 @@ class DataBundle:
 
         Examples
         --------
-        Flag duplicates with overwriting :py:attr:`tables`.
+        Flag duplicates without overwriting :py:attr:`data`.
 
-        >>> db.flag_duplicates()
-        >>> flagged_tables = db.tables
+        >>> flagged_tables = db.flag_duplicates()
 
-        Flag duplicates without overwriting :py:attr:`tables`.
+        Flag duplicates with overwriting :py:attr:`data`.
 
-        >>> db.flag_duplicates()
-        >>> flagged_tables = db.tables_dups_flagged
+        >>> db.flag_duplicates(inplace=True)
+        >>> flagged_tables = db.data
 
         See Also
         --------
-        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
-        DataBundle.get_duplicates : Get duplicate matches in `tables`.
-        DataBundle.duplicate_check : Duplicate check in `tables`.
+        DataBundle.remove_duplicates : Remove detected duplicates in `data`.
+        DataBundle.get_duplicates : Get duplicate matches in `data`.
+        DataBundle.duplicate_check : Duplicate check in `data`.
 
         Note
         ----
         For more information see :py:func:`DupDetect.flag_duplicates`
         """
-        self.DupDetect.flag_duplicates(**kwargs)
-        df_ = self._tables.copy()
-        df_["header"] = self.DupDetect.result
-        if overwrite is True:
-            self._tables = df_
+        db_ = self._get_db(inplace)
+        db_.DupDetect.flag_duplicates(**kwargs)
+        if db_._mode == "tables" and "header" in db_._data:
+            db_._data["header"] = db_.DupDetect.result
         else:
-            self._tables_dups_flagged = df_
-        return self
+            db_._data = db_.DupDetect.result
+        return db_
 
     def get_duplicates(self, **kwargs):
-        """Get duplicate matches in :py:attr:`tables`.
+        """Get duplicate matches in :py:attr:`data`.
 
         Returns
         -------
@@ -727,9 +781,9 @@ class DataBundle:
 
         See Also
         --------
-        DataBundle.remove_duplicates : Remove detected duplicates in `tables`.
-        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
-        DataBundle.duplicate_check : Duplicate check in `tables`.
+        DataBundle.remove_duplicates : Remove detected duplicates in `data`.
+        DataBundle.flag_duplicates : Flag detected duplicates in `data`.
+        DataBundle.duplicate_check : Duplicate check in `data`.
 
         Note
         ----
@@ -737,15 +791,15 @@ class DataBundle:
         """
         return self.DupDetect.get_duplicates(**kwargs)
 
-    def remove_duplicates(self, overwrite=True, **kwargs):
-        """Remove detected duplicates in :py:attr:`tables`.
+    def remove_duplicates(self, inplace=False, **kwargs):
+        """Remove detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------
-        overwrite: bool
-            If ``True`` overwrite :py:attr:`tables` in :py:class:`cdm_reader_mapper.DataBundle`.
-            Else set new attribute :py:attr:`tables_dups_removed` containing flagged duplicates.
-            Default: True
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing no duplicates.
+            Default: False
 
         Note
         ----
@@ -753,32 +807,27 @@ class DataBundle:
 
         Examples
         --------
-        Remove duplicates with overwriting :py:attr:`tables`.
+        Remove duplicates without overwriting :py:attr:`data`.
 
-        >>> db.remove_duplicates()
-        >>> removed_tables = db.tables
+        >>> removed_tables = db.remove_duplicates()
 
-        Remove duplicates without overwriting :py:attr:`tables`.
+        Remove duplicates with overwriting :py:attr:`data`.
 
-        >>> db.remove_duplicates()
-        >>> removed_tables = db.tables_dups_removed
+        >>> db.remove_duplicates(inplace=True)
+        >>> removed_tables = db.data
 
         See Also
         --------
-        DataBundle.flag_duplicates : Flag detected duplicates in `tables`.
-        DataBundle.get_duplicates : Get duplicate matches in `tables`.
-        DataBundle.duplicate_check : Duplicate check in `tables`.
+        DataBundle.flag_duplicates : Flag detected duplicates in `data`.
+        DataBundle.get_duplicates : Get duplicate matches in `data`.
+        DataBundle.duplicate_check : Duplicate check in `data`.
 
         Note
         ----
         For more information see :py:func:`DupDetect.remove_duplicates`
         """
-        self.DupDetect.remove_duplicates(**kwargs)
-        df_ = self._tables.copy()
-        header_ = self.DupDetect.result
-        df_ = df_[df_.index.isin(header_.index)]
-        if overwrite is True:
-            self._tables = df_
-        else:
-            self._tables_dups_removed = df_
-        return self
+        db_ = self._get_db(inplace)
+        db_.DupDetect.remove_duplicates(**kwargs)
+        header_ = db_.DupDetect.result
+        db_._data = db_._data[db_._data.index.isin(header_.index)]
+        return db_

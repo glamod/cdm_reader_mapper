@@ -12,8 +12,7 @@ import xarray as xr
 from .. import properties
 from ..schemas import schemas
 from .configurator import Configurator
-from .utilities import convert_entries, decode_entries, validate_path
-from .validators import validate
+from .utilities import validate_path
 
 
 class FileReader:
@@ -71,15 +70,14 @@ class FileReader:
                     del self.schema["sections"][section]["elements"][data_var]
                     continue
                 for attr, value in elements[data_var].items():
-                    if value == "__from_file__":
-                        if attr in ds[data_var].attrs:
-                            self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ] = ds[data_var].attrs[attr]
-                        else:
-                            del self.schema["sections"][section]["elements"][data_var][
-                                attr
-                            ]
+                    if value != "__from_file__":
+                        continue
+                    if attr in ds[data_var].attrs:
+                        self.schema["sections"][section]["elements"][data_var][attr] = (
+                            ds[data_var].attrs[attr]
+                        )
+                    else:
+                        del self.schema["sections"][section]["elements"][data_var][attr]
 
     def _select_years(self, df: pl.DataFrame) -> pl.DataFrame:
         if self.year_init is None and self.year_end is None:
@@ -178,7 +176,7 @@ class FileReader:
         self.columns = df.columns
         # Replace None with NaN - is this necessary for polars?
         # df = df.where(df.notnull(), np.nan)
-        return df
+        return self._select_years(df)
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -189,44 +187,6 @@ class FileReader:
             setattr(self, attr, val)
         del config_dict["self"]
         return config_dict
-
-    def convert_and_decode_df(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ):
-        """DOCUMENTATION."""
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = decode_entries(
-                    df[section],
-                    decoder_dict[section],
-                )
-                # decoded.index = df[section].index
-                df = df.with_columns(decoded.alias(section))
-
-            converted = convert_entries(
-                df[section],
-                converter_dict[section],
-                **converter_kwargs[section],
-            )
-            # converted.index = df[section].index
-            df = df.with_columns(converted.alias(section))
-        return df
-
-    def validate_df(self, df, isna=None):
-        """DOCUMENTATION."""
-        return validate(
-            data=df,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
-        )
 
     def open_data(
         self,

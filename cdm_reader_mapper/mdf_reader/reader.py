@@ -17,16 +17,8 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, convert_str_boolean, validate_arg
-
-
-def _remove_boolean_values(x):
-    x = convert_str_boolean(x)
-    if x is True:
-        return
-    if x is False:
-        return
-    return x
+from .utils.utilities import adjust_dtype, remove_boolean_values, validate_arg
+from .utils.validators import validate
 
 
 class MDFFileReader(FileReader):
@@ -46,6 +38,38 @@ class MDFFileReader(FileReader):
 
     def __init__(self, *args, **kwargs):
         FileReader.__init__(self, *args, **kwargs)
+
+    def _convert_and_decode(
+        self,
+        df,
+        converter_dict,
+        converter_kwargs,
+        decoder_dict,
+    ):
+        """DOCUMENTATION."""
+        for section in converter_dict.keys():
+            if section not in df.columns:
+                continue
+            if section in decoder_dict.keys():
+                decoded = decoder_dict[section](df[section])
+                df = df.with_columns(decoded.alias(section))
+
+            converted = converter_dict[section](
+                df[section], **converter_kwargs[section]
+            )
+            # converted.index = df[section].index
+            df = df.with_columns(converted.alias(section))
+        return df
+
+    def _validate(self, df):
+        """DOCUMENTATION."""
+        return validate(
+            data=df,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
+            schema=self.schema,
+            disables=self.disable_reads,
+        )
 
     def convert_and_decode_entries(
         self,
@@ -93,7 +117,7 @@ class MDFFileReader(FileReader):
         if decode is not True:
             decoder_dict = {}
 
-        data = self.convert_and_decode_df(
+        data = self._convert_and_decode(
             data,
             converter_dict,
             converter_kwargs,
@@ -109,12 +133,12 @@ class MDFFileReader(FileReader):
         if validate is not True:
             mask = pd.DataFrame()
         elif isinstance(data, pd.DataFrame):
-            mask = self.validate_df(data)
+            mask = self._validate(data)
         else:
             data_buffer = StringIO()
             TextParser_ = make_copy(data)
             for i, df_ in enumerate(TextParser_):
-                mask_ = self.validate_df(df_)
+                mask_ = self._validate(df_)
                 mask_.to_csv(
                     data_buffer,
                     header=False,
@@ -135,14 +159,14 @@ class MDFFileReader(FileReader):
         if isinstance(data, pl.DataFrame):
             return data
         if isinstance(data, pd.DataFrame):
-            data = data.map(_remove_boolean_values)
+            data = data.map(remove_boolean_values)
             dtype = adjust_dtype(self.dtypes, data)
             return data.astype(dtype)
         else:
             data_buffer = StringIO()
             TextParser = make_copy(data)
             for i, df_ in enumerate(TextParser):
-                df = df_.map(_remove_boolean_values)
+                df = df_.map(remove_boolean_values)
                 dtype = adjust_dtype(self.dtypes, df)
                 date_columns = []
                 df.to_csv(
@@ -311,8 +335,10 @@ def read_mdf(
 
     See Also
     --------
+    read: Read either original marine-meteorological or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
+    write: Write either MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
@@ -341,7 +367,7 @@ def read_mdf(
 
 
 def read_data(
-    data,
+    source,
     mask=None,
     info=None,
     imodel=None,
@@ -352,7 +378,7 @@ def read_data(
 
     Parameters
     ----------
-    data: str
+    source: str
         The data file (including path) to be read.
     mask: str, optional
         The validation file (including path) to be read.
@@ -376,14 +402,12 @@ def read_data(
     -------
     cdm_reader_mapper.DataBundle
 
-    Note
-    ----
-    :py:func:`cdm_reader_mapper.write_data` dumps ``data``, ``mask`` and ``info`` on file system.
-
     See Also
     --------
+    read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
+    write: Write both MDF data or CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
@@ -420,7 +444,7 @@ def read_data(
     parse_dates = info_dict.get("parse_dates", False)
 
     data = _read_csv(
-        data,
+        source,
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,

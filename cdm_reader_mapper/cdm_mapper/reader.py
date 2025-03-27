@@ -53,11 +53,79 @@ from cdm_reader_mapper.common import get_filename, logging_hdlr
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from . import properties
-from ._utilities import get_cdm_subset, get_usecols
+from .utils.utilities import get_cdm_subset, get_usecols
+
+
+def _read_file(ifile, table, col_subset, **kwargs):
+    usecols = get_usecols(table, col_subset)
+    return pd.read_csv(ifile, usecols=usecols, **kwargs)
+
+
+def _read_single_file(
+    ifile,
+    cdm_subset=None,
+    col_subset=None,
+    logger=None,
+    **kwargs,
+):
+    return _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
+
+
+def _read_multiple_files(
+    inp_dir,
+    prefix=None,
+    suffix=None,
+    extension="psv",
+    cdm_subset=None,
+    col_subset=None,
+    logger=None,
+    **kwargs,
+):
+    if suffix is None:
+        suffix = ""
+
+    # See if there's anything at all:
+    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
+    files = glob.glob(pattern)
+
+    if len(files) == 0:
+        logger.error(f"No files found matching pattern {pattern}")
+        return [pd.DataFrame()]
+
+    df_list = []
+    for table in cdm_subset:
+        if table not in properties.cdm_tables:
+            logger.warning(f"Requested table {table} not defined in CDM")
+            continue
+        logger.info(f"Getting file path for pattern {table}")
+        pattern_ = get_filename(
+            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
+        )
+        paths_ = glob.glob(pattern_)
+        if len(paths_) != 1:
+            logger.warning(
+                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
+                "Cannot securely retrieve cdm table(s)"
+            )
+            continue
+
+        dfi = _read_single_file(
+            paths_[0], cdm_subset=[table], col_subset=col_subset, **kwargs
+        )
+        if len(dfi) == 0:
+            logger.warning(
+                f"Table {table} empty in file system, not added to the final DF"
+            )
+            continue
+
+        dfi = dfi.set_index("report_id", drop=False)
+        dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
+        df_list.append(dfi)
+    return df_list
 
 
 def read_tables(
-    inp_dir,
+    source,
     prefix=None,
     suffix=None,
     extension="psv",
@@ -65,20 +133,24 @@ def read_tables(
     col_subset=None,
     delimiter="|",
     na_values=None,
+    **kwargs,
 ):
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
-    inp_dir: str
-        Path to the input file(s).
+    source: str, optional
+        The file (including path) or the path to the file(s) to be read.
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Could de used if `source` is a valid directory path.
     suffix: str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Could de used if `source` is a valid directory path.
     extension: str
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Could de used if `source` is a valid directory path.
         Default: psv
     cdm_subset: str or list, optional
         Specifies a subset of tables or a single table.
@@ -89,6 +161,8 @@ def read_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
+
+        Required if `source` is a valid file name.
     col_subset: str, list or dict, optional
         Specify the section or sections of the file to read.
 
@@ -111,72 +185,56 @@ def read_tables(
 
     See Also
     --------
+    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
-    write_tables : Write CDM tables to disk.
+    write: Write either MDF data or CDM tables to disk.
+    write_tables: Write CDM tables to disk.
     write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
-    if not os.path.isdir(inp_dir):
-        logger.error(f"Data path not found {inp_dir}: ")
-        return DataBundle(tables=pd.DataFrame())
-
-    if suffix is None:
-        suffix = ""
-
-    # See if there's anything at all:
-    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
-    files = glob.glob(pattern)
-
-    if len(files) == 0:
-        logger.error(f"No files found matching pattern {pattern}")
-        return DataBundle(tables=pd.DataFrame())
-
+    kwargs = {
+        "delimiter": delimiter,
+        "dtype": "object",
+        "na_values": na_values,
+        "keep_default_na": False,
+    }
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    df_list = []
-    for table in cdm_subset:
-        if table not in properties.cdm_tables:
-            logger.error(f"Requested table {table} not defined in CDM")
-            return DataBundle(tables=pd.DataFrame())
-        logger.info(f"Getting file path for pattern {table}")
-        pattern_ = get_filename(
-            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
-        )
-        paths_ = glob.glob(pattern_)
-        if len(paths_) != 1:
-            logger.warning(
-                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
-                "Cannot securely retrieve cdm table(s)"
+    if os.path.isfile(source):
+        df_list = [
+            _read_single_file(
+                source,
+                cdm_subset=cdm_subset,
+                col_subset=col_subset,
+                logger=logger,
+                **kwargs,
             )
-            continue
-
-        usecols = get_usecols(table, col_subset)
-        dfi = pd.read_csv(
-            paths_[0],
-            delimiter=delimiter,
-            usecols=usecols,
-            dtype="object",
-            na_values=na_values,
-            keep_default_na=False,
+        ]
+    elif os.path.isdir(source):
+        df_list = _read_multiple_files(
+            source,
+            prefix=prefix,
+            suffix=suffix,
+            extension=extension,
+            cdm_subset=cdm_subset,
+            col_subset=col_subset,
+            logger=logger,
+            **kwargs,
         )
-        if len(dfi) == 0:
-            logger.warning(
-                f"Table {table} empty in file system, not added to the final DF"
-            )
-            continue
-
-        dfi = dfi.set_index("report_id", drop=False)
-        dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
-        df_list.append(dfi)
+    else:
+        logger.error(
+            f"Source is neither a valid file name nor a valid directory path: {source}"
+        )
+        return DataBundle(data=pd.DataFrame())
 
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
-        return DataBundle(tables=pd.DataFrame())
+        return DataBundle(data=pd.DataFrame(), mode="tables")
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
-    return DataBundle(tables=merged)
+    return DataBundle(data=merged, columns=merged.columns, mode="tables")

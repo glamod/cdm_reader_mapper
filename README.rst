@@ -39,7 +39,10 @@ It was developed to read the IMMA_ (International Maritime Meteorological Archiv
 
 
 Installation
-------------
+============
+
+Installation using pip
+----------------------
 
 You can install the package directly from pip:
 
@@ -57,8 +60,27 @@ If you want to contribute, we recommend cloning the repository and installing th
 
 This will install the package but you can still edit it and you don't need the package in your :code:`PYTHONPATH`
 
+Installation using uv
+---------------------
+
+You can install the package using `uv`_ package manager, this will add the library to your active environment:
+
+.. code-block:: console
+
+    uv add cdm_reader_mapper
+
+To develop the package using uv, the following will create a virtual environment, uv defaults to ``.venv``:
+
+.. code-block:: console
+
+    git clone https://github.com/glamod/cdm_reader_mapper
+    cd cdm_reader_mapper
+    uv venv --python 3.12      # Create an environment with the recommended python version
+    source .venv/bin/activate  # Load the virtual environment (for bash or zsh)
+    uv sync
+
 Documentation
--------------
+=============
 
 The official documentation is at https://cdm-reader-mapper.readthedocs.io/
 
@@ -69,7 +91,7 @@ How to make the most of cdm_reader_mapper:
 * `How to map to the Common Data Model (CDM)`_
 
 Logging
--------
+=======
 
 By default, :code:`cdm_reader_mapper` outputs logging information to :code:`stdout`. To tell :code:`cdm_reader_mapper` to output logs to a file, set the :code:`CDM_LOG_FILE` environment variable **before** loading :code:`cdm_reader_mapper`.
 
@@ -85,9 +107,9 @@ This will set the file :code:`log_file.log` as the output for all logging inform
 
 
 Run a test
-----------
+==========
 
-Read imma data with the `cdm_reader_mapper.read_mdf` function:
+Read imma data with the ``cdm_reader_mapper.read_mdf`` function:
 
 .. code-block:: python
 
@@ -116,30 +138,30 @@ Detect and flag duplicated observations:
 
     imma_bundle.duplicate_check()
 
-    imma_bundle.flag_duplicates(overwrite=False)
+    df_flagged = imma_bundle.flag_duplicates(overwrite=False)
 
 
 For more details on how to use the ``cdm_reader_mapper`` toolbox see the following `jupyter example notebooks`_.
 
 Contributing to cdm_reader_mapper
----------------------------------
+=================================
 
-If you're interested in participating in the development of `cdm_reader_mapper` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
+If you're interested in participating in the development of ``cdm_reader_mapper`` by suggesting new features, new indices or report bugs, please leave us a message on the `issue tracker`_.
 
 If you would like to contribute code or documentation (which is greatly appreciated!), check out the `Contributing Guidelines`_ before you begin!
 
 How to cite this library
-------------------------
+========================
 
 If you wish to cite `glamod-marine-processing` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/14135493.
 
 License
--------
+=======
 
 This is free software: you can redistribute it and/or modify it under the terms of the `Apache License 2.0`_. A copy of this license is provided in the code repository (`LICENSE`_).
 
 Credits
--------
+=======
 
 ``cdm_reader_mapper`` development is funded through Copernicus Climate Change Service (C3S_).
 
@@ -187,8 +209,10 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 
 .. _UKMCAS: https://www.metoffice.gov.uk/services/data/met-office-marine-data-service
 
-.. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml/badge.svg
-        :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/ci.yml
+.. _uv: https://docs.astral.sh/uv/
+
+.. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml/badge.svg
+        :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml
         :alt: Build Status
 
 .. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
@@ -255,8 +279,8 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
         :target: https://pypi.python.org/pypi/cdm_reader_mapper
         :alt: Supported Python Versions
 
-.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14135493.svg
-        :target: https://doi.org/10.5281/zenodo.14135493
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14922212.svg
+        :target: https://doi.org/10.5281/zenodo.14922212
  	:alt: DOI
 
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg

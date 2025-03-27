@@ -7,7 +7,6 @@ import logging
 import polars as pl
 
 from .. import properties
-from .utilities import convert_str_boolean
 
 
 class df_converters:
@@ -108,7 +107,6 @@ class df_converters:
 
     def object_to_object(self, data: pl.Series, disable_white_strip=None):
         """DOCUMENTATION."""
-        # With strip() an empty element after stripping, is just an empty element, no NaN...
         if data.dtype != "object":
             return data
         data = self.decode(data)
