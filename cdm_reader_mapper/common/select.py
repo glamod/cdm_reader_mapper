@@ -42,7 +42,8 @@ def dataframe_apply_index(
         in_df = in_df.reset_index(drop=True)
 
     return in_df
-    
+
+
 def dataframe_selection(
     df,
     index,
@@ -52,26 +53,24 @@ def dataframe_selection(
 ):
     """Common dataframe selction fucntion."""
     out1 = dataframe_apply_index(
-            df,
-            index,
-            reset_index=reset_index,
-            inverse=inverse,
+        df,
+        index,
+        reset_index=reset_index,
+        inverse=inverse,
     )
     if return_rejected is True:
-            index2 = [idx for idx in df.index if idx not in index]
-            out2 = dataframe_apply_index(
-                df,
-                index2,
-                reset_index=reset_index,
-                inverse=inverse,
-            )
-            return out1, out2
-    return out1, pd.DataFrame(columns=out1.columns)    
-    
-    
-    
-def parser_apply_index(
-):
+        index2 = [idx for idx in df.index if idx not in index]
+        out2 = dataframe_apply_index(
+            df,
+            index2,
+            reset_index=reset_index,
+            inverse=inverse,
+        )
+        return out1, out2
+    return out1, pd.DataFrame(columns=out1.columns)
+
+
+def parser_apply_index():
     """Apply index for pandas.TextFileReader."""
 
 
