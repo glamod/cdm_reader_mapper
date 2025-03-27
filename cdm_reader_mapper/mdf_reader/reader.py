@@ -10,6 +10,7 @@ from io import StringIO as StringIO
 
 import pandas as pd
 import polars as pl
+import xarray as xr
 
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
@@ -61,7 +62,7 @@ class MDFFileReader(FileReader):
             df = df.with_columns(converted.alias(section))
         return df
 
-    def _validate(self, df):
+    def _validate(self, df) -> pl.DataFrame:
         """DOCUMENTATION."""
         return validate(
             data=df,
@@ -125,33 +126,17 @@ class MDFFileReader(FileReader):
         )
         return data
 
-    def validate_entries(self, data, validate):
+    def validate_entries(self, data, validate) -> pl.DataFrame:
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            mask = pd.DataFrame()
-        elif isinstance(data, pd.DataFrame):
+            mask = pl.DataFrame()
+        elif isinstance(data, pl.DataFrame):
             mask = self._validate(data)
         else:
-            data_buffer = StringIO()
-            TextParser_ = make_copy(data)
-            for i, df_ in enumerate(TextParser_):
-                mask_ = self._validate(df_)
-                mask_.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                )
-            data_buffer.seek(0)
-            mask = pd.read_csv(
-                data_buffer,
-                names=df_.columns,
-                chunksize=self.chunksize,
-            )
+            raise TypeError("Unknown data type")
         return mask
 
     def remove_boolean_values(self, data):
@@ -260,23 +245,70 @@ class MDFFileReader(FileReader):
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
 
-        data = self.open_data(
+        TextParser = self.open_data(
             chunksize=chunksize,
             format=self.format,
         )
 
         # 2.3. Extract, read and validate data in same loop
-        logging.info("Extracting and reading sections")
-        data = self.convert_and_decode_entries(
-            data,
-            convert=convert,
-            decode=decode,
-        )
-        mask = self.validate_entries(data, validate)
+        if isinstance(TextParser, (pd.DataFrame, xr.Dataset)):
+            data, mask = self._read_loop(
+                TextParser, read_sections_list, sections, decode, convert, validate
+            )
+        else:
+            data_buffer = StringIO()
+            mask_buffer = StringIO()
+            for df_ in TextParser:
+                df, mask_ = self._read_loop(
+                    df_, read_sections_list, sections, decode, convert, validate
+                )
+                df.to_csv(
+                    data_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+                mask_.to_csv(
+                    mask_buffer,
+                    header=False,
+                    mode="a",
+                    encoding="utf-8",
+                    index=False,
+                    quoting=csv.QUOTE_NONE,
+                    sep=properties.internal_delimiter,
+                    quotechar="\0",
+                    escapechar="\0",
+                )
+            data_buffer.seek(0)
+            data = pd.read_csv(
+                data_buffer,
+                names=self.columns,
+                chunksize=self.chunksize,
+                dtype=object,
+                parse_dates=self.parse_dates,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
+            mask_buffer.seek(0)
+            mask = pd.read_csv(
+                mask_buffer,
+                names=self.columns,
+                chunksize=self.chunksize,
+                dtype=object,
+                parse_dates=self.parse_dates,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+            )
 
         # 3. Create output DataBundle object
         logging.info("Create output DataBundle object")
-        data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
             columns=self.columns,
@@ -286,6 +318,26 @@ class MDFFileReader(FileReader):
             mask=mask,
             imodel=self.imodel,
         )
+
+    def _read_loop(
+        self, TextParser, order, valid, decode, convert, validate
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        logging.info("Extracting and reading sections")
+        data, mask = self._read_sections(
+            pl.from_pandas(TextParser), order, valid, format=self.format
+        )
+
+        logging.info("Decoding and converting entries")
+        data = self.convert_and_decode_entries(
+            data,
+            convert=convert,
+            decode=decode,
+        )
+
+        logging.info("Extracting and reading sections")
+        mask = self.validate_entries(data, validate)
+
+        return data.to_pandas(), mask.to_pandas()
 
 
 def read_mdf(
