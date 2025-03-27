@@ -114,6 +114,7 @@ class FileReader:
             dtype=object,
             skip_blank_lines=False,
             widths=[properties.MAX_FULL_REPORT_WIDTH],
+            names=["full_str"],
             **kwargs,
         )
 
