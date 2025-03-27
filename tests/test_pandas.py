@@ -12,7 +12,7 @@ data_dict = dict(test_data.test_icoads_r300_d700)
 
 def _get_data(TextParser, **kwargs):
     if TextParser is True:
-        kwargs["chunksize"] = 10000
+        kwargs["chunksize"] = 3
     return read(**data_dict, imodel="icoads_r300_d700", **kwargs)
 
 

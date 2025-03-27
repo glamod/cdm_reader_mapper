@@ -13,7 +13,7 @@ data_dict = dict(test_data.test_icoads_r300_d721)
 
 def _get_data(TextParser, **kwargs):
     if TextParser is True:
-        kwargs["chunksize"] = 10000
+        kwargs["chunksize"] = 3
     return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
@@ -116,6 +116,137 @@ def test_select_from_list(TextParser, reset_index, inverse):
         expected = expected.reset_index(drop=True)
 
     pd.testing.assert_frame_equal(expected, selected)
+
+
+@pytest.mark.parametrize("TextParser", [True, False])
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def ztest_partition_true(TextParser, reset_index, inverse):
+    data = _get_data(TextParser, sections=["c99_data"])
+    result = data.partition_true(reset_index=reset_index, inverse=inverse)
+    expected = data.data
+    selected = result[0].data
+    rejected = result[1].data
+
+    if TextParser is True:
+        expected = make_copy(expected).read()
+        selected = make_copy(selected).read()
+        rejected = make_copy(rejected).read()
+
+    if inverse is False:
+        expected1 = expected[:5]
+        expected2 = expected[:0]
+    else:
+        expected1 = expected[:0]
+        expected2 = expected[:5]
+
+    if reset_index is True:
+        expected1 = expected1.reset_index(drop=True)
+        expected2 = expected2.reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(expected1, selected)
+    pd.testing.assert_frame_equal(expected2, rejected)
+
+
+@pytest.mark.parametrize("TextParser", [True, False])
+@pytest.mark.parametrize("reset_index", [True, False])
+@pytest.mark.parametrize("inverse", [True, False])
+def ztest_partition_false(TextParser, reset_index, inverse):
+    data = _get_data(TextParser, sections=["c99_data"])
+    result = data.partition_false(reset_index=reset_index, inverse=inverse)
+    expected = data.data
+    selected = result[0].data
+    rejected = result[1].data
+
+    if TextParser is True:
+        expected = make_copy(expected).read()
+        selected = make_copy(selected).read()
+        rejected = make_copy(rejected).read()
+
+    if inverse is False:
+        expected1 = expected[:0]
+        expected2 = expected[:5]
+    else:
+        expected1 = expected[:5]
+        expected2 = expected[:0]
+
+    if reset_index is True:
+        expected1 = expected1.reset_index(drop=True)
+        expected2 = expected2.reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(expected1, selected)
+    pd.testing.assert_frame_equal(expected2, rejected)
+
+
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
+def ztest_partition_from_index(TextParser, reset_index, inverse):
+    data = _get_data(TextParser)
+    result = data.partition_from_index(
+        [0, 2, 4], reset_index=reset_index, inverse=inverse
+    )
+    expected = data.data
+    selected = result[0].data
+    rejected = result[1].data
+
+    if TextParser is True:
+        expected = make_copy(expected).read()
+        selected = make_copy(selected).read()
+        rejected = make_copy(rejected).read()
+
+    if inverse is False:
+        idx1 = expected.index.isin([0, 2, 4])
+        idx2 = expected.index.isin([1, 3])
+    else:
+        idx1 = expected.index.isin([1, 3])
+        idx2 = expected.index.isin([0, 2, 4])
+
+    expected1 = expected[idx1]
+    expected2 = expected[idx2]
+
+    if reset_index is True:
+        expected1 = expected1.reset_index(drop=True)
+        expected2 = expected2.reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(expected1, selected)
+    pd.testing.assert_frame_equal(expected2, rejected)
+
+
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
+def test_partition_from_list(TextParser, reset_index, inverse):
+    data = _get_data(TextParser)
+    selection = {("c1", "B1"): [26, 41]}
+    result = data.partition_from_list(
+        selection, reset_index=reset_index, inverse=inverse
+    )
+    expected = data.data
+    selected = result[0].data
+    rejected = result[1].data
+
+    if TextParser is True:
+        expected = make_copy(expected).read()
+        selected = make_copy(selected).read()
+        rejected = make_copy(rejected).read()
+
+    if inverse is False:
+        idx1 = expected.index.isin([1, 3])
+        idx2 = expected.index.isin([0, 2, 4])
+    else:
+        idx1 = expected.index.isin([0, 2, 4])
+        idx2 = expected.index.isin([1, 3])
+
+    expected1 = expected[idx1]
+    expected2 = expected[idx2]
+
+    if reset_index is True:
+        expected1 = expected1.reset_index(drop=True)
+        expected2 = expected2.reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(expected1, selected)
+    pd.testing.assert_frame_equal(expected2, rejected)
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
