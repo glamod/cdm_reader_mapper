@@ -14,15 +14,6 @@ import pandas as pd
 
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
-# Need to define a general thing for the parser() functions, like we did with
-# the dataframe_apply_index(), because they are all the same but for the
-# selection applied!!!!!
-
-# The index of the resulting dataframe(s) is reinitialized here, it does not
-# inherit from parent df
-#
-# data is a dataframe or a TextFileReader
-
 
 def dataframe_apply_index(
     df,
@@ -50,7 +41,7 @@ def dataframe_selection(
     inverse=False,
     return_rejected=False,
 ):
-    """Common dataframe selction fucntion."""
+    """Common pandas DataFrame selection function."""
     out1 = dataframe_apply_index(
             df,
             index,
@@ -67,28 +58,9 @@ def dataframe_selection(
             )
             return out1, out2
     return out1, pd.DataFrame(columns=out1.columns)    
-    
-    
-    
-def parser_apply_index(
-):
-    """Apply index for pandas.TextFileReader."""
 
-
-def select_bool(
-    data, mask, boolean, reset_index=False, inverse=False, return_rejected=False
-):
-    """DOCUMENTATION."""
-
-    # mask is a the full df/parser of which we only use col
-    def dataframe(
-        df,
-        mask,
-        boolean,
-        reset_index=False,
-        inverse=False,
-        return_rejected=False,
-    ):
+def dataframe_selection_bool(df, mask, boolean, **kwargs):
+        """DOCUMENTATION."""
         # get the index values and pass to the general function
         # If a mask is empty, assume True (...)
         if boolean is True:
@@ -99,37 +71,56 @@ def select_bool(
         return dataframe_selection(
             df,
             index,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
+            **kwargs,
+        )
+      
+def dataframe_selection_from_list(df, col, values, **kwargs):
+        """DOCUMENTATION."""
+        # get the index values and pass to the general function
+        in_df = df.loc[df[col].isin(values)]
+        index = list(in_df.index)
+        return dataframe_selection(
+            df,
+            index,
+            **kwargs,
         )
 
-    def parser(
-        data_parser,
-        mask_parser,
-        boolean,
-        reset_index=False,
-        inverse=False,
-        return_rejected=False,
-    ):
-        mask_cp = pandas_TextParser_hdlr.make_copy(mask_parser)
-        read_params = [
+
+def dataframe_selection_from_index(df, index, **kwargs):    
+        """DOCUMENTATION."""
+        return dataframe_selection(
+            df,
+            index,
+            **kwargs,
+        )    
+    
+    
+def parser_selection(data, *args, func=None, mask=None, reset_index=False, inverse=False, return_rejected=False):
+    """Common pandas TextFileReader selection function."""
+    read_params = [
             "chunksize",
             "names",
             "dtype",
             "parse_dates",
             "date_parser",
             "infer_datetime_format",
-        ]
-        write_dict = {"header": None, "mode": "a", "index": not reset_index}
-        read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
-        buffer1 = StringIO()
-        buffer2 = StringIO()
-        for df, mask_df in zip(data_parser, mask_cp):
-            out1, out2 = dataframe(
-                df,
-                mask_df,
-                boolean,
+    ]
+    write_dict = {"header": None, "mode": "a", "index": not reset_index}
+    read_dict = {x: data.orig_options.get(x) for x in read_params}
+    buffer1 = StringIO()
+    buffer2 = StringIO()
+    if mask is None:
+        zipped = data
+    else:
+        mask_cp = pandas_TextParser_hdlr.make_copy(mask)
+        zipped = zip(data, mask_cp)
+        
+    for zip_ in zipped:
+            if not isinstance(zip_, tuple):
+                zip_ = [zip_]
+            out1, out2 = func(
+                *zip_,
+                *args,
                 reset_index=reset_index,
                 inverse=inverse,
                 return_rejected=return_rejected,
@@ -137,31 +128,38 @@ def select_bool(
             out1.to_csv(buffer1, **write_dict)
             if return_rejected is True:
                 out2.to_csv(buffer2, **write_dict)
-
+    
+    if mask is not None:
         mask_cp.close()
-        buffer1.seek(0)
-        buffer2.seek(0)
-        return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
-
+    buffer1.seek(0)
+    buffer2.seek(0)
+    return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)    
+    
+def select(data, func, *args, **kwargs):
+    """DOCUMENTATION."""
     if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(
+        return parser_selection(
             data,
-            mask,
-            boolean,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
+            *args,
+            func=func,
+            **kwargs,
         )
+    return func(data, *args, **kwargs)    
 
-    return dataframe(
+def select_bool(
+    data, mask, boolean, reset_index=False, inverse=False, return_rejected=False
+):
+    """DOCUMENTATION.""" 
+    func = dataframe_selection_bool
+    return select(
         data,
-        mask,
+        func,
         boolean,
+        mask=mask,
         reset_index=reset_index,
         inverse=inverse,
-        return_rejected=return_rejected,
+        return_rejected=return_rejected,        
     )
-
 
 def select_true(data, mask, reset_index=False, inverse=False, return_rejected=False):
     """DOCUMENTATION."""
@@ -186,87 +184,21 @@ def select_false(data, mask, reset_index=False, inverse=False, return_rejected=F
         return_rejected=return_rejected,
     )
 
-
 def select_from_list(
     data, selection, reset_index=False, inverse=False, return_rejected=False
 ):
     """DOCUMENTATION."""
-
-    # selection is a dictionary like {col_name:[values to select]}
-    def dataframe(
-        df,
-        col,
-        values,
-        reset_index=False,
-        inverse=False,
-        return_rejected=False,
-    ):
-        # get the index values and pass to the general function
-        in_df = df.loc[df[col].isin(values)]
-        index = list(in_df.index)
-        return dataframe_selection(
-            df,
-            index,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-    def parser(
-        data_parser,
-        col,
-        values,
-        reset_index=False,
-        inverse=False,
-        return_rejected=False,
-    ):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        write_dict = {"header": None, "mode": "a", "index": not reset_index}
-        read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
-        buffer1 = StringIO()
-        buffer2 = StringIO()
-        for df in data_parser:
-            out1, out2 = dataframe(
-                df,
-                col,
-                values,
-                reset_index=reset_index,
-                inverse=inverse,
-                return_rejected=return_rejected,
-            )
-            out1.to_csv(buffer1, **write_dict)
-            if return_rejected is True:
-                out2.to_csv(buffer2, **write_dict)
-
-        buffer1.seek(0)
-        buffer2.seek(0)
-        return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
-
+    func = dataframe_selection_from_list
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(
-            data,
-            col,
-            values,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-    return dataframe(
+    return select(
         data,
+        func,
         col,
         values,
         reset_index=reset_index,
         inverse=inverse,
-        return_rejected=return_rejected,
+        return_rejected=return_rejected,        
     )
 
 
@@ -274,67 +206,12 @@ def select_from_index(
     data, index, reset_index=False, inverse=False, return_rejected=False
 ):
     """DOCUMENTATION."""
-
-    # index is a list of integer positions to select from data
-    def dataframe(
-        df,
-        index,
-        reset_index=False,
-        inverse=False,
-        return_rejected=False,
-    ):
-        return dataframe_selection(
-            df,
-            index,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-    def parser(
-        data_parser, index, reset_index=False, inverse=False, return_rejected=False
-    ):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        write_dict = {"header": None, "mode": "a", "index": not reset_index}
-        read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
-        buffer1 = StringIO()
-        buffer2 = StringIO()
-        for df in data_parser:
-            out1, out2 = dataframe(
-                df,
-                index,
-                reset_index=reset_index,
-                inverse=inverse,
-                return_rejected=return_rejected,
-            )
-            out1.to_csv(buffer1, **write_dict)
-            if return_rejected is True:
-                out2.to_csv(buffer2, **write_dict)
-
-        buffer1.seek(0)
-        buffer2.seek(0)
-        return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
-
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(
-            data,
-            index,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-    return dataframe(
+    func = dataframe_selection_from_index
+    return select(
         data,
+        func,
         index,
         reset_index=reset_index,
         inverse=inverse,
-        return_rejected=return_rejected,
+        return_rejected=return_rejected,        
     )
