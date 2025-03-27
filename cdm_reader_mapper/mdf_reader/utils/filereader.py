@@ -173,7 +173,6 @@ class FileReader:
         elif format == "text":
             TextParser = self._read_text(
                 encoding=encoding,
-                widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
                 chunksize=chunksize,
             )
