@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import ast
-import csv
-import logging
 
-import numpy as np
 import pandas as pd
 import polars as pl
+import polars.selectors as cs
+import xarray as xr
 
 from .. import properties
 from . import converters, decoders
@@ -20,7 +19,7 @@ class Configurator:
 
     def __init__(
         self,
-        df=pd.DataFrame(),
+        df: pd.DataFrame | pl.DataFrame | xr.Dataset = pl.DataFrame(),
         schema=None,
         order=None,
         valid=None,
@@ -138,11 +137,14 @@ class Configurator:
             },
         }
 
-    def open_polars(self) -> pl.DataFrame:
-        """Open TextParser to a pl.DataFrame"""
-        self.df = self.df.with_columns(
-            pl.lit([]).alias("missing_values")
-        ).with_row_index("index")
+    def open_text(self):
+        """Open TextParser to a polars.DataFrame"""
+        if isinstance(self.df, pd.DataFrame):
+            self.df = pl.from_pandas(self.df)
+        if not isinstance(self.df, pl.DataFrame):
+            raise TypeError(f"Cannot open with polars for {type(self.df) = }")
+        self.df = self.df.with_row_index("index")
+        mask_df = pl.DataFrame()
         for section in self.orders:
             header = self.schema["sections"][section]["header"]
 
@@ -178,9 +180,7 @@ class Configurator:
                 )
 
             # Used for validation
-            self.df = self.df.with_columns(
-                pl.col(section).is_null().alias(f"_{section}_missing")
-            )
+            section_missing = self.df.get_column(section).is_null()
 
             # Don't read fields
             disable_read = header.get("disable_read", False)
@@ -208,6 +208,12 @@ class Configurator:
                     for field in field_names:
                         self.df = self.df.with_columns(
                             pl.col(field).str.strip_chars(" ").name.keep()
+                        )
+                        mask_df = mask_df.with_columns(
+                            (
+                                section_missing
+                                | self.df.get_column(field).is_not_null()
+                            ).alias(field)
                         )
 
                     continue
@@ -252,14 +258,12 @@ class Configurator:
                             .alias(index)
                         ),
                         pl.col(section).str.tail(-field_length).name.keep(),
-                        (
-                            # Handle missing sections
-                            pl.when(pl.col(section).is_null())
-                            .then(pl.col("missing_values").list.concat(pl.lit([index])))
-                            .otherwise(pl.col("missing_values"))
-                            .alias("missing_values")
-                        ),
                     ]
+                )
+                mask_df = mask_df.with_columns(
+                    (section_missing | self.df.get_column(field).is_not_null()).alias(
+                        field
+                    )
                 )
                 if delimiter is not None:
                     self.df = self.df.with_columns(
@@ -268,94 +272,12 @@ class Configurator:
 
             self.df = self.df.drop([section])
 
-        return self.df.drop("full_str")
-
-    def open_pandas(self):
-        """Open TextParser to pd.DataSeries."""
-        return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
-
-    def _read_line(self, line: str):
-        i = j = 0
-        data_dict = {}
-        for order in self.orders:
-            header = self.schema["sections"][order]["header"]
-
-            disable_read = header.get("disable_read")
-            if disable_read is True:
-                data_dict[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
-                continue
-
-            sentinal = header.get("sentinal")
-            bad_sentinal = sentinal is not None and not self._validate_sentinal(
-                i, line, sentinal
-            )
-
-            section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
-            sections = self.schema["sections"][order]["elements"]
-
-            field_layout = header.get("field_layout")
-            delimiter = header.get("delimiter")
-            if delimiter is not None:
-                delimiter_format = header.get("format")
-                if delimiter_format == "delimited":
-                    # Read as CSV
-                    field_names = sections.keys()
-                    fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
-                    for field_name, field in zip(field_names, fields):
-                        index = self._get_index(field_name, order)
-                        data_dict[index] = field.strip()
-                        i += len(field)
-                    j = i
-                    continue
-                elif field_layout != "fixed_width":
-                    logging.error(
-                        f"Delimiter for {order} is set to {delimiter}. Please specify either format or field_layout in your header schema {header}."
-                    )
-                    return
-
-            k = i + section_length
-            for section, section_dict in sections.items():
-                missing = True
-                index = self._get_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(section_dict)
-                na_value = section_dict.get("missing_value")
-                field_length = section_dict.get(
-                    "field_length", properties.MAX_FULL_REPORT_WIDTH
-                )
-
-                j = (i + field_length) if not bad_sentinal else i
-                if j > k:
-                    missing = False
-                    j = k
-
-                if ignore is not True:
-                    value = line[i:j]
-
-                    if not value.strip():
-                        value = True
-                    if value == na_value:
-                        value = True
-
-                    if i == j and missing is True:
-                        value = False
-
-                    data_dict[index] = value
-
-                if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
-                    j += len(delimiter)
-                i = j
-
-        return pd.Series(data_dict)
+        return self.df.drop("full_str"), mask_df.with_row_index("index")
 
     def open_netcdf(self):
-        """Open netCDF to pd.Series."""
-
-        def replace_empty_strings(series):
-            if series.dtype == "object":
-                series = series.str.decode("utf-8")
-                series = series.str.strip()
-                series = series.map(lambda x: True if x == "" else x)
-            return series
+        """Open netCDF to polars.DataFrame."""
+        if not isinstance(self.df, xr.Dataset):
+            raise TypeError(f"Cannot open with netCDF for {type(self.df) = }")
 
         missing_values = []
         attrs = {}
@@ -382,15 +304,26 @@ class Configurator:
                 elif section in self.df.dims:
                     renames[section] = index
                 elif section in self.df.attrs:
-                    attrs[index] = self.df.attrs[index]
+                    # Initialise a constant column
+                    attrs[index] = pl.lit(self.df.attrs[section].replace("\n", "; "))
                 else:
                     missing_values.append(index)
 
-        df = self.df[renames.keys()].to_dataframe().reset_index()
-        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
-        df = df.rename(columns=renames)
-        df = df.assign(**attrs)
-        df[disables] = np.nan
-        df = df.apply(lambda x: replace_empty_strings(x))
-        df[missing_values] = False
-        return pl.from_pandas(df).with_row_index("index")
+        df: pl.DataFrame = pl.from_pandas(
+            self.df[renames.keys()].to_dataframe().reset_index()
+        ).with_row_index("index")
+        df = df.rename(mapping=renames)
+        df = df.with_columns(**attrs)
+        df = df.with_columns(
+            [pl.lit(None).alias(missing) for missing in missing_values]
+        )
+        df = df.with_columns([pl.lit(None).alias(disable) for disable in disables])
+        # Replace empty or whitespace string with None
+        df = df.with_columns(cs.string().str.strip_chars().replace("", None))
+
+        # Create missing mask
+        mask_df = df.select(pl.all().is_not_null())
+        mask_df = mask_df.with_columns(
+            [pl.lit(True).alias(c) for c in missing_values + disables]
+        )
+        return df, mask_df.with_row_index("index")

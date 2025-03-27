@@ -130,11 +130,11 @@ class FileReader:
         format,
     ):
         if format == "text":
-            df = Configurator(
+            df, mask_df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_text()
         elif format == "netcdf":
-            df = Configurator(
+            df, mask_df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
         else:
@@ -146,7 +146,7 @@ class FileReader:
         self.columns = df.columns
         # Replace None with NaN - is this necessary for polars?
         # df = df.where(df.notnull(), np.nan)
-        return df
+        return df, mask_df
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
