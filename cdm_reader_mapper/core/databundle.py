@@ -568,7 +568,7 @@ class DataBundle:
         return self._return_db(db_, inplace)
 
     def select_from_index(self, index, inplace=False, **kwargs):
-        """Select rows of :py:attr:`data` with specific indexes.
+        """Select rows from :py:attr:`data` with specific indexes.
 
         Parameters
         ----------
@@ -611,6 +611,182 @@ class DataBundle:
         db_._data = select_from_index(db_._data, index, **kwargs)[0]
         db_._mask = select_from_index(db_._mask, index, **kwargs)[0]
         return self._return_db(db_, inplace)
+
+    def partition_true(self, **kwargs):
+        """Select both valid and invalid values from :py:attr:`data` via :py:attr:`mask`.
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None
+
+        Examples
+        --------
+        Select valid values only without overwriting the old data.
+
+        >>> true_values, false_values = db.select_true()
+
+        Select valid values only with overwriting the old data.
+
+        >>> db.select_true(inplace=True)
+        >>> true_values = db.data
+
+        See Also
+        --------
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+
+        Note
+        ----
+        For more information see :py:func:`select_true`
+        """
+        db1 = self.copy()
+        db2 = self.copy()
+        db1._data, db2._data = select_true(
+            db1._data, db1._mask, return_rejected=True, **kwargs
+        )
+        # db1._mask, db2._mask = select_true(db1._mask, db1._mask, return_rejected=True, **kwargs)
+        return db1, db2
+
+    def partition_false(self, **kwargs):
+        """Select both invalid and valid values from :py:attr:`data` via :py:attr:`mask`.
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None
+
+        Examples
+        --------
+        Select valid values only without overwriting the old data.
+
+        >>> true_values, false_values = db.select_true()
+
+        Select valid values only with overwriting the old data.
+
+        >>> db.select_true(inplace=True)
+        >>> true_values = db.data
+
+        See Also
+        --------
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+
+        Note
+        ----
+        For more information see :py:func:`select_true`
+        """
+        db1 = self.copy()
+        db2 = self.copy()
+        db1._data, db2._data = select_false(
+            db1._data, db1._mask, return_rejected=True, **kwargs
+        )
+        db1._mask, db2._mask = select_false(
+            db1._mask, db1._mask, return_rejected=True, **kwargs
+        )
+        return db1, db2
+
+    def partition_from_list(self, selection, **kwargs):
+        """Select both columns in selection and columns not in selection from :py:attr:`data`.
+
+        Parameters
+        ----------
+        selection: dict
+            Keys: columns to be selected.
+            Values: values in keys to be selected
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None
+
+        Examples
+        --------
+        Select specific columns without overwriting the old data.
+
+        >>> true_values, false_values = db.select_from_list(
+        ...     selection={("c1", "B1"): [26, 41]},
+        ... )
+
+        Select specific columns with overwriting the old data.
+
+        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, inplace=True)
+        >>> true_values = db.selected
+
+        See Also
+        --------
+        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
+
+        Note
+        ----
+        For more information see :py:func:`select_from_list`
+        """
+        db1 = self.copy()
+        db2 = self.copy()
+        db1._data, db2._data = select_from_list(
+            db1._data, selection, return_rejected=True, **kwargs
+        )
+        db1._mask, db2._mask = select_from_list(
+            db1._mask, selection, return_rejected=True, **kwargs
+        )
+        return db1, db2
+
+    def partition_from_index(self, index, **kwargs):
+        """Select both rows in index list and rows not in index list from :py:attr:`data`.
+
+        Parameters
+        ----------
+        index: list
+            Indexes to be selected.
+
+
+        Returns
+        -------
+        If `inplace` is False
+            :py:class:`~DataBundle`
+        Else:
+            None
+
+        Examples
+        --------
+        Select specific columns without overwriting the old data.
+
+         >>> true_values, false_values = db.select_from_index([0, 2, 4])
+
+        Select specific columns with overwriting the old data.
+
+        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
+        >>> true_values = db.selected
+
+        See Also
+        --------
+        DataBundle.select_from_list : Select columns from `data` with specific values.
+        DataBundle.select_true : Select valid values from `data` via `mask`.
+        DataBundle.select_false : Select invalid values from `data` via `mask`.
+
+        Note
+        ----
+        For more information see :py:func:`select_from_index`
+        """
+        db1 = self.copy()
+        db2 = self.copy()
+        db1._data, db2._data = select_from_index(
+            db1._data, index, return_rejected=True, **kwargs
+        )
+        db1._mask, db2._mask = select_from_index(
+            db1._mask, index, return_rejected=True, **kwargs
+        )
+        return db1, db2
 
     def unique(self, **kwargs):
         """Get unique values of :py:attr:`data`.
