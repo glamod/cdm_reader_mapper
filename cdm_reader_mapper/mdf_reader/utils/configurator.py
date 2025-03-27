@@ -249,7 +249,7 @@ class Configurator:
                 elif section in self.df.dims:
                     renames[section] = index
                 elif section in self.df.attrs:
-                    attrs[index] = self.df.attrs[index]
+                    attrs[index] = self.df.attrs[section]
                 else:
                     missing_values.append(index)
 
