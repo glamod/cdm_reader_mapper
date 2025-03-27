@@ -29,8 +29,6 @@ def dataframe_apply_index(
     index_list,
     reset_index=False,
     inverse=False,
-    idx_in_offset=0,
-    idx_out_offset=0,
 ):
     """Apply index to pandas DataFrame."""
     index = df.index.isin(index_list)
@@ -41,7 +39,7 @@ def dataframe_apply_index(
         in_df = df[index]
 
     if reset_index is True:
-        in_df.index = range(idx_in_offset, idx_in_offset + len(in_df))
+        in_df = in_df.reset_index(drop=True)
 
     return in_df
 
@@ -59,8 +57,6 @@ def select_bool(
         reset_index=False,
         inverse=False,
         return_rejected=False,
-        idx_in_offset=0,
-        idx_out_offset=0,
     ):
         # get the index values and pass to the general function
         # If a mask is empty, assume True (...)
@@ -68,26 +64,23 @@ def select_bool(
             global_mask = mask.all(axis=1)
         else:
             global_mask = ~(mask.any(axis=1))
-        index = global_mask[global_mask.fillna(boolean)].index
+        index1 = global_mask[global_mask.fillna(boolean)].index
         out1 = dataframe_apply_index(
             df,
-            index,
+            index1,
             reset_index=reset_index,
             inverse=inverse,
-            idx_in_offset=idx_in_offset,
-            idx_out_offset=idx_out_offset,
         )
         if return_rejected is True:
+            index2 = [idx for idx in df.index if idx not in index1]
             out2 = dataframe_apply_index(
                 df,
-                index,
+                index2,
                 reset_index=reset_index,
                 inverse=inverse,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
             )
             return out1, out2
-        return out1, pd.DataFrame()
+        return out1, pd.DataFrame(columns=out1.columns)
 
     def parser(
         data_parser,
@@ -106,11 +99,10 @@ def select_bool(
             "date_parser",
             "infer_datetime_format",
         ]
+        write_dict = {"header": None, "mode": "a", "index": not reset_index}
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         buffer1 = StringIO()
         buffer2 = StringIO()
-        idx_in_offset = 0
-        idx_out_offset = 0
         for df, mask_df in zip(data_parser, mask_cp):
             out1, out2 = dataframe(
                 df,
@@ -119,13 +111,10 @@ def select_bool(
                 reset_index=reset_index,
                 inverse=inverse,
                 return_rejected=return_rejected,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
             )
-            out1.to_csv(buffer1, header=False, mode="a")
+            out1.to_csv(buffer1, **write_dict)
             if return_rejected is True:
-                out2.to_csv(buffer1, header=False, mode="a")
-            idx_in_offset += len(out1)
+                out2.to_csv(buffer2, **write_dict)
 
         mask_cp.close()
         buffer1.seek(0)
@@ -189,28 +178,23 @@ def select_from_list(
         reset_index=False,
         inverse=False,
         return_rejected=False,
-        idx_in_offset=0,
-        idx_out_offset=0,
     ):
         # get the index values and pass to the general function
         in_df = df.loc[df[col].isin(values)]
-        index = list(in_df.index)
+        index1 = list(in_df.index)
         out1 = dataframe_apply_index(
             df,
-            index,
+            index1,
             reset_index=reset_index,
             inverse=inverse,
-            idx_in_offset=idx_in_offset,
-            idx_out_offset=idx_out_offset,
         )
         if return_rejected is True:
+            index2 = [idx for idx in df.index if idx not in index1]
             out2 = dataframe_apply_index(
                 df,
-                index,
+                index2,
                 reset_index=reset_index,
                 inverse=inverse,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
             )
             return out1, out2
         return out1, pd.DataFrame()
@@ -231,11 +215,10 @@ def select_from_list(
             "date_parser",
             "infer_datetime_format",
         ]
+        write_dict = {"header": None, "mode": "a", "index": not reset_index}
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         buffer1 = StringIO()
         buffer2 = StringIO()
-        idx_in_offset = 0
-        idx_out_offset = 0
         for df in data_parser:
             out1, out2 = dataframe(
                 df,
@@ -243,13 +226,11 @@ def select_from_list(
                 values,
                 reset_index=reset_index,
                 inverse=inverse,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
+                return_rejected=return_rejected,
             )
-            out1.to_csv(buffer1, header=False, mode="a")
-            idx_in_offset += len(out1)
+            out1.to_csv(buffer1, **write_dict)
             if return_rejected is True:
-                out2.to_csv(buffer2, header=False, mode="a")
+                out2.to_csv(buffer2, **write_dict)
 
         buffer1.seek(0)
         buffer2.seek(0)
@@ -288,25 +269,20 @@ def select_from_index(
         reset_index=False,
         inverse=False,
         return_rejected=False,
-        idx_in_offset=0,
-        idx_out_offset=0,
     ):
         out1 = dataframe_apply_index(
             df,
             index,
             reset_index=reset_index,
             inverse=inverse,
-            idx_in_offset=idx_in_offset,
-            idx_out_offset=idx_out_offset,
         )
         if return_rejected is True:
+            index2 = [idx for idx in df.index if idx not in index]
             out2 = dataframe_apply_index(
                 df,
-                index,
+                index2,
                 reset_index=reset_index,
                 inverse=inverse,
-                idx_in_offset=idx_in_offset,
-                idx_out_offset=idx_out_offset,
             )
             return out1, out2
         return out1, pd.DataFrame()
@@ -322,10 +298,10 @@ def select_from_index(
             "date_parser",
             "infer_datetime_format",
         ]
+        write_dict = {"header": None, "mode": "a", "index": not reset_index}
         read_dict = {x: data_parser.orig_options.get(x) for x in read_params}
         buffer1 = StringIO()
         buffer2 = StringIO()
-
         for df in data_parser:
             out1, out2 = dataframe(
                 df,
@@ -334,15 +310,27 @@ def select_from_index(
                 inverse=inverse,
                 return_rejected=return_rejected,
             )
-            out1.to_csv(buffer1, header=False, mode="a")
+            out1.to_csv(buffer1, **write_dict)
             if return_rejected is True:
-                out2.to_csv(buffer2, header=False, mode="a")
+                out2.to_csv(buffer2, **write_dict)
 
         buffer1.seek(0)
         buffer2.seek(0)
         return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
 
     if isinstance(data, pd.io.parsers.TextFileReader):
-        return parser(data, index, reset_index=reset_index, inverse=inverse)
+        return parser(
+            data,
+            index,
+            reset_index=reset_index,
+            inverse=inverse,
+            return_rejected=return_rejected,
+        )
 
-    return dataframe(data, index, reset_index=reset_index, inverse=inverse)
+    return dataframe(
+        data,
+        index,
+        reset_index=reset_index,
+        inverse=inverse,
+        return_rejected=return_rejected,
+    )
