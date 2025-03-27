@@ -42,6 +42,37 @@ def dataframe_apply_index(
         in_df = in_df.reset_index(drop=True)
 
     return in_df
+    
+def dataframe_selection(
+    df,
+    index,
+    reset_index=False,
+    inverse=False,
+    return_rejected=False,
+):
+    """Common dataframe selction fucntion."""
+    out1 = dataframe_apply_index(
+            df,
+            index,
+            reset_index=reset_index,
+            inverse=inverse,
+    )
+    if return_rejected is True:
+            index2 = [idx for idx in df.index if idx not in index]
+            out2 = dataframe_apply_index(
+                df,
+                index2,
+                reset_index=reset_index,
+                inverse=inverse,
+            )
+            return out1, out2
+    return out1, pd.DataFrame(columns=out1.columns)    
+    
+    
+    
+def parser_apply_index(
+):
+    """Apply index for pandas.TextFileReader."""
 
 
 def select_bool(
@@ -64,23 +95,14 @@ def select_bool(
             global_mask = mask.all(axis=1)
         else:
             global_mask = ~(mask.any(axis=1))
-        index1 = global_mask[global_mask.fillna(boolean)].index
-        out1 = dataframe_apply_index(
+        index = global_mask[global_mask.fillna(boolean)].index
+        return dataframe_selection(
             df,
-            index1,
+            index,
             reset_index=reset_index,
             inverse=inverse,
+            return_rejected=return_rejected,
         )
-        if return_rejected is True:
-            index2 = [idx for idx in df.index if idx not in index1]
-            out2 = dataframe_apply_index(
-                df,
-                index2,
-                reset_index=reset_index,
-                inverse=inverse,
-            )
-            return out1, out2
-        return out1, pd.DataFrame(columns=out1.columns)
 
     def parser(
         data_parser,
@@ -181,23 +203,14 @@ def select_from_list(
     ):
         # get the index values and pass to the general function
         in_df = df.loc[df[col].isin(values)]
-        index1 = list(in_df.index)
-        out1 = dataframe_apply_index(
+        index = list(in_df.index)
+        return dataframe_selection(
             df,
-            index1,
+            index,
             reset_index=reset_index,
             inverse=inverse,
+            return_rejected=return_rejected,
         )
-        if return_rejected is True:
-            index2 = [idx for idx in df.index if idx not in index1]
-            out2 = dataframe_apply_index(
-                df,
-                index2,
-                reset_index=reset_index,
-                inverse=inverse,
-            )
-            return out1, out2
-        return out1, pd.DataFrame()
 
     def parser(
         data_parser,
@@ -270,22 +283,13 @@ def select_from_index(
         inverse=False,
         return_rejected=False,
     ):
-        out1 = dataframe_apply_index(
+        return dataframe_selection(
             df,
             index,
             reset_index=reset_index,
             inverse=inverse,
+            return_rejected=return_rejected,
         )
-        if return_rejected is True:
-            index2 = [idx for idx in df.index if idx not in index]
-            out2 = dataframe_apply_index(
-                df,
-                index2,
-                reset_index=reset_index,
-                inverse=inverse,
-            )
-            return out1, out2
-        return out1, pd.DataFrame()
 
     def parser(
         data_parser, index, reset_index=False, inverse=False, return_rejected=False
