@@ -244,6 +244,7 @@ class MDFFileReader(FileReader):
 
         self.chunksize = chunksize
         self.skiprows = skiprows
+        self.format = properties.open_file.get(self.imodel, "text")
 
         # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
@@ -258,12 +259,10 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
+
         data = self.open_data(
-            read_sections_list,
-            sections,
-            # INFO: Set default as "pandas" to account for custom schema
-            # open_with=properties.open_file.get(self.imodel, "pandas"),
-            open_with=properties.open_file.get(self.imodel, "polars"),
+            chunksize=chunksize,
+            format=self.format,
         )
 
         # 2.3. Extract, read and validate data in same loop

@@ -7,6 +7,7 @@ import os
 from copy import deepcopy
 
 import polars as pl
+import pandas as pd
 import xarray as xr
 
 from .. import properties
@@ -104,43 +105,16 @@ class FileReader:
 
         return df.filter(mask)
 
-    # def _read_pandas(self, **kwargs):
-    #     return pd.read_fwf(
-    #         self.source,
-    #         header=None,
-    #         quotechar="\0",
-    #         escapechar="\0",
-    #         dtype=object,
-    #         skip_blank_lines=False,
-    #         widths=[properties.MAX_FULL_REPORT_WIDTH],
-    #         **kwargs,
-    #     )
-    #
-    def _read_fwf_polars(self, **kwargs):
-        if "chunksize" in kwargs:
-            logging.warning("Chunking not supported by polars reader")
-            # batch_size = kwargs["chunksize"]
-            del kwargs["chunksize"]
-            # return pl.read_csv_batched(
-            #     self.source,
-            #     has_header=False,
-            #     separator="\0",
-            #     new_columns=["full_str"],
-            #     quote_char="\0",
-            #     infer_schema_length=0,
-            #     batch_size=batch_size,
-            #     **kwargs,
-            # )
-        return pl.read_csv(
+    def _read_text(self, **kwargs):
+        return pd.read_fwf(
             self.source,
-            has_header=False,
-            separator="\0",
-            new_columns=["full_str"],
-            quote_char="\0",
-            infer_schema=False,
+            header=None,
+            quotechar="\0",
+            escapechar="\0",
+            dtype=object,
+            skip_blank_lines=False,
+            widths=[properties.MAX_FULL_REPORT_WIDTH],
             **kwargs,
-        ).select(
-            pl.col("full_str").str.head(properties.MAX_FULL_REPORT_WIDTH).name.keep()
         )
 
     def _read_netcdf(self, **kwargs):
@@ -153,30 +127,26 @@ class FileReader:
         TextParser,
         order,
         valid,
-        open_with,
+        format,
     ):
-        if open_with == "polars":
+        if format == "text":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_polars()
-        # elif open_with == "pandas":
-        #     df = Configurator(
-        #         df=TextParser, schema=self.schema, order=order, valid=valid
-        #     ).open_pandas()
-        elif open_with == "netcdf":
+            ).open_text()
+        elif format == "netcdf":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
             ).open_netcdf()
         else:
-            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
+            raise ValueError("format has to be one of ['text', 'netcdf']")
 
         # missing_values = df.select(["index", "missing_values"]).pipe(set_missing_values)
-        df = df.drop("missing_values").pipe(self._select_years)
+        df = df.pipe(self._select_years)
 
         self.columns = df.columns
         # Replace None with NaN - is this necessary for polars?
         # df = df.where(df.notnull(), np.nan)
-        return self._select_years(df)
+        return df
 
     def get_configurations(self, order, valid):
         """DOCUMENTATION."""
@@ -190,29 +160,30 @@ class FileReader:
 
     def open_data(
         self,
-        order,
-        valid,
-        # chunksize,
-        open_with="polars",
+        chunksize,
+        format="text",
     ):
         """DOCUMENTATION."""
         encoding = self.schema["header"].get("encoding")
-        if open_with == "netcdf":
+        if format == "netcdf":
             TextParser = self._read_netcdf()
         # NOTE: Chunking - polars does have pl.read_csv_batched, but batch_size
         # is not respected: https://github.com/pola-rs/polars/issues/19978
         # alternative: lazy?
-        elif open_with == "polars":
-            TextParser = self._read_fwf_polars(
+        elif format == "text":
+            TextParser = self._read_text(
                 encoding=encoding,
-                skip_rows=self.skiprows,
-                # chunksize=chunksize,
+                widths=[properties.MAX_FULL_REPORT_WIDTH],
+                skiprows=self.skiprows,
+                chunksize=chunksize,
             )
         else:
-            raise ValueError("open_with has to be one of ['polars', 'netcdf']")
+            raise ValueError("format has to be one of ['text', 'netcdf']")
+
+        return TextParser
         # if isinstance(TextParser, (pl.DataFrame, xr.Dataset)):
-        df = self._read_sections(TextParser, order, valid, open_with=open_with)
-        return df
+        #     df, mask_df = self._read_sections(TextParser, order, valid, open_with=open_with)
+        #     return df, mask_df
         # else:
         #     data_buffer = StringIO()
         #     for i, df_ in enumerate(TextParser):
