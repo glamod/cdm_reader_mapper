@@ -243,7 +243,7 @@ def df_schema(df_columns, schema):
     def get_index(idx, lst, section):
         if len(lst) == 1:
             return idx
-        return (section, idx)
+        return ":".join([section, idx])
 
     flat_schema = dict()
     for section in schema.get("sections"):
