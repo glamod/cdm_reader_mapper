@@ -197,7 +197,7 @@ class Configurator:
                 if delimiter_format == "delimited":
                     # Read as CSV
                     field_names = fields.keys()
-                    field_names = [self._get_index(section, x) for x in field_names]
+                    field_names = [self._get_index(x, section) for x in field_names]
                     n_fields = len(field_names)
                     self.df = self.df.with_columns(
                         pl.col(section)
