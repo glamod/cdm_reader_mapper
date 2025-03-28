@@ -62,10 +62,11 @@ class MDFFileReader(FileReader):
             df = df.with_columns(converted.alias(section))
         return df
 
-    def _validate(self, df) -> pl.DataFrame:
+    def _validate(self, df, mask) -> pl.DataFrame:
         """DOCUMENTATION."""
         return validate(
             data=df,
+            mask=mask,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
             schema=self.schema,
@@ -126,7 +127,7 @@ class MDFFileReader(FileReader):
         )
         return data
 
-    def validate_entries(self, data, validate) -> pl.DataFrame:
+    def validate_entries(self, data, mask, validate) -> pl.DataFrame:
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
@@ -134,7 +135,7 @@ class MDFFileReader(FileReader):
         if validate is not True:
             mask = pl.DataFrame()
         elif isinstance(data, pl.DataFrame):
-            mask = self._validate(data)
+            mask = self._validate(data, mask)
         else:
             raise TypeError("Unknown data type")
         return mask
@@ -333,9 +334,14 @@ class MDFFileReader(FileReader):
         )
 
         logging.info("Extracting and reading sections")
-        mask = self.validate_entries(data, validate)
+        mask = self.validate_entries(data, mask, validate)
 
-        return data.to_pandas(), mask.to_pandas()
+        renames = {c: tuple(c.split(":")) for c in data.columns}
+
+        return (
+            data.to_pandas().rename(columns=renames),
+            mask.to_pandas().rename(columns=renames),
+        )
 
 
 def read_mdf(
