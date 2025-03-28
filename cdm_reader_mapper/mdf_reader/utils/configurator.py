@@ -319,7 +319,9 @@ class Configurator:
         )
         df = df.with_columns([pl.lit(None).alias(disable) for disable in disables])
         # Replace empty or whitespace string with None
-        df = df.with_columns(cs.string().str.strip_chars().replace("", None))
+        df = df.with_columns(
+            cs.binary().cast(pl.String).str.strip_chars().replace("", None)
+        )
 
         # Create missing mask
         mask_df = df.select(pl.all().is_not_null())
