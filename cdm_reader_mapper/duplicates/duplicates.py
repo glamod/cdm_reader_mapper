@@ -471,10 +471,11 @@ def duplicate_check(
     -------
         cdm_reader_mapper.DupDetect
     """
-    data = data.reset_index(drop=True)
-
     if reindex_by_null is True:
         data = reindex_nulls(data)
+
+    index = data.index
+    data.reset_index(drop=True)
 
     if table_name:
         data = data[table_name]
@@ -530,4 +531,5 @@ def duplicate_check(
         compared.append(compared_)
 
     compared = pd.concat(compared)
+    data.set_index(index, inplace=True)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)

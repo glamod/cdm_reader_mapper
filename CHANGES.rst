@@ -22,6 +22,8 @@ New features and enhancements
 * apply pandas functions directly to ``DataBundle.data`` by calling ``DataBundle.<pandas-func>`` (:pull:`248`).
 * make ``DataBundle`` support item assignment for ``DataBundle.data`` (:pull:`248`).
 * optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
+* ``cdm_reader.reader.read_tables``: optionally, set null_label (:pull:`242`)
+* ``DataBundle.select_*``: optionally, return unselected pd.DataFrame as second return value by setting ``return_invalid`` to ``True`` (:pull:`242`)
 
 
 Breaking changes
@@ -29,8 +31,10 @@ Breaking changes
 
 * remove property ``tables`` from ``DataBundle`` object. Instead, ``DataBundle.map_model`` overwrites ``.DataBundle.data`` (:pull:`238`).
 * set default ``overwrite`` values from ``True`` to ``False`` that is consistent with pandas ``inplace`` argument and rename ``overwrite`` to ``inplace`` (:pull:`238`, :pull:`248`).
+* ``inplace`` returns ``None`` that is consistent with pandas (:pull:`242`)
 * ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
 * ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
+* select functions to not reset indexes by default (:pull:`242`)
 
 Bug fixes
 ^^^^^^^^^
@@ -38,6 +42,8 @@ Bug fixes
 * ``cdm_reder_mapper.metmetpy``: set deck keys from ``???`` to ``d???`` in icoads json files which makes values accessible again (:pull:`238`).
 * ``cdm_reder_mapper.metmetpy``: set ``imma1`` to ``icoads`` and ``immt`` to ``gcc`` in icoads/gcc json files which makes properties accessible again (:pull:`238`).
 * ``DataBundle.copy`` function now makes a real deepcopy of ``DataBundle`` object (:pull:`248`).
+* ``cdm_reader_mapper.map_model``: return null_label if conversion fails (:pull:`242`)
+* keep indexes during duplicate check (:pull:`242`)
 
 2.0.1 (2025-02-25)
 ------------------
