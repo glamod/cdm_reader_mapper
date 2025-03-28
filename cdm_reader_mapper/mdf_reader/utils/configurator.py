@@ -215,6 +215,7 @@ class Configurator:
                                 | self.df.get_column(field).is_not_null()
                             ).alias(field)
                         )
+                    self.df = self.df.drop([section])
 
                     continue
                 elif field_layout != "fixed_width":
