@@ -187,7 +187,6 @@ def validate(
 
     # 1. Numeric elements
     numeric_elements = _get_elements(elements, element_atts, "numeric_types")
-    print(numeric_elements)
     mask = validate_numeric(mask, numeric_elements, data, element_atts)
 
     # 2. Table coded elements
