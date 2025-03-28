@@ -143,7 +143,7 @@ class Configurator:
             self.df = pl.from_pandas(self.df)
         if not isinstance(self.df, pl.DataFrame):
             raise TypeError(f"Cannot open with polars for {type(self.df) = }")
-        self.df = self.df.with_row_index("index")
+        self.df = self.df
         mask_df = pl.DataFrame()
         for section in self.orders:
             header = self.schema["sections"][section]["header"]
@@ -273,7 +273,7 @@ class Configurator:
 
             self.df = self.df.drop([section])
 
-        return self.df.drop("full_str"), mask_df.with_row_index("index")
+        return self.df.drop("full_str"), mask_df
 
     def open_netcdf(self):
         """Open netCDF to polars.DataFrame."""
@@ -329,4 +329,4 @@ class Configurator:
         mask_df = mask_df.with_columns(
             [pl.lit(True).alias(c) for c in missing_values + disables]
         )
-        return df.with_row_index("index"), mask_df.with_row_index("index")
+        return df, mask_df
