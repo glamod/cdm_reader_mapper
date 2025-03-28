@@ -6,7 +6,7 @@ import ast
 import csv
 import logging
 import os
-from io import StringIO as StringIO
+from io import StringIO
 
 import pandas as pd
 import polars as pl
@@ -323,9 +323,7 @@ class MDFFileReader(FileReader):
         self, TextParser, order, valid, decode, convert, validate
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         logging.info("Extracting and reading sections")
-        data, mask = self._read_sections(
-            pl.from_pandas(TextParser), order, valid, format=self.format
-        )
+        data, mask = self._read_sections(TextParser, order, valid, format=self.format)
 
         logging.info("Decoding and converting entries")
         data = self.convert_and_decode_entries(
