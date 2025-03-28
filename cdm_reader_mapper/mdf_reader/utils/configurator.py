@@ -236,7 +236,7 @@ class Configurator:
                 if ignore:
                     # Move to next field
                     self.df = self.df.with_columns(
-                        pl.col(section).str.slice(field_length).name.keep(),
+                        pl.col(section).str.tail(-field_length).name.keep(),
                     )
                     if delimiter is not None:
                         self.df = self.df.with_columns(
