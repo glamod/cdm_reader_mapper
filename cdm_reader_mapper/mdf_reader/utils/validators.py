@@ -28,12 +28,9 @@ def validate_datetime(mask, elements, data: pl.DataFrame):
 
 def validate_numeric(mask: pl.DataFrame, elements, data: pl.DataFrame, schema):
     """DOCUMENTATION."""
-    lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
-    upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
-
     # Handle cases where value is explicitly None in the dictionary
-    lower.update({k: -np.inf for k, v in lower.items() if v is None})
-    upper.update({k: np.inf for k, v in upper.items() if v is None})
+    lower = {x: schema.get(x).get("valid_min") or -np.inf for x in elements}
+    upper = {x: schema.get(x).get("valid_max") or np.inf for x in elements}
 
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
