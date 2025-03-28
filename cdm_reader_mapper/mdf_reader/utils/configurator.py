@@ -261,8 +261,8 @@ class Configurator:
                     ]
                 )
                 mask_df = mask_df.with_columns(
-                    (section_missing | self.df.get_column(field).is_not_null()).alias(
-                        field
+                    (section_missing | self.df.get_column(index).is_not_null()).alias(
+                        index
                     )
                 )
                 if delimiter is not None:
