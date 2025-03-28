@@ -312,7 +312,7 @@ class Configurator:
 
         df: pl.DataFrame = pl.from_pandas(
             self.df[renames.keys()].to_dataframe().reset_index()
-        ).with_row_index("index")
+        )
         df = df.rename(mapping=renames)
         df = df.with_columns(**attrs)
         df = df.with_columns(
@@ -329,4 +329,4 @@ class Configurator:
         mask_df = mask_df.with_columns(
             [pl.lit(True).alias(c) for c in missing_values + disables]
         )
-        return df, mask_df.with_row_index("index")
+        return df.with_row_index("index"), mask_df.with_row_index("index")
