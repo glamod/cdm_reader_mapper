@@ -9,10 +9,11 @@ from .cdm_mapper.writer import write_tables  # noqa
 from .common import count_by_cat as unique  # noqa
 from .common import (  # noqa
     replace_columns,
-    select_false,
-    select_from_index,
-    select_from_list,
-    select_true,
+    split_by_boolean,
+    split_by_boolean_false,
+    split_by_column_entries,
+    split_by_index,
+    split_by_boolean_true,
 )
 from .core.databundle import DataBundle  # noqa
 from .core.reader import read  # noqa

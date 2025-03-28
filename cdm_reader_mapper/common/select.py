@@ -13,7 +13,7 @@ from io import StringIO
 import pandas as pd
 
 
-def dataframe_apply_index(
+def _dataframe_apply_index(
     df,
     index_list,
     reset_index=False,
@@ -32,7 +32,7 @@ def dataframe_apply_index(
     return in_df
 
 
-def dataframe_selection(
+def _split_dataframe_by_index(
     df,
     index,
     reset_index=False,
@@ -40,7 +40,7 @@ def dataframe_selection(
     return_rejected=False,
 ):
     """Common pandas DataFrame selection function."""
-    out1 = dataframe_apply_index(
+    out1 = _dataframe_apply_index(
         df,
         index,
         reset_index=reset_index,
@@ -48,7 +48,7 @@ def dataframe_selection(
     )
     if return_rejected is True:
         index2 = [idx for idx in df.index if idx not in index]
-        out2 = dataframe_apply_index(
+        out2 = _dataframe_apply_index(
             df,
             index2,
             reset_index=reset_index,
@@ -58,7 +58,7 @@ def dataframe_selection(
     return out1, pd.DataFrame(columns=out1.columns)
 
 
-def dataframe_selection_bool(df, mask, boolean, **kwargs):
+def split_dataframe_by_boolean(df, mask, boolean, **kwargs):
     """DOCUMENTATION."""
     # get the index values and pass to the general function
     # If a mask is empty, assume True (...)
@@ -67,35 +67,35 @@ def dataframe_selection_bool(df, mask, boolean, **kwargs):
     else:
         global_mask = ~(mask.any(axis=1))
     index = global_mask[global_mask.fillna(boolean)].index
-    return dataframe_selection(
+    return _split_dataframe_by_index(
         df,
         index,
         **kwargs,
     )
 
 
-def dataframe_selection_from_list(df, col, values, **kwargs):
+def split_dataframe_by_column_entries(df, col, values, **kwargs):
     """DOCUMENTATION."""
     # get the index values and pass to the general function
     in_df = df.loc[df[col].isin(values)]
     index = list(in_df.index)
-    return dataframe_selection(
+    return _split_dataframe_by_index(
         df,
         index,
         **kwargs,
     )
 
 
-def dataframe_selection_from_index(df, index, **kwargs):
+def split_dataframe_by_index(df, index, **kwargs):
     """DOCUMENTATION."""
-    return dataframe_selection(
+    return _split_dataframe_by_index(
         df,
         index,
         **kwargs,
     )
 
 
-def parser_selection(
+def split_parser(
     data, *args, func=None, reset_index=False, inverse=False, return_rejected=False
 ):
     """Common pandas TextFileReader selection function."""
@@ -130,12 +130,12 @@ def parser_selection(
     return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
 
 
-def select(data, func, *args, **kwargs):
+def split(data, func, *args, **kwargs):
     """DOCUMENTATION."""
     if not isinstance(data, list):
         data = [data]
     if isinstance(data[0], pd.io.parsers.TextFileReader):
-        return parser_selection(
+        return split_parser(
             data,
             *args,
             func=func,
@@ -144,12 +144,12 @@ def select(data, func, *args, **kwargs):
     return func(*data, *args, **kwargs)
 
 
-def select_bool(
+def split_by_boolean(
     data, mask, boolean, reset_index=False, inverse=False, return_rejected=False
 ):
     """DOCUMENTATION."""
-    func = dataframe_selection_bool
-    return select(
+    func = split_dataframe_by_boolean
+    return split(
         [data, mask],
         func,
         boolean,
@@ -159,9 +159,11 @@ def select_bool(
     )
 
 
-def select_true(data, mask, reset_index=False, inverse=False, return_rejected=False):
+def split_by_boolean_true(
+    data, mask, reset_index=False, inverse=False, return_rejected=False
+):
     """DOCUMENTATION."""
-    return select_bool(
+    return split_by_boolean(
         data,
         mask,
         True,
@@ -171,9 +173,11 @@ def select_true(data, mask, reset_index=False, inverse=False, return_rejected=Fa
     )
 
 
-def select_false(data, mask, reset_index=False, inverse=False, return_rejected=False):
+def split_by_boolean_false(
+    data, mask, reset_index=False, inverse=False, return_rejected=False
+):
     """DOCUMENTATION."""
-    return select_bool(
+    return split_by_boolean(
         data,
         mask,
         False,
@@ -183,14 +187,14 @@ def select_false(data, mask, reset_index=False, inverse=False, return_rejected=F
     )
 
 
-def select_from_list(
+def split_by_column_entries(
     data, selection, reset_index=False, inverse=False, return_rejected=False
 ):
     """DOCUMENTATION."""
-    func = dataframe_selection_from_list
+    func = split_dataframe_by_column_entries
     col = list(selection.keys())[0]
     values = list(selection.values())[0]
-    return select(
+    return split(
         data,
         func,
         col,
@@ -201,12 +205,12 @@ def select_from_list(
     )
 
 
-def select_from_index(
+def split_by_index(
     data, index, reset_index=False, inverse=False, return_rejected=False
 ):
     """DOCUMENTATION."""
-    func = dataframe_selection_from_index
-    return select(
+    func = split_dataframe_by_index
+    return split(
         data,
         func,
         index,

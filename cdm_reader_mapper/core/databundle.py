@@ -16,10 +16,10 @@ from cdm_reader_mapper.common import (
     count_by_cat,
     get_length,
     replace_columns,
-    select_false,
-    select_from_index,
-    select_from_list,
-    select_true,
+    split_by_boolean_true,
+    split_by_index,
+    split_by_column_entries,
+    split_by_boolean_false,
 )
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.metmetpy import (
@@ -433,8 +433,8 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_true(self, inplace=False, **kwargs):
-        """Select valid values from :py:attr:`data` via :py:attr:`mask`.
+    def select_where_all_true(self, inplace=False, **kwargs):
+        """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are True.
 
         Parameters
         ----------
@@ -452,32 +452,32 @@ class DataBundle:
 
         Examples
         --------
-        Select valid values only without overwriting the old data.
+        Select without overwriting the old data.
 
-        >>> true_values, false_values = db.select_true()
+        >>> db_selected = db.select_where_all_true()
 
-        Select valid values only with overwriting the old data.
+        Select overwriting the old data.
 
-        >>> db.select_true(inplace=True)
-        >>> true_values = db.data
+        >>> db.select_where_all_true(inplace=True)
+        >>> df_selected = db.data
 
         See Also
         --------
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
 
         Note
         ----
-        For more information see :py:func:`select_true`
+        For more information see :py:func:`split_by_boolean_true`
         """
         db_ = self._get_db(inplace)
-        db_._data = select_true(db_._data, db_._mask, **kwargs)[0]
-        db_._mask = select_true(db_._mask, db_._mask, **kwargs)[0]
+        db_._data = split_by_boolean_true(db_._data, db_._mask, **kwargs)[0]
+        db_._mask = split_by_boolean_true(db_._mask, db_._mask, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_false(self, inplace=False, **kwargs):
-        """Select invalid values from :py:attr:`data` via :py:attr:`mask`.
+    def select_where_all_false(self, inplace=False, **kwargs):
+        """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are False.
 
         Parameters
         ----------
@@ -495,38 +495,38 @@ class DataBundle:
 
         Examples
         --------
-        Select valid values only without overwriting the old data.
+        Select without overwriting the old data.
 
-        >>> true_values, false_values = db.select_true()
+        >>> db_selected = db.select_where_all_true()
 
         Select valid values only with overwriting the old data.
 
-        >>> db.select_true(inplace=True)
-        >>> true_values = db.data
+        >>> db.select_where_all_true(inplace=True)
+        >>> df_selected = db.data
 
         See Also
         --------
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
 
         Note
         ----
-        For more information see :py:func:`select_true`
+        For more information see :py:func:`split_by_boolean_false`
         """
         db_ = self._get_db(inplace)
-        db_._data = select_false(db_._data, db_._mask, **kwargs)[0]
-        db_._mask = select_false(db_._mask, db_._mask, **kwargs)[0]
+        db_._data = split_by_boolean_false(db_._data, db_._mask, **kwargs)[0]
+        db_._mask = split_by_boolean_false(db_._mask, db_._mask, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_from_list(self, selection, inplace=False, **kwargs):
-        """Select columns from :py:attr:`data` with specific values.
+    def select_where_entry_isin(self, selection, inplace=False, **kwargs):
+        """Select rows from :py:attr:`data` where column entries are in a specific value list.
 
         Parameters
         ----------
         selection: dict
-            Keys: columns to be selected.
-            Values: values in keys to be selected
+            Keys: Column names in :py:attr:`data`.
+            Values: Specific value list.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
@@ -541,39 +541,39 @@ class DataBundle:
 
         Examples
         --------
-        Select specific columns without overwriting the old data.
+        Select without overwriting the old data.
 
-        >>> true_values, false_values = db.select_from_list(
+        >>> db_selected = db.select_from_list(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
-        Select specific columns with overwriting the old data.
+        Select with overwriting the old data.
 
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, inplace=True)
-        >>> true_values = db.selected
+        >>> db.select_where_entry_isin(selection={("c1", "B1"): [26, 41]}, inplace=True)
+        >>> df_selected = db.data
 
         See Also
         --------
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
 
         Note
         ----
-        For more information see :py:func:`select_from_list`
+        For more information see :py:func:`split_by_column_entries`
         """
         db_ = self._get_db(inplace)
-        db_._data = select_from_list(db_._data, selection, **kwargs)[0]
-        db_._mask = select_from_list(db_._mask, selection, **kwargs)[0]
+        db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
+        db_._mask = split_by_column_entries(db_._mask, selection, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_from_index(self, index, inplace=False, **kwargs):
-        """Select rows from :py:attr:`data` with specific indexes.
+    def select_where_index_isin(self, index, inplace=False, **kwargs):
+        """Select rows from :py:attr:`data` where indexes are in a specific index list.
 
         Parameters
         ----------
         index: list
-            Indexes to be selected.
+            Specific index list.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
@@ -588,166 +588,150 @@ class DataBundle:
 
         Examples
         --------
-        Select specific columns without overwriting the old data.
+        Select without overwriting the old data.
 
-         >>> true_values, false_values = db.select_from_index([0, 2, 4])
+         >>> db_selected = db.select_from_index([0, 2, 4])
 
-        Select specific columns with overwriting the old data.
+        Select with overwriting the old data.
 
         >>> db.select_from_index(index=[0, 2, 4], inplace=True)
-        >>> true_values = db.selected
+        >>> df_selected = db.data
 
         See Also
         --------
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
 
         Note
         ----
-        For more information see :py:func:`select_from_index`
+        For more information see :py:func:`split_by_index`
         """
         db_ = self._get_db(inplace)
-        db_._data = select_from_index(db_._data, index, **kwargs)[0]
-        db_._mask = select_from_index(db_._mask, index, **kwargs)[0]
+        db_._data = split_by_index(db_._data, index, **kwargs)[0]
+        db_._mask = split_by_index(db_._mask, index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def partition_true(self, **kwargs):
-        """Select both valid and invalid values from :py:attr:`data` via :py:attr:`mask`.
+    def split_by_boolean_true(self, **kwargs):
+        """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are True.
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        tuple
+            First :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are True.
+            Second :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are False.
 
         Examples
         --------
-        Select valid values only without overwriting the old data.
+        Split DataBundle.
 
-        >>> true_values, false_values = db.select_true()
-
-        Select valid values only with overwriting the old data.
-
-        >>> db.select_true(inplace=True)
-        >>> true_values = db.data
+        >>> db_true, db_false = db.split_where_all_true()
 
         See Also
         --------
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
+        DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
+        DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
+        DataBundle.split_by_index : Split `data` by rows within specific index list.
 
         Note
         ----
-        For more information see :py:func:`select_true`
+        For more information see :py:func:`split_by_boolean_true`
         """
         db1 = self.copy()
         db2 = self.copy()
-        db1._data, db2._data = select_true(
+        db1._data, db2._data = split_by_boolean_true(
             db1._data, db1._mask, return_rejected=True, **kwargs
         )
-        # db1._mask, db2._mask = select_true(db1._mask, db1._mask, return_rejected=True, **kwargs)
-        return db1, db2
-
-    def partition_false(self, **kwargs):
-        """Select both invalid and valid values from :py:attr:`data` via :py:attr:`mask`.
-
-        Returns
-        -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
-
-        Examples
-        --------
-        Select valid values only without overwriting the old data.
-
-        >>> true_values, false_values = db.select_true()
-
-        Select valid values only with overwriting the old data.
-
-        >>> db.select_true(inplace=True)
-        >>> true_values = db.data
-
-        See Also
-        --------
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
-
-        Note
-        ----
-        For more information see :py:func:`select_true`
-        """
-        db1 = self.copy()
-        db2 = self.copy()
-        db1._data, db2._data = select_false(
-            db1._data, db1._mask, return_rejected=True, **kwargs
-        )
-        db1._mask, db2._mask = select_false(
+        db1._mask, db2._mask = split_by_boolean_true(
             db1._mask, db1._mask, return_rejected=True, **kwargs
         )
         return db1, db2
 
-    def partition_from_list(self, selection, **kwargs):
-        """Select both columns in selection and columns not in selection from :py:attr:`data`.
+    def split_by_boolean_false(self, **kwargs):
+        """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
+
+        Returns
+        -------
+        tuple
+            First :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are False.
+            Second :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are True.
+
+        Examples
+        --------
+        Split DataBundle.
+
+        >>> db_false, db_true = db.split_where_all_false()
+
+        See Also
+        --------
+        DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are True.
+        DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
+        DataBundle.split_by_index : Split `data` by rows within specific index list.
+
+        Note
+        ----
+        For more information see :py:func:`split_by_boolean_false`
+        """
+        db1 = self.copy()
+        db2 = self.copy()
+        db1._data, db2._data = split_by_boolean_false(
+            db1._data, db1._mask, return_rejected=True, **kwargs
+        )
+        db1._mask, db2._mask = split_by_boolean_false(
+            db1._mask, db1._mask, return_rejected=True, **kwargs
+        )
+        return db1, db2
+
+    def split_by_column_entries(self, selection, **kwargs):
+        """Split :py:attr:`data` by rows where column entries are in a specific value list.
 
         Parameters
         ----------
         selection: dict
-            Keys: columns to be selected.
-            Values: values in keys to be selected
+            Keys: Column names in :py:attr:`data`.
+            Values: Specific value list.
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        tuple
+            First :py:class:`~DataBundle` including rows where column entries are in a specific value list.
+            Second :py:class:`~DataBundle` including rows where column entries are not in a specific value list.
 
         Examples
         --------
-        Select specific columns without overwriting the old data.
+        Split DataBundle.
 
-        >>> true_values, false_values = db.select_from_list(
+        >>> db_isin, db_isnotin = db.split_where_entry_isin(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
-        Select specific columns with overwriting the old data.
-
-        >>> db.select_from_list(selection={("c1", "B1"): [26, 41]}, inplace=True)
-        >>> true_values = db.selected
-
         See Also
         --------
-        DataBundle.select_from_index : Select rows of `data` with specific indexes.
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
+        DataBundle.split_by_index : Split `data` by rows within specific index list.
+        DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
+        DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
 
         Note
         ----
-        For more information see :py:func:`select_from_list`
+        For more information see :py:func:`split_by_column_entries`
         """
         db1 = self.copy()
         db2 = self.copy()
-        db1._data, db2._data = select_from_list(
+        db1._data, db2._data = split_by_column_entries(
             db1._data, selection, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = select_from_list(
+        db1._mask, db2._mask = split_by_column_entries(
             db1._mask, selection, return_rejected=True, **kwargs
         )
         return db1, db2
 
-    def partition_from_index(self, index, **kwargs):
-        """Select both rows in index list and rows not in index list from :py:attr:`data`.
+    def split_by_index(self, index, **kwargs):
+        """Split :py:attr:`data` by rows within specific index list.
 
         Parameters
         ----------
         index: list
-            Indexes to be selected.
+            Specific index list.
 
 
         Returns
@@ -770,20 +754,20 @@ class DataBundle:
 
         See Also
         --------
-        DataBundle.select_from_list : Select columns from `data` with specific values.
-        DataBundle.select_true : Select valid values from `data` via `mask`.
-        DataBundle.select_false : Select invalid values from `data` via `mask`.
+        DataBundle.split_by_column_entries : Select columns from `data` with specific values.
+        DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
+        DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
 
         Note
         ----
-        For more information see :py:func:`select_from_index`
+        For more information see :py:func:`split_by_index`
         """
         db1 = self.copy()
         db2 = self.copy()
-        db1._data, db2._data = select_from_index(
+        db1._data, db2._data = split_by_index(
             db1._data, index, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = select_from_index(
+        db1._mask, db2._mask = split_by_index(
             db1._mask, index, return_rejected=True, **kwargs
         )
         return db1, db2

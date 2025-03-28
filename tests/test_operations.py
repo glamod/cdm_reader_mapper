@@ -20,9 +20,9 @@ def _get_data(TextParser, **kwargs):
 @pytest.mark.parametrize("TextParser", [True, False])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def test_select_true(TextParser, reset_index, inverse):
+def test_select_where_all_true(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.select_true(reset_index=reset_index, inverse=inverse)
+    result = data.select_where_all_true(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -44,9 +44,9 @@ def test_select_true(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [True, False])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def test_select_false(TextParser, reset_index, inverse):
+def test_select_where_all_false(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.select_false(reset_index=reset_index, inverse=inverse)
+    result = data.select_where_all_false(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result.data
 
@@ -68,9 +68,11 @@ def test_select_false(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def test_select_from_index(TextParser, reset_index, inverse):
+def test_select_where_index_isin(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
-    result = data.select_from_index([0, 2, 4], reset_index=reset_index, inverse=inverse)
+    result = data.select_where_index_isin(
+        [0, 2, 4], reset_index=reset_index, inverse=inverse
+    )
     expected = data.data
     selected = result.data
 
@@ -94,10 +96,12 @@ def test_select_from_index(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [True, False])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def test_select_from_list(TextParser, reset_index, inverse):
+def test_select_where_entry_isin(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
-    result = data.select_from_list(selection, reset_index=reset_index, inverse=inverse)
+    result = data.select_where_entry_isin(
+        selection, reset_index=reset_index, inverse=inverse
+    )
     expected = data.data
     selected = result.data
 
@@ -121,9 +125,9 @@ def test_select_from_list(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [True, False])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def ztest_partition_true(TextParser, reset_index, inverse):
+def test_split_by_boolean_true(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.partition_true(reset_index=reset_index, inverse=inverse)
+    result = data.split_by_boolean_true(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result[0].data
     rejected = result[1].data
@@ -151,9 +155,9 @@ def ztest_partition_true(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [True, False])
 @pytest.mark.parametrize("reset_index", [True, False])
 @pytest.mark.parametrize("inverse", [True, False])
-def ztest_partition_false(TextParser, reset_index, inverse):
+def test_split_by_boolean_false(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
-    result = data.partition_false(reset_index=reset_index, inverse=inverse)
+    result = data.split_by_boolean_false(reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result[0].data
     rejected = result[1].data
@@ -181,11 +185,9 @@ def ztest_partition_false(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def ztest_partition_from_index(TextParser, reset_index, inverse):
+def test_split_by_index(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
-    result = data.partition_from_index(
-        [0, 2, 4], reset_index=reset_index, inverse=inverse
-    )
+    result = data.split_by_index([0, 2, 4], reset_index=reset_index, inverse=inverse)
     expected = data.data
     selected = result[0].data
     rejected = result[1].data
@@ -216,10 +218,10 @@ def ztest_partition_from_index(TextParser, reset_index, inverse):
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def test_partition_from_list(TextParser, reset_index, inverse):
+def test_split_by_column_entries(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
-    result = data.partition_from_list(
+    result = data.split_by_column_entries(
         selection, reset_index=reset_index, inverse=inverse
     )
     expected = data.data
