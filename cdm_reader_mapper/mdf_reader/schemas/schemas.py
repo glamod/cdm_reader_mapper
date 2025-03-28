@@ -13,30 +13,64 @@ import logging
 import os
 from pathlib import Path
 
+import polars as pl
+
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
 from .. import properties
 
 
+def _get_type_map():
+    return {
+        "float": pl.Float64,
+        "float64": pl.Float64,
+        "float32": pl.Float32,
+        "int": pl.Int64,
+        "int64": pl.Int64,
+        "int32": pl.Int32,
+        "int16": pl.Int16,
+        "int8": pl.Int8,
+        "uint": pl.UInt64,
+        "uint64": pl.UInt64,
+        "uint32": pl.UInt32,
+        "uint16": pl.UInt16,
+        "uint8": pl.UInt8,
+        "str": pl.String,
+        "object": pl.String,
+        "key": pl.String,
+        "date": pl.Datetime,
+        "datetime": pl.Datetime,
+        "time": pl.Datetime,
+    }
+
+
 def convert_dtype_to_default(dtype, section, element):
     """Convert data type to defaults (int, float)."""
     if dtype is None:
-        return
-    elif dtype == "float":
-        return dtype
-    elif dtype == "int":
-        return properties.pandas_int
-    elif "float" in dtype.lower():
+        return  # pl.String
+    dtype_map = _get_type_map()
+    dtype = dtype.lower()
+
+    polars_dtype = dtype_map.get(dtype)
+    if polars_dtype is not None:
+        return polars_dtype
+
+    if "float" in dtype:
         logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to float."
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to float 32."
         )
-        return "float"
-    elif "int" in dtype.lower():
+        return pl.Float32
+    elif "uint" in dtype:
         logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to int."
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to uint 32."
         )
-        return properties.pandas_int
-    return dtype
+        return pl.UInt32
+    elif "int" in dtype:
+        logging.warning(
+            f"Set column type of ({section}, {element}) from deprecated {dtype} to int 32."
+        )
+        return pl.Int32
+    return pl.String
 
 
 def _read_schema(schema):
@@ -154,7 +188,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
     else:
         imodel = imodel.split("_")
         if imodel[0] not in properties.supported_data_models:
-            logging.error("Input data model " f"{imodel[0]}" " not supported")
+            logging.error(f"Input data model {imodel[0]} not supported")
             return
         schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
 
@@ -209,7 +243,7 @@ def df_schema(df_columns, schema):
     def get_index(idx, lst, section):
         if len(lst) == 1:
             return idx
-        return (section, idx)
+        return ":".join([section, idx])
 
     flat_schema = dict()
     for section in schema.get("sections"):

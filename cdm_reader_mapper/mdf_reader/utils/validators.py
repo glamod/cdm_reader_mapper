@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
-import pandas as pd
+import polars as pl
 
 from .. import properties
 from ..codes import codes
@@ -13,36 +13,24 @@ from ..schemas import schemas
 from .utilities import convert_str_boolean
 
 
-def validate_datetime(elements, data):
+def validate_datetime(mask, elements, data: pl.DataFrame):
     """DOCUMENTATION."""
+    for element in elements:
+        col = data.get_column(element)
+        if not col.dtype.is_temporal():
+            mask = mask.with_columns(pl.lit(False).alias(element))
+            continue
 
-    def is_date_object(object):
-        if hasattr(object, "year"):
-            return True
+        mask = mask.with_columns((pl.col(element) & col.is_not_null()).alias(element))
 
-    mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    mask[elements] = (
-        data[elements].apply(np.vectorize(is_date_object)) | data[elements].isna()
-    )
     return mask
 
 
-def validate_numeric(elements, data, schema):
+def validate_numeric(mask: pl.DataFrame, elements, data: pl.DataFrame, schema):
     """DOCUMENTATION."""
-
-    # Find thresholds in schema. Flag if not available -> warn
-    def _to_numeric(x):
-        if x is None:
-            return np.nan
-        x = convert_str_boolean(x)
-        if isinstance(x, bool):
-            return x
-        return float(x)
-
-    data[elements] = data[elements].map(_to_numeric)
-    mask = pd.DataFrame(index=data.index, data=False, columns=elements)
-    lower = {x: schema.get(x).get("valid_min", -np.inf) for x in elements}
-    upper = {x: schema.get(x).get("valid_max", np.inf) for x in elements}
+    # Handle cases where value is explicitly None in the dictionary
+    lower = {x: schema.get(x).get("valid_min") or -np.inf for x in elements}
+    upper = {x: schema.get(x).get("valid_max") or np.inf for x in elements}
 
     set_elements = [
         x for x in lower.keys() if lower.get(x) != -np.inf and upper.get(x) != np.inf
@@ -57,26 +45,45 @@ def validate_numeric(elements, data, schema):
         logging.warning(
             "Corresponding upper and/or lower bounds set to +/-inf for validation"
         )
-    mask[elements] = (
-        (data[elements] >= [lower.get(x) for x in elements])
-        & (data[elements] <= [upper.get(x) for x in elements])
-    ) | data[elements].isna()
+
+    mask = mask.with_columns(
+        [
+            (
+                pl.col(element)
+                | (
+                    data[element].is_not_null()
+                    & data[element].is_not_nan()
+                    & data[element].is_between(
+                        lower.get(element), upper.get(element), closed="both"
+                    )
+                )
+            ).alias(element)
+            for element in elements
+        ]
+    )
     return mask
 
 
-def validate_str(elements, data):
+def validate_str(mask, elements, data):
     """DOCUMENTATION."""
-    return pd.DataFrame(index=data.index, data=True, columns=elements)
+    return mask
 
 
-def validate_codes(elements, data, schema, imodel, ext_table_path):
+def validate_codes(
+    mask: pl.DataFrame,
+    elements: list[str],
+    data: pl.DataFrame,
+    schema,
+    imodel,
+    ext_table_path,
+):
     """DOCUMENTATION."""
-    mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
         code_table_name = schema.get(element).get("codetable")
         if not code_table_name:
             logging.error(f"Code table not defined for element {element}")
             logging.warning("Element mask set to False")
+            mask = mask.with_columns(pl.lit(False).alias(element))
             continue
 
         table = codes.read_table(
@@ -87,19 +94,18 @@ def validate_codes(elements, data, schema, imodel, ext_table_path):
         if not table:
             continue
 
-        dtype = properties.pandas_dtypes.get(schema.get(element).get("column_type"))
+        dtype = properties.polars_dtypes.get(schema.get(element).get("column_type"))
 
         table_keys = list(table.keys())
-        validation_df = data[element]
-        value = validation_df.astype(dtype).astype("str")
-        valid = validation_df.notna()
-        mask_ = value.isin(table_keys)
-        mask[element] = mask_.where(valid, True)
+        col = data.get_column(element)
+        col = col.cast(dtype).cast(pl.String)
+        valid = col.is_not_null() & col.is_not_nan() & col.is_in(table_keys)
+        mask = mask.with_columns((pl.col(element) | valid).alias(element))
 
     return mask
 
 
-def _get_elements(elements, element_atts, key):
+def _get_elements(elements, element_atts, key) -> list[str]:
     def _condition(x):
         column_types = element_atts.get(x).get("column_type")
         if key == "numeric_types":
@@ -125,7 +131,8 @@ def _mask_boolean(x, boolean):
 
 
 def validate(
-    data,
+    data: pl.DataFrame,
+    mask: pl.DataFrame,
     imodel,
     ext_table_path,
     schema,
@@ -159,37 +166,25 @@ def validate(
         filename=None,
     )
     # Check input
-    if not isinstance(data, pd.DataFrame):  # or not isinstance(mask0, pd.DataFrame):
+    if not isinstance(data, pl.DataFrame) or not isinstance(mask, pl.DataFrame):
         # logging.error("Input data and mask must be a pandas data frame object")
         logging.error("input data must be a pandas DataFrame.")
         return
 
-    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
-    if data.empty:
+    if data.is_empty():
         return mask
+
+    disables = disables or []
 
     # Get the data elements from the input data: might be just a subset of
     # data model and flatten the schema to get a simple and sequential list
     # of elements included in the input data
-    elements = [x for x in data if x not in disables]
+    elements = [x for x in data.columns if x not in disables]
     element_atts = schemas.df_schema(elements, schema)
 
-    # See what elements we need to validate
+    # 1. Numeric elements
     numeric_elements = _get_elements(elements, element_atts, "numeric_types")
-    datetime_elements = _get_elements(elements, element_atts, "datetime")
-    coded_elements = _get_elements(elements, element_atts, "key")
-    str_elements = _get_elements(elements, element_atts, "str")
-
-    if _element_tuples(numeric_elements, datetime_elements, coded_elements):
-        validated_columns = pd.MultiIndex.from_tuples(
-            list(set(numeric_elements + coded_elements + datetime_elements))
-        )
-    else:
-        validated_columns = list(
-            set(numeric_elements + coded_elements + datetime_elements)
-        )
-
-    mask[numeric_elements] = validate_numeric(numeric_elements, data, element_atts)
+    mask = validate_numeric(mask, numeric_elements, data, element_atts)
 
     # 2. Table coded elements
     # See following: in multiple keys code tables, the non parameter element,
@@ -201,8 +196,10 @@ def validate(
     # Get the full list of keys combinations (tuples, triplets...) and check the column combination against that: if it fails, mark the element!
     # Need to see how to grab the YEAR part of a datetime when YEAR comes from a datetime element
     # pd.DatetimeIndex(df['_datetime']).year
+    coded_elements = _get_elements(elements, element_atts, "key")
     if len(coded_elements) > 0:
-        mask[coded_elements] = validate_codes(
+        mask = validate_codes(
+            mask,
             coded_elements,
             data,
             element_atts,
@@ -211,21 +208,12 @@ def validate(
         )
 
     # 3. Datetime elements
-    mask[datetime_elements] = validate_datetime(datetime_elements, data)
+    datetime_elements = _get_elements(elements, element_atts, "datetime")
+    mask = validate_datetime(mask, datetime_elements, data)
 
     # 4. str elements
-    mask[str_elements] = validate_str(str_elements, data)
+    str_elements = _get_elements(elements, element_atts, "str")
+    mask = validate_str(mask, str_elements, data)
 
-    # 5. Set False values
-    mask[validated_columns] = mask[validated_columns].mask(
-        data[validated_columns].map(_mask_boolean, boolean=False),
-        False,
-    )
-
-    mask[validated_columns] = mask[validated_columns].mask(
-        data[validated_columns].map(_mask_boolean, boolean=True),
-        True,
-    )
-
-    mask[disables] = np.nan
+    mask = mask.with_columns([pl.lit(None).alias(disable) for disable in disables])
     return mask
