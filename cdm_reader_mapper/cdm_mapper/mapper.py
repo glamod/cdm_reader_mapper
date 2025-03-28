@@ -3,9 +3,8 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
-the C3S Climate Data Store Common Data Model (CDM) header and observational
-tables using the mapping information available in the tool's mapping library
+Maps data contained in a pandas DataFrame to the C3S Climate Data Store Common Data Model (CDM)
+header and observational tables using the mapping information available in the tool's mapping library
 for the input data model.
 
 @author: iregon
@@ -13,13 +12,10 @@ for the input data model.
 
 from __future__ import annotations
 
-from copy import deepcopy
-from io import StringIO
-
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common import logging_hdlr
 
 from . import properties
 from .codes.codes import get_code_table
@@ -223,11 +219,11 @@ def _map_and_convert(
     null_label,
     imodel_functions,
     codes_subset,
-    cdm_tables,
     cdm_complete,
+    cdm_atts,
     logger,
 ):
-    atts = deepcopy(cdm_tables[table]["atts"])
+    atts = cdm_atts.get(table)
     columns = (
         [x for x in atts.keys() if x in idata.columns]
         if not cdm_complete
@@ -258,10 +254,7 @@ def _map_and_convert(
 
     table_df_i.columns = pd.MultiIndex.from_product([[table], columns])
     table_df_i = drop_duplicates(table_df_i)
-    table_df_i = table_df_i.fillna(null_label)
-    table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
-    cdm_tables[table]["columns"] = table_df_i.columns
-    return cdm_tables
+    return table_df_i.fillna(null_label)
 
 
 def map_and_convert(
@@ -284,11 +277,6 @@ def map_and_convert(
 
     imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
 
-    # Initialize dictionary to store temporal tables (buffer) and table attributes
-    cdm_tables = {
-        k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
-    }
-
     date_columns = {}
     for table, values in imodel_maps.items():
         date_columns[table] = [
@@ -297,39 +285,22 @@ def map_and_convert(
             if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
         ]
 
-    for idata in data:
-        cols = [x for x in idata]
-        for table, mapping in imodel_maps.items():
-            cdm_tables = _map_and_convert(
-                idata,
-                mapping,
-                table,
-                cols,
-                null_label,
-                imodel_functions,
-                codes_subset,
-                cdm_tables,
-                cdm_complete,
-                logger,
-            )
-
     table_list = []
-    for table in cdm_tables.keys():
-        # Convert dtime to object to be parsed by the reader
-        logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+    for table in cdm_subset:
+        mapping = imodel_maps[table]
+        table_df = _map_and_convert(
+            data,
+            mapping,
+            table,
+            data.columns,
+            null_label,
+            imodel_functions,
+            codes_subset,
+            cdm_complete,
+            cdm_atts,
+            logger,
         )
-        cdm_tables[table]["buffer"].seek(0)
-        data = pd.read_csv(
-            cdm_tables[table]["buffer"],
-            names=cdm_tables[table]["columns"],
-            na_values=[],
-            dtype="object",
-            keep_default_na=False,
-        )
-        cdm_tables[table]["buffer"].close()
-        cdm_tables[table].pop("buffer")
-        table_list.append(data)
+        table_list.append(table_df)
 
     merged = pd.concat(table_list, axis=1, join="outer")
     return merged.reset_index(drop=True)
@@ -377,23 +348,12 @@ def map_model(
         return
 
     # Check input data type and content (empty?)
-    # Make sure data is an iterable: this is to homogenize how we handle
-    # dataframes and textreaders
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if len(data) == 0:
-            logger.error("Input data is empty")
-            return
-        else:
-            data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-    else:
+    if not isinstance(data, pd.DataFrame):
         logger.error("Input data type " f"{type(data)}" " not supported")
+        return
+
+    if data.empty:
+        logger.error("Input data is empty")
         return
 
     return map_and_convert(
