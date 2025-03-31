@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-def convert_integer(data, null_label):
+def convert_integer(data, null_label) -> pd.Series:
     """
     Convert all elements that have 'int' as type attribute.
 
@@ -19,7 +19,8 @@ def convert_integer(data, null_label):
 
     Returns
     -------
-    data: data as int type
+    Series
+        Data as int type.
     """
 
     def _return_str(x, null_label):
@@ -33,7 +34,7 @@ def convert_integer(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def convert_float(data, null_label, decimal_places):
+def convert_float(data, null_label, decimal_places) -> pd.Series:
     """
     Convert all elements that have 'float' as type attribute.
 
@@ -45,7 +46,8 @@ def convert_float(data, null_label, decimal_places):
 
     Returns
     -------
-    data: data as float type
+    Series
+        Data as float type.
     """
 
     def _return_str(x, null_label, format_float):
@@ -60,7 +62,7 @@ def convert_float(data, null_label, decimal_places):
     return data.apply(lambda x: _return_str(x, null_label, format_float))
 
 
-def convert_datetime(data, null_label):
+def convert_datetime(data, null_label) -> pd.Series:
     """
     Convert datetime objects in the format: "%Y-%m-%d %H:%M:%S".
 
@@ -71,7 +73,8 @@ def convert_datetime(data, null_label):
 
     Returns
     -------
-    data: data as datetime objects
+    Series
+        Data as datetime objects.
     """
 
     def _return_str(x, null_label):
@@ -84,7 +87,7 @@ def convert_datetime(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def convert_str(data, null_label):
+def convert_str(data, null_label) -> pd.Series:
     """
     Convert string elements.
 
@@ -95,7 +98,8 @@ def convert_str(data, null_label):
 
     Returns
     -------
-    data: data as string objects
+    Series
+        Data as string objects.
     """
 
     def _return_str(x, null_label):
@@ -108,7 +112,7 @@ def convert_str(data, null_label):
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def convert_integer_array(data, null_label):
+def convert_integer_array(data, null_label) -> pd.Series:
     """
     Convert a series of integer objects as array.
 
@@ -119,12 +123,13 @@ def convert_integer_array(data, null_label):
 
     Returns
     -------
-    data: array of int objects
+    Series
+       Data as array of int objects.
     """
     return data.apply(convert_integer_array_i, null_label=null_label)
 
 
-def convert_str_array(data, null_label):
+def convert_str_array(data, null_label) -> pd.Series:
     """
     Convert a series of string objects as array.
 
@@ -135,12 +140,13 @@ def convert_str_array(data, null_label):
 
     Returns
     -------
-    data: array of str objects
+    Series
+        Data as array of str objects.
     """
     return data.apply(convert_str_array_i)
 
 
-def convert_integer_array_i(row, null_label=None):
+def convert_integer_array_i(row, null_label=None) -> str | None:
     """
     Convert a series of integer objects.
 
@@ -151,7 +157,8 @@ def convert_integer_array_i(row, null_label=None):
 
     Returns
     -------
-    data: int
+    str or null_label
+        List of integers as string array or null_label if list of integers is empty.
     """
 
     def _return_str(x):
@@ -170,7 +177,7 @@ def convert_integer_array_i(row, null_label=None):
     return null_label
 
 
-def convert_str_array_i(row, null_label=None):
+def convert_str_array_i(row, null_label=None) -> str | None:
     """
     Convert a series of string objects.
 
@@ -181,7 +188,8 @@ def convert_str_array_i(row, null_label=None):
 
     Returns
     -------
-    data: str
+    str
+        List of strings as string array or null_label if list of strings is empty.
     """
 
     def _return_str(x):

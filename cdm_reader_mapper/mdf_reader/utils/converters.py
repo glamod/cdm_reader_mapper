@@ -16,7 +16,7 @@ class df_converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
-    def to_numeric(self, data, offset, scale):
+    def to_numeric(self, data, offset, scale) -> pd.Series:
         """Convert object type elements of a pandas series to numeric type."""
 
         def _to_numeric(x):
@@ -33,7 +33,7 @@ class df_converters:
 
         return data.apply(lambda x: _to_numeric(x))
 
-    def object_to_numeric(self, data, scale=None, offset=None):
+    def object_to_numeric(self, data, scale=None, offset=None) -> pd.Series:
         """
         Convert the object type elements of a pandas series to numeric type.
 
@@ -67,7 +67,7 @@ class df_converters:
             data = self.to_numeric(data, offset, scale)
         return data
 
-    def object_to_object(self, data, disable_white_strip=False):
+    def object_to_object(self, data, disable_white_strip=False) -> pd.Series:
         """DOCUMENTATION."""
         if data.dtype != "object":
             return data
@@ -82,7 +82,7 @@ class df_converters:
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
         )
 
-    def object_to_datetime(self, data, datetime_format="%Y%m%d"):
+    def object_to_datetime(self, data, datetime_format="%Y%m%d") -> pd.DateTimeIndex:
         """DOCUMENTATION."""
         if data.dtype != "object":
             return data

@@ -18,7 +18,7 @@ def _dataframe_apply_index(
     index_list,
     reset_index=False,
     inverse=False,
-):
+) -> pd.DataFrame | pd.Series:
     """Apply index to pandas DataFrame."""
     index = df.index.isin(index_list)
     if inverse is True:
@@ -38,7 +38,7 @@ def _split_dataframe_by_index(
     reset_index=False,
     inverse=False,
     return_rejected=False,
-):
+) -> tuple[pd.DataFrame]:
     """Common pandas DataFrame selection function."""
     out1 = _dataframe_apply_index(
         df,
@@ -58,7 +58,7 @@ def _split_dataframe_by_index(
     return out1, pd.DataFrame(columns=out1.columns)
 
 
-def split_dataframe_by_boolean(df, mask, boolean, **kwargs):
+def split_dataframe_by_boolean(df, mask, boolean, **kwargs) -> tuple[pd.DataFrame]:
     """DOCUMENTATION."""
     # get the index values and pass to the general function
     # If a mask is empty, assume True (...)
@@ -74,7 +74,7 @@ def split_dataframe_by_boolean(df, mask, boolean, **kwargs):
     )
 
 
-def split_dataframe_by_column_entries(df, col, values, **kwargs):
+def split_dataframe_by_column_entries(df, col, values, **kwargs) -> tuple[pd.DataFrame]:
     """DOCUMENTATION."""
     # get the index values and pass to the general function
     in_df = df.loc[df[col].isin(values)]
@@ -86,7 +86,7 @@ def split_dataframe_by_column_entries(df, col, values, **kwargs):
     )
 
 
-def split_dataframe_by_index(df, index, **kwargs):
+def split_dataframe_by_index(df, index, **kwargs) -> tuple[pd.DataFrame]:
     """DOCUMENTATION."""
     return _split_dataframe_by_index(
         df,
@@ -97,7 +97,7 @@ def split_dataframe_by_index(df, index, **kwargs):
 
 def split_parser(
     data, *args, func=None, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.io.parsers.TextFileReader]:
     """Common pandas TextFileReader selection function."""
     read_params = [
         "chunksize",
@@ -130,7 +130,9 @@ def split_parser(
     return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
 
 
-def split(data, func, *args, **kwargs):
+def split(
+    data, func, *args, **kwargs
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     if not isinstance(data, list):
         data = [data]
@@ -146,7 +148,7 @@ def split(data, func, *args, **kwargs):
 
 def split_by_boolean(
     data, mask, boolean, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     func = split_dataframe_by_boolean
     return split(
@@ -161,7 +163,7 @@ def split_by_boolean(
 
 def split_by_boolean_true(
     data, mask, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     return split_by_boolean(
         data,
@@ -175,7 +177,7 @@ def split_by_boolean_true(
 
 def split_by_boolean_false(
     data, mask, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     return split_by_boolean(
         data,
@@ -189,7 +191,7 @@ def split_by_boolean_false(
 
 def split_by_column_entries(
     data, selection, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     func = split_dataframe_by_column_entries
     col = list(selection.keys())[0]
@@ -207,7 +209,7 @@ def split_by_column_entries(
 
 def split_by_index(
     data, index, reset_index=False, inverse=False, return_rejected=False
-):
+) -> tuple[pd.DataFrame | pd.io.parsers.TextfileReader]:
     """DOCUMENTATION."""
     func = split_dataframe_by_index
     return split(

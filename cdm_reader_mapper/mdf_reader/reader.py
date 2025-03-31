@@ -44,7 +44,7 @@ class MDFFileReader(FileReader):
         converter_dict,
         converter_kwargs,
         decoder_dict,
-    ):
+    ) -> pd.DataFrame:
         for section in converter_dict.keys():
             if section not in df.columns:
                 continue
@@ -60,7 +60,7 @@ class MDFFileReader(FileReader):
             df[section] = converted
         return df
 
-    def _validate(self, df):
+    def _validate(self, df) -> pd.DataFrame:
         return validate(
             data=df,
             imodel=self.imodel,
@@ -77,7 +77,7 @@ class MDFFileReader(FileReader):
         converter_dict=None,
         converter_kwargs=None,
         decoder_dict=None,
-    ):
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """Convert and decode data entries by using a pre-defined data model.
 
         Overwrite attribute `data` with converted and/or decoded data.
@@ -156,7 +156,9 @@ class MDFFileReader(FileReader):
             )
         return data
 
-    def validate_entries(self, data, validate):
+    def validate_entries(
+        self, data, validate
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """Validate data entries by using a pre-defined data model.
 
         Fill attribute `valid` with boolean mask.
@@ -185,7 +187,9 @@ class MDFFileReader(FileReader):
             )
         return mask
 
-    def remove_boolean_values(self, data):
+    def remove_boolean_values(
+        self, data
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION"""
         if isinstance(data, pd.DataFrame):
             data = data.map(remove_boolean_values)
@@ -238,7 +242,7 @@ class MDFFileReader(FileReader):
         converter_kwargs=None,
         validate=True,
         **kwargs,
-    ):
+    ) -> DataBundle:
         """Read data from disk.
 
         Parameters
@@ -327,7 +331,7 @@ def read_mdf(
     year_init=None,
     year_end=None,
     **kwargs,
-):
+) -> DataBundle:
     """Read data files compliant with a user specific data model.
 
     Reads a data file to a pandas DataFrame using a pre-defined data model.
@@ -402,7 +406,7 @@ def read_data(
     imodel=None,
     col_subset=None,
     **kwargs,
-):
+) -> DataBundle:
     """Read MDF data which is already on a pre-defined data model.
 
     Parameters

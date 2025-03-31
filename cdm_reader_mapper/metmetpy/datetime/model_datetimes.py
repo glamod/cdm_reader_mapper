@@ -23,7 +23,7 @@ from .. import properties
 
 
 # ---------------- General purpose functions ----------------------------------
-def datetime_decimalhour_to_hm(ds):
+def datetime_decimalhour_to_hm(ds) -> tuple[int]:
     """DOCUMENTATiON."""
     hours = int(math.floor(ds))
     minutes = int(math.floor(60.0 * math.fmod(ds, 1)))
@@ -31,10 +31,10 @@ def datetime_decimalhour_to_hm(ds):
 
 
 # ---------------- Data model conversions -------------------------------------
-def icoads(data, conversion):
+def icoads(data, conversion) -> pd.DataFrame | pd.Series:
     """DOCUMENTATiON."""
 
-    def to_datetime(data):
+    def to_datetime(data) -> pd.Series:
         dt_data = data[datetime_cols]
         not_na = dt_data.notna().all(axis=1)
         date_format = "%Y-%m-%d-%H-%M"
@@ -64,7 +64,7 @@ def icoads(data, conversion):
         )
         return dt_series
 
-    def from_datetime(ds):
+    def from_datetime(ds) -> pd.DataFrame:
         icoads = pd.DataFrame(index=ds.index, columns=datetime_cols)
         locs = ds.notna()
         # Note however that if there is missing data, the corresponding column
@@ -93,13 +93,13 @@ def icoads(data, conversion):
 
 
 # ---------------- Send input to appropriate function -------------------------
-def to_datetime(data, model):
+def to_datetime(data, model) -> pd.Series:
     """DOCUMENTATiON."""
     if model == "icoads":
         return icoads(data, "to_datetime")
 
 
-def from_datetime(data, model):
+def from_datetime(data, model) -> pd.DataFrame:
     """DOCUMENTATiON."""
     if model == "icoads":
         return icoads(data, "from_datetime")

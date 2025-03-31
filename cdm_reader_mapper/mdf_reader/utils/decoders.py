@@ -5,6 +5,8 @@ from __future__ import annotations
 from .. import properties
 from .utilities import convert_str_boolean
 
+import pandas as pd
+
 
 class df_decoders:
     """DOCUMENTATION."""
@@ -13,7 +15,7 @@ class df_decoders:
         # Return as object, conversion to actual type in converters only!
         self.dtype = "object"
 
-    def base36(self, data):
+    def base36(self, data) -> pd.Series:
         """DOCUMENTATION."""
 
         def _base36(x):

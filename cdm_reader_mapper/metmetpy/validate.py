@@ -69,7 +69,7 @@ from .datetime import model_datetimes
 _base = f"{properties._base}.station_id"
 
 
-def _get_id_col(data, imodel, logger):
+def _get_id_col(data, imodel, logger) -> int | list | None:
     id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
         logger.error(
@@ -89,7 +89,7 @@ def _get_id_col(data, imodel, logger):
     return id_col
 
 
-def _get_patterns(dck_id_model, blank, dck, data_model_files, logger):
+def _get_patterns(dck_id_model, blank, dck, data_model_files, logger) -> list[str]:
     pattern_dict = dck_id_model.get("valid_patterns")
 
     if pattern_dict == {}:
@@ -108,7 +108,7 @@ def _get_patterns(dck_id_model, blank, dck, data_model_files, logger):
     return patterns
 
 
-def validate_id(data, imodel, blank=False, log_level="INFO"):
+def validate_id(data, imodel, blank=False, log_level="INFO") -> pd.Series:
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     if isinstance(data, pd.io.parsers.TextFileReader):
@@ -156,7 +156,7 @@ def validate_id(data, imodel, blank=False, log_level="INFO"):
     return idSeries.str.match(combined_compiled, na=na_values)
 
 
-def validate_datetime(data, imodel, log_level="INFO"):
+def validate_datetime(data, imodel, log_level="INFO") -> pd.Series:
     """DOCUMENTATiON."""
     # dck input only to be consistent with other validators in the metmetpy module
     logger = logging_hdlr.init_logger(__name__, level=log_level)

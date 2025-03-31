@@ -5,7 +5,7 @@ from __future__ import annotations
 from .. import properties
 
 
-def dict_to_tuple_list(dic):
+def dict_to_tuple_list(dic) -> list[tuple]:
     """Convert dictionary with list values to list of tuples."""
     tuple_list = []
     for k, v in dic.items():
@@ -17,7 +17,7 @@ def dict_to_tuple_list(dic):
     return tuple_list
 
 
-def get_cdm_subset(cdm_subset):
+def get_cdm_subset(cdm_subset) -> list[str]:
     """Return cdm_subset."""
     if cdm_subset is None:
         return properties.cdm_tables
@@ -26,7 +26,7 @@ def get_cdm_subset(cdm_subset):
     return cdm_subset
 
 
-def get_usecols(tb, col_subset=None):
+def get_usecols(tb, col_subset=None) -> list[str]:
     """Return usecols for pandas.read_csv function."""
     if isinstance(col_subset, str):
         return [col_subset]
@@ -36,7 +36,7 @@ def get_usecols(tb, col_subset=None):
         return col_subset.get(tb)
 
 
-def adjust_filename(filename, table="", extension="psv"):
+def adjust_filename(filename, table="", extension="psv") -> str:
     """Adjust filename."""
     if table not in filename:
         filename = f"{table}-{filename}"

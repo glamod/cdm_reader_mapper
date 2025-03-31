@@ -160,7 +160,7 @@ class DataBundle:
         self._imodel = imodel
         self._mode = mode
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Length of :py:attr:`data`."""
         return get_length(self._data)
 
@@ -182,14 +182,17 @@ class DataBundle:
                 return reader_method(self, data, attr, *args, **kwargs)
 
             TextParser = make_copy(data)
-            first_chunk = next(TextParser)
-            attr_func = getattr(first_chunk, attr)
-            if not callable(attr_func):
-                return attr_func
-            return SubscriptableMethod(wrapped_reader_method)
+            for df_ in TextParser:
+                attr_func = getattr(df_, attr)
+                if callable(attr_func):
+                    return SubscriptableMethod(wrapped_reader_method)
+                print(attr_func)
+                print(type(attr_func))
+            exit()
+            return attr_func
         raise TypeError("'data' is neither a DataFrame nor a TextFileReader object.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation for :py:attr:`data`."""
         return self._data.__repr__()
 
@@ -282,17 +285,17 @@ class DataBundle:
     def mode(self, value):
         self._mode = value
 
-    def _get_db(self, inplace):
+    def _get_db(self, inplace) -> DataBundle:
         if inplace is True:
             return self
         return self.copy()
 
-    def _return_db(self, db, inplace):
+    def _return_db(self, db, inplace) -> DataBundle | None:
         if inplace is True:
             return
         return db
 
-    def _stack(self, other, datasets, inplace, **kwargs):
+    def _stack(self, other, datasets, inplace, **kwargs) -> DataBundle | None:
         db_ = self._get_db(inplace)
         if not isinstance(other, list):
             other = [other]
@@ -314,7 +317,7 @@ class DataBundle:
 
         return self._return_db(db_, inplace)
 
-    def add(self, addition, inplace=False):
+    def add(self, addition, inplace=False) -> DataBundle | None:
         """Adding information to a :py:class:`~DataBundle`.
 
         Parameters
@@ -328,10 +331,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle with added information or None if ``inplace=True``.
 
         Examples
         --------
@@ -343,7 +344,9 @@ class DataBundle:
             setattr(db_, f"_{name}", data)
         return self._return_db(db_, inplace)
 
-    def stack_v(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
+    def stack_v(
+        self, other, datasets=["data", "mask"], inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Stack multiple :py:class:`~DataBundle`'s vertically.
 
         Parameters
@@ -364,10 +367,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            Vertically stacked DataBundle or None if ``inplace=True``.
 
         Examples
         --------
@@ -379,7 +380,9 @@ class DataBundle:
         """
         return self._stack(other, datasets, inplace, **kwargs)
 
-    def stack_h(self, other, datasets=["data", "mask"], inplace=False, **kwargs):
+    def stack_h(
+        self, other, datasets=["data", "mask"], inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Stack multiple :py:class:`~DataBundle`'s horizontally.
 
         Parameters
@@ -404,10 +407,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            Horizontally stacked DataBundle or None if ``inplace=True``.
 
         See Also
         --------
@@ -415,8 +416,14 @@ class DataBundle:
         """
         return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
-    def copy(self):
+    def copy(self) -> DataBundle:
         """Make deep copy of a :py:class:`~DataBundle`.
+
+        Returns
+        -------
+        :py:class:`~DataBundle`
+              Copy of a DataBundle.
+
 
         Examples
         --------
@@ -433,7 +440,7 @@ class DataBundle:
             setattr(db, key, value)
         return db
 
-    def select_where_all_true(self, inplace=False, **kwargs):
+    def select_where_all_true(self, inplace=False, **kwargs) -> DataBundle | None:
         """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are True.
 
         Parameters
@@ -445,10 +452,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing rows where all column entries in :py:attr:`mask` are True or None if ``inplace=True``.
 
         Examples
         --------
@@ -476,7 +481,7 @@ class DataBundle:
         db_._mask = split_by_boolean_true(db_._mask, db_._mask, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_where_all_false(self, inplace=False, **kwargs):
+    def select_where_all_false(self, inplace=False, **kwargs) -> DataBundle | None:
         """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are False.
 
         Parameters
@@ -488,10 +493,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing rows where all column entries in :py:attr:`mask` are False or None if ``inplace=True``.
 
         Examples
         --------
@@ -519,7 +522,9 @@ class DataBundle:
         db_._mask = split_by_boolean_false(db_._mask, db_._mask, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_where_entry_isin(self, selection, inplace=False, **kwargs):
+    def select_where_entry_isin(
+        self, selection, inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Select rows from :py:attr:`data` where column entries are in a specific value list.
 
         Parameters
@@ -534,10 +539,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing rows where column entries are in a specific value list or None if ``inplace=True``.
 
         Examples
         --------
@@ -567,8 +570,10 @@ class DataBundle:
         db_._mask = split_by_column_entries(db_._mask, selection, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_where_index_isin(self, index, inplace=False, **kwargs):
-        """Select rows from :py:attr:`data` where indexes are in a specific index list.
+    def select_where_index_isin(
+        self, index, inplace=False, **kwargs
+    ) -> DataBundle | None:
+        """Select rows from :py:attr:`data` where indexes within a specific index list.
 
         Parameters
         ----------
@@ -581,10 +586,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing rows where indexes are within a specific index list or None if ``inplace=True``.
 
         Examples
         --------
@@ -612,7 +615,7 @@ class DataBundle:
         db_._mask = split_by_index(db_._mask, index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def split_by_boolean_true(self, **kwargs):
+    def split_by_boolean_true(self, **kwargs) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are True.
 
         Returns
@@ -647,7 +650,7 @@ class DataBundle:
         )
         return db1, db2
 
-    def split_by_boolean_false(self, **kwargs):
+    def split_by_boolean_false(self, **kwargs) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
 
         Returns
@@ -682,7 +685,9 @@ class DataBundle:
         )
         return db1, db2
 
-    def split_by_column_entries(self, selection, **kwargs):
+    def split_by_column_entries(
+        self, selection, **kwargs
+    ) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where column entries are in a specific value list.
 
         Parameters
@@ -725,7 +730,7 @@ class DataBundle:
         )
         return db1, db2
 
-    def split_by_index(self, index, **kwargs):
+    def split_by_index(self, index, **kwargs) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows within specific index list.
 
         Parameters
@@ -736,21 +741,16 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        tuple
+            First :py:class:`~DataBundle` including rows within specific index list.
+            Second :py:class:`~DataBundle` including rows outside specific index list.
+
 
         Examples
         --------
-        Select specific columns without overwriting the old data.
+        Split DataBundle.
 
-         >>> true_values, false_values = db.select_from_index([0, 2, 4])
-
-        Select specific columns with overwriting the old data.
-
-        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
-        >>> true_values = db.selected
+         >>> db_isin, db_isnotin = db.select_from_index([0, 2, 4])
 
         See Also
         --------
@@ -772,7 +772,7 @@ class DataBundle:
         )
         return db1, db2
 
-    def unique(self, **kwargs):
+    def unique(self, **kwargs) -> dict:
         """Get unique values of :py:attr:`data`.
 
         Returns
@@ -790,7 +790,9 @@ class DataBundle:
         """
         return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(self, df_corr, subset=None, inplace=False, **kwargs):
+    def replace_columns(
+        self, df_corr, subset=None, inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Replace columns in :py:attr:`data`.
 
         Parameters
@@ -806,10 +808,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle with replaced column names or None if ``inplace=True``.
 
         Examples
         --------
@@ -831,7 +831,7 @@ class DataBundle:
         db_._columns = db_._data.columns
         return self._return_db(db_, inplace)
 
-    def correct_datetime(self, inplace=False):
+    def correct_datetime(self, inplace=False) -> DataBundle | None:
         """Correct datetime information in :py:attr:`data`.
 
         Parameters
@@ -843,10 +843,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle with corrected datetime information or None if ``inplace=True``.
 
         Examples
         --------
@@ -866,7 +864,7 @@ class DataBundle:
         db_._data = correct_datetime(db_._data, db_._imodel)
         return self._return_db(db_, inplace)
 
-    def validate_datetime(self):
+    def validate_datetime(self) -> pd.DataFrame:
         """Validate datetime information in :py:attr:`data`.
 
         Returns
@@ -892,7 +890,7 @@ class DataBundle:
         """
         return validate_datetime(self._data, self._imodel)
 
-    def correct_pt(self, inplace=False):
+    def correct_pt(self, inplace=False) -> DataBundle | None:
         """Correct platform type information in :py:attr:`data`.
 
         Parameters
@@ -904,10 +902,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle with corrected platform type information or None if ``inplace=True``.
 
         Examples
         --------
@@ -927,7 +923,7 @@ class DataBundle:
         db_._data = correct_pt(db_._data, db_._imodel)
         return self._return_db(db_, inplace)
 
-    def validate_id(self, **kwargs):
+    def validate_id(self, **kwargs) -> pd.DataFrame:
         """Validate station id information in :py:attr:`data`.
 
         Returns
@@ -953,9 +949,8 @@ class DataBundle:
         """
         return validate_id(self._data, self._imodel, **kwargs)
 
-    def map_model(self, inplace=False, **kwargs):
+    def map_model(self, inplace=False, **kwargs) -> DataBundle | None:
         """Map :py:attr:`data` to the Common Data Model.
-        Write output to :py:attr:`data`.
 
         Parameters
         ----------
@@ -966,10 +961,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing :py:attr:`data` mapped to the CDM or None if ``inplace=True``.
 
         Examples
         --------
@@ -986,7 +979,7 @@ class DataBundle:
         db_._data = _tables
         return self._return_db(db_, inplace)
 
-    def write(self, **kwargs):
+    def write(self, **kwargs) -> None:
         """Write :py:attr:`data` on disk.
 
         Examples
@@ -1017,7 +1010,7 @@ class DataBundle:
             **kwargs,
         )
 
-    def duplicate_check(self, inplace=False, **kwargs):
+    def duplicate_check(self, inplace=False, **kwargs) -> DataBundle | None:
         """Duplicate check in :py:attr:`data`.
 
         Parameters
@@ -1029,10 +1022,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing new :py:class:`~DupDetect` class for further duplicate check methods or None if ``inplace=True``.
 
         Note
         ----
@@ -1048,7 +1039,7 @@ class DataBundle:
         Note
         ----
         This adds a new class :py:class:`~DupDetect` to :py:class:`~DataBundle`.
-        This class is necessary for further duplicate methods.
+        This class is necessary for further duplicate check methods.
 
         Examples
         --------
@@ -1072,7 +1063,7 @@ class DataBundle:
         db_.DupDetect = duplicate_check(data, **kwargs)
         return self._return_db(db_, inplace)
 
-    def flag_duplicates(self, inplace=False, **kwargs):
+    def flag_duplicates(self, inplace=False, **kwargs) -> DataBundle | None:
         """Flag detected duplicates in :py:attr:`data`.
 
         Parameters
@@ -1084,10 +1075,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle containing duplicate flags in :py:attr:`data` or None if ``inplace=True``.
 
         Note
         ----
@@ -1122,7 +1111,7 @@ class DataBundle:
             db_._data = db_.DupDetect.result
         return self._return_db(db_, inplace)
 
-    def get_duplicates(self, **kwargs):
+    def get_duplicates(self, **kwargs) -> list:
         """Get duplicate matches in :py:attr:`data`.
 
         Returns
@@ -1150,7 +1139,7 @@ class DataBundle:
         """
         return self.DupDetect.get_duplicates(**kwargs)
 
-    def remove_duplicates(self, inplace=False, **kwargs):
+    def remove_duplicates(self, inplace=False, **kwargs) -> DataBundle | None:
         """Remove detected duplicates in :py:attr:`data`.
 
         Parameters
@@ -1162,10 +1151,8 @@ class DataBundle:
 
         Returns
         -------
-        If `inplace` is False
-            :py:class:`~DataBundle`
-        Else:
-            None
+        :py:class:`~DataBundle` or None
+            DataBundle without duplictaed rows or None if ``inplace=True``.
 
         Note
         ----

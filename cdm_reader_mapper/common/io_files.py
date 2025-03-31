@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 
 
-def get_filename(pattern, path=".", extension="psv"):
+def get_filename(pattern, path=".", extension="psv") -> str:
     """Get file name."""
     if extension[0] != ".":
         extension = f".{extension}"

@@ -67,7 +67,7 @@ def _read_single_file(
     col_subset=None,
     null_label="null",
     **kwargs,
-):
+) -> pd.DataFrame:
     dfi_ = _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
     if dfi_.empty:
         return pd.DataFrame()
@@ -87,7 +87,7 @@ def _read_multiple_files(
     null_label="null",
     logger=None,
     **kwargs,
-):
+) -> list[pd.DataFrame]:
     if suffix is None:
         suffix = ""
 
@@ -145,7 +145,7 @@ def read_tables(
     na_values=None,
     null_label="null",
     **kwargs,
-):
+) -> DataBundle:
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.
 

@@ -29,30 +29,30 @@ class Configurator:
         self.valid = valid or []
         self.schema = schema or {}
 
-    def _validate_sentinal(self, i, line, sentinal):
+    def _validate_sentinal(self, i, line, sentinal) -> bool:
         slen = len(sentinal)
         str_start = line[i : i + slen]
         return str_start == sentinal
 
-    def _get_index(self, section, order):
+    def _get_index(self, section, order) -> dict | tuple[str, dict]:
         if len(self.orders) == 1:
             return section
         else:
             return (order, section)
 
-    def _get_ignore(self, section_dict):
+    def _get_ignore(self, section_dict) -> bool:
         ignore = section_dict.get("ignore")
         if isinstance(ignore, str):
             ignore = ast.literal_eval(ignore)
         return ignore
 
-    def _get_dtype(self):
+    def _get_dtype(self) -> str:
         return properties.pandas_dtypes.get(self.sections_dict.get("column_type"))
 
-    def _get_converter(self):
+    def _get_converter(self) -> callable:
         return converters.get(self.sections_dict.get("column_type"))
 
-    def _get_conv_kwargs(self):
+    def _get_conv_kwargs(self) -> dict:
         column_type = self.sections_dict.get("column_type")
         if column_type is None:
             return
@@ -61,7 +61,7 @@ class Configurator:
             for converter_arg in properties.data_type_conversion_args.get(column_type)
         }
 
-    def _get_decoder(self):
+    def _get_decoder(self) -> callable | None:
         encoding = self.sections_dict.get("encoding")
         if encoding is None:
             return
@@ -70,31 +70,31 @@ class Configurator:
             return
         return decoders.get(encoding).get(column_type)
 
-    def _update_dtypes(self, dtypes, index):
+    def _update_dtypes(self, dtypes, index) -> dict:
         dtype = self._get_dtype()
         if dtype:
             dtypes[index] = dtype
         return dtypes
 
-    def _update_converters(self, converters, index):
+    def _update_converters(self, converters, index) -> dict:
         converter = self._get_converter()
         if converter:
             converters[index] = converter
         return converters
 
-    def _update_kwargs(self, kwargs, index):
+    def _update_kwargs(self, kwargs, index) -> dict:
         conv_kwargs = self._get_conv_kwargs()
         if conv_kwargs:
             kwargs[index] = conv_kwargs
         return kwargs
 
-    def _update_decoders(self, decoders, index):
+    def _update_decoders(self, decoders, index) -> dict:
         decoder = self._get_decoder()
         if decoder:
             decoders[index] = decoder
         return decoders
 
-    def get_configuration(self):
+    def get_configuration(self) -> dict:
         """Get ICOADS data model specific information."""
         disable_reads = []
         dtypes = {}
@@ -137,11 +137,11 @@ class Configurator:
             },
         }
 
-    def open_pandas(self):
+    def open_pandas(self) -> pd.DataFrame:
         """Open TextParser to pd.DataSeries."""
         return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
 
-    def _read_line(self, line: str):
+    def _read_line(self, line: str) -> pd.Series:
         i = j = 0
         data_dict = {}
         for order in self.orders:
@@ -214,7 +214,7 @@ class Configurator:
 
         return pd.Series(data_dict)
 
-    def open_netcdf(self):
+    def open_netcdf(self) -> pd.DataFrame:
         """Open netCDF to pd.Series."""
 
         def replace_empty_strings(series):

@@ -33,7 +33,7 @@ def replace_columns(
     rep_c=None,
     rep_map=None,
     log_level="INFO",
-):
+) -> pd.DataFrame:
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     df_l = df_l.copy()
