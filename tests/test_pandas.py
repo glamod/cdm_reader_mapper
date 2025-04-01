@@ -31,6 +31,13 @@ def test_size(TextParser):
 
 
 @pytest.mark.parametrize("TextParser", [True, False])
+def test_shape(TextParser):
+    data = _get_data(TextParser)
+    result = data.shape
+    np.testing.assert_equal(result, (5, 286))
+
+
+@pytest.mark.parametrize("TextParser", [True, False])
 def test_dropna(TextParser):
     data = _get_data(TextParser)
     result = data.dropna(how="any")
