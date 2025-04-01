@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import csv
-
 from copy import deepcopy
 from io import StringIO as StringIO
 
+import numpy as np
 import pandas as pd
 
 from .writer import write
@@ -29,7 +28,6 @@ from cdm_reader_mapper.metmetpy import (
     validate_id,
 )
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-from cdm_reader_mapper.mdf_reader import properties
 
 
 def method(attr_func, *args, **kwargs):
@@ -46,40 +44,57 @@ def reader_method(DataBundle, data, attr, *args, **kwargs):
     """Handles operations on chunked DataFrame (TextFileReader)."""
     data_buffer = StringIO()
     TextParser = make_copy(data)
-    chunksize = TextParser.chunksize
+    read_params = [
+        "chunksize",
+        "parse_dates",
+        "date_parser",
+        "infer_datetime_format",
+    ]
+    write_dict = {"header": None, "mode": "a", "index": True}
+    read_dict = {x: TextParser.orig_options.get(x) for x in read_params}
     inplace = kwargs.get("inplace", False)
     for df_ in TextParser:
         attr_func = getattr(df_, attr)
-        if not callable(attr_func):
-            return attr_func
         result_df = method(attr_func, *args, **kwargs)
         if result_df is None:
             result_df = df_
-        result_df.to_csv(
-            data_buffer,
-            header=False,
-            mode="a",
-            encoding=DataBundle.encoding,
-            index=False,
-            quoting=csv.QUOTE_NONE,
-            sep=properties.internal_delimiter,
-            quotechar="\0",
-            escapechar="\0",
-        )
-        data_buffer.seek(0)
-    TextParser = pd.read_csv(
-        data_buffer,
-        names=result_df.columns,
-        chunksize=chunksize,
-        dtype=DataBundle.dtypes,
-        delimiter=properties.internal_delimiter,
-        quotechar="\0",
-        escapechar="\0",
-    )
+        result_df.to_csv(data_buffer, **write_dict)
+    dtypes = {}
+    for k, v in result_df.dtypes.items():
+        if v == "object":
+            v = "str"
+        dtypes[k] = v
+    read_dict["dtype"] = dtypes
+    read_dict["names"] = result_df.columns
+    data_buffer.seek(0)
+    TextParser = pd.read_csv(data_buffer, **read_dict)
     if inplace:
         DataBundle._data = TextParser
         return
     return TextParser
+
+
+def combine_attribute_values(attr_func, TextParser, attr):
+    """Combine attribute values across all chunks."""
+    # Collect values of the attribute across all chunks and combine them
+    combined_values = [attr_func]
+    for chunk in TextParser:
+        combined_values.append(getattr(chunk, attr))
+
+    if isinstance(attr_func, pd.Index):
+        combined_index = combined_values[0]
+        for idx in combined_values[1:]:
+            combined_index = combined_index.union(idx)
+        return combined_index
+    if isinstance(attr_func, (int, float)):
+        return sum(combined_values)
+    if isinstance(attr_func, tuple) and len(attr_func) == 2:
+        first_ = sum(value[0] for value in combined_values)
+        second_ = attr_func[1]
+        return (first_, second_)
+    if isinstance(attr_func, (list, np.ndarray)):
+        return np.concatenate(combined_values)
+    return combined_values
 
 
 class SubscriptableMethod:
@@ -182,14 +197,12 @@ class DataBundle:
                 return reader_method(self, data, attr, *args, **kwargs)
 
             TextParser = make_copy(data)
-            for df_ in TextParser:
-                attr_func = getattr(df_, attr)
-                if callable(attr_func):
-                    return SubscriptableMethod(wrapped_reader_method)
-                print(attr_func)
-                print(type(attr_func))
-            exit()
-            return attr_func
+            first_chunk = next(TextParser)
+            attr_func = getattr(first_chunk, attr)
+            if callable(attr_func):
+                return SubscriptableMethod(wrapped_reader_method)
+            return combine_attribute_values(attr_func, TextParser, attr)
+
         raise TypeError("'data' is neither a DataFrame nor a TextFileReader object.")
 
     def __repr__(self) -> str:
