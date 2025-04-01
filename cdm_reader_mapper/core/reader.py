@@ -5,7 +5,7 @@ from __future__ import annotations
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.mdf_reader.reader import read_mdf, read_data
 
-from .core import DataBundle
+from .databundle import DataBundle
 
 
 def read(
