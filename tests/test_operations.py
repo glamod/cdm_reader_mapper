@@ -17,33 +17,42 @@ def _get_data(TextParser, **kwargs):
     return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-@pytest.mark.parametrize("reset_index", [True, False])
-@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_select_where_all_true(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
     result = data.select_where_all_true(reset_index=reset_index, inverse=inverse)
     expected = data.data
+    expected_mask = data.mask
     selected = result.data
+    selected_mask = result.mask
 
     if TextParser is True:
         expected = make_copy(expected).read()
         selected = make_copy(selected).read()
+        expected_mask = make_copy(expected_mask).read()
+        selected_mask = make_copy(selected_mask).read()
 
     if inverse is False:
         expected = expected[:5]
+        expected_mask = expected_mask[:5]
     else:
         expected = expected[:0]
+        expected_mask = expected_mask[:0]
 
     if reset_index is True:
         expected = expected.reset_index(drop=True)
+        expected_mask = expected_mask.reset_index(drop=True)
 
+    print(selected_mask)
     pd.testing.assert_frame_equal(expected, selected)
+    pd.testing.assert_frame_equal(expected_mask, selected_mask)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-@pytest.mark.parametrize("reset_index", [True, False])
-@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_select_where_all_false(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
     result = data.select_where_all_false(reset_index=reset_index, inverse=inverse)
@@ -93,9 +102,9 @@ def test_select_where_index_isin(TextParser, reset_index, inverse):
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-@pytest.mark.parametrize("reset_index", [True, False])
-@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_select_where_entry_isin(TextParser, reset_index, inverse):
     data = _get_data(TextParser)
     selection = {("c1", "B1"): [26, 41]}
@@ -122,9 +131,9 @@ def test_select_where_entry_isin(TextParser, reset_index, inverse):
     pd.testing.assert_frame_equal(expected, selected)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-@pytest.mark.parametrize("reset_index", [True, False])
-@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_split_by_boolean_true(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
     result = data.split_by_boolean_true(reset_index=reset_index, inverse=inverse)
@@ -152,9 +161,9 @@ def test_split_by_boolean_true(TextParser, reset_index, inverse):
     pd.testing.assert_frame_equal(expected2, rejected)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-@pytest.mark.parametrize("reset_index", [True, False])
-@pytest.mark.parametrize("inverse", [True, False])
+@pytest.mark.parametrize("TextParser", [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_split_by_boolean_false(TextParser, reset_index, inverse):
     data = _get_data(TextParser, sections=["c99_data"])
     result = data.split_by_boolean_false(reset_index=reset_index, inverse=inverse)

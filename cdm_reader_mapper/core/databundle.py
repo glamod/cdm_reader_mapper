@@ -30,6 +30,17 @@ from cdm_reader_mapper.metmetpy import (
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
+def _copy(value):
+    """Make copy of value"""
+    if isinstance(value, dict):
+        return deepcopy(value)
+    elif isinstance(value, pd.DataFrame):
+        return value.copy()
+    elif isinstance(value, pd.io.parsers.TextFileReader):
+        return make_copy(value)
+    return value
+
+
 def method(attr_func, *args, **kwargs):
     """Handles both method calls and subscriptable attributes."""
     try:
@@ -444,12 +455,7 @@ class DataBundle:
         """
         db = DataBundle()
         for key, value in self.__dict__.items():
-            if isinstance(value, dict):
-                value = deepcopy(value)
-            elif isinstance(value, pd.DataFrame):
-                value = value.copy()
-            elif isinstance(value, pd.io.parsers.TextFileReader):
-                value = make_copy(value)
+            value = _copy(value)
             setattr(db, key, value)
         return db
 
@@ -490,8 +496,10 @@ class DataBundle:
         For more information see :py:func:`split_by_boolean_true`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_boolean_true(db_._data, db_._mask, **kwargs)[0]
-        db_._mask = split_by_boolean_true(db_._mask, db_._mask, **kwargs)[0]
+        _mask = _copy(db_._mask)
+        db_._data = split_by_boolean_true(db_._data, _mask, **kwargs)[0]
+        _prev_index = db_._data.__dict__["_prev_index"]
+        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def select_where_all_false(self, inplace=False, **kwargs) -> DataBundle | None:
@@ -531,8 +539,10 @@ class DataBundle:
         For more information see :py:func:`split_by_boolean_false`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_boolean_false(db_._data, db_._mask, **kwargs)[0]
-        db_._mask = split_by_boolean_false(db_._mask, db_._mask, **kwargs)[0]
+        _mask = _copy(db_._mask)
+        db_._data = split_by_boolean_false(db_._data, _mask, **kwargs)[0]
+        _prev_index = db_._data.__dict__["_prev_index"]
+        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
@@ -580,7 +590,8 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
-        db_._mask = split_by_column_entries(db_._mask, selection, **kwargs)[0]
+        _prev_index = db_._data.__dict__["_prev_index"]
+        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def select_where_index_isin(
@@ -625,7 +636,8 @@ class DataBundle:
         """
         db_ = self._get_db(inplace)
         db_._data = split_by_index(db_._data, index, **kwargs)[0]
-        db_._mask = split_by_index(db_._mask, index, **kwargs)[0]
+        _prev_index = db_._data.__dict__["_prev_index"]
+        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def split_by_boolean_true(self, **kwargs) -> tuple[DataBundle, DataBundle]:
@@ -653,15 +665,17 @@ class DataBundle:
         ----
         For more information see :py:func:`split_by_boolean_true`
         """
-        db1 = self.copy()
-        db2 = self.copy()
-        db1._data, db2._data = split_by_boolean_true(
-            db1._data, db1._mask, return_rejected=True, **kwargs
+        db1_ = self.copy()
+        db2_ = self.copy()
+        _mask = _copy(db1_._mask)
+        db1_._data, db2_._data = split_by_boolean_true(
+            db1_._data, _mask, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = split_by_boolean_true(
-            db1._mask, db1._mask, return_rejected=True, **kwargs
+        _prev_index = db1_._data.__dict__["_prev_index"]
+        db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, _prev_index, return_rejected=True, **kwargs
         )
-        return db1, db2
+        return db1_, db2_
 
     def split_by_boolean_false(self, **kwargs) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
@@ -688,15 +702,17 @@ class DataBundle:
         ----
         For more information see :py:func:`split_by_boolean_false`
         """
-        db1 = self.copy()
-        db2 = self.copy()
-        db1._data, db2._data = split_by_boolean_false(
-            db1._data, db1._mask, return_rejected=True, **kwargs
+        db1_ = self.copy()
+        db2_ = self.copy()
+        _mask = _copy(db1_._mask)
+        db1_._data, db2_._data = split_by_boolean_false(
+            db1_._data, _mask, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = split_by_boolean_false(
-            db1._mask, db1._mask, return_rejected=True, **kwargs
+        _prev_index = db1_._data.__dict__["_prev_index"]
+        db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, _prev_index, return_rejected=True, **kwargs
         )
-        return db1, db2
+        return db1_, db2_
 
     def split_by_column_entries(
         self, selection, **kwargs
@@ -733,15 +749,16 @@ class DataBundle:
         ----
         For more information see :py:func:`split_by_column_entries`
         """
-        db1 = self.copy()
-        db2 = self.copy()
-        db1._data, db2._data = split_by_column_entries(
-            db1._data, selection, return_rejected=True, **kwargs
+        db1_ = self.copy()
+        db2_ = self.copy()
+        db1_._data, db2_._data = split_by_column_entries(
+            db1_._data, selection, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = split_by_column_entries(
-            db1._mask, selection, return_rejected=True, **kwargs
+        _prev_index = db1_._data.__dict__["_prev_index"]
+        db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, _prev_index, return_rejected=True, **kwargs
         )
-        return db1, db2
+        return db1_, db2_
 
     def split_by_index(self, index, **kwargs) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows within specific index list.
@@ -775,15 +792,15 @@ class DataBundle:
         ----
         For more information see :py:func:`split_by_index`
         """
-        db1 = self.copy()
-        db2 = self.copy()
-        db1._data, db2._data = split_by_index(
-            db1._data, index, return_rejected=True, **kwargs
+        db1_ = self.copy()
+        db2_ = self.copy()
+        db1_._data, db2_._data = split_by_index(
+            db1_._data, index, return_rejected=True, **kwargs
         )
-        db1._mask, db2._mask = split_by_index(
-            db1._mask, index, return_rejected=True, **kwargs
+        db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, index, return_rejected=True, **kwargs
         )
-        return db1, db2
+        return db1_, db2_
 
     def unique(self, **kwargs) -> dict:
         """Get unique values of :py:attr:`data`.

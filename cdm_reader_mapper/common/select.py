@@ -20,6 +20,10 @@ def _dataframe_apply_index(
     inverse=False,
 ) -> pd.DataFrame | pd.Series:
     """Apply index to pandas DataFrame."""
+    if isinstance(index_list, str):
+        index_list = [index_list]
+    if isinstance(index_list, list):
+        index_list = pd.Index(index_list)
     index = df.index.isin(index_list)
     if inverse is True:
         in_df = df[~index]
@@ -29,6 +33,7 @@ def _dataframe_apply_index(
     if reset_index is True:
         in_df = in_df.reset_index(drop=True)
 
+    in_df.__dict__["_prev_index"] = index_list
     return in_df
 
 
@@ -54,8 +59,11 @@ def _split_dataframe_by_index(
             reset_index=reset_index,
             inverse=inverse,
         )
-        return out1, out2
-    return out1, pd.DataFrame(columns=out1.columns)
+    else:
+        out2 = pd.DataFrame(columns=out1.columns)
+        out2.__dict__["_prev_index"] = pd.Index([])
+
+    return out1, out2
 
 
 def split_dataframe_by_boolean(df, mask, boolean, **kwargs) -> tuple[pd.DataFrame]:
@@ -111,6 +119,8 @@ def split_parser(
     read_dict = {x: data[0].orig_options.get(x) for x in read_params}
     buffer1 = StringIO()
     buffer2 = StringIO()
+    _prev_index1 = None
+    _prev_index2 = None
     for zipped in zip(*data):
         if not isinstance(zipped, tuple):
             zipped = tuple(zipped)
@@ -121,13 +131,31 @@ def split_parser(
             inverse=inverse,
             return_rejected=return_rejected,
         )
+        if _prev_index1 is None:
+            _prev_index1 = out1.__dict__["_prev_index"]
+        else:
+            print(out1.__dict__["_prev_index"])
+            _prev_index1 = _prev_index1.union(out1.__dict__["_prev_index"])
+        if _prev_index2 is None:
+            _prev_index2 = out2.__dict__["_prev_index"]
+        else:
+            _prev_index2 = _prev_index2.union(out2.__dict__["_prev_index"])
         out1.to_csv(buffer1, **write_dict)
         if return_rejected is True:
             out2.to_csv(buffer2, **write_dict)
-
+    dtypes = {}
+    for k, v in out1.dtypes.items():
+        if v == "object":
+            v = "str"
+        dtypes[k] = v
+    read_dict["dtype"] = dtypes
     buffer1.seek(0)
     buffer2.seek(0)
-    return pd.read_csv(buffer1, **read_dict), pd.read_csv(buffer2, **read_dict)
+    TextParser1 = pd.read_csv(buffer1, **read_dict)
+    TextParser1.__dict__["_prev_index"] = _prev_index1
+    TextParser2 = pd.read_csv(buffer2, **read_dict)
+    TextParser2.__dict__["_prev_index"] = _prev_index2
+    return TextParser1, TextParser2
 
 
 def split(
