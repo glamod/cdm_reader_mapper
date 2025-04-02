@@ -42,6 +42,7 @@ Bug fixes
 * ``cdm_reder_mapper.metmetpy``: set deck keys from ``???`` to ``d???`` in icoads json files which makes values accessible again (:pull:`238`).
 * ``cdm_reder_mapper.metmetpy``: set ``imma1`` to ``icoads`` and ``immt`` to ``gcc`` in icoads/gcc json files which makes properties accessible again (:pull:`238`).
 * ``DataBundle.copy`` function now makes a real deepcopy of ``DataBundle`` object (:pull:`248`).
+* correct key index->section for self.df.attrs in open_netcdf (:pull:`252`)
 * ``cdm_reader_mapper.map_model``: return null_label if conversion fails (:pull:`242`)
 * keep indexes during duplicate check (:pull:`242`)
 
