@@ -62,7 +62,7 @@ def test_rename(TextParser):
     pd.testing.assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("TextParser", [True])
+@pytest.mark.parametrize("TextParser", [True, False])
 def test_inplace(TextParser):
     data = _get_data(TextParser)
     _renames = {("core", "MO"): ("core", "MONTH")}
@@ -75,4 +75,16 @@ def test_inplace(TextParser):
         expected = make_copy(expected).read()
     expected = expected.rename(columns=_renames)
     expected = expected.astype(result.dtypes)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize("TextParser", [False])
+def test_iloc(TextParser):
+    data = _get_data(TextParser)
+    result = data.iloc[[1, 3, 4]]
+    expected = data.data
+    if TextParser:
+        result = make_copy(result).read()
+        expected = make_copy(expected).read()
+    expected = expected.loc[[1, 3, 4]]
     pd.testing.assert_frame_equal(result, expected)
