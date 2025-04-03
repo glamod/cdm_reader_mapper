@@ -72,8 +72,11 @@ def add_duplicates(df, dups) -> pd.DataFrame:
             return row
 
         dup_idx = dups.loc[idx].to_list()
-        v_ = report_ids.iloc[dup_idx[0]]
-        v_ = sorted(v_.tolist())
+        if isinstance(dup_idx[0][0], str):
+            v_ = sorted(dup_idx[0])
+        else:
+            v_ = report_ids.iloc[dup_idx[0]]
+            v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
 
@@ -147,7 +150,7 @@ class DupDetect:
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
@@ -195,7 +198,7 @@ class DupDetect:
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
@@ -295,7 +298,7 @@ class DupDetect:
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
