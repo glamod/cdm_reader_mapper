@@ -116,7 +116,12 @@ class SubscriptableMethod:
 
     def __getitem__(self, item):
         """Ensure subscript access is handled properly."""
-        return self.func[item]
+        try:
+            return self.func[item]
+        except TypeError:
+            raise NotImplementedError(
+                "Calling subscriptable methods have not been implemented for chunked data yet."
+            )
 
     def __call__(self, *args, **kwargs):
         """Ensure function calls work properly."""
