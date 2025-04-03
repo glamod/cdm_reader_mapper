@@ -192,7 +192,9 @@ class DataBundle(_DataBundle):
         """
         return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
-    def select_where_all_true(self, inplace=False, **kwargs) -> DataBundle | None:
+    def select_where_all_true(
+        self, inplace=False, do_mask=True, **kwargs
+    ) -> DataBundle | None:
         """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are True.
 
         Parameters
@@ -201,6 +203,8 @@ class DataBundle(_DataBundle):
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with valid values only in :py:attr:`data`.
             Default: False
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -231,11 +235,14 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
         db_._data = split_by_boolean_true(db_._data, _mask, **kwargs)[0]
-        _prev_index = db_._data.__dict__["_prev_index"]
-        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+        if do_mask is True:
+            _prev_index = db_._data.__dict__["_prev_index"]
+            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def select_where_all_false(self, inplace=False, **kwargs) -> DataBundle | None:
+    def select_where_all_false(
+        self, inplace=False, do_mask=True, **kwargs
+    ) -> DataBundle | None:
         """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are False.
 
         Parameters
@@ -244,6 +251,8 @@ class DataBundle(_DataBundle):
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with invalid values only in :py:attr:`data`.
             Default: False
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -274,12 +283,13 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
         db_._data = split_by_boolean_false(db_._data, _mask, **kwargs)[0]
-        _prev_index = db_._data.__dict__["_prev_index"]
-        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+        if do_mask is True:
+            _prev_index = db_._data.__dict__["_prev_index"]
+            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
-        self, selection, inplace=False, **kwargs
+        self, selection, inplace=False, do_mask=True, **kwargs
     ) -> DataBundle | None:
         """Select rows from :py:attr:`data` where column entries are in a specific value list.
 
@@ -292,6 +302,8 @@ class DataBundle(_DataBundle):
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
             Default: False
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -323,12 +335,13 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
-        _prev_index = db_._data.__dict__["_prev_index"]
-        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+        if do_mask is True:
+            _prev_index = db_._data.__dict__["_prev_index"]
+            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
     def select_where_index_isin(
-        self, index, inplace=False, **kwargs
+        self, index, inplace=False, do_mask=True, **kwargs
     ) -> DataBundle | None:
         """Select rows from :py:attr:`data` where indexes within a specific index list.
 
@@ -340,6 +353,8 @@ class DataBundle(_DataBundle):
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with selected rows only in :py:attr:`data`.
             Default: False
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -369,12 +384,20 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         db_._data = split_by_index(db_._data, index, **kwargs)[0]
-        _prev_index = db_._data.__dict__["_prev_index"]
-        db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+        if do_mask is True:
+            _prev_index = db_._data.__dict__["_prev_index"]
+            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
-    def split_by_boolean_true(self, **kwargs) -> tuple[DataBundle, DataBundle]:
+    def split_by_boolean_true(
+        self, do_mask=True, **kwargs
+    ) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are True.
+
+        Parameteers
+        -----------
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -404,14 +427,22 @@ class DataBundle(_DataBundle):
         db1_._data, db2_._data = split_by_boolean_true(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
-        _prev_index = db1_._data.__dict__["_prev_index"]
-        db1_._mask, db2_._mask = split_by_index(
-            db1_._mask, _prev_index, return_rejected=True, **kwargs
-        )
+        if do_mask is True:
+            _prev_index = db1_._data.__dict__["_prev_index"]
+            db1_._mask, db2_._mask = split_by_index(
+                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            )
         return db1_, db2_
 
-    def split_by_boolean_false(self, **kwargs) -> tuple[DataBundle, DataBundle]:
+    def split_by_boolean_false(
+        self, do_mask=True, **kwargs
+    ) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
+
+        Parameteers
+        -----------
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -441,14 +472,15 @@ class DataBundle(_DataBundle):
         db1_._data, db2_._data = split_by_boolean_false(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
-        _prev_index = db1_._data.__dict__["_prev_index"]
-        db1_._mask, db2_._mask = split_by_index(
-            db1_._mask, _prev_index, return_rejected=True, **kwargs
-        )
+        if do_mask is True:
+            _prev_index = db1_._data.__dict__["_prev_index"]
+            db1_._mask, db2_._mask = split_by_index(
+                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            )
         return db1_, db2_
 
     def split_by_column_entries(
-        self, selection, **kwargs
+        self, selection, do_mask=True, **kwargs
     ) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows where column entries are in a specific value list.
 
@@ -457,6 +489,8 @@ class DataBundle(_DataBundle):
         selection: dict
             Keys: Column names in :py:attr:`data`.
             Values: Specific value list.
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
         Returns
         -------
@@ -487,19 +521,24 @@ class DataBundle(_DataBundle):
         db1_._data, db2_._data = split_by_column_entries(
             db1_._data, selection, return_rejected=True, **kwargs
         )
-        _prev_index = db1_._data.__dict__["_prev_index"]
-        db1_._mask, db2_._mask = split_by_index(
-            db1_._mask, _prev_index, return_rejected=True, **kwargs
-        )
+        if do_mask is True:
+            _prev_index = db1_._data.__dict__["_prev_index"]
+            db1_._mask, db2_._mask = split_by_index(
+                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            )
         return db1_, db2_
 
-    def split_by_index(self, index, **kwargs) -> tuple[DataBundle, DataBundle]:
+    def split_by_index(
+        self, index, do_mask=True, **kwargs
+    ) -> tuple[DataBundle, DataBundle]:
         """Split :py:attr:`data` by rows within specific index list.
 
         Parameters
         ----------
         index: list
             Specific index list.
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
 
 
         Returns
@@ -530,9 +569,10 @@ class DataBundle(_DataBundle):
         db1_._data, db2_._data = split_by_index(
             db1_._data, index, return_rejected=True, **kwargs
         )
-        db1_._mask, db2_._mask = split_by_index(
-            db1_._mask, index, return_rejected=True, **kwargs
-        )
+        if do_mask is True:
+            db1_._mask, db2_._mask = split_by_index(
+                db1_._mask, index, return_rejected=True, **kwargs
+            )
         return db1_, db2_
 
     def unique(self, **kwargs) -> dict:
