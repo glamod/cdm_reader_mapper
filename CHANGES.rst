@@ -36,7 +36,7 @@ New features and enhancements
 Internal changes
 ^^^^^^^^^^^^^^^^^
 
-* split DataBundle class into main (``cdm_reader_mapper.core._utilities``) and main methods (``cdm_reader_mapper.core.databundle``) (:pull:`242`)
+* split DataBundle class into main class (``cdm_reader_mapper.core._utilities``) and method function class (``cdm_reader_mapper.core.databundle``) (:pull:`242`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
