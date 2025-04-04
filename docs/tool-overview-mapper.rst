@@ -23,7 +23,9 @@ Workflow
 
    db = read_mdf(filepath, imodel=imodel)
 
-   cdm_tables = db.map_model()
+   db_cdm = db.map_model()
+
+   cdm_tables = db_cdm.data
 
 .. note:: Set ``inplace`` to True to overwrite :py:attr:`DataBundle.data`:
 

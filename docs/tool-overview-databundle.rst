@@ -56,9 +56,9 @@ The first function applies ICOADS deck specific platform ID corrections to the d
 
 .. code-block:: console
 
-    cor_pt = db.correct_pt()
+    db_cor_pt = db.correct_pt()
 
-    cor_dt = db.correct_datetime()
+    db_cor_dt = db.correct_datetime()
 
 Manipulate :py:attr:`DataBundle.data` and select subsets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,7 +73,9 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
 
 .. code-block:: console
 
-    cdm_tables = db.map_model()
+    db_cdm = db.map_model()
+
+    cdm_tables = db_cdm.data
 
 .. note:: Set ``inplace`` to True to overwrite :py:attr:`DataBundle.data`:
 
@@ -94,7 +96,7 @@ The first step is to call the method function :py:func:`DataBundle.duplicate_che
 
 .. code-block:: console
 
-    db.duplicate_check()
+    db_dup = db.duplicate_check()
 
 Afterwards there are two options how to deal with the detected duplicates:
 
