@@ -24,7 +24,21 @@ New features and enhancements
 * optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
 * ``cdm_reader.reader.read_tables``: optionally, set null_label (:pull:`242`)
 * ``DataBundle.select_*``: optionally, return unselected pd.DataFrame as second return value by setting ``return_invalid`` to ``True`` (:pull:`242`)
+* new method functions: ``DataBundle.select_where_all_false`` (:pull:`242`)
+* new method functions: ``DataBundle.split_*`` (:pull:`242`)
 
+  * ``DataBundle.split_by_boolean_true``
+  * ``DataBundle.split_by_boolean_false``
+  * ``DataBundle.split_by_column_entries``
+  * ``DataBundle.split_by_index``
+
+* optionally, set ``null_label`` in ``cdm_reader_mapper.read_cdm`` (:pull:`242`)
+* implement pandas indexer like ``iloc`` for not chunked data (:pull:`242`)
+
+Internal changes
+^^^^^^^^^^^^^^^^^
+
+* split DataBundle class into main (``cdm_reader_mapper.core._utilities``) and main methods (``cdm_reader_mapper.core.databundle``) (:pull:`242`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -34,7 +48,18 @@ Breaking changes
 * ``inplace`` returns ``None`` that is consistent with pandas (:pull:`242`)
 * ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
 * ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
-* select functions to not reset indexes by default (:pull:`242`)
+* select functions do not reset indexes by default (:pull:`242`)
+* rename ``DataBundle.select_*`` functions:
+
+    * ``DataBundle.select_true`` -> ``DataBundle.select_where_all_boolean``
+    * ``DataBundle.select_from_list`` -> ``DataBundle.select_where_entry_isin``
+    * ``DataBundle.select_from_index`` -> ``DataBundle.select_where_index_isin``
+
+* rename ``cdm_reader_mapper.common.select_*`` functions and make them returning tuple of selected and rejected data (:pull:`242`):
+
+    * ``select_true`` -> ``split_by_boolean_true``
+    * ``select_from_list`` -> ``split_by_column_entries``
+    * ``select_from_index`` -> ``spit_by_index``
 
 Bug fixes
 ^^^^^^^^^
