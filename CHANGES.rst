@@ -36,6 +36,7 @@ New features and enhancements
 Internal changes
 ^^^^^^^^^^^^^^^^^
 
+* ``cdm_reader_mapper.common.select``: restructure, simplify and summarize functions (:pull:`242`)
 * split DataBundle class into main class (``cdm_reader_mapper.core._utilities``) and method function class (``cdm_reader_mapper.core.databundle``) (:pull:`242`)
 
 Breaking changes
