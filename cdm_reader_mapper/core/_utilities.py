@@ -72,8 +72,7 @@ def reader_method(DataBundle, data, attr, *args, **kwargs):
 
 
 def combine_attribute_values(attr_func, TextParser, attr):
-    """Combine attribute values across all chunks."""
-    # Collect values of the attribute across all chunks and combine them
+    """Collect values of the attribute across all chunks and combine them."""
     combined_values = [attr_func]
     for chunk in TextParser:
         combined_values.append(getattr(chunk, attr))
@@ -259,17 +258,17 @@ class _DataBundle:
     def mode(self, value):
         self._mode = value
 
-    def _get_db(self, inplace) -> DataBundle:
+    def _get_db(self, inplace):
         if inplace is True:
             return self
         return self.copy()
 
-    def _return_db(self, db, inplace) -> DataBundle | None:
+    def _return_db(self, db, inplace):
         if inplace is True:
             return
         return db
 
-    def _stack(self, other, datasets, inplace, **kwargs) -> DataBundle | None:
+    def _stack(self, other, datasets, inplace, **kwargs):
         db_ = self._get_db(inplace)
         if not isinstance(other, list):
             other = [other]
