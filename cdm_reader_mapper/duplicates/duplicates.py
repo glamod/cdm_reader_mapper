@@ -12,8 +12,8 @@ import recordlinkage as rl
 from ._duplicate_settings import Compare, _compare_kwargs, _histories, _method_kwargs
 
 
-def convert_series(df, conversion):
-    """Convert data types in dataframe.
+def convert_series(df, conversion) -> pd.DataFrame:
+    """Convert data types in Dataframe.
 
     Parameters
     ----------
@@ -44,7 +44,7 @@ def convert_series(df, conversion):
     return df
 
 
-def add_history(df, indexes):
+def add_history(df, indexes) -> pd.DataFrame:
     """Add duplicate information to history."""
 
     def _datetime_now():
@@ -63,7 +63,7 @@ def add_history(df, indexes):
     return df
 
 
-def add_duplicates(df, dups):
+def add_duplicates(df, dups) -> pd.DataFrame:
     """Add duplicates to table."""
 
     def _add_dups(row):
@@ -72,8 +72,11 @@ def add_duplicates(df, dups):
             return row
 
         dup_idx = dups.loc[idx].to_list()
-        v_ = report_ids.iloc[dup_idx[0]]
-        v_ = sorted(v_.tolist())
+        if isinstance(dup_idx[0][0], str):
+            v_ = sorted(dup_idx[0])
+        else:
+            v_ = report_ids.iloc[dup_idx[0]]
+            v_ = sorted(v_.tolist())
         row["duplicates"] = "{" + ",".join(v_) + "}"
         return row
 
@@ -81,7 +84,7 @@ def add_duplicates(df, dups):
     return df.apply(lambda x: _add_dups(x), axis=1)
 
 
-def add_report_quality(df, indexes_bad):
+def add_report_quality(df, indexes_bad) -> pd.DataFrame:
     """Add report quality to table."""
     df["report_quality"] = df["report_quality"].astype(int)
     df.loc[indexes_bad, "report_quality"] = 1
@@ -112,7 +115,7 @@ class DupDetect:
         self.method_kwargs = method_kwargs
         self.compare_kwargs = compare_kwargs
 
-    def _get_limit(self, limit):
+    def _get_limit(self, limit) -> int | float:
         _limit = 0.991
         if limit == "default":
             return _limit
@@ -120,7 +123,7 @@ class DupDetect:
             return _limit
         return limit
 
-    def _get_equal_musts(self):
+    def _get_equal_musts(self) -> list[str]:
         equal_musts = []
         for value in self.compare_kwargs.keys():
             if not isinstance(value, list):
@@ -130,7 +133,7 @@ class DupDetect:
                     equal_musts.append(v)
         return equal_musts
 
-    def _total_score(self):
+    def _total_score(self) -> None:
         """Get total score of duplicate check."""
         pcmax = self.compared.shape[1]
         self.score = 1 - (abs(self.compared.sum(axis=1) - pcmax) / pcmax)
@@ -141,13 +144,13 @@ class DupDetect:
         limit="default",
         equal_musts=None,
         overwrite=True,
-    ):
+    ) -> list[tuple]:
         """Get duplicate matches.
 
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
@@ -189,13 +192,13 @@ class DupDetect:
         keep="first",
         limit="default",
         equal_musts=None,
-    ):
+    ) -> pd.DataFrame:
         r"""Get result dataset with flagged duplicates.
 
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
@@ -289,13 +292,13 @@ class DupDetect:
         keep="first",
         limit="default",
         equal_musts=None,
-    ):
+    ) -> pd.DataFrame:
         """Get result dataset with deleted matches.
 
         Parameters
         ----------
         keep: str, ["first", "last"]
-            Which entry shpould be kept in result dataset.
+            Which entry should be kept in result dataset.
         limit: float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
             Default: .991
@@ -317,7 +320,7 @@ class DupDetect:
         return self.result
 
 
-def set_comparer(compare_dict):
+def set_comparer(compare_dict) -> Compare:
     """Set recordlinkage Comparer.
 
     Parameters
@@ -359,7 +362,7 @@ def set_comparer(compare_dict):
     return comparer
 
 
-def remove_ignores(dic, columns):
+def remove_ignores(dic, columns) -> dict:
     """Remove entries containing column names."""
     new_dict = {}
     if isinstance(columns, str):
@@ -378,7 +381,7 @@ def remove_ignores(dic, columns):
     return new_dict
 
 
-def change_offsets(dic, dic_o):
+def change_offsets(dic, dic_o) -> dict:
     """Change offsets in compare dictionary."""
     for key in dic.keys():
         if key not in dic_o.keys():
@@ -387,7 +390,7 @@ def change_offsets(dic, dic_o):
     return dic
 
 
-def reindex_nulls(df):
+def reindex_nulls(df) -> pd.DataFrame:
     """Reindex by nulls."""
 
     def _count_nulls(row):
@@ -435,7 +438,7 @@ def duplicate_check(
     ignore_entries=None,
     offsets=None,
     reindex_by_null=True,
-):
+) -> DupDetect:
     """Duplicate check.
 
     Parameters
@@ -471,10 +474,11 @@ def duplicate_check(
     -------
         cdm_reader_mapper.DupDetect
     """
-    data = data.reset_index(drop=True)
-
     if reindex_by_null is True:
         data = reindex_nulls(data)
+
+    index = data.index
+    data.reset_index(drop=True)
 
     if table_name:
         data = data[table_name]
@@ -530,4 +534,5 @@ def duplicate_check(
         compared.append(compared_)
 
     compared = pd.concat(compared)
+    data.set_index(index, inplace=True)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)

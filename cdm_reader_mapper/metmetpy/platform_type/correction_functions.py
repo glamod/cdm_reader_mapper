@@ -16,7 +16,7 @@ import pandas as pd
 from .. import properties
 
 
-def is_num(X):
+def is_num(X) -> bool:
     """DOCUMENTATION."""
     try:
         return X.isnumeric()
@@ -24,7 +24,7 @@ def is_num(X):
         return False
 
 
-def overwrite_data(data, loc, pt_col, value):
+def overwrite_data(data, loc, pt_col, value) -> pd.DataFrame:
     """Overwrite data."""
     if pt_col not in data.columns:
         return data
@@ -42,7 +42,7 @@ def fill_value(
     out_condition=pd.DataFrame(),
     out_condition_values=None,
     self_out_conditions="intersect",
-):
+) -> pd.Series:
     """DOCUMENTATION."""
     # Modes:
     #   - if not self_condition_value and not out_condition: force fillna = True
@@ -89,7 +89,7 @@ def fill_value(
     return fill_serie.mask(msk, other=fill_value)
 
 
-def deck_717_gcc(data):
+def deck_717_gcc(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     drifters = "7"
     buoys = "9"
@@ -103,7 +103,7 @@ def deck_717_gcc(data):
     return data
 
 
-def deck_700_icoads(data):
+def deck_700_icoads(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     drifters = "7"
     sid = "147"
@@ -123,7 +123,7 @@ def deck_700_icoads(data):
     return data
 
 
-def deck_892_icoads(data):
+def deck_892_icoads(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     sid = "29"
     pt = "5"
@@ -140,7 +140,7 @@ def deck_892_icoads(data):
     return data
 
 
-def deck_792_icoads(data):
+def deck_792_icoads(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     sid = "103"
     pt = "5"
@@ -161,7 +161,7 @@ def deck_792_icoads(data):
     return overwrite_data(data, loc, pt_col, buoys)
 
 
-def deck_992_icoads(data):
+def deck_992_icoads(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     sid = "114"
     pt = "5"

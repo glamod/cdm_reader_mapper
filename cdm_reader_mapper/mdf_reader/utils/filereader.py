@@ -60,7 +60,7 @@ class FileReader:
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
-    def _adjust_schema(self, ds, dtypes):
+    def _adjust_schema(self, ds, dtypes) -> dict:
         sections = deepcopy(self.schema["sections"])
         for section in sections.keys():
             elements = sections[section]["elements"]
@@ -81,7 +81,7 @@ class FileReader:
                     else:
                         del self.schema["sections"][section]["elements"][data_var][attr]
 
-    def _select_years(self, df):
+    def _select_years(self, df) -> pd.DataFrame:
         def get_years_from_datetime(date):
             try:
                 return date.year
@@ -105,7 +105,7 @@ class FileReader:
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
-    def _read_pandas(self, **kwargs):
+    def _read_pandas(self, **kwargs) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         return pd.read_fwf(
             self.source,
             header=None,
@@ -116,7 +116,7 @@ class FileReader:
             **kwargs,
         )
 
-    def _read_netcdf(self, **kwargs):
+    def _read_netcdf(self, **kwargs) -> pd.Dataset:
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
         return ds.squeeze()
@@ -127,7 +127,7 @@ class FileReader:
         order,
         valid,
         open_with,
-    ):
+    ) -> pd.DataFrame:
         if open_with == "pandas":
             df = Configurator(
                 df=TextParser, schema=self.schema, order=order, valid=valid
@@ -142,7 +142,7 @@ class FileReader:
         self.columns = df.columns
         return self._select_years(df)
 
-    def get_configurations(self, order, valid):
+    def get_configurations(self, order, valid) -> dict:
         """DOCUMENTATION."""
         config_dict = Configurator(
             schema=self.schema, order=order, valid=valid
@@ -158,7 +158,7 @@ class FileReader:
         valid,
         chunksize,
         open_with="pandas",
-    ):
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
         encoding = self.schema["header"].get("encoding")
         if open_with == "netcdf":

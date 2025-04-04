@@ -19,7 +19,7 @@ except ImportError:
 _default_cache_dir_ = Path(user_cache_dir("cdm-testdata", ".cache"))
 
 
-def _file_md5_checksum(f_name):
+def _file_md5_checksum(f_name) -> str:
     hash_md5 = hashlib.md5()  # noqa: S324
     with open(f_name, "rb") as f:
         hash_md5.update(f.read())
@@ -34,7 +34,7 @@ def _get_remote_file(lfile, url, name):
     return urlretrieve(url, lfile)  # noqa: S310
 
 
-def _check_md5s(f, md5, mode="error"):
+def _check_md5s(f, md5, mode="error") -> bool:
     msg = f"{f.as_posix()} and md5 checksum do not match."
     md5_ = _file_md5_checksum(f)
     if md5_.strip() != md5.strip():
@@ -50,7 +50,7 @@ def _check_md5s(f, md5, mode="error"):
 def _with_md5_suffix(
     name: Path,
     suffix: str,
-):
+) -> Path:
     return name.with_suffix(f"{suffix}.md5")
 
 
@@ -74,7 +74,7 @@ def _get_file(
     cache_dir: Path,
     clear_cache: bool,
     within_drs: bool,
-):
+) -> Path:
     cache_dir = cache_dir.absolute()
     if clear_cache is True:
         _rm_tree(cache_dir)
@@ -113,7 +113,7 @@ def load_file(
     cache_dir: str | Path = _default_cache_dir_,
     clear_cache: bool = False,
     within_drs: bool = True,
-):
+) -> Path:
     """Load file from the online Github-like repository.
 
     Parameters

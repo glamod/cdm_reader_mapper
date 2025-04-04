@@ -26,7 +26,7 @@ def read_table(
     code_table_name,
     imodel=None,
     ext_table_path=None,
-):
+) -> dict:
     """
     Read a data model code table file to a dictionary.
 

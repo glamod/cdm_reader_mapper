@@ -22,7 +22,7 @@ from cdm_reader_mapper.common.json_dict import (
 from .. import properties
 
 
-def get_cdm_atts(cdm_tables=None):
+def get_cdm_atts(cdm_tables=None) -> dict:
     """Get CDM attribute tables.
 
     Parameters
@@ -59,7 +59,7 @@ def get_cdm_atts(cdm_tables=None):
     return cdm_atts
 
 
-def get_imodel_maps(data_model, *sub_models, cdm_tables=[]):
+def get_imodel_maps(data_model, *sub_models, cdm_tables=[]) -> dict:
     """DOCUMENTATION."""
     imodel_maps = {}
     observations = []

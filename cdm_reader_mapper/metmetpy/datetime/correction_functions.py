@@ -14,7 +14,7 @@ from .. import properties
 from . import model_datetimes
 
 
-def dck_201_icoads(data):
+def dck_201_icoads(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     yr_col = properties.metadata_datamodels.get("year").get("icoads")
     mo_col = properties.metadata_datamodels.get("month").get("icoads")

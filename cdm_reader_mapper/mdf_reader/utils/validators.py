@@ -13,7 +13,7 @@ from ..schemas import schemas
 from .utilities import convert_str_boolean
 
 
-def validate_datetime(elements, data):
+def validate_datetime(elements, data) -> pd.DataFrame:
     """DOCUMENTATION."""
 
     def is_date_object(object):
@@ -27,7 +27,7 @@ def validate_datetime(elements, data):
     return mask
 
 
-def validate_numeric(elements, data, schema):
+def validate_numeric(elements, data, schema) -> pd.DataFrame:
     """DOCUMENTATION."""
 
     # Find thresholds in schema. Flag if not available -> warn
@@ -64,12 +64,12 @@ def validate_numeric(elements, data, schema):
     return mask
 
 
-def validate_str(elements, data):
+def validate_str(elements, data) -> pd.DataFrame:
     """DOCUMENTATION."""
     return pd.DataFrame(index=data.index, data=True, columns=elements)
 
 
-def validate_codes(elements, data, schema, imodel, ext_table_path):
+def validate_codes(elements, data, schema, imodel, ext_table_path) -> pd.DataFrame:
     """DOCUMENTATION."""
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
     for element in elements:
@@ -99,7 +99,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path):
     return mask
 
 
-def _get_elements(elements, element_atts, key):
+def _get_elements(elements, element_atts, key) -> list[str]:
     def _condition(x):
         column_types = element_atts.get(x).get("column_type")
         if key == "numeric_types":
@@ -109,7 +109,7 @@ def _get_elements(elements, element_atts, key):
     return [x for x in elements if _condition(x)]
 
 
-def _element_tuples(numeric_elements, datetime_elements, coded_elements):
+def _element_tuples(numeric_elements, datetime_elements, coded_elements) -> bool:
     ele_tpl = [
         isinstance(x, tuple)
         for x in numeric_elements + datetime_elements + coded_elements
@@ -117,7 +117,7 @@ def _element_tuples(numeric_elements, datetime_elements, coded_elements):
     return any(ele_tpl)
 
 
-def _mask_boolean(x, boolean):
+def _mask_boolean(x, boolean) -> bool:
     x = convert_str_boolean(x)
     if x is boolean:
         return True
@@ -130,7 +130,7 @@ def validate(
     ext_table_path,
     schema,
     disables=None,
-):
+) -> pd.DataFrame:
     """Validate data.
 
     Parameters

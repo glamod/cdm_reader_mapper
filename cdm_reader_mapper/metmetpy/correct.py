@@ -73,7 +73,9 @@ from .platform_type import correction_functions as corr_f_pt
 _base = f"{properties._base}"
 
 
-def _correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
+def _correct_dt(
+    data, data_model, dck, correction_method, log_level="INFO"
+) -> pd.DataFrame:
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -96,7 +98,9 @@ def _correct_dt(data, data_model, dck, correction_method, log_level="INFO"):
     return data
 
 
-def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
+def _correct_pt(
+    data, imodel, dck, pt_col, fix_methods, log_level="INFO"
+) -> pd.DataFrame:
     """DOCUMENTATION."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -133,7 +137,7 @@ def _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO"):
     return data
 
 
-def correct_datetime(data, imodel, log_level="INFO", _base=_base):
+def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
@@ -191,7 +195,7 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base):
         return pd.read_csv(buffer, **read_dict)
 
 
-def correct_pt(data, imodel, log_level="INFO", _base=_base):
+def correct_pt(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters

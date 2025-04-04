@@ -65,10 +65,16 @@ def _read_single_file(
     ifile,
     cdm_subset=None,
     col_subset=None,
-    logger=None,
+    null_label="null",
     **kwargs,
-):
-    return _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
+) -> pd.DataFrame:
+    dfi_ = _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
+    if dfi_.empty:
+        return pd.DataFrame()
+    dfi_ = dfi_.set_index("report_id", drop=False)
+    if null_label in dfi_.index:
+        return dfi_.drop(index=null_label)
+    return dfi_
 
 
 def _read_multiple_files(
@@ -78,9 +84,10 @@ def _read_multiple_files(
     extension="psv",
     cdm_subset=None,
     col_subset=None,
+    null_label="null",
     logger=None,
     **kwargs,
-):
+) -> list[pd.DataFrame]:
     if suffix is None:
         suffix = ""
 
@@ -110,15 +117,18 @@ def _read_multiple_files(
             continue
 
         dfi = _read_single_file(
-            paths_[0], cdm_subset=[table], col_subset=col_subset, **kwargs
+            paths_[0],
+            cdm_subset=[table],
+            col_subset=col_subset,
+            null_label=null_label,
+            **kwargs,
         )
-        if len(dfi) == 0:
+        if dfi.empty:
             logger.warning(
                 f"Table {table} empty in file system, not added to the final DF"
             )
             continue
 
-        dfi = dfi.set_index("report_id", drop=False)
         dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
         df_list.append(dfi)
     return df_list
@@ -133,8 +143,9 @@ def read_tables(
     col_subset=None,
     delimiter="|",
     na_values=None,
+    null_label="null",
     **kwargs,
-):
+) -> DataBundle:
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.
 
@@ -178,6 +189,9 @@ def read_tables(
     na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
         Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
         For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+    null_label: str
+        String how to label non valid values in `data`.
+        Default: null
 
     Returns
     -------
@@ -210,6 +224,7 @@ def read_tables(
                 source,
                 cdm_subset=cdm_subset,
                 col_subset=col_subset,
+                null_label=null_label,
                 logger=logger,
                 **kwargs,
             )
@@ -222,6 +237,7 @@ def read_tables(
             extension=extension,
             cdm_subset=cdm_subset,
             col_subset=col_subset,
+            null_label=null_label,
             logger=logger,
             **kwargs,
         )
@@ -234,7 +250,6 @@ def read_tables(
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
         return DataBundle(data=pd.DataFrame(), mode="tables")
-
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
     return DataBundle(data=merged, columns=merged.columns, mode="tables")

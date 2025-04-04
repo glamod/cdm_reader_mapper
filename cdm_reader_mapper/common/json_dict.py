@@ -7,7 +7,7 @@ import json
 from .getting_files import get_path
 
 
-def open_json_file(ifile, encoding="utf-8"):
+def open_json_file(ifile, encoding="utf-8") -> dict:
     """Open JSON file.
 
     Parameters
@@ -26,7 +26,7 @@ def open_json_file(ifile, encoding="utf-8"):
     return json_dict
 
 
-def collect_json_files(idir, *args, base=None, name=None):
+def collect_json_files(idir, *args, base=None, name=None) -> list[str]:
     """Collect available data_model release deck files.
 
     Parameters
@@ -70,7 +70,7 @@ def collect_json_files(idir, *args, base=None, name=None):
     return list_of_files
 
 
-def combine_dicts(list_of_files, base=None):
+def combine_dicts(list_of_files, base=None) -> dict:
     """Read list of json files and combine them to one dictionary.
 
     Parameters

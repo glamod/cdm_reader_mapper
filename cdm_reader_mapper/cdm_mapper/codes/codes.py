@@ -28,14 +28,14 @@ def _eval(s):
         return s
 
 
-def _isvalid(x):
+def _isvalid(x) -> int | None:
     try:
         return int(x)
     except ValueError:
         None
 
 
-def _expand_integer_range_key(d):
+def _expand_integer_range_key(d) -> dict:
     if not isinstance(d, dict):
         return d
     d_ = {}
@@ -65,13 +65,13 @@ def _expand_integer_range_key(d):
     return d_
 
 
-def open_code_table(ifile):
+def open_code_table(ifile) -> dict:
     """Open code table from json file on disk."""
     json_dict = open_json_file(ifile)
     return _expand_integer_range_key(json_dict)
 
 
-def get_code_table(data_model, *sub_models, code_table=None):
+def get_code_table(data_model, *sub_models, code_table=None) -> dict:
     """Load code tables into dictionary.
 
     Parameters

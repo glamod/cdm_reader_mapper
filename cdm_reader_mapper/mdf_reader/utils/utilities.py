@@ -6,7 +6,7 @@ import logging
 import os
 
 
-def convert_dtypes(dtypes):
+def convert_dtypes(dtypes) -> tuple[str]:
     """Convert datetime to object."""
     parse_dates = []
     for key, value in dtypes.items():
@@ -16,7 +16,7 @@ def convert_dtypes(dtypes):
     return dtypes, parse_dates
 
 
-def validate_arg(arg_name, arg_value, arg_type):
+def validate_arg(arg_name, arg_value, arg_type) -> bool:
     """Validate input argument is as expected type.
 
     Parameters
@@ -41,7 +41,7 @@ def validate_arg(arg_name, arg_value, arg_type):
     return True
 
 
-def validate_path(arg_name, arg_value):
+def validate_path(arg_name, arg_value) -> bool:
     """Validate input argument is an existing directory.
 
     Parameters
@@ -62,14 +62,14 @@ def validate_path(arg_name, arg_value):
     return True
 
 
-def adjust_dtype(dtype, df):
+def adjust_dtype(dtype, df) -> dict:
     """Adjust dtypes to DataFrame."""
     if not isinstance(dtype, dict):
         return dtype
     return {k: v for k, v in dtype.items() if k in df.columns}
 
 
-def convert_str_boolean(x):
+def convert_str_boolean(x) -> str | bool:
     """Convert str boolean value to boolean value."""
     if x == "True":
         x = True
@@ -78,7 +78,7 @@ def convert_str_boolean(x):
     return x
 
 
-def remove_boolean_values(x):
+def remove_boolean_values(x) -> str | None:
     """Remove boolean values."""
     x = convert_str_boolean(x)
     if x is True:

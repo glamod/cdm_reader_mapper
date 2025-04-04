@@ -28,7 +28,7 @@ from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
 
 
-def drop_duplicates(df):
+def drop_duplicates(df) -> pd.DataFrame:
     """Drop duplicates from list."""
 
     def list_to_tuple(v):
@@ -65,7 +65,7 @@ def _map_to_df(m, x):
 def _decimal_places(
     entry,
     decimal_places,
-):
+) -> int:
     if decimal_places is not None:
 
         if isinstance(decimal_places, int):
@@ -82,7 +82,7 @@ def _transform(
     transform,
     kwargs,
     logger,
-):
+) -> pd.Series:
     logger.debug(f"\ttransform: {transform}")
     logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
     trans = getattr(imodel_functions, transform)
@@ -94,7 +94,7 @@ def _code_table(
     data_model,
     code_table,
     logger,
-):
+) -> pd.Series:
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
     try:
         series = series.to_frame()
@@ -110,13 +110,13 @@ def _code_table(
 def _default(
     default,
     length,
-):
+) -> list | int:
     if isinstance(default, list):
         return [default] * length
     return default
 
 
-def _fill_value(series, fill_value):
+def _fill_value(series, fill_value) -> pd.Series | int:
     if fill_value is None:
         return series
     if series is None:
@@ -134,7 +134,7 @@ def _map_data(
     kwargs,
     length,
     logger,
-):
+) -> pd.Series:
     if series is None:
         series = _default(default, length)
     elif series.empty:
@@ -157,7 +157,9 @@ def _map_data(
     return _fill_value(series, fill_value)
 
 
-def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger):
+def _mapping(
+    idata, imapping, imodel_functions, atts, codes_subset, cols, logger
+) -> pd.DataFrame:
     elements = imapping.get("elements")
     transform = imapping.get("transform")
     kwargs = imapping.get("kwargs", {})
@@ -201,7 +203,7 @@ def _mapping(idata, imapping, imodel_functions, atts, codes_subset, cols, logger
     return data, atts
 
 
-def _convert_dtype(data, atts, logger):
+def _convert_dtype(data, atts, logger) -> pd.DataFrame:
     if atts is None:
         return np.nan
     itype = atts.get("data_type")
@@ -226,7 +228,7 @@ def _map_and_convert(
     cdm_tables,
     cdm_complete,
     logger,
-):
+) -> pd.DataFrame:
     atts = deepcopy(cdm_tables[table]["atts"])
     columns = (
         [x for x in atts.keys() if x in idata.columns]
@@ -273,7 +275,7 @@ def map_and_convert(
     cdm_complete=True,
     null_label="null",
     logger=None,
-):
+) -> pd.DataFrame:
     """Map and convert MDF data to CDM tables."""
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
@@ -343,26 +345,31 @@ def map_model(
     null_label="null",
     cdm_complete=True,
     log_level="INFO",
-):
+) -> pd.DataFrame:
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
     data: pandas.DataFrame, pd.parser.TextFileReader or io.String
-      input data to map.
+        input data to map.
     imodel: str
-      A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
-      CDM in a specific way.
-      e.g. ``icoads_r300_d704``
+        A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
+        CDM in a specific way.
+        e.g. ``icoads_r300_d704``
     cdm_subset: list, optional
-      subset of CDM model tables to map.
-      Defaults to the full set of CDM tables defined for the imodel.
+        subset of CDM model tables to map.
+        Defaults to the full set of CDM tables defined for the imodel.
     codes_subset: list, optional
-      subset of code mapping tables to map.
-      Default to the full set of code mapping tables defined for the imodel.
+        subset of code mapping tables to map.
+        Default to the full set of code mapping tables defined for the imodel.
+    null_label: str
+        String how to label non valid values in `data`.
+        Default: null
+    cdm_complete:
+        If True map entire CDM tables list.
     log_level: str
-      level of logging information to save.
-      Defaults to ‘DEBUG’.
+        level of logging information to save.
+        Default: DEBUG.
 
     Returns
     -------

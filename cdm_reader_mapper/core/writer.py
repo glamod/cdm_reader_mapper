@@ -10,7 +10,7 @@ def write(
     data,
     mode="data",
     **kwargs,
-):
+) -> None:
     """Write either MDF data or CDM tables on disk.
 
     Parameters

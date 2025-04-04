@@ -40,7 +40,9 @@ In this case deck 704: US Marine Meteorological Journal collection of data code:
 
 .. code-block:: console
 
-    cdm_tables = db.map_model()
+    db_cdm = db.map_model()
+
+    cdm_tables = db_cdm.data
 
 4. Detect duplicated observations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,11 +51,15 @@ Detect and flag duplicated observations without overwriting the original CDM tab
 
 .. code-block:: console
 
-    db.duplicate_check()
+    db_dup = db.duplicate_check()
 
-    flagged_tables = db.flag_duplicates()
+     db_dup_f = db_dup.flag_duplicates()
 
-    removed_tables = db.remove_duplicates()
+     flagged_tables = db_dup_f.data
+
+     db_dup_r = db_dup.remove_duplicates()
+
+     removed_tables = db_dup_r.data
 
 5. Write the output
 ~~~~~~~~~~~~~~~~~~~
@@ -61,5 +67,4 @@ This writes the output to an ascii file with a pipe delimited format using the f
 
 .. code-block:: console
 
-    db.data = flagged_tables
     db.write()

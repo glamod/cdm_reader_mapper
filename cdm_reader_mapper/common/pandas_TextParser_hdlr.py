@@ -31,7 +31,7 @@ read_params = [
 ]
 
 
-def make_copy(OParser):
+def make_copy(OParser) -> pd.io.parsers.TextFileReader:
     """Make a copy of a pandas TextParser object."""
     try:
         f = OParser.handles.handle
@@ -44,7 +44,7 @@ def make_copy(OParser):
         return
 
 
-def restore(Parser):
+def restore(Parser) -> pd.io.parsers.TextFileReader:
     """Restore pandas TextParser object."""
     try:
         f = Parser.handles.handle
@@ -57,7 +57,7 @@ def restore(Parser):
         return Parser
 
 
-def is_not_empty(Parser):
+def is_not_empty(Parser) -> bool:
     """Return boolean whether pandas TextParser object is empty."""
     try:
         Parser_copy = make_copy(Parser)
@@ -79,7 +79,7 @@ def is_not_empty(Parser):
         return False
 
 
-def get_length(Parser):
+def get_length(Parser) -> int:
     """Get length of pandas TextParser object."""
     try:
         Parser_copy = make_copy(Parser)

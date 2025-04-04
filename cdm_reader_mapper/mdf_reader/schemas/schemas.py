@@ -18,7 +18,7 @@ from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 from .. import properties
 
 
-def convert_dtype_to_default(dtype, section, element):
+def convert_dtype_to_default(dtype, section, element) -> str:
     """Convert data type to defaults (int, float)."""
     if dtype is None:
         return
@@ -39,7 +39,7 @@ def convert_dtype_to_default(dtype, section, element):
     return dtype
 
 
-def _read_schema(schema):
+def _read_schema(schema) -> dict:
     """DOCUMENTATION."""
     if not schema["header"]:
         if not schema["sections"]:
@@ -111,7 +111,7 @@ def _read_schema(schema):
     return schema
 
 
-def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
+def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict:
     """
     Read a data model schema file.
 
@@ -176,7 +176,7 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None):
     return _read_schema(schema)
 
 
-def df_schema(df_columns, schema):
+def df_schema(df_columns, schema) -> dict:
     """
     Create simple data model schema dictionary.
 

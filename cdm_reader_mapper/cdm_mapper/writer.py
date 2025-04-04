@@ -36,7 +36,7 @@ def _table_to_ascii(
     encoding="utf-8",
     col_subset=None,
     filename=None,
-):
+) -> None:
     data = data.dropna(how="all")
 
     header = True
@@ -63,7 +63,7 @@ def write_tables(
     delimiter="|",
     encoding="utf-8",
     **kwargs,
-):
+) -> None:
     """Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters

@@ -14,14 +14,14 @@ import pandas as pd
 from cdm_reader_mapper.common import pandas_TextParser_hdlr
 
 
-def count_by_cat_i(series):
+def count_by_cat_i(series) -> dict:
     """Count unique values."""
     counts = series.value_counts(dropna=False)
     counts.index.fillna(str(np.nan))
     return counts.to_dict()
 
 
-def get_length(data):
+def get_length(data) -> int:
     """Get length of pandas object.
 
     Parameters
@@ -40,7 +40,7 @@ def get_length(data):
         return pandas_TextParser_hdlr.get_length(data)
 
 
-def count_by_cat(data, columns=None):
+def count_by_cat(data, columns=None) -> dict:
     """Count unique values.
 
     Parameters
@@ -64,19 +64,18 @@ def count_by_cat(data, columns=None):
         for column in columns:
             counts[column] = count_by_cat_i(data[column])
         return counts
-    else:
-        for column in columns:
-            data_cp = pandas_TextParser_hdlr.make_copy(data)
-            count_dicts = []
-            for df in data_cp:
-                count_dicts.append(count_by_cat_i(df[column]))
+    for column in columns:
+        data_cp = pandas_TextParser_hdlr.make_copy(data)
+        count_dicts = []
+        for df in data_cp:
+            count_dicts.append(count_by_cat_i(df[column]))
 
-            data_cp.close()
-            cats = [list(x.keys()) for x in count_dicts]
-            cats = list({x for y in cats for x in y})
-            cats.sort
-            count_dict = {}
-            for cat in cats:
-                count_dict[cat] = sum([x.get(cat) for x in count_dicts if x.get(cat)])
-            counts[column] = count_dict
-        return counts
+        data_cp.close()
+        cats = [list(x.keys()) for x in count_dicts]
+        cats = list({x for y in cats for x in y})
+        cats.sort
+        count_dict = {}
+        for cat in cats:
+            count_dict[cat] = sum([x.get(cat) for x in count_dicts if x.get(cat)])
+        counts[column] = count_dict
+    return counts
