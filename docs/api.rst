@@ -17,8 +17,11 @@ Read data from disk
    :toctree: generated/
 
    read
-   read_mdf
+
    read_data
+
+   read_mdf
+
    read_tables
 
 .. _databundle:
@@ -70,11 +73,21 @@ Selection
 .. autosummary::
    :toctree: generated/
 
-   DataBundle.select_from_index
+   DataBundle.split_by_boolean_true
 
-   DataBundle.select_from_list
+   DataBundle.split_by_boolean_false
 
-   DataBundle.select_true
+   DataBundle.split_by_column_entries
+
+   DataBundle.split_by_index
+
+   DataBundle.select_where_all_true
+
+   DataBundle.select_where_all_false
+
+   DataBundle.select_where_entry_isin
+
+   DataBundle.select_where_index_isisn
 
 .. _validation:
 
@@ -121,9 +134,9 @@ Duplicate check
 
    DataBundle.duplicate_check
 
-   DataBundle.get_duplicates
-
    DataBundle.flag_duplicates
+
+   DataBundle.get_duplicates
 
    DataBundle.remove_duplicates
 
@@ -143,17 +156,21 @@ DataBundle's property attributes
 .. autosummary::
    :toctree: generated/
 
-   DataBundle.data
-
    DataBundle.columns
+
+   DataBundle.data
 
    DataBundle.dtypes
 
-   DataBundle.parse_dates
+   DataBundle.encoding
+
+   DataBundle.imodel
 
    DataBundle.mask
 
-   DataBundle.imodel
+   DataBundle.mode
+
+   DataBundle.parse_dates
 
 .. _useful_func:
 
@@ -164,18 +181,43 @@ Useful functions
    :toctree: generated/
 
    correct_datetime
+
    correct_pt
-   unique
-   replace_columns
-   validate_datetime
-   validate_id
-   select_true
-   select_from_index
-   select_from_list
-   map_model
+
    duplicate_check
+
+   map_model
+
+   read
+
+   read_data
+
+   read_mdf
+
+   read_tables
+
+   replace_columns
+
+   split_by_boolean
+
+   split_by_boolea_false
+
+   split_by_boolean_true
+
+   split_by_column_entries
+
+   split_by_index
+
+   unique
+
+   validate_datetime
+
+   validate_id
+
    write
+
    write_data
+
    write_tables
 
 .. _dupdetect:
@@ -194,8 +236,8 @@ Check Duplicates
 .. autosummary::
    :toctree: generated/
 
-   DupDetect.get_duplicates
-
    DupDetect.flag_duplicates
+
+   DupDetect.get_duplicates
 
    DupDetect.remove_duplicates
