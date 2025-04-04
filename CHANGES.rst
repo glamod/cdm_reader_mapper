@@ -23,7 +23,6 @@ New features and enhancements
 * make ``DataBundle`` support item assignment for ``DataBundle.data`` (:pull:`248`).
 * optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
 * ``cdm_reader.reader.read_tables``: optionally, set null_label (:pull:`242`)
-* ``DataBundle.select_*``: optionally, return unselected pd.DataFrame as second return value by setting ``return_invalid`` to ``True`` (:pull:`242`)
 * new method functions: ``DataBundle.select_where_all_false`` (:pull:`242`)
 * new method functions: ``DataBundle.split_*`` (:pull:`242`)
 
