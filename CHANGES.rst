@@ -53,7 +53,7 @@ Breaking changes
     * ``DataBundle.select_from_list`` -> ``DataBundle.select_where_entry_isin``
     * ``DataBundle.select_from_index`` -> ``DataBundle.select_where_index_isin``
 
-* rename ``cdm_reader_mapper.common.select_*`` functions and make them returning tuple of selected and rejected data (:pull:`242`):
+* rename ``cdm_reader_mapper.common.select_*`` functions and make them returning a tuple of selected and rejected data after user-defined selection criteria (:pull:`242`):
 
     * ``select_true`` -> ``split_by_boolean_true``
     * ``select_from_list`` -> ``split_by_column_entries``
