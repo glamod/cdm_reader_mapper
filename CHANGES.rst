@@ -31,7 +31,6 @@ New features and enhancements
   * ``DataBundle.split_by_column_entries``
   * ``DataBundle.split_by_index``
 
-* optionally, set ``null_label`` in ``cdm_reader_mapper.read_cdm`` (:pull:`242`)
 * implement pandas indexer like ``iloc`` for not chunked data (:pull:`242`)
 
 Internal changes
