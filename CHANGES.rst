@@ -24,7 +24,7 @@ New features and enhancements
 * optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
 * ``cdm_reader.reader.read_tables``: optionally, set null_label (:pull:`242`)
 * new method function: ``DataBundle.select_where_all_false`` (:pull:`242`)
-* new method functions: ``DataBundle.split_*`` which split a DataBundle into two new DataBundles containig data selected and rejected after user-defined selection criteria (:pull:`242`)
+* new method functions: ``DataBundle.split_*`` which split a DataBundle into two new DataBundles containing data selected and rejected after user-defined selection criteria (:pull:`242`)
 
   * ``DataBundle.split_by_boolean_true``
   * ``DataBundle.split_by_boolean_false``
