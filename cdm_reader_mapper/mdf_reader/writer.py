@@ -13,13 +13,13 @@ from cdm_reader_mapper.common import get_filename
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
-def _update_dtypes(dtypes, columns):
+def _update_dtypes(dtypes, columns) -> dict:
     if isinstance(dtypes, dict):
         dtypes = {k: v for k, v in dtypes.items() if k in columns}
     return dtypes
 
 
-def _update_col_names(dtypes, col_o, col_n):
+def _update_col_names(dtypes, col_o, col_n) -> str | dict:
     if isinstance(dtypes, str):
         return dtypes
     if col_o in dtypes.keys():
@@ -42,7 +42,7 @@ def write_data(
     col_subset=None,
     delimiter=",",
     **kwargs,
-):
+) -> None:
     """Write pandas.DataFrame to MDF file on file system.
 
     Parameters

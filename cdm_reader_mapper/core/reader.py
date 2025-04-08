@@ -5,12 +5,14 @@ from __future__ import annotations
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.mdf_reader.reader import read_mdf, read_data
 
+from .databundle import DataBundle
+
 
 def read(
     source,
     mode="mdf",
     **kwargs,
-):
+) -> DataBundle:
     """Read either original marine-meteorological data or MDF data or CDM tables from disk.
 
     Parameters
@@ -25,6 +27,10 @@ def read(
           * "tables" to read CDM tables from disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
 
         Default: mdf
+
+    Returns
+    -------
+    DataBundle
 
     See Also
     --------

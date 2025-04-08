@@ -22,15 +22,43 @@ New features and enhancements
 * apply pandas functions directly to ``DataBundle.data`` by calling ``DataBundle.<pandas-func>`` (:pull:`248`).
 * make ``DataBundle`` support item assignment for ``DataBundle.data`` (:pull:`248`).
 * optionally, apply selections to ``DataBundle.mask`` in ``DataBundle.select_*`` functions (:pull:`248`).
+* ``cdm_reader.reader.read_tables``: optionally, set null_label (:pull:`242`)
+* new method function: ``DataBundle.select_where_all_false`` (:pull:`242`)
+* new method functions: ``DataBundle.split_*`` which split a DataBundle into two new DataBundles containing data selected and rejected after user-defined selection criteria (:pull:`242`)
 
+  * ``DataBundle.split_by_boolean_true``
+  * ``DataBundle.split_by_boolean_false``
+  * ``DataBundle.split_by_column_entries``
+  * ``DataBundle.split_by_index``
+
+* implement pandas indexer like ``iloc`` for not chunked data (:pull:`242`)
+
+Internal changes
+^^^^^^^^^^^^^^^^^
+
+* ``cdm_reader_mapper.common.select``: restructure, simplify and summarize functions (:pull:`242`)
+* split DataBundle class into main class (``cdm_reader_mapper.core._utilities``) and method function class (``cdm_reader_mapper.core.databundle``) (:pull:`242`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
 
 * remove property ``tables`` from ``DataBundle`` object. Instead, ``DataBundle.map_model`` overwrites ``.DataBundle.data`` (:pull:`238`).
 * set default ``overwrite`` values from ``True`` to ``False`` that is consistent with pandas ``inplace`` argument and rename ``overwrite`` to ``inplace`` (:pull:`238`, :pull:`248`).
+* ``inplace`` returns ``None`` that is consistent with pandas (:pull:`242`)
 * ``DataBundle`` method functions return a ``DataBundle`` instead of a ``pandas.DataFrame`` (:pull:`248`).
 * ``DataBundle.select_*`` functions write only selected entries to ``DataBundle.data`` and do not take other list entries from ``common.select_*`` function returns into account (:pull:`248`).
+* select functions do not reset indexes by default (:pull:`242`)
+* rename ``DataBundle.select_*`` functions:
+
+    * ``DataBundle.select_true`` -> ``DataBundle.select_where_all_boolean``
+    * ``DataBundle.select_from_list`` -> ``DataBundle.select_where_entry_isin``
+    * ``DataBundle.select_from_index`` -> ``DataBundle.select_where_index_isin``
+
+* rename ``cdm_reader_mapper.common.select_*`` functions and make them returning a tuple of selected and rejected data after user-defined selection criteria (:pull:`242`):
+
+    * ``select_true`` -> ``split_by_boolean_true``
+    * ``select_from_list`` -> ``split_by_column_entries``
+    * ``select_from_index`` -> ``spit_by_index``
 
 Bug fixes
 ^^^^^^^^^
@@ -39,6 +67,8 @@ Bug fixes
 * ``cdm_reder_mapper.metmetpy``: set ``imma1`` to ``icoads`` and ``immt`` to ``gcc`` in icoads/gcc json files which makes properties accessible again (:pull:`238`).
 * ``DataBundle.copy`` function now makes a real deepcopy of ``DataBundle`` object (:pull:`248`).
 * correct key index->section for self.df.attrs in open_netcdf (:pull:`252`)
+* ``cdm_reader_mapper.map_model``: return null_label if conversion fails (:pull:`242`)
+* keep indexes during duplicate check (:pull:`242`)
 
 2.0.1 (2025-02-25)
 ------------------
