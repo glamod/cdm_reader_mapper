@@ -309,7 +309,7 @@ class MDFFileReader(FileReader):
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
-        logging.info("Creata output DataBundle object")
+        logging.info("Creat a output DataBundle object")
         data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
