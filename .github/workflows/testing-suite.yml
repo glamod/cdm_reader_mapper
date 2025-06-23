@@ -65,7 +65,7 @@ jobs:
 
       - name: Import cdm_reader_mapper toolbox
         run: |
-          python -c "import cdm_reader_mapper"
+          uv run python -c "import cdm_reader_mapper"
 
       - name: Run tests
         timeout-minutes: 10
