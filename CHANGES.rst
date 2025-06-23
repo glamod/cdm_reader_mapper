@@ -3,6 +3,14 @@
 Changelog
 =========
 
+2.1.1 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+License and Legal
+^^^^^^^^^^^^^^^^^
+Updated copyright statements in `LICENSE` (:issue:`271`, :pull:`272`).
+
 2.1.0 (2025-04-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
