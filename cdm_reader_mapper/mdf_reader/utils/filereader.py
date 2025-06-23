@@ -116,7 +116,7 @@ class FileReader:
             **kwargs,
         )
 
-    def _read_netcdf(self, **kwargs) -> pd.Dataset:
+    def _read_netcdf(self, **kwargs) -> xr.Dataset:
         ds = xr.open_mfdataset(self.source, **kwargs)
         self._adjust_schema(ds, ds.dtypes)
         return ds.squeeze()
@@ -158,9 +158,10 @@ class FileReader:
         valid,
         chunksize,
         open_with="pandas",
+        encoding: str | None = None,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
-        encoding = self.schema["header"].get("encoding")
+        encoding = encoding or self.schema["header"].get("encoding")
         if open_with == "netcdf":
             TextParser = self._read_netcdf()
         elif open_with == "pandas":

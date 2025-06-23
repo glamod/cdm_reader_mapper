@@ -241,6 +241,7 @@ class MDFFileReader(FileReader):
         converter_dict=None,
         converter_kwargs=None,
         validate=True,
+        encoding: str | None = None,
         **kwargs,
     ) -> DataBundle:
         """Read data from disk.
@@ -266,6 +267,8 @@ class MDFFileReader(FileReader):
           If None use information from a pre-defined data model.
         validate: bool, default: True
           Validate data entries by using a pre-defined data model.
+        encoding: str, optional
+          Encoding of the input file, overrides the value in the imodel schema
         """
         # 0. VALIDATE INPUT
         if not validate_arg("sections", sections, list):
@@ -296,6 +299,7 @@ class MDFFileReader(FileReader):
             sections,
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
+            encoding=encoding,
             chunksize=chunksize,
         )
 
@@ -330,6 +334,7 @@ def read_mdf(
     ext_table_path=None,
     year_init=None,
     year_end=None,
+    encoding: str | None = None,
     **kwargs,
 ) -> DataBundle:
     """Read data files compliant with a user specific data model.
@@ -361,6 +366,8 @@ def read_mdf(
         Left border of time axis.
     year_end: str or int, optional
         Right border of time axis.
+    encoding : str, optional
+        The encoding of the input file. Overrides the value in the imodel schema file.
 
     Returns
     -------
@@ -396,7 +403,7 @@ def read_mdf(
         ext_table_path=ext_table_path,
         year_init=year_init,
         year_end=year_end,
-    ).read(**kwargs)
+    ).read(encoding=encoding, **kwargs)
 
 
 def read_data(
