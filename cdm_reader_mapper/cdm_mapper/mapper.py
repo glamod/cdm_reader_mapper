@@ -121,6 +121,11 @@ def _fill_value(series, fill_value) -> pd.Series | int:
         return series
     if series is None:
         return fill_value
+    if isinstance(fill_value, str):
+        dtype = "object"
+    else:
+        dtype = type(fill_value)
+    series = series.astype(dtype)
     return series.fillna(value=fill_value)
 
 
@@ -208,12 +213,13 @@ def _convert_dtype(data, atts, logger) -> pd.DataFrame:
         return np.nan
     itype = atts.get("data_type")
     if converters.get(itype):
+        print(converters.get(itype))
         iconverter_kwargs = iconverters_kwargs.get(itype)
         if iconverter_kwargs:
             kwargs = {x: atts.get(x) for x in iconverter_kwargs}
         else:
             kwargs = {}
-        return converters.get(itype)(data, np.nan, **kwargs)
+        data = converters.get(itype)(data, np.nan, **kwargs)
     return data
 
 
