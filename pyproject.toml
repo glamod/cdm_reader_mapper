@@ -134,7 +134,7 @@ values = [
 
 [tool.codespell]
 ignore-words-list = "sentinal, vaid, SME, ASII, TRU"
-skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*.csv"
+skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*.csv, tests/test_schemas/**/*.json"
 
 [tool.coverage.run]
 relative_files = true
