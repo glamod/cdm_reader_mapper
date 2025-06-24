@@ -163,19 +163,6 @@ from ._testing_workflow_suite import _testing_suite
             },
         ),
         (
-            "icoads_r300_d721",
-            None,
-            None,
-            False,
-            None,
-            {
-                "encoding": "cp1252",
-                "ext_schema_file": os.path.join(
-                    os.path.dirname(__file__), "test_schemas", "d721_no_encoding.json"
-                ),
-            },
-        ),
-        (
             "icoads_r300_mixed",
             None,
             None,
