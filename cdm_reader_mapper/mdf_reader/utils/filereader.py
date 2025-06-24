@@ -106,6 +106,8 @@ class FileReader:
         return df.iloc[index].reset_index(drop=True)
 
     def _read_pandas(self, **kwargs) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        if (enc := kwargs.get("encoding")) is not None:
+            logging.info(f"Reading with encoding = {enc}")
         return pd.read_fwf(
             self.source,
             header=None,
