@@ -175,6 +175,14 @@ from ._testing_workflow_suite import _testing_suite
                 ),
             },
         ),
+        (
+            "icoads_r300_mixed",
+            None,
+            None,
+            False,
+            None,
+            {"encoding": "cp1252"},
+        ),
     ],
 )
 def test_read_data(
