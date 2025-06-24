@@ -294,12 +294,13 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
+        self.encoding = encoding or self.encoding
         data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
-            encoding=encoding,
+            encoding=self.encoding,
             chunksize=chunksize,
         )
 
