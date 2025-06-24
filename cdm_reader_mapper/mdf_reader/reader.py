@@ -314,7 +314,7 @@ class MDFFileReader(FileReader):
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
-        logging.info("Creat a output DataBundle object")
+        logging.info("Create an output DataBundle object")
         data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
@@ -413,6 +413,7 @@ def read_data(
     info=None,
     imodel=None,
     col_subset=None,
+    encoding: str | None = None,
     **kwargs,
 ) -> DataBundle:
     """Read MDF data which is already on a pre-defined data model.
@@ -438,6 +439,8 @@ def read_data(
           e.g. list type object col_subset = [columns]
 
         Column labels could be both string or tuple.
+    encoding : str, optional
+        The encoding of the input file. Overrides the value in the imodel schema file.
 
     Returns
     -------
@@ -489,6 +492,7 @@ def read_data(
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,
+        encoding=encoding,
     )
     mask = _read_csv(mask, col_subset=col_subset)
     return DataBundle(
@@ -498,4 +502,5 @@ def read_data(
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,
+        encoding=encoding,
     )
