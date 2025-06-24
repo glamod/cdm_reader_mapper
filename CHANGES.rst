@@ -11,6 +11,11 @@ License and Legal
 ^^^^^^^^^^^^^^^^^
 Updated copyright statements in `LICENSE` (:issue:`271`, :pull:`272`).
 
+Bug fixes
+^^^^^^^^^
+
+* ``cdm_reader_mapper.write_data``: fix doubling of output file name (:pull:`273`)
+
 2.1.0 (2025-04-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
