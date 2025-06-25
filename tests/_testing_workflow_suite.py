@@ -47,6 +47,7 @@ def _testing_suite(
         mask=f"mask-{imodel}.csv",
         info=f"info-{imodel}.json",
         mode="data",
+        **kwargs,
     )
 
     data_res = db_res.data.copy()
@@ -64,6 +65,7 @@ def _testing_suite(
         info=expected_data["info"],
         col_subset=data_res.columns,
         mode="data",
+        **kwargs,
     )
     data_exp = db_exp.data.copy()
     mask_exp = db_exp.mask.copy()

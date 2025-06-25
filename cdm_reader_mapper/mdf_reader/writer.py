@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from io import StringIO as StringIO
 
 import pandas as pd
@@ -160,10 +159,10 @@ def write_data(
             "index": False,
             "sep": delimiter,
         }
-        data_df.to_csv(os.path.join(out_dir, filename_data), **kwargs)
+        data_df.to_csv(filename_data, **kwargs)
         if not mask_df.empty:
-            mask_df.to_csv(os.path.join(out_dir, filename_mask), **kwargs)
+            mask_df.to_csv(filename_mask, **kwargs)
 
     if info:
-        with open(os.path.join(out_dir, filename_info), "w") as fileObj:
+        with open(filename_info, "w") as fileObj:
             json.dump(info, fileObj, indent=4)

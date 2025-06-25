@@ -241,6 +241,7 @@ class MDFFileReader(FileReader):
         converter_dict=None,
         converter_kwargs=None,
         validate=True,
+        encoding: str | None = None,
         **kwargs,
     ) -> DataBundle:
         """Read data from disk.
@@ -266,6 +267,8 @@ class MDFFileReader(FileReader):
           If None use information from a pre-defined data model.
         validate: bool, default: True
           Validate data entries by using a pre-defined data model.
+        encoding: str, optional
+          Encoding of the input file, overrides the value in the imodel schema
         """
         # 0. VALIDATE INPUT
         if not validate_arg("sections", sections, list):
@@ -291,11 +294,13 @@ class MDFFileReader(FileReader):
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         self.configurations = self.get_configurations(read_sections_list, sections)
+        self.encoding = encoding or self.encoding
         data = self.open_data(
             read_sections_list,
             sections,
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
+            encoding=self.encoding,
             chunksize=chunksize,
         )
 
@@ -309,7 +314,7 @@ class MDFFileReader(FileReader):
         mask = self.validate_entries(data, validate)
 
         # 3. Create output DataBundle object
-        logging.info("Creat a output DataBundle object")
+        logging.info("Create an output DataBundle object")
         data = self.remove_boolean_values(data)
         return DataBundle(
             data=data,
@@ -330,6 +335,7 @@ def read_mdf(
     ext_table_path=None,
     year_init=None,
     year_end=None,
+    encoding: str | None = None,
     **kwargs,
 ) -> DataBundle:
     """Read data files compliant with a user specific data model.
@@ -361,6 +367,8 @@ def read_mdf(
         Left border of time axis.
     year_end: str or int, optional
         Right border of time axis.
+    encoding : str, optional
+        The encoding of the input file. Overrides the value in the imodel schema file.
 
     Returns
     -------
@@ -396,7 +404,7 @@ def read_mdf(
         ext_table_path=ext_table_path,
         year_init=year_init,
         year_end=year_end,
-    ).read(**kwargs)
+    ).read(encoding=encoding, **kwargs)
 
 
 def read_data(
@@ -405,6 +413,7 @@ def read_data(
     info=None,
     imodel=None,
     col_subset=None,
+    encoding: str | None = None,
     **kwargs,
 ) -> DataBundle:
     """Read MDF data which is already on a pre-defined data model.
@@ -430,6 +439,8 @@ def read_data(
           e.g. list type object col_subset = [columns]
 
         Column labels could be both string or tuple.
+    encoding : str, optional
+        The encoding of the input file. Overrides the value in the imodel schema file.
 
     Returns
     -------
@@ -481,6 +492,7 @@ def read_data(
         col_subset=col_subset,
         dtype=dtype,
         parse_dates=parse_dates,
+        encoding=encoding,
     )
     mask = _read_csv(mask, col_subset=col_subset)
     return DataBundle(
@@ -490,4 +502,5 @@ def read_data(
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,
+        encoding=encoding,
     )
