@@ -162,20 +162,6 @@ def string_add_i(a, b, c, sep) -> str | None:
         return sep.join(filter(None, [a, b, c]))
 
 
-def to_datetime(series, format):
-    """Convert to datetime object."""
-    # print(string, format)
-    try:
-        series = series.astype(int)
-    except TypeError:
-        return pd.NaT
-    series = series.astype(str)
-    string = "-".join(series)
-    print(string)
-    print(datetime.datetime.strptime(string, format))
-    return datetime.datetime.strptime(string, format)
-
-
 def to_int(series):
     """Convert value to integer if possible."""
     try:
