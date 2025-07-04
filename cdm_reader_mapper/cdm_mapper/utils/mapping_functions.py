@@ -162,6 +162,16 @@ def string_add_i(a, b, c, sep) -> str | None:
         return sep.join(filter(None, [a, b, c]))
 
 
+def to_int(series):
+    """Convert value to integer if possible."""
+    try:
+        return int(series)
+    except TypeError:
+        return pd.NA
+    except ValueError:
+        return pd.NA
+
+
 class mapping_functions:
     """Class for mapping Common Data Model (CDM)."""
 
@@ -170,7 +180,7 @@ class mapping_functions:
         self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_hm(self, series) -> pd.Series:
-        """Convert datetime object to hours and minutes."""
+        """Convert to hours and minutes."""
         hr = series.values[4]
         if not isinstance(hr, (int, float)):
             series = series.apply(lambda x: None)
@@ -189,9 +199,10 @@ class mapping_functions:
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
-        df = df.astype(int, errors="ignore")
+        df = df.applymap(to_int)
+        strings = df.astype(str).apply("-".join, axis=1).values
         return pd.to_datetime(
-            df.astype(str).apply("-".join, axis=1).values,
+            strings,
             format=date_format,
             errors="coerce",
         )
