@@ -42,11 +42,11 @@ imodel_lineages = {
 }
 
 c2k_methods = {
-    "gcc": "method_b",
+    "gdac": "method_b",
 }
 
 k_elements = {
-    "gcc": 1,
+    "gdac": 1,
 }
 
 tf = TimezoneFinder()

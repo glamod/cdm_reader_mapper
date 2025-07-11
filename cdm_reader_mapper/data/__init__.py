@@ -176,7 +176,7 @@ class test_data:
         """IMMAT deck ??? test data."""
         return self._get_data_dict(
             "2003-02-01_subset.immt",
-            "gcc",
+            "gdac",
         )
 
     @property

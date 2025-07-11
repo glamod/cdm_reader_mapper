@@ -1,0 +1,36 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "_SST"
+    }
+  },
+  "observed_variable": {
+    "default": 95
+  },
+  "secondary_variable": {},
+  "observation_value": {
+    "elements": [
+      "SSN",
+      "SST"
+    ],
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "secondary_value": {
+    "elements": "SSN",
+    "code_table": "T_sign"
+  },
+  "units": {
+    "default": 5
+  },
+  "original_units": {
+    "elements": "IT"
+  },
+  "original_value": {
+    "elements": "SST",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

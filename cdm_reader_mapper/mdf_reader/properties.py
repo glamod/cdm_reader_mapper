@@ -11,7 +11,7 @@ open_file = {
 }
 
 year_column = {
-    "gcc": "YR",
+    "gdac": "YR",
     "icoads": ("core", "YR"),
     "craid": ("drifter_measurements", "JULD"),
 }

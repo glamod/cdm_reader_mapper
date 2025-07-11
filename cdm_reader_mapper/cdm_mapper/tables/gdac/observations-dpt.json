@@ -1,0 +1,36 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "_DPT"
+    }
+  },
+  "observed_variable": {
+    "default": 36
+  },
+  "secondary_variable": {},
+  "observation_value": {
+    "elements": [
+      "ST",
+      "DPT"
+    ],
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "secondary_value": {
+    "elements": "ST",
+    "code_table": "T_sign"
+  },
+  "units": {
+    "default": 5
+  },
+  "original_units": {
+    "elements": "IT"
+  },
+  "original_value": {
+    "elements": "DPT",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "_AT"
+    }
+  },
+  "secondary_variable": {
+    "default": 16
+  },
+  "observed_variable": {
+    "default": 85
+  },
+  "observation_value": {
+    "elements": [
+      "SN",
+      "AT"
+    ],
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
+  },
+  "secondary_value": {
+    "elements": "SN",
+    "code_table": "T_sign"
+  },
+  "units": {
+    "default": 5
+  },
+  "original_units": {
+    "elements": "IT"
+  },
+  "original_value": {
+    "elements": "AT",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}
