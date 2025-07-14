@@ -106,7 +106,7 @@ def convert_str(data, null_label) -> pd.Series:
         if isinstance(x, list):
             return str(x)
         if pd.isna(x):
-            return str(null_label)
+            return null_label
         return str(x)
 
     return data.apply(lambda x: _return_str(x, null_label))
