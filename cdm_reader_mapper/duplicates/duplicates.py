@@ -220,7 +220,12 @@ class DupDetect:
 
         def _get_similars(drop, keeps):
             if drop[drop_] in keeps:
-                return (int(drop[drop_]), int(drop[keep_]))
+                drops = drop[drop_]
+                keeps = drop[keep_]
+                try:
+                    return int(drops), int(keeps)
+                except ValueError:
+                    return drops, keeps
 
         def _get_duplicates(x, last):
             b = list(set(x[last].values))
