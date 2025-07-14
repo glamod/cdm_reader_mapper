@@ -213,7 +213,6 @@ def _convert_dtype(data, atts, logger) -> pd.DataFrame:
         return np.nan
     itype = atts.get("data_type")
     if converters.get(itype):
-        print(converters.get(itype))
         iconverter_kwargs = iconverters_kwargs.get(itype)
         if iconverter_kwargs:
             kwargs = {x: atts.get(x) for x in iconverter_kwargs}
