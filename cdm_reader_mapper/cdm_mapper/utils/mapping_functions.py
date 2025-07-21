@@ -140,10 +140,15 @@ def location_accuracy_i(li, lat) -> int | np.nan:
     """Calculate location accuracy."""
     degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
     deg_km = 111
-    accuracy = degrees.get(int(li), np.nan) * math.sqrt(
-        (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
-    )
-    return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
+    try:
+        accuracy = degrees.get(int(li), np.nan) * math.sqrt(
+            (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
+        )
+    except ValueError:
+        return np.nan
+    if np.isnan(accuracy):
+        return np.nan
+    return max(1, int(round(accuracy)))
 
 
 def convert_to_str(a) -> str:
