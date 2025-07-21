@@ -37,7 +37,10 @@ def validate_numeric(elements, data, schema) -> pd.DataFrame:
         x = convert_str_boolean(x)
         if isinstance(x, bool):
             return x
-        return float(x)
+        try:
+            return float(x)
+        except ValueError:
+            return False
 
     data[elements] = data[elements].map(_to_numeric)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
