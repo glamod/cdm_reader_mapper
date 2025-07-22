@@ -144,6 +144,13 @@ class result_data:
         )
 
     @property
+    def expected_icoads_r300_mixed(self):
+        return self._get_data_dict(
+            "1899-01-02_subset",
+            "icoads_r300_mixed",
+        )
+
+    @property
     def expected_icoads_r302_d792(self):
         return self._get_data_dict(
             "2022-02-01_subset",

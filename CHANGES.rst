@@ -3,6 +3,26 @@
 Changelog
 =========
 
+2.1.1 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* add ``encoding`` optional argument to ``cdm_reader_mapper.read_mdf`` and ``cdm_reader_mapper.read_data`` which overrides default value set by model schema if set (:issue:`268`, :pull:`273`).
+
+License and Legal
+^^^^^^^^^^^^^^^^^
+Updated copyright statements in `LICENSE` (:issue:`271`, :pull:`272`).
+
+Bug fixes
+^^^^^^^^^
+
+* ``cdm_reader_mapper.write_data``: fix doubling of output file name (:pull:`273`)
+* ``cdm_reader_mapper.cdm_mapper.mapping_functions``: datetime conversion now ignores unformatable dates (:issue:`277`, :pull:`278`)
+* ``README``: fixing hyperlink (:issue:`279`. :pull:`280`)
+
 2.1.0 (2025-04-08)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)

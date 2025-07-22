@@ -58,7 +58,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "black[jupyter] ==25.1.0",
-  "blackdoc ==0.4.0",
+  "blackdoc ==0.4.1",
   "codespell ==2.4.1",
   "coverage >=7.5.0",
   "coveralls >=4.0.1",
@@ -100,11 +100,7 @@ all = ["cdm_reader_mapper[dev]", "cdm_reader_mapper[docs]"]
 [tool]
 
 [tool.black]
-target-version = [
-  "py310",
-  "py311",
-  "py312"
-]
+target-version = ["py310", "py311", "py312"]
 
 [tool.bumpversion]
 commit = true
@@ -127,14 +123,11 @@ independent = false
 
 [tool.bumpversion.parts.release]
 optional_value = "release"
-values = [
-  "dev",
-  "release"
-]
+values = ["dev", "release"]
 
 [tool.codespell]
 ignore-words-list = "sentinal, vaid, SME, ASII, TRU"
-skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*.csv"
+skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*"
 
 [tool.coverage.run]
 relative_files = true
@@ -222,11 +215,7 @@ testpaths = ["./tests"]
 src = ["cdm_reader_mapper"]
 line-length = 150
 target-version = "py312"
-exclude = [
-  ".git",
-  "build",
-  ".eggs"
-]
+exclude = [".git", "build", ".eggs"]
 extend-include = [
   "*.ipynb" # Include notebooks
 ]

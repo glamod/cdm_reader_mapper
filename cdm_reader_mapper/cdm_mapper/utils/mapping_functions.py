@@ -167,6 +167,16 @@ def string_add_i(a, b, c, sep) -> str | None:
         return sep.join(filter(None, [a, b, c]))
 
 
+def to_int(series):
+    """Convert value to integer if possible."""
+    try:
+        return int(series)
+    except TypeError:
+        return pd.NA
+    except ValueError:
+        return pd.NA
+
+
 class mapping_functions:
     """Class for mapping Common Data Model (CDM)."""
 
@@ -197,9 +207,10 @@ class mapping_functions:
         df = df.apply(
             lambda x: self.datetime_decimalhour_to_hm(x, def_hr=def_hr), axis=1
         )
-        df = df.astype(int, errors="ignore")
+        df = df.applymap(to_int)
+        strings = df.astype(str).apply("-".join, axis=1).values
         return pd.to_datetime(
-            df.astype(str).apply("-".join, axis=1).values,
+            strings,
             format=date_format,
             errors="coerce",
         )

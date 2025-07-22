@@ -76,6 +76,14 @@ class test_data:
         )
 
     @property
+    def test_icoads_r300_mixed(self):
+        """IMMA1 mixed test data."""
+        return self._get_data_dict(
+            "1899-01-02_subset.imma",
+            "icoads_r300_mixed",
+        )
+
+    @property
     def test_icoads_r302_d794(self):
         """IMMA1 deck 794 test data."""
         return self._get_data_dict(
