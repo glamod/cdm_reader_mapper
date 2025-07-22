@@ -37,14 +37,16 @@ class df_converters:
                 x = x.strip()
                 x.replace(" ", "0")
             try:
-                result = offset + Decimal(str(x)) * scale
+                x = Decimal(str(x))
+                decimal_places = max_decimal_places(offset, scale, x)
+                result = offset + x * scale
                 return result.quantize(Decimal("1." + "0" * decimal_places))
             except ValueError:
                 return False
 
         offset = Decimal(str(offset))
         scale = Decimal(str(scale))
-        decimal_places = max_decimal_places(offset, scale)
+        # decimal_places = max_decimal_places(offset, scale)
 
         return data.apply(lambda x: _to_numeric(x))
 
