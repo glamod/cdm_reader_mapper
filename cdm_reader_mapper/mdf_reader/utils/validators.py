@@ -97,7 +97,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path) -> pd.DataFra
         value = validation_df.astype(dtype).astype("str")
         valid = validation_df.notna()
         mask_ = value.isin(table_keys)
-        mask[element] = mask_.where(valid, True)
+        mask[element] = mask_.where(valid, True) | validation_df.isna()
 
     return mask
 
