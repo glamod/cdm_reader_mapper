@@ -174,26 +174,29 @@ class mapping_functions:
         self.imodel = imodel
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_hm(self, series) -> pd.Series:
+    def datetime_decimalhour_to_hm(self, series, def_hr=None) -> pd.Series:
         """Convert datetime object to hours and minutes."""
         hr = series.values[4]
         if not isinstance(hr, (int, float)):
-            series = series.apply(lambda x: None)
-            return series
+            if def_hr is None:
+                return series.apply(lambda x: None)
+            hr = def_hr
         timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
         series["HR"] = int(seconds / 3600)
         series["M"] = int(seconds / 60) % 60
         return series
 
-    def datetime_imma1(self, df) -> pd.DateTimeIndex:  # TZ awareness?
+    def datetime_imma1(self, df, def_hr=None) -> pd.DateTimeIndex:  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
         df = df.assign(HR=df.iloc[:, -1])
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
-        df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
+        df = df.apply(
+            lambda x: self.datetime_decimalhour_to_hm(x, def_hr=def_hr), axis=1
+        )
         df = df.astype(int, errors="ignore")
         return pd.to_datetime(
             df.astype(str).apply("-".join, axis=1).values,
