@@ -138,8 +138,7 @@
         "C1": {
           "description": "country code",
           "field_length": 2,
-          "column_type": "key",
-          "codetable": "ICOADS.C0.C1"
+          "column_type": "key"
         },
         "DI": {
           "description": "wind direction indic.",
@@ -473,8 +472,7 @@
         "C2": {
           "description": "2nd country code",
           "field_length": 2,
-          "column_type": "key",
-          "codetable": "ICOADS.C0.C1"
+          "column_type": "key"
         },
         "SQZ": {
           "description": "SST: z flag",
@@ -742,45 +740,45 @@
           "description": "observation source",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.os"
+          "codetable": "ICOADS.C5.OS"
         },
         "OP": {
           "description": "observation platform",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.op"
+          "codetable": "ICOADS.C5.OP"
         },
         "FM": {
           "description": "FM code version",
           "field_length": 1,
           "column_type": "int",
           "encoding": "base36",
-          "codetable": "icoads_3_0.fm"
+          "codetable": "ICOADS.C5.FM"
         },
         "IMMV": {
           "description": "IMMT version",
           "field_length": 1,
           "column_type": "int",
           "encoding": "base36",
-          "codetable": "icoads_3_0.immv"
+          "codetable": "ICOADS.C5.IMMV"
         },
         "IX": {
           "description": "station / weather indic.",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.ix"
+          "codetable": "ICOADS.C5.IX"
         },
         "W2": {
           "description": "2nd past weather",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.pastWeather"
+          "codetable": "ICOADS.C5.W2"
         },
         "WMI": {
           "description": "indicicator for wave measurement",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.wmi"
+          "codetable": "ICOADS.C5.WMI"
         },
         "SD2": {
           "description": "direction of secondary swell",
@@ -807,7 +805,7 @@
           "description": "ice accretion on ship",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.is"
+          "codetable": "ICOADS.C5.IS"
         },
         "ES": {
           "description": "thickness of ice accretion",
@@ -820,7 +818,7 @@
           "description": "rate of ice accretion",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.rs"
+          "codetable": "ICOADS.C5.RS"
         },
         "IC1": {
           "description": "concentration of sea ice",
@@ -873,7 +871,7 @@
           "description": "duration of period of reference for amount of precipitation",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.tr"
+          "codetable": "ICOADS.C5.TR"
         },
         "NU": {
           "description": "national use",
@@ -885,133 +883,133 @@
           "description": "quality control indicator",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicatorGeneral"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI1": {
           "description": "QC indicator for height of clouds",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI2": {
           "description": "QC indicator for visibility",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI3": {
           "description": "QC indicator for clouds",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI4": {
           "description": "QC indicator for wind direction",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI5": {
           "description": "QC indicator for wind speed",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI6": {
           "description": "QC indicator for air temperature",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI7": {
           "description": "QC indicator for dew-point temperature",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI8": {
           "description": "QC indicator for air pressure",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI9": {
           "description": "QC indicator for weather",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI10": {
           "description": "QC indicator for sea surface temperature",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI11": {
           "description": "QC indicator for period of wind waves of of measured waves",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI12": {
           "description": "QC indicator for height of wind waves of of measured waves",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI13": {
           "description": "QC indicator for swell",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI14": {
           "description": "QC indicator for precipitation",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI15": {
           "description": "QC indicator for characteristic of pressure tendency",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI16": {
           "description": "QC indicator for amount of pressure tendency",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI17": {
           "description": "QC indicator for true direction of ship",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI18": {
           "description": "QC indicator for ship's average speed",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI19": {
           "description": "QC indicator for wet-bulb temperature",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI20": {
           "description": "QC indicator for ship's position",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI21": {
           "description": "MQCS version",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCversion"
+          "codetable": "ICOADS.C5.MQCSv"
         },
         "HDG": {
           "description": "ships's heading",
@@ -1068,49 +1066,49 @@
           "description": "QC indicator for ship's heading",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI23": {
           "description": "QC indicator for course over ground",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI24": {
           "description": "QC indicator for speed over ground",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI25": {
           "description": "QC indicator for SLL",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI26": {
           "description": "see doc",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI27": {
           "description": "QC indicator for SLHH",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI28": {
           "description": "QC indicator for relative wind direction",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "QI29": {
           "description": "QC indicator for relative wind speed",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.MQCIndicator"
+          "codetable": "ICOADS.C5.MQCS"
         },
         "RH": {
           "description": "relative humidity",
@@ -1125,13 +1123,13 @@
           "description": "relative humidity indicator",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.rhi"
+          "codetable": "ICOADS.C5.RHI"
         },
         "AWSI": {
           "description": "AWS indicator",
           "field_length": 1,
           "column_type": "int",
-          "codetable": "icoads_3_0.awsi"
+          "codetable": "ICOADS.C5.AWSI"
         },
         "IMONO": {
           "description": "IMO number",
@@ -1334,45 +1332,41 @@
           "column_type": "str",
           "valid_max": 1.0,
           "valid_min": 0.0,
-          "scale": 1.0,
-          "precision": null,
-          "codetable": null
+          "scale": 1.0
         },
         "C1M": {
           "description": "recruiting country",
           "field_length": 2,
-          "column_type": "str",
-          "codetable": "icoads_3_0.country"
+          "column_type": "str"
         },
         "OPM": {
           "description": "type of ship (program)",
           "field_length": 2,
           "column_type": "int",
-          "codetable": "icoads_3_0.opm"
+          "codetable": "ICOADS.C7.OPM"
         },
         "KOV": {
           "description": "kind of vessel",
           "field_length": 2,
           "column_type": "str",
-          "codetable": "icoads_3_0.kov"
+          "codetable": "ICOADS.c7.KOV"
         },
         "COR": {
           "description": "country of registry",
           "field_length": 2,
-          "column_type": "str",
-          "codetable": "icoads_3_0.country"
+          "column_type": "str"
         },
         "TOB": {
           "description": "type of barometer",
           "field_length": 3,
           "column_type": "str",
-          "codetable": "icoads_3_0.tob"
+          "codetable": "ICOADS.C7.TOB"
         },
         "TOT": {
           "description": "type of thermometer",
           "field_length": 3,
           "column_type": "str",
-          "codetable": "icoads_3_0.tot"
+          "codetable": "ICOADS.C7.TOT"
         },
         "EOT": {
           "description": "exposure of thermometer",
@@ -1384,13 +1378,13 @@
           "description": "screen location",
           "field_length": 2,
           "column_type": "int",
-          "codetable": "icoads_3_0.lot"
+          "codetable": "ICOADS.c7.LOT"
         },
         "TOH": {
           "description": "type of hygrometer",
           "field_length": 1,
           "column_type": "str",
-          "codetable": "icoads_3_0.toh"
+          "codetable": "ICOADS.C7.TOH"
         },
         "EOH": {
           "description": "exposure of hygrometer",
@@ -1402,7 +1396,7 @@
           "description": "SST measurement method",
           "field_length": 3,
           "column_type": "str",
-          "codetable": "icoads_3_0.sstMethod_c7"
+          "codetable": "ICOADS.C7.SIM"
         },
         "LOV": {
           "description": "length of vessel",
@@ -1460,9 +1454,7 @@
           "column_type": "int",
           "valid_max": 99999.0,
           "valid_min": 0.0,
-          "scale": 1.0,
-          "precision": null,
-          "codetable": null
+          "scale": 1.0
         },
         "SMV": {
           "description": "source format version",
@@ -1470,7 +1462,7 @@
           "column_type": "int",
           "valid_max": 99,
           "valid_min": 0,
-          "codetable": "icoads_3_0.smv"
+          "codetable": "ICOADS.C7.SMV"
         }
       }
     },
@@ -1720,50 +1712,42 @@
           "description": "change code",
           "field_length": 1,
           "column_type": "int",
-          "encoding": "base36",
-          "codetable": "ICOADS.C9.CCe"
+          "encoding": "base36"
         },
         "WWe": {
           "description": "present weather",
           "field_length": 2,
-          "column_type": "int",
-          "codetable": "icoads_3_0.ww"
+          "column_type": "int"
         },
         "Ne": {
           "description": "total cloud amount",
           "field_length": 1,
-          "column_type": "int",
-          "codetable": "ICOADS.C9.N"
+          "column_type": "int"
         },
         "NHe": {
           "description": "lower cloud amount",
           "field_length": 1,
-          "column_type": "int",
-          "codetable": "ICOADS.C9.NH"
+          "column_type": "int"
         },
         "He": {
           "description": "lower cloud base height",
           "field_length": 1,
-          "column_type": "int",
-          "codetable": "icoads_3_0.h"
+          "column_type": "int"
         },
         "CLe": {
           "description": "low cloud type",
           "field_length": 2,
-          "column_type": "int",
-          "codetable": "icoads_3_0.cl"
+          "column_type": "int"
         },
         "CMe": {
           "description": "middle cloud type",
           "field_length": 2,
-          "column_type": "int",
-          "codetable": "icoads_3_0.cm"
+          "column_type": "int"
         },
         "CHe": {
           "description": "high cloud type",
           "field_length": 1,
-          "column_type": "int",
-          "codetable": "icoads_3_0.ch"
+          "column_type": "int"
         },
         "AM": {
           "description": "middle cloud amount",
@@ -1800,8 +1784,7 @@
         "SBI": {
           "description": "sky-brightness indicator",
           "field_length": 1,
-          "column_type": "int",
-          "codetable": "ICOADS.C9.SBI"
+          "column_type": "int"
         },
         "SA": {
           "description": "solar altitude",
@@ -1877,8 +1860,6 @@
           "description": "model-collocated first guess value",
           "field_length": 7,
           "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
           "scale": 1.0,
           "precision": "1"
         },
@@ -1886,8 +1867,6 @@
           "description": "model-collocated first guess",
           "field_length": 7,
           "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
           "scale": 1.0,
           "precision": "1"
         },
@@ -1895,8 +1874,6 @@
           "description": "value or repesentative value",
           "field_length": 7,
           "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
           "scale": 1.0,
           "precision": "1"
         },
@@ -1904,8 +1881,6 @@
           "description": "model-collocated analysis spread",
           "field_length": 7,
           "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
           "scale": 1.0,
           "precision": "1"
         },
@@ -1913,8 +1888,6 @@
           "description": "bias corrected value",
           "field_length": 7,
           "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
           "scale": 1.0,
           "precision": "1"
         },
@@ -1928,7 +1901,6 @@
           "description": "creation date",
           "field_length": 8,
           "column_type": "int",
-          "valid_max": null,
           "valid_min": 20140101.0
         },
         "ASIR": {
@@ -1982,12 +1954,7 @@
         "VAD": {
           "description": "value added data",
           "field_length": 6,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null,
-          "codetable": null
+          "column_type": "float"
         },
         "IVAU1": {
           "description": "type indicator for VAU1",
@@ -2008,11 +1975,7 @@
         "VAU1": {
           "description": "uncertainty of type IVAU1",
           "field_length": 6,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null
+          "column_type": "float"
         },
         "IVAU2": {
           "description": "type indicator for VAU2",
@@ -2033,11 +1996,7 @@
         "VAU2": {
           "description": "uncertainty of type IVAU2",
           "field_length": 6,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null
+          "column_type": "float"
         },
         "IVAU3": {
           "description": "type indicator for VAU3",
@@ -2058,11 +2017,7 @@
         "VAU3": {
           "description": "uncertainty of type IVAU3",
           "field_length": 6,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null
+          "column_type": "float"
         },
         "VQC": {
           "description": "value added QC flag",
@@ -2074,18 +2029,12 @@
         "ARCI": {
           "description": "author reference code",
           "field_length": 4,
-          "column_type": "object",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null,
-          "codetable": null
+          "column_type": "object"
         },
         "CDI": {
           "description": "creation date",
           "field_length": 8,
           "column_type": "int",
-          "valid_max": null,
           "valid_min": 20140101.0
         },
         "ASII": {
@@ -2131,36 +2080,22 @@
         "CEF": {
           "description": "corrected / erroneous field flag",
           "field_length": 1,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null
+          "column_type": "float"
         },
         "ERRD": {
           "description": "corrected / erroneous field value",
           "field_length": 10,
-          "column_type": "float",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null
+          "column_type": "float"
         },
         "ARCE": {
           "description": "author reference code",
           "field_length": 4,
-          "column_type": "object",
-          "valid_max": null,
-          "valid_min": null,
-          "scale": null,
-          "precision": null,
-          "codetable": null
+          "column_type": "object"
         },
         "CDE": {
           "description": "creation date",
           "field_length": 8,
           "column_type": "int",
-          "valid_max": null,
           "valid_min": 20140101.0
         },
         "ASIE": {
