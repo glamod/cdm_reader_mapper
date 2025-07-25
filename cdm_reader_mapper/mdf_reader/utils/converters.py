@@ -46,7 +46,6 @@ class df_converters:
 
         offset = Decimal(str(offset))
         scale = Decimal(str(scale))
-        # decimal_places = max_decimal_places(offset, scale)
 
         return data.apply(lambda x: _to_numeric(x))
 
