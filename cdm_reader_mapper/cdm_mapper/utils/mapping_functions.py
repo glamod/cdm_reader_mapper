@@ -188,9 +188,7 @@ class mapping_functions:
         """Convert datetime object to hours and minutes."""
         hr = series.values[4]
         if not isinstance(hr, (int, float)):
-            if def_hr is None:
-                return series.apply(lambda x: None)
-            hr = def_hr
+            return series.apply(lambda x: None)
         timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
         series["HR"] = int(seconds / 3600)
