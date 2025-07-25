@@ -121,12 +121,7 @@ def _fill_value(series, fill_value) -> pd.Series | int:
         return series
     if series is None:
         return fill_value
-    if isinstance(fill_value, str):
-        dtype = "object"
-    else:
-        dtype = type(fill_value)
-    series = series.astype(dtype)
-    return series.fillna(value=fill_value)
+    return series.fillna(value=fill_value).infer_objects(copy=False)
 
 
 def _map_data(
