@@ -138,7 +138,7 @@
         "C1": {
           "description": "country code",
           "field_length": 2,
-          "column_type": "key"
+          "column_type": "str"
         },
         "DI": {
           "description": "wind direction indic.",
@@ -472,7 +472,7 @@
         "C2": {
           "description": "2nd country code",
           "field_length": 2,
-          "column_type": "key"
+          "column_type": "str"
         },
         "SQZ": {
           "description": "SST: z flag",
