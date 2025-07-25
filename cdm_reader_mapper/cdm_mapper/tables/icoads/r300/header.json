@@ -4,11 +4,6 @@
       "prepend": "ICOADS-30"
     }
   },
-  "report_timestamp": {
-    "kwargs": {
-      "def_hr": 12
-    }
-  },
   "source_id": {
     "kwargs": {
       "prepend": "ICOADS-3-0-0T"
