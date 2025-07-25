@@ -195,7 +195,7 @@ class mapping_functions:
         series["M"] = int(seconds / 60) % 60
         return series
 
-    def datetime_imma1(self, df, def_hr=None) -> pd.DateTimeIndex:  # TZ awareness?
+    def datetime_imma1(self, df) -> pd.DateTimeIndex:  # TZ awareness?
         """Convert to pandas datetime object."""
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
