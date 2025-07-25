@@ -184,7 +184,7 @@ class mapping_functions:
         self.imodel = imodel
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_hm(self, series, def_hr=None) -> pd.Series:
+    def datetime_decimalhour_to_hm(self, series) -> pd.Series:
         """Convert datetime object to hours and minutes."""
         hr = series.values[4]
         if not isinstance(hr, (int, float)):
