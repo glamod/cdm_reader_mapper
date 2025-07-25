@@ -8,6 +8,7 @@
       "LON",
       "LAT"
     ],
-    "transform": "datetime_to_cdm_time",
+    "transform": "datetime_to_cdm_time"
+
   }
 }
