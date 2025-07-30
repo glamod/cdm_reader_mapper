@@ -167,13 +167,13 @@ def string_add_i(a, b, c, sep) -> str | None:
         return sep.join(filter(None, [a, b, c]))
 
 
-def to_int(series):
-    """Convert value to integer if possible."""
-    try:
-        return int(series)
-    except TypeError:
+def to_int(value):
+    """Convert value to integer if possible, return pd.NA for invalid input."""
+    if pd.isna(value):
         return pd.NA
-    except ValueError:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
         return pd.NA
 
 
@@ -203,7 +203,7 @@ class mapping_functions:
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
-        df = df.apply(np.vectorize(to_int))
+        df = df.applymap(np.vectorize(to_int))
         strings = df.astype(str).apply("-".join, axis=1).values
         return pd.to_datetime(
             strings,
