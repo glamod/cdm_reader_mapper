@@ -135,9 +135,7 @@ def _map_data(
     length,
     logger,
 ) -> pd.Series:
-    if series is None:
-        series = _default(default, length)
-    elif series.empty:
+    if (series is None or series.empty) and not transform:
         series = _default(default, length)
     elif transform:
         series = _transform(

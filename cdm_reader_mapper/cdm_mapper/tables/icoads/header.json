@@ -138,8 +138,6 @@
     "transform": "datetime_utcnow"
   },
   "history": {
-    "sections": "core",
-    "elements": "YR",
     "transform": "lineage"
   },
   "source_id": {
