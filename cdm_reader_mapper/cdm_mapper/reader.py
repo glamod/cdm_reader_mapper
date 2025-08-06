@@ -68,6 +68,8 @@ def _read_single_file(
     null_label="null",
     **kwargs,
 ) -> pd.DataFrame:
+    if not isinstance(cdm_subset, list):
+        cdm_subset = [cdm_subset]
     dfi_ = _read_file(ifile, table=cdm_subset[0], col_subset=col_subset, **kwargs)
     if dfi_.empty:
         return pd.DataFrame()
@@ -100,6 +102,8 @@ def _read_multiple_files(
         return [pd.DataFrame()]
 
     df_list = []
+    if not isinstance(cdm_subset, list):
+        cdm_subset = [cdm_subset]
     for table in cdm_subset:
         if table not in properties.cdm_tables:
             logger.warning(f"Requested table {table} not defined in CDM")
@@ -225,7 +229,6 @@ def read_tables(
                 cdm_subset=cdm_subset,
                 col_subset=col_subset,
                 null_label=null_label,
-                logger=logger,
                 **kwargs,
             )
         ]

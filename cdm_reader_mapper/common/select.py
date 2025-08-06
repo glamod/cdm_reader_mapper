@@ -134,7 +134,6 @@ def split_parser(
         if _prev_index1 is None:
             _prev_index1 = out1.__dict__["_prev_index"]
         else:
-            print(out1.__dict__["_prev_index"])
             _prev_index1 = _prev_index1.union(out1.__dict__["_prev_index"])
         if _prev_index2 is None:
             _prev_index2 = out2.__dict__["_prev_index"]
