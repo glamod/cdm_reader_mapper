@@ -191,7 +191,7 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 
 .. _How to map to the Common Data Model (CDM): https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/CDM_mapper_example_deck704.html
 
-.. _How to read an IMMA file: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/mdf_reader_test_overview.html
+.. _How to read an IMMA file: https://cdm-reader-mapper.readthedocs.io/en/latest/example_notebooks/read_overview.html
 
 .. _IMMA: https://icoads.noaa.gov/e-doc/imma/R3.0-imma1.pdf
 
