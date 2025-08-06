@@ -126,7 +126,7 @@ optional_value = "release"
 values = ["dev", "release"]
 
 [tool.codespell]
-ignore-words-list = "sentinel, vaid, SME, ASII, TRU"
+ignore-words-list = "vaid, SME, ASII, TRU"
 skip = "cdm_reader_mapper/mdf_reader/codes/**/*.json, cdm_reader_mapper/mdf_reader/schemas/**/*.json, cdm_reader_mapper/cdm_mapper/codes/**/*.json, tests/results/*"
 
 [tool.coverage.run]

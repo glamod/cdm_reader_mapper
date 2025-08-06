@@ -172,7 +172,7 @@ class test_data:
         )
 
     @property
-    def test_gcc(self):
+    def test_gdac(self):
         """IMMAT deck ??? test data."""
         return self._get_data_dict(
             "2003-02-01_subset.immt",
