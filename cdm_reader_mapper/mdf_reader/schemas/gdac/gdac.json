@@ -147,7 +147,6 @@
       "valid_max": 9999.9,
       "valid_min": 0.0,
       "scale": 0.1,
-      "column_name": "PPPP",
       "units": "hectopascal"
     },
     "ww": {
