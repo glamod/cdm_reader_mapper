@@ -24,6 +24,8 @@ Contributors
 
 * Elizabeth Kent <eck@noc.ac.uk> `@lizkent <https://github.com/lizkent>`_
 
+* Jan Marius Willruth <jan.willruth@dwd.de> `@JanWillruth <https://github.com/JanWillruth>`_
+
 Previous Contributors
 ---------------------
 
