@@ -16,7 +16,9 @@ class df_converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
         self.preprocessing_functions = {
-            'PPPP': lambda x: str(10000 + int(x)) if isinstance(x, str) and x.startswith('0') else x
+            "PPPP": lambda x: (
+                str(10000 + int(x)) if isinstance(x, str) and x.startswith("0") else x
+            )
         }
 
     def to_numeric(self, data, offset, scale) -> pd.Series:
