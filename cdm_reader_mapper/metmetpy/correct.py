@@ -161,7 +161,7 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFram
     _base = f"{_base}.datetime"
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {imodel} has to deck information.")
+        logger.warning(f"Dataset {imodel} has no deck information.")
         return data
     dck = mrd[2]
 

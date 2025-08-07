@@ -10,25 +10,25 @@
   },
   "observation_value": {
     "elements": [
-      "SW",
-      "WBT"
+      "sgnTbTbTb",
+      "TbTbTb"
     ],
     "transform": "temperature_celsius_to_kelvin",
     "decimal_places": 2
   },
   "secondary_value": {
-    "elements": "SW",
+    "elements": "sgnTbTbTb",
     "code_table": "T_sign"
   },
   "units": {
     "default": 5
   },
   "original_units": {
-    "elements": "IT"
+    "elements": "iT"
   },
   "original_code_table": {},
   "original_value": {
-    "elements": "WBT",
+    "elements": "TbTbTb",
     "decimal_places": 1
   },
   "conversion_method": {

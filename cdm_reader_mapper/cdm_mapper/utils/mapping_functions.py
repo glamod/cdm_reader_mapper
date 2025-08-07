@@ -207,6 +207,17 @@ class mapping_functions:
             errors="coerce",
         )
 
+    def datetime_immt(self, df) -> pd.DatetimeIndex:
+        """Convert to pandas datetime object for IMMT format."""
+        date_format = "%Y-%m-%d-%H-%M"
+        df["M"] = 0
+        strings = df.astype(str).apply("-".join, axis=1).values
+        return pd.to_datetime(
+            strings,
+            format=date_format,
+            errors="coerce",
+        )
+
     def datetime_utcnow(self, df) -> datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
@@ -343,7 +354,7 @@ class mapping_functions:
         return np.vectorize(string_add_i)(prepend, joint, append, sep=separator)
 
     def temperature_celsius_to_kelvin(self, df) -> pd.DataFrame | pd.Series:
-        """Convert temperature from degrre Ceslius to Kelvin."""
+        """Convert temperature from Celsius to Kelvin."""
         method = find_entry(self.imodel, c2k_methods)
         if not method:
             method = "method_a"
@@ -369,15 +380,15 @@ class mapping_functions:
         df.astype(float)
         return np.round(df / 3.2808, 2)
 
-    def guid(self, df, prepend="", append="") -> pd.DataFrame | pd.Series:
-        """DOCUMENTATION."""
+    def gdac_uid(self, df, prepend="", append="") -> pd.DataFrame | pd.Series:
+        """Generate unique UID from timestamp + ship's callsign (ID)"""
         df = df.copy()
-        df["YR"] = df["YR"].apply(lambda x: f"{x:04d}")
-        df["MO"] = df["MO"].apply(lambda x: f"{x:02d}")
-        df["DY"] = df["DY"].apply(lambda x: f"{x:02d}")
+        df["AAAA"] = df["AAAA"].apply(lambda x: f"{x:04d}")
+        df["MM"] = df["MM"].apply(lambda x: f"{x:02d}")
+        df["YY"] = df["YY"].apply(lambda x: f"{x:02d}")
         df["GG"] = df["GG"].astype("int64").apply(lambda x: f"{x:02d}")
         name = df.apply(lambda x: "".join(x), axis=1)
-        uid = np.empty(np.shape(df["YR"]), dtype="U126")
+        uid = np.empty(np.shape(df["AAAA"]), dtype="U126")
         for i, n in enumerate(name):
             uid[i] = (
                 str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)

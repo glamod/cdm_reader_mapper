@@ -345,7 +345,7 @@
       "codetable": "IMMT.SW"
     },
     "TbTbTb": {
-      "description": "wet-bulb temperature",
+      "description": "Wet-bulb temperature",
       "field_length": 3,
       "column_type": "float",
       "valid_max": 99.9,

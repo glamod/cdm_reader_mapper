@@ -1,13 +1,13 @@
 {
   "report_id": {
     "elements": [
-      "YR",
-      "MO",
-      "DY",
+      "AAAA",
+      "MM",
+      "YY",
       "GG",
       "ID"
     ],
-    "transform": "guid",
+    "transform": "gdac_uid",
     "kwargs": {
       "prepend": "gdac_"
     }
@@ -43,12 +43,11 @@
     "default": 5
   },
   "longitude": {
-    "elements": "LON",
-    "transform": "longitude_360to180",
+    "elements": "LoLoLoLo",
     "decimal_places": 1
   },
   "latitude": {
-    "elements": "LAT",
+    "elements": "LaLaLa",
     "decimal_places": 1
   },
   "location_accuracy": {},
@@ -61,14 +60,14 @@
   },
   "station_speed": {
     "elements": [
-      "YR",
-      "VS"
+      "AAAA",
+      "vs"
     ],
     "code_table": "ship_speed_ms",
     "decimal_places": 1
   },
   "station_course": {
-    "elements": "DS",
+    "elements": "Ds",
     "code_table": "station_course",
     "decimal_places": 0
   },
@@ -88,12 +87,12 @@
   },
   "report_timestamp": {
     "elements": [
-      "YR",
-      "MO",
-      "DY",
+      "AAAA",
+      "MM",
+      "YY",
       "GG"
     ],
-    "transform": "datetime_imma1"
+    "transform": "datetime_immt"
   },
   "report_duration": {
     "default": 11
@@ -106,7 +105,7 @@
   "profile_id": {},
   "events_at_station": {},
   "report_quality": {
-    "elements": "QCI"
+    "elements": "iQC"
   },
   "duplicate_status": {
     "default": 4
@@ -116,7 +115,7 @@
     "transform": "datetime_utcnow"
   },
   "history": {
-    "elements": "YR",
+    "elements": "AAAA",
     "transform": "lineage"
   },
   "processing_level": {},

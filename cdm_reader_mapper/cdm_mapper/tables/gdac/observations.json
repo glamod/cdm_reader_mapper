@@ -1,26 +1,26 @@
 {
   "observation_id": {
     "elements": [
-      "YR",
-      "MO",
-      "DY",
+      "AAAA",
+      "MM",
+      "YY",
       "GG",
       "ID"
     ],
-    "transform": "guid",
+    "transform": "gdac_uid",
     "kwargs": {
       "prepend": "gdac_"
     }
   },
   "report_id": {
     "elements": [
-      "YR",
-      "MO",
-      "DY",
+      "AAAA",
+      "MM",
+      "YY",
       "GG",
       "ID"
     ],
-    "transform": "guid",
+    "transform": "gdac_uid",
     "kwargs": {
       "prepend": "gdac_"
     }
@@ -30,24 +30,23 @@
   },
   "date_time": {
     "elements": [
-      "YR",
-      "MO",
-      "DY",
+      "AAAA",
+      "MM",
+      "YY",
       "GG"
     ],
-    "transform": "datetime_imma1"
+    "transform": "datetime_immt"
   },
   "date_time_meaning": {},
   "observation_duration": {
     "default": 8
   },
   "longitude": {
-    "elements": "LON",
-    "transform": "longitude_360to180",
+    "elements": "LoLoLoLo",
     "decimal_places": 1
   },
   "latitude": {
-    "elements": "LAT",
+    "elements": "LaLaLa",
     "decimal_places": 1
   },
   "crs": {

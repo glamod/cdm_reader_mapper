@@ -10,24 +10,24 @@
   "secondary_variable": {},
   "observation_value": {
     "elements": [
-      "ST",
-      "DPT"
+      "sgnTdTdTd",
+      "TdTdTd"
     ],
     "transform": "temperature_celsius_to_kelvin",
     "decimal_places": 2
   },
   "secondary_value": {
-    "elements": "ST",
+    "elements": "sgnTdTdTd",
     "code_table": "T_sign"
   },
   "units": {
     "default": 5
   },
   "original_units": {
-    "elements": "IT"
+    "elements": "iT"
   },
   "original_value": {
-    "elements": "DPT",
+    "elements": "TdTdTd",
     "decimal_places": 1
   },
   "conversion_method": {

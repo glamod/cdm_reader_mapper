@@ -12,24 +12,24 @@
   },
   "observation_value": {
     "elements": [
-      "SN",
-      "AT"
+      "sgnTTT",
+      "TTT"
     ],
     "transform": "temperature_celsius_to_kelvin",
     "decimal_places": 2
   },
   "secondary_value": {
-    "elements": "SN",
+    "elements": "sgnTTT",
     "code_table": "T_sign"
   },
   "units": {
     "default": 5
   },
   "original_units": {
-    "elements": "IT"
+    "elements": "iT"
   },
   "original_value": {
-    "elements": "AT",
+    "elements": "TTT",
     "decimal_places": 1
   },
   "conversion_method": {

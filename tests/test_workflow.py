@@ -94,13 +94,9 @@ from ._testing_workflow_suite import _testing_suite
             "gdac",
             None,
             None,
-            False,
-            None,
-            {
-                "ext_schema_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "gdac"
-                )
-            },
+            True,
+            [0, 1, 2, 3, 4],
+            {"year_init": 2002},
         ),
         (
             "craid",

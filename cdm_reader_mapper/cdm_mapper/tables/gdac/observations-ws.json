@@ -9,7 +9,7 @@
     "default": 107
   },
   "observation_value": {
-    "elements": "W",
+    "elements": "ff",
     "decimal_places": 1
   },
   "units": {
@@ -19,7 +19,7 @@
     "default": 731
   },
   "original_value": {
-    "elements": "W",
+    "elements": "ff",
     "decimal_places": 1
   },
   "conversion_method": {},
