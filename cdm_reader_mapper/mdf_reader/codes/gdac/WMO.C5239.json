@@ -1,0 +1,13 @@
+{
+  "0": "Ship in open water with floating ice in sight",
+  "1": "Ship in easily penetrable ice; conditions improving-Ship in ice",
+  "2": "Ship in easily penetrable ice; conditions not changing-Ship in ice",
+  "3": "Ship in easily penetrable ice; conditions worsening-Ship in ice",
+  "4": "Ship in ice difficult to penetrate; conditions improving-Ship in ice",
+  "5": "Ship in ice difficult to penetrate; conditions not changing-Ship in ice",
+  "6": "Ice forming and floes freezing together-Ship in ice difficult to penetrate and conditions worsening-Ship in ice",
+  "7": "Ice under slight pressure-Ship in ice difficult to penetrate and conditions worsening-Ship in ice",
+  "8": "Ice under moderate or severe pressure-Ship in ice difficult to penetrate and conditions worsening-Ship in ice",
+  "9": "Ship beset-Ship in ice difficult to penetrate and conditions worsening-Ship in ice",
+  "/": "Unable to report, because of darkness or lack of visibility"
+}

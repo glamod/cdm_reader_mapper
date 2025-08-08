@@ -1,0 +1,12 @@
+{
+  "0": "unknown",
+  "1": "selected ship",
+  "2": "supplementary ship",
+  "3": "auxiliary ship",
+  "4": "registered VOSClim ship",
+  "5": "fixed sea station (e.g., rig or platform)",
+  "6": "coastal station",
+  "7": "[reserved]",
+  "8": "[reserved]",
+  "9": "others / data buoy"
+}

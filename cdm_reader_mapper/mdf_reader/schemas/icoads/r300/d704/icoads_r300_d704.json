@@ -22,7 +22,7 @@
       },
       {
         "s": [
-          "c99_sentinal",
+          "c99_sentinel",
           "c99_journal",
           "c99_voyage",
           "c99_daily"
@@ -39,7 +39,7 @@
   "sections": {
     "c98": {
       "header": {
-        "sentinal": "9815",
+        "sentinel": "9815",
         "length": 15
       },
       "elements": {
@@ -98,9 +98,9 @@
         }
       }
     },
-    "c99_sentinal": {
+    "c99_sentinel": {
       "header": {
-        "sentinal": "99 0 ",
+        "sentinel": "99 0 ",
         "length": 5,
         "field_layout": "fixed_width"
       },
@@ -130,12 +130,12 @@
     },
     "c99_journal": {
       "header": {
-        "sentinal": "1",
+        "sentinel": "1",
         "field_layout": "fixed_width",
         "length": 117
       },
       "elements": {
-        "sentinal": {
+        "sentinel": {
           "description": "Journal header record identifier",
           "field_length": 1,
           "column_type": "str"
@@ -291,12 +291,12 @@
     },
     "c99_voyage": {
       "header": {
-        "sentinal": "2",
+        "sentinel": "2",
         "length": 52,
         "field_layout": "fixed_width"
       },
       "elements": {
-        "sentinal": {
+        "sentinel": {
           "description": "Voyage header record identifier",
           "field_length": 1,
           "column_type": "str"
@@ -335,12 +335,12 @@
     },
     "c99_daily": {
       "header": {
-        "sentinal": "3",
+        "sentinel": "3",
         "field_layout": "fixed_width",
         "length": 61
       },
       "elements": {
-        "sentinal": {
+        "sentinel": {
           "description": "Daily information record identifier",
           "field_length": 1,
           "column_type": "str"
@@ -480,12 +480,12 @@
     },
     "c99_data4": {
       "header": {
-        "sentinal": "4",
+        "sentinel": "4",
         "field_layout": "fixed_width",
         "length": 97
       },
       "elements": {
-        "sentinal": {
+        "sentinel": {
           "description": "Data information record type identifier",
           "field_length": 1,
           "column_type": "str"
@@ -666,12 +666,12 @@
     },
     "c99_data5": {
       "header": {
-        "sentinal": "5",
+        "sentinel": "5",
         "field_layout": "fixed_width",
         "length": 103
       },
       "elements": {
-        "sentinal": {
+        "sentinel": {
           "description": "Data information record type identifier",
           "field_length": 1,
           "column_type": "str"

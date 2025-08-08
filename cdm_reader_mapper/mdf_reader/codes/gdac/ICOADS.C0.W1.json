@@ -1,0 +1,12 @@
+{
+  "0": "cloud covering one half or less of the sky throughout the period",
+  "1": "cloud covering more than one half of the sky during part of the period and covering one half or less during part of the period",
+  "2": "cloud covering more than one half of the sky throughout the period",
+  "3": "sandstorm, dust storm or blowing snow",
+  "4": "fog, ice fog, or thick haze (US includes thick smoke)",
+  "5": "drizzle",
+  "6": "rain",
+  "7": "snow, or rain and snow mixed",
+  "8": "shower",
+  "9": "thunderstorm with or without precipitation"
+}

@@ -1,0 +1,32 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "_SLP"
+    }
+  },
+  "secondary_variable": {},
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "elements": "PPPP",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": 0
+  },
+  "units": {
+    "default": 32
+  },
+  "original_units": {
+    "default": 530
+  },
+  "original_value": {
+    "elements": "PPPP",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 7
+  }
+}

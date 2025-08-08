@@ -1,0 +1,13 @@
+{
+  "0": "0 to 50 m",
+  "1": "50 to 100 m",
+  "2": "100 to 200 m",
+  "3": "200 to 300 m",
+  "4": "300 to 600 m",
+  "5": "600 to 1000 m",
+  "6": "1000 to 1500 m",
+  "7": "1500 to 2000 m",
+  "8": "2000 to 2500 m",
+  "9": "2500m or more, or no clouds",
+  "/": "Height of base of cloud not known or base of clouds at a level lower and tops at a level higher than that of the station"
+}

@@ -1,0 +1,8 @@
+{
+  "0": "positive or zero measured wet-bulb temperature",
+  "1": "negative measured wet-bulb temperature",
+  "2": "iced measured wet-bulb temperature",
+  "5": "positive or zero computed wet-bulb temperature",
+  "6": "negative computed wet-bulb temperature",
+  "7": "iced computed wet-bulb temperature"
+}

@@ -1,0 +1,13 @@
+{
+  "0": "Calm (in D, DK), or stationary (in Ds), or at the station (in Da, D1), or stationary or no clouds (in DH, DL, DM)",
+  "1": "NE",
+  "2": "E",
+  "3": "SE",
+  "4": "S",
+  "5": "SW",
+  "6": "W",
+  "7": "NW",
+  "8": "N",
+  "9": "All directions (in Da, D1), or confused (in DK), or variable (in D(wind)), or unknown (in Ds), or unknown or clouds invisible (in DH, DL, DM)",
+  "/": "Report from a coastal land station or displacement of ship not reported (in Ds only - see Regulation 12.3.1.2 (b))"
+}

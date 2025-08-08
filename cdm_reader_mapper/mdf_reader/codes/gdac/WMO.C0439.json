@@ -1,0 +1,13 @@
+{
+  "0": "No ice of land origin",
+  "1": "1-5 icebergs, no growlers or bergy bits",
+  "2": "6-10 icebergs, no growlers or bergy bits",
+  "3": "11-20 icebergs, no growlers or bergy bits",
+  "4": "Up to and including 10 growlers and bergy bits - no icebergs",
+  "5": "More than 10 growlers and bergy bits - no icebergs",
+  "6": "1-5 icebergs, with growlers and bergy bits",
+  "7": "6-10 icebergs, with growlers and bergy bits",
+  "8": "11-20 icebergs, with growlers and bergy bits",
+  "9": "More than 20 icebergs, with growlers and bergy bits - a major hazard to navigation",
+  "/": "Unable to report, because of darkness, lack of visibility or because only sea ice is visible"
+}

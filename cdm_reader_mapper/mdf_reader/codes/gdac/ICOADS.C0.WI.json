@@ -1,0 +1,11 @@
+{
+  "0": "meter per second, estimated",
+  "1": "meter per second, obtained from anemometer (measured)",
+  "2": "estimated (original units unknown)",
+  "3": "knot, estimated",
+  "4": "knot, obtained from anemometer (measured)",
+  "5": "Beaufort force (based on documentation)",
+  "6": "estimated (original units unknown) or unknown method ",
+  "7": "measured (original units unknown)",
+  "8": "high-resolution measurement (e.g., hundredths of a meter per second)"
+}

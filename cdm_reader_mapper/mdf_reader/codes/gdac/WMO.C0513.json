@@ -1,0 +1,13 @@
+{
+  "0": "No CL clouds",
+  "1": "Cumulus humilis or Cumulus fractus other than of bad weather, or both",
+  "2": "Cumulus mediocris or congestus, with or without Cumulus of species fractus or humilis or Stratocumulus, all having their bases at the same level",
+  "3": "Cumulonimbus calvus, with or without Cumulus, Stratocumulus or Stratus",
+  "4": "Stratocumulus cumulogenitus",
+  "5": "Stratocumulus other than Stratocumulus cumulogenitus",
+  "6": "Stratus nebulosus or Stratus fractus other than of bad weather, or both",
+  "7": "Stratus fractus or Cumulus fractus of bad weather,* or both (pannus), usually below Altostratus or Nimbostratus",
+  "8": "Cumulus and Stratocumulus other than Stratocumulus cumulogenitus, with bases at different levels",
+  "9": "Cumulonimbus capillatus (often with an anvil), with or without Cumulonimbus calvus, Cumulus, Stratocumulus, Stratus or pannus",
+  "10": "CL clouds invisible owing to darkness, fog, blowing dust or sand, or other similar phenomena"
+}

@@ -1,0 +1,12 @@
+{
+  "0": "wind sea and swell estimated shipborne wave recorder",
+  "1": "wind sea and swell measured shipborne wave recorder",
+  "2": "mixed wave measured, swell estimated shipborne wave recorder",
+  "3": "other combinations measured and estimated shipborne wave recorder",
+  "4": "wind sea and swell measured buoy",
+  "5": "mixed wave measured, swell estimated buoy",
+  "6": "other combinations measured and estimated buoy",
+  "7": "wind sea and swell measured other measurement system",
+  "8": "mixed wave measured, swell estimated other measurement system",
+  "9": "other combinations measured and estimated other measurement system"
+}

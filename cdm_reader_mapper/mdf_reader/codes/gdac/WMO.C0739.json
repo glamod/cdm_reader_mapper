@@ -1,0 +1,13 @@
+{
+  "0": "Ship in shore or flaw lead",
+  "1": "Principal ice edge towards NE",
+  "2": "Principal ice edge towards E",
+  "3": "Principal ice edge towards SE",
+  "4": "Principal ice edge towards S",
+  "5": "Principal ice edge towards SW",
+  "6": "Principal ice edge towards W",
+  "7": "Principal ice edge towards NW",
+  "8": "Principal ice edge towards N",
+  "9": "Not determined (ship in ice)",
+  "/": "Unable to report, because of darkness, lack of visibility or because only ice of land origin is visible"
+}

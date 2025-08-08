@@ -1,0 +1,13 @@
+{
+  "0": "New ice only (frazil ice, grease ice, slush, shuga)",
+  "1": "Nilas or ice rind, less than 10 cm thick",
+  "2": "Young ice (grey ice, grey-white ice), 10-30 cm thick",
+  "3": "Predominantly new and/or young ice with some first-year ice",
+  "4": "Predominantly thin first-year ice with some new and/or young ice",
+  "5": "All thin first-year ice (30 - 70 cm thick)",
+  "6": "Predominantly medium first-year ice (70 - 120 cm thick) and thick first-year ice (>120 cm thick) with some thinner (younger) first-year ice",
+  "7": "All medium and thick first-year ice",
+  "8": "Predominantly medium and thick first-year ice with some old ice (usually more than 2 metres thick)",
+  "9": "Predominantly old ice",
+  "/": "Unable to report, because of darkness, lack of visibility or because only ice of land origin is visible or because ship is more than 0.5 nautical mile away from ice edge"
+}
