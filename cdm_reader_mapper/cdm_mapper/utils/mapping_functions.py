@@ -218,7 +218,7 @@ class mapping_functions:
             errors="coerce",
         )
 
-    def datetime_utcnow(self, df) -> datetime:
+    def datetime_utcnow(self) -> datetime.datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 
@@ -395,3 +395,19 @@ class mapping_functions:
             )
         df["UUID"] = uid
         return df["UUID"]
+
+    def gdac_latitude(self, df) -> pd.DataFrame | pd.Series:
+        """Add sign to latitude based on quadrant"""
+        if "Qc" not in df.columns or "LaLaLa" not in df.columns:
+            raise KeyError("DataFrame must contain 'Qc' and 'LaLaLa' columns")
+        lat = df["LaLaLa"].copy()
+        lat[df["Qc"].isin([3, 5])] *= -1
+        return lat
+
+    def gdac_longitude(self, df) -> pd.DataFrame | pd.Series:
+        """Add sign to longitude based on quadrant"""
+        if "Qc" not in df.columns or "LoLoLoLo" not in df.columns:
+            raise KeyError("DataFrame must contain 'Qc' and 'LoLoLoLo' columns")
+        lon = df["LoLoLoLo"].copy()
+        lon[df["Qc"].isin([5, 7])] *= -1
+        return lon

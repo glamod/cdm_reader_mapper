@@ -43,11 +43,19 @@
     "default": 5
   },
   "longitude": {
-    "elements": "LoLoLoLo",
+    "elements": [
+      "Qc",
+      "LoLoLoLo"
+    ],
+    "transform": "gdac_longitude",
     "decimal_places": 1
   },
   "latitude": {
-    "elements": "LaLaLa",
+    "elements": [
+      "Qc",
+      "LaLaLa"
+    ],
+    "transform": "gdac_latitude",
     "decimal_places": 1
   },
   "location_accuracy": {},
