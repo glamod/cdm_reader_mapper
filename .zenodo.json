@@ -13,6 +13,10 @@
       "orcid": "0009-0003-5558-2327"
     },
     {
+      "name": "Willruth, Jan Marius",
+      "affiliation": "Deutscher Wetterdienst, Hamburg, Germany"
+    },
+    {
       "name": "Andersson, Axel",
       "affiliation": "Deutscher Wetterdienst, Hamburg, Germany",
       "orcid": "0000-0002-6956-0298"
@@ -30,10 +34,6 @@
       "name": "Kent, Elizabeth",
       "affiliation": "National Oceanography Centre, Southampton, United Kingdom",
       "orcid": "0000-0002-6209-4247"
-    },
-    {
-      "name": "Willruth, Jan Marius",
-      "affiliation": "Deutscher Wetterdienst, Hamburg, Germany"
     }
   ],
   "keywords": [

@@ -88,6 +88,11 @@ repos:
     hooks:
       - id: check-hooks-apply
       - id: check-useless-excludes
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.8.9
+    hooks:
+      - id: uv-lock
 
 ci:
   autofix_commit_msg: |

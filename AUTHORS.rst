@@ -13,6 +13,8 @@ Co-Developers
 
 * Joseph Siddons <joseph.siddons@noc.ac.uk> `@jtsiddons <https://github.com/jtsiddons>`_
 
+* Jan Marius Willruth <jan.willruth@dwd.de> `@JanWillruth <https://github.com/JanWillruth>`_
+
 Contributors
 ------------
 
@@ -23,8 +25,6 @@ Contributors
 * Richard Cornes <richard.cornes@noc.ac.uk> `@rcornes <https://github.com/rcornes>`_
 
 * Elizabeth Kent <eck@noc.ac.uk> `@lizkent <https://github.com/lizkent>`_
-
-* Jan Marius Willruth <jan.willruth@dwd.de> `@JanWillruth <https://github.com/JanWillruth>`_
 
 Previous Contributors
 ---------------------
