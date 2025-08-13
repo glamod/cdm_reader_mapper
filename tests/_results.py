@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import logging
 from pathlib import Path
 from urllib.error import HTTPError
 
@@ -203,7 +204,10 @@ class result_data:
 
         try:
             info = load_file(os.path.join(*drs, "output", info))
-        except Exception:
+        except OSError as exception:
+            raise exception
+        except Exception as exception:
+            logging.warning(exception)
             info = None
 
         return {

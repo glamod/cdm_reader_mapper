@@ -29,7 +29,7 @@ jobs:
         # Bookend python versions
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags.
       - name: Set environment variables
@@ -39,7 +39,7 @@ jobs:
           echo "UV_CACHE_DIR=/tmp/.uv-cache" >> $GITHUB_ENV
 
       - name: Install uv
-        uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
@@ -75,6 +75,7 @@ jobs:
           --junitxml=test-results/${{ runner.os }}-${{ matrix.python-version }}.xml
 
       - name: Upload code coverage to Codecov
+        if: github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
         with:
           files: ./coverage.xml
