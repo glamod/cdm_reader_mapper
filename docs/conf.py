@@ -96,7 +96,7 @@ remove_from_toctrees = ["generated/*"]
 
 # General information about the project.
 project = "cdm_reader_mapper"
-copyright = "2019-2025, Ludwig Lierhammer, Joseph Siddons, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent"
+copyright = "2019-2025, Ludwig Lierhammer, Joseph Siddons, Jan Marius Willruth, Axel Andersson, Tina Leiding, Richard Cornes and Elizabeth Kent"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

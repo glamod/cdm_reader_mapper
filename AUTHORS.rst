@@ -13,6 +13,8 @@ Co-Developers
 
 * Joseph Siddons <joseph.siddons@noc.ac.uk> `@jtsiddons <https://github.com/jtsiddons>`_
 
+* Jan Marius Willruth <jan.willruth@dwd.de> `@JanWillruth <https://github.com/JanWillruth>`_
+
 Contributors
 ------------
 

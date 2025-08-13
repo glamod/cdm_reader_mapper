@@ -42,11 +42,11 @@ imodel_lineages = {
 }
 
 c2k_methods = {
-    "gcc": "method_b",
+    "gdac": "method_b",
 }
 
 k_elements = {
-    "gcc": 1,
+    "gdac": 1,
 }
 
 tf = TimezoneFinder()
@@ -207,7 +207,18 @@ class mapping_functions:
             errors="coerce",
         )
 
-    def datetime_utcnow(self, df) -> datetime:
+    def datetime_immt(self, df) -> pd.DatetimeIndex:
+        """Convert to pandas datetime object for IMMT format."""
+        date_format = "%Y-%m-%d-%H-%M"
+        df["M"] = 0
+        strings = df.astype(str).apply("-".join, axis=1).values
+        return pd.to_datetime(
+            strings,
+            format=date_format,
+            errors="coerce",
+        )
+
+    def datetime_utcnow(self) -> datetime.datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 
@@ -343,7 +354,7 @@ class mapping_functions:
         return np.vectorize(string_add_i)(prepend, joint, append, sep=separator)
 
     def temperature_celsius_to_kelvin(self, df) -> pd.DataFrame | pd.Series:
-        """Convert temperature from degrre Ceslius to Kelvin."""
+        """Convert temperature from Celsius to Kelvin."""
         method = find_entry(self.imodel, c2k_methods)
         if not method:
             method = "method_a"
@@ -369,18 +380,34 @@ class mapping_functions:
         df.astype(float)
         return np.round(df / 3.2808, 2)
 
-    def guid(self, df, prepend="", append="") -> pd.DataFrame | pd.Series:
-        """DOCUMENTATION."""
+    def gdac_uid(self, df, prepend="", append="") -> pd.DataFrame | pd.Series:
+        """Generate unique UID from timestamp + ship's callsign (ID)"""
         df = df.copy()
-        df["YR"] = df["YR"].apply(lambda x: f"{x:04d}")
-        df["MO"] = df["MO"].apply(lambda x: f"{x:02d}")
-        df["DY"] = df["DY"].apply(lambda x: f"{x:02d}")
+        df["AAAA"] = df["AAAA"].apply(lambda x: f"{x:04d}")
+        df["MM"] = df["MM"].apply(lambda x: f"{x:02d}")
+        df["YY"] = df["YY"].apply(lambda x: f"{x:02d}")
         df["GG"] = df["GG"].astype("int64").apply(lambda x: f"{x:02d}")
         name = df.apply(lambda x: "".join(x), axis=1)
-        uid = np.empty(np.shape(df["YR"]), dtype="U126")
+        uid = np.empty(np.shape(df["AAAA"]), dtype="U126")
         for i, n in enumerate(name):
             uid[i] = (
                 str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)
             )
         df["UUID"] = uid
         return df["UUID"]
+
+    def gdac_latitude(self, df) -> pd.DataFrame | pd.Series:
+        """Add sign to latitude based on quadrant"""
+        if "Qc" not in df.columns or "LaLaLa" not in df.columns:
+            raise KeyError("DataFrame must contain 'Qc' and 'LaLaLa' columns")
+        lat = df["LaLaLa"].copy()
+        lat[df["Qc"].isin([3, 5])] *= -1
+        return lat
+
+    def gdac_longitude(self, df) -> pd.DataFrame | pd.Series:
+        """Add sign to longitude based on quadrant"""
+        if "Qc" not in df.columns or "LoLoLoLo" not in df.columns:
+            raise KeyError("DataFrame must contain 'Qc' and 'LoLoLoLo' columns")
+        lon = df["LoLoLoLo"].copy()
+        lon[df["Qc"].isin([5, 7])] *= -1
+        return lon

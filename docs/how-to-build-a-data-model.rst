@@ -57,7 +57,7 @@ The general structure of a schema and the description of each attribute is expla
 |Sections       |common           |``delimiter``, ``disable_read``    |
 |(header)       |                 |``field_layout``                   |
 |               +-----------------+-----------------------------------+
-|               |fixed_width      |``length``, ``sentinal``           |
+|               |fixed_width      |``length``, ``sentinel``           |
 +---------------+-----------------+-----------------------------------+
 
 .. _schema-header-block:
@@ -74,7 +74,7 @@ There is no need to declare a **header** block in data models for which sections
            "parsing_order": [
                {"s": ["core"]},
                {"o": ["c1","c5","c6","c7","c8","c9","c95","c96","c97","c98"]},
-               {"s": ["c99_sentinal", "c99_data", "c99_header", "c99_qc"]}]
+               {"s": ["c99_sentinel", "c99_data", "c99_header", "c99_qc"]}]
        },
 
 +---------------------------+-------------------+
@@ -300,7 +300,7 @@ Example of a schema section block: "core" section of the ``.imma`` schema::
 
       "sections": {
            "core": {
-               "header": {"sentinal": null,"length": 108},
+               "header": {"sentinel": null,"length": 108},
                "elements": {
                    "YR": {
                        "description": "year UTC",
@@ -349,11 +349,11 @@ Section header
          1. ``delimited`` or ``fix_width``
          2. Defaults to ``delimited`` if ``delimiter`` is set, else defaults to what ever is set in the ``fixed_width``.
 
-- ``sentinal``
+- ``sentinel``
       - String type of descriptor that allows the code to identify a section.
       - Applies to sections of *format.fixed_width*
       - It is a mandatory field if the section is unique, unique in a parsing_order block, or part of a sequential parsing_order block.
-      - Elements bearing the sentinal need to be, additionally, declared in the elements block.
+      - Elements bearing the sentinel need to be, additionally, declared in the elements block.
 
 - ``length``
       - Numeric integer type of descriptor that defines the length of the section (how many bytes or characters in a string).

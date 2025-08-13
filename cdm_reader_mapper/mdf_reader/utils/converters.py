@@ -15,6 +15,11 @@ class df_converters:
         self.dtype = dtype
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
+        self.preprocessing_functions = {
+            "PPPP": lambda x: (
+                str(10000 + int(x)) if isinstance(x, str) and x.startswith("0") else x
+            )
+        }
 
     def to_numeric(self, data, offset, scale) -> pd.Series:
         """Convert object type elements of a pandas series to numeric type."""
@@ -31,13 +36,18 @@ class df_converters:
             except ValueError:
                 return False
 
+        # Apply preprocessing if a function exists for this column
+        column_name = data.name
+        if column_name in self.preprocessing_functions:
+            data = data.apply(self.preprocessing_functions[column_name])
+
         return data.apply(lambda x: _to_numeric(x))
 
     def object_to_numeric(self, data, scale=None, offset=None) -> pd.Series:
         """
         Convert the object type elements of a pandas series to numeric type.
 
-        Right spaces are trated as ceros. Scale and offset can optionally be applied.
+        Right spaces are treated as zeros. Scale and offset can optionally be applied.
         The final data type according to the class dtype.
 
         Parameters
@@ -54,6 +64,8 @@ class df_converters:
             Scale to apply after conversion to numeric
         offset : numeric, optional
             Offset to apply after conversion to numeric
+        column_name : str, optional
+            Name of the column being processed
 
         Returns
         -------
