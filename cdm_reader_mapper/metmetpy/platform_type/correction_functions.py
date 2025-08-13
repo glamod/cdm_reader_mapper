@@ -89,7 +89,7 @@ def fill_value(
     return fill_serie.mask(msk, other=fill_value)
 
 
-def deck_717_gcc(data) -> pd.DataFrame:
+def deck_717_gdac(data) -> pd.DataFrame:
     """DOCUMENTATION."""
     drifters = "7"
     buoys = "9"

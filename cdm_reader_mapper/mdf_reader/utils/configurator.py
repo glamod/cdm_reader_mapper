@@ -29,10 +29,10 @@ class Configurator:
         self.valid = valid or []
         self.schema = schema or {}
 
-    def _validate_sentinal(self, i, line, sentinal) -> bool:
-        slen = len(sentinal)
+    def _validate_sentinel(self, i, line, sentinel) -> bool:
+        slen = len(sentinel)
         str_start = line[i : i + slen]
-        return str_start == sentinal
+        return str_start == sentinel
 
     def _get_index(self, section, order) -> dict | tuple[str, dict]:
         if len(self.orders) == 1:
@@ -152,9 +152,9 @@ class Configurator:
                 data_dict[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
 
-            sentinal = header.get("sentinal")
-            bad_sentinal = sentinal is not None and not self._validate_sentinal(
-                i, line, sentinal
+            sentinel = header.get("sentinel")
+            bad_sentinel = sentinel is not None and not self._validate_sentinel(
+                i, line, sentinel
             )
 
             section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
@@ -190,7 +190,7 @@ class Configurator:
                     "field_length", properties.MAX_FULL_REPORT_WIDTH
                 )
 
-                j = (i + field_length) if not bad_sentinal else i
+                j = (i + field_length) if not bad_sentinel else i
                 if j > k:
                     missing = False
                     j = k

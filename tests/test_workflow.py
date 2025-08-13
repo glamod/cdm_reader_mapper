@@ -38,7 +38,7 @@ from ._testing_workflow_suite import _testing_suite
         ("icoads_r300_d700", None, None, True, None, {}),
         ("icoads_r302_d792", None, None, True, None, {}),
         ("icoads_r302_d992", None, None, True, None, {}),
-        ("gcc", None, None, True, None, {}),
+        ("gdac", None, None, True, None, {}),
         ("craid", None, None, True, None, {}),
         (
             "icoads_r300_d714",
@@ -91,7 +91,7 @@ from ._testing_workflow_suite import _testing_suite
             {"year_init": 1874, "year_end": 1874},
         ),
         (
-            "gcc",
+            "gdac",
             None,
             None,
             True,

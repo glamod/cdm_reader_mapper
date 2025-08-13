@@ -26,7 +26,7 @@
   "sections": {
     "core": {
       "header": {
-        "sentinal": null,
+        "sentinel": null,
         "length": 108
       },
       "elements": {
@@ -380,7 +380,7 @@
     },
     "c1": {
       "header": {
-        "sentinal": " 165",
+        "sentinel": " 165",
         "length": 65
       },
       "elements": {
@@ -720,7 +720,7 @@
     },
     "c5": {
       "header": {
-        "sentinal": " 594",
+        "sentinel": " 594",
         "length": 94
       },
       "elements": {
@@ -1143,7 +1143,7 @@
     },
     "c6": {
       "header": {
-        "sentinal": " 668",
+        "sentinel": " 668",
         "length": 68
       },
       "elements": {
@@ -1310,7 +1310,7 @@
     },
     "c7": {
       "header": {
-        "sentinal": " 758",
+        "sentinel": " 758",
         "length": 58
       },
       "elements": {
@@ -1468,7 +1468,7 @@
     },
     "c8": {
       "header": {
-        "sentinal": " 82U",
+        "sentinel": " 82U",
         "length": 102
       },
       "elements": {
@@ -1692,7 +1692,7 @@
     },
     "c9": {
       "header": {
-        "sentinal": " 932",
+        "sentinel": " 932",
         "length": 32
       },
       "elements": {
@@ -1808,7 +1808,7 @@
     },
     "c95": {
       "header": {
-        "sentinal": "9561",
+        "sentinel": "9561",
         "length": 61
       },
       "elements": {
@@ -1913,7 +1913,7 @@
     },
     "c96": {
       "header": {
-        "sentinal": "9653",
+        "sentinel": "9653",
         "length": 53
       },
       "elements": {
@@ -2047,7 +2047,7 @@
     },
     "c97": {
       "header": {
-        "sentinal": "9732",
+        "sentinel": "9732",
         "length": 32
       },
       "elements": {
@@ -2108,7 +2108,7 @@
     },
     "c98": {
       "header": {
-        "sentinal": "9815",
+        "sentinel": "9815",
         "length": 15
       },
       "elements": {
@@ -2169,7 +2169,7 @@
     },
     "c99": {
       "header": {
-        "sentinal": "99 0",
+        "sentinel": "99 0",
         "disable_read": true
       }
     }

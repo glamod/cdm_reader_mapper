@@ -6,4 +6,4 @@ numeric_types = ["Int64", "int", "float"]
 
 object_types = ["str", "object", "key", "datetime"]
 
-supported_data_models = ["craid", "gcc", "icoads", "pub47"]
+supported_data_models = ["craid", "gdac", "icoads", "pub47"]

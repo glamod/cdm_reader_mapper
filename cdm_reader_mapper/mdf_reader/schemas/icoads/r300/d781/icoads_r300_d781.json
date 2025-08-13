@@ -22,7 +22,7 @@
       },
       {
         "s": [
-          "c99_sentinal",
+          "c99_sentinel",
           "c99_voyage",
           "c99_data",
           "c99_qc"
@@ -31,9 +31,9 @@
     ]
   },
   "sections": {
-    "c99_sentinal": {
+    "c99_sentinel": {
       "header": {
-        "sentinal": "99 0 ",
+        "sentinel": "99 0 ",
         "length": 5,
         "field_layout": "fixed_width"
       },
@@ -63,7 +63,7 @@
     },
     "c99_voyage": {
       "header": {
-        "sentinal": "",
+        "sentinel": "",
         "length": 36,
         "field_layout": "fixed_width"
       },
@@ -160,7 +160,7 @@
     },
     "c99_data": {
       "header": {
-        "sentinal": "",
+        "sentinel": "",
         "length": 73,
         "field_layout": "fixed_width"
       },
@@ -322,7 +322,7 @@
     },
     "c99_qc": {
       "header": {
-        "sentinal": "",
+        "sentinel": "",
         "length": 13,
         "field_layout": "fixed_width"
       },
