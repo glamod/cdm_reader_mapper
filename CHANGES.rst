@@ -5,16 +5,24 @@ Changelog
 
 2.1.1 (unreleased)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Joseph Siddons (:user:`jtsiddons`) and Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * add ``encoding`` optional argument to ``cdm_reader_mapper.read_mdf`` and ``cdm_reader_mapper.read_data`` which overrides default value set by model schema if set (:issue:`268`, :pull:`273`).
+* ``cdm_reader_mapper.mdf_reader``: Added preprocessing function to convert air pressure (PPPP) in IMMT format (:pull:`287`)
+* ``cdm_reader_mapper.cdm_mapper``: Added mapping functions for IMMT datetime, latitude, and longitude conversions (:pull:`287`)
 
 License and Legal
 ^^^^^^^^^^^^^^^^^
 Updated copyright statements in `LICENSE` (:issue:`271`, :pull:`272`).
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``cdm_reader_mapper``: Replace "gcc" with "gdac" (:pull:`287`)
+* ``cdm_reader_mapper``: Update gdac schemas to adhere to IMMT-5 documentation (:pull:`287`)
+
 
 Bug fixes
 ^^^^^^^^^
