@@ -24,6 +24,9 @@ def _testing_suite(
     drops=None,
     **kwargs,
 ):
+    out_dir = ".pytest_cache"
+    os.makedirs(out_dir, exist_ok=True)
+
     exp = f"expected_{imodel}"
 
     db_mdf = read(
@@ -40,12 +43,12 @@ def _testing_suite(
 
     val_id = db_mdf.validate_id()
 
-    db_mdf.write(suffix=imodel)
+    db_mdf.write(suffix=imodel, out_dir=out_dir)
 
     db_res = read(
-        f"data-{imodel}.csv",
-        mask=f"mask-{imodel}.csv",
-        info=f"info-{imodel}.json",
+        os.path.join(out_dir, f"data-{imodel}.csv"),
+        mask=os.path.join(out_dir, f"mask-{imodel}.csv"),
+        info=os.path.join(out_dir, f"info-{imodel}.json"),
         mode="data",
         **kwargs,
     )
@@ -107,8 +110,8 @@ def _testing_suite(
 
     col_subset = get_col_subset(db_mdf.data, codes_subset)
 
-    db_mdf.write(suffix=imodel)
-    output = read(".", suffix=imodel, cdm_subset=cdm_subset, mode="tables")
+    db_mdf.write(suffix=imodel, out_dir=out_dir)
+    output = read(out_dir, suffix=imodel, cdm_subset=cdm_subset, mode="tables")
 
     output_exp = read(
         expected_data["cdm_table"],
