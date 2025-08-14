@@ -222,7 +222,7 @@ class mapping_functions:
             errors="coerce",
         )
 
-    def datetime_utcnow(self) -> datetime.datetime:
+    def datetime_utcnow(self, df) -> datetime.datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 
