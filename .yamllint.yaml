@@ -5,7 +5,5 @@ yaml-files:
 
 rules:
   document-start: disable
-  line-length:
-    max: 130
-    level: warning
+  line-length: disable
   truthy: disable
