@@ -8,6 +8,7 @@ description = "Common Data Model reader and mapper toolbox"
 authors = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
   {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"},
   {name = "Axel Andersson", email = "axel.andersson@dwd.de"},
   {name = "Tina Leiding", email = "tina.leiding@dwd.de"},
   {name = "Richard Cornes", email = "richard.cornes@noc.ac.uk"},
@@ -15,7 +16,8 @@ authors = [
 ]
 maintainers = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
-  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"}
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"},
 ]
 readme = {file = "README.rst", content-type = "text/x-rst"}
 requires-python = ">=3.10"
