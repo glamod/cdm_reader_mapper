@@ -28,22 +28,6 @@ class test_data:
         )
 
     @property
-    def test_icoads_r300_d701_type1(self):
-        """IMMA1 deck 701 type1 test data."""
-        return self._get_data_dict(
-            "1845-04-01_subset.imma",
-            "icoads_r300_d701",
-        )
-
-    @property
-    def test_icoads_r300_d701_type2(self):
-        """IMMA1 deck 701 type2 test data."""
-        return self._get_data_dict(
-            "1845-04-01_subset.imma",
-            "icoads_r300_d701",
-        )
-
-    @property
     def test_icoads_r300_d706(self):
         """IMMA1 deck 706 test data."""
         return self._get_data_dict(

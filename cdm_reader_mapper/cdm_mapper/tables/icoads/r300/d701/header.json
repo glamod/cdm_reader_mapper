@@ -1,4 +1,16 @@
 {
+  "report_timestamp": {
+    "sections": "core",
+    "elements": [
+      "YR",
+      "MO",
+      "DY",
+      "HR",
+      "LON",
+      "LAT"
+    ],
+    "transform": "datetime_imma1_701"
+  },
   "station_name": {
     "sections": "core",
     "elements": "ID",
