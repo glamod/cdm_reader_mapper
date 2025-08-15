@@ -40,16 +40,9 @@ class result_data:
         )
 
     @property
-    def expected_icoads_r300_d701_type1(self):
+    def expected_icoads_r300_d701(self):
         return self._get_data_dict(
-            "type1_1845-04-01_subset",
-            "icoads_r300_d701",
-        )
-
-    @property
-    def expected_icoads_r300_d701_type2(self):
-        return self._get_data_dict(
-            "type2_1845-04-01_subset",
+            "1845-04-01_subset",
             "icoads_r300_d701",
         )
 

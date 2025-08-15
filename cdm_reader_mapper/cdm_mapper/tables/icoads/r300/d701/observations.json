@@ -5,9 +5,10 @@
       "YR",
       "MO",
       "DY",
+      "HR",
       "LON",
       "LAT"
     ],
-    "transform": "datetime_to_cdm_time"
+    "transform": "datetime_imma1_701"
   }
 }

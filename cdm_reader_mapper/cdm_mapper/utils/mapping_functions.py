@@ -192,7 +192,10 @@ class mapping_functions:
         return series
 
     def datetime_imma1(self, df) -> pd.DateTimeIndex:  # TZ awareness?
-        """Convert to pandas datetime object."""
+        """Convert to pandas datetime object for IMMA1 format."""
+        if df.empty:
+            return
+        df = df.iloc[:, 0:4]
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
         df = df.assign(HR=df.iloc[:, -1])
@@ -201,11 +204,61 @@ class mapping_functions:
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
         df = df.applymap(to_int)
         strings = df.astype(str).apply("-".join, axis=1).values
-        return pd.to_datetime(
+        result = pd.to_datetime(
             strings,
             format=date_format,
             errors="coerce",
         )
+        result.index = df.index
+        return result
+
+    def datetime_imma1_to_utc(self, df) -> pd.DataTimeIndex:
+        """
+        Convert to pandas datetime object for IMMA1 deck 701 format.
+        Set missing hour to 12 and use latitude and longitude information
+        to convert local midday to UTC time.
+        """
+        if df.empty:
+            return
+
+        date_format = "%Y-%m-%d-%H-%M"
+        df.columns = [col[1] for col in df.columns]
+        df_dates = df.iloc[:, 0:3].astype(str)
+        df_dates["HR"] = "12"
+        df_dates["M"] = "0"
+        df_coords = df.iloc[:, 4:6].astype(float)
+        lon_ = df_coords.columns[0]
+        lat_ = df_coords.columns[1]
+        df_coords["lon_converted"] = coord_360_to_180i(df_coords[lon_])
+        time_zone = df_coords.swifter.apply(
+            lambda x: time_zone_i(x[lat_], x["lon_converted"]),
+            axis=1,
+        )
+        data = pd.to_datetime(
+            df_dates.swifter.apply("-".join, axis=1).values,
+            format=date_format,
+            errors="coerce",
+        )
+        d = {"Dates": data, "Time_zone": time_zone.values}
+        df_time = pd.DataFrame(data=d)
+
+        results = df_time.swifter.apply(
+            lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
+        )
+        results.index = df.index
+        return results.dt.tz_convert(None)
+
+    def datetime_imma1_701(self, df) -> pd.DateTimeIndex:
+        """Convert to pandas datetime object for IMMA1 deck 701 format."""
+        if df.empty:
+            return
+        hr = df.iloc[:, 3]
+        valid_mask = hr.notna()
+
+        results = pd.Series([pd.NaT] * len(df), index=df.index, dtype="datetime64[ns]")
+        results[valid_mask] = self.datetime_imma1(df[valid_mask])
+        results[~valid_mask] = self.datetime_imma1_to_utc(df[~valid_mask])
+        return results
 
     def datetime_immt(self, df) -> pd.DatetimeIndex:
         """Convert to pandas datetime object for IMMT format."""
@@ -225,49 +278,6 @@ class mapping_functions:
     def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f") -> pd.DateTimeIndex:
         """Convert string to datetime object."""
         return pd.to_datetime(df.values, format=format, errors="coerce")
-
-    def datetime_to_cdm_time(self, df) -> pd.DataFrame:
-        """
-        Convert time object to datetime object.
-
-        Converts year, month, day and time indicator to
-        a datetime obj with a 24hrs format '%Y-%m-%d-%H'
-
-        Parameters
-        ----------
-        dates: list of elements from a date array
-
-        Returns
-        -------
-        date: datetime obj
-        """
-        df = df["core"].dropna(how="any")
-        date_format = "%Y-%m-%d-%H-%M"
-
-        df_dates = df.iloc[:, 0:3].astype(str)
-        df_dates["H"] = "12"
-        df_dates["M"] = "0"
-        df_coords = df.iloc[:, 3:5].astype(float)
-
-        # Convert long to -180 to 180 for time zone finding
-        df_coords["lon_converted"] = coord_360_to_180i(df_coords["LON"])
-        time_zone = df_coords.swifter.apply(
-            lambda x: time_zone_i(x["LAT"], x["lon_converted"]),
-            axis=1,
-        )
-
-        data = pd.to_datetime(
-            df_dates.swifter.apply("-".join, axis=1).values,
-            format=date_format,
-            errors="coerce",
-        )
-
-        d = {"Dates": data, "Time_zone": time_zone.values}
-        df_time = pd.DataFrame(data=d)
-
-        return df_time.swifter.apply(
-            lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
-        )
 
     def df_col_join(self, df, sep) -> str:
         """Join pandas Dataframe."""
