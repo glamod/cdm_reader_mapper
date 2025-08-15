@@ -13,6 +13,8 @@ New features and enhancements
 * add ``encoding`` optional argument to ``cdm_reader_mapper.read_mdf`` and ``cdm_reader_mapper.read_data`` which overrides default value set by model schema if set (:issue:`268`, :pull:`273`).
 * ``cdm_reader_mapper.mdf_reader``: Added preprocessing function to convert air pressure (PPPP) in IMMT format (:pull:`287`)
 * ``cdm_reader_mapper.cdm_mapper``: Added mapping functions for IMMT datetime, latitude, and longitude conversions (:pull:`287`)
+* ``cdm_reader_mapper.cdm_mapper``: New mapping function `datetime_imma_d701` for icoads_r300_d701 (:issue:`288`, :pull:`295`)
+* ``cdm_reader_mapper.cdm_mapper``: New mapping function `datetime_imma1_to_utc` for mapping local midday to UTC (:issue:`288`, :pull:`295`)
 
 License and Legal
 ^^^^^^^^^^^^^^^^^
@@ -22,6 +24,8 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * ``cdm_reader_mapper``: Replace "gcc" with "gdac" (:pull:`287`)
 * ``cdm_reader_mapper``: Update gdac schemas to adhere to IMMT-5 documentation (:pull:`287`)
+* ``cdm_reader_mapper``: combine icoads_r300_d701_type1 and icoads_r300_d701_type1 test and result data to icoads_r300_d701 (:issue:`288`, :pull:`295`)
+* ``cdm_reader_mapper.cdm_mapper``: combine icoads_r300_d701_type1 and icoads_r300_d701_type1 mapping tables to icoads_r300_d701 (:issue:`288`, :pull:`295`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
