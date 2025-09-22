@@ -38,3 +38,9 @@ Previous Contributors
 * Beatriz Recinos
 
 * Andreas Wernecke
+
+Funded by
+---------
+This project is funded through Copernicus Climate Change Service (C3S_).
+
+.. _C3S: https://climate.copernicus.eu/
