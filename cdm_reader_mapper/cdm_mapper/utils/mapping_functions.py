@@ -140,10 +140,15 @@ def location_accuracy_i(li, lat) -> int | np.nan:
     """Calculate location accuracy."""
     degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
     deg_km = 111
-    accuracy = degrees.get(int(li), np.nan) * math.sqrt(
-        (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
-    )
-    return np.nan if np.isnan(accuracy) else max(1, int(round(accuracy)))
+    try:
+        accuracy = degrees.get(int(li), np.nan) * math.sqrt(
+            (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
+        )
+    except ValueError:
+        return np.nan
+    if np.isnan(accuracy):
+        return np.nan
+    return max(1, int(round(accuracy)))
 
 
 def convert_to_str(a) -> str:
@@ -162,13 +167,13 @@ def string_add_i(a, b, c, sep) -> str | None:
         return sep.join(filter(None, [a, b, c]))
 
 
-def to_int(series):
-    """Convert value to integer if possible."""
-    try:
-        return int(series)
-    except TypeError:
+def to_int(value):
+    """Convert value to integer if possible, return pd.NA for invalid input."""
+    if pd.isna(value):
         return pd.NA
-    except ValueError:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
         return pd.NA
 
 
@@ -180,11 +185,10 @@ class mapping_functions:
         self.utc = datetime.timezone.utc
 
     def datetime_decimalhour_to_hm(self, series) -> pd.Series:
-        """Convert to hours and minutes."""
+        """Convert datetime object to hours and minutes."""
         hr = series.values[4]
         if not isinstance(hr, (int, float)):
-            series = series.apply(lambda x: None)
-            return series
+            return series.apply(lambda x: None)
         timedelta = datetime.timedelta(hours=hr)
         seconds = timedelta.total_seconds()
         series["HR"] = int(seconds / 3600)
@@ -202,7 +206,7 @@ class mapping_functions:
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
         df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
-        df = df.applymap(to_int)
+        df = df.applymap(np.vectorize(to_int))
         strings = df.astype(str).apply("-".join, axis=1).values
         result = pd.to_datetime(
             strings,
@@ -271,7 +275,7 @@ class mapping_functions:
             errors="coerce",
         )
 
-    def datetime_utcnow(self) -> datetime.datetime:
+    def datetime_utcnow(self, df) -> datetime.datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 

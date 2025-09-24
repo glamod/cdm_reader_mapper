@@ -37,7 +37,10 @@ def validate_numeric(elements, data, schema) -> pd.DataFrame:
         x = convert_str_boolean(x)
         if isinstance(x, bool):
             return x
-        return float(x)
+        try:
+            return float(x)
+        except ValueError:
+            return False
 
     data[elements] = data[elements].map(_to_numeric)
     mask = pd.DataFrame(index=data.index, data=False, columns=elements)
@@ -94,7 +97,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path) -> pd.DataFra
         value = validation_df.astype(dtype).astype("str")
         valid = validation_df.notna()
         mask_ = value.isin(table_keys)
-        mask[element] = mask_.where(valid, True)
+        mask[element] = mask_.where(valid, True) | validation_df.isna()
 
     return mask
 
