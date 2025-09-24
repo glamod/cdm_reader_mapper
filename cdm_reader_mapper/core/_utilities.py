@@ -117,7 +117,7 @@ class _DataBundle:
 
     def __init__(
         self,
-        data=None,
+        data=pd.DataFrame(),
         columns=None,
         dtypes=None,
         parse_dates=None,
