@@ -122,7 +122,7 @@ class _DataBundle:
         dtypes=None,
         parse_dates=None,
         encoding=None,
-        mask=None,
+        mask=pd.DataFrame(),
         imodel=None,
         mode="data",
     ):
