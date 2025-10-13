@@ -34,7 +34,7 @@
           "description": "year UTC",
           "field_length": 4,
           "column_type": "int",
-          "valid_max": 2024,
+          "valid_max": 2025,
           "valid_min": 1600,
           "units": "year"
         },
