@@ -2,10 +2,20 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pandas as pd
 
 from .. import properties
 from .utilities import convert_str_boolean
+
+
+def max_decimal_places(*decimals):
+    """Get maximum number of decimal places for each Decimal number."""
+    decimal_places = [
+        -d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0 for d in decimals
+    ]
+    return max(decimal_places)
 
 
 class df_converters:
@@ -32,9 +42,15 @@ class df_converters:
                 x = x.strip()
                 x.replace(" ", "0")
             try:
-                return offset + float(x) * scale
+                x = Decimal(str(x))
+                decimal_places = max_decimal_places(offset, scale, x)
+                result = offset + x * scale
+                return result.quantize(Decimal("1." + "0" * decimal_places))
             except ValueError:
                 return False
+
+        offset = Decimal(str(offset))
+        scale = Decimal(str(scale))
 
         # Apply preprocessing if a function exists for this column
         column_name = data.name

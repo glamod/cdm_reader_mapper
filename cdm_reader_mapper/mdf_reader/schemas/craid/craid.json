@@ -327,15 +327,15 @@
         },
         "DRIFTER_NUMBER": {
           "description": "C-RAID drifter unique identifier. Example: '1190171'",
-          "column_type": "int"
+          "column_type": "str"
         },
         "DRIFTER_DAC_NUMBER": {
           "description": "DAC drifter unique identifier. Example: '9706311'",
-          "column_type": "int"
+          "column_type": "str"
         },
         "DRIFTER_WMO_NUMBER": {
           "description": "WMO drifter identifier. WMO is the World Meteorological Organization. This platform number is unique. Example: '3200552'",
-          "column_type": "int"
+          "column_type": "str"
         },
         "WMO_INST_TYPE": {
           "description": "Instrument type from WMO code table 1770. A subset of WMO table 1770 is documented in the Reference Table 8. Example: TBD.",
@@ -343,7 +343,7 @@
         },
         "PTT": {
           "description": "Transmission identifier of the drifter. Example: '11195'",
-          "column_type": "int"
+          "column_type": "str"
         },
         "TRANS_SYSTEM": {
           "description": "Name of the telecommunication system from Reference Table 10. Example: 'ARGOS'",
@@ -352,7 +352,7 @@
         },
         "TRANS_SYSTEM_ID": {
           "description": "Program identifier of the telecommunication subscription. DACS can use N/A or alternative of their choice when not applicable. Example: '221' is a program number for all the beacons of an Argos customer.",
-          "column_type": "int"
+          "column_type": "str"
         },
         "TRANS_SYSTEM_FORMAT": {
           "description": "Binary format used to relay the data to shore. This entry may point to a table where each entry links to external documents (with DOIs). For example, for Iridium SBD data formats for drifters, there is this document: doi: 10.5281/zenodo.1305119. A similar document for ARGOS drifter data formats would be ideal.",

@@ -121,7 +121,7 @@ def _fill_value(series, fill_value) -> pd.Series | int:
         return series
     if series is None:
         return fill_value
-    return series.fillna(value=fill_value)
+    return series.fillna(value=fill_value).infer_objects(copy=False)
 
 
 def _map_data(
@@ -135,9 +135,7 @@ def _map_data(
     length,
     logger,
 ) -> pd.Series:
-    if series is None:
-        series = _default(default, length)
-    elif series.empty:
+    if (series is None or series.empty) and not transform:
         series = _default(default, length)
     elif transform:
         series = _transform(
@@ -213,7 +211,7 @@ def _convert_dtype(data, atts, logger) -> pd.DataFrame:
             kwargs = {x: atts.get(x) for x in iconverter_kwargs}
         else:
             kwargs = {}
-        return converters.get(itype)(data, np.nan, **kwargs)
+        data = converters.get(itype)(data, np.nan, **kwargs)
     return data
 
 

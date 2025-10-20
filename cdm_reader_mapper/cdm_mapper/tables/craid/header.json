@@ -115,8 +115,6 @@
     "transform": "datetime_utcnow"
   },
   "history": {
-    "sections": "drifter_history",
-    "elements": "HISTORY_INSTITUTION",
     "transform": "lineage"
   },
   "source_id": {

@@ -26,10 +26,16 @@ Breaking changes
 * ``cdm_reader_mapper``: Update gdac schemas to adhere to IMMT-5 documentation (:pull:`287`)
 * ``cdm_reader_mapper``: combine icoads_r300_d701_type1 and icoads_r300_d701_type1 test and result data to icoads_r300_d701 (:issue:`288`, :pull:`295`)
 * ``cdm_reader_mapper.cdm_mapper``: combine icoads_r300_d701_type1 and icoads_r300_d701_type1 mapping tables to icoads_r300_d701 (:issue:`288`, :pull:`295`)
+* ``cdm_reader_mapper.read``: Allow strings as input for cdm_subset (:pull:`281`)
+* ``cdm_reader_mapper.cdm_mapper``: Remove timestamps and/or previous history information in column `history` (:pull:`281`)
+* ``cdm_reader_mapper.DataBundle``: Set empty pd.DataFrames as defaults for both `data` and `mask` (:pull:`281`)
+* ``cdm_reader_mapper.mdf_reader``: read drifter numbers as strings not as integers with C-RAID (:pull:`281`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
 * ``tests``: create test data result hidden directory (:pull:`291`)
+* ```cdm_reader_mapper.mdf_reader``: update and tidy-up ICOADS mapping tables (:pull:`281`)
+* timezonefinde is pinned below v7.0.0 (:pull:``281)
 
 Bug fixes
 ^^^^^^^^^
