@@ -90,7 +90,7 @@ About
 
 .. include:: ../README.rst
     :start-after: hyperlinks
-    
+
 .. |newline| raw:: html
 
    <br>
@@ -98,4 +98,3 @@ About
 .. |tab| raw:: html
 
    &emsp;  <!-- HTML em-space -->
-    
