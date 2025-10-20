@@ -72,6 +72,10 @@
         :width: 20%
         :target: https://icoads.noaa.gov/
 
-.. |logo_NOC| image:: _static/images/logos_c3s/LOGO_2024_-_NOC_1_COLOUR.png
-        :width: 10%
+.. |logo_NOC| image:: _static/images/logos_c3s/LOGO_2025_NOC.png
+        :width: 25%
         :target: https://noc.ac.uk/
+        
+.. |logo_DWD| image:: _static/images/logos_c3s/logo_DWD_RGB.png
+        :width: 35%
+        :target: https://www.dwd.de/        

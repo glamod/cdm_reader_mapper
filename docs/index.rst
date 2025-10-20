@@ -78,9 +78,24 @@ About
 
 :License: |license|
 
-|logo_c3s| |logo_NOC| |logo_ICOADS| |logo_copernicus|
+|newline|
+
+|newline|
+
+|tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |logo_c3s| |logo_ICOADS| |logo_copernicus|
+
+|tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |tab| |logo_DWD| |logo_NOC|
 
 .. include:: hyperlinks.rst
 
 .. include:: ../README.rst
     :start-after: hyperlinks
+    
+.. |newline| raw:: html
+
+   <br>
+
+.. |tab| raw:: html
+
+   &emsp;  <!-- HTML em-space -->
+    
