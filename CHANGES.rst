@@ -42,7 +42,7 @@ Bug fixes
 
 * ``cdm_reader_mapper.write_data``: fix doubling of output file name (:pull:`273`)
 * ``cdm_reader_mapper.cdm_mapper.mapping_functions``: datetime conversion now ignores unformatable dates (:issue:`277`, :pull:`278`)
-* ``README``: fixing hyperlink (:issue:`279`. :pull:`280`)
+* ``README``: fixing hyperlink (:issue:`279`, :pull:`280`)
 * ``tests``: raise OSError on checksum mismatch (:pull:`291`)
 
 2.1.0 (2025-04-08)
