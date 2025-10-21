@@ -3,7 +3,7 @@
 Changelog
 =========
 
-2.1.1 (unreleased)
+2.1.1 (2025-10-21)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Joseph Siddons (:user:`jtsiddons`) and Jan Marius Willruth (:user:`JanWillruth`)
 
