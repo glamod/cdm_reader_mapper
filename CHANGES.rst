@@ -34,7 +34,7 @@ Breaking changes
 Internal changes
 ^^^^^^^^^^^^^^^^
 * ``tests``: create test data result hidden directory (:pull:`291`)
-* ```cdm_reader_mapper.mdf_reader``: update and tidy-up ICOADS mapping tables (:pull:`281`)
+* ``cdm_reader_mapper.mdf_reader``: update and tidy-up ICOADS mapping tables (:pull:`281`)
 * timezonefinde is pinned below v7.0.0 (:pull:``281)
 
 Bug fixes
