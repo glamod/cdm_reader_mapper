@@ -102,7 +102,6 @@ def _code_table(
         logger.warning(f"Could not convert {series} to frame.")
 
     series_str = series.astype(str)
-
     series_str.columns = ["_".join(col) for col in series_str.columns.values]
     return series_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
 
@@ -201,7 +200,7 @@ def _mapping(
     return data, atts
 
 
-def _convert_dtype(data, atts, logger) -> pd.DataFrame:
+def _convert_dtype(data, atts) -> pd.DataFrame:
     if atts is None:
         return np.nan
     itype = atts.get("data_type")
@@ -249,9 +248,7 @@ def _map_and_convert(
             cols,
             logger,
         )
-        table_df_i[column] = _convert_dtype(
-            table_df_i[column], atts.get(column), logger
-        )
+        table_df_i[column] = _convert_dtype(table_df_i[column], atts.get(column))
 
     if "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
