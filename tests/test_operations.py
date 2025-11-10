@@ -29,7 +29,7 @@ def _get_data(TextParser, **kwargs):
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def ztest_select_operators(
+def test_select_operators(
     func, args, idx_exp, idx_rej, skwargs, TextParser, reset_index, inverse
 ):
     data = _get_data(TextParser, **skwargs)
