@@ -210,7 +210,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.pytest]
-python_files = "test_*.py"
+python_files = ["test_*.py"]
 testpaths = ["./tests"]
 
 [tool.ruff]
