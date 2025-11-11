@@ -28,7 +28,7 @@ from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
 
 
-def drop_duplicates(df) -> pd.DataFrame:
+def drop_duplicated_rows(df) -> pd.DataFrame:
     """Drop duplicates from list."""
 
     def list_to_tuple(v):
@@ -197,6 +197,7 @@ def _mapping(
         len(idata),
         logger,
     )
+
     atts = _decimal_places(atts, decimal_places)
     return data, atts
 
@@ -225,6 +226,8 @@ def _map_and_convert(
     codes_subset,
     cdm_tables,
     cdm_complete,
+    drop_missing_obs,
+    drop_duplicates,
     logger,
 ) -> pd.DataFrame:
     atts = deepcopy(cdm_tables[table]["atts"])
@@ -253,11 +256,12 @@ def _map_and_convert(
             table_df_i[column], atts.get(column), logger
         )
 
-    if "observation_value" in table_df_i:
+    if drop_missing_obs is True and "observation_value" in table_df_i:
         table_df_i = table_df_i.dropna(subset=["observation_value"])
 
     table_df_i.columns = pd.MultiIndex.from_product([[table], columns])
-    table_df_i = drop_duplicates(table_df_i)
+    if drop_duplicates:
+        table_df_i = drop_duplicated_rows(table_df_i)
     table_df_i = table_df_i.fillna(null_label)
     table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
     cdm_tables[table]["columns"] = table_df_i.columns
@@ -271,6 +275,8 @@ def map_and_convert(
     cdm_subset=None,
     codes_subset=None,
     cdm_complete=True,
+    drop_missing_obs=True,
+    drop_duplicates=True,
     null_label="null",
     logger=None,
 ) -> pd.DataFrame:
@@ -310,6 +316,8 @@ def map_and_convert(
                 codes_subset,
                 cdm_tables,
                 cdm_complete,
+                drop_missing_obs,
+                drop_duplicates,
                 logger,
             )
 
@@ -342,6 +350,8 @@ def map_model(
     codes_subset=None,
     null_label="null",
     cdm_complete=True,
+    drop_missing_obs=True,
+    drop_duplicates=True,
     log_level="INFO",
 ) -> pd.DataFrame:
     """Map a pandas DataFrame to the CDM header and observational tables.
@@ -363,11 +373,19 @@ def map_model(
     null_label: str
         String how to label non valid values in `data`.
         Default: null
-    cdm_complete:
+    cdm_complete: bool
         If True map entire CDM tables list.
+        Default: True
+    drop_missing_obs: bool
+        If True Drop observations without a valid observation value
+        (e.g. no air_temperature value).
+        Default: True
+    drop_duplicates: bool
+        If True drop duplicated rows.
+        Default: True
     log_level: str
         level of logging information to save.
-        Default: DEBUG.
+        Default: INFO.
 
     Returns
     -------
@@ -409,5 +427,7 @@ def map_model(
         codes_subset=codes_subset,
         null_label=null_label,
         cdm_complete=cdm_complete,
+        drop_missing_obs=drop_missing_obs,
+        drop_duplicates=drop_duplicates,
         logger=logger,
     )
