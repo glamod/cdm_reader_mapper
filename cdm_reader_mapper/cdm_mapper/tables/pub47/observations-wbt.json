@@ -5,7 +5,8 @@
       "barometer1_height_above_summer_load_line",
       "visual_observing_height"
     ],
-    "transform": "select_column"
+    "transform": "select_column",
+    "decimal_places": 1
   },
   "observation_height_above_station_surface": {
     "elements": [
@@ -13,7 +14,8 @@
       "barometer1_height_above_summer_load_line",
       "visual_observing_height"
     ],
-    "transform": "select_column"
+    "transform": "select_column",
+    "decimal_places": 1
   },
   "sensor_id": {
     "elements": "hygrometer1_parameter"
