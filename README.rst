@@ -155,7 +155,7 @@ If you would like to contribute code or documentation (which is greatly apprecia
 How to cite this library
 ========================
 
-If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/15174199.
+If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/17403676.
 
 License
 =======
