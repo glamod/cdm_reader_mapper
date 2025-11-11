@@ -10,7 +10,7 @@ from cdm_reader_mapper.data import test_data
 
 
 def test_map_model():
-    pub47_csv = test_data["test_pub47"]["source"]  # noqa
+    pub47_csv = test_data["test_pub47"]["source"]
     df = pd.read_csv(
         pub47_csv,
         delimiter="|",

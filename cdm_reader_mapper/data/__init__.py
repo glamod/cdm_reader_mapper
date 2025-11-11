@@ -5,7 +5,7 @@ from __future__ import annotations
 from cdm_reader_mapper.common import load_file
 
 
-class test_data:
+class TestData:
     """CDM test data."""
 
     def __init__(self):
@@ -193,4 +193,4 @@ class test_data:
         }
 
 
-test_data = test_data()
+test_data = TestData()
