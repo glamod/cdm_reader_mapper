@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-import pytest
+import pytest  # noqa
 
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 
@@ -11,7 +11,7 @@ from cdm_reader_mapper.data import test_data
 
 def test_map_model():
     df = pd.read_csv(
-        test_data.test_pub47["source"],
+        test_data["test_pub47"]["source"],
         delimiter="|",
         dtype="object",
         header=0,
