@@ -157,7 +157,7 @@ class test_data:
 
     @property
     def test_gdac(self):
-        """IMMAT deck ??? test data."""
+        """IMMT test data."""
         return self._get_data_dict(
             "2003-02-01_subset.immt",
             "gdac",
@@ -169,6 +169,14 @@ class test_data:
         return self._get_data_dict(
             "2004-12-20_subset.nc",
             "craid",
+        )
+
+    @property
+    def test_pub47(self):
+        """Pub47 v202501 test data."""
+        return self._get_data_dict(
+            "2022_01.csv",
+            "pub47",
         )
 
     def __getitem__(self, attr):
