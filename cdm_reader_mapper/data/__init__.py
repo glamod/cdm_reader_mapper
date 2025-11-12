@@ -174,10 +174,9 @@ class TestData:
     @property
     def test_pub47(self):
         """Pub47 v202501 test data."""
-        return self._get_data_dict(
-            "2022_01.csv",
-            "pub47",
-        )
+        return {
+            "source": load_file("Pub47/v202501/pub47_2022_01.csv")
+        }
 
     def __getitem__(self, attr):
         """Make class subscriptable."""
