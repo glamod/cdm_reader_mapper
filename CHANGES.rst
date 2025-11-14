@@ -3,13 +3,36 @@
 Changelog
 =========
 
+2.1.2 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* new parameter in function `map_model` (:pull:`327`)
+
+  * `drop_duplicates`: If True remove duplicated rows (default: True)
+  * `drop_missing_obs`: If True remove observation rows tihout a valid `observation_value` (default: True)
+
+* new Pub47 testdata (test_data["test_pub47"]) (:pull:`327`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* implement map_model test for Pub47 data (:issue:`310`, :pull:`327`)
+* rename test data class from test_data to TestData (:pull:`327`)
+
+Bug fixes
+^^^^^^^^^
+* add Pub47 mapping code tables (`observing_frequency` and `vessel_type`) (:issue:`308`, :pull:`327`)
+* observation tables are not empty anymore after mapping Pub47 raw data to the CDM (:issue:`309`, :pull:`327`)
+
+
 2.1.1 (2025-10-21)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Joseph Siddons (:user:`jtsiddons`) and Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 * add ``encoding`` optional argument to ``cdm_reader_mapper.read_mdf`` and ``cdm_reader_mapper.read_data`` which overrides default value set by model schema if set (:issue:`268`, :pull:`273`).
 * ``cdm_reader_mapper.mdf_reader``: Added preprocessing function to convert air pressure (PPPP) in IMMT format (:pull:`287`)
 * ``cdm_reader_mapper.cdm_mapper``: Added mapping functions for IMMT datetime, latitude, and longitude conversions (:pull:`287`)

@@ -165,14 +165,9 @@ def load_file(
     return local_file
 
 
-def get_files(anchor):
-    """Get files."""
-    return _files(anchor)
-
-
 def get_path(path):
     """Get path."""
     try:
-        return get_files(path)
+        return _files(path)
     except ModuleNotFoundError:
         logging.warning(f"No module named {path}")

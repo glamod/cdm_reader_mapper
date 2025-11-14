@@ -5,7 +5,7 @@ from __future__ import annotations
 from cdm_reader_mapper.common import load_file
 
 
-class test_data:
+class TestData:
     """CDM test data."""
 
     def __init__(self):
@@ -157,7 +157,7 @@ class test_data:
 
     @property
     def test_gdac(self):
-        """IMMAT deck ??? test data."""
+        """IMMT test data."""
         return self._get_data_dict(
             "2003-02-01_subset.immt",
             "gdac",
@@ -170,6 +170,11 @@ class test_data:
             "2004-12-20_subset.nc",
             "craid",
         )
+
+    @property
+    def test_pub47(self):
+        """Pub47 v202501 test data."""
+        return {"source": load_file("Pub47/v202501/pub47_2022_01.csv")}
 
     def __getitem__(self, attr):
         """Make class subscriptable."""
@@ -185,4 +190,4 @@ class test_data:
         }
 
 
-test_data = test_data()
+test_data = TestData()

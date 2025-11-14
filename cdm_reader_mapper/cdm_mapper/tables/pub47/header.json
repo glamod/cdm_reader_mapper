@@ -3,7 +3,8 @@
     "elements": "ship_name"
   },
   "platform_sub_type": {
-    "elements": "vessel_type"
+    "elements": "vessel_type",
+    "code_table": "vessel_type"
   },
   "primary_station_id": {
     "elements": "ship_callsign"
@@ -12,6 +13,7 @@
     "elements": "record"
   },
   "report_duration": {
-    "elements": "observing_frequency"
+    "elements": "observing_frequency",
+    "code_table": "observing_frequency"
   }
 }
