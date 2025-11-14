@@ -111,9 +111,6 @@ def test_split_operators(
         expected_mask1 = expected_mask1.reset_index(drop=True)
         expected_mask2 = expected_mask2.reset_index(drop=True)
 
-    print(selected)
-    print(rejected)
-
     pd.testing.assert_frame_equal(expected1, selected)
     pd.testing.assert_frame_equal(expected2, rejected)
     pd.testing.assert_frame_equal(expected_mask1, selected_mask)
