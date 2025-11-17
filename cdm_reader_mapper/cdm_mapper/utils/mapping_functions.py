@@ -99,11 +99,19 @@ def coord_dmh_to_90i(deg, min, hemis) -> float:
     -------
     var: latitude in decimal degrees
     """
-    hemisphere = 1
+    if hemis not in ("N", "S"):
+        raise ValueError(f"Hemisphere must be 'N' or 'S' not {hemis}.")
+    if not (0 <= min < 60):
+        raise ValueError(f"Minutes must be between 0 and 60, not {min}.")
+
+    abs_deg = abs(deg)
     min_df = min / 60
+
+    decimal = abs_deg + min_df
+
     if hemis == "S":
-        hemisphere = -1
-    return np.round((deg + min_df), 2) * hemisphere
+        decimal *= -1
+    return np.round(decimal, 2)
 
 
 def convert_to_utc_i(date, zone) -> pd.DateTimeIndex:
@@ -125,6 +133,8 @@ def convert_to_utc_i(date, zone) -> pd.DateTimeIndex:
 
 def time_zone_i(lat, lon) -> str | None:
     """Return time zone."""
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return
     return tf.timezone_at(lng=lon, lat=lat)
 
 
@@ -132,11 +142,10 @@ def longitude_360to180_i(lon) -> int | float:
     """Convert latitudes within 1-80 and 180 degrees."""
     if lon > 180:
         return -180 + math.fmod(lon, 180)
-    else:
-        return lon
+    return lon
 
 
-def location_accuracy_i(li, lat) -> int | np.nan:
+def location_accuracy_i(li, lat) -> int | float:
     """Calculate location accuracy."""
     degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
     deg_km = 111
@@ -144,7 +153,7 @@ def location_accuracy_i(li, lat) -> int | np.nan:
         accuracy = degrees.get(int(li), np.nan) * math.sqrt(
             (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
         )
-    except ValueError:
+    except (TypeError, ValueError):
         return np.nan
     if np.isnan(accuracy):
         return np.nan
@@ -169,7 +178,10 @@ def string_add_i(a, b, c, sep) -> str | None:
 
 def to_int(value):
     """Convert value to integer if possible, return pd.NA for invalid input."""
-    if pd.isna(value):
+    try:
+        if pd.isna(value):
+            return pd.NA
+    except ValueError:
         return pd.NA
     try:
         return int(value)
@@ -184,29 +196,39 @@ class mapping_functions:
         self.imodel = imodel
         self.utc = datetime.timezone.utc
 
-    def datetime_decimalhour_to_hm(self, series) -> pd.Series:
+    def datetime_decimalhour_to_hm(self, row: pd.Series) -> pd.Series:
         """Convert datetime object to hours and minutes."""
-        hr = series.values[4]
-        if not isinstance(hr, (int, float)):
-            return series.apply(lambda x: None)
-        timedelta = datetime.timedelta(hours=hr)
-        seconds = timedelta.total_seconds()
-        series["HR"] = int(seconds / 3600)
-        series["M"] = int(seconds / 60) % 60
-        return series
+        try:
+            hr = row.values[4]
+        except IndexError:
+            return pd.Series({"HR": None, "M": None})
+
+        if hr is None or pd.isna(hr) or not np.issubdtype(type(hr), np.number):
+            return pd.Series({"HR": None, "M": None})
+
+        total_seconds = float(hr) * 3600
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds % 3600) // 60)
+
+        return pd.Series({"HR": hours, "M": minutes})
 
     def datetime_imma1(self, df) -> pd.DateTimeIndex:  # TZ awareness?
         """Convert to pandas datetime object for IMMA1 format."""
         if df.empty:
-            return
+            return pd.DatetimeIndex([])
+
         df = df.iloc[:, 0:4]
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
         df = df.assign(HR=df.iloc[:, -1])
         df["M"] = df["HR"].copy()
         df = df.drop(columns=hr_, axis=1)
-        df = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
+
+        hr_min = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
+        df["HR"] = hr_min["HR"]
+        df["M"] = hr_min["M"]
         df = df.applymap(np.vectorize(to_int))
+
         strings = df.astype(str).apply("-".join, axis=1).values
         result = pd.to_datetime(
             strings,
@@ -216,86 +238,106 @@ class mapping_functions:
         result.index = df.index
         return result
 
-    def datetime_imma1_to_utc(self, df) -> pd.DataTimeIndex:
+    def datetime_imma1_to_utc(self, df) -> pd.DatatimeIndex:
         """
         Convert to pandas datetime object for IMMA1 deck 701 format.
         Set missing hour to 12 and use latitude and longitude information
         to convert local midday to UTC time.
         """
         if df.empty:
-            return
+            return pd.DatetimeIndex([])
 
         date_format = "%Y-%m-%d-%H-%M"
-        df.columns = [col[1] for col in df.columns]
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [col[1] for col in df.columns]
+
         df_dates = df.iloc[:, 0:3].astype(str)
         df_dates["HR"] = "12"
         df_dates["M"] = "0"
+
         df_coords = df.iloc[:, 4:6].astype(float)
         lon_ = df_coords.columns[0]
         lat_ = df_coords.columns[1]
         df_coords["lon_converted"] = coord_360_to_180i(df_coords[lon_])
+
         time_zone = df_coords.swifter.apply(
             lambda x: time_zone_i(x[lat_], x["lon_converted"]),
             axis=1,
         )
-        data = pd.to_datetime(
-            df_dates.swifter.apply("-".join, axis=1).values,
-            format=date_format,
-            errors="coerce",
-        )
-        d = {"Dates": data, "Time_zone": time_zone.values}
-        df_time = pd.DataFrame(data=d)
+
+        strings = df_dates.swifter.apply("-".join, axis=1).values
+        data = pd.to_datetime(strings, format=date_format, errors="coerce")
+        df_time = pd.DataFrame(data={"Dates": data, "Time_zone": time_zone.values})
 
         results = df_time.swifter.apply(
             lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
         )
         results.index = df.index
-        return results.dt.tz_convert(None)
+        return pd.DatetimeIndex(results.dt.tz_convert(None))
 
     def datetime_imma1_701(self, df) -> pd.DateTimeIndex:
         """Convert to pandas datetime object for IMMA1 deck 701 format."""
         if df.empty:
-            return
+            return pd.DatetimeIndex([])
+
         hr = df.iloc[:, 3]
         valid_mask = hr.notna()
 
         results = pd.Series([pd.NaT] * len(df), index=df.index, dtype="datetime64[ns]")
-        results[valid_mask] = self.datetime_imma1(df[valid_mask])
-        results[~valid_mask] = self.datetime_imma1_to_utc(df[~valid_mask])
-        return results
+
+        if valid_mask.any():
+            results[valid_mask] = self.datetime_imma1(df[valid_mask])
+
+        if (~valid_mask).any():
+            results[~valid_mask] = self.datetime_imma1_to_utc(df[~valid_mask])
+
+        return pd.DatetimeIndex(results)
 
     def datetime_immt(self, df) -> pd.DatetimeIndex:
         """Convert to pandas datetime object for IMMT format."""
+        if df.empty:
+            return pd.DatetimeIndex([])
+
         date_format = "%Y-%m-%d-%H-%M"
+        df = df.copy()
         df["M"] = 0
+
         strings = df.astype(str).apply("-".join, axis=1).values
-        return pd.to_datetime(
+        result = pd.to_datetime(
             strings,
             format=date_format,
             errors="coerce",
         )
+        return pd.DatetimeIndex(result)
 
     def datetime_utcnow(self, df) -> datetime.datetime:
         """Get actual UTC time."""
         return datetime.datetime.now(self.utc)
 
-    def datetime_craid(self, df, format="%Y-%m-%d %H:%M:%S.%f") -> pd.DateTimeIndex:
+    def datetime_craid(self, series, format="%Y-%m-%d %H:%M:%S.%f") -> pd.DateTimeIndex:
         """Convert string to datetime object."""
-        return pd.to_datetime(df.values, format=format, errors="coerce")
+        if series.empty:
+            return pd.DatetimeIndex([])
+        data_1d = series.values.ravel()
+        return pd.to_datetime(data_1d, format=format, errors="coerce")
 
-    def df_col_join(self, df, sep) -> str:
+    def df_col_join(self, df, sep: str) -> pd.Series:
         """Join pandas Dataframe."""
-        joint = df.iloc[:, 0].astype(str)
-        for i in range(1, len(df.columns)):
-            joint = joint + sep + df.iloc[:, i].astype(str)
-        return joint
+        if df.empty:
+            return pd.Series([], dtype=str)
 
-    def float_opposite(self, df) -> float:
+        return df.astype(str).agg(sep.join, axis=1)
+
+    def float_opposite(self, series) -> float | pd.Series:
         """Return float opposite."""
-        return -df
+        return -series
 
     def select_column(self, df) -> pd.Series:
         """Select columns."""
+        if df.empty or df.shape[1] == 0:
+            return pd.Series(dtype=float)
+
         c = df.columns.to_list()
         c.reverse()
         s = df[c[0]].copy()
@@ -304,25 +346,34 @@ class mapping_functions:
                 s.update(df[ci])
         return s
 
-    def float_scale(self, df, factor=1) -> pd.DataFrame | pd.Series:
+    def float_scale(self, series, factor=1) -> pd.Series:
         """Multiply with scale factor."""
-        return df * factor
+        if pd.api.types.is_numeric_dtype(series):
+            return series * factor
+        return pd.Series(dtype=float, name=series.name)
 
-    def integer_to_float(self, df) -> pd.DataFrame | pd.Series:
-        """Convert integer to float."""
-        return df.astype(float)
+    def integer_to_float(self, s: pd.Series) -> pd.Series:
+        """Convert integer or numeric Series to float. Non-numeric ? empty float Series."""
+        if not isinstance(s, pd.Series):
+            raise TypeError("integer_to_float only supports Series")
 
-    def icoads_wd_conversion(self, df) -> pd.DataFrame | pd.Series:
+        if pd.api.types.is_numeric_dtype(s):
+            return s.astype(float)
+
+        return pd.Series(dtype=float, name=s.name)
+
+    def icoads_wd_conversion(self, series) -> pd.Series:
         """Convert ICOADS WD."""
-        df = df.mask(df == 361, 0)
-        df = df.mask(df == 362, np.nan)
-        return df
+        series = series.mask(series == 361, 0)
+        series = series.mask(series == 362, np.nan)
+        return series
 
-    def icoads_wd_integer_to_float(self, df) -> pd.DataFrame | pd.Series:
+    def icoads_wd_integer_to_float(self, series) -> pd.Series:
         """Convert ICOADS WD integer to float."""
-        notna = df.notna()
-        df[notna] = self.icoads_wd_conversion(df[notna])
-        return self.integer_to_float(df)
+        s = series.copy()
+        notna = s.notna()
+        s.loc[notna] = self.icoads_wd_conversion(s.loc[notna])
+        return self.integer_to_float(s)
 
     def lineage(self, df) -> str:
         """Get lineage."""
@@ -332,53 +383,75 @@ class mapping_functions:
             strf = strf + imodel_lineage
         return strf
 
-    def longitude_360to180(self, df) -> pd.DataFrame | pd.Series:
+    def longitude_360to180(self, series) -> pd.Series:
         """Convert longitudes within -180 and 180 degrees."""
-        return np.vectorize(longitude_360to180_i)(df)
+        result = np.vectorize(longitude_360to180_i, otypes="f")(series)
+        return pd.Series(
+            result, name=series.name, index=series.index, dtype=series.dtypes
+        )
 
-    def location_accuracy(self, df) -> pd.DataFrame | pd.Series:
+    def location_accuracy(self, df) -> pd.Series:
         """Calculate location accuracy."""
-        return np.vectorize(location_accuracy_i, otypes="f")(
-            df.iloc[:, 0], df.iloc[:, 1]
-        )  # last minute tweak so that is does no fail on nans!
+        if df.empty:
+            return pd.Series([], dtype=float)
 
-    def observing_programme(self, df) -> pd.DataFrame | pd.Series:
+        li_array = df.iloc[:, 0]
+        lat_array = df.iloc[:, 1]
+
+        result = np.vectorize(location_accuracy_i, otypes="f")(
+            li_array, lat_array
+        )  # last minute tweak so that is does no fail on nans!
+        return pd.Series(result, dtype=float, index=df.index)
+
+    def observing_programme(self, series) -> pd.Series:
         """Map observing programme."""
         op = {str(i): [5, 7, 56] for i in range(0, 6)}
         op.update({"7": [5, 7, 9]})
-        return df.map(op, na_action="ignore")
+        return series.map(op, na_action="ignore")
 
     def string_add(
-        self, df, prepend="", append="", separator="", zfill_col=None, zfill=None
-    ) -> pd.DataFrame | pd.Series:
+        self, series, prepend="", append="", separator="", zfill_col=None, zfill=None
+    ) -> pd.Series:
         """Add string."""
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
-                df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
-        return np.vectorize(string_add_i)(prepend, df, append, separator)
+                series.iloc[:, col] = series.iloc[:, col].astype(str).str.zfill(width)
+
+        result = np.vectorize(string_add_i, otypes="O")(
+            prepend, series, append, separator
+        )
+
+        return pd.Series(result, index=series.index, dtype="object")
 
     def string_join_add(
         self, df, prepend=None, append=None, separator="", zfill_col=None, zfill=None
-    ) -> pd.DataFrame | pd.Series:
+    ) -> pd.Series:
         """Join string."""
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
                 df.iloc[:, col] = df.iloc[:, col].astype(str).str.zfill(width)
         joint = self.df_col_join(df, separator)
-        return np.vectorize(string_add_i)(prepend, joint, append, sep=separator)
+        result = np.vectorize(string_add_i, otypes="O")(
+            prepend, joint, append, sep=separator
+        )
+        return pd.Series(result, index=df.index, dtype="object")
 
-    def temperature_celsius_to_kelvin(self, df) -> pd.DataFrame | pd.Series:
+    def temperature_celsius_to_kelvin(self, df) -> pd.Series:
         """Convert temperature from Celsius to Kelvin."""
         method = find_entry(self.imodel, c2k_methods)
         if not method:
             method = "method_a"
         if method == "method_a":
-            return df + 273.15
+            result = df + 273.15
         if method == "method_b":
             df.iloc[:, 0] = np.where((df.iloc[:, 0] == 0) | (df.iloc[:, 0] == 5), 1, -1)
-            return df.iloc[:, 0] * df.iloc[:, 1] + 273.15
+            result = df.iloc[:, 0] * df.iloc[:, 1] + 273.15
 
-    def time_accuracy(self, df) -> pd.DataFrame | pd.Series:  # ti_core
+        if isinstance(result, pd.DataFrame):
+            result = result.iloc[:, 0]
+        return pd.Series(result, dtype=float)
+
+    def time_accuracy(self, series) -> pd.Series:  # ti_core
         """Calculate time accuracy."""
         # Shouldn't we use the code_table mapping for this? see CDM!
         secs = {
@@ -387,7 +460,7 @@ class mapping_functions:
             "2": int(round(3600 / 60)),
             "3": int(round(3600 / 100)),
         }
-        return df.map(secs, na_action="ignore")
+        return series.map(secs, na_action="ignore")
 
     def feet_to_m(self, df) -> float:
         """Convert feet into meter."""
