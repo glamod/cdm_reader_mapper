@@ -22,6 +22,10 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
 )
 
 from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.common.json_dict import open_json_file
+
+# from cdm_reader_mapper.cdm_mapper.reader import read_tables
+from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functions
 from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
 
@@ -93,7 +97,6 @@ def test_decimal_places(decimal_places, expected):
 def test_transform():
     series = pd.Series(data={"a": 1, "b": 2, "c": np.nan}, index=["a", "b", "c"])
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    imodel_functions = mapping_functions("icoads_r300_d721")
     result = _transform(series, imodel_functions, "integer_to_float", {}, logger)
     expected = pd.Series(data={"a": 1.0, "b": 2.0, "c": np.nan}, index=["a", "b", "c"])
     pd.testing.assert_series_equal(result, expected)
@@ -208,7 +211,6 @@ def test_map_data(series, transform, code_table, default, fill_value, expected):
         "length": None,
         "logger": logger,
     }
-    imodel_functions = mapping_functions("icoads_r300_d721")
     result = _map_data(
         series, transform, code_table, default, fill_value, imodel_functions, **kwargs
     )
@@ -426,3 +428,53 @@ def test_map_model_pub47():
     )
 
     pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data_model",
+    [
+        "icoads_r300_d714",
+        "icoads_r300_d701",
+        "icoads_r300_d706",
+        "icoads_r300_d705",
+        "icoads_r300_d702",
+        "icoads_r300_d707",
+        # "icoads_r300_mixed", -> encoding
+        "icoads_r302_d794",
+        "icoads_r300_d704",
+        "icoads_r300_d721",
+        "icoads_r300_d730",
+        "icoads_r300_d781",
+        "icoads_r300_d703",
+        "icoads_r300_d201",
+        "icoads_r300_d892",
+        "icoads_r300_d700",
+        "icoads_r302_d792",
+        # "gdac", -> Jan
+        "craid",
+    ],
+)
+def test_map_model_test_data(data_model):
+    source = test_data[f"test_{data_model}"]["mdf_data"]
+    info = open_json_file(test_data[f"test_{data_model}"]["mdf_info"])
+    df = pd.read_csv(source, dtype=info["dtypes"])
+    if ":" in df.columns[0]:
+        df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+    result = map_model(df, data_model)
+    for cdm_table in cdm_tables:
+        expected = pd.read_csv(
+            test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
+            delimiter="|",
+            dtype="object",
+            na_values=None,
+            keep_default_na=False,
+        )
+        result_table = result[cdm_table].copy()
+        result_table = result_table.dropna()
+        if "record_timestamp" in expected.columns:
+            expected = expected.drop("record_timestamp", axis=1)
+            result_table = result_table.drop("record_timestamp", axis=1)
+        if "history" in expected.columns:
+            expected = expected.drop("history", axis=1)
+            result_table = result_table.drop("history", axis=1)
+        pd.testing.assert_frame_equal(result_table, expected)
