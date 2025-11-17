@@ -24,7 +24,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
 from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import open_json_file
 
-# from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functions
 from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
