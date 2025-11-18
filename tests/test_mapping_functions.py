@@ -19,7 +19,7 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import (
     longitude_360to180_i,
     location_accuracy_i,
     convert_to_str,
-    # string_add_i,
+    string_add_i,
     to_int,
     mapping_functions,
 )
@@ -237,6 +237,33 @@ def test_location_accuracy_i_minimum_one():
 )
 def test_convert_to_str(input_val, expected):
     assert convert_to_str(input_val) == expected
+
+
+@pytest.mark.parametrize(
+    "a,b,c,sep,expected",
+    [
+        ("x", "y", "z", "-", "x-y-z"),  # normal case
+        ("x", "y", None, "-", "x-y"),  # c filtered out
+        ("x", "y", "", "-", "x-y"),  # c empty string filtered
+        (None, "mid", "end", "/", "mid/end"),  # a filtered out
+        (1, 2, 3, ",", "1,2,3"),  # numeric conversion
+        ("a", "b", "c", "::", "a::b::c"),  # custom separator
+    ],
+)
+def test_string_add_i_valid(a, b, c, sep, expected):
+    assert string_add_i(a, b, c, sep) == expected
+
+
+@pytest.mark.parametrize(
+    "a,b,c,sep",
+    [
+        ("a", None, "c", "-"),  # b becomes falsy
+        ("a", "", "c", "-"),  # b empty ? returns None
+        (None, None, None, ","),  # all None ? b falsy
+    ],
+)
+def test_string_add_i_returns_none_when_b_falsy(a, b, c, sep):
+    assert string_add_i(a, b, c, sep) is None
 
 
 @pytest.mark.parametrize(
@@ -906,3 +933,172 @@ def test_time_accuracy(input_series, expected):
     obj = mapping_functions("dummy_model")
     result = obj.time_accuracy(input_series)
     pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "input_series, expected",
+    [
+        # Simple numeric feet values
+        (pd.Series([0, 3.2808, 6.5616]), pd.Series([0.00, 1.00, 2.00])),
+        # String values that should be converted to float
+        (pd.Series(["3.2808", "32.808"]), pd.Series([1.00, 10.00])),
+        # Includes NaN
+        (pd.Series([3.2808, np.nan, 9.8424]), pd.Series([1.00, np.nan, 3.00])),
+        # Empty series
+        (pd.Series([], dtype=float), pd.Series([], dtype=float)),
+    ],
+)
+def test_feet_to_m(input_series, expected):
+    obj = mapping_functions("dummy_model")  # same pattern as your example
+    result = obj.feet_to_m(input_series)
+
+    # Make sure dtype is float in expected because feet_to_m returns floats
+    expected = expected.astype(float)
+
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "input_df, prepend, append, expected_uuids",
+    [
+        # Basic single row
+        (
+            pd.DataFrame({"AAAA": [12], "MM": [3], "YY": [7], "GG": [5]}),
+            "",
+            "",
+            pd.Series(["a57ea24d0eb65ca390a63bd175c906db"], dtype="object"),
+        ),
+        # Multiple rows
+        (
+            pd.DataFrame(
+                {"AAAA": [1, 2024], "MM": [1, 12], "YY": [1, 99], "GG": [1, 23]}
+            ),
+            "",
+            "",
+            pd.Series(
+                [
+                    "de3d414a8823554bbfde50f2305958d0",
+                    "5f4b0ac6560552bf9e69cc9de0541bd6",
+                ],
+                dtype="object",
+            ),
+        ),
+        # With prepend and append
+        (
+            pd.DataFrame({"AAAA": [50], "MM": [6], "YY": [24], "GG": [4]}),
+            "PRE-",
+            "-POST",
+            pd.Series(["PRE-1d37cb121ceb546daba6431da61cd309-POST"], dtype="object"),
+        ),
+        # Empty dataframe
+        (
+            pd.DataFrame({"AAAA": [], "MM": [], "YY": [], "GG": []}),
+            "",
+            "",
+            pd.Series([], dtype="object"),
+        ),
+    ],
+)
+def test_gdac_uid(input_df, prepend, append, expected_uuids):
+    obj = mapping_functions("dummy_model")
+
+    result = obj.gdac_uid(input_df, prepend=prepend, append=append)
+
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True),
+        expected_uuids.reset_index(drop=True),
+        check_names=False,  # ignore the Series name difference
+    )
+
+
+@pytest.mark.parametrize(
+    "input_df, expected_latitudes",
+    [
+        # Quadrants 1 and 2: positive
+        (pd.DataFrame({"Qc": [1, 2], "LaLaLa": [10.0, 20.0]}), pd.Series([10.0, 20.0])),
+        # Quadrants 3 and 5: negative
+        (
+            pd.DataFrame({"Qc": [3, 5], "LaLaLa": [10.0, 20.0]}),
+            pd.Series([-10.0, -20.0]),
+        ),
+        # Mixed quadrants
+        (
+            pd.DataFrame({"Qc": [1, 3, 5, 2], "LaLaLa": [1.0, 2.0, 3.0, 4.0]}),
+            pd.Series([1.0, -2.0, -3.0, 4.0]),
+        ),
+        # Empty dataframe
+        (pd.DataFrame({"Qc": [], "LaLaLa": []}), pd.Series([], dtype=float)),
+    ],
+)
+def test_gdac_latitude(input_df, expected_latitudes):
+    obj = mapping_functions("dummy_model")
+
+    result = obj.gdac_latitude(input_df)
+
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True),
+        expected_latitudes.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gdac_latitude_missing_columns():
+    obj = mapping_functions("dummy_model")
+
+    # Missing 'Qc'
+    df_missing_qc = pd.DataFrame({"LaLaLa": [10.0, 20.0]})
+    with pytest.raises(KeyError):
+        obj.gdac_latitude(df_missing_qc)
+
+    # Missing 'LaLaLa'
+    df_missing_lat = pd.DataFrame({"Qc": [1, 2]})
+    with pytest.raises(KeyError):
+        obj.gdac_latitude(df_missing_lat)
+
+
+@pytest.mark.parametrize(
+    "input_df, expected_longitudes",
+    [
+        # Quadrants 1, 3: positive
+        (
+            pd.DataFrame({"Qc": [1, 3], "LoLoLoLo": [10.0, 20.0]}),
+            pd.Series([10.0, 20.0]),
+        ),
+        # Quadrants 5 and 7: negative
+        (
+            pd.DataFrame({"Qc": [5, 7], "LoLoLoLo": [10.0, 20.0]}),
+            pd.Series([-10.0, -20.0]),
+        ),
+        # Mixed quadrants
+        (
+            pd.DataFrame({"Qc": [1, 5, 7, 3], "LoLoLoLo": [1.0, 2.0, 3.0, 4.0]}),
+            pd.Series([1.0, -2.0, -3.0, 4.0]),
+        ),
+        # Empty dataframe
+        (pd.DataFrame({"Qc": [], "LoLoLoLo": []}), pd.Series([], dtype=float)),
+    ],
+)
+def test_gdac_longitude(input_df, expected_longitudes):
+    obj = mapping_functions("dummy_model")
+
+    result = obj.gdac_longitude(input_df)
+
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True),
+        expected_longitudes.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gdac_longitude_missing_columns():
+    obj = mapping_functions("dummy_model")
+
+    # Missing 'Qc'
+    df_missing_qc = pd.DataFrame({"LoLoLoLo": [10.0, 20.0]})
+    with pytest.raises(KeyError):
+        obj.gdac_longitude(df_missing_qc)
+
+    # Missing 'LoLoLoLo'
+    df_missing_lon = pd.DataFrame({"Qc": [1, 2]})
+    with pytest.raises(KeyError):
+        obj.gdac_longitude(df_missing_lon)

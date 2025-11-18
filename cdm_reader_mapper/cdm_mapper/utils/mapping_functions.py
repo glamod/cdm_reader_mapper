@@ -462,13 +462,16 @@ class mapping_functions:
         }
         return series.map(secs, na_action="ignore")
 
-    def feet_to_m(self, df) -> float:
+    def feet_to_m(self, series) -> float:
         """Convert feet into meter."""
-        df.astype(float)
-        return np.round(df / 3.2808, 2)
+        series = series.astype(float)
+        return np.round(series / 3.2808, 2)
 
-    def gdac_uid(self, df, prepend="", append="") -> pd.DataFrame | pd.Series:
+    def gdac_uid(self, df, prepend="", append="") -> pd.Series:
         """Generate unique UID from timestamp + ship's callsign (ID)"""
+        if df.empty:
+            return pd.Series([], dtype="object")
+
         df = df.copy()
         df["AAAA"] = df["AAAA"].apply(lambda x: f"{x:04d}")
         df["MM"] = df["MM"].apply(lambda x: f"{x:02d}")
@@ -483,7 +486,7 @@ class mapping_functions:
         df["UUID"] = uid
         return df["UUID"]
 
-    def gdac_latitude(self, df) -> pd.DataFrame | pd.Series:
+    def gdac_latitude(self, df) -> pd.Series:
         """Add sign to latitude based on quadrant"""
         if "Qc" not in df.columns or "LaLaLa" not in df.columns:
             raise KeyError("DataFrame must contain 'Qc' and 'LaLaLa' columns")
@@ -491,7 +494,7 @@ class mapping_functions:
         lat[df["Qc"].isin([3, 5])] *= -1
         return lat
 
-    def gdac_longitude(self, df) -> pd.DataFrame | pd.Series:
+    def gdac_longitude(self, df) -> pd.Series:
         """Add sign to longitude based on quadrant"""
         if "Qc" not in df.columns or "LoLoLoLo" not in df.columns:
             raise KeyError("DataFrame must contain 'Qc' and 'LoLoLoLo' columns")
