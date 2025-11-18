@@ -103,7 +103,7 @@ def test_coord_dmh_to_90i_invalid_minutes(minutes):
 
 def test_convert_to_utc_i_basic():
     # Create a naive DatetimeIndex
-    local_times = pd.date_range("2025-11-17 00:00", periods=3, freq="H")
+    local_times = pd.date_range("2025-11-17 00:00", periods=3, freq="h")
 
     # Convert from US/Eastern (UTC-5 normally)
     utc_times = convert_to_utc_i(local_times, "US/Eastern")
@@ -121,7 +121,7 @@ def test_convert_to_utc_i_basic():
 
 def test_convert_to_utc_i_different_timezone():
     # Europe/Berlin (UTC+1 normally)
-    local_times = pd.date_range("2025-11-17 00:00", periods=2, freq="H")
+    local_times = pd.date_range("2025-11-17 00:00", periods=2, freq="h")
     utc_times = convert_to_utc_i(local_times, "Europe/Berlin")
 
     expected = pd.DatetimeIndex(
