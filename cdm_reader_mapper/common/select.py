@@ -9,254 +9,126 @@ Created on Wed Jul  3 09:48:18 2019
 from __future__ import annotations
 
 from io import StringIO
+from typing import Sequence, Iterable, Callable
 
 import pandas as pd
 
 
-def _dataframe_apply_index(
+def _select_rows_by_index(
     df: pd.DataFrame,
-    index_list: Union[str, Sequence],
-    reset_index: bool = False,
-    inverse: bool = False,
-) -> Union[pd.DataFrame, pd.Series]:
-    """
-    Select rows from a DataFrame based on index values.
+    index_list: str | int | Sequence,
+    **kwargs,
+) -> pd.DataFrame:
+    """Select rows from a DataFrame based on index values."""
+    reset_index = kwargs.get("reset_index", False)
+    inverse = kwargs.get("inverse", False)
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    index_list : str or sequence of index values
-        Index value(s) to filter by. If a single string is provided, it is converted to a list.
-    reset_index : bool, default False
-        If True, reset the resulting DataFrame index.
-    inverse : bool, default False
-        If True, select rows NOT in `index_list`.
-
-    Returns
-    -------
-    pd.DataFrame or pd.Series
-        Subset of the original DataFrame (or Series if the input is a Series) with an
-        additional attribute `_prev_index` storing the applied index_list.
-    
-    Notes
-    -----
-    - `_prev_index` attribute is attached to the resulting DataFrame/Series for tracking.
-    """
-    if isinstance(index_list, str):
+    if not isinstance(index_list, (list, tuple, pd.Index)):
         index_list = [index_list]
-    if isinstance(index_list, list):
-        index_list = pd.Index(index_list)
-    
+
+    index_list = pd.Index(index_list)
+
     mask = df.index.isin(index_list)
     if inverse is True:
-        in_df = df[~mask]
-    else:
-        in_df = df[mask]
+        mask = ~mask
+
+    out = df[mask]
 
     if reset_index is True:
-        in_df = in_df.reset_index(drop=True)
+        out = out.reset_index(drop=True)
 
-    in_df.__dict__["_prev_index"] = index_list
-    return in_df
+    out.__dict__["_prev_index"] = index_list
+    return out
 
 
-def _split_dataframe_by_index(
+def _split_by_index(
     df: pd.DataFrame,
-    index: Union[str, Sequence],
-    reset_index: bool = False,
-    inverse: bool = False,
-    return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Split a DataFrame into two parts based on index values.
+    indexes: str | Sequence,
+    **kwargs,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a DataFrame into two parts based on index values."""
+    return_rejected = kwargs.get("return_rejected", False)
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    index : str or sequence
-        Index value(s) to select. Can be a string, list, or tuple.
-    reset_index : bool, default False
-        If True, reset the index of the resulting DataFrames.
-    inverse : bool, default False
-        If True, invert the selection.
-    return_rejected : bool, default False
-        If True, also return the rejected (non-selected) rows as the second DataFrame.
-        If False, the second DataFrame will be empty but maintain the column structure.
+    selected = _select_rows_by_index(df, indexes, **kwargs)
 
-    Returns
-    -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - First DataFrame: selected rows according to `index` and `inverse`.
-        - Second DataFrame: rejected rows (if `return_rejected=True`) or empty DataFrame.
-        
-        Both DataFrames have an attribute `_prev_index` storing the applied index list.
-    """
-    out1 = _dataframe_apply_index(
-        df,
-        index,
-        reset_index=reset_index,
-        inverse=inverse,
-    )
     if return_rejected is True:
-        if isinstance(index, str):
-            index = [index]
-        index2 = [idx for idx in df.index if idx not in index]
-        out2 = _dataframe_apply_index(
-            df,
-            index2,
-            reset_index=reset_index,
-            inverse=inverse,
-        )
+        if not isinstance(indexes, (list, tuple, pd.Index)):
+            indexes = [indexes]
+        reject_list = [idx for idx in df.index if idx not in indexes]
+
+        rejected = _select_rows_by_index(df, reject_list, **kwargs)
     else:
-        out2 = pd.DataFrame({col: df[col].iloc[0:0] for col in df.columns})
-        out2.__dict__["_prev_index"] = pd.Index([])
+        rejected = pd.DataFrame({col: df[col].iloc[0:0] for col in df.columns})
+        rejected.__dict__["_prev_index"] = pd.Index([])
 
-    return out1, out2
+    return selected, rejected
 
 
-def split_dataframe_by_boolean(
-    df: pd.DataFrame,
-    mask: pd.DataFrame,
-    boolean: bool,
-    **kwargs
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _ensure_empty_df_consistent(
+    df_part: pd.DataFrame, template: pd.DataFrame, **kwargs
+) -> pd.DataFrame:
     """
-    Split a DataFrame based on a boolean mask using `_split_dataframe_by_index`.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    mask : pd.DataFrame
-        Boolean DataFrame of the same length as `df`. Determines which rows
-        satisfy the condition.
-    boolean : bool
-        Determines the selection logic:
-        - True: select rows where all mask values are True.
-        - False: select rows where all mask values are False (inverse selection).
-    **kwargs : dict
-        Additional arguments passed to `_split_dataframe_by_index` such as:
-        - reset_index : bool
-        - inverse : bool
-        - return_rejected : bool
-
-    Returns
-    -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - First DataFrame: rows matching the boolean mask.
-        - Second DataFrame: remaining rows, or empty if `return_rejected=False`.
-        
-        Both DataFrames maintain a `_prev_index` attribute storing the applied indices.
+    Ensure empty output DataFrames keep the dtypes of a template frame
+    and have a `_prev_index` attribute.
     """
+    if df_part.empty:
+        df_part = pd.DataFrame(
+            {col: pd.Series(dtype=template[col].dtype) for col in template.columns}
+        )
+        df_part.__dict__["_prev_index"] = pd.Index([])
+
+    return df_part
+
+
+def _split_by_boolean_mask(
+    df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a DataFrame based on a boolean mask using `_split_by_index`."""
     # get the index values and pass to the general function
     # If a mask is empty, assume True (...)
     if mask.empty:
-        index = df.index
+        indexes = df.index
     else:
-      if boolean is True:
-        global_mask = mask.eq(True).all(axis=1)
-      else:
-        global_mask = mask.eq(False).any(axis=1)
-      index = global_mask[global_mask].index 
+        if boolean is True:
+            global_mask = mask.eq(True).all(axis=1)
+        else:
+            global_mask = mask.eq(False).any(axis=1)
+        indexes = global_mask[global_mask].index
 
-    selected, rejected =  _split_dataframe_by_index(
-        df,
-        index,
-        **kwargs,
-    )
+    selected, rejected = _split_by_index(df, indexes, **kwargs)
+    selected = _ensure_empty_df_consistent(selected, df)
+    rejected = _ensure_empty_df_consistent(rejected, df)
 
-    for df_part in [selected, rejected]:
-        if df_part.empty:
-            df_part[:] = pd.DataFrame({col: pd.Series(dtype=dt) for col, dt in df.dtypes.items()})
-            df_part.__dict__["_prev_index"] = pd.Index([])
-
-    return selected, rejected    
+    return selected, rejected
 
 
-def split_dataframe_by_column_entries(
-    df: pd.DataFrame,
-    col: str,
-    values: list,
-    **kwargs
+def _split_by_column_values(
+    df: pd.DataFrame, col: str, values: Iterable, **kwargs
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Split a DataFrame based on entries in a specific column using `_split_dataframe_by_index`.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    col : str
-        Column name to check for specific values.
-    values : list
-        List of values to select from the column.
-    **kwargs : dict
-        Additional arguments passed to `_split_dataframe_by_index` such as:
-        - reset_index : bool
-        - inverse : bool
-        - return_rejected : bool
-
-    Returns
-    -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - First DataFrame: rows where `col` contains a value in `values`.
-        - Second DataFrame: remaining rows, or empty if `return_rejected=False`.
-        
-        Both DataFrames maintain a `_prev_index` attribute storing the applied indices.
-    """
+    """Split a DataFrame based on entries in a specific column using `_split_by_index`."""
     # select rows where column contains one of the values
-    in_df = df.loc[df[col].isin(values)]
-    index = list(in_df.index)
+    subset = df.loc[df[col].isin(values)]
+    indexes = list(subset.index)
 
-    selected, rejected = _split_dataframe_by_index(df, index, **kwargs)
-
-    # preserve dtypes for empty selections
-    for df_part in [selected, rejected]:
-        if df_part.empty:
-            df_part[:] = pd.DataFrame({c: pd.Series(dtype=dt) for c, dt in df.dtypes.items()})
-            df_part.__dict__["_prev_index"] = pd.Index([])
-
-    return selected, rejected
-
-def split_dataframe_by_index(df: pd.DataFrame, index, **kwargs) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Split a DataFrame based on index values.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    index : str or sequence
-        Index value(s) to select.
-    **kwargs : dict
-        Additional arguments passed to `_split_dataframe_by_index`, e.g.:
-        - reset_index : bool
-        - inverse : bool
-        - return_rejected : bool
-
-    Returns
-    -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - First DataFrame: selected rows based on `index`.
-        - Second DataFrame: remaining rows (empty if `return_rejected=False`).
-        
-        Both DataFrames maintain a `_prev_index` attribute storing the applied indices.
-    """
-    selected, rejected = _split_dataframe_by_index(df, index, **kwargs)
-
-    # Ensure empty selections have proper dtypes
-    for df_part in [selected, rejected]:
-        if df_part.empty:
-            df_part[:] = pd.DataFrame({col: pd.Series(dtype=dt) for col, dt in df.dtypes.items()})
-            df_part.__dict__["_prev_index"] = pd.Index([])
+    selected, rejected = _split_by_index(df, indexes, **kwargs)
+    selected = _ensure_empty_df_consistent(selected, df)
+    rejected = _ensure_empty_df_consistent(rejected, df)
 
     return selected, rejected
 
 
+def _split_by_index_values(
+    df: pd.DataFrame, index, **kwargs
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a DataFrame based on index values using `_split_by_index`."""
+    selected, rejected = _split_by_index(df, index, **kwargs)
+    selected = _ensure_empty_df_consistent(selected, df)
+    rejected = _ensure_empty_df_consistent(rejected, df)
 
-def split_parser(
+    return selected, rejected
+
+
+def _split_parser(
     data, *args, func=None, reset_index=False, inverse=False, return_rejected=False
 ) -> tuple[pd.io.parsers.TextFileReader]:
     """Common pandas TextFileReader selection function."""
@@ -310,56 +182,28 @@ def split_parser(
     return TextParser1, TextParser2
 
 
-def split(
-    data: Union[pd.DataFrame, pd.io.parsers.TextFileReader, Iterable],
-    func: Callable[..., Tuple[pd.DataFrame, pd.DataFrame]],
+def _split(
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    func: Callable[..., tuple[pd.DataFrame, pd.DataFrame]],
     *args,
-    **kwargs
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    **kwargs,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Apply a split function to one or more DataFrames.
 
-    This function normalizes `data` into a list, then dispatches to either:
-    - `split_parser` if the elements are `TextFileReader` objects.
-    - `func` otherwise (user-provided split function such as 
-      `split_dataframe_by_index`, `split_dataframe_by_column_entries`, etc.).
-
-    Parameters
-    ----------
-    data : DataFrame, TextFileReader, or iterable of either
-        Input to be processed. If a single object is provided, it is wrapped
-        into a list. If the first element is a `TextFileReader`, the call is
-        delegated to `split_parser`.
-    func : callable
-        Function to apply when working with DataFrames. Must accept the 
-        unpacked elements of `data` followed by `*args` and `**kwargs`, and 
-        return a tuple of two DataFrames.
-    *args : tuple
-        Additional positional arguments forwarded to `func` or `split_parser`.
-    **kwargs : dict
-        Additional keyword arguments forwarded to `func` or `split_parser`.
-
-    Returns
-    -------
-    tuple of DataFrame
-        Tuple containing:
-        - The selected subset DataFrame
-        - The rejected subset DataFrame
-
-    Notes
-    -----
-    - When `data` contains `TextFileReader` objects, the execution path routes
-      to `split_parser` and the behavior depends on that function.
+    - If `data` is a single DataFrame, pass it to `func`.
+    - If `data` is a list of DataFrames, only the first is used here
+      (TextFileReader logic is handled separately).
     """
-    if not isinstance(data, list):
-        data = [data]
-    if isinstance(data[0], pd.io.parsers.TextFileReader):
-        return split_parser(
-            data,
-            *args,
-            func=func,
-            **kwargs,
-        )
+    # single DataFrame case
+    if isinstance(data, pd.DataFrame):
+        return func(data, *args, **kwargs)
+
+    # list of DataFrames (used only for TextFileReader)
+    if isinstance(data, list) and isinstance(data[0], pd.io.parsers.TextFileReader):
+        return _split_parser(data, *args, func=func, **kwargs)
+
+    # fallback: assume first DataFrame
     return func(*data, *args, **kwargs)
 
 
@@ -370,44 +214,37 @@ def split_by_boolean(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split a DataFrame using a boolean mask via `split_dataframe_by_boolean`.
-
-    This is a convenience wrapper around :func:`split` that applies
-    `split_dataframe_by_boolean` to a DataFrame and mask pair.
+    Split a DataFrame using a boolean mask via ``split_dataframe_by_boolean``.
 
     Parameters
     ----------
-    data : DataFrame
-        The DataFrame to be split.
-    mask : DataFrame
-        A boolean DataFrame of the same length as `data`.
+    data : pandas.DataFrame
+        DataFrame to be split.
+    mask : pandas.DataFrame
+        Boolean mask with the same length as ``data``.
     boolean : bool
         Determines mask interpretation:
-        - True  ? select rows where *all* mask columns are True
-        - False ? select rows where *any* mask column is False
-    reset_index : bool, default False
-        Whether to reset the index in the two returned DataFrames.
-    inverse : bool, default False
-        If True, invert the selection when passing to the underlying function.
-    return_rejected : bool, default False
-        If True, return both selected and rejected rows.
-        If False, rejected part is empty but retains column structure.
+
+        - ``True``  ? select rows where **all** mask columns are True.
+        - ``False`` ? select rows where **any** mask column is False.
+    reset_index : bool, optional
+        If ``True``, reset the index of returned DataFrames.
+    inverse : bool, optional
+        If ``True``, invert the selection performed by the underlying function.
+    return_rejected : bool, optional
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (DataFrame, DataFrame)
-        The selected and rejected DataFrames returned by
-        `split_dataframe_by_boolean`.
-
-    Notes
-    -----
-    - The `_prev_index` attribute is preserved as implemented in the
-      underlying split functions.
+    (pandas.DataFrame, pandas.DataFrame)
+        Tuple ``(selected, rejected)`` returned by the underlying
+        ``split_dataframe_by_boolean`` implementation.
     """
-    func = split_dataframe_by_boolean
-    return split(
+    func = _split_by_boolean_mask
+    return _split(
         [data, mask],
         func,
         boolean,
@@ -423,36 +260,27 @@ def split_by_boolean_true(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split a DataFrame using a boolean mask, selecting rows where all mask columns are True.
-
-    This is a convenience wrapper around `split_by_boolean` that automatically sets
-    `boolean=True`.
+    Split rows where all mask columns are ``True``.
 
     Parameters
     ----------
-    data : pd.DataFrame
-        The DataFrame to be split.
-    mask : pd.DataFrame
-        A boolean DataFrame of the same length as `data`.
-    reset_index : bool, default False
-        Whether to reset the index in the two returned DataFrames.
-    inverse : bool, default False
-        If True, invert the selection when passing to the underlying function.
-    return_rejected : bool, default False
-        If True, return both selected and rejected rows.
-        If False, the rejected part is empty but retains column structure.
+    data : pandas.DataFrame
+        DataFrame to be split.
+    mask : pandas.DataFrame
+        Boolean mask with the same length as ``data``.
+    reset_index : bool, optional
+        If ``True``, reset indices in returned DataFrames.
+    inverse : bool, optional
+        If ``True``, invert the selection.
+    return_rejected : bool, optional
+        If ``True``, also return rejected rows.
 
     Returns
     -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - The first DataFrame contains rows where all mask columns are True.
-        - The second DataFrame contains the remaining rows (empty if `return_rejected=False`).
-        
-    Notes
-    -----
-    - The `_prev_index` attribute is preserved as implemented in the underlying split functions.
+    (pandas.DataFrame, pandas.DataFrame)
+        Selected rows (all mask columns True) and rejected rows.
     """
     return split_by_boolean(
         data,
@@ -470,36 +298,27 @@ def split_by_boolean_false(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split a DataFrame using a boolean mask, selecting rows where any mask column is False.
-
-    This is a convenience wrapper around `split_by_boolean` that automatically sets
-    `boolean=False`.
+    Split rows where at least one mask column is ``False``.
 
     Parameters
     ----------
-    data : pd.DataFrame
-        The DataFrame to be split.
-    mask : pd.DataFrame
-        A boolean DataFrame of the same length as `data`.
-    reset_index : bool, default False
-        Whether to reset the index in the two returned DataFrames.
-    inverse : bool, default False
-        If True, invert the selection when passing to the underlying function.
-    return_rejected : bool, default False
-        If True, return both selected and rejected rows.
-        If False, the rejected part is empty but retains column structure.
+    data : pandas.DataFrame
+        DataFrame to be split.
+    mask : pandas.DataFrame
+        Boolean mask with the same length as ``data``.
+    reset_index : bool, optional
+        If ``True``, reset indices in returned DataFrames.
+    inverse : bool, optional
+        If ``True``, invert the selection.
+    return_rejected : bool, optional
+        If ``True``, return rejected rows as well.
 
     Returns
     -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        - The first DataFrame contains rows where any mask column is False.
-        - The second DataFrame contains the remaining rows (empty if `return_rejected=False`).
-
-    Notes
-    -----
-    - The `_prev_index` attribute is preserved as implemented in the underlying split functions.
+    (pandas.DataFrame, pandas.DataFrame)
+        Selected rows (any mask column False) and rejected rows.
     """
     return split_by_boolean(
         data,
@@ -513,48 +332,37 @@ def split_by_boolean_false(
 
 def split_by_column_entries(
     data: pd.DataFrame,
-    selection: Dict[str, Iterable],
+    selection: dict[str, Iterable],
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split a DataFrame based on whether values in a specified column match
-    any value in a given list.
-
-    This is a convenience wrapper around `split` that uses
-    `split_dataframe_by_column_entries` as the splitting function.
+    Split a DataFrame based on matching values in a given column.
 
     Parameters
     ----------
-    data : pd.DataFrame
-        The DataFrame to be split.
+    data : pandas.DataFrame
+        DataFrame to be split.
     selection : dict
-        A dictionary mapping a column name to an iterable of values to select.
-        Example: {"city": ["London", "Berlin"]}.
-    reset_index : bool, default False
-        Whether to reset the index in both returned DataFrames.
-    inverse : bool, default False
-        If True, invert the selection when performing the split.
-    return_rejected : bool, default False
-        If True, return rejected rows as the second DataFrame.
-        If False, return an empty (dtype-preserving) DataFrame.
+        Mapping of a column name to an iterable of allowed values.
+        Example: ``{"city": ["London", "Berlin"]}``.
+    reset_index : bool, optional
+        Whether to reset index in returned DataFrames.
+    inverse : bool, optional
+        If ``True``, invert the selection.
+    return_rejected : bool, optional
+        If ``True``, return rejected rows as the second DataFrame.
 
     Returns
     -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        A tuple (selected, rejected) where:
-        - selected contains rows with column values in `selection[col]`
-        - rejected contains the remaining rows (or empty if `return_rejected=False`)
-
-    Notes
-    -----
-    - The `_prev_index` attribute is preserved by the underlying split functions.
+    (pandas.DataFrame, pandas.DataFrame)
+        Selected rows (column value in provided list) and rejected rows.
     """
-    func = split_dataframe_by_column_entries
-    col = list(selection.keys())[0]
-    values = list(selection.values())[0]
-    return split(
+    func = _split_by_column_values
+    col = next(iter(selection.keys()))
+    values = next(iter(selection.values()))
+    return _split(
         data,
         func,
         col,
@@ -571,34 +379,30 @@ def split_by_index(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split a DataFrame based on index values.
-
-    This is a convenience wrapper around `split` using
-    `split_dataframe_by_index` as the underlying function.
+    Split a DataFrame by selecting specific index labels.
 
     Parameters
     ----------
-    data : pd.DataFrame
-        The DataFrame to be split.
-    index : label or list-like
-        Index values to select from the DataFrame.
-    reset_index : bool, default False
-        Whether to reset the index of returned DataFrames.
-    inverse : bool, default False
-        If True, select all rows *except* those in `index`.
-    return_rejected : bool, default False
-        If True, return both selected and rejected rows.
-        If False, rejected is empty but dtype-preserving.
+    data : pandas.DataFrame
+        DataFrame to be split.
+    index : label or sequence of labels
+        Index values to select.
+    reset_index : bool, optional
+        If ``True``, reset index in returned DataFrames.
+    inverse : bool, optional
+        If ``True``, select rows **not** in ``index``.
+    return_rejected : bool, optional
+        If ``True``, return rejected rows as well.
 
     Returns
     -------
-    (DataFrame, DataFrame)
-        Selected and rejected DataFrames.
+    (pandas.DataFrame, pandas.DataFrame)
+        Selected rows (index in given list) and rejected rows.
     """
-    func = split_dataframe_by_index
-    return split(
+    func = _split_by_index_values
+    return _split(
         data,
         func,
         index,
