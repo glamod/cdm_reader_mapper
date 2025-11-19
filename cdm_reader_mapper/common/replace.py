@@ -19,58 +19,97 @@ Replacement arguments:
 
 from __future__ import annotations
 
+
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
 
 def replace_columns(
-    df_l,
-    df_r,
-    pivot_c=None,
-    pivot_l=None,
-    pivot_r=None,
-    rep_c=None,
-    rep_map=None,
-    log_level="INFO",
-) -> pd.DataFrame:
-    """DOCUMENTATION."""
+    df_l: pd.DataFrame,
+    df_r: pd.DataFrame,
+    pivot_c: str | None = None,
+    pivot_l: str | None = None,
+    pivot_r: str | None = None,
+    rep_c: str | list[str] | None = None,
+    rep_map: dict[str, str] | None = None,
+    log_level: str = "INFO",
+) -> pd.DataFrame | None:
+    """
+    Replace columns in one DataFrame using row-matching from another.
+
+    Parameters
+    ----------
+    df_l : pandas.DataFrame
+        The left DataFrame whose columns will be replaced.
+    df_r : pandas.DataFrame
+        The right DataFrame providing replacement values.
+    pivot_c : str, optional
+        A single pivot column present in both DataFrames.
+        Overrides `pivot_l` and `pivot_r`.
+    pivot_l : str, optional
+        Pivot column in `df_l`. Used only when `pivot_c` is not supplied.
+    pivot_r : str, optional
+        Pivot column in `df_r`. Used only when `pivot_c` is not supplied.
+    rep_c : str or list of str, optional
+        One or more column names to replace in `df_l`.
+        Ignored if `rep_map` is supplied.
+    rep_map : dict, optional
+        Mapping between left and right column names as `{left_col: right_col}`.
+    log_level : str, optional
+        Logging level to use.
+
+    Returns
+    -------
+    pandas.DataFrame or None
+        Updated DataFrame with replacements applied, or `None` if validation fails.
+
+    Notes
+    -----
+    This function logs errors and returns `None` instead of raising exceptions.
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    df_l = df_l.copy()
-    df_r = df_r.copy()
+
     # Check inargs
     if not isinstance(df_l, pd.DataFrame) or not isinstance(df_r, pd.DataFrame):
-        logger.error("Input left and right data must be pandas dataframes")
+        logger.error("Input left and right data must be pandas DataFrames.")
         return
-    if not pivot_c and not (pivot_l and pivot_r):
-        logger.error("Pivot columns must be declared correctly")
-        return
-    elif pivot_c:
-        pivot_l = pivot_c
-        pivot_r = pivot_c
-    # Now index on pivot
-    df_l = df_l.set_index(pivot_l, drop=False)
-    df_r = df_r.set_index(pivot_r, drop=False)
 
-    if not rep_c and not rep_map:
+    if pivot_c:
+        pivot_l = pivot_r = pivot_c
+
+    if not (pivot_l and pivot_r):
         logger.error(
-            "Replacement columns must be declared with a list (rep_c) or a dictionary (rep_map)"
+            "Pivot columns must be declared using `pivot_c` or both `pivot_l` and `pivot_r`."
         )
         return
 
-    # Subsample right df to what's going to be replaced renaming to left and
-    # making sure we have right cols replicated when they are used to be mapped to multiple cols on left
-    if rep_c:
-        rep_c = [rep_c] if not isinstance(rep_c, list) else rep_c
-    rep_map = rep_map if rep_map else {x: x for x in rep_c}
+    df_l = df_l.copy().set_index(pivot_l, drop=False)
+    df_r = df_r.copy().set_index(pivot_r, drop=False)
 
-    names_l = list(rep_map.keys())
-    df_r_l = pd.DataFrame(columns=names_l)
-    for i in names_l:
-        df_r_l[i] = df_r[rep_map.get(i)]
+    if rep_map is None:
+        if rep_c is None:
+            logger.error(
+                "Replacement columns must be declared using `rep_c` or `rep_map`."
+            )
+            return
+        if isinstance(rep_c, str):
+            rep_c = [rep_c]
+        rep_map = {col: col for col in rep_c}
 
-    # And merge all data from right into left
+    missing_cols = [src for src in rep_map.values() if src not in df_r.columns]
+    if missing_cols:
+        logger.error(
+            f"Replacement source columns not found in right DataFrame: {missing_cols}."
+        )
+        return None
+
+    # Build right-side replacement DataFrame with left-column names
+    df_r_l = df_r[list(rep_map.values())].rename(
+        columns={v: k for k, v in rep_map.items()}
+    )
+
+    # Apply update
     df_l.update(df_r_l)
-    # Return with index reset to default
-    df_l = df_l.reset_index(drop=True)
-    return df_l
+
+    return df_l.reset_index(drop=True)
