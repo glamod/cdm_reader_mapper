@@ -29,7 +29,7 @@ def _get_data(TextParser, **kwargs):
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def ztest_select_operators(
+def test_select_operators(
     func, args, idx_exp, idx_rej, skwargs, TextParser, reset_index, inverse
 ):
     data = _get_data(TextParser, **skwargs)
@@ -110,9 +110,6 @@ def test_split_operators(
         expected2 = expected2.reset_index(drop=True)
         expected_mask1 = expected_mask1.reset_index(drop=True)
         expected_mask2 = expected_mask2.reset_index(drop=True)
-
-    print(selected)
-    print(rejected)
 
     pd.testing.assert_frame_equal(expected1, selected)
     pd.testing.assert_frame_equal(expected2, rejected)
