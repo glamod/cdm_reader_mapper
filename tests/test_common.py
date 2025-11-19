@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import pytest
+import json
 import logging
+import sys
 import pandas as pd
 
 from io import StringIO
@@ -29,6 +31,11 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
     get_length,
 )
 from cdm_reader_mapper.common.logging_hdlr import init_logger
+from cdm_reader_mapper.common.json_dict import (
+    open_json_file,
+    collect_json_files,
+    combine_dicts,
+)
 
 
 def make_parser(text, **kwargs):
@@ -81,6 +88,14 @@ def boolean_mask_true():
         },
         index=[10, 11, 12, 13, 14],
     )
+
+
+@pytest.fixture
+def tmp_json_file(tmp_path):
+    data = {"a": 1, "b": 2}
+    file_path = tmp_path / "test.json"
+    file_path.write_text(json.dumps(data))
+    return file_path, data
 
 
 @pytest.mark.parametrize(
@@ -467,3 +482,126 @@ def test_init_logger_file(tmp_path):
     with open(log_file, encoding="utf-8") as f:
         content = f.read()
     assert "File log message" in content
+
+
+def test_open_json_file(tmp_json_file):
+    file_path, data = tmp_json_file
+    result = open_json_file(file_path)
+    assert result == data
+
+
+def test_open_json_file_with_pathlib(tmp_path):
+    data = {"x": 42}
+    file_path = tmp_path / "data.json"
+    file_path.write_text(json.dumps(data))
+    result = open_json_file(file_path)
+    assert result == data
+
+
+def test_collect_json_files_basic(tmp_path):
+    sys.modules.pop("idir", None)
+    base_pkg = tmp_path / "idir"
+    base_pkg.mkdir()
+    (base_pkg / "__init__.py").write_text("")
+    (base_pkg / "idir.json").write_text(json.dumps({"x": 1}))
+    (base_pkg / "idir_release.json").write_text(json.dumps({"y": 2}))
+
+    sys.path.insert(0, str(tmp_path))
+    import importlib
+
+    importlib.import_module("idir")
+
+    # Collect files from the base package directly using Path
+    files = list((base_pkg).glob("*.json"))
+    names = [f.name for f in files]
+
+    assert "idir.json" in names
+    assert "idir_release.json" in names
+
+
+def test_collect_json_files_with_args(tmp_path):
+    sys.modules.pop("idir", None)
+    sys.modules.pop("idir.idir", None)
+    sys.modules.pop("idir,idir,release", None)
+    base_pkg = tmp_path / "idir"
+    base_pkg.mkdir()
+    (base_pkg / "__init__.py").write_text("")
+
+    idir_pkg = base_pkg / "idir"
+    idir_pkg.mkdir()
+    (idir_pkg / "__init__.py").write_text("")
+    (idir_pkg / "idir.json").write_text(json.dumps({"x": 1}))
+
+    release_pkg = idir_pkg / "release"
+    release_pkg.mkdir()
+    (release_pkg / "__init__.py").write_text("")
+    (release_pkg / "idir_release.json").write_text(json.dumps({"y": 2}))
+
+    sys.path.insert(0, str(tmp_path))
+    import importlib
+
+    importlib.import_module("idir.idir.release")
+
+    files = collect_json_files("idir", "release", base="idir")
+    names = [f.name for f in files]
+
+    assert "idir.json" in names
+    assert "idir_release.json" in names
+
+
+def test_collect_json_files_missing_dir(tmp_path):
+    package_dir = tmp_path / "missing_pkg"
+    package_dir.mkdir()
+    (package_dir / "__init__.py").write_text("")
+
+    sys.path.insert(0, str(tmp_path))
+    files = collect_json_files("missing_pkg")
+
+    assert files == []
+
+
+def test_combine_dicts_single_file(tmp_path):
+    module_name = "temp_module_single"
+    module_path = tmp_path / module_name
+    module_path.mkdir()
+    (module_path / "__init__.py").write_text("")
+
+    file_path = module_path / "data.json"
+    file_path.write_text(json.dumps({"a": 1}))
+
+    sys.path.insert(0, str(tmp_path))
+
+    combined = combine_dicts(str(file_path))
+    assert combined == {"a": 1}
+
+    sys.path.pop(0)
+
+
+def test_combine_dicts_multiple_files(tmp_path):
+    module_name = "temp_module_multi"
+    module_path = tmp_path / module_name
+    module_path.mkdir()
+    (module_path / "__init__.py").write_text("")
+
+    file1 = module_path / "file1.json"
+    file1.write_text(json.dumps({"a": 1}))
+    file2 = module_path / "file2.json"
+    file2.write_text(json.dumps({"b": 2}))
+
+    sys.path.insert(0, str(tmp_path))
+
+    combined = combine_dicts([str(file1), str(file2)])
+    assert combined == {"a": 1, "b": 2}
+
+    sys.path.pop(0)
+
+
+def test_combine_dicts(tmp_path):
+    base_file = tmp_path / "base.json"
+    base_file.write_text(json.dumps({"a": 1}))
+
+    sub_file = tmp_path / "sub.json"
+    sub_file.write_text(json.dumps({"b": 2}))
+
+    combined = combine_dicts([base_file, sub_file])
+    assert combined == {"a": 1, "b": 2}
