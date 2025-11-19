@@ -8,7 +8,7 @@ from pandas.io.parsers import TextFileReader
 from unittest.mock import Mock
 
 from cdm_reader_mapper.common.select import (
-    split_dataframe_by_boolean, 
+    split_dataframe_by_boolean,
     split_dataframe_by_column_entries,
     split_dataframe_by_index,
     split_parser,
@@ -69,7 +69,7 @@ from cdm_reader_mapper.common.select import (
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
         ),
-    ]
+    ],
 )
 def test_split_dataframe_by_boolean(
     data, mask_data, boolean, return_rejected, expected_selected, expected_rejected
@@ -83,12 +83,12 @@ def test_split_dataframe_by_boolean(
 
     pd.testing.assert_frame_equal(selected, expected_selected)
     pd.testing.assert_frame_equal(rejected, expected_rejected)
-    
+
     # Check _prev_index attribute exists
     assert hasattr(selected, "_prev_index")
     if return_rejected:
         assert hasattr(rejected, "_prev_index")
-        
+
 
 @pytest.mark.parametrize(
     "data, col, values, return_rejected, expected_selected, expected_rejected",
@@ -138,7 +138,7 @@ def test_split_dataframe_by_boolean(
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
         ),
-    ]
+    ],
 )
 def test_split_dataframe_by_column_entries(
     data, col, values, return_rejected, expected_selected, expected_rejected
@@ -149,7 +149,7 @@ def test_split_dataframe_by_column_entries(
     )
 
     pd.testing.assert_frame_equal(selected, expected_selected)
-    pd.testing.assert_frame_equal(rejected, expected_rejected)  
+    pd.testing.assert_frame_equal(rejected, expected_rejected)
 
 
 @pytest.mark.parametrize(
@@ -195,7 +195,7 @@ def test_split_dataframe_by_column_entries(
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
             pd.DataFrame({"A": pd.Series(dtype=float), "B": pd.Series(dtype=float)}),
         ),
-    ]
+    ],
 )
 def test_split_dataframe_by_index(
     data, index, return_rejected, expected_selected, expected_rejected
@@ -215,7 +215,7 @@ def test_split_dataframe_by_index(
         ([0], [0]),
         ([1, 2], [1, 2]),
         ([], []),
-    ]
+    ],
 )
 def test_split_with_split_dataframe_by_index(index, expected_sel_idx):
     df = pd.DataFrame({"x": [10, 20, 30]})
@@ -232,14 +232,15 @@ def test_split_with_split_dataframe_by_index(index, expected_sel_idx):
 
     assert hasattr(sel, "_prev_index")
     assert hasattr(rej, "_prev_index")
-    
+
+
 @pytest.mark.parametrize(
     "values, expected_sel_idx",
     [
         ([1], [0]),
         ([2, 3], [1, 2]),
         ([999], []),
-    ]
+    ],
 )
 def test_split_with_split_dataframe_by_column_entries(values, expected_sel_idx):
     df = pd.DataFrame({"a": [1, 2, 3], "b": [10, 20, 30]})
@@ -268,7 +269,7 @@ def test_split_with_split_dataframe_by_column_entries(values, expected_sel_idx):
         (pd.DataFrame({"m1": [True, False], "m2": [True, True]}), True, [0]),
         # boolean=False ? any False
         (pd.DataFrame({"m1": [True, False], "m2": [True, False]}), False, [1]),
-    ]
+    ],
 )
 def test_split_with_split_dataframe_by_boolean(mask_df, boolean, expected_sel_idx):
     df = pd.DataFrame({"x": [10, 20]})
@@ -287,16 +288,16 @@ def test_split_with_split_dataframe_by_boolean(mask_df, boolean, expected_sel_id
 
     assert hasattr(sel, "_prev_index")
     assert hasattr(rej, "_prev_index")
-    
+
+
 @pytest.mark.parametrize(
     "mask_df, boolean, expected_sel_idx",
     [
         # boolean=True ? all True
         (pd.DataFrame({"m1": [True, False], "m2": [True, True]}), True, [0]),
-
         # boolean=False ? any False
         (pd.DataFrame({"m1": [True, False], "m2": [True, False]}), False, [1]),
-    ]
+    ],
 )
 def test_split_by_boolean_functional(mask_df, boolean, expected_sel_idx):
     df = pd.DataFrame({"x": [10, 20]})
@@ -325,7 +326,8 @@ def test_split_by_boolean_empty_mask_selects_all():
     assert sel.equals(df)
     assert rej.empty
     assert list(rej.columns) == list(df.columns)
-    
+
+
 @pytest.mark.parametrize("boolean", [True, False])
 def test_split_by_boolean_empty_selection_dtypes(boolean):
     df = pd.DataFrame({"x": [10, 20]})
@@ -353,9 +355,9 @@ def test_split_by_boolean_reset_index():
 
     sel, rej = split_by_boolean(df, mask, True, reset_index=True, return_rejected=True)
 
-    assert list(sel.index) == [0]     # reset index
-    assert list(rej.index) == [0]     # also reset
-    
+    assert list(sel.index) == [0]  # reset index
+    assert list(rej.index) == [0]  # also reset
+
 
 @pytest.mark.parametrize(
     "mask_df, expected_sel_idx",
@@ -363,7 +365,7 @@ def test_split_by_boolean_reset_index():
         # boolean=True ? select rows where *all* mask columns are True
         (pd.DataFrame({"m1": [True, False], "m2": [True, True]}), [0]),
         (pd.DataFrame({"m1": [True, True], "m2": [True, True]}), [0, 1]),
-    ]
+    ],
 )
 def test_split_by_boolean_true_functional(mask_df, expected_sel_idx):
     df = pd.DataFrame({"x": [10, 20]})
@@ -376,6 +378,7 @@ def test_split_by_boolean_true_functional(mask_df, expected_sel_idx):
     assert sel1.equals(sel2)
     assert rej1.equals(rej2)
     assert list(sel1.index) == expected_sel_idx
+
 
 def test_split_by_boolean_true_empty_mask_selects_all():
     df = pd.DataFrame({"x": [10, 20]})
@@ -418,40 +421,38 @@ def test_split_by_boolean_true_reset_index():
     assert list(sel.index) == [0]
     assert list(rej.index) == [0]
 
+
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "A": [1, 2, 3, 4],
-        "B": [10, 20, 30, 40]
-    })
+    return pd.DataFrame({"A": [1, 2, 3, 4], "B": [10, 20, 30, 40]})
+
 
 @pytest.fixture
 def sample_mask():
-    return pd.DataFrame({
-        "A": [True, False, True, True],
-        "B": [True, True, False, True]
-    })
+    return pd.DataFrame(
+        {"A": [True, False, True, True], "B": [True, True, False, True]}
+    )
+
 
 @pytest.mark.parametrize(
     "func, boolean, expected_selected_indices",
     [
         (split_by_boolean_true, True, [0, 3]),  # only rows where all True
-        (split_by_boolean_false, False, [1, 2])  # rows where any False
-    ]
+        (split_by_boolean_false, False, [1, 2]),  # rows where any False
+    ],
 )
-@pytest.mark.parametrize(
-    "return_rejected", [False, True]
-)
-def test_split_by_boolean(sample_df, sample_mask, func, boolean, expected_selected_indices, return_rejected):
+@pytest.mark.parametrize("return_rejected", [False, True])
+def test_split_by_boolean(
+    sample_df, sample_mask, func, boolean, expected_selected_indices, return_rejected
+):
     selected, rejected = func(
-        sample_df,
-        sample_mask,
-        reset_index=True,
-        return_rejected=return_rejected
+        sample_df, sample_mask, reset_index=True, return_rejected=return_rejected
     )
 
     # Check selected rows
-    assert list(selected.index) == list(range(len(expected_selected_indices)))  # reset_index=True
+    assert list(selected.index) == list(
+        range(len(expected_selected_indices))
+    )  # reset_index=True
     assert selected.shape[0] == len(expected_selected_indices)
 
     # Check _prev_index exists
@@ -463,19 +464,22 @@ def test_split_by_boolean(sample_df, sample_mask, func, boolean, expected_select
         # rejected should be empty
         assert rejected.empty
         assert all(col in rejected.columns for col in sample_df.columns)
-        
+
+
 @pytest.mark.parametrize(
     "selection, expected_selected_idx",
     [
         ({"city": ["London"]}, [0, 3]),
         ({"city": ["Paris", "Berlin"]}, [1, 2]),
-    ]
+    ],
 )
 def test_split_by_column_entries(selection, expected_selected_idx):
-    df = pd.DataFrame({
-        "city": ["London", "Paris", "Berlin", "London"],
-        "value": [10, 20, 30, 40],
-    })
+    df = pd.DataFrame(
+        {
+            "city": ["London", "Paris", "Berlin", "London"],
+            "value": [10, 20, 30, 40],
+        }
+    )
 
     sel, rej = split_by_column_entries(df, selection, return_rejected=True)
 
@@ -488,11 +492,14 @@ def test_split_by_column_entries(selection, expected_selected_idx):
     assert hasattr(sel, "_prev_index")
     assert hasattr(rej, "_prev_index")
 
+
 def test_split_by_column_entries_reset_index():
-    df = pd.DataFrame({
-        "city": ["A", "B", "A"],
-        "value": [1, 2, 3],
-    })
+    df = pd.DataFrame(
+        {
+            "city": ["A", "B", "A"],
+            "value": [1, 2, 3],
+        }
+    )
 
     sel, rej = split_by_column_entries(
         df,
@@ -501,14 +508,17 @@ def test_split_by_column_entries_reset_index():
         return_rejected=True,
     )
 
-    assert list(sel.index) == [0, 1]     # reset
-    assert list(rej.index) == [0]        # reset
+    assert list(sel.index) == [0, 1]  # reset
+    assert list(rej.index) == [0]  # reset
+
 
 def test_split_by_column_entries_inverse():
-    df = pd.DataFrame({
-        "city": ["A", "B", "C"],
-        "value": [1, 2, 3],
-    })
+    df = pd.DataFrame(
+        {
+            "city": ["A", "B", "C"],
+            "value": [1, 2, 3],
+        }
+    )
 
     # Normally "A" ? index [0]
     # With inverse=True ? everything except [0]
@@ -519,14 +529,17 @@ def test_split_by_column_entries_inverse():
         return_rejected=True,
     )
 
-    assert list(sel.index) == [1, 2]   # inverse selection
+    assert list(sel.index) == [1, 2]  # inverse selection
     assert list(rej.index) == [0]
-    
+
+
 def test_split_by_column_entries_empty_rejected_dtype_preserved():
-    df = pd.DataFrame({
-        "city": ["A", "A"],
-        "value": [1, 2],
-    })
+    df = pd.DataFrame(
+        {
+            "city": ["A", "A"],
+            "value": [1, 2],
+        }
+    )
 
     sel, rej = split_by_column_entries(
         df,
@@ -540,10 +553,12 @@ def test_split_by_column_entries_empty_rejected_dtype_preserved():
 
 
 def test_split_by_column_entries_empty_selection_dtype_preserved():
-    df = pd.DataFrame({
-        "city": ["A", "A"],
-        "value": [1, 2],
-    })
+    df = pd.DataFrame(
+        {
+            "city": ["A", "A"],
+            "value": [1, 2],
+        }
+    )
 
     sel, rej = split_by_column_entries(
         df,
@@ -554,7 +569,7 @@ def test_split_by_column_entries_empty_selection_dtype_preserved():
     assert sel.empty
     assert list(sel.dtypes) == list(df.dtypes)
     assert list(rej.index) == list(df.index)
-    
+
 
 @pytest.mark.parametrize(
     "index, expected_selected",
@@ -562,7 +577,7 @@ def test_split_by_column_entries_empty_selection_dtype_preserved():
         ([0], [0]),
         ([1, 3], [1, 3]),
         ([], []),
-    ]
+    ],
 )
 def test_split_by_index_basic(index, expected_selected):
     df = pd.DataFrame({"x": [10, 20, 30, 40]})
@@ -575,6 +590,7 @@ def test_split_by_index_basic(index, expected_selected):
 
     assert hasattr(sel, "_prev_index")
     assert hasattr(rej, "_prev_index")
+
 
 def test_split_by_index_reset_index():
     df = pd.DataFrame({"x": [10, 20, 30]})
@@ -590,7 +606,7 @@ def test_split_by_index_inverse():
 
     sel, rej = split_by_index(df, [1], inverse=True, return_rejected=True)
 
-    assert list(sel.index) == [0, 2]     # everything except index 1
+    assert list(sel.index) == [0, 2]  # everything except index 1
     assert list(rej.index) == [1]
 
 
@@ -603,7 +619,8 @@ def test_split_by_index_empty_rejected_dtype_preserved():
     assert rej.empty
     assert list(rej.columns) == ["x"]
     assert rej["x"].dtype == df["x"].dtype
-    
+
+
 def test_split_by_index_empty_selection():
     df = pd.DataFrame({"x": [10, 20]})
 
@@ -613,5 +630,3 @@ def test_split_by_index_empty_selection():
     assert list(sel.dtypes) == list(df.dtypes)
 
     assert list(rej.index) == list(df.index)
-    
-        
