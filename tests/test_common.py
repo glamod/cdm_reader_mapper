@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+import logging
 import pandas as pd
 
 from io import StringIO
@@ -27,6 +28,7 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
     is_not_empty,
     get_length,
 )
+from cdm_reader_mapper.common.logging_hdlr import init_logger
 
 
 def make_parser(text, **kwargs):
@@ -38,7 +40,6 @@ def make_parser(text, **kwargs):
 def make_broken_parser(text: str):
     """Return a pandas TextFileReader that will fail in make_copy."""
     parser = pd.read_csv(StringIO(text), chunksize=2)
-    # Simulate broken handle
     parser.handles.handle = None
     return parser
 
@@ -367,7 +368,7 @@ def test_make_copy_basic():
 def test_make_copy_failure_memory():
     parser = make_broken_parser("a,b\n1,2\n")
     cp = make_copy(parser)
-    assert cp is None  # triggers exception path
+    assert cp is None
 
 
 def test_restore_basic():
@@ -384,7 +385,7 @@ def test_restore_basic():
 def test_restore_failure_memory():
     parser = make_broken_parser("a,b\n1,2\n")
     restored = restore(parser)
-    assert restored is None  # triggers exception path
+    assert restored is None
 
 
 def test_is_not_empty_true():
@@ -400,7 +401,7 @@ def test_is_not_empty_false():
 def test_is_not_empty_failure_make_copy_memory():
     parser = make_broken_parser("a,b\n1,2\n")
     result = is_not_empty(parser)
-    assert result is None  # triggers exception path in make_copy
+    assert result is None
 
 
 def test_get_length_basic():
@@ -421,4 +422,48 @@ def test_get_length_failure_due_to_bad_line():
 def test_get_length_failure_make_copy_memory():
     parser = make_broken_parser("a,b\n1,2\n")
     result = get_length(parser)
-    assert result is None  # triggers exception path in make_copy
+    assert result is None
+
+
+def test_init_logger_returns_logger():
+    logger = init_logger("test_module")
+    assert isinstance(logger, logging.Logger)
+    assert logger.name == "test_module"
+
+
+def test_init_logger_levels(caplog):
+    logger = logging.getLogger("level_module")
+    logger.setLevel(logging.DEBUG)
+
+    stream_handler = logging.StreamHandler()
+    logger.addHandler(stream_handler)
+
+    with caplog.at_level(logging.DEBUG, logger="level_module"):
+        logger.debug("Debug message")
+        logger.info("Info message")
+
+    logger.removeHandler(stream_handler)
+
+    assert "Debug message" in caplog.text
+    assert "Info message" in caplog.text
+
+
+def test_warning_logged(caplog):
+    logger = logging.getLogger("lowercase_module")
+    logger.setLevel(logging.WARNING)  # Ensure WARNING and above are captured
+
+    with caplog.at_level(logging.WARNING, logger="lowercase_module"):
+        logger.warning("Warning message")
+
+    assert "Warning message" in caplog.text
+
+
+def test_init_logger_file(tmp_path):
+    log_file = tmp_path / "test.log"
+    logger = init_logger("file_module", fn=str(log_file))
+    logger.info("File log message")
+
+    assert log_file.exists()
+    with open(log_file, encoding="utf-8") as f:
+        content = f.read()
+    assert "File log message" in content
