@@ -499,53 +499,49 @@ def test_open_json_file_with_pathlib(tmp_path):
 
 
 def test_collect_json_files_basic(tmp_path):
-    sys.modules.pop("idir", None)
-    base_pkg = tmp_path / "idir"
+    base_pkg = tmp_path / "idir0"
     base_pkg.mkdir()
     (base_pkg / "__init__.py").write_text("")
-    (base_pkg / "idir.json").write_text(json.dumps({"x": 1}))
-    (base_pkg / "idir_release.json").write_text(json.dumps({"y": 2}))
+    (base_pkg / "idir0.json").write_text(json.dumps({"x": 1}))
+    (base_pkg / "idir0_release.json").write_text(json.dumps({"y": 2}))
 
     sys.path.insert(0, str(tmp_path))
     import importlib
 
-    importlib.import_module("idir")
+    importlib.import_module("idir0")
 
     files = list((base_pkg).glob("*.json"))
     names = [f.name for f in files]
 
-    assert "idir.json" in names
-    assert "idir_release.json" in names
+    assert "idir0.json" in names
+    assert "idir0_release.json" in names
 
 
 def test_collect_json_files_with_args(tmp_path):
-    sys.modules.pop("idir", None)
-    sys.modules.pop("idir.idir", None)
-    sys.modules.pop("idir,idir,release", None)
-    base_pkg = tmp_path / "idir"
+    base_pkg = tmp_path / "idir1"
     base_pkg.mkdir()
     (base_pkg / "__init__.py").write_text("")
 
-    idir_pkg = base_pkg / "idir"
+    idir_pkg = base_pkg / "idir1"
     idir_pkg.mkdir()
     (idir_pkg / "__init__.py").write_text("")
-    (idir_pkg / "idir.json").write_text(json.dumps({"x": 1}))
+    (idir_pkg / "idir1.json").write_text(json.dumps({"x": 1}))
 
     release_pkg = idir_pkg / "release"
     release_pkg.mkdir()
     (release_pkg / "__init__.py").write_text("")
-    (release_pkg / "idir_release.json").write_text(json.dumps({"y": 2}))
+    (release_pkg / "idir1_release.json").write_text(json.dumps({"y": 2}))
 
     sys.path.insert(0, str(tmp_path))
     import importlib
 
-    importlib.import_module("idir.idir.release")
+    importlib.import_module("idir1.idir1.release")
 
-    files = collect_json_files("idir", "release", base="idir")
+    files = collect_json_files("idir1", "release", base="idir1")
     names = [f.name for f in files]
 
-    assert "idir.json" in names
-    assert "idir_release.json" in names
+    assert "idir1.json" in names
+    assert "idir1_release.json" in names
 
 
 def test_collect_json_files_missing_dir(tmp_path):
