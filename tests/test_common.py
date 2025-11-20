@@ -5,6 +5,8 @@ import json
 import logging
 import os
 import sys
+
+import numpy as np
 import pandas as pd
 
 from io import StringIO
@@ -29,7 +31,9 @@ from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
     make_copy,
     restore,
     is_not_empty,
-    get_length,
+)
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
+    get_length as get_length_hdlr,
 )
 from cdm_reader_mapper.common.logging_hdlr import init_logger
 from cdm_reader_mapper.common.json_dict import (
@@ -38,6 +42,7 @@ from cdm_reader_mapper.common.json_dict import (
     combine_dicts,
 )
 from cdm_reader_mapper.common.io_files import get_filename
+from cdm_reader_mapper.common.inspect import _count_by_cat, get_length, count_by_cat
 
 
 def make_parser(text, **kwargs):
@@ -423,22 +428,22 @@ def test_is_not_empty_failure_make_copy_memory():
 
 def test_get_length_basic():
     parser = make_parser("a,b\n1,2\n3,4\n5,6\n")
-    assert get_length(parser) == 3
+    assert get_length_hdlr(parser) == 3
 
 
 def test_get_length_empty():
     parser = make_parser("a,b\n")
-    assert get_length(parser) == 0
+    assert get_length_hdlr(parser) == 0
 
 
 def test_get_length_failure_due_to_bad_line():
     parser = make_parser("a,b\n1,2\n1,2,3\n")
-    assert get_length(parser) is None
+    assert get_length_hdlr(parser) is None
 
 
 def test_get_length_failure_make_copy_memory():
     parser = make_broken_parser("a,b\n1,2\n")
-    result = get_length(parser)
+    result = get_length_hdlr(parser)
     assert result is None
 
 
@@ -660,3 +665,89 @@ def test_get_filename_extension_normalization(tmp_path, extension, normalized):
 def test_get_filename_name_part(pattern, expected_name):
     out = get_filename(pattern)
     assert out.endswith(expected_name)
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        (["a", "b", "a"], {"a": 2, "b": 1}),
+        ([np.nan, "x", np.nan], {"nan": 2, "x": 1}),
+        ([], {}),
+        ([1, 2, 1, 3], {1: 2, 2: 1, 3: 1}),
+        ([None, "a", None], {"nan": 2, "a": 1}),
+    ],
+)
+def test_count_by_cat_i(data, expected):
+    series = pd.Series(data)
+    assert _count_by_cat(series) == expected
+
+
+@pytest.mark.parametrize(
+    "data, columns, expected",
+    [
+        # Single column, no NaN
+        (pd.DataFrame({"A": ["x", "y", "x"]}), "A", {"A": {"x": 2, "y": 1}}),
+        # Multiple columns, including empty string and NaN
+        (
+            pd.DataFrame({"A": ["x", "y", "x"], "B": [1, 2, np.nan]}),
+            ["A", "B"],
+            {"A": {"x": 2, "y": 1}, "B": {1: 1, 2: 1, "nan": 1}},
+        ),
+        # Column as tuple
+        (
+            pd.DataFrame({"C": ["a", "a", "b"]}),
+            ("C",),
+            {"C": {"a": 2, "b": 1}},
+        ),
+        # Empty DataFrame
+        (pd.DataFrame(columns=["D"]), ["D"], {"D": {}}),
+    ],
+)
+def test_count_by_cat_dataframe(data, columns, expected):
+    result = count_by_cat(data, columns)
+    assert result == expected
+
+
+def test_count_by_cat_single_column_string():
+    df = pd.DataFrame({"A": [1, 2, 2, np.nan]})
+    result = count_by_cat(df, "A")
+    assert result == {"A": {1: 1, 2: 2, "nan": 1}}
+
+
+def test_count_by_cat_textfilereader():
+    text = """A,B
+1,x
+2,y
+2,x
+nan,z
+"""
+    parser = make_parser(text)
+
+    result = count_by_cat(parser, ["A", "B"])
+    expected = {
+        "A": {1: 1, 2: 2, "nan": 1},
+        "B": {"x": 2, "y": 1, "z": 1},
+    }
+    assert result == expected
+
+
+def test_count_by_cat_broken_parser():
+    text = """A,B
+1,x
+2,y
+"""
+    parser = make_broken_parser(text)
+    # Expecting an exception or graceful handling depending on implementation
+    with pytest.raises(Exception):
+        count_by_cat(parser, ["A", "B"])
+
+
+@pytest.mark.parametrize(
+    "data, expected_len",
+    [
+        (pd.DataFrame({"A": [1, 2, 3]}), 3),
+        (make_parser("A,B\n1,x\n2,y\n3,z"), 3),
+    ],
+)
+def test_get_length(data, expected_len):
+    assert get_length(data) == expected_len
