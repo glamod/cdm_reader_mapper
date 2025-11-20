@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 import json
 import logging
+import os
 import sys
 import pandas as pd
 
@@ -36,6 +37,7 @@ from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
 )
+from cdm_reader_mapper.common.io_files import get_filename
 
 
 def make_parser(text, **kwargs):
@@ -600,3 +602,61 @@ def test_combine_dicts(tmp_path):
 
     combined = combine_dicts([base_file, sub_file])
     assert combined == {"a": 1, "b": 2}
+
+
+@pytest.mark.parametrize(
+    "pattern, extension, expected_filename",
+    [
+        (["a", "b"], "txt", "a-b.txt"),
+        (["a", "", "c"], "psv", "a-c.psv"),
+        (["x"], ".csv", "x.csv"),
+        ([], "log", ""),
+    ],
+)
+def test_get_filename_basic(tmp_path, pattern, extension, expected_filename):
+    expected = str(tmp_path / expected_filename) if expected_filename else ""
+    assert get_filename(pattern, path=str(tmp_path), extension=extension) == expected
+
+
+@pytest.mark.parametrize(
+    "pattern, separator, expected",
+    [
+        (["part1", "part2"], "-", "part1-part2"),
+        (["part1", "part2"], "_", "part1_part2"),
+        (["single"], "_", "single"),
+        (["", "only"], "-", "only"),
+        ([], "-", ""),  # empty pattern ? empty string
+    ],
+)
+def test_get_filename_separator(pattern, separator, expected):
+    # extension is empty for simplicity
+    result = get_filename(pattern, extension="", separator=separator)
+    # Compare only the filename part
+    assert os.path.basename(result) == expected
+
+
+@pytest.mark.parametrize(
+    "extension, normalized",
+    [
+        ("txt", ".txt"),
+        (".csv", ".csv"),
+        ("psv", ".psv"),
+        ("", ""),  # edge case
+    ],
+)
+def test_get_filename_extension_normalization(tmp_path, extension, normalized):
+    result = get_filename(["file"], path=str(tmp_path), extension=extension)
+    assert result.endswith(normalized)
+
+
+@pytest.mark.parametrize(
+    "pattern, expected_name",
+    [
+        (["data", "2024"], "data-2024.psv"),
+        (["", "A", "B"], "A-B.psv"),
+        (["only"], "only.psv"),
+    ],
+)
+def test_get_filename_name_part(pattern, expected_name):
+    out = get_filename(pattern)
+    assert out.endswith(expected_name)
