@@ -465,7 +465,7 @@ def test_init_logger_levels(caplog):
 
 def test_warning_logged(caplog):
     logger = logging.getLogger("lowercase_module")
-    logger.setLevel(logging.WARNING)  # Ensure WARNING and above are captured
+    logger.setLevel(logging.WARNING)
 
     with caplog.at_level(logging.WARNING, logger="lowercase_module"):
         logger.warning("Warning message")
@@ -511,7 +511,6 @@ def test_collect_json_files_basic(tmp_path):
 
     importlib.import_module("idir")
 
-    # Collect files from the base package directly using Path
     files = list((base_pkg).glob("*.json"))
     names = [f.name for f in files]
 
