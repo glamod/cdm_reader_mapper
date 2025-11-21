@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pytest
+
+import hashlib
 import json
 import logging
 import os
@@ -10,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 from io import StringIO
+from pathlib import Path
 
 
 from cdm_reader_mapper.common.select import (
@@ -43,6 +46,16 @@ from cdm_reader_mapper.common.json_dict import (
 )
 from cdm_reader_mapper.common.io_files import get_filename
 from cdm_reader_mapper.common.inspect import _count_by_cat, get_length, count_by_cat
+from cdm_reader_mapper.common.getting_files import (
+    _file_md5_checksum,
+    _get_remote_file,
+    _check_md5s,
+    _with_md5_suffix,
+    _rm_tree,
+    _get_file,
+    load_file,
+    get_path,
+)
 
 
 def make_parser(text, **kwargs):
@@ -56,6 +69,29 @@ def make_broken_parser(text: str):
     parser = pd.read_csv(StringIO(text), chunksize=2)
     parser.handles.handle = None
     return parser
+
+
+def compute_md5(content: bytes) -> str:
+    """Helper to get MD5 of bytes."""
+    return hashlib.md5(content).hexdigest()  # noqa: S324
+
+
+def create_structure(root: Path, structure):
+    """
+    Recursively create files and directories from a declarative structure list.
+
+    Structure syntax:
+    - "file.txt" ? creates file
+    - ("dirname", [ ... ]) ? creates subdirectory with children
+    """
+    for item in structure:
+        if isinstance(item, str):
+            (root / item).write_text("x")
+        else:
+            dirname, children = item
+            sub = root / dirname
+            sub.mkdir()
+            create_structure(sub, children)
 
 
 @pytest.fixture
@@ -630,13 +666,11 @@ def test_get_filename_basic(tmp_path, pattern, extension, expected_filename):
         (["part1", "part2"], "_", "part1_part2"),
         (["single"], "_", "single"),
         (["", "only"], "-", "only"),
-        ([], "-", ""),  # empty pattern ? empty string
+        ([], "-", ""),
     ],
 )
 def test_get_filename_separator(pattern, separator, expected):
-    # extension is empty for simplicity
     result = get_filename(pattern, extension="", separator=separator)
-    # Compare only the filename part
     assert os.path.basename(result) == expected
 
 
@@ -646,7 +680,7 @@ def test_get_filename_separator(pattern, separator, expected):
         ("txt", ".txt"),
         (".csv", ".csv"),
         ("psv", ".psv"),
-        ("", ""),  # edge case
+        ("", ""),
     ],
 )
 def test_get_filename_extension_normalization(tmp_path, extension, normalized):
@@ -685,21 +719,17 @@ def test_count_by_cat_i(data, expected):
 @pytest.mark.parametrize(
     "data, columns, expected",
     [
-        # Single column, no NaN
         (pd.DataFrame({"A": ["x", "y", "x"]}), "A", {"A": {"x": 2, "y": 1}}),
-        # Multiple columns, including empty string and NaN
         (
             pd.DataFrame({"A": ["x", "y", "x"], "B": [1, 2, np.nan]}),
             ["A", "B"],
             {"A": {"x": 2, "y": 1}, "B": {1: 1, 2: 1, "nan": 1}},
         ),
-        # Column as tuple
         (
             pd.DataFrame({"C": ["a", "a", "b"]}),
             ("C",),
             {"C": {"a": 2, "b": 1}},
         ),
-        # Empty DataFrame
         (pd.DataFrame(columns=["D"]), ["D"], {"D": {}}),
     ],
 )
@@ -737,7 +767,6 @@ def test_count_by_cat_broken_parser():
 2,y
 """
     parser = make_broken_parser(text)
-    # Expecting an exception or graceful handling depending on implementation
     with pytest.raises(Exception):
         count_by_cat(parser, ["A", "B"])
 
@@ -751,3 +780,190 @@ def test_count_by_cat_broken_parser():
 )
 def test_get_length(data, expected_len):
     assert get_length(data) == expected_len
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        b"hello world",
+        b"",
+        b"1234567890" * 1000,
+    ],
+)
+def test_file_md5_checksum(tmp_path, content):
+    file_path = tmp_path / "testfile.txt"
+    file_path.write_bytes(content)
+
+    expected = compute_md5(content)
+
+    result = _file_md5_checksum(file_path)
+    assert result == expected
+
+
+def test_get_remote_file_real(tmp_path):
+    lfile = tmp_path / "README.md"
+    name = Path("README.md")
+    base_url = "https://raw.githubusercontent.com/glamod/cdm-testdata/main"
+
+    local_file, _ = _get_remote_file(lfile, base_url, name)
+
+    assert lfile.exists()
+    assert lfile.stat().st_size > 0
+    assert Path(local_file) == lfile
+
+
+@pytest.mark.parametrize("content", [b"hello world", b"1234567890"])
+def test_check_md5s_correct(tmp_path, content):
+    f = tmp_path / "testfile.txt"
+    f.write_bytes(content)
+    md5 = compute_md5(content)
+    assert _check_md5s(f, md5) is True
+    assert f.exists()
+
+
+def test_check_md5s_error_mode(tmp_path):
+    f = tmp_path / "file.txt"
+    f.write_text("data")
+    wrong_md5 = "deadbeefdeadbeefdeadbeefdeadbeef"
+    with pytest.raises(OSError, match="do not match"):
+        _check_md5s(f, wrong_md5, mode="error")
+
+    assert not f.exists()
+
+
+def test_check_md5s_warning_mode(tmp_path):
+    f = tmp_path / "file2.txt"
+    f.write_text("data")
+    wrong_md5 = "deadbeefdeadbeefdeadbeefdeadbeef"
+
+    with pytest.warns(UserWarning, match="do not match"):
+        _check_md5s(f, wrong_md5, mode="warning")
+
+    assert not f.exists()
+
+
+@pytest.mark.parametrize(
+    "original,suffix,expected",
+    [
+        (Path("file.txt"), ".txt", Path("file.txt.md5")),
+        (Path("archive.tar.gz"), ".hash", Path("archive.tar.hash.md5")),
+        (Path("noext"), ".x", Path("noext.x.md5")),
+        (Path("/tmp/data.bin"), ".bin", Path("/tmp/data.bin.md5")),  # noqa: S108
+    ],
+)
+def test_with_md5_suffix(original, suffix, expected):
+    assert _with_md5_suffix(original, suffix) == expected
+
+
+@pytest.mark.parametrize(
+    "structure",
+    [
+        [],
+        ["a.txt"],
+        ["a.txt", ("sub", ["b.txt", "c.txt"])],
+        [("x", [("y", ["deep.txt"])])],
+    ],
+)
+def test_rm_tree(tmp_path, structure):
+    base = tmp_path / "root"
+    base.mkdir()
+
+    create_structure(base, structure)
+
+    assert base.exists()
+    _rm_tree(base)
+    assert not base.exists()
+
+
+def test_get_file_real(tmp_path):
+    f = "header-icoads_r302_d792_2022-02-01_subset.psv"
+    name = Path(f)
+    base_url = "https://raw.githubusercontent.com/glamod/cdm-testdata/main/icoads/r302/d792/cdm_tables"
+    cache_dir = tmp_path / "cache"
+
+    out_file = _get_file(
+        name=name,
+        suffix=".psv",
+        url=base_url,
+        cache_dir=cache_dir,
+        clear_cache=True,
+        within_drs=False,
+    )
+
+    assert out_file.exists()
+    assert out_file.stat().st_size > 0
+    assert out_file.parent == cache_dir
+    assert out_file.name == f
+
+    import urllib.request
+
+    remote_bytes = urllib.request.urlopen(  # noqa: S310
+        f"{base_url}/{name.name}"
+    ).read()
+    assert compute_md5(out_file.read_bytes()) == compute_md5(remote_bytes)
+
+    assert list(cache_dir.rglob("*.md5")) == []
+
+
+@pytest.mark.parametrize("within_drs", [True, False])
+@pytest.mark.parametrize("cache", [True, False])
+def test_load_file_real(tmp_path, within_drs, cache):
+    base_url = "https://github.com/glamod/cdm-testdata"
+    drs = "icoads/r302/d792/cdm_tables"
+    f = "header-icoads_r302_d792_2022-02-01_subset.psv"
+    cache_dir = tmp_path / "cache"
+
+    local_file = load_file(
+        name=os.path.join(drs, f),
+        github_url=base_url,
+        branch="main",
+        cache=cache,
+        cache_dir=cache_dir,
+        clear_cache=True,
+        within_drs=within_drs,
+    )
+
+    if cache:
+        assert local_file.exists()
+        expected_parent = cache_dir if not within_drs else cache_dir / Path(drs)
+        assert local_file.parent == expected_parent
+        assert local_file.name == f
+        assert list(cache_dir.rglob("*.md5")) == []
+    else:
+        assert not local_file.exists()
+
+    import urllib.request
+
+    url = "/".join((base_url, "raw", "main", drs, f))
+    remote_bytes = urllib.request.urlopen(url).read()  # noqa: S310
+    if cache:
+        assert compute_md5(local_file.read_bytes()) == compute_md5(remote_bytes)
+
+
+def test_load_file_invalid_url():
+    """Test that load_file raises ValueError for unsafe URLs."""
+    with pytest.raises(ValueError):
+        load_file(name="file.txt", github_url="ftp://malicious-site.com")
+
+
+def test_get_path_existing_file(tmp_path):
+    file_path = tmp_path / "file.txt"
+    file_path.write_text("hello")
+
+    result = get_path(str(file_path))
+
+    assert isinstance(result, Path)
+    assert result.exists()
+    assert result == file_path
+
+
+def test_get_path_missing_file(tmp_path, caplog):
+    missing_file = tmp_path / "missing.txt"
+    caplog.set_level(logging.WARNING)
+
+    result = get_path(str(missing_file))
+
+    assert result is None
+    assert any(
+        "No module named" in msg or "Cannot treat" in msg for msg in caplog.messages
+    )
