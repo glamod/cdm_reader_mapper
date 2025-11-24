@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -10,6 +11,16 @@ from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
     to_datetime,
     from_datetime,
     icoads,
+)
+from cdm_reader_mapper.metmetpy.platform_type.correction_functions import (
+    is_num,
+    overwrite_data,
+    fill_value,
+    deck_717_gdac,
+    deck_700_icoads,
+    deck_892_icoads,
+    deck_792_icoads,
+    deck_992_icoads,
 )
 
 YR = properties.metadata_datamodels["year"]["icoads"]
@@ -235,3 +246,193 @@ def test_dck_201_icoads():
     result = dck_201_icoads(data.copy())
 
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+@pytest.mark.parametrize(
+    "x, exp",
+    [
+        ("123", True),
+        ("0", True),
+        ("12.3", False),
+        ("abc", False),
+        (None, False),
+        (1, False),
+        (12.3, False),
+    ],
+)
+def test_is_num(x, exp):
+    assert is_num(x) is exp
+
+
+def test_overwrite_data():
+    df = pd.DataFrame({"PT": [1, 2, 3, 4], "VAL": [10, 20, 30, 40]})
+
+    loc = df["PT"] > 2
+    result = overwrite_data(df.copy(), loc, "VAL", 999)
+
+    expected = pd.DataFrame({"PT": [1, 2, 3, 4], "VAL": [10, 20, 999, 999]})
+
+    pd.testing.assert_frame_equal(result, expected)
+
+    result2 = overwrite_data(df.copy(), loc, "NON_EXIST", 0)
+    pd.testing.assert_frame_equal(result2, df)
+
+    result3 = overwrite_data(df.copy(), [False, False, False, False], "VAL", 0)
+    pd.testing.assert_frame_equal(result3, df)
+
+
+def test_fill_value():
+    s = pd.Series([1, 2, 3, None, 2])
+
+    result = fill_value(s, fill_value=99, fillna=True)
+    expected = pd.Series([1, 2, 3, 99, 2])
+    pd.testing.assert_series_equal(result, expected, check_dtype=False)
+
+    result2 = fill_value(s, fill_value=0, self_condition_value=2)
+    expected2 = pd.Series([1, 0, 3, None, 0])
+    pd.testing.assert_series_equal(result2, expected2)
+
+    df = pd.DataFrame({"mask": [True, False, True, False, True]})
+    result3 = fill_value(
+        s, fill_value=-1, out_condition=df, out_condition_values={"mask": True}
+    )
+    expected3 = pd.Series([-1, 2, -1, None, -1])
+    pd.testing.assert_series_equal(result3, expected3)
+
+
+def test_deck_717_gdac():
+    pt_col = properties.metadata_datamodels["platform"]["gdac"]
+
+    df = pd.DataFrame({pt_col: [np.nan, 0, 1, np.nan], "N": [1, np.nan, 2, np.nan]})
+
+    expected = pd.DataFrame({pt_col: ["7", "9", 1, "7"], "N": [1, np.nan, 2, np.nan]})
+
+    result = deck_717_gdac(df.copy())
+
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_deck_700_icoads():
+    id_col = properties.metadata_datamodels["id"]["icoads"]
+    sid_col = properties.metadata_datamodels["source"]["icoads"]
+    pt_col = properties.metadata_datamodels["platform"]["icoads"]
+
+    data = pd.DataFrame(
+        {
+            id_col: ["12345", "54321", "00001", "ABCDE"],
+            sid_col: ["147", "147", "999", "147"],
+            pt_col: [pd.NA, "5", "5", "5"],
+        }
+    )
+
+    expected = pd.DataFrame(
+        {
+            id_col: ["12345", "54321", "00001", "ABCDE"],
+            sid_col: ["147", "147", "999", "147"],
+            pt_col: ["7", "6", "5", "5"],
+        }
+    )
+
+    result = deck_700_icoads(data.copy())
+
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_deck_892_icoads():
+    ID = properties.metadata_datamodels["id"]["icoads"]
+    SID = properties.metadata_datamodels["source"]["icoads"]
+    PT = properties.metadata_datamodels["platform"]["icoads"]
+
+    columns = [ID, SID, PT]
+
+    data = pd.DataFrame(
+        [
+            ["12345", "29", "5"],
+            ["12345", "29", "6"],
+            ["12345", "30", "5"],
+            ["1234", "29", "5"],
+        ],
+        columns=columns,
+    )
+
+    expected = pd.DataFrame(
+        [
+            ["12345", "29", "6"],
+            ["12345", "29", "6"],
+            ["12345", "30", "5"],
+            ["1234", "29", "5"],
+        ],
+        columns=columns,
+    )
+
+    result = deck_892_icoads(data.copy())
+
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_deck_792_icoads_basic():
+    id_col = properties.metadata_datamodels["id"]["icoads"]
+    sid_col = properties.metadata_datamodels["source"]["icoads"]
+    pt_col = properties.metadata_datamodels["platform"]["icoads"]
+
+    data = pd.DataFrame(
+        {
+            id_col: ["123456", "12345", "7123456", "2345678"],
+            sid_col: ["103", "103", "103", "103"],
+            pt_col: ["5", "5", "5", "5"],
+        }
+    )
+
+    expected = pd.DataFrame(
+        {
+            id_col: ["123456", "12345", "7123456", "2345678"],
+            sid_col: ["103", "103", "103", "103"],
+            pt_col: ["6", "5", "5", "5"],
+        }
+    )
+
+    result = deck_792_icoads(data.copy())
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_deck_792_icoads_no_change():
+    id_col = properties.metadata_datamodels["id"]["icoads"]
+    sid_col = properties.metadata_datamodels["source"]["icoads"]
+    pt_col = properties.metadata_datamodels["platform"]["icoads"]
+
+    data = pd.DataFrame(
+        {
+            id_col: ["12345", "7123456", "56789"],
+            sid_col: ["104", "103", "103"],
+            pt_col: ["5", "6", "5"],
+        }
+    )
+
+    expected = data.copy()
+    result = deck_792_icoads(data.copy())
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_deck_992_icoads_basic():
+    id_col = properties.metadata_datamodels["id"]["icoads"]
+    sid_col = properties.metadata_datamodels["source"]["icoads"]
+    pt_col = properties.metadata_datamodels["platform"]["icoads"]
+
+    data = pd.DataFrame(
+        {
+            id_col: ["6202222", "123456", "7123456", "2345678"],
+            sid_col: ["114", "114", "114", "114"],
+            pt_col: ["5", "5", "5", "5"],
+        }
+    )
+
+    expected = pd.DataFrame(
+        {
+            id_col: ["6202222", "123456", "7123456", "2345678"],
+            sid_col: ["114", "114", "114", "114"],
+            pt_col: ["4", "6", "5", "5"],
+        }
+    )
+
+    result = deck_992_icoads(data.copy())
+    pd.testing.assert_frame_equal(result, expected)
