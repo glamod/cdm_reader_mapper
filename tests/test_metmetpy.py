@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from cdm_reader_mapper.metmetpy import properties
+from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
 from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
     datetime_decimalhour_to_hm,
     to_datetime,
@@ -15,6 +16,8 @@ YR = properties.metadata_datamodels["year"]["icoads"]
 MO = properties.metadata_datamodels["month"]["icoads"]
 DY = properties.metadata_datamodels["day"]["icoads"]
 HR = properties.metadata_datamodels["hour"]["icoads"]
+
+datetime_cols = [YR, MO, DY, HR]
 
 
 @pytest.mark.parametrize(
@@ -213,3 +216,22 @@ def test_to_datetime_raises_error():
 def test_from_datetime_raises_error():
     with pytest.raises(ValueError):
         to_datetime(pd.Series(), "invalid_model")
+
+
+def test_dck_201_icoads():
+    data = pd.DataFrame(
+        {YR: [1899, 1900, 1899], MO: [1, 2, 3], DY: [1, 15, 1], HR: [0, 12, 0]}
+    )
+
+    expected = pd.DataFrame(
+        {
+            YR: [1898, 1900, 1899],
+            MO: [12, 2, 2],
+            DY: [31, 15, 28],
+            HR: [0, 12, 0],
+        }
+    )
+
+    result = dck_201_icoads(data.copy())
+
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
