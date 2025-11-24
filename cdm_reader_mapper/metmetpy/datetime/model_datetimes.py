@@ -22,84 +22,115 @@ import pandas as pd
 from .. import properties
 
 
-# ---------------- General purpose functions ----------------------------------
-def datetime_decimalhour_to_hm(ds) -> tuple[int]:
-    """DOCUMENTATiON."""
-    hours = int(math.floor(ds))
-    minutes = int(math.floor(60.0 * math.fmod(ds, 1)))
+def datetime_decimalhour_to_hm(decimal_hours: float) -> tuple[int, int]:
+    """
+    Convert a decimal-hour value (e.g., 12.5) to (hours, minutes).
+
+    Parameters
+    ----------
+    decimal_hours : float
+        Decimal hour value.
+
+    Returns
+    -------
+    tuple[int, int]
+        Integer hours and minutes.
+    """
+    hours = int(math.floor(decimal_hours))
+    minutes = int(math.floor(60.0 * math.fmod(decimal_hours, 1)))
     return hours, minutes
 
 
-# ---------------- Data model conversions -------------------------------------
-def icoads(data, conversion) -> pd.DataFrame | pd.Series:
-    """DOCUMENTATiON."""
+def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd.Series:
+    """
+    Convert ICOADS date/time fields between DataFrame representation
+    and pandas datetime Series.
 
-    def to_datetime(data) -> pd.Series:
-        dt_data = data[datetime_cols]
-        not_na = dt_data.notna().all(axis=1)
-        date_format = "%Y-%m-%d-%H-%M"
-        empty = True if len(not_na.loc[not_na]) == 0 else False
+    Parameters
+    ----------
+    data : DataFrame or Series
+        For conversion="to_datetime": a DataFrame containing the ICOADS
+        date fields YR, MO, DY, HR (can be strings or tuple column names).
+        For conversion="from_datetime": a Series of datetime64 values.
 
-        dt_series = pd.Series(data=pd.NaT, index=data.index)
-        if empty:
-            return dt_series
+    conversion : {"to_datetime", "from_datetime"}
+        Direction of conversion.
 
-        hours, minutes = np.vectorize(datetime_decimalhour_to_hm)(
-            dt_data.iloc[np.where(not_na)[0], -1].values
-        )
-        columns = dt_data.columns
-        index = len(dt_data.columns) - 1
-        col_idx = columns[index]
-        dt_data = dt_data.drop(col_idx, axis=1)
-        dt_data.loc[not_na, "H"] = hours
-        dt_data.loc[not_na, "M"] = minutes
-        dt_series.loc[not_na] = pd.to_datetime(
-            dt_data.loc[not_na, :]
-            .astype(int)
-            .astype(str)
-            .apply("-".join, axis=1)
-            .values,
-            format=date_format,
-            errors="coerce",
-        )
-        return dt_series
+    Returns
+    -------
+    Series or DataFrame
+        Converted date values.
+    """
+    yr_col = properties.metadata_datamodels["year"]["icoads"]
+    mo_col = properties.metadata_datamodels["month"]["icoads"]
+    dd_col = properties.metadata_datamodels["day"]["icoads"]
+    hr_col = properties.metadata_datamodels["hour"]["icoads"]
 
-    def from_datetime(ds) -> pd.DataFrame:
-        icoads = pd.DataFrame(index=ds.index, columns=datetime_cols)
-        locs = ds.notna()
-        # Note however that if there is missing data, the corresponding column
-        # will be float despite the 'int' conversion
-        icoads[yr_col] = ds.dt.year[locs].astype("int")
-        icoads[mo_col] = ds.dt.month[locs].astype("int")
-        icoads[dd_col] = ds.dt.day[locs].astype("int")
-        icoads[hr_col] = ds.dt.hour[locs] + ds.dt.minute[locs] / 60
-        return icoads
-
-    yr_col = properties.metadata_datamodels.get("year").get("icoads")
-    mo_col = properties.metadata_datamodels.get("month").get("icoads")
-    dd_col = properties.metadata_datamodels.get("day").get("icoads")
-    hr_col = properties.metadata_datamodels.get("hour").get("icoads")
     datetime_cols = [yr_col, mo_col, dd_col, hr_col]
-    datetime_cols = [dt_ for dt_ in datetime_cols if dt_ in data.columns]
+    if isinstance(data, pd.DataFrame):
+        datetime_cols = [c for c in datetime_cols if c in data.columns]
 
-    if not datetime_cols:
-        return pd.Series()
-    elif len(datetime_cols) == 1:
-        datetime_cols = datetime_cols[0]
+    def to_datetime(df: pd.DataFrame) -> pd.Series:
+        if not datetime_cols:
+            return pd.Series(dtype="datetime64[ns]")
+
+        dt_data = df[datetime_cols].copy()
+        valid = dt_data.notna().all(axis=1)
+
+        out = pd.Series(pd.NaT, index=df.index)
+        if not valid.any():
+            return out
+
+        hour_col = datetime_cols[-1]
+        hours, minutes = np.vectorize(datetime_decimalhour_to_hm)(
+            dt_data.loc[valid, hour_col].values
+        )
+
+        dt_data = dt_data.drop(columns=[hour_col])
+        dt_data.loc[valid, "H"] = hours
+        dt_data.loc[valid, "M"] = minutes
+
+        strings = dt_data.loc[valid].astype(int).astype(str).apply("-".join, axis=1)
+
+        out.loc[valid] = pd.to_datetime(
+            strings, format="%Y-%m-%d-%H-%M", errors="coerce"
+        )
+        return out
+
+    def from_datetime(ds: pd.Series) -> pd.DataFrame:
+        df = pd.DataFrame(index=ds.index, columns=datetime_cols)
+        df.columns = pd.MultiIndex.from_tuples(datetime_cols)
+        valid = ds.notna()
+
+        df.loc[valid, yr_col] = ds.dt.year[valid].astype(int)
+        df.loc[valid, mo_col] = ds.dt.month[valid].astype(int)
+        df.loc[valid, dd_col] = ds.dt.day[valid].astype(int)
+        df.loc[valid, hr_col] = ds.dt.hour[valid] + ds.dt.minute[valid] / 60
+
+        return df
+
     if conversion == "to_datetime":
+        if not isinstance(data, pd.DataFrame):
+            raise TypeError("to_datetime requires a DataFrame")
         return to_datetime(data)
-    elif conversion == "from_datetime":
+
+    if conversion == "from_datetime":
+        if not isinstance(data, pd.Series):
+            raise TypeError("from_datetime requires a Series")
         return from_datetime(data)
 
+    raise ValueError("conversion must be one of {'to_datetime','from_datetime'}")
 
-# ---------------- Send input to appropriate function -------------------------
-def to_datetime(data, model) -> pd.Series:
-    """DOCUMENTATiON."""
+
+def to_datetime(data: pd.DataFrame, model: str = "icoads") -> pd.Series:
+    """Dispatch conversion to datetime according to model."""
     if model == "icoads":
         return icoads(data, "to_datetime")
+    raise ValueError(f"Unknown model: {model}")
 
 
-def from_datetime(data, model) -> pd.DataFrame:
-    """DOCUMENTATiON."""
+def from_datetime(data: pd.Series, model: str = "icoads") -> pd.DataFrame:
+    """Dispatch conversion from datetime according to model."""
     if model == "icoads":
         return icoads(data, "from_datetime")
+    raise ValueError(f"Unknown model: {model}")
