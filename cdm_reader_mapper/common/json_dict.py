@@ -39,7 +39,7 @@ def collect_json_files(
     ----------
     idir : str
         Base directory to search.
-    *args : str
+    args : str
         Optional subdirectory names for recursive searching.
     base : str, optional
         Base path to prepend to idir.
@@ -56,7 +56,6 @@ def collect_json_files(
     ifile = name or idir
     list_of_files = list(data_dir.glob(f"{ifile}.json")) if data_dir else []
 
-    i = 0
     for arg in args:
         if name is None:
             ifile = f"{ifile}_{arg}"
