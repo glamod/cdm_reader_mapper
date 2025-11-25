@@ -36,6 +36,7 @@ def datetime_decimalhour_to_hm(decimal_hours: float) -> tuple[int, int]:
     tuple[int, int]
         Integer hours and minutes.
     """
+    decimal_hours = float(decimal_hours)
     hours = int(math.floor(decimal_hours))
     minutes = int(math.floor(60.0 * math.fmod(decimal_hours, 1)))
     return hours, minutes
