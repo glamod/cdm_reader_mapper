@@ -7,13 +7,14 @@ import pytest  # noqa
 from cdm_reader_mapper import read, test_data
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
-data_dict = dict(test_data.test_icoads_r300_d700)
+data_dict = test_data.test_icoads_r300_d700
 
 
 def _get_data(TextParser, **kwargs):
     if TextParser is True:
         kwargs["chunksize"] = 3
-    return read(**data_dict, imodel="icoads_r300_d700", **kwargs)
+    source = data_dict["source"]
+    return read(source, imodel="icoads_r300_d700", **kwargs)
 
 
 @pytest.mark.parametrize("TextParser", [True, False])

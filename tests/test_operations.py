@@ -3,18 +3,34 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from pathlib import Path
+
 from cdm_reader_mapper import read, test_data
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
-from ._results import cdm_header, correction_df
+_base = Path(__file__).parent
 
-data_dict = dict(test_data.test_icoads_r300_d721)
+data_dict = test_data.test_icoads_r300_d721
 
 
 def _get_data(TextParser, **kwargs):
     if TextParser is True:
         kwargs["chunksize"] = 3
-    return read(**data_dict, imodel="icoads_r300_d721", **kwargs)
+    source = data_dict["source"]
+    return read(source, imodel="icoads_r300_d721", **kwargs)
+
+
+cdm_header = read(
+    test_data["test_icoads_r302_d792"]["cdm_header"].parent,
+    cdm_subset=["header"],
+    mode="tables",
+)
+
+correction_df = pd.read_csv(
+    list((_base / "corrections").glob("2022-02.txt.gz"))[0],
+    delimiter="|",
+    names=["report_id", "primary_station_id", "primary_station_id.isChange"],
+)
 
 
 @pytest.mark.parametrize(

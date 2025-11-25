@@ -176,7 +176,7 @@ def test_fill_value(series, fill_value, expected):
             None,
             None,
             pd.Series(
-                data={"a": 1001.0, "b": 1004.0, "c": np.nan}, index=["a", "b", "c"]
+                data={"a": 1001.0, "b": 1002.0, "c": np.nan}, index=["a", "b", "c"]
             ),
         ),
         (
@@ -198,7 +198,7 @@ def test_fill_value(series, fill_value, expected):
             None,
             5000.0,
             pd.Series(
-                data={"a": 1001.0, "b": 1004.0, "c": 5000.0}, index=["a", "b", "c"]
+                data={"a": 1001.0, "b": 1002.0, "c": 5000.0}, index=["a", "b", "c"]
             ),
         ),
     ],
@@ -210,6 +210,7 @@ def test_map_data(series, transform, code_table, default, fill_value, expected):
         "length": None,
         "logger": logger,
     }
+    imodel_functions = mapping_functions("icoads_r300_d701")
     result = _map_data(
         series, transform, code_table, default, fill_value, imodel_functions, **kwargs
     )

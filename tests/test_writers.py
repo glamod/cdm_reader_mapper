@@ -3,14 +3,13 @@ from __future__ import annotations
 import pandas as pd
 import pytest  # noqa
 
-from cdm_reader_mapper import read
+from cdm_reader_mapper import read, test_data
 
-from ._results import result_data
 
 imodel = "icoads_r300_d714"
-exp = f"expected_{imodel}"
-expected_data = getattr(result_data, exp)
-db_exp = read(dict(expected_data)["cdm_table"], suffix=f"{imodel}*", mode="tables")
+pattern = f"test_{imodel}"
+cdm_path = test_data[pattern]["cdm_header"].parent
+db_exp = read(cdm_path, suffix=f"{imodel}*", mode="tables")
 
 
 def test_write_data():
