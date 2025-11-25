@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from io import StringIO
+
 from cdm_reader_mapper.metmetpy import properties
 from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
 from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
@@ -22,13 +24,27 @@ from cdm_reader_mapper.metmetpy.platform_type.correction_functions import (
     deck_792_icoads,
     deck_992_icoads,
 )
+from cdm_reader_mapper.metmetpy.correct import (
+    _correct_dt,
+    _correct_pt,
+    correct_datetime,
+    correct_pt,
+)
 
 YR = properties.metadata_datamodels["year"]["icoads"]
 MO = properties.metadata_datamodels["month"]["icoads"]
 DY = properties.metadata_datamodels["day"]["icoads"]
 HR = properties.metadata_datamodels["hour"]["icoads"]
+ID = properties.metadata_datamodels["id"]["icoads"]
+SID = properties.metadata_datamodels["source"]["icoads"]
+PT = properties.metadata_datamodels["platform"]["icoads"]
 
 datetime_cols = [YR, MO, DY, HR]
+
+
+@pytest.fixture
+def sample_df():
+    return pd.DataFrame({"A": [1, 2, 3]})
 
 
 @pytest.mark.parametrize(
@@ -313,23 +329,19 @@ def test_deck_717_gdac():
 
 
 def test_deck_700_icoads():
-    id_col = properties.metadata_datamodels["id"]["icoads"]
-    sid_col = properties.metadata_datamodels["source"]["icoads"]
-    pt_col = properties.metadata_datamodels["platform"]["icoads"]
-
     data = pd.DataFrame(
         {
-            id_col: ["12345", "54321", "00001", "ABCDE"],
-            sid_col: ["147", "147", "999", "147"],
-            pt_col: [pd.NA, "5", "5", "5"],
+            ID: ["12345", "54321", "00001", "ABCDE"],
+            SID: ["147", "147", "999", "147"],
+            PT: [pd.NA, "5", "5", "5"],
         }
     )
 
     expected = pd.DataFrame(
         {
-            id_col: ["12345", "54321", "00001", "ABCDE"],
-            sid_col: ["147", "147", "999", "147"],
-            pt_col: ["7", "6", "5", "5"],
+            ID: ["12345", "54321", "00001", "ABCDE"],
+            SID: ["147", "147", "999", "147"],
+            PT: ["7", "6", "5", "5"],
         }
     )
 
@@ -339,10 +351,6 @@ def test_deck_700_icoads():
 
 
 def test_deck_892_icoads():
-    ID = properties.metadata_datamodels["id"]["icoads"]
-    SID = properties.metadata_datamodels["source"]["icoads"]
-    PT = properties.metadata_datamodels["platform"]["icoads"]
-
     columns = [ID, SID, PT]
 
     data = pd.DataFrame(
@@ -371,23 +379,19 @@ def test_deck_892_icoads():
 
 
 def test_deck_792_icoads_basic():
-    id_col = properties.metadata_datamodels["id"]["icoads"]
-    sid_col = properties.metadata_datamodels["source"]["icoads"]
-    pt_col = properties.metadata_datamodels["platform"]["icoads"]
-
     data = pd.DataFrame(
         {
-            id_col: ["123456", "12345", "7123456", "2345678"],
-            sid_col: ["103", "103", "103", "103"],
-            pt_col: ["5", "5", "5", "5"],
+            ID: ["123456", "12345", "7123456", "2345678"],
+            SID: ["103", "103", "103", "103"],
+            PT: ["5", "5", "5", "5"],
         }
     )
 
     expected = pd.DataFrame(
         {
-            id_col: ["123456", "12345", "7123456", "2345678"],
-            sid_col: ["103", "103", "103", "103"],
-            pt_col: ["6", "5", "5", "5"],
+            ID: ["123456", "12345", "7123456", "2345678"],
+            SID: ["103", "103", "103", "103"],
+            PT: ["6", "5", "5", "5"],
         }
     )
 
@@ -396,15 +400,11 @@ def test_deck_792_icoads_basic():
 
 
 def test_deck_792_icoads_no_change():
-    id_col = properties.metadata_datamodels["id"]["icoads"]
-    sid_col = properties.metadata_datamodels["source"]["icoads"]
-    pt_col = properties.metadata_datamodels["platform"]["icoads"]
-
     data = pd.DataFrame(
         {
-            id_col: ["12345", "7123456", "56789"],
-            sid_col: ["104", "103", "103"],
-            pt_col: ["5", "6", "5"],
+            ID: ["12345", "7123456", "56789"],
+            SID: ["104", "103", "103"],
+            PT: ["5", "6", "5"],
         }
     )
 
@@ -414,25 +414,316 @@ def test_deck_792_icoads_no_change():
 
 
 def test_deck_992_icoads_basic():
-    id_col = properties.metadata_datamodels["id"]["icoads"]
-    sid_col = properties.metadata_datamodels["source"]["icoads"]
-    pt_col = properties.metadata_datamodels["platform"]["icoads"]
-
     data = pd.DataFrame(
         {
-            id_col: ["6202222", "123456", "7123456", "2345678"],
-            sid_col: ["114", "114", "114", "114"],
-            pt_col: ["5", "5", "5", "5"],
+            ID: ["6202222", "123456", "7123456", "2345678"],
+            SID: ["114", "114", "114", "114"],
+            PT: ["5", "5", "5", "5"],
         }
     )
 
     expected = pd.DataFrame(
         {
-            id_col: ["6202222", "123456", "7123456", "2345678"],
-            sid_col: ["114", "114", "114", "114"],
-            pt_col: ["4", "6", "5", "5"],
+            ID: ["6202222", "123456", "7123456", "2345678"],
+            SID: ["114", "114", "114", "114"],
+            PT: ["4", "6", "5", "5"],
         }
     )
 
     result = deck_992_icoads(data.copy())
     pd.testing.assert_frame_equal(result, expected)
+
+
+def test_correct_dt():
+    data = pd.DataFrame(
+        {
+            YR: [1899, 1900, 1899],
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    expected = pd.DataFrame(
+        {
+            YR: [1898, 1900, 1899],
+            MO: [12, 2, 2],
+            DY: [31, 15, 28],
+            HR: [0, 12, 0],
+        }
+    )
+
+    correction_method = {"201": {"function": "dck_201_icoads"}}
+
+    result = _correct_dt(
+        data.copy(),
+        data_model="icoads",
+        dck="201",
+        correction_method=correction_method,
+    )
+
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_pt_fillna():
+    pt_col = "platform"
+    data = pd.DataFrame({pt_col: [None, "5", None, "3"]})
+
+    fix_methods = {
+        "201": {
+            "method": "fillna",
+            "fill_value": "7",
+        }
+    }
+
+    expected = pd.DataFrame({pt_col: ["7", "5", "7", "3"]})
+
+    result = _correct_pt(
+        data.copy(),
+        imodel="icoads",
+        dck="201",
+        pt_col=pt_col,
+        fix_methods=fix_methods,
+    )
+
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_pt_function():
+    data = pd.DataFrame(
+        {
+            ID: ["12345", "99999"],
+            SID: ["147", "999"],
+            PT: ["5", "5"],
+        }
+    )
+
+    fix_methods = {
+        "700": {
+            "method": "function",
+            "function": "deck_700_icoads",
+        }
+    }
+
+    expected = pd.DataFrame(
+        {
+            ID: ["12345", "99999"],
+            SID: ["147", "999"],
+            PT: ["6", "5"],
+        }
+    )
+
+    result = _correct_pt(
+        data.copy(),
+        imodel="icoads",
+        dck="700",
+        pt_col=PT,
+        fix_methods=fix_methods,
+    )
+
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_pt_no_fix_for_deck():
+    pt_col = "PT"
+    data = pd.DataFrame({pt_col: ["1", None, "3"]})
+
+    fix_methods = {"999": {"method": "fillna", "fill_value": "7"}}
+
+    result = _correct_pt(
+        data.copy(),
+        imodel="icoads",
+        dck="888",
+        pt_col=pt_col,
+        fix_methods=fix_methods,
+    )
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_pt_missing_platform_column():
+    data = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+
+    fix_methods = {"201": {"method": "fillna", "fill_value": "7"}}
+
+    result = _correct_pt(
+        data.copy(),
+        imodel="icoads",
+        dck="201",
+        pt_col="PT",
+        fix_methods=fix_methods,
+    )
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_pt_raises_unknown_method():
+    data = pd.DataFrame({"PT": ["1", "2"]})
+
+    fix_methods = {"201": {"method": "not_a_method"}}
+
+    with pytest.raises(ValueError, match="not implemented"):
+        _correct_pt(
+            data.copy(),
+            imodel="icoads",
+            dck="201",
+            pt_col="PT",
+            fix_methods=fix_methods,
+        )
+
+
+def test_correct_pt_fillna_missing_fillvalue():
+    data = pd.DataFrame({"PT": ["1", None]})
+
+    fix_methods = {"201": {"method": "fillna"}}  # missing fill_value
+
+    with pytest.raises(ValueError, match='requires "fill_value"'):
+        _correct_pt(
+            data.copy(),
+            imodel="icoads",
+            dck="201",
+            pt_col="PT",
+            fix_methods=fix_methods,
+        )
+
+
+def test_correct_pt_missing_function_name():
+    data = pd.DataFrame({"PT": ["1", "2"]})
+
+    fix_methods = {"700": {"method": "function"}}  # no "function": "func_name"
+
+    with pytest.raises(ValueError, match='requires "function" name'):
+        _correct_pt(
+            data.copy(),
+            imodel="icoads",
+            dck="700",
+            pt_col="PT",
+            fix_methods=fix_methods,
+        )
+
+
+def test_correct_pt_missing_function_object():
+    data = pd.DataFrame({"PT": ["1", "2"]})
+
+    fix_methods = {"700": {"method": "function", "function": "NO_SUCH_FUNC"}}
+
+    with pytest.raises(ValueError, match="not found"):
+        _correct_pt(
+            data.copy(),
+            imodel="icoads",
+            dck="700",
+            pt_col="PT",
+            fix_methods=fix_methods,
+        )
+
+
+@pytest.mark.parametrize(
+    "data_input,imodel,expected",
+    [
+        (
+            pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}),
+            "icoads_r300_d201",
+            pd.DataFrame({YR: [1898], MO: [12], DY: [31], HR: [0]}),
+        ),
+        (
+            pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
+            "icoads_r300_d201",
+            pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
+        ),
+    ],
+)
+def test_correct_datetime(data_input, imodel, expected):
+    result = correct_datetime(data_input.copy(), imodel, log_level="CRITICAL")
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_datetime_textfilereader():
+    csv_text = "1899,1,1,0\n1900,1,1,12"
+
+    expected = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
+
+    parser = pd.read_csv(
+        StringIO(csv_text), chunksize=2, header=None, names=datetime_cols, dtype=int
+    )
+
+    result = correct_datetime(parser, "icoads_r300_d201").read()
+
+    pd.testing.assert_frame_equal(
+        result.reset_index(drop=True), expected.reset_index(drop=True)
+    )
+
+
+@pytest.mark.parametrize(
+    "data_input,imodel,expected",
+    [
+        # fillna method
+        (
+            pd.DataFrame({PT: [None, "7", None]}),
+            "icoads_r300_d993",
+            pd.DataFrame({PT: ["5", "7", "5"]}),
+        ),
+        # function method
+        (
+            pd.DataFrame(
+                {
+                    ID: ["12345", "99999"],
+                    SID: ["147", "999"],
+                    PT: ["5", "5"],
+                }
+            ),
+            "icoads_r300_d700",
+            pd.DataFrame(
+                {
+                    ID: ["12345", "99999"],
+                    SID: ["147", "999"],
+                    PT: ["6", "5"],
+                }
+            ),
+        ),
+    ],
+)
+def test_correct_pt_dataframe(data_input, imodel, expected):
+    """Test correct_pt with DataFrame input."""
+    result = correct_pt(data_input.copy(), imodel, log_level="CRITICAL")
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+@pytest.mark.parametrize(
+    "csv_text,names,imodel,expected",
+    [
+        # fillna method
+        (
+            "\n7\n\n",  # first row empty, second row "5"
+            [PT],
+            "icoads_r300_d993",
+            pd.DataFrame({PT: ["5", "7", "5"]}),
+        ),
+        # function method
+        (
+            "5,12345,147\n5,99999,999\n7,123,999",
+            [PT, ID, SID],
+            "icoads_r300_d700",
+            pd.DataFrame(
+                {
+                    PT: ["6", "5", "7"],
+                    ID: ["12345", "99999", "123"],
+                    SID: ["147", "999", "999"],
+                }
+            ),
+        ),
+    ],
+)
+def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
+    """Test correct_pt with TextFileReader input."""
+    parser = pd.read_csv(
+        StringIO(csv_text),
+        chunksize=2,
+        header=None,
+        names=names,
+        dtype=object,
+        skip_blank_lines=False,
+    )
+    result = (
+        correct_pt(parser, imodel, log_level="CRITICAL").read().reset_index(drop=True)
+    )
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
