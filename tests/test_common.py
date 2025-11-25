@@ -18,7 +18,7 @@ from pathlib import Path
 from cdm_reader_mapper.common.select import (
     _select_rows_by_index,
     _split_by_index,
-    _ensure_empty_df_consistent,
+    # _ensure_empty_df_consistent,
     _split_by_boolean_mask,
     _split_by_column_values,
     _split_by_index_values,
@@ -191,17 +191,17 @@ def test_split_by_index_empty_df(empty_df):
     assert rejected.empty
 
 
-def test_ensure_empty_df_consistent(sample_df):
-    empty = pd.DataFrame(columns=sample_df.columns)
-    result = _ensure_empty_df_consistent(empty, sample_df)
-    for col in sample_df.columns:
-        assert result[col].dtype == sample_df[col].dtype
-    assert "_prev_index" in result.__dict__
+# def test_ensure_empty_df_consistent(sample_df):
+#    empty = pd.DataFrame(columns=sample_df.columns)
+#    result = _ensure_empty_df_consistent(empty, sample_df)
+#    for col in sample_df.columns:
+#        assert result[col].dtype == sample_df[col].dtype
+#    assert "_prev_index" in result.__dict__
 
 
-def test_ensure_empty_df_consistent_non_empty(sample_df):
-    result = _ensure_empty_df_consistent(sample_df, sample_df)
-    assert result.equals(sample_df)
+# def test_ensure_empty_df_consistent_non_empty(sample_df):
+#    result = _ensure_empty_df_consistent(sample_df, sample_df)
+#    assert result.equals(sample_df)
 
 
 @pytest.mark.parametrize(

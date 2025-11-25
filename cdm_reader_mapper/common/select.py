@@ -23,22 +23,21 @@ def _select_rows_by_index(
     reset_index = kwargs.get("reset_index", False)
     inverse = kwargs.get("inverse", False)
 
-    if not isinstance(index_list, (list, tuple, pd.Index)):
+    if isinstance(index_list, str):
         index_list = [index_list]
-
-    index_list = pd.Index(index_list)
-
-    mask = df.index.isin(index_list)
+    if isinstance(index_list, list):
+        index_list = pd.Index(index_list)
+    index = df.index.isin(index_list)
     if inverse is True:
-        mask = ~mask
-
-    out = df[mask]
+        in_df = df[~index]
+    else:
+        in_df = df[index]
 
     if reset_index is True:
-        out = out.reset_index(drop=True)
+        in_df = in_df.reset_index(drop=True)
 
-    out.__dict__["_prev_index"] = index_list
-    return out
+    in_df.__dict__["_prev_index"] = index_list
+    return in_df
 
 
 def _split_by_index(
@@ -49,83 +48,52 @@ def _split_by_index(
     """Split a DataFrame into two parts based on index values."""
     return_rejected = kwargs.get("return_rejected", False)
 
-    selected = _select_rows_by_index(df, indexes, **kwargs)
-
+    out1 = _select_rows_by_index(
+        df,
+        indexes,
+        **kwargs,
+    )
     if return_rejected is True:
-        if not isinstance(indexes, (list, tuple, pd.Index)):
-            indexes = [indexes]
-        reject_list = [idx for idx in df.index if idx not in indexes]
-
-        rejected = _select_rows_by_index(df, reject_list, **kwargs)
+        index2 = [idx for idx in df.index if idx not in indexes]
+        out2 = _select_rows_by_index(df, index2, **kwargs)
     else:
-        rejected = pd.DataFrame({col: df[col].iloc[0:0] for col in df.columns})
-        rejected.__dict__["_prev_index"] = pd.Index([])
+        out2 = pd.DataFrame(columns=out1.columns)
+        out2.__dict__["_prev_index"] = pd.Index([])
 
-    return selected, rejected
-
-
-def _ensure_empty_df_consistent(
-    df_part: pd.DataFrame, template: pd.DataFrame, **kwargs
-) -> pd.DataFrame:
-    """
-    Ensure empty output DataFrames keep the dtypes of a template frame
-    and have a `_prev_index` attribute.
-    """
-    if df_part.empty:
-        df_part = pd.DataFrame(
-            {col: pd.Series(dtype=template[col].dtype) for col in template.columns}
-        )
-        df_part.__dict__["_prev_index"] = pd.Index([])
-
-    return df_part
+    return out1, out2
 
 
 def _split_by_boolean_mask(
     df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a DataFrame based on a boolean mask using `_split_by_index`."""
-    # get the index values and pass to the general function
-    # If a mask is empty, assume True (...)
-    if mask.empty:
-        indexes = df.index
+    if boolean is True:
+        global_mask = mask.all(axis=1)
     else:
-        if boolean is True:
-            global_mask = mask.eq(True).all(axis=1)
-        else:
-            global_mask = mask.eq(False).any(axis=1)
-        indexes = global_mask[global_mask].index
+        global_mask = ~(mask.any(axis=1))
+    indexes = global_mask[global_mask.fillna(boolean)].index
 
-    selected, rejected = _split_by_index(df, indexes, **kwargs)
-    selected = _ensure_empty_df_consistent(selected, df)
-    rejected = _ensure_empty_df_consistent(rejected, df)
-
-    return selected, rejected
+    return _split_by_index(df, indexes, **kwargs)
 
 
 def _split_by_column_values(
     df: pd.DataFrame, col: str, values: Iterable, **kwargs
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a DataFrame based on entries in a specific column using `_split_by_index`."""
-    # select rows where column contains one of the values
-    subset = df.loc[df[col].isin(values)]
-    indexes = list(subset.index)
-
-    selected, rejected = _split_by_index(df, indexes, **kwargs)
-    selected = _ensure_empty_df_consistent(selected, df)
-    rejected = _ensure_empty_df_consistent(rejected, df)
-
-    return selected, rejected
+    in_df = df.loc[df[col].isin(values)]
+    index = list(in_df.index)
+    return _split_by_index(
+        df,
+        index,
+        **kwargs,
+    )
 
 
 def _split_by_index_values(
     df: pd.DataFrame, index, **kwargs
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a DataFrame based on index values using `_split_by_index`."""
-    selected, rejected = _split_by_index(df, index, **kwargs)
-    selected = _ensure_empty_df_consistent(selected, df)
-    rejected = _ensure_empty_df_consistent(rejected, df)
-
-    return selected, rejected
+    return _split_by_index(df, index, **kwargs)
 
 
 def _split_parser(
@@ -195,15 +163,10 @@ def _split(
     - If `data` is a list of DataFrames, only the first is used here
       (TextFileReader logic is handled separately).
     """
-    # single DataFrame case
-    if isinstance(data, pd.DataFrame):
-        return func(data, *args, **kwargs)
-
-    # list of DataFrames (used only for TextFileReader)
-    if isinstance(data, list) and isinstance(data[0], pd.io.parsers.TextFileReader):
+    if not isinstance(data, list):
+        data = [data]
+    if isinstance(data[0], pd.io.parsers.TextFileReader):
         return _split_parser(data, *args, func=func, **kwargs)
-
-    # fallback: assume first DataFrame
     return func(*data, *args, **kwargs)
 
 

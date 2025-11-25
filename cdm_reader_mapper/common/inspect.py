@@ -49,7 +49,7 @@ def count_by_cat(
     if columns is None:
         columns = data.columns
     if not isinstance(columns, list):
-        columns = list(columns) if isinstance(columns, (tuple, list)) else [columns]
+        columns = [columns]
 
     counts = {}
 

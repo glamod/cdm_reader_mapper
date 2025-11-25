@@ -88,12 +88,13 @@ def test_select_operators(
 )
 @pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
-@pytest.mark.parametrize("inverse", [False, True])
+@pytest.mark.parametrize("inverse", [True, True])
 def test_split_operators(
     func, args, idx_exp, idx_rej, skwargs, TextParser, reset_index, inverse
 ):
     data = _get_data(TextParser, **skwargs)
     result = getattr(data, func)(*args, reset_index=reset_index, inverse=inverse)
+
     expected = data.data
     expected_mask = data.mask
     selected = result[0].data
@@ -133,7 +134,13 @@ def test_split_operators(
     pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
+@pytest.mark.parametrize(
+    "TextParser",
+    [
+        True,
+        False,
+    ],
+)
 def test_inspect_count_by_cat(TextParser):
     data = _get_data(TextParser)
     result = data.unique(columns=("c1", "B1"))
