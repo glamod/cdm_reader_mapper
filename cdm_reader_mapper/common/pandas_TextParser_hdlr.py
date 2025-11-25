@@ -18,6 +18,7 @@ read_params = [
     "delimiter",
     "quotechar",
     "escapechar",
+    "skip_blank_lines",
 ]
 
 
