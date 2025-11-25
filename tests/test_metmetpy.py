@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import logging
 import pytest
 
 from io import StringIO
@@ -29,6 +30,12 @@ from cdm_reader_mapper.metmetpy.correct import (
     _correct_pt,
     correct_datetime,
     correct_pt,
+)
+from cdm_reader_mapper.metmetpy.validate import (
+    _get_id_col,
+    _get_patterns,
+    validate_id,
+    validate_datetime,
 )
 
 YR = properties.metadata_datamodels["year"]["icoads"]
@@ -575,7 +582,7 @@ def test_correct_pt_raises_unknown_method():
 def test_correct_pt_fillna_missing_fillvalue():
     data = pd.DataFrame({"PT": ["1", None]})
 
-    fix_methods = {"201": {"method": "fillna"}}  # missing fill_value
+    fix_methods = {"201": {"method": "fillna"}}
 
     with pytest.raises(ValueError, match='requires "fill_value"'):
         _correct_pt(
@@ -590,7 +597,7 @@ def test_correct_pt_fillna_missing_fillvalue():
 def test_correct_pt_missing_function_name():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
-    fix_methods = {"700": {"method": "function"}}  # no "function": "func_name"
+    fix_methods = {"700": {"method": "function"}}
 
     with pytest.raises(ValueError, match='requires "function" name'):
         _correct_pt(
@@ -656,13 +663,11 @@ def test_correct_datetime_textfilereader():
 @pytest.mark.parametrize(
     "data_input,imodel,expected",
     [
-        # fillna method
         (
             pd.DataFrame({PT: [None, "7", None]}),
             "icoads_r300_d993",
             pd.DataFrame({PT: ["5", "7", "5"]}),
         ),
-        # function method
         (
             pd.DataFrame(
                 {
@@ -691,14 +696,12 @@ def test_correct_pt_dataframe(data_input, imodel, expected):
 @pytest.mark.parametrize(
     "csv_text,names,imodel,expected",
     [
-        # fillna method
         (
-            "\n7\n\n",  # first row empty, second row "5"
+            "\n7\n\n",
             [PT],
             "icoads_r300_d993",
             pd.DataFrame({PT: ["5", "7", "5"]}),
         ),
-        # function method
         (
             "5,12345,147\n5,99999,999\n7,123,999",
             [PT, ID, SID],
@@ -727,3 +730,165 @@ def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
         correct_pt(parser, imodel, log_level="CRITICAL").read().reset_index(drop=True)
     )
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_get_id_col_not_defined():
+    logger = logging.getLogger("test_logger")
+    df = pd.DataFrame({"X": [1, 2, 3]})
+    result = _get_id_col(df, "unknown_model", logger)
+    assert result is None
+
+
+def test_get_id_col_missing_in_data():
+    logger = logging.getLogger("test_logger")
+    df = pd.DataFrame({"X": [1, 2, 3]})
+    result = _get_id_col(df, "icoads", logger)
+    assert result is None
+
+
+def test_get_id_col_single_column_present():
+    logger = logging.getLogger("test_logger")
+    df = pd.DataFrame({("core", "ID"): [1, 2, 3], ("other", "ID"): [4, 5, 6]})
+    result = _get_id_col(df, "icoads", logger)
+    assert result == ("core", "ID")
+
+
+def test_get_patterns_empty_dict():
+    logger = logging.getLogger("test_logger")
+    dck_id_model = {"valid_patterns": {}}
+    blank = False
+    dck = "123"
+    data_model_files = ["dummy.json"]
+
+    result = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
+    assert result == [".*?"]
+
+
+def test_get_patterns_with_patterns():
+    logger = logging.getLogger("test_logger")
+    dck_id_model = {"valid_patterns": {"p1": "A.*", "p2": "B.*"}}
+    blank = False
+    dck = "123"
+    data_model_files = ["dummy.json"]
+
+    result = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
+    assert set(result) == {"A.*", "B.*"}
+
+
+def test_get_patterns_with_blank_true():
+    logger = logging.getLogger("test_logger")
+    dck_id_model = {"valid_patterns": {"p1": "A.*"}}
+    blank = True
+    dck = "123"
+    data_model_files = ["dummy.json"]
+
+    result = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
+    assert "A.*" in result
+    assert "^$" in result
+    assert len(result) == 2
+
+
+def test_get_patterns_empty_and_blank_true():
+    logger = logging.getLogger("test_logger")
+    dck_id_model = {"valid_patterns": {}}
+    blank = True
+    dck = "123"
+    data_model_files = ["dummy.json"]
+
+    result = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
+    assert ".*?" in result
+    assert "^$" in result
+    assert len(result) == 2
+
+
+@pytest.mark.parametrize(
+    "data_input, imodel, blank, expected",
+    [
+        (
+            pd.DataFrame({ID: ["12345", "ABCDE"]}),
+            "icoads_r300_d201",
+            False,
+            pd.Series([True, False], name=ID),
+        ),
+        (
+            pd.DataFrame({ID: ["12345", ""]}),
+            "icoads_r300_d201",
+            True,
+            pd.Series([True, True], name=ID),
+        ),
+        (
+            pd.DataFrame({ID: ["12345", ""]}),
+            "icoads_r300_d201",
+            False,
+            pd.Series([True, True], name=ID),
+        ),
+    ],
+)
+def test_validate_id_dataframe(data_input, imodel, blank, expected):
+    result = validate_id(data_input.copy(), imodel, blank=blank, log_level="CRITICAL")
+    pd.testing.assert_series_equal(result, expected, check_dtype=False)
+
+
+def test_validate_id_textfilereader():
+    csv_text = "12345\nABCDE\n\n"
+    parser = pd.read_csv(
+        StringIO(csv_text),
+        chunksize=2,
+        header=None,
+        names=[ID],
+        dtype=object,
+        skip_blank_lines=False,
+    )
+    result = validate_id(parser, "icoads_r300_d201", blank=False, log_level="CRITICAL")
+    expected = pd.Series([True, False, True], name=ID)
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True), expected, check_dtype=False
+    )
+
+
+@pytest.mark.parametrize(
+    "data_input, expected",
+    [
+        (
+            pd.DataFrame({YR: [2023, 2023], MO: [1, 1], DY: [1, 2], HR: [12, 13]}),
+            pd.Series([True, True]),
+        ),
+        (
+            pd.DataFrame({YR: [2023, 2023], MO: [1, 1], DY: [1, 2], HR: [12, None]}),
+            pd.Series([True, False]),
+        ),
+        (
+            pd.DataFrame(
+                {YR: [2023, None], MO: [1, None], DY: [1, None], HR: [12, None]}
+            ),
+            pd.Series([True, False]),
+        ),
+    ],
+)
+def test_validate_datetime_dataframe(data_input, expected):
+    result = validate_datetime(data_input.copy(), "icoads", log_level="CRITICAL")
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True), expected, check_dtype=False
+    )
+
+
+@pytest.mark.parametrize(
+    "csv_text, expected",
+    [
+        ("2023,1,1,12\n2023,1,2,13\n\n", pd.Series([True, True, False])),
+        ("2023,1,1,12\n2023,1,2,\n\n", pd.Series([True, False, False])),
+    ],
+)
+def test_validate_datetime_textfilereader(csv_text, expected):
+    parser = pd.read_csv(
+        StringIO(csv_text),
+        chunksize=2,
+        header=None,
+        names=datetime_cols,
+        dtype=object,
+        skip_blank_lines=False,
+    )
+    result = validate_datetime(parser, "icoads", log_level="CRITICAL")
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True), expected, check_dtype=False
+    )
