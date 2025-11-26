@@ -18,7 +18,6 @@ from pathlib import Path
 from cdm_reader_mapper.common.select import (
     _select_rows_by_index,
     _split_by_index,
-    # _ensure_empty_df_consistent,
     _split_by_boolean_mask,
     _split_by_column_values,
     _split_by_index_values,
@@ -191,19 +190,6 @@ def test_split_by_index_empty_df(empty_df):
     assert rejected.empty
 
 
-# def test_ensure_empty_df_consistent(sample_df):
-#    empty = pd.DataFrame(columns=sample_df.columns)
-#    result = _ensure_empty_df_consistent(empty, sample_df)
-#    for col in sample_df.columns:
-#        assert result[col].dtype == sample_df[col].dtype
-#    assert "_prev_index" in result.__dict__
-
-
-# def test_ensure_empty_df_consistent_non_empty(sample_df):
-#    result = _ensure_empty_df_consistent(sample_df, sample_df)
-#    assert result.equals(sample_df)
-
-
 @pytest.mark.parametrize(
     "column,boolean,expected_selected,expected_rejected",
     [
@@ -318,8 +304,9 @@ def test_split_by_boolean_public(sample_df, boolean_mask):
     selected, rejected = split_by_boolean(
         sample_df, boolean_mask, boolean=False, return_rejected=True
     )
-    assert list(selected.index) == [10, 11, 12, 13, 14]
-    assert rejected.empty
+    assert list(selected.index) == []
+    assert list(rejected.index) == [10, 11, 12, 13, 14]
+
     selected, rejected = split_by_boolean(
         sample_df, boolean_mask, boolean=True, return_rejected=True
     )
@@ -339,8 +326,8 @@ def test_split_by_boolean_false_public(sample_df, boolean_mask):
     selected, rejected = split_by_boolean_false(
         sample_df, boolean_mask, return_rejected=True
     )
-    assert list(selected.index) == [10, 11, 12, 13, 14]
-    assert rejected.empty
+    assert list(selected.index) == []
+    assert list(rejected.index) == [10, 11, 12, 13, 14]
 
 
 def test_split_by_index_empty(empty_df):
@@ -727,7 +714,7 @@ def test_count_by_cat_i(data, expected):
         ),
         (
             pd.DataFrame({"C": ["a", "a", "b"]}),
-            ("C",),
+            "C",
             {"C": {"a": 2, "b": 1}},
         ),
         (pd.DataFrame(columns=["D"]), ["D"], {"D": {}}),

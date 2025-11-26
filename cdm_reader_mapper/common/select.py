@@ -63,16 +63,37 @@ def _split_by_index(
     return out1, out2
 
 
-def _split_by_boolean_mask(
+def _split_by_boolean_mask_(
     df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a DataFrame based on a boolean mask using `_split_by_index`."""
+    if mask.empty:
+        if boolean:
+            indexes = df.index
+        else:
+            indexes = df.index.difference(df.index)
+        return _split_by_index(df, indexes, **kwargs)
+
     if boolean is True:
         global_mask = mask.all(axis=1)
     else:
         global_mask = ~(mask.any(axis=1))
-    indexes = global_mask[global_mask.fillna(boolean)].index
 
+    indexes = global_mask[global_mask.fillna(boolean)].index
+    return _split_by_index(df, indexes, **kwargs)
+
+
+def _split_by_boolean_mask(
+    df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a DataFrame based on strict boolean masks (all-True or all-False)."""
+    if mask.empty:
+        selected = pd.Series(boolean, index=df.index)
+    else:
+        selected = mask.all(axis=1) if boolean else ~mask.any(axis=1)
+        selected = selected.fillna(boolean)
+
+    indexes = selected[selected].index
     return _split_by_index(df, indexes, **kwargs)
 
 
