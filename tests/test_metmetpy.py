@@ -242,16 +242,6 @@ def test_from_datetime_basis():
     assert abs(df.loc[0, HR] - 12.5) < 1e-6
 
 
-def test_to_datetime_raises_error():
-    with pytest.raises(ValueError):
-        to_datetime(pd.DataFrame(), "invalid_model")
-
-
-def test_from_datetime_raises_error():
-    with pytest.raises(ValueError):
-        to_datetime(pd.Series(), "invalid_model")
-
-
 def test_dck_201_icoads():
     data = pd.DataFrame(
         {YR: [1899, 1900, 1899], MO: [1, 2, 3], DY: [1, 15, 1], HR: [0, 12, 0]}

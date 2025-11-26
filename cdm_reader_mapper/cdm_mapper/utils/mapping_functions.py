@@ -606,10 +606,7 @@ class mapping_functions:
         if not isinstance(s, pd.Series):
             raise TypeError("integer_to_float only supports Series")
 
-        if pd.api.types.is_numeric_dtype(s):
-            return s.astype(float)
-
-        return pd.Series(dtype=float, name=s.name)
+        return s.astype(float)
 
     def icoads_wd_conversion(self, series: pd.Series) -> pd.Series:
         """
@@ -806,11 +803,13 @@ class mapping_functions:
         pd.Series
             Series of joined and modified strings.
         """
+        df = df.copy()
         if zfill_col and zfill:
             for col, width in zip(zfill_col, zfill):
                 column_name = df.columns[col]
                 df[column_name] = df[column_name].astype("object")
                 df[column_name] = df[column_name].astype(str).str.zfill(width)
+
         joint = self.df_col_join(df, separator)
         result = np.vectorize(string_add_i, otypes="O")(
             prepend, joint, append, sep=separator

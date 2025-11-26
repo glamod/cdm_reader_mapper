@@ -75,19 +75,20 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
         if not datetime_cols:
             return pd.Series(dtype="datetime64[ns]")
 
-        dt_data = df[datetime_cols].copy()
+        dt_data = df[[col for col in datetime_cols if col in df.columns]].copy()
+        if dt_data.empty:
+            return pd.Series(pd.NaT, index=df.index, dtype="datetime64[ns]")
+
         valid = dt_data.notna().all(axis=1)
 
-        out = pd.Series(pd.NaT, index=df.index)
+        out = pd.Series(pd.NaT, index=df.index, dtype="datetime64[ns]")
         if not valid.any():
             return out
 
-        hour_col = datetime_cols[-1]
-        hours, minutes = np.vectorize(datetime_decimalhour_to_hm)(
-            dt_data.loc[valid, hour_col].values
-        )
+        hour_values = dt_data.iloc[valid.values, -1].values
+        hours, minutes = np.vectorize(datetime_decimalhour_to_hm)(hour_values)
 
-        dt_data = dt_data.drop(columns=[hour_col])
+        dt_data = dt_data.drop(dt_data.columns[-1], axis=1)
         dt_data.loc[valid, "H"] = hours
         dt_data.loc[valid, "M"] = minutes
 
@@ -127,11 +128,11 @@ def to_datetime(data: pd.DataFrame, model: str = "icoads") -> pd.Series:
     """Dispatch conversion to datetime according to model."""
     if model == "icoads":
         return icoads(data, "to_datetime")
-    raise ValueError(f"Unknown model: {model}")
+    return data
 
 
 def from_datetime(data: pd.Series, model: str = "icoads") -> pd.DataFrame:
     """Dispatch conversion from datetime according to model."""
     if model == "icoads":
         return icoads(data, "from_datetime")
-    raise ValueError(f"Unknown model: {model}")
+    return data

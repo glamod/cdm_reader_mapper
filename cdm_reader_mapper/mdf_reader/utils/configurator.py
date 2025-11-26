@@ -9,6 +9,8 @@ import logging
 import numpy as np
 import pandas as pd
 
+from itertools import zip_longest
+
 from .. import properties
 from . import converters, decoders
 from .utilities import convert_dtypes
@@ -168,10 +170,19 @@ class Configurator:
                     # Read as CSV
                     field_names = sections.keys()
                     fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
-                    for field_name, field in zip(field_names, fields):
+
+                    # for field_name, field in zip(field_names, fields):
+                    for field_name, field in zip_longest(
+                        field_names, fields, fillvalue=None
+                    ):
                         index = self._get_index(field_name, order)
-                        data_dict[index] = field.strip()
-                        i += len(field)
+                        # data_dict[index] = field.strip()
+                        data_dict[index] = field.strip() if field is not None else None
+                        # i += len(field)
+                        if field is not None:
+                            i += len(
+                                field
+                            )  # increment by length of field only if present
                     j = i
                     continue
                 elif field_layout != "fixed_width":

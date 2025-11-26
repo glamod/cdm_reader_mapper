@@ -164,7 +164,7 @@ class MDFFileReader(FileReader):
         Fill attribute `valid` with boolean mask.
         """
         if validate is not True:
-            mask = pd.DataFrame()
+            mask = pd.DataFrame(dtype="boolean")
         elif isinstance(data, pd.DataFrame):
             mask = self._validate(data)
         else:
@@ -184,6 +184,7 @@ class MDFFileReader(FileReader):
                 data_buffer,
                 names=df_.columns,
                 chunksize=self.chunksize,
+                dtype="boolean",
             )
         return mask
 
@@ -457,7 +458,7 @@ def read_data(
     """
 
     def _update_column_labels(columns):
-        columns_ = []
+        new_cols = []
         for col in columns:
             try:
                 col_ = ast.literal_eval(col)
@@ -465,18 +466,22 @@ def read_data(
                 col_ = tuple(col.split(":"))
             except ValueError:
                 col_ = col
-            columns_.append(col_)
-        return columns_
+            new_cols.append(col_)
+
+        if all(isinstance(c, tuple) for c in new_cols):
+            return pd.MultiIndex.from_tuples(new_cols)
+
+        return pd.Index(new_cols)
 
     def _read_csv(ifile, col_subset=None, **kwargs):
-        if ifile is None:
+        if ifile is None or not os.path.isfile(ifile):
             return pd.DataFrame()
-        if not os.path.isfile(ifile):
-            return pd.DataFrame()
+
         df = pd.read_csv(ifile, delimiter=",", **kwargs)
         df.columns = _update_column_labels(df.columns)
         if col_subset is not None:
             df = df[col_subset]
+
         return df
 
     if info is None:
@@ -486,6 +491,8 @@ def read_data(
 
     dtype = info_dict.get("dtypes", "object")
     parse_dates = info_dict.get("parse_dates", False)
+    if encoding is None:
+        encoding = info_dict.get("encoding", None)
 
     data = _read_csv(
         source,
@@ -494,7 +501,7 @@ def read_data(
         parse_dates=parse_dates,
         encoding=encoding,
     )
-    mask = _read_csv(mask, col_subset=col_subset)
+    mask = _read_csv(mask, col_subset=col_subset, dtype="boolean")
     return DataBundle(
         data=data,
         columns=data.columns,

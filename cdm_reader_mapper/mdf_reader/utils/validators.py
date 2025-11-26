@@ -231,4 +231,4 @@ def validate(
     )
 
     mask[disables] = np.nan
-    return mask
+    return mask.astype("boolean")

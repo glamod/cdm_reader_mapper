@@ -439,7 +439,6 @@ def test_map_model_pub47():
         "icoads_r300_d705",
         "icoads_r300_d702",
         "icoads_r300_d707",
-        # "icoads_r300_mixed", -> encoding
         "icoads_r302_d794",
         "icoads_r300_d704",
         "icoads_r300_d721",
@@ -450,7 +449,7 @@ def test_map_model_pub47():
         "icoads_r300_d892",
         "icoads_r300_d700",
         "icoads_r302_d792",
-        # "gdac", -> Jan
+        "icoads_r302_d992",
         "craid",
     ],
 )
@@ -464,6 +463,58 @@ def test_map_model_test_data(data_model):
     for cdm_table in cdm_tables:
         expected = pd.read_csv(
             test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
+            delimiter="|",
+            dtype="object",
+            na_values=None,
+            keep_default_na=False,
+        )
+        result_table = result[cdm_table].copy()
+        result_table = result_table.dropna()
+        if "record_timestamp" in expected.columns:
+            expected = expected.drop("record_timestamp", axis=1)
+            result_table = result_table.drop("record_timestamp", axis=1)
+        if "history" in expected.columns:
+            expected = expected.drop("history", axis=1)
+            result_table = result_table.drop("history", axis=1)
+        pd.testing.assert_frame_equal(result_table, expected)
+
+
+def _test_map_model_test_data_mixed():
+    source = test_data["test_icoads_r300_mixed"]["mdf_data"]
+    info = open_json_file(test_data["test_icoads_r300_mixed"]["mdf_info"])
+    df = pd.read_csv(source, dtype=info["dtypes"], encoding="cp1252")
+    if ":" in df.columns[0]:
+        df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+    result = map_model(df, "icoads_r300_mixed")
+    for cdm_table in cdm_tables:
+        expected = pd.read_csv(
+            test_data["test_icoads_r300_mixed"][f"cdm_{cdm_table}"],
+            delimiter="|",
+            dtype="object",
+            na_values=None,
+            keep_default_na=False,
+        )
+        result_table = result[cdm_table].copy()
+        result_table = result_table.dropna()
+        if "record_timestamp" in expected.columns:
+            expected = expected.drop("record_timestamp", axis=1)
+            result_table = result_table.drop("record_timestamp", axis=1)
+        if "history" in expected.columns:
+            expected = expected.drop("history", axis=1)
+            result_table = result_table.drop("history", axis=1)
+        pd.testing.assert_frame_equal(result_table, expected)
+
+
+def _test_map_model_test_data_gdac():
+    source = test_data["test_gdac"]["mdf_data"]
+    info = open_json_file(test_data["test_gdac"]["mdf_info"])
+    df = pd.read_csv(source, dtype=info["dtypes"])
+    if ":" in df.columns[0]:
+        df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+    result = map_model(df, "gdac")
+    for cdm_table in cdm_tables:
+        expected = pd.read_csv(
+            test_data["test_gdac"][f"cdm_{cdm_table}"],
             delimiter="|",
             dtype="object",
             na_values=None,

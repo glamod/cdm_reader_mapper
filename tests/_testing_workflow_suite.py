@@ -4,9 +4,8 @@ import os
 
 import pandas as pd
 
-from cdm_reader_mapper import read
+from cdm_reader_mapper import read, test_data
 
-from ._results import result_data
 from ._utilities import (
     drop_rows,
     get_col_subset,
@@ -27,7 +26,7 @@ def _testing_suite(
     out_dir = ".pytest_cache"
     os.makedirs(out_dir, exist_ok=True)
 
-    exp = f"expected_{imodel}"
+    exp = f"test_{imodel}"
 
     db_mdf = read(
         source,
@@ -56,16 +55,16 @@ def _testing_suite(
     data_res = db_res.data.copy()
     mask_res = db_res.mask.copy()
 
-    expected_data = getattr(result_data, exp)
-    result_data_file = expected_data["data"]
+    expected_data = test_data[exp]
+    result_data_file = expected_data["mdf_data"]
 
     if not os.path.isfile(result_data_file):
         return
 
     db_exp = read(
         result_data_file,
-        mask=expected_data["mask"],
-        info=expected_data["info"],
+        mask=expected_data["mdf_mask"],
+        info=expected_data["mdf_info"],
         col_subset=data_res.columns,
         mode="data",
         **kwargs,
@@ -111,10 +110,20 @@ def _testing_suite(
     col_subset = get_col_subset(db_mdf.data, codes_subset)
 
     db_mdf.write(suffix=imodel, out_dir=out_dir)
-    output = read(out_dir, suffix=imodel, cdm_subset=cdm_subset, mode="tables")
+
+    output = read(out_dir, suffix=f"{imodel}*", cdm_subset=cdm_subset, mode="tables")
+
+    expected_data["cdm_header"]
+    expected_data["cdm_observations-at"]
+    expected_data["cdm_observations-dpt"]
+    expected_data["cdm_observations-slp"]
+    expected_data["cdm_observations-sst"]
+    expected_data["cdm_observations-wbt"]
+    expected_data["cdm_observations-wd"]
+    expected_data["cdm_observations-ws"]
 
     output_exp = read(
-        expected_data["cdm_table"],
+        expected_data["cdm_header"].parent,
         suffix=f"{imodel}*",
         cdm_subset=cdm_subset,
         mode="tables",
@@ -122,6 +131,7 @@ def _testing_suite(
 
     output = output.data
     output_exp = output_exp.data
+
     output, output_exp = remove_datetime_columns(output, output_exp, col_subset)
     output_exp = drop_rows(output_exp, drops)
     pd.testing.assert_frame_equal(output, output_exp)
