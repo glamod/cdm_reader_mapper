@@ -12,26 +12,32 @@ cdm_path = test_data[pattern]["cdm_header"].parent
 db_exp = read(cdm_path, suffix=f"{imodel}*", mode="tables")
 
 
-def test_write_data():
-    db_exp.write(suffix=f"{imodel}_all")
-    db_res = read(".", suffix=f"{imodel}_all", mode="tables")
+def test_write_data(tmp_path):
+    db_exp.write(out_dir=tmp_path, suffix=f"{imodel}_all")
+    db_res = read(tmp_path, suffix=f"{imodel}_all", mode="tables")
     pd.testing.assert_frame_equal(db_exp.data, db_res.data)
 
 
 @pytest.mark.parametrize("table", ["header", "observations-sst"])
-def test_write_tables(table):
-    db_exp.write(suffix=f"{imodel}_{table}_all", cdm_subset=table)
-    db_res = read(".", suffix=f"{imodel}_{table}_all", cdm_subset=table, mode="tables")
+def test_write_tables(tmp_path, table):
+    db_exp.write(out_dir=tmp_path, suffix=f"{imodel}_{table}_all", cdm_subset=table)
+    db_res = read(
+        tmp_path, suffix=f"{imodel}_{table}_all", cdm_subset=table, mode="tables"
+    )
     table_exp = db_exp[table].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res[table])
 
 
-def test_write_fns():
+def test_write_fns(tmp_path):
     db_exp.write(
-        prefix="prefix", suffix=f"{imodel}_all", extension="csv", delimiter=","
+        out_dir=tmp_path,
+        prefix="prefix",
+        suffix=f"{imodel}_all",
+        extension="csv",
+        delimiter=",",
     )
     db_res = read(
-        ".",
+        tmp_path,
         prefix="prefix",
         suffix=f"{imodel}_all",
         extension="csv",
@@ -41,30 +47,31 @@ def test_write_fns():
     pd.testing.assert_frame_equal(db_exp.data, db_res.data)
 
 
-def test_write_filename():
-    db_exp.write(filename=f"{imodel}_filename_all")
-    db_res = read(".", suffix=f"{imodel}_filename_all", mode="tables")
+def test_write_filename(tmp_path):
+    db_exp.write(out_dir=tmp_path, filename=f"{imodel}_filename_all")
+    db_res = read(tmp_path, suffix=f"{imodel}_filename_all", mode="tables")
     pd.testing.assert_frame_equal(db_exp.data, db_res.data)
 
 
-def test_write_filename_dict():
+def test_write_filename_dict(tmp_path):
     filename_dict = {
         "header": f"{imodel}_filename_dict_all",
         "observations-sst": f"observations-sst-{imodel}_filename_dict_all.psv",
     }
-    db_exp.write(filename=filename_dict)
-    db_res = read(".", suffix=f"{imodel}_filename_dict_all", mode="tables")
+    db_exp.write(out_dir=tmp_path, filename=filename_dict)
+    db_res = read(tmp_path, suffix=f"{imodel}_filename_dict_all", mode="tables")
     pd.testing.assert_frame_equal(db_exp[filename_dict.keys()], db_res.data)
 
 
-def test_write_col_subset():
+def test_write_col_subset(tmp_path):
     table = "header"
     columns = ["report_id", "latitude", "longitude"]
     db_exp.write(
+        out_dir=tmp_path,
         suffix=f"{imodel}_{table}_all",
         cdm_subset=table,
         col_subset={table: columns},
     )
-    db_res = read(".", suffix=f"{imodel}_{table}_all", mode="tables")
+    db_res = read(tmp_path, suffix=f"{imodel}_{table}_all", mode="tables")
     table_exp = db_exp[table][columns].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res[table])
