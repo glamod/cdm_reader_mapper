@@ -11,9 +11,12 @@ from cdm_reader_mapper.mdf_reader.reader import (
     read_data,
 )
 
-from ._utilities import (
-    drop_rows,
-)
+def _drop_rows(df, drops):
+    if drops == "all":
+        return df.drop(df.index)
+    elif drops:
+        return df.drop(drops).reset_index(drop=True)
+    return df
 
 
 def _read_mdf_test_data(data_model, select=None, drop=None, **kwargs):
@@ -37,8 +40,8 @@ def _read_mdf_test_data(data_model, select=None, drop=None, **kwargs):
         expected.mask = expected.mask[select]
 
     if drop:
-        expected.data = drop_rows(expected.data, drop)
-        expected.mask = drop_rows(expected.mask, drop)
+        expected.data = _drop_rows(expected.data, drop)
+        expected.mask = _drop_rows(expected.mask, drop)
 
     pd.testing.assert_frame_equal(result.data, expected.data)
     pd.testing.assert_frame_equal(result.mask, expected.mask)
