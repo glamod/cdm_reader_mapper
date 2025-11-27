@@ -71,6 +71,7 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
     if not select:
         select = cdm_tables
     for cdm_table in select:
+        print(cdm_table)
         expected = pd.read_csv(
             test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
             delimiter="|",
@@ -80,6 +81,7 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
         )
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna()
+
         if "record_timestamp" in expected.columns:
             expected = expected.drop("record_timestamp", axis=1)
             result_table = result_table.drop("record_timestamp", axis=1)
@@ -488,7 +490,7 @@ def test_map_model_test_data(data_model):
     _map_model_test_data(data_model)
 
 
-def test_map_model_test_data_mixed():  # report_id differ
+def test_map_model_test_data_mixed():
     _map_model_test_data("icoads_r300_mixed", encoding="cp1252")
 
 

@@ -20,7 +20,7 @@ def _drop_rows(df, drops):
     return df
 
 
-def _read_mdf_test_data(data_model, select=None, drop=None, **kwargs):
+def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwargs):
     source = test_data[f"test_{data_model}"]["source"]
     result = read_mdf(source, imodel=data_model, **kwargs)
 
@@ -41,8 +41,14 @@ def _read_mdf_test_data(data_model, select=None, drop=None, **kwargs):
         expected.mask = expected.mask[select]
 
     if drop:
-        expected.data = _drop_rows(expected.data, drop)
-        expected.mask = _drop_rows(expected.mask, drop)
+        result.data = result.data.drop(columns=drop)
+        result.mask = result.mask.drop(columns=drop)
+        expected.data = expected.data.drop(columns=drop)
+        expected.mask = expected.mask.drop(columns=drop)
+
+    if drop_idx:
+        expected.data = _drop_rows(expected.data, drop_idx)
+        expected.mask = _drop_rows(expected.mask, drop_idx)
 
     pd.testing.assert_frame_equal(result.data, expected.data)
     pd.testing.assert_frame_equal(result.mask, expected.mask)
@@ -79,7 +85,6 @@ def test_read_mdf_test_data(data_model):
 @pytest.mark.parametrize(
     "data_model, kwargs",
     [
-        ("icoads_r300_mixed", {"encoding": "cp1252"}),  # c99 section
         ("icoads_r300_d714", {"chunksize": 3}),
         ("icoads_r300_d721", {"chunksize": 3}),
         (
@@ -140,11 +145,15 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
     ],
 )
 def test_read_mdf_test_data_select(data_model, kwargs, select):
-    _read_mdf_test_data(data_model, **kwargs, select=select)
+    _read_mdf_test_data(data_model, select=select, **kwargs)
+
+
+def test_read_mdf_test_data_drop():
+    _read_mdf_test_data("icoads_r300_mixed", drop=["c99"], encoding="cp1252")
 
 
 @pytest.mark.parametrize(
-    "data_model, kwargs, drop",
+    "data_model, kwargs, drop_idx",
     [
         ("icoads_r300_d702", {"year_init": 1874}, [0, 1, 2, 3, 4]),
         ("icoads_r300_d702", {"year_end": 1874}, [5, 6, 7, 8, 9]),
@@ -157,5 +166,5 @@ def test_read_mdf_test_data_select(data_model, kwargs, select):
         ("craid", {"year_end": 2003}, "all"),
     ],
 )
-def test_read_mdf_test_data_drop(data_model, kwargs, drop):
-    _read_mdf_test_data(data_model, **kwargs, drop=drop)
+def _test_read_mdf_test_data_drop_idx(data_model, kwargs, drop_idx):
+    _read_mdf_test_data(data_model, drop_idx=drop_idx, **kwargs)
