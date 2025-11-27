@@ -75,7 +75,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         "icoads_r302_d792",
         "icoads_r302_d992",
         "craid",
-        "gdac",  # mask value
+        "gdac",
     ],
 )
 def test_read_mdf_test_data(data_model):
@@ -162,9 +162,9 @@ def test_read_mdf_test_data_drop():
             {"year_init": 1874, "year_end": 1874},
             "all",
         ),
-        ("gdac", {"year_init": 2002}, [0, 1, 2, 3, 4]),  # mask value
+        ("gdac", {"year_init": 2002}, [0, 1, 2, 3, 4]),
         ("craid", {"year_end": 2003}, "all"),
     ],
 )
-def _test_read_mdf_test_data_drop_idx(data_model, kwargs, drop_idx):
+def test_read_mdf_test_data_drop_idx(data_model, kwargs, drop_idx):
     _read_mdf_test_data(data_model, drop_idx=drop_idx, **kwargs)
