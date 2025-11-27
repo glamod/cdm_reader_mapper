@@ -3,63 +3,53 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from pathlib import Path
-
-from cdm_reader_mapper import read, test_data
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-
-_base = Path(__file__).parent
-
-data_dict = test_data.test_icoads_r300_d721
+from cdm_reader_mapper import DataBundle
 
 
-def _get_data(TextParser, **kwargs):
-    if TextParser is True:
-        kwargs["chunksize"] = 3
-    source = data_dict["source"]
-    return read(source, imodel="icoads_r300_d721", **kwargs)
-
-
-cdm_header = read(
-    test_data["test_icoads_r302_d792"]["cdm_header"].parent,
-    cdm_subset=["header"],
-    mode="tables",
-)
-
-correction_df = pd.read_csv(
-    list((_base / "corrections").glob("2022-02.txt.gz"))[0],
-    delimiter="|",
-    names=["report_id", "primary_station_id", "primary_station_id.isChange"],
-)
+@pytest.fixture
+def sample_df():
+    """Simple DataFrame for testing."""
+    data = pd.DataFrame(
+        {
+            "A": [19, 26, 27, 41, 91],
+            "B": [0, 1, 2, 3, 4],
+        }
+    )
+    mask = pd.DataFrame(
+        {
+            "A": [True, True, True, False, True],
+            "B": [True, True, True, False, False],
+        }
+    )
+    return DataBundle(data=data, mask=mask)
 
 
 @pytest.mark.parametrize(
-    "func,args,idx_exp,idx_rej,skwargs",
+    "func, args, idx_exp, idx_rej",
     [
-        ("select_where_all_true", [], [0, 1, 2, 3, 4], [], {"sections": ["c99_data"]}),
-        ("select_where_all_false", [], [], [0, 1, 2, 3, 4], {"sections": ["c99_data"]}),
-        ("select_where_index_isin", [[0, 2, 4]], [0, 2, 4], [1, 3], {}),
-        ("select_where_entry_isin", [{("c1", "B1"): [26, 41]}], [1, 3], [0, 2, 4], {}),
+        ("select_where_all_true", [], [0, 1, 2], [3, 4]),
+        ("select_where_all_false", [], [3], [0, 1, 2, 4]),
+        ("select_where_index_isin", [[0, 2, 4]], [0, 2, 4], [1, 3]),
+        ("select_where_entry_isin", [{"A": [26, 41]}], [1, 3], [0, 2, 4]),
     ],
 )
-@pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
 def test_select_operators(
-    func, args, idx_exp, idx_rej, skwargs, TextParser, reset_index, inverse
+    sample_df,
+    func,
+    args,
+    idx_exp,
+    idx_rej,
+    reset_index,
+    inverse,
 ):
-    data = _get_data(TextParser, **skwargs)
-    result = getattr(data, func)(*args, reset_index=reset_index, inverse=inverse)
-    expected = data.data
-    expected_mask = data.mask
+    result = getattr(sample_df, func)(*args, reset_index=reset_index, inverse=inverse)
+
+    expected = sample_df.data
+    expected_mask = sample_df.mask
     selected = result.data
     selected_mask = result.mask
-
-    if TextParser is True:
-        expected = make_copy(expected).read()
-        selected = make_copy(selected).read()
-        expected_mask = make_copy(expected_mask).read()
-        selected_mask = make_copy(selected_mask).read()
 
     if inverse is False:
         idx = expected.index.isin(idx_exp)
@@ -78,37 +68,33 @@ def test_select_operators(
 
 
 @pytest.mark.parametrize(
-    "func,args,idx_exp,idx_rej,skwargs",
+    "func, args, idx_exp, idx_rej",
     [
-        ("split_by_boolean_true", [], [0, 1, 2, 3, 4], [], {"sections": ["c99_data"]}),
-        ("split_by_boolean_false", [], [], [0, 1, 2, 3, 4], {"sections": ["c99_data"]}),
-        ("split_by_index", [[0, 2, 4]], [0, 2, 4], [1, 3], {}),
-        ("split_by_column_entries", [{("c1", "B1"): [26, 41]}], [1, 3], [0, 2, 4], {}),
+        ("split_by_boolean_true", [], [0, 1, 2], [3, 4]),
+        ("split_by_boolean_false", [], [3], [0, 1, 2, 4]),
+        ("split_by_index", [[0, 2, 4]], [0, 2, 4], [1, 3]),
+        ("split_by_column_entries", [{"A": [26, 41]}], [1, 3], [0, 2, 4]),
     ],
 )
-@pytest.mark.parametrize("TextParser", [False, True])
 @pytest.mark.parametrize("reset_index", [False, True])
-@pytest.mark.parametrize("inverse", [True, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_split_operators(
-    func, args, idx_exp, idx_rej, skwargs, TextParser, reset_index, inverse
+    sample_df,
+    func,
+    args,
+    idx_exp,
+    idx_rej,
+    reset_index,
+    inverse,
 ):
-    data = _get_data(TextParser, **skwargs)
-    result = getattr(data, func)(*args, reset_index=reset_index, inverse=inverse)
+    result = getattr(sample_df, func)(*args, reset_index=reset_index, inverse=inverse)
 
-    expected = data.data
-    expected_mask = data.mask
+    expected = sample_df.data
+    expected_mask = sample_df.mask
     selected = result[0].data
     selected_mask = result[0].mask
     rejected = result[1].data
     rejected_mask = result[1].mask
-
-    if TextParser is True:
-        expected = make_copy(expected).read()
-        selected = make_copy(selected).read()
-        rejected = make_copy(rejected).read()
-        expected_mask = make_copy(expected_mask).read()
-        selected_mask = make_copy(selected_mask).read()
-        rejected_mask = make_copy(rejected_mask).read()
 
     if inverse is False:
         idx1 = expected.index.isin(idx_exp)
@@ -134,31 +120,30 @@ def test_split_operators(
     pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
 
 
-@pytest.mark.parametrize(
-    "TextParser",
-    [
-        True,
-        False,
-    ],
-)
-def test_inspect_count_by_cat(TextParser):
-    data = _get_data(TextParser)
-    result = data.unique(columns=("c1", "B1"))
-    assert result == {("c1", "B1"): {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
+def test_inspect_count_by_cat(sample_df):
+    result = sample_df.unique(columns=("A"))
+    assert result == {"A": {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
-def test_replace():
-    result = cdm_header.replace_columns(
-        correction_df,
-        subset="header",
-        pivot_c="report_id",
-        rep_c=["primary_station_id", "primary_station_id.isChange"],
+def test_replace_columns(sample_df):
+    df_corr = pd.DataFrame(
+        {
+            "A_new": [101, 201, 301, 401, 501],
+            "B": range(5),
+        }
     )
-    cdm_header[("header", "primary_station_id")] = [
-        "MASKSTID2",
-        "MASKSTID2",
-        "MASKSTID",
-        "MASKSTID2",
-        "MASKSTID2",
-    ]
-    pd.testing.assert_frame_equal(cdm_header.data, result.data)
+    result = sample_df.replace_columns(
+        df_corr,
+        subset=["B", "A"],
+        rep_map={"A": "A_new"},
+        pivot_l="B",
+        pivot_r="B",
+    )
+    expected = pd.DataFrame(
+        {
+            "A": [101, 201, 301, 401, 501],
+            "B": [0, 1, 2, 3, 4],
+        }
+    )
+
+    pd.testing.assert_frame_equal(result.data, expected)
