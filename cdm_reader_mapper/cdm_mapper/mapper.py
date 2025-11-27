@@ -83,8 +83,8 @@ def _transform(
     kwargs,
     logger,
 ) -> pd.Series:
-    # logger.debug(f"\ttransform: {transform}")
-    # logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
+    logger.debug(f"\ttransform: {transform}")
+    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
     trans = getattr(imodel_functions, transform)
     return trans(series, **kwargs)
 
@@ -171,14 +171,14 @@ def _mapping(
 
     to_map = None
     if elements:
-        # logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
+        logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
         missing_els = [x for x in elements if x not in cols]
         if len(missing_els) > 0:
-            # logger.warning(
-            #    "Following elements from data model missing from input data: {} to map.".format(
-            #        ",".join([str(x) for x in missing_els])
-            #    )
-            # )
+            logger.warning(
+                "Following elements from data model missing from input data: {} to map.".format(
+                    ",".join([str(x) for x in missing_els])
+                )
+            )
             return _default(None, len(idata)), atts
 
         to_map = idata[elements]
@@ -238,11 +238,11 @@ def _map_and_convert(
     )
     table_df_i = pd.DataFrame(index=idata.index, columns=columns)
 
-    # logger.debug(f"Table: {table}")
+    logger.debug(f"Table: {table}")
     for column in columns:
         if column not in mapping.keys():
             continue
-        # logger.debug(f"\tElement: {column}")
+        logger.debug(f"\tElement: {column}")
         table_df_i[column], atts[column] = _mapping(
             idata,
             mapping[column],
@@ -323,9 +323,9 @@ def map_and_convert(
     table_list = []
     for table in cdm_tables.keys():
         # Convert dtime to object to be parsed by the reader
-        # logger.debug(
-        #    f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
-        # )
+        logger.debug(
+            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+        )
         cdm_tables[table]["buffer"].seek(0)
         data = pd.read_csv(
             cdm_tables[table]["buffer"],
@@ -409,7 +409,7 @@ def map_model(
         else:
             data = [data]
     elif isinstance(data, pd.io.parsers.TextFileReader):
-        # logger.debug("Input is a pd.TextFileReader")
+        logger.debug("Input is a pd.TextFileReader")
         not_empty = pandas_TextParser_hdlr.is_not_empty(data)
         if not not_empty:
             logger.error("Input data is empty")
