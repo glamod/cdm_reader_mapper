@@ -11,6 +11,7 @@ from cdm_reader_mapper.mdf_reader.reader import (
     read_data,
 )
 
+
 def _drop_rows(df, drops):
     if drops == "all":
         return df.drop(df.index)
@@ -151,9 +152,9 @@ def test_read_mdf_test_data_select(data_model, kwargs, select):
             "icoads_r300_d702",
             {"year_init": 1874, "year_end": 1874},
             "all",
-        ),  # mask dtype
+        ),
         ("gdac", {"year_init": 2002}, [0, 1, 2, 3, 4]),  # mask value
-        ("craid", {"year_end": 2003}, "all"),  # mask dtype
+        ("craid", {"year_end": 2003}, "all"),
     ],
 )
 def test_read_mdf_test_data_drop(data_model, kwargs, drop):
