@@ -31,34 +31,43 @@ from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_
 from cdm_reader_mapper.data import test_data
 
 
-mapping_table = {"1": 1000, "2": 2000, "4": {"5": 5000}}
-imodel_maps = get_imodel_maps("icoads", "r300", "d720", cdm_tables=["header"])
-imodel_functions = mapping_functions("icoads_r300_d720")
-cdm_atts = get_cdm_atts("header")
+@pytest.fixture
+def imodel_maps():
+    return get_imodel_maps("icoads", "r300", "d720", cdm_tables=["header"])
 
 
-data_header = pd.DataFrame(
-    data={
-        ("c1", "PT"): ["2", "4", "9", "21"],
-        ("c98", "UID"): ["5012", "8960", "0037", "1000"],
-        ("c1", "LZ"): ["1", None, None, "3"],
-    }
-)
+@pytest.fixture
+def imodel_functions():
+    return mapping_functions("icoads_r300_d720")
 
-data_expected = pd.DataFrame(
-    data={
-        ("header", "report_id"): [
-            "ICOADS-30-5012",
-            "ICOADS-30-8960",
-            "ICOADS-30-0037",
-            "ICOADS-30-1000",
-        ],
-        ("header", "duplicate_status"): ["4", "4", "4", "4"],
-        ("header", "platform_type"): ["2", "33", "32", "45"],
-        ("header", "location_quality"): ["2", "0", "0", "0"],
-        ("header", "source_id"): ["null", "null", "null", "null"],
-    }
-)
+
+@pytest.fixture
+def data_header():
+    return pd.DataFrame(
+        data={
+            ("c1", "PT"): ["2", "4", "9", "21"],
+            ("c98", "UID"): ["5012", "8960", "0037", "1000"],
+            ("c1", "LZ"): ["1", None, None, "3"],
+        }
+    )
+
+
+@pytest.fixture
+def data_header_expected():
+    return pd.DataFrame(
+        data={
+            ("header", "report_id"): [
+                "ICOADS-30-5012",
+                "ICOADS-30-8960",
+                "ICOADS-30-0037",
+                "ICOADS-30-1000",
+            ],
+            ("header", "duplicate_status"): ["4", "4", "4", "4"],
+            ("header", "platform_type"): ["2", "33", "32", "45"],
+            ("header", "location_quality"): ["2", "0", "0", "0"],
+            ("header", "source_id"): ["null", "null", "null", "null"],
+        }
+    )
 
 
 def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
@@ -71,7 +80,6 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
     if not select:
         select = cdm_tables
     for cdm_table in select:
-        print(cdm_table)
         expected = pd.read_csv(
             test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
             delimiter="|",
@@ -104,17 +112,21 @@ def test_drop_duplicated_rows():
 
 
 @pytest.mark.parametrize(
-    "value,mapping_table,expected",
+    "value,expected",
     [
-        ("1", mapping_table, 1000),
-        ("2", mapping_table, 2000),
-        ("3", mapping_table, None),
-        ("4", None, None),
-        (["4", "5"], mapping_table, 5000),
+        ("1", 1000),
+        ("2", 2000),
+        ("3", None),
+        (["4", "5"], 5000),
     ],
 )
-def test_map_to_df(value, mapping_table, expected):
+def test_map_to_df(value, expected):
+    mapping_table = {"1": 1000, "2": 2000, "4": {"5": 5000}}
     assert _map_to_df(mapping_table, value) == expected
+
+
+def test_map_to_df_none():
+    assert _map_to_df(None, "4") is None
 
 
 @pytest.mark.parametrize(
@@ -125,7 +137,7 @@ def test_decimal_places(decimal_places, expected):
     assert _decimal_places({}, decimal_places) == expected
 
 
-def test_transform():
+def test_transform(imodel_functions):
     series = pd.Series(data={"a": 1, "b": 2, "c": np.nan}, index=["a", "b", "c"])
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     result = _transform(series, imodel_functions, "integer_to_float", {}, logger)
@@ -264,7 +276,7 @@ def test_map_data(series, transform, code_table, default, fill_value, expected):
         ("location_quality", [2.0, "0", "0", "0"]),
     ],
 )
-def test_mapping(column, expected):
+def test_mapping(imodel_maps, imodel_functions, data_header, column, expected):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     imapping = imodel_maps["header"][column]
     result = _mapping(
@@ -303,8 +315,11 @@ def test_convert_dtype(value, atts, expected):
         assert result, expected
 
 
-def test_map_and_convert():
+def test_map_and_convert(
+    imodel_maps, imodel_functions, data_header, data_header_expected
+):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
+    cdm_atts = get_cdm_atts("header")
     cdm_tables = {
         "header": {"buffer": StringIO(), "atts": cdm_atts["header"]},
     }
@@ -332,10 +347,12 @@ def test_map_and_convert():
     )
     cdm_tables["header"]["buffer"].close()
     cdm_tables["header"].pop("buffer")
-    pd.testing.assert_frame_equal(result[data_expected.columns], data_expected)
+    pd.testing.assert_frame_equal(
+        result[data_header_expected.columns], data_header_expected
+    )
 
 
-def test_map_and_convert_func():
+def test_map_and_convert_func(data_header, data_header_expected):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     result = map_and_convert(
         "icoads",
@@ -345,16 +362,20 @@ def test_map_and_convert_func():
         cdm_subset=["header"],
         logger=logger,
     )
-    pd.testing.assert_frame_equal(result[data_expected.columns], data_expected)
+    pd.testing.assert_frame_equal(
+        result[data_header_expected.columns], data_header_expected
+    )
 
 
-def test_map_model_icoads():
+def test_map_model_icoads(data_header, data_header_expected):
     result = map_model(
         data_header,
         "icoads_r300_d720",
         cdm_subset=["header"],
     )
-    pd.testing.assert_frame_equal(result[data_expected.columns], data_expected)
+    pd.testing.assert_frame_equal(
+        result[data_header_expected.columns], data_header_expected
+    )
 
 
 def test_map_model_pub47():

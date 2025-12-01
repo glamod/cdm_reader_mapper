@@ -281,19 +281,15 @@ def compared_matrix(dummy_data):
 def test_get_duplicates_limit_and_equal_musts(dummy_data, compared_matrix):
     dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
 
-    # Test default limit
     matches_default = dd.get_duplicates(keep="first", limit=0.5)
     assert len(matches_default) > 0
 
-    # Test custom limit
     matches_custom = dd.get_duplicates(keep="first", limit=0.5)
     assert len(matches_custom) > 0
 
-    # Test equal_musts as string
     matches_eq_str = dd.get_duplicates(keep="first", equal_musts="primary_station_id")
     assert all(matches_eq_str["primary_station_id"])
 
-    # Test equal_musts as list
     matches_eq_list = dd.get_duplicates(
         keep="first", equal_musts=["primary_station_id", "longitude"]
     )
@@ -304,7 +300,6 @@ def test_get_duplicates_limit_and_equal_musts(dummy_data, compared_matrix):
 def test_get_duplicates_keep_integer(dummy_data, compared_matrix):
     dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
 
-    # Using integer as keep
     dd.get_duplicates(keep=0)
     assert hasattr(dd, "matches")
 
@@ -312,15 +307,12 @@ def test_get_duplicates_keep_integer(dummy_data, compared_matrix):
 def test_flag_duplicates_variants(dummy_data, compared_matrix):
     dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
 
-    # keep="last"
     flagged_last = dd.flag_duplicates(keep="last")
     assert flagged_last["duplicate_status"].isin([0, 1, 3]).all()
 
-    # ensure 'duplicates' and 'history' columns exist
     assert "duplicates" in flagged_last.columns
     assert "history" in flagged_last.columns
 
-    # keep integer index
     flagged_int = dd.flag_duplicates(keep=0)
     assert flagged_int["duplicate_status"].isin([0, 1, 3]).all()
 
@@ -328,17 +320,14 @@ def test_flag_duplicates_variants(dummy_data, compared_matrix):
 def test_remove_duplicates_variants(dummy_data, compared_matrix):
     dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
 
-    # keep="first"
     result_first = dd.remove_duplicates(keep="first")
     remaining_ids_first = set(result_first["report_id"])
     assert "A" in remaining_ids_first
 
-    # keep="last"
     result_last = dd.remove_duplicates(keep="last")
     remaining_ids_last = set(result_last["report_id"])
     assert "D" in remaining_ids_last
 
-    # keep integer index
     result_int = dd.remove_duplicates(keep=0)
     remaining_ids_int = set(result_int["report_id"])
     assert "A" in remaining_ids_int
@@ -347,7 +336,6 @@ def test_remove_duplicates_variants(dummy_data, compared_matrix):
 def test_get_total_score(dummy_data, compared_matrix):
     dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
     dd._total_score()
-    # Score should be computed
     assert hasattr(dd, "score")
     assert dd.score.min() >= 0
     assert dd.score.max() <= 1

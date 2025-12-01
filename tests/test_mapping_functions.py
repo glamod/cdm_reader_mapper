@@ -24,8 +24,6 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import (
     mapping_functions,
 )
 
-imappings = mapping_functions("icoads_r300_d720")
-
 
 @pytest.mark.parametrize(
     "entry,expected",
