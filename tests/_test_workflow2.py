@@ -12,7 +12,7 @@ from ._testing_workflow_suite import _testing_suite
 @pytest.mark.parametrize(
     "imodel, cdm_subset, codes_subset, mapping, drops, mdf_kwargs",
     [
-        ("icoads_r300_d701", None, None, True, None, {}), #p
+        ("icoads_r300_d701", None, None, True, None, {}),  # p
     ],
 )
 def test_read_data(
@@ -24,7 +24,7 @@ def test_read_data(
     mdf_kwargs,
 ):
     _testing_suite(
-        #**dict(getattr(test_data, f"test_{imodel}")),
+        # **dict(getattr(test_data, f"test_{imodel}")),
         test_data[f"test_{imodel}"]["source"],
         imodel=imodel,
         cdm_subset=cdm_subset,

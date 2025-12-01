@@ -12,41 +12,41 @@ from ._testing_workflow_suite import _testing_suite
 @pytest.mark.parametrize(
     "imodel, cdm_subset, codes_subset, mapping, drops, mdf_kwargs",
     [
-        #("icoads_r300_d714", None, None, True, None, {}), #p -> mdf
-        #(
+        # ("icoads_r300_d714", None, None, True, None, {}), #p -> mdf
+        # (
         #    "icoads_r300_d714",
         #    None,
         #    None,
         #    False,
         #    None,
         #    {"sections": ["core", "c99"]},
-        #), #p -> mdf
-        #("icoads_r300_d701", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d702", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d703", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d704", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d705", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d706", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d707", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d721", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d730", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d781", None, None, True, None, {}), #p -> mdf
-        #("icoads_r302_d794", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d201", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d892", None, None, True, None, {}), #p -> mdf
-        #("icoads_r300_d700", None, None, True, None, {}), #p -> mdf
-        #("icoads_r302_d792", None, None, True, None, {}), #p -> mdf
-        #("icoads_r302_d992", None, None, True, None, {}), #p -> mdf
-        #("gdac", None, None, True, None, {}), #p -> mdf
-        #("craid", None, None, True, None, {}), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # ("icoads_r300_d701", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d702", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d703", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d704", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d705", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d706", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d707", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d721", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d730", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d781", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r302_d794", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d201", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d892", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r300_d700", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r302_d792", None, None, True, None, {}), #p -> mdf
+        # ("icoads_r302_d992", None, None, True, None, {}), #p -> mdf
+        # ("gdac", None, None, True, None, {}), #p -> mdf
+        # ("craid", None, None, True, None, {}), #p -> mdf
+        # (
         #    "icoads_r300_d714",
         #    ["header", "observations-sst"],
         #    None,
         #    True,
         #    None,
         #    {},
-        #), #p -> cdm
+        # ), #p -> cdm
         (
             "icoads_r300_d714",
             None,
@@ -54,58 +54,58 @@ from ._testing_workflow_suite import _testing_suite
             True,
             None,
             {},
-        ), #p -> cdm
-        #("icoads_r300_d714", None, None, True, None, {"chunksize": 3}), #p -mdf
-        #(
+        ),  # p -> cdm
+        # ("icoads_r300_d714", None, None, True, None, {"chunksize": 3}), #p -mdf
+        # (
         #    "icoads_r300_d714",
         #    None,
         #    None,
         #    False,
         #    None,
         #    {"sections": ["c99"], "chunksize": 3},
-        #), #p -> mdf
-        #("icoads_r300_d721", None, None, True, None, {"chunksize": 3}), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # ("icoads_r300_d721", None, None, True, None, {"chunksize": 3}), #p -> mdf
+        # (
         #    "icoads_r300_d702",
         #    None,
         #    None,
         #    True,
         #    [0, 1, 2, 3, 4],
         #    {"year_init": 1874},
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d702",
         #    None,
         #    None,
         #    True,
         #    [5, 6, 7, 8, 9],
         #    {"year_end": 1874},
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d702",
         #    None,
         #    None,
         #    True,
         #    "all",
         #    {"year_init": 1874, "year_end": 1874},
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "gdac",
         #    None,
         #    None,
         #    True,
         #    [0, 1, 2, 3, 4],
         #    {"year_init": 2002},
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "craid",
         #    None,
         #    None,
         #    True,
         #    "all",
         #    {"year_end": 2003},
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d703",
         #    None,
         #    None,
@@ -116,8 +116,8 @@ from ._testing_workflow_suite import _testing_suite
         #           ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
         #        )
         #    },
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d703",
         #    None,
         #    None,
@@ -128,8 +128,8 @@ from ._testing_workflow_suite import _testing_suite
         #            ".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"
         #        )
         #    },
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d703",
         #    None,
         #    None,
@@ -143,8 +143,8 @@ from ._testing_workflow_suite import _testing_suite
         #            ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
         #        ),
         #    },
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_d703",
         #    None,
         #    None,
@@ -160,15 +160,15 @@ from ._testing_workflow_suite import _testing_suite
         #            "icoads.json",
         #        )
         #    },
-        #), #p -> mdf
-        #(
+        # ), #p -> mdf
+        # (
         #    "icoads_r300_mixed",
         #    None,
         #    None,
         #    False,
         #    None,
         #    {"encoding": "cp1252"},
-        #), #p -> mdf
+        # ), #p -> mdf
     ],
 )
 def test_read_data(
