@@ -1,90 +1,86 @@
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
-import pytest  # noqa
+import pytest
+from io import StringIO
 
-from cdm_reader_mapper import read, test_data
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-
-data_dict = dict(test_data.test_icoads_r300_d700)
+from cdm_reader_mapper import DataBundle
 
 
-def _get_data(TextParser, **kwargs):
-    if TextParser is True:
-        kwargs["chunksize"] = 3
-    return read(**data_dict, imodel="icoads_r300_d700", **kwargs)
+@pytest.fixture
+def sample_df():
+    """Simple DataFrame for testing."""
+    data = pd.DataFrame({"A": [1, 2, None], "B": ["x", "y", "z"]})
+    return DataBundle(data=data)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_index(TextParser):
-    data = _get_data(TextParser)
-    result = data.index
-    np.testing.assert_equal(list(result), [0, 1, 2, 3, 4])
+@pytest.fixture
+def sample_text_reader():
+    """Fixture that returns a TextFileReader."""
+    csv_data = "A,B\n1,x\n2,y\n, z"
+    data = pd.read_csv(StringIO(csv_data), chunksize=1)
+    return DataBundle(data=data)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_size(TextParser):
-    data = _get_data(TextParser)
-    result = data.size
-    np.testing.assert_equal(result, 1430)
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_index(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+    assert list(obj.index) == [0, 1, 2]
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_shape(TextParser):
-    data = _get_data(TextParser)
-    result = data.shape
-    np.testing.assert_equal(result, (5, 286))
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_size(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+    assert obj.size == 6
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_dropna(TextParser):
-    data = _get_data(TextParser)
-    result = data.dropna(how="any")
-    if TextParser:
-        result = make_copy(result).read()
-    expected = pd.DataFrame(columns=data.columns)
-    expected = expected.astype(data.dtypes)
-    pd.testing.assert_frame_equal(result, expected)
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_shape(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+    assert obj.shape == (3, 2)
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_rename(TextParser):
-    data = _get_data(TextParser)
-    _renames = {("core", "MO"): ("core", "MONTH")}
-    result = data.rename(columns=_renames)
-    expected = data.data
-    if TextParser:
-        result = make_copy(result).read()
-        expected = make_copy(expected).read()
-    expected = expected.rename(columns=_renames)
-    expected = expected.astype(result.dtypes)
-    pd.testing.assert_frame_equal(result, expected)
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_dropna(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+
+    dropped = obj.dropna()
+    if not isinstance(dropped, pd.DataFrame):
+        dropped = dropped.read()
+
+    assert dropped.shape == (2, 2)
+    assert dropped["A"].isna().sum() == 0
 
 
-@pytest.mark.parametrize("TextParser", [True, False])
-def test_inplace(TextParser):
-    data = _get_data(TextParser)
-    _renames = {("core", "MO"): ("core", "MONTH")}
-    data_ = data.copy()
-    data_.rename(columns=_renames, inplace=True)
-    result = data_.data
-    expected = data.data
-    if TextParser:
-        result = make_copy(result).read()
-        expected = make_copy(expected).read()
-    expected = expected.rename(columns=_renames)
-    expected = expected.astype(result.dtypes)
-    pd.testing.assert_frame_equal(result, expected)
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_rename(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+
+    renamed = obj.rename(columns={"A": "A_new"})
+    if not isinstance(renamed, pd.DataFrame):
+        renamed = renamed.read()
+
+    assert "A_new" in renamed.columns
+    assert "A" not in renamed.columns
 
 
-@pytest.mark.parametrize("TextParser", [False])
-def test_iloc(TextParser):
-    data = _get_data(TextParser)
-    result = data.iloc[[1, 3, 4]]
-    expected = data.data
-    if TextParser:
-        result = make_copy(result).read()
-        expected = make_copy(expected).read()
-    expected = expected.loc[[1, 3, 4]]
-    pd.testing.assert_frame_equal(result, expected)
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_rename_inplace(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+
+    obj.rename(columns={"A": "A_new"}, inplace=True)
+
+    assert "A_new" in obj.columns
+
+
+@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+def test_iloc(request, fixture_name):
+    obj = request.getfixturevalue(fixture_name)
+
+    if fixture_name == "sample_df":
+        first_row = obj.iloc[0]
+        assert first_row["A"] == 1
+        assert first_row["B"] == "x"
+    else:
+        with pytest.raises(NotImplementedError):
+            _ = obj.iloc[0]

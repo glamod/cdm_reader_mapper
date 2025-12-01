@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper import read
-
-from ._results import result_data
+from cdm_reader_mapper import read, test_data
 
 
 def _manipulate_header(df):
@@ -126,9 +124,9 @@ def _manipulation(df):
 
 
 def _get_test_data(imodel):
-    exp_name = f"expected_{imodel}"
-    exp_data = getattr(result_data, exp_name)
-    data_path = exp_data.get("cdm_table")
+    pattern = f"test_{imodel}"
+    data_file = test_data[pattern]["cdm_header"]
+    data_path = data_file.parent
     return read(
         data_path,
         suffix=f"{imodel}*",

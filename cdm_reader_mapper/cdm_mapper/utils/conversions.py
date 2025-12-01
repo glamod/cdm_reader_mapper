@@ -8,19 +8,66 @@ import numpy as np
 import pandas as pd
 
 
-def convert_integer(data, null_label) -> pd.Series:
+def _convert_array_general(
+    data: pd.Series, null_label: str, convert_to_int: bool = False
+) -> pd.Series:
     """
-    Convert all elements that have 'int' as type attribute.
+    Convert a series of values (single or list) into string arrays in "{...}" format.
 
     Parameters
     ----------
-    data: data tables to convert
-    null_label: specified how nan are represented
+    data : pd.Series
+        Series containing values or lists of values.
+    null_label : str
+        Label to use for null/empty values.
+    convert_to_int : bool, default=False
+        If True, numeric values are converted to integer strings only.
 
     Returns
     -------
-    Series
-        Data as int type.
+    pd.Series
+        Series of string arrays in "{...}" format or null_label if empty.
+    """
+
+    def _convert_value(x):
+        if isinstance(x, str):
+            try:
+                x = ast.literal_eval(x)
+            except (SyntaxError, ValueError):
+                x = [x]
+
+        x_list = x if isinstance(x, list) else [x]
+
+        str_list = []
+        for v in x_list:
+            if v is None or (isinstance(v, float) and np.isnan(v)):
+                continue
+            if convert_to_int:
+                if isinstance(v, (int, float, np.integer, np.floating)):
+                    str_list.append(str(int(v)))
+            else:
+                str_list.append(str(v))
+
+        return "{" + ",".join(str_list) + "}" if str_list else null_label
+
+    return data.apply(_convert_value).astype(object)
+
+
+def convert_integer(data: pd.Series, null_label: str) -> pd.Series:
+    """
+    Convert numeric elements to integer strings.
+
+    Parameters
+    ----------
+    data : pd.Series
+        Series of numeric values to convert.
+    null_label : str
+        Label to use for NaN or invalid values.
+
+    Returns
+    -------
+    pd.Series
+        Series with values as integer strings, NaNs replaced by null_label.
     """
 
     def _return_str(x, null_label):
@@ -31,23 +78,26 @@ def convert_integer(data, null_label) -> pd.Series:
         except ValueError:
             return null_label
 
-    return data.apply(lambda x: _return_str(x, null_label))
+    return data.apply(lambda x: _return_str(x, null_label)).astype(object)
 
 
-def convert_float(data, null_label, decimal_places) -> pd.Series:
+def convert_float(data: pd.Series, null_label: str, decimal_places: int) -> pd.Series:
     """
-    Convert all elements that have 'float' as type attribute.
+    Convert numeric elements to float strings with specified decimals.
 
     Parameters
     ----------
-    data: data tables to convert
-    null_label: specified how nan are represented
-    decimal_places: number of decimal places
+    data : pd.Series
+        Series of numeric values to convert.
+    null_label : str
+        Label to use for NaN or invalid values.
+    decimal_places : int
+        Number of decimal places for formatting.
 
     Returns
     -------
-    Series
-        Data as float type.
+    pd.Series
+        Series with values as formatted float strings, NaNs replaced by null_label.
     """
 
     def _return_str(x, null_label, format_float):
@@ -59,22 +109,24 @@ def convert_float(data, null_label, decimal_places) -> pd.Series:
             return null_label
 
     format_float = "{:." + str(decimal_places) + "f}"
-    return data.apply(lambda x: _return_str(x, null_label, format_float))
+    return data.apply(lambda x: _return_str(x, null_label, format_float)).astype(object)
 
 
-def convert_datetime(data, null_label) -> pd.Series:
+def convert_datetime(data: pd.Series, null_label: str) -> pd.Series:
     """
-    Convert datetime objects in the format: "%Y-%m-%d %H:%M:%S".
+    Convert datetime elements to string format "%Y-%m-%d %H:%M:%S".
 
     Parameters
     ----------
-    data: date time elements
-    null_label: specified how nan are represented
+    data : pd.Series
+        Series of datetime objects or strings.
+    null_label : str
+        Label to use for NaN or invalid values.
 
     Returns
     -------
-    Series
-        Data as datetime objects.
+    pd.Series
+        Series with datetime strings, NaNs replaced by null_label.
     """
 
     def _return_str(x, null_label):
@@ -84,22 +136,24 @@ def convert_datetime(data, null_label) -> pd.Series:
             return x
         return x.strftime("%Y-%m-%d %H:%M:%S")
 
-    return data.apply(lambda x: _return_str(x, null_label))
+    return data.apply(lambda x: _return_str(x, null_label)).astype(object)
 
 
-def convert_str(data, null_label) -> pd.Series:
+def convert_str(data: pd.Series, null_label: str) -> pd.Series:
     """
-    Convert string elements.
+    Convert elements to string representation.
 
     Parameters
     ----------
-    data: data tables to convert
-    null_label: specified how nan are represented
+    data : pd.Series
+        Series containing elements to convert.
+    null_label : str
+        Label to use for NaN or invalid values.
 
     Returns
     -------
-    Series
-        Data as string objects.
+    pd.Series
+        Series with string representations of elements.
     """
 
     def _return_str(x, null_label):
@@ -112,99 +166,42 @@ def convert_str(data, null_label) -> pd.Series:
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def convert_integer_array(data, null_label) -> pd.Series:
+def convert_integer_array(data: pd.Series, null_label: str) -> pd.Series:
     """
-    Convert a series of integer objects as array.
+    Convert a series of integer values or lists to string array format.
 
     Parameters
     ----------
-    data: data tables to convert
-    null_label: specified how nan are represented
+    data : pd.Series
+        Series containing integer values or lists of integers.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
-    Series
-       Data as array of int objects.
+    pd.Series
+        Series with integer arrays in "{...}" format.
     """
-    return data.apply(convert_integer_array_i, null_label=null_label)
+    return _convert_array_general(data, null_label, convert_to_int=True)
 
 
-def convert_str_array(data, null_label) -> pd.Series:
+def convert_str_array(data: pd.Series, null_label: str) -> pd.Series:
     """
-    Convert a series of string objects as array.
+    Convert a series of values or lists to string array format.
 
     Parameters
     ----------
-    data: data tables to convert
-    null_label: specified how nan are represented
+    data : pd.Series
+        Series containing elements or lists of elements.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
-    Series
-        Data as array of str objects.
+    pd.Series
+        Series with string arrays in "{...}" format.
     """
-    return data.apply(convert_str_array_i)
-
-
-def convert_integer_array_i(row, null_label=None) -> str | None:
-    """
-    Convert a series of integer objects.
-
-    Parameters
-    ----------
-    row
-    null_label
-
-    Returns
-    -------
-    str or null_label
-        List of integers as string array or null_label if list of integers is empty.
-    """
-
-    def _return_str(x):
-        if x is None:
-            return x
-        if np.isfinite(x):
-            return str(int(x))
-
-    row = row if not isinstance(row, str) else ast.literal_eval(row)
-    row = row if isinstance(row, list) else [row]
-
-    str_row = [_return_str(x) for x in row]
-    string = ",".join(filter(bool, str_row))
-    if len(string) > 0:
-        return "{" + string + "}"
-    return null_label
-
-
-def convert_str_array_i(row, null_label=None) -> str | None:
-    """
-    Convert a series of string objects.
-
-    Parameters
-    ----------
-    row
-    null_label
-
-    Returns
-    -------
-    str
-        List of strings as string array or null_label if list of strings is empty.
-    """
-
-    def _return_str(x):
-        if x is None:
-            return x
-        if np.isfinite(x):
-            return str(x)
-
-    row = row if not isinstance(row, str) else ast.literal_eval(row)
-    row = row if isinstance(row, list) else [row]
-    str_row = [_return_str(x) for x in row]
-    string = ",".join(filter(bool, str_row))
-    if len(string) > 0:
-        return "{" + string + "}"
-    return null_label
+    return _convert_array_general(data, null_label, convert_to_int=False)
 
 
 converters = {

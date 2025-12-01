@@ -151,6 +151,7 @@ def write_data(
             info["parse_dates"] = [
                 parse_date for parse_date in info["parse_dates"] if parse_date in header
             ]
+            info["encoding"] = encoding
 
         kwargs = {
             "header": header,

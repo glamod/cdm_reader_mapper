@@ -12,6 +12,8 @@ from __future__ import annotations
 import ast
 import datetime
 
+from typing import Any
+
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
     combine_dicts,
@@ -21,48 +23,50 @@ from cdm_reader_mapper.common.json_dict import (
 from .. import properties
 
 
-def _eval(s):
+def _eval(s: str) -> Any:
+    """Safely evaluate a string as a Python literal."""
     try:
         return ast.literal_eval(s)
     except (SyntaxError, ValueError):
         return s
 
 
-def _isvalid(x) -> int | None:
+def _to_int(x: Any) -> int | None:
+    """Convert input to an integer if possible."""
     try:
         return int(x)
-    except ValueError:
+    except (TypeError, ValueError):
         None
 
 
-def _expand_integer_range_key(d) -> dict:
+def _expand_integer_range_key(d: Any) -> Any:
+    """Expand dictionary keys that are integer ranges into individual year keys."""
     if not isinstance(d, dict):
         return d
-    d_ = {}
+
+    expanded = {}
+
     for k, v in d.items():
-        k_ = _eval(k)
-        if not isinstance(k_, list):
-            d_[k] = _expand_integer_range_key(v)
-            continue
-        if len(k_) < 2:
-            continue
-        lower = _isvalid(k_[0])
-        upper = k_[1]
-        if upper == "yyyy":
-            upper = datetime.date.today().year
-        upper = _isvalid(upper)
+        v = _expand_integer_range_key(v)
 
-        if len(k_) < 2:
-            step = _isvalid(k[2])
-        else:
-            step = 1
+        k_eval = _eval(k)
 
-        if None in [lower, upper, step]:
-            continue
+        if isinstance(k_eval, list) and len(k_eval) >= 2:
+            lower = _to_int(k_eval[0])
+            upper = _to_int(
+                k_eval[1] if k_eval[1] != "yyyy" else datetime.date.today().year
+            )
+            step = _to_int(k_eval[2] if len(k_eval) > 2 else 1)
 
-        for yr in range(lower, upper + 1, step):
-            d_[str(yr)] = v
-    return d_
+            if None in (lower, upper, step):
+                continue
+
+            for i in range(lower, upper + 1, step):
+                expanded[str(i)] = v
+        elif not isinstance(k_eval, list):
+            expanded[k] = v
+
+    return expanded
 
 
 def open_code_table(ifile) -> dict:
@@ -71,19 +75,27 @@ def open_code_table(ifile) -> dict:
     return _expand_integer_range_key(json_dict)
 
 
-def get_code_table(data_model, *sub_models, code_table=None) -> dict:
+def get_code_table(
+    data_model: str, *sub_models: str, code_table: str | None = None
+) -> dict[str, dict[str, Any]]:
     """Load code tables into dictionary.
+
+    Combine JSON code table files from a specified data model,
+    optional submodels, and common code tables.
 
     Parameters
     ----------
-    data_model: str
-        The name of the data model to read. This is for
-        data models included in the tool.
-    sub_models*: optionally
-        Sub-directories of ``data_model``.
-        E.g. r300 d701 type2
+    data_model : str
+        The main data model name, e.g., `icoads`.
+    sub_models : str
+        Optional submodel names, e.g. `r300`, `d721`.
     code_table: str
-        Name of the code table to find.
+        Name of the code table to load. If None, return empty dictionary.
+
+    Returns
+    -------
+    dict
+        Combined dictionary of code tables. Nested tables are merged recursively.
     """
     common_files = collect_json_files(
         "common", base=f"{properties._base}.codes", name=code_table

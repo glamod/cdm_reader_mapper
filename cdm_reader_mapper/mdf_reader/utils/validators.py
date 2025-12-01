@@ -162,12 +162,11 @@ def validate(
         filename=None,
     )
     # Check input
-    if not isinstance(data, pd.DataFrame):  # or not isinstance(mask0, pd.DataFrame):
-        # logging.error("Input data and mask must be a pandas data frame object")
+    if not isinstance(data, pd.DataFrame):
         logging.error("input data must be a pandas DataFrame.")
         return
 
-    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype=object)
+    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype="boolean")
     if data.empty:
         return mask
 
@@ -231,4 +230,4 @@ def validate(
     )
 
     mask[disables] = np.nan
-    return mask
+    return mask.astype("boolean")

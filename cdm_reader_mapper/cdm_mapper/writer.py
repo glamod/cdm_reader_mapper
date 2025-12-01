@@ -22,7 +22,11 @@ of the imodel, the number of decimal places used comes from a default tool defin
 
 from __future__ import annotations
 
+import os
+
 import pandas as pd
+
+from pathlib import Path
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
@@ -38,7 +42,6 @@ def _table_to_ascii(
     filename=None,
 ) -> None:
     data = data.dropna(how="all")
-
     header = True
     wmode = "w"
     data.to_csv(
@@ -53,7 +56,7 @@ def _table_to_ascii(
 
 def write_tables(
     data,
-    out_dir=".",
+    out_dir=None,
     prefix=None,
     suffix=None,
     extension="psv",
@@ -70,7 +73,7 @@ def write_tables(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
-    out_dir: str
+    out_dir: str, optional
         Path to the output directory.
         Default: current directory
     prefix: str, optional
@@ -134,10 +137,15 @@ def write_tables(
         logger.warning("All CDM tables are empty")
         return
 
-    if isinstance(filename, str):
+    if isinstance(filename, dict):
+        cdm_subset = list(filename.keys())
+    elif isinstance(filename, (str, Path)):
         filename = {table_name: filename for table_name in cdm_subset}
     elif filename is None:
         filename = {}
+
+    if out_dir is None:
+        out_dir = "."
 
     for table in cdm_subset:
         if table not in data:
@@ -152,6 +160,9 @@ def write_tables(
                 [prefix, table, suffix], path=out_dir, extension=extension
             )
         filename_ = adjust_filename(filename_, table=table, extension=extension)
+        if len(Path(filename_).parts) == 1:
+            filename_ = os.path.join(out_dir, filename_)
+
         logger.info(f"Writing table {table}: {filename_}")
         _table_to_ascii(
             cdm_table,
