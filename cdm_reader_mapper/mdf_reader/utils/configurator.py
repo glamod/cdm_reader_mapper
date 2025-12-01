@@ -143,85 +143,78 @@ class Configurator:
         """Open TextParser to pd.DataSeries."""
         return self.df.apply(lambda x: self._read_line(x[0]), axis=1)
 
+    def _process_section(
+        self, line: str, i: int, order: str, header: dict, data_dict: dict
+    ) -> int:
+        sections = self.schema["sections"][order]["elements"]
+        section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
+        delimiter = header.get("delimiter")
+        field_layout = header.get("field_layout")
+        sentinel = header.get("sentinel")
+        bad_sentinel = sentinel is not None and not self._validate_sentinel(
+            i, line, sentinel
+        )
+        k = i + section_length
+
+        if delimiter and header.get("format") == "delimited":
+            fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
+            for field_name, field in zip_longest(
+                sections.keys(), fields, fillvalue=None
+            ):
+                index = self._get_index(field_name, order)
+                data_dict[index] = field.strip() if field is not None else None
+                if field is not None:
+                    i += len(field)
+            return i
+
+        if delimiter and field_layout != "fixed_width":
+            logging.error(
+                f"Delimiter for {order} is set to {delimiter}. "
+                f"Please specify either format or field_layout in your header schema {header}."
+            )
+            return i
+
+        for section, section_dict in sections.items():
+            missing = True
+            index = self._get_index(section, order)
+            ignore = (order not in self.valid) or self._get_ignore(section_dict)
+            na_value = section_dict.get("missing_value")
+            field_length = section_dict.get(
+                "field_length", properties.MAX_FULL_REPORT_WIDTH
+            )
+
+            j = i if bad_sentinel else i + field_length
+            if j > k:
+                missing = False
+                j = k
+
+            if not ignore:
+                value = line[i:j]
+                if not value.strip() or value == na_value:
+                    value = True
+                if i == j and missing:
+                    value = False
+                data_dict[index] = value
+
+            if delimiter and line[j : j + len(delimiter)] == delimiter:
+                j += len(delimiter)
+
+            i = j
+
+        return i
+
     def _read_line(self, line: str) -> pd.Series:
-        i = j = 0
+        i = 0
         data_dict = {}
+
         for order in self.orders:
             header = self.schema["sections"][order]["header"]
 
-            disable_read = header.get("disable_read")
-            if disable_read is True:
+            if header.get("disable_read") is True:
                 data_dict[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
 
-            sentinel = header.get("sentinel")
-            bad_sentinel = sentinel is not None and not self._validate_sentinel(
-                i, line, sentinel
-            )
-
-            section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
-            sections = self.schema["sections"][order]["elements"]
-
-            field_layout = header.get("field_layout")
-            delimiter = header.get("delimiter")
-            if delimiter is not None:
-                delimiter_format = header.get("format")
-                if delimiter_format == "delimited":
-                    # Read as CSV
-                    field_names = sections.keys()
-                    fields = list(csv.reader([line[i:]], delimiter=delimiter))[0]
-
-                    # for field_name, field in zip(field_names, fields):
-                    for field_name, field in zip_longest(
-                        field_names, fields, fillvalue=None
-                    ):
-                        index = self._get_index(field_name, order)
-                        # data_dict[index] = field.strip()
-                        data_dict[index] = field.strip() if field is not None else None
-                        # i += len(field)
-                        if field is not None:
-                            i += len(
-                                field
-                            )  # increment by length of field only if present
-                    j = i
-                    continue
-                elif field_layout != "fixed_width":
-                    logging.error(
-                        f"Delimiter for {order} is set to {delimiter}. Please specify either format or field_layout in your header schema {header}."
-                    )
-                    return
-
-            k = i + section_length
-            for section, section_dict in sections.items():
-                missing = True
-                index = self._get_index(section, order)
-                ignore = (order not in self.valid) or self._get_ignore(section_dict)
-                na_value = section_dict.get("missing_value")
-                field_length = section_dict.get(
-                    "field_length", properties.MAX_FULL_REPORT_WIDTH
-                )
-
-                j = (i + field_length) if not bad_sentinel else i
-                if j > k:
-                    missing = False
-                    j = k
-
-                if ignore is not True:
-                    value = line[i:j]
-
-                    if not value.strip():
-                        value = True
-                    if value == na_value:
-                        value = True
-
-                    if i == j and missing is True:
-                        value = False
-
-                    data_dict[index] = value
-
-                if delimiter is not None and line[j : j + len(delimiter)] == delimiter:
-                    j += len(delimiter)
-                i = j
+            i = self._process_section(line, i, order, header, data_dict)
 
         return pd.Series(data_dict)
 
