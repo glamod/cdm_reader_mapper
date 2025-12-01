@@ -138,7 +138,9 @@ def write_tables(
         logger.warning("All CDM tables are empty")
         return
 
-    if isinstance(filename, (str, Path)):
+    if isinstance(filename, dict):
+        cdm_subset = list(filename.keys())
+    elif isinstance(filename, (str, Path)):
         filename = {table_name: filename for table_name in cdm_subset}
     elif filename is None:
         filename = {}
