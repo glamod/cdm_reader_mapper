@@ -41,7 +41,9 @@ def _table_to_ascii(
     col_subset=None,
     filename=None,
 ) -> None:
+    print(data)
     data = data.dropna(how="all")
+    print(data)
 
     header = True
     wmode = "w"

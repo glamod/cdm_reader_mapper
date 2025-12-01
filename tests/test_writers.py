@@ -30,6 +30,8 @@ def test_write_header(tmp_path):
 
 def test_write_observations(tmp_path):
     table = "observations-sst"
+    print(db_exp.data)
+    print(db_exp[table])
     db_exp.write(out_dir=tmp_path, suffix=f"{imodel}_{table}_all", cdm_subset=table)
     db_res = read(
         tmp_path, suffix=f"{imodel}_{table}_all", cdm_subset=table, mode="tables"
