@@ -17,7 +17,8 @@ from io import StringIO
 from pathlib import Path
 
 from urllib.parse import urlparse
-import urllib.request
+
+import requests
 
 
 from cdm_reader_mapper.common.select import (
@@ -86,7 +87,9 @@ def get_remote_bytes(url: str) -> bytes:
     if parsed.scheme not in ("http", "https"):
         raise ValueError(f"Unsupported URL scheme: {parsed.scheme}.")
 
-    return urllib.request.urlopen(url).read()  # noqa: S310
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    return response.content
 
 
 def create_structure(root: Path, structure):

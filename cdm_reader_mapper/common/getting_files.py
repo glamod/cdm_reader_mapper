@@ -5,10 +5,10 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import requests
 import warnings
 from pathlib import Path
 from urllib.parse import urlparse
-from urllib.request import urlretrieve
 
 from platformdirs import user_cache_dir
 
@@ -39,13 +39,20 @@ def _get_remote_file(
     lfile = Path(lfile)
     name = Path(name)
     remote_url = "/".join((url.rstrip("/"), name.as_posix()))
+
     lfile.parent.mkdir(exist_ok=True, parents=True)
-    msg = f"Attempting to fetch remote file: {name.as_posix()}"
-    logging.info(msg)
+    logging.info(f"Attempting to fetch remote file: {name.as_posix()}")
+
     parsed = urlparse(remote_url)
     if parsed.scheme not in ("http", "https"):
         raise ValueError(f"Unsupported URL scheme: {parsed.scheme}.")
-    return urlretrieve(remote_url, lfile)  # noqa: S310
+
+    response = requests.get(remote_url, timeout=10)
+    response.raise_for_status()
+
+    lfile.write_bytes(response.content)
+
+    return lfile, response
 
 
 def _check_md5s(f: Path, md5: str, mode: str = "error") -> bool:
