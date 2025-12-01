@@ -7,6 +7,7 @@ import logging
 import os
 import warnings
 from pathlib import Path
+from urllib.parse import urlparse
 from urllib.request import urlretrieve
 
 from platformdirs import user_cache_dir
@@ -41,6 +42,9 @@ def _get_remote_file(
     lfile.parent.mkdir(exist_ok=True, parents=True)
     msg = f"Attempting to fetch remote file: {name.as_posix()}"
     logging.info(msg)
+    parsed = urlparse(remote_url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"Unsupported URL scheme: {parsed.scheme}.")
     return urlretrieve(remote_url, lfile)  # noqa: S310
 
 

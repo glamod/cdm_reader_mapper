@@ -3,16 +3,21 @@ from __future__ import annotations
 import pytest
 
 import hashlib
+import importlib
 import json
 import logging
 import os
 import sys
+import tempfile
 
 import numpy as np
 import pandas as pd
 
 from io import StringIO
 from pathlib import Path
+
+from urllib.parse import urlparse
+import urllib.request
 
 
 from cdm_reader_mapper.common.select import (
@@ -72,7 +77,16 @@ def make_broken_parser(text: str):
 
 def compute_md5(content: bytes) -> str:
     """Helper to get MD5 of bytes."""
-    return hashlib.md5(content).hexdigest()  # noqa: S324
+    return hashlib.md5(content, usedforsecurity=False).hexdigest()  # noqa: S324
+
+
+def get_remote_bytes(url: str) -> bytes:
+    """Fetch the content of a remote URL as bytes."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"Unsupported URL scheme: {parsed.scheme}.")
+
+    return urllib.request.urlopen(url).read()  # noqa: S310
 
 
 def create_structure(root: Path, structure):
@@ -91,6 +105,15 @@ def create_structure(root: Path, structure):
             sub = root / dirname
             sub.mkdir()
             create_structure(sub, children)
+
+
+def create_temp_file(suffix: str) -> tuple[Path, str, Path]:
+    """Create a temporary file and return (file_path, suffix, expected_md5_path)."""
+    tmp_file = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
+    tmp_path = Path(tmp_file.name)
+    md5_path = tmp_path.with_suffix(tmp_path.suffix + ".md5")
+    tmp_file.close()
+    return tmp_path, suffix, md5_path
 
 
 @pytest.fixture
@@ -536,7 +559,6 @@ def test_collect_json_files_basic(tmp_path):
     (base_pkg / "idir0_release.json").write_text(json.dumps({"y": 2}))
 
     sys.path.insert(0, str(tmp_path))
-    import importlib
 
     importlib.import_module("idir0")
 
@@ -563,7 +585,6 @@ def test_collect_json_files_with_args(tmp_path):
     (release_pkg / "idir1_release.json").write_text(json.dumps({"y": 2}))
 
     sys.path.insert(0, str(tmp_path))
-    import importlib
 
     importlib.import_module("idir1.idir1.release")
 
@@ -835,7 +856,7 @@ def test_check_md5s_warning_mode(tmp_path):
         (Path("file.txt"), ".txt", Path("file.txt.md5")),
         (Path("archive.tar.gz"), ".hash", Path("archive.tar.hash.md5")),
         (Path("noext"), ".x", Path("noext.x.md5")),
-        (Path("/tmp/data.bin"), ".bin", Path("/tmp/data.bin.md5")),  # noqa: S108
+        create_temp_file(".bin"),
     ],
 )
 def test_with_md5_suffix(original, suffix, expected):
@@ -882,11 +903,7 @@ def test_get_file_real(tmp_path):
     assert out_file.parent == cache_dir
     assert out_file.name == f
 
-    import urllib.request
-
-    remote_bytes = urllib.request.urlopen(  # noqa: S310
-        f"{base_url}/{name.name}"
-    ).read()
+    remote_bytes = get_remote_bytes(f"{base_url}/{name.name}")
     assert compute_md5(out_file.read_bytes()) == compute_md5(remote_bytes)
 
     assert list(cache_dir.rglob("*.md5")) == []
@@ -919,10 +936,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
     else:
         assert not local_file.exists()
 
-    import urllib.request
-
-    url = "/".join((base_url, "raw", "main", drs, f))
-    remote_bytes = urllib.request.urlopen(url).read()  # noqa: S310
+    remote_bytes = get_remote_bytes(f"{base_url}/raw/main/{drs}/{f}")
     if cache:
         assert compute_md5(local_file.read_bytes()) == compute_md5(remote_bytes)
 
