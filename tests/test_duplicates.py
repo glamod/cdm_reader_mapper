@@ -173,23 +173,6 @@ def test_change_offsets():
     assert updated["col2"]["kwargs"]["offset"] == 0.2
 
 
-def test_duplicate_check_basic():
-    df = pd.DataFrame(
-        {
-            "report_id": ["A", "B"],
-            "primary_station_id": ["S1", "S2"],
-            "longitude": [10, 20],
-            "latitude": [50, 60],
-            "report_timestamp": pd.to_datetime(["2023-01-01", "2023-01-02"]),
-            "station_speed": [5, 6],
-            "station_course": [100, 200],
-        }
-    )
-    detector = duplicate_check(df, method="SortedNeighbourhood")
-    assert isinstance(detector, DupDetect)
-    assert detector.data.shape[0] == df.shape[0]
-
-
 def test_reindex_nulls_orders_by_null_count():
     df = pd.DataFrame({"a": ["null", 1, "null", 2], "b": ["null", 2, 3, "null"]})
     result = reindex_nulls(df)
@@ -208,7 +191,7 @@ def test_comparer_basic():
     df = pd.DataFrame(
         {
             "report_id": ["A", "B", "C"],
-            "primary_station_id": [1, 1, 2],
+            "primary_station_id": ["S1", "S1", "S2"],
             "longitude": [0.1, 0.15, 0.2],
             "latitude": [51.0, 51.01, 52.0],
             "report_timestamp": pd.to_datetime(
@@ -232,110 +215,182 @@ def test_comparer_basic():
     assert "primary_station_id" in comp.compared.columns
 
 
+def test_duplicate_check_basic():
+    df = pd.DataFrame(
+        {
+            "report_id": ["A", "B"],
+            "primary_station_id": ["S1", "S2"],
+            "longitude": [10, 20],
+            "latitude": [50, 60],
+            "report_timestamp": pd.to_datetime(["2023-01-01", "2023-01-02"]),
+            "station_speed": [5, 6],
+            "station_course": [100, 200],
+        }
+    )
+    detector = duplicate_check(df, method="SortedNeighbourhood")
+    assert isinstance(detector, DupDetect)
+    assert detector.data.shape[0] == df.shape[0]
+
+
 @pytest.fixture
 def dummy_data():
     df = pd.DataFrame(
         {
-            "report_id": ["A", "B", "C", "D"],
-            "primary_station_id": [1, 1, 2, 1],
-            "longitude": [0.1, 0.1, 0.2, 0.1],
-            "latitude": [51.0, 51.0, 52.0, 51.0],
+            "report_id": ["A", "B", "C", "D", "E", "F"],
+            "primary_station_id": ["S1", "S1", "S2", "S2", "S1", "S1"],
+            "longitude": [0.1, 0.1, 0.2, 0.1, 0.1, 0.1],
+            "latitude": [51.0, 51.2, 52.0, 51.0, 51.0, 51.0],
             "report_timestamp": pd.to_datetime(
                 [
                     "2023-01-01 00:00",
                     "2023-01-01 00:00",
-                    "2023-01-02 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
                     "2023-01-01 00:00",
                 ]
             ),
-            "station_speed": [10.0, 10.0, 8.0, 10.0],
-            "station_course": [90, 90, 180, 90],
+            "station_speed": [10.0, 10.0, 8.0, 10.0, 8.0, 10.0],
+            "station_course": [90, 90, 180, 90, 60, 90],
             "report_quality": 2,
         }
     )
-    df.index = [0, 1, 2, 3]
+    df.index = [0, 1, 2, 3, 4, 5]
     return df
 
 
-@pytest.fixture
-def compared_matrix(dummy_data):
-    index = pd.MultiIndex.from_tuples(
-        [
-            (0, 1),
-            (2, 3),
-        ]
+@pytest.mark.parametrize(
+    "kwargs, exp_ids",
+    [
+        ({}, [(5, 0)]),
+        ({"offsets": {"latitude": 0.22}}, [(1, 0), (5, 0), (5, 1)]),
+        (
+            {"ignore_columns": ["station_speed", "station_course"]},
+            [(4, 0), (5, 0), (5, 4)],
+        ),
+        ({"ignore_entries": {"primary_station_id": "S2"}}, [(5, 0), (3, 0), (3, 5)]),
+        ({"ignore_entries": {"primary_station_id": ["S2"]}}, [(5, 0), (3, 0), (3, 5)]),
+    ],
+)
+def test_get_duplicates_kwargs(dummy_data, kwargs, exp_ids):
+    dd = duplicate_check(
+        dummy_data,
+        method="SortedNeighbourhood",
+        **kwargs,
     )
-    compared = pd.DataFrame(
-        {
-            "primary_station_id": [True, False],
-            "longitude": [True, False],
-            "latitude": [True, False],
-            "station_speed": [False, False],
-            "station_course": [False, False],
-        },
-        index=index,
-    )
-    return compared
+
+    assert hasattr(dd, "compared")
+
+    dd.get_duplicates()
+
+    assert hasattr(dd, "matches")
+
+    pd.testing.assert_index_equal(dd.matches.index, pd.MultiIndex.from_tuples(exp_ids))
 
 
-def test_get_duplicates_limit_and_equal_musts(dummy_data, compared_matrix):
-    dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
+def test_duplicate_check_reindex(dummy_data):
+    dd = duplicate_check(
+        dummy_data,
+        method="SortedNeighbourhood",
+        reindex_by_null=False,
+    )
+
+    assert hasattr(dd, "compared")
+
+    result = dd.compared
+
+    exp_idx = pd.MultiIndex.from_tuples(
+        [(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)]
+    )
+    pd.testing.assert_index_equal(dd.compared.index, exp_idx)
+
+    assert list(result.columns) == [
+        "primary_station_id",
+        "longitude",
+        "latitude",
+        "report_timestamp",
+        "station_speed",
+        "station_course",
+    ]
+
+
+def test_get_duplicates_limit_and_equal_musts(dummy_data):
+    dd = duplicate_check(dummy_data, method="SortedNeighbourhood")
 
     matches_default = dd.get_duplicates(keep="first", limit=0.5)
-    assert len(matches_default) > 0
-
-    matches_custom = dd.get_duplicates(keep="first", limit=0.5)
-    assert len(matches_custom) > 0
+    expected_indexes = pd.MultiIndex.from_tuples([(5, 0)])
+    pd.testing.assert_index_equal(matches_default.index, expected_indexes)
 
     matches_eq_str = dd.get_duplicates(keep="first", equal_musts="primary_station_id")
-    assert all(matches_eq_str["primary_station_id"])
+    expected_indexes = pd.MultiIndex.from_tuples([(5, 0)])
+    pd.testing.assert_index_equal(matches_eq_str.index, expected_indexes)
 
     matches_eq_list = dd.get_duplicates(
         keep="first", equal_musts=["primary_station_id", "longitude"]
     )
-    assert all(matches_eq_list["primary_station_id"])
-    assert all(matches_eq_list["longitude"])
+    expected_indexes = pd.MultiIndex.from_tuples([(5, 0)])
+    pd.testing.assert_index_equal(matches_eq_list.index, expected_indexes)
 
 
-def test_get_duplicates_keep_integer(dummy_data, compared_matrix):
-    dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
+@pytest.mark.parametrize(
+    "keep, exp_duplicate_status, exp_duplicates",
+    [
+        ("first", [1, 0, 0, 0, 0, 3], ["{F}", "", "", "", "", "{A}"]),
+        ("last", [3, 0, 0, 0, 0, 1], ["{F}", "", "", "", "", "{A}"]),
+        (0, [3, 0, 0, 0, 0, 1], ["{F}", "", "", "", "", "{A}"]),
+        (-1, [1, 0, 0, 0, 0, 3], ["{F}", "", "", "", "", "{A}"]),
+    ],
+)
+def test_flag_duplicates(dummy_data, keep, exp_duplicate_status, exp_duplicates):
+    dd = duplicate_check(dummy_data, method="SortedNeighbourhood")
 
-    dd.get_duplicates(keep=0)
-    assert hasattr(dd, "matches")
+    result = dd.flag_duplicates(keep=keep)
 
+    assert "duplicate_status" in result.columns
+    assert "duplicates" in result.columns
+    assert "history" in result.columns
 
-def test_flag_duplicates_variants(dummy_data, compared_matrix):
-    dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
+    expected_duplicate_status = pd.Series(exp_duplicate_status, name="duplicate_status")
+    expected_duplicates = pd.Series(exp_duplicates, name="duplicates")
 
-    flagged_last = dd.flag_duplicates(keep="last")
-    assert flagged_last["duplicate_status"].isin([0, 1, 3]).all()
-
-    assert "duplicates" in flagged_last.columns
-    assert "history" in flagged_last.columns
-
-    flagged_int = dd.flag_duplicates(keep=0)
-    assert flagged_int["duplicate_status"].isin([0, 1, 3]).all()
-
-
-def test_remove_duplicates_variants(dummy_data, compared_matrix):
-    dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
-
-    result_first = dd.remove_duplicates(keep="first")
-    remaining_ids_first = set(result_first["report_id"])
-    assert "A" in remaining_ids_first
-
-    result_last = dd.remove_duplicates(keep="last")
-    remaining_ids_last = set(result_last["report_id"])
-    assert "D" in remaining_ids_last
-
-    result_int = dd.remove_duplicates(keep=0)
-    remaining_ids_int = set(result_int["report_id"])
-    assert "A" in remaining_ids_int
+    pd.testing.assert_series_equal(
+        result["duplicate_status"], expected_duplicate_status
+    )
+    pd.testing.assert_series_equal(result["duplicates"], expected_duplicates)
 
 
-def test_get_total_score(dummy_data, compared_matrix):
-    dd = DupDetect(dummy_data, compared_matrix, "SortedNeighbourhood", {}, {})
+@pytest.mark.parametrize(
+    "keep, exp_idx",
+    [
+        ("first", [0, 1, 2, 3, 4]),
+        ("last", [1, 2, 3, 4, 5]),
+        (0, [1, 2, 3, 4, 5]),
+        (-1, [0, 1, 2, 3, 4]),
+    ],
+)
+def test_remove_duplicates(dummy_data, keep, exp_idx):
+    dd = duplicate_check(dummy_data, method="SortedNeighbourhood")
+
+    result = dd.remove_duplicates(keep=keep)
+    pd.testing.assert_index_equal(result.index, pd.Index(exp_idx))
+
+
+def test_get_total_score(dummy_data):
+    dd = duplicate_check(dummy_data, method="SortedNeighbourhood")
     dd._total_score()
+
     assert hasattr(dd, "score")
-    assert dd.score.min() >= 0
-    assert dd.score.max() <= 1
+
+    expected = pd.Series(
+        [5.0 / 6.0, 0.5, 2.0 / 3.0, 0.5, 1.0, 5.0 / 6.0, 2.0 / 3.0],
+        index=pd.MultiIndex.from_tuples(
+            [(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)]
+        ),
+    )
+    pd.testing.assert_series_equal(dd.score, expected)
+
+
+def test_get_duplicates_raises(dummy_data):
+    dd = duplicate_check(dummy_data)
+    with pytest.raises(ValueError):
+        dd.get_duplicates(keep=1)
