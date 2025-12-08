@@ -246,7 +246,7 @@ class DupDetect:
         Parameters
         ----------
         keep : str or int
-            Which entry to keep: 'first', 'last', or a specific integer index.
+            Which entry to keep: 'first', 'last', or -1, 0.
         limit : str or float, optional
             Threshold of total similarity score to consider as duplicate.
         equal_musts : str or list[str], optional
@@ -259,14 +259,20 @@ class DupDetect:
         pd.DataFrame
             DataFrame containing matched duplicates.
         """
+        if keep not in ["first", "last", -1, 0]:
+            raise ValueError("keep has to be one of 'first', 'last', -1 or 0.")
+
         if keep == "first":
-            self.drop = 0
-            self.keep = -1
+            keep = -1
         elif keep == "last":
+            keep = 0
+
+        self.keep = keep
+        if keep == 0:
             self.drop = -1
-            self.keep = 0
-        elif not isinstance(keep, int):
-            raise ValueError("keep has to be one of 'first', 'last' of integer value.")
+        elif keep == -1:
+            self.drop = 0
+
         if overwrite is True:
             self._total_score()
             self.limit = self._get_limit(limit)
