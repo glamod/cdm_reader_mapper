@@ -7,6 +7,10 @@ Changelog
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Announcements
+^^^^^^^^^^^^^
+This release adds support for Python 3.14 (:pull:`339`)
+
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * new parameter in function `map_model` (:pull:`327`)
