@@ -5,7 +5,7 @@ Changelog
 
 2.1.2 (unreleased)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
 Announcements
 ^^^^^^^^^^^^^
