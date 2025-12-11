@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         # Bookend python versions
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload code coverage to Codecov
         if: github.ref == 'refs/heads/main'
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           files: ./coverage.xml
           flags: unittests

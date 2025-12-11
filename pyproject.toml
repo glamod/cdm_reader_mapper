@@ -17,7 +17,7 @@ authors = [
 maintainers = [
   {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
   {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
-  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"},
+  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"}
 ]
 readme = {file = "README.rst", content-type = "text/x-rst"}
 requires-python = ">=3.10"
@@ -34,7 +34,8 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13"
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14"
 ]
 dynamic = ["version"]
 dependencies = [
@@ -59,7 +60,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "black[jupyter] ==25.11.0",
+  "black[jupyter] ==25.12.0",
   "blackdoc ==0.4.6",
   "codespell ==2.4.1",
   "coverage >=7.5.0",

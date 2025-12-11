@@ -5,7 +5,11 @@ Changelog
 
 2.1.2 (unreleased)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
+
+Announcements
+^^^^^^^^^^^^^
+This release adds support for Python 3.14 (:pull:`339`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
