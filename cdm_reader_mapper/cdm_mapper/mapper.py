@@ -395,14 +395,14 @@ def map_model(
     imodel = imodel.split("_")
     # Check we have imodel registered, leave otherwise
     if imodel[0] not in properties.supported_data_models:
-        # logger.error("Input data model " f"{imodel[0]}" " not supported")
+        logger.error("Input data model " f"{imodel[0]}" " not supported")
         return
 
     # Check input data type and content (empty?)
     # Make sure data is an iterable: this is to homogenize how we handle
     # dataframes and textreaders
     if isinstance(data, pd.DataFrame):
-        # logger.debug("Input data is a pd.DataFrame")
+        logger.debug("Input data is a pd.DataFrame")
         if len(data) == 0:
             logger.error("Input data is empty")
             return
