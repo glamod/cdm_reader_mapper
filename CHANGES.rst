@@ -24,6 +24,11 @@ Internal changes
 ^^^^^^^^^^^^^^^^
 * implement map_model test for Pub47 data (:issue:`310`, :pull:`327`)
 * rename test data class from test_data to TestData (:pull:`327`)
+* update .gitignore (:pull:``324`)
+* update and add docstrings for multiple functions (:pull:`324`)
+* ``cdm_reader_mapper.cdm_mapper``: update mapping functions for more readability (:pull:`324`)
+* ``cdm_reader_mapper.cdm_mapper``: introdice some helper functions (:pull:`324`)
+* add more unit tests (:issue:`311`, :pull:`324`)
 
 Bug fixes
 ^^^^^^^^^

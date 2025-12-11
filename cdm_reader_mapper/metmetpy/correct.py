@@ -60,6 +60,7 @@ invocation) logging an error.
 from __future__ import annotations
 
 from io import StringIO
+from typing import Any
 
 import pandas as pd
 
@@ -74,34 +75,47 @@ _base = f"{properties._base}"
 
 
 def _correct_dt(
-    data, data_model, dck, correction_method, log_level="INFO"
+    data: pd.DataFrame,
+    data_model: str,
+    dck: str,
+    correction_method: dict[str, dict[str, str]],
+    log_level: str = "INFO",
 ) -> pd.DataFrame:
-    """DOCUMENTATION."""
+    """Apply deck-specific datetime corrections to a dataset."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     # 1. Optional deck specific corrections
     datetime_correction = correction_method.get(dck, {}).get("function")
     if not datetime_correction:
         logger.info(
-            f"No datetime correction to apply to deck {dck} data from data\
-                        model {data_model}"
+            f"No datetime correction to apply to deck {dck} data "
+            f"from data model {data_model}."
         )
-    else:
-        logger.info(f'Applying "{datetime_correction}" datetime correction')
-        try:
-            trans = getattr(corr_f_dt, datetime_correction)
-            trans(data)
-        except Exception:
-            logger.error("Applying correction ", exc_info=True)
-            return
+        return data
 
-    return data
+    logger.info(f'Applying "{datetime_correction}" datetime correction')
+    try:
+        trans = getattr(corr_f_dt, datetime_correction)
+    except AttributeError as e:
+        logger.error(f"Correction function '{datetime_correction}' not found.")
+        raise e
+
+    try:
+        return trans(data)
+    except Exception as e:
+        logger.error("Error applying datetime correction", exc_info=True)
+        raise e
 
 
 def _correct_pt(
-    data, imodel, dck, pt_col, fix_methods, log_level="INFO"
+    data: pd.DataFrame,
+    imodel: str,
+    dck: str,
+    pt_col: str | list[str],
+    fix_methods: dict[str, dict[str, Any]],
+    log_level: str = "INFO",
 ) -> pd.DataFrame:
-    """DOCUMENTATION."""
+    """Apply platform-type corrections for a given deck."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     deck_fix = fix_methods.get(dck)
@@ -110,34 +124,53 @@ def _correct_pt(
             f"No platform type fixes to apply to deck {dck} data from dataset {imodel}"
         )
         return data
-    elif not isinstance(pt_col, list):
+
+    if not isinstance(pt_col, list):
         pt_col = [pt_col]
 
     pt_col = [col for col in pt_col if col in data.columns]
     if not pt_col:
         logger.info(f"No platform type found. Selected columns are {data.columns}")
         return data
-    elif len(pt_col) == 1:
+
+    if len(pt_col) == 1:
         pt_col = pt_col[0]
 
-    #    Find fix method
-    if deck_fix.get("method") == "fillna":
+    method = deck_fix.get("method")
+
+    if method == "fillna":
         fillvalue = deck_fix.get("fill_value")
+        if fillvalue is None:
+            raise ValueError(
+                f'Platform fix "fillna" for deck {dck} requires "fill_value".'
+            )
         logger.info(f"Filling na values with {fillvalue}")
         data[pt_col] = corr_f_pt.fill_value(data[pt_col], fillvalue)
         return data
-    elif deck_fix.get("method") == "function":
+
+    if method == "function":
         transform = deck_fix.get("function")
+        if transform is None:
+            raise ValueError(
+                f'Platform fix "function" for deck {dck} requires "function" name.'
+            )
         logger.info(f"Applying fix function {transform}")
+        if not hasattr(corr_f_pt, transform):
+            raise ValueError(f'Platform fix function "{transform}" not found.')
         trans = getattr(corr_f_pt, transform)
         return trans(data)
-    logger.error(
-        'Platform type fix method "{}" not implemented'.format(deck_fix.get("method"))
+
+    raise ValueError(
+        f'Platform type fix method "{method}" not implemented for deck {dck}.'
     )
-    return data
 
 
-def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
+def correct_datetime(
+    data: pd.DataFrame | pd.io.parsers.TextFileReader,
+    imodel: str,
+    log_level: str = "INFO",
+    _base=_base,
+) -> pd.DataFrame | pd.io.parsers.TextFileReader:
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
@@ -148,25 +181,33 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFram
         Name of internally available data model.
         e.g. icoads_d300_704
     log_level: str
-      level of logging information to save.
-      Default: INFO
+        level of logging information to save.
+        Default: INFO
+    _base: str, optional
+        Base path for datetime correction metadata.
 
     Returns
     -------
     pandas.DataFrame or pandas.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the adjusted data
+
+    Raises
+    ------
+    ValueError
+        If `_correct_dt` raises an error during correction.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.datetime"
+
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {imodel} has no deck information.")
         return data
+
     dck = mrd[2]
 
     replacements_method_files = collect_json_files(*mrd, base=_base)
-
     if len(replacements_method_files) == 0:
         logger.warning(f"Data model {imodel} has no replacements in library")
         logger.warning("Module will proceed with no attempt to apply id replacements")
@@ -175,7 +216,7 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFram
     correction_method = combine_dicts(replacements_method_files, base=_base)
 
     if isinstance(data, pd.DataFrame):
-        return _correct_dt(data, imodel, dck, correction_method, log_level="INFO")
+        return _correct_dt(data, imodel, dck, correction_method, log_level=log_level)
     elif isinstance(data, pd.io.parsers.TextFileReader):
         read_params = [
             "chunksize",
@@ -186,16 +227,25 @@ def correct_datetime(data, imodel, log_level="INFO", _base=_base) -> pd.DataFram
             "infer_datetime_format",
         ]
         read_dict = {x: data.orig_options.get(x) for x in read_params}
+
         buffer = StringIO()
         data_ = pandas_TextParser_hdlr.make_copy(data)
         for df in data_:
-            df = _correct_dt(df, imodel, dck, correction_method, log_level="INFO")
+            df = _correct_dt(df, imodel, dck, correction_method, log_level=log_level)
             df.to_csv(buffer, header=False, index=False, mode="a")
+
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)
 
+    raise TypeError(f"Unsupported data type: {type(data)}")
 
-def correct_pt(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
+
+def correct_pt(
+    data: pd.DataFrame | pd.io.parsers.TextFileReader,
+    imodel: str,
+    log_level="INFO",
+    _base=_base,
+) -> pd.DataFrame | pd.io.parsers.TextFileReader:
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
@@ -214,13 +264,20 @@ def correct_pt(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
     pandas.DataFrame or pandas.io.parsers.TextFileReader
         a pandas.DataFrame or pandas.io.parsers.TextFileReader
         with the adjusted data
+
+    Raises
+    ------
+    ValueError
+        If `_correct_pt` raises an error during correction.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.platform_type"
+
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {imodel} has to deck information.")
         return data
+
     dck = mrd[2]
 
     fix_files = collect_json_files(*mrd, base=_base)
@@ -230,7 +287,6 @@ def correct_pt(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
         return data
 
     fix_methods = combine_dicts(fix_files, base=_base)
-
     pt_col = properties.metadata_datamodels["platform"].get(mrd[0])
 
     if not pt_col:
@@ -258,3 +314,5 @@ def correct_pt(data, imodel, log_level="INFO", _base=_base) -> pd.DataFrame:
 
         buffer.seek(0)
         return pd.read_csv(buffer, **read_dict)
+
+    raise TypeError(f"Unsupported data type: {type(data)}")

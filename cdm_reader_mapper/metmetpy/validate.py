@@ -56,6 +56,7 @@ will warn and validate all to True, with NaN to False
 
 from __future__ import annotations
 
+import logging
 import re
 
 import pandas as pd
@@ -69,14 +70,15 @@ from .datetime import model_datetimes
 _base = f"{properties._base}.station_id"
 
 
-def _get_id_col(data, imodel, logger) -> int | list | None:
+def _get_id_col(
+    data: pd.DataFrame, imodel: str, logger: logging.logger
+) -> int | list[int] | None:
+    """Retrieve the ID column(s) for a given data model from the metadata."""
     id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
-        logger.error(
-            f"Data model {imodel} ID column not defined in\
-                     properties file"
-        )
+        logger.error(f"Data model {imodel} ID column not defined in properties file.")
         return
+
     if not isinstance(id_col, list):
         id_col = [id_col]
 
@@ -84,15 +86,24 @@ def _get_id_col(data, imodel, logger) -> int | list | None:
     if not id_col:
         logger.error(f"No ID columns found. Selected columns are {list(data.columns)}")
         return
+
     if len(id_col) == 1:
         id_col = id_col[0]
+
     return id_col
 
 
-def _get_patterns(dck_id_model, blank, dck, data_model_files, logger) -> list[str]:
+def _get_patterns(
+    dck_id_model: dict,
+    blank: bool,
+    dck: str,
+    data_model_files: list[str],
+    logger: logging.logger,
+) -> list[str]:
+    """Generate a list of validation patterns for a given deck.."""
     pattern_dict = dck_id_model.get("valid_patterns")
 
-    if pattern_dict == {}:
+    if not pattern_dict:
         logger.warning(
             f'Input dck "{dck}" validation patterns are empty in file {data_model_files}'
         )
@@ -105,12 +116,50 @@ def _get_patterns(dck_id_model, blank, dck, data_model_files, logger) -> list[st
         patterns.append("^$")
         logger.warning("Setting valid blank pattern option to true")
         logger.warning("NaN values will validate to True")
+
     return patterns
 
 
-def validate_id(data, imodel, blank=False, log_level="INFO") -> pd.Series:
-    """DOCUMENTATION."""
+def validate_id(
+    data: pd.DataFrame | pd.Series | pd.io.parsers.TextFileReader,
+    imodel: str,
+    blank: bool = False,
+    log_level: str = "INFO",
+) -> pd.Series | None:
+    """
+    Validate ID column(s) in a dataset against deck-specific patterns.
+
+    Parameters
+    ----------
+    data : pd.DataFrame, pd.Series, or pd.io.parsers.TextFileReader
+        Input dataset or series containing ID values.
+    imodel : str
+        Name of internally available data model, e.g., "icoads_r300_d201".
+    blank : bool, optional
+        If True, empty values are considered valid. Default is False.
+    log_level : str, optional
+        Logging level. Default is "INFO".
+
+    Returns
+    -------
+    pd.Series or None
+        Boolean Series indicating whether each ID is valid.
+        Returns None if validation cannot be performed due to missing data,
+        columns, or deck definitions.
+
+    Raises
+    ------
+    None explicitly; errors are logged and function returns None on failure.
+
+    Notes
+    -----
+    - If `data` is a TextFileReader, it is fully read into a DataFrame.
+    - Uses `_get_id_col` to determine which column(s) contain IDs.
+    - Uses `_get_patterns` to get regex patterns for the deck.
+    - Empty values match "^$" pattern if `blank=True`.
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+
     if isinstance(data, pd.io.parsers.TextFileReader):
         data = pandas_TextParser_hdlr.make_copy(data).read()
     elif not isinstance(data, (pd.DataFrame, pd.Series)):
@@ -124,16 +173,14 @@ def validate_id(data, imodel, blank=False, log_level="INFO") -> pd.Series:
     if len(mrd) < 3:
         logger.error(f"Dataset {imodel} has no deck information.")
         return
-    dck = mrd[2]
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
+    dck = mrd[2]
 
     id_col = _get_id_col(data, mrd[0], logger)
     if id_col is None:
         return
 
-    idSeries = data[id_col]
+    id_series = data[id_col]
 
     data_model_files = collect_json_files(*mrd, base=_base)
 
@@ -153,12 +200,43 @@ def validate_id(data, imodel, blank=False, log_level="INFO") -> pd.Series:
     na_values = True if "^$" in patterns else False
     combined_compiled = re.compile("|".join(patterns))
 
-    return idSeries.str.match(combined_compiled, na=na_values)
+    return id_series.str.match(combined_compiled, na=na_values)
 
 
-def validate_datetime(data, imodel, log_level="INFO") -> pd.Series:
-    """DOCUMENTATiON."""
-    # dck input only to be consistent with other validators in the metmetpy module
+def validate_datetime(
+    data: pd.DataFrame | pd.Series | pd.io.parsers.TextFileReader,
+    imodel: str,
+    blank: bool = False,
+    log_level: str = "INFO",
+) -> pd.Series | None:
+    """Validate datetime columns in a dataset according to the specified model.
+
+    Parameters
+    ----------
+    data : pd.DataFrame, pd.Series, or pd.io.parsers.TextFileReader
+        Input dataset or series containing ID values.
+    imodel : str
+        Name of internally available data model, e.g., "icoads_r300_d201".
+    blank : bool, optional
+        If True, empty values are considered valid. Default is False.
+    log_level : str, optional
+        Logging level. Default is "INFO".
+
+    Returns
+    -------
+    pd.Series or None
+        Boolean Series indicating whether each ID is valid.
+        Returns None if validation cannot be performed due to missing data,
+        columns, or deck definitions.
+
+    Raises
+    ------
+    None explicitly; errors are logged and function returns None on failure.
+
+    Notes
+    -----
+    - If `data` is a TextFileReader, it is fully read into a DataFrame.
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     model = imodel.split("_")[0]
 
@@ -166,8 +244,7 @@ def validate_datetime(data, imodel, log_level="INFO") -> pd.Series:
         data = pandas_TextParser_hdlr.make_copy(data).read()
     elif not isinstance(data, (pd.DataFrame, pd.Series)):
         logger.error(
-            f"Input data must be a pd.DataFrame or pd.Series.\
-                     Input data type is {type(data)}"
+            f"Input data must be a pd.DataFrame or pd.Series.Input data type is {type(data)}."
         )
         return
 

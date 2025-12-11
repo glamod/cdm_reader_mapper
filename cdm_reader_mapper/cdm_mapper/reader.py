@@ -127,6 +127,7 @@ def _read_multiple_files(
             null_label=null_label,
             **kwargs,
         )
+
         if dfi.empty:
             logger.warning(
                 f"Table {table} empty in file system, not added to the final DF"
@@ -135,6 +136,7 @@ def _read_multiple_files(
 
         dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
         df_list.append(dfi)
+
     return df_list
 
 
@@ -253,6 +255,7 @@ def read_tables(
     if len(df_list) == 0:
         logger.error("All tables empty in file system")
         return DataBundle(data=pd.DataFrame(), mode="tables")
+
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
     return DataBundle(data=merged, columns=merged.columns, mode="tables")

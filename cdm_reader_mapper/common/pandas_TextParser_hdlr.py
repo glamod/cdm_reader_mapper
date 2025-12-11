@@ -1,22 +1,12 @@
-"""
-Functions for pandas TextParser objects.
-
-Created on Tue Apr  2 10:34:56 2019
-
-Assumes we are never writing a header!
-
-@author: iregon
-"""
+"""Utilities for handling pandas TextParser objects safely."""
 
 from __future__ import annotations
-
-from io import StringIO
-
 import pandas as pd
+from pandas.io.parsers import TextFileReader
+from io import StringIO
+import logging
 
-from . import logging_hdlr
-
-logger = logging_hdlr.init_logger(__name__, level="DEBUG")
+logger = logging.getLogger(__name__)
 
 read_params = [
     "chunksize",
@@ -28,67 +18,130 @@ read_params = [
     "delimiter",
     "quotechar",
     "escapechar",
+    "skip_blank_lines",
 ]
 
 
-def make_copy(OParser) -> pd.io.parsers.TextFileReader:
-    """Make a copy of a pandas TextParser object."""
+def make_copy(Parser: TextFileReader) -> TextFileReader | None:
+    """
+    Create a duplicate of a pandas TextFileReader object.
+
+    Parameters
+    ----------
+    Parser : pandas.io.parsers.TextFileReader
+        The TextFileReader whose state will be copied.
+
+    Returns
+    -------
+    pandas.io.parsers.TextFileReader or None
+        A new TextFileReader with identical content and read options,
+        or None if copying fails.
+
+    Notes
+    -----
+    - The source handle must support `.getvalue()`, meaning this works
+      only for in-memory file-like objects such as `StringIO`.
+    """
     try:
-        f = OParser.handles.handle
-        NewRef = StringIO(f.getvalue())
-        read_dict = {x: OParser.orig_options.get(x) for x in read_params}
-        NParser = pd.read_csv(NewRef, **read_dict)
-        return NParser
+        f = Parser.handles.handle
+        new_ref = StringIO(f.getvalue())
+        read_dict = {k: Parser.orig_options.get(k) for k in read_params}
+        return pd.read_csv(new_ref, **read_dict)
     except Exception:
         logger.error("Failed to copy TextParser", exc_info=True)
-        return
+        return None
 
 
-def restore(Parser) -> pd.io.parsers.TextFileReader:
-    """Restore pandas TextParser object."""
+def restore(Parser: TextFileReader) -> TextFileReader | None:
+    """
+    Restore a TextFileReader to its initial read position and state.
+
+    Parameters
+    ----------
+    Parser : pandas.io.parsers.TextFileReader
+        The TextFileReader to restore.
+
+    Returns
+    -------
+    pandas.io.parsers.TextFileReader or None
+        Restored TextFileReader, or None if restoration fails.
+    """
     try:
         f = Parser.handles.handle
         f.seek(0)
-        read_dict = {x: Parser.orig_options.get(x) for x in read_params}
-        Parser = pd.read_csv(f, **read_dict)
-        return Parser
+        read_dict = {k: Parser.orig_options.get(k) for k in read_params}
+        return pd.read_csv(f, **read_dict)
     except Exception:
         logger.error("Failed to restore TextParser", exc_info=True)
-        return Parser
+        return None
 
 
-def is_not_empty(Parser) -> bool:
-    """Return boolean whether pandas TextParser object is empty."""
+def is_not_empty(Parser: TextFileReader) -> bool | None:
+    """
+    Determine whether a TextFileReader contains at least one row.
+
+    Parameters
+    ----------
+    Parser : pandas.io.parsers.TextFileReader
+        The parser to inspect.
+
+    Returns
+    -------
+    bool or None
+        True if not empty.
+        False if empty.
+        None if an error occurs.
+    """
     try:
-        Parser_copy = make_copy(Parser)
+        parser_copy = make_copy(Parser)
+        if parser_copy is None:
+            return None
     except Exception:
         logger.error(
-            f"Failed to process input. Input type is {type(Parser)}", exc_info=True
+            f"Failed to process input. Input type is {type(Parser)}",
+            exc_info=True,
         )
-        return
+        return None
+
     try:
-        first_chunk = Parser_copy.get_chunk()
-        Parser_copy.close()
-        if len(first_chunk) > 0:
-            logger.debug("Is not empty")
-            return True
-        else:
-            return False
+        chunk = parser_copy.get_chunk()
+        parser_copy.close()
+        return len(chunk) > 0
     except Exception:
-        logger.debug("Something went wrong", exc_info=True)
+        logger.debug("Error while checking emptiness", exc_info=True)
         return False
 
 
-def get_length(Parser) -> int:
-    """Get length of pandas TextParser object."""
+def get_length(Parser: TextFileReader) -> int | None:
+    """
+    Count total rows in a TextFileReader (consuming a copied stream).
+
+    Parameters
+    ----------
+    Parser : pandas.io.parsers.TextFileReader
+        The parser to measure.
+
+    Returns
+    -------
+    int or None
+        Total number of rows, or None if processing fails.
+    """
     try:
-        Parser_copy = make_copy(Parser)
+        parser_copy = make_copy(Parser)
+        if parser_copy is None:
+            return None
     except Exception:
         logger.error(
-            f"Failed to process input. Input type is {type(Parser)}", exc_info=True
+            f"Failed to process input. Input type is {type(Parser)}",
+            exc_info=True,
         )
-        return
-    no_records = 0
-    for df in Parser_copy:
-        no_records += len(df)
-    return no_records
+        return None
+
+    total = 0
+    try:
+        for df in parser_copy:
+            total += len(df)
+        return total
+    except Exception:
+        logger.error("Failed while counting rows", exc_info=True)
+        return None
