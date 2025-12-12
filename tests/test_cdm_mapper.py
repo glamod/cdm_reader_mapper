@@ -20,6 +20,10 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
     _convert_dtype,
     _table_mapping,
     _map_and_convert,
+    # _prepare_cdm_tables,  # no tests yet
+    # _process_chunk,  # no tests yet
+    # _finalize_output,  # no tests yet
+    # _normalize_input_data,  # no tests yet
     map_model,
 )
 

@@ -51,6 +51,19 @@ def _check_input_data_type(data, logger):
     return _log_and_return_empty("Input data type " f"{type(data)}" " not supported")
 
 
+def _normalize_input_data(data, logger):
+    """Return an iterator of DataFrames irrespective of input type."""
+    data = _check_input_data_type(data, logger)
+
+    if data is None:
+        return iter(())
+
+    if isinstance(data, list):
+        return iter(data)
+
+    return data
+
+
 def _is_empty(value):
     """Check whether a value is considered empty."""
     if value is None:
@@ -328,10 +341,86 @@ def _table_mapping(
     return table_df.fillna(null_label)
 
 
+def _prepare_cdm_tables(cdm_subset):
+    """Prepare table buffers and attributes for CDM tables."""
+    cdm_atts = get_cdm_atts(cdm_subset)
+    return {
+        table: {
+            "buffer": StringIO(),
+            "atts": deepcopy(cdm_atts.get(table)),
+        }
+        for table in cdm_subset
+    }
+
+
+def _process_chunk(
+    idata,
+    imodel_maps,
+    imodel_functions,
+    cdm_tables,
+    cols,
+    null_label,
+    codes_subset,
+    cdm_complete,
+    drop_missing_obs,
+    drop_duplicates,
+    logger,
+):
+    """Process one chunk of input data."""
+    for table, mapping in imodel_maps.items():
+        logger.debug(f"Table: {table}")
+
+        table_df = _table_mapping(
+            idata=idata,
+            mapping=mapping,
+            atts=deepcopy(cdm_tables[table]["atts"]),
+            cols=cols,
+            null_label=null_label,
+            imodel_functions=imodel_functions,
+            codes_subset=codes_subset,
+            cdm_complete=cdm_complete,
+            drop_missing_obs=drop_missing_obs,
+            drop_duplicates=drop_duplicates,
+            logger=logger,
+        )
+
+        table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
+        table_df.to_csv(
+            cdm_tables[table]["buffer"],
+            header=False,
+            index=False,
+            mode="a",
+        )
+        cdm_tables[table]["columns"] = table_df.columns
+
+
+def _finalize_output(cdm_tables, logger):
+    """Turn buffers into DataFrames and combine all tables."""
+    final_tables = []
+
+    for table, meta in cdm_tables.items():
+        logger.debug(f"\tParse datetime by reader; Table: {table}")
+
+        meta["buffer"].seek(0)
+        df = pd.read_csv(
+            meta["buffer"],
+            names=meta["columns"],
+            na_values=[],
+            dtype="object",
+            keep_default_na=False,
+        )
+
+        meta["buffer"].close()
+
+        final_tables.append(df)
+
+    return pd.concat(final_tables, axis=1, join="outer").reset_index(drop=True)
+
+
 def _map_and_convert(
     data_model,
     *sub_models,
-    data=pd.DataFrame(),
+    data=None,
     cdm_subset=None,
     codes_subset=None,
     cdm_complete=True,
@@ -341,75 +430,36 @@ def _map_and_convert(
     logger=None,
 ) -> pd.DataFrame:
     """Map and convert MDF data to CDM tables."""
-    data = _check_input_data_type(data, logger)
+    data_iter = _normalize_input_data(data, logger)
 
-    if data is None:
+    if data_iter is None:
         return pd.DataFrame()
 
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
 
-    cdm_atts = get_cdm_atts(cdm_subset)
-
     imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
-
     imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
 
-    cdm_tables = {
-        k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
-    }
+    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    date_columns = {}
-    for table, values in imodel_maps.items():
-        date_columns[table] = [
-            i
-            for i, x in enumerate(list(values))
-            if "timestamp" in cdm_atts.get(table, {}).get(x, {}).get("data_type")
-        ]
-
-    for idata in data:
-        cols = [x for x in idata]
-        for table, mapping in imodel_maps.items():
-            logger.debug(f"Table: {table}")
-            table_df = _table_mapping(
-                idata,
-                mapping,
-                deepcopy(cdm_tables[table]["atts"]),
-                cols,
-                null_label,
-                imodel_functions,
-                codes_subset,
-                cdm_complete,
-                drop_missing_obs,
-                drop_duplicates,
-                logger,
-            )
-
-            table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
-            table_df.to_csv(
-                cdm_tables[table]["buffer"], header=False, index=False, mode="a"
-            )
-            cdm_tables[table]["columns"] = table_df.columns
-
-    table_list = []
-    for table in cdm_tables.keys():
-        logger.debug(
-            f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
+    for idata in data_iter:
+        cols = list(idata.columns)
+        _process_chunk(
+            idata=idata,
+            imodel_maps=imodel_maps,
+            imodel_functions=imodel_functions,
+            cdm_tables=cdm_tables,
+            cols=cols,
+            null_label=null_label,
+            codes_subset=codes_subset,
+            cdm_complete=cdm_complete,
+            drop_missing_obs=drop_missing_obs,
+            drop_duplicates=drop_duplicates,
+            logger=logger,
         )
-        cdm_tables[table]["buffer"].seek(0)
-        data = pd.read_csv(
-            cdm_tables[table]["buffer"],
-            names=cdm_tables[table]["columns"],
-            na_values=[],
-            dtype="object",
-            keep_default_na=False,
-        )
-        cdm_tables[table]["buffer"].close()
-        cdm_tables[table].pop("buffer")
-        table_list.append(data)
 
-    merged = pd.concat(table_list, axis=1, join="outer")
-    return merged.reset_index(drop=True)
+    return _finalize_output(cdm_tables, logger)
 
 
 def map_model(
