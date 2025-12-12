@@ -6,18 +6,20 @@ import pytest
 from io import StringIO
 
 from cdm_reader_mapper.cdm_mapper.mapper import (
-    drop_duplicated_rows,
-    _map_to_df,
+    _check_input_data_type,
+    _is_empty,
+    _drop_duplicated_rows,
+    _get_nested_value,
     _decimal_places,
     _transform,
     _code_table,
     _default,
     _fill_value,
-    _map_data,
-    _mapping,
+    _extract_input_data,
+    _column_mapping,
     _convert_dtype,
+    _table_mapping,
     _map_and_convert,
-    map_and_convert,
     map_model,
 )
 
@@ -29,6 +31,33 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functio
 from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
 
 from cdm_reader_mapper.data import test_data
+
+
+@pytest.fixture
+def sample_df():
+    return pd.DataFrame({"A": [1, 2]})
+
+
+@pytest.fixture
+def sample_df_empty():
+    return pd.DataFrame()
+
+
+@pytest.fixture
+def sample_tfr():
+    csv_data = "A\n1\n2"
+    return pd.read_csv(StringIO(csv_data), chunksize=1)
+
+
+@pytest.fixture
+def sample_tfr_empty():
+    csv_data = "A\n"
+    return pd.read_csv(StringIO(csv_data), chunksize=1)
+
+
+@pytest.fixture
+def sample_string():
+    return "A"
 
 
 @pytest.fixture
@@ -100,11 +129,63 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
         pd.testing.assert_frame_equal(result_table, expected)
 
 
+def test_check_input_data_type_df_non_empty(sample_df):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _check_input_data_type(sample_df, logger)
+
+    assert result == [sample_df]
+
+
+def test_check_input_data_type_df_empty(sample_df_empty):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _check_input_data_type(sample_df_empty, logger)
+
+    assert result is None
+
+
+def test_check_input_data_type_textfilereader_non_empty(sample_tfr):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _check_input_data_type(sample_tfr, logger)
+
+    assert result is sample_tfr
+
+
+def test_check_input_data_type_textfilereader_empty(sample_tfr_empty):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _check_input_data_type(sample_tfr_empty, logger)
+
+    assert result is None
+
+
+def test_check_input_data_type_invalid_type(sample_string):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _check_input_data_type(sample_string, logger)
+
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (None, True),
+        (pd.DataFrame(), True),
+        (pd.DataFrame({"a": [1]}), False),
+        (123, False),
+        ("string", False),
+        ([], True),
+        ({}, True),
+        ("", True),
+    ],
+)
+def test_is_empty(value, expected):
+    assert _is_empty(value) is expected
+
+
 def test_drop_duplicated_rows():
     data = pd.DataFrame(
         data={"col1": [1, 2, 3, 4, 3], "col2": [[5, 9], [6, 9], [7, 9], [8, 9], [7, 9]]}
     )
-    result = drop_duplicated_rows(data)
+    result = _drop_duplicated_rows(data)
     expected = pd.DataFrame(
         data={"col1": [1, 2, 3, 4], "col2": [[5, 9], [6, 9], [7, 9], [8, 9]]}
     )
@@ -120,21 +201,21 @@ def test_drop_duplicated_rows():
         (["4", "5"], 5000),
     ],
 )
-def test_map_to_df(value, expected):
+def test_get_nested_value(value, expected):
     mapping_table = {"1": 1000, "2": 2000, "4": {"5": 5000}}
-    assert _map_to_df(mapping_table, value) == expected
+    assert _get_nested_value(mapping_table, value) == expected
 
 
-def test_map_to_df_none():
-    assert _map_to_df(None, "4") is None
+def test_get_nested_value_none():
+    assert _get_nested_value(None, "4") is None
 
 
 @pytest.mark.parametrize(
     "decimal_places,expected",
-    [(None, {}), (4, {"decimal_places": 4}), ("4", {"decimal_places": 5})],
+    [(None, 5), (4, 4), ("4", 5)],
 )
 def test_decimal_places(decimal_places, expected):
-    assert _decimal_places({}, decimal_places) == expected
+    assert _decimal_places(decimal_places) == expected
 
 
 def test_transform(imodel_functions):
@@ -143,6 +224,13 @@ def test_transform(imodel_functions):
     result = _transform(series, imodel_functions, "integer_to_float", {}, logger)
     expected = pd.Series(data={"a": 1.0, "b": 2.0, "c": np.nan}, index=["a", "b", "c"])
     pd.testing.assert_series_equal(result, expected)
+
+
+def test_transform_notfound(imodel_functions):
+    series = pd.Series(data={"a": 1, "b": 2, "c": np.nan}, index=["a", "b", "c"])
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _transform(series, imodel_functions, "invalid_function", {}, logger)
+    pd.testing.assert_series_equal(result, series)
 
 
 def test_code_table():
@@ -154,7 +242,8 @@ def test_code_table():
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     result = _code_table(series, "icoads_r300_d721", "baro_units", logger)
     expected = pd.Series(
-        data={"a": 1001.0, "b": 1004.0, "c": np.nan}, index=["a", "b", "c"]
+        data={"a": 1001.0, "b": 1004.0, "c": np.nan},
+        index=["a", "b", "c"],
     )
     pd.testing.assert_series_equal(result, expected)
 
@@ -162,8 +251,8 @@ def test_code_table():
 @pytest.mark.parametrize(
     "default,length,expected",
     [
-        (5, 1, 5),
-        (5, 5, 5),
+        (5, 1, [5]),
+        (5, 5, [5, 5, 5, 5, 5]),
         ([5], 5, [[5], [5], [5], [5], [5]]),
         ([5, 6], 5, [[5, 6], [5, 6], [5, 6], [5, 6], [5, 6]]),
     ],
@@ -180,7 +269,6 @@ def test_default(default, length, expected):
             None,
             pd.Series(data={"a": 1, "b": 2, "c": 3}, index=["a", "b", "c"]),
         ),
-        (None, 5, 5),
         (
             pd.Series(data={"a": 1, "b": None, "c": np.nan}, index=["a", "b", "c"]),
             5,
@@ -194,107 +282,6 @@ def test_fill_value(series, fill_value, expected):
         pd.testing.assert_series_equal(result, expected)
     else:
         assert result == expected
-
-
-@pytest.mark.parametrize(
-    "series,transform,code_table,default,fill_value,expected",
-    [
-        (None, None, None, 5, None, 5),
-        (pd.Series(), None, None, 5, None, 5),
-        (
-            pd.Series(data={"a": 1, "b": None, "c": np.nan}, index=["a", "b", "c"]),
-            None,
-            None,
-            None,
-            5,
-            pd.Series(data={"a": 1, "b": 5, "c": 5.0}, index=["a", "b", "c"]),
-        ),
-        (
-            pd.Series(
-                data={"a": "1", "b": "2", "c": np.nan},
-                index=["a", "b", "c"],
-                name=("test", "data"),
-            ),
-            None,
-            "baro_units",
-            None,
-            None,
-            pd.Series(
-                data={"a": 1001.0, "b": 1002.0, "c": np.nan}, index=["a", "b", "c"]
-            ),
-        ),
-        (
-            pd.Series(data={"a": 1, "b": 2, "c": np.nan}, index=["a", "b", "c"]),
-            "integer_to_float",
-            None,
-            None,
-            None,
-            pd.Series(data={"a": 1.0, "b": 2.0, "c": np.nan}, index=["a", "b", "c"]),
-        ),
-        (
-            pd.Series(
-                data={"a": "1", "b": "2", "c": np.nan},
-                index=["a", "b", "c"],
-                name=("test", "data"),
-            ),
-            None,
-            "baro_units",
-            None,
-            5000.0,
-            pd.Series(
-                data={"a": 1001.0, "b": 1002.0, "c": 5000.0}, index=["a", "b", "c"]
-            ),
-        ),
-    ],
-)
-def test_map_data(series, transform, code_table, default, fill_value, expected):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    kwargs = {
-        "kwargs": {},
-        "length": None,
-        "logger": logger,
-    }
-    imodel_functions = mapping_functions("icoads_r300_d701")
-    result = _map_data(
-        series, transform, code_table, default, fill_value, imodel_functions, **kwargs
-    )
-    if isinstance(result, pd.Series):
-        pd.testing.assert_series_equal(result, expected)
-    else:
-        assert result == expected
-
-
-@pytest.mark.parametrize(
-    "column,expected",
-    [
-        ("duplicate_status", 4),
-        ("platform_type", [2, 33, 32, 45]),
-        (
-            "report_id",
-            ["ICOADS-30-5012", "ICOADS-30-8960", "ICOADS-30-0037", "ICOADS-30-1000"],
-        ),
-        ("location_quality", [2.0, "0", "0", "0"]),
-    ],
-)
-def test_mapping(imodel_maps, imodel_functions, data_header, column, expected):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    imapping = imodel_maps["header"][column]
-    result = _mapping(
-        data_header,
-        imapping,
-        imodel_functions,
-        {},
-        None,
-        data_header.columns,
-        logger,
-    )[0]
-    if isinstance(result, pd.Series):
-        expected = pd.Series(expected)
-        pd.testing.assert_series_equal(result, pd.Series(expected))
-    elif isinstance(result, np.ndarray):
-        np.testing.assert_array_equal(result, np.array(expected))
-    else:
-        assert result, expected
 
 
 @pytest.mark.parametrize(
@@ -315,50 +302,98 @@ def test_convert_dtype(value, atts, expected):
         assert result, expected
 
 
-def test_map_and_convert(
+@pytest.mark.parametrize(
+    "column, elements, default, use_default, exp",
+    [
+        ("duplicate_status", None, 4, True, [4, 4, 4, 4]),
+        ("platform_type", [("c1", "PT")], None, False, "idata"),
+        ("report_id", [("c98", "UID")], None, False, "idata"),
+        ("latitude", [("core", "LAT")], None, True, [None, None, None, None]),
+        ("location_quality", [("c1", "LZ")], None, False, "idata"),
+    ],
+)
+def test_extract_input_data(
+    imodel_maps, data_header, column, elements, default, use_default, exp
+):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _extract_input_data(
+        data_header,
+        elements,
+        data_header.columns,
+        default,
+        logger,
+    )
+    assert isinstance(result, tuple)
+
+    assert result[1] is use_default
+
+    if exp == "idata":
+        exp = data_header[elements[0]]
+    elif isinstance(exp, list):
+        exp = pd.Series(exp)
+
+    pd.testing.assert_series_equal(result[0], exp)
+
+
+@pytest.mark.parametrize(
+    "column, expected",
+    [
+        ("duplicate_status", [4, 4, 4, 4]),
+        ("platform_type", [2, 33, 32, 45]),
+        (
+            "report_id",
+            ["ICOADS-30-5012", "ICOADS-30-8960", "ICOADS-30-0037", "ICOADS-30-1000"],
+        ),
+        ("location_quality", [2.0, "0", "0", "0"]),
+        ("latitude", [None, None, None, None]),
+    ],
+)
+def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expected):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    mapping_column = imodel_maps["header"][column]
+    column_atts = get_cdm_atts("header")["header"][column]
+    result, _ = _column_mapping(
+        data_header,
+        mapping_column,
+        imodel_functions,
+        column_atts,
+        None,
+        data_header.columns,
+        column,
+        logger,
+    )
+    pd.testing.assert_series_equal(result, pd.Series(expected, name=column))
+
+
+def test_table_mapping(
     imodel_maps, imodel_functions, data_header, data_header_expected
 ):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    cdm_atts = get_cdm_atts("header")
-    cdm_tables = {
-        "header": {"buffer": StringIO(), "atts": cdm_atts["header"]},
-    }
-    cdm_tables = _map_and_convert(
+    table_atts = get_cdm_atts("header")["header"]
+    result = _table_mapping(
         data_header,
         imodel_maps["header"],
-        "header",
+        table_atts,
         data_header.columns,
         "null",
         imodel_functions,
         None,
-        cdm_tables,
         True,
         False,
         False,
         logger,
     )
-    cdm_tables["header"]["buffer"].seek(0)
-    result = pd.read_csv(
-        cdm_tables["header"]["buffer"],
-        names=cdm_tables["header"]["columns"],
-        na_values=[],
-        dtype="object",
-        keep_default_na=False,
-    )
-    cdm_tables["header"]["buffer"].close()
-    cdm_tables["header"].pop("buffer")
-    pd.testing.assert_frame_equal(
-        result[data_header_expected.columns], data_header_expected
-    )
+    expected = data_header_expected["header"]
+    pd.testing.assert_frame_equal(result[expected.columns], expected)
 
 
-def test_map_and_convert_func(data_header, data_header_expected):
+def test_map_and_convert(data_header, data_header_expected):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = map_and_convert(
+    result = _map_and_convert(
         "icoads",
         "r300",
         "d720",
-        data=[data_header],
+        data=data_header,
         cdm_subset=["header"],
         logger=logger,
     )
