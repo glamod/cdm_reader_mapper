@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from io import StringIO
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -28,7 +29,43 @@ from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
 
 
-def drop_duplicated_rows(df) -> pd.DataFrame:
+def _check_input_data_type(data, logger):
+    """Check whether inpuit data type is valid."""
+
+    def _log_and_return_empty(msg):
+        logger.error(msg)
+
+    if isinstance(data, pd.DataFrame):
+        logger.debug("Input data is a pd.DataFrame")
+        if data.empty:
+            return _log_and_return_empty("Input data is empty")
+        return [data]
+
+    elif isinstance(data, pd.io.parsers.TextFileReader):
+        logger.debug("Input is a pd.TextFileReader")
+        if not pandas_TextParser_hdlr.is_not_empty(data):
+            return _log_and_return_empty("Input data is empty")
+
+        return data
+
+    return _log_and_return_empty("Input data type " f"{type(data)}" " not supported")
+
+
+def _is_empty(value):
+    """Check whether a value is considered empty."""
+    if value is None:
+        return True
+
+    if hasattr(value, "empty"):
+        return bool(value.empty)
+
+    if not value:
+        return True
+
+    return False
+
+
+def _drop_duplicated_rows(df) -> pd.DataFrame:
     """Drop duplicates from list."""
 
     def list_to_tuple(v):
@@ -48,115 +85,158 @@ def drop_duplicated_rows(df) -> pd.DataFrame:
     return df.astype(dtypes)
 
 
-def _map_to_df(m, x):
-    if not isinstance(m, dict):
-        return
-    for x_ in x:
-        if x_ in m.keys():
-            v = m[x_]
-            if isinstance(v, dict):
-                m = v
-                continue
-            else:
-                return v
+def _get_nested_value(ndict, keys) -> Any | None:
+    """Traverse nested dictionaries along a sequence of keys."""
+    if not isinstance(ndict, dict):
         return
 
+    current = ndict
+    for key in keys:
+        if not isinstance(current, dict):
+            return
+        if key not in current:
+            return
+        value = current[key]
+        if isinstance(value, dict):
+            current = value
+            continue
+        return value
 
-def _decimal_places(
-    entry,
-    decimal_places,
-) -> int:
-    if decimal_places is not None:
 
-        if isinstance(decimal_places, int):
-            entry["decimal_places"] = decimal_places
-        else:
-            entry["decimal_places"] = properties.default_decimal_places
+def _convert_dtype(series, atts) -> pd.DataFrame:
+    """Convert data to the type specified in `atts`."""
+    if atts is None:
+        return np.nan
 
-    return entry
+    dtype = atts.get("data_type")
+    if not dtype:
+        return series
+
+    converter = converters.get(dtype)
+    if not converter:
+        return series
+
+    converter_keys = iconverters_kwargs.get(dtype)
+    if converter_keys:
+        kwargs = {key: atts.get(key) for key in converter_keys}
+    else:
+        kwargs = {}
+
+    return converter(series, np.nan, **kwargs)
+
+
+def _decimal_places(decimal_places) -> int:
+    """Set the 'decimal_places' in the entry dictionary."""
+    if decimal_places is None or not isinstance(decimal_places, int):
+        return properties.default_decimal_places
+
+    return decimal_places
 
 
 def _transform(
-    series,
+    data,
     imodel_functions,
     transform,
     kwargs,
     logger,
 ) -> pd.Series:
-    logger.debug(f"\ttransform: {transform}")
-    logger.debug("\tkwargs: {}".format(",".join(list(kwargs.keys()))))
-    trans = getattr(imodel_functions, transform)
-    return trans(series, **kwargs)
+    """Apply a transformation function from imodel_functions to a pandas Series."""
+    logger.debug(f"Applying transform: {transform}")
+    if kwargs:
+        logger.debug(f"With kwargs: {', '.join(kwargs.keys())}")
+    try:
+        trans_func = getattr(imodel_functions, transform)
+    except AttributeError:
+        logger.error(f"Transform '{transform}' not found in imodel_functions")
+        return data
+
+    return trans_func(data, **kwargs)
 
 
 def _code_table(
-    series,
+    data,
     data_model,
     code_table,
     logger,
 ) -> pd.Series:
+    """Map values in a Series or DataFrame using a (possibly nested) code table."""
+    logger.debug(f"Mapping code table: {code_table}")
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
-    try:
-        series = series.to_frame()
-    except Exception:
-        logger.warning(f"Could not convert {series} to frame.")
 
-    series_str = series.astype(str)
-    series_str.columns = ["_".join(col) for col in series_str.columns.values]
-    return series_str.apply(lambda x: _map_to_df(table_map, x), axis=1)
+    try:
+        df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
+    except Exception:
+        logger.warning(f"Could not convert {data} to a DataFrame.")
+        return pd.Series([None] * len(data), index=data.index)
+
+    df = df.astype(str)
+
+    df.columns = [
+        "_".join(col) if isinstance(col, tuple) else str(col) for col in df.columns
+    ]
+
+    def _map_col(col):
+        return _get_nested_value(table_map, col.tolist())
+
+    return df.apply(_map_col, axis=1)
 
 
 def _default(
     default,
     length,
-) -> list | int:
-    if isinstance(default, list):
-        return [default] * length
-    return default
+) -> list:
+    """Return a list of a given length filled with the default value."""
+    return [default] * length
 
 
-def _fill_value(series, fill_value) -> pd.Series | int:
+def _fill_value(series, fill_value) -> pd.Series:
+    """Fill missing values in series."""
     if fill_value is None:
         return series
-    if series is None:
-        return fill_value
     return series.fillna(value=fill_value).infer_objects(copy=False)
 
 
-def _map_data(
-    series,
-    transform,
-    code_table,
-    default,
-    fill_value,
+def _extract_input_data(idata, elements, cols, default, logger):
+    """Extract the relevant input data based on `elements`."""
+
+    def _return_default():
+        return pd.Series(_default(default, len(idata))), True
+
+    if not elements:
+        return _return_default()
+
+    logger.debug(f"\telements: {' '.join(map(str, elements))}")
+
+    missing_elements = [e for e in elements if e not in cols]
+    if missing_elements:
+        logger.warning(
+            "Missing elements from input data: {}".format(
+                ",".join(map(str, missing_elements))
+            )
+        )
+        return _return_default()
+
+    data = idata[elements]
+    if len(elements) == 1:
+        data = data.iloc[:, 0]
+
+    if _is_empty(data):
+        return _return_default()
+
+    return data, False
+
+
+def _column_mapping(
+    idata,
+    imapping,
     imodel_functions,
-    kwargs,
-    length,
+    atts,
+    codes_subset,
+    cols,
+    column,
     logger,
-) -> pd.Series:
-    if (series is None or series.empty) and not transform:
-        series = _default(default, length)
-    elif transform:
-        series = _transform(
-            series,
-            imodel_functions,
-            transform,
-            kwargs,
-            logger=logger,
-        )
-    elif code_table:
-        series = _code_table(
-            series,
-            imodel_functions.imodel,
-            code_table,
-            logger=logger,
-        )
-    return _fill_value(series, fill_value)
-
-
-def _mapping(
-    idata, imapping, imodel_functions, atts, codes_subset, cols, logger
-) -> pd.DataFrame:
+):
+    """Map a column (or multiple elements) in input data according to mapping rules."""
     elements = imapping.get("elements")
     transform = imapping.get("transform")
     kwargs = imapping.get("kwargs", {})
@@ -165,109 +245,90 @@ def _mapping(
     fill_value = imapping.get("fill_value")
     decimal_places = imapping.get("decimal_places")
 
-    if codes_subset:
-        if code_table not in codes_subset:
-            code_table = None
+    if codes_subset and code_table not in codes_subset:
+        code_table = None
 
-    to_map = None
-    if elements:
-        logger.debug("\telements: {}".format(" ".join([str(x) for x in elements])))
-        missing_els = [x for x in elements if x not in cols]
-        if len(missing_els) > 0:
-            logger.warning(
-                "Following elements from data model missing from input data: {} to map.".format(
-                    ",".join([str(x) for x in missing_els])
-                )
-            )
-            return _default(None, len(idata)), atts
-
-        to_map = idata[elements]
-        if len(elements) == 1:
-            to_map = to_map.iloc[:, 0]
-
-    data = _map_data(
-        to_map,
-        transform,
-        code_table,
+    data, used_default = _extract_input_data(
+        idata,
+        elements,
+        cols,
         default,
-        fill_value,
-        imodel_functions,
-        kwargs,
-        len(idata),
         logger,
     )
 
-    atts = _decimal_places(atts, decimal_places)
+    if transform and not used_default:
+        data = _transform(
+            data,
+            imodel_functions,
+            transform,
+            kwargs,
+            logger=logger,
+        )
+
+    elif code_table and not used_default:
+        data = _code_table(
+            data,
+            imodel_functions.imodel,
+            code_table,
+            logger=logger,
+        )
+
+    data = pd.Series(data, index=idata.index, name=column)
+    data = _fill_value(data, fill_value)
+    atts["decimal_places"] = _decimal_places(decimal_places)
+
     return data, atts
 
 
-def _convert_dtype(data, atts) -> pd.DataFrame:
-    if atts is None:
-        return np.nan
-    itype = atts.get("data_type")
-    if converters.get(itype):
-        iconverter_kwargs = iconverters_kwargs.get(itype)
-        if iconverter_kwargs:
-            kwargs = {x: atts.get(x) for x in iconverter_kwargs}
-        else:
-            kwargs = {}
-        data = converters.get(itype)(data, np.nan, **kwargs)
-
-    return data
-
-
-def _map_and_convert(
+def _table_mapping(
     idata,
     mapping,
-    table,
+    atts,
     cols,
     null_label,
     imodel_functions,
     codes_subset,
-    cdm_tables,
     cdm_complete,
     drop_missing_obs,
     drop_duplicates,
     logger,
 ) -> pd.DataFrame:
-    atts = deepcopy(cdm_tables[table]["atts"])
     columns = (
         [x for x in atts.keys() if x in idata.columns]
         if not cdm_complete
         else list(atts.keys())
     )
-    table_df_i = pd.DataFrame(index=idata.index, columns=columns)
 
-    logger.debug(f"Table: {table}")
+    table_df = pd.DataFrame(index=idata.index, columns=columns)
+
     for column in columns:
         if column not in mapping.keys():
             continue
+
         logger.debug(f"\tElement: {column}")
-        table_df_i[column], atts[column] = _mapping(
+
+        table_df[column], atts[column] = _column_mapping(
             idata,
             mapping[column],
             imodel_functions,
             atts[column],
             codes_subset,
             cols,
+            column,
             logger,
         )
-        table_df_i[column] = _convert_dtype(table_df_i[column], atts.get(column))
+        table_df[column] = _convert_dtype(table_df[column], atts.get(column))
 
-    if drop_missing_obs is True and "observation_value" in table_df_i:
-        table_df_i = table_df_i.dropna(subset=["observation_value"])
+    if drop_missing_obs is True and "observation_value" in table_df:
+        table_df = table_df.dropna(subset=["observation_value"])
 
-    table_df_i.columns = pd.MultiIndex.from_product([[table], columns])
     if drop_duplicates:
-        table_df_i = drop_duplicated_rows(table_df_i)
+        table_df = _drop_duplicated_rows(table_df)
 
-    table_df_i = table_df_i.fillna(null_label)
-    table_df_i.to_csv(cdm_tables[table]["buffer"], header=False, index=False, mode="a")
-    cdm_tables[table]["columns"] = table_df_i.columns
-    return cdm_tables
+    return table_df.fillna(null_label)
 
 
-def map_and_convert(
+def _map_and_convert(
     data_model,
     *sub_models,
     data=pd.DataFrame(),
@@ -280,6 +341,11 @@ def map_and_convert(
     logger=None,
 ) -> pd.DataFrame:
     """Map and convert MDF data to CDM tables."""
+    data = _check_input_data_type(data, logger)
+
+    if data is None:
+        return pd.DataFrame()
+
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
 
@@ -289,7 +355,6 @@ def map_and_convert(
 
     imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
 
-    # Initialize dictionary to store temporal tables (buffer) and table attributes
     cdm_tables = {
         k: {"buffer": StringIO(), "atts": cdm_atts.get(k)} for k in imodel_maps.keys()
     }
@@ -305,24 +370,29 @@ def map_and_convert(
     for idata in data:
         cols = [x for x in idata]
         for table, mapping in imodel_maps.items():
-            cdm_tables = _map_and_convert(
+            logger.debug(f"Table: {table}")
+            table_df = _table_mapping(
                 idata,
                 mapping,
-                table,
+                deepcopy(cdm_tables[table]["atts"]),
                 cols,
                 null_label,
                 imodel_functions,
                 codes_subset,
-                cdm_tables,
                 cdm_complete,
                 drop_missing_obs,
                 drop_duplicates,
                 logger,
             )
 
+            table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
+            table_df.to_csv(
+                cdm_tables[table]["buffer"], header=False, index=False, mode="a"
+            )
+            cdm_tables[table]["columns"] = table_df.columns
+
     table_list = []
     for table in cdm_tables.keys():
-        # Convert dtime to object to be parsed by the reader
         logger.debug(
             f"\tParse datetime by reader; Table: {table}; Columns: {date_columns[table]}"
         )
@@ -393,32 +463,11 @@ def map_model(
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     imodel = imodel.split("_")
-    # Check we have imodel registered, leave otherwise
     if imodel[0] not in properties.supported_data_models:
         logger.error("Input data model " f"{imodel[0]}" " not supported")
         return
 
-    # Check input data type and content (empty?)
-    # Make sure data is an iterable: this is to homogenize how we handle
-    # dataframes and textreaders
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if len(data) == 0:
-            logger.error("Input data is empty")
-            return
-        else:
-            data = [data]
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        not_empty = pandas_TextParser_hdlr.is_not_empty(data)
-        if not not_empty:
-            logger.error("Input data is empty")
-            return
-    else:
-        logger.error("Input data type " f"{type(data)}" " not supported")
-        return
-
-    return map_and_convert(
+    return _map_and_convert(
         imodel[0],
         *imodel[1:],
         data=data,
