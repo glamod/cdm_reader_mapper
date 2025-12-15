@@ -63,6 +63,8 @@ def get_cdm_atts(
 
     cdm_atts = {}
     for cdm_table in cdm_table_list:
+        if cdm_table not in properties.cdm_tables:
+            continue
         if cdm_table == "header":
             cdm_atts[cdm_table] = deepcopy(header_dict)
         else:
