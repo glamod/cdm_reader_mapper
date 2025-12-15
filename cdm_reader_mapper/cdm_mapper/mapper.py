@@ -343,7 +343,11 @@ def _table_mapping(
 
 def _prepare_cdm_tables(cdm_subset):
     """Prepare table buffers and attributes for CDM tables."""
+    if isinstance(cdm_subset, str):
+        cdm_subset = [cdm_subset]
     cdm_atts = get_cdm_atts(cdm_subset)
+    if not cdm_atts:
+        return {}
     return {
         table: {
             "buffer": StringIO(),

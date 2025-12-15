@@ -20,10 +20,7 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
     _convert_dtype,
     _table_mapping,
     _map_and_convert,
-    # _prepare_cdm_tables,  # no tests yet
-    # _process_chunk,  # no tests yet
-    # _finalize_output,  # no tests yet
-    # _normalize_input_data,  # no tests yet
+    _prepare_cdm_tables,
     map_model,
 )
 
@@ -212,6 +209,40 @@ def test_get_nested_value(value, expected):
 
 def test_get_nested_value_none():
     assert _get_nested_value(None, "4") is None
+
+
+@pytest.mark.parametrize(
+    "table",
+    [
+        "header",
+        "observations-at",
+        "observations-dpt",
+        "observations-slp",
+        "observations-sst",
+        "observations-wbt",
+        "observations-wd",
+        "observations-ws",
+    ],
+)
+@pytest.mark.parametrize("is_list", [True, False])
+def test_prepare_cdm_tables(table, is_list):
+    if is_list is True:
+        table_in = [table]
+    else:
+        table_in = table
+
+    result = _prepare_cdm_tables(table_in)
+
+    assert isinstance(result, dict)
+    assert list(result.keys()) == [table]
+    assert "buffer" in result[table]
+    assert isinstance(result[table]["buffer"], StringIO)
+    assert "atts" in result[table]
+
+
+def test_prepare_cdm_tables_invalid():
+    result = _prepare_cdm_tables("invalid")
+    assert result == {}
 
 
 @pytest.mark.parametrize(
