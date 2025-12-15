@@ -20,6 +20,10 @@ New features and enhancements
 
 * new Pub47 testdata (test_data["test_pub47"]) (:pull:`327`)
 
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_covnert` to helepr function `_map_and_convert` (:pull:`343`)
+
 Internal changes
 ^^^^^^^^^^^^^^^^
 * implement map_model test for Pub47 data (:issue:`310`, :pull:`327`)
@@ -29,6 +33,7 @@ Internal changes
 * ``cdm_reader_mapper.cdm_mapper``: update mapping functions for more readability (:pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: introdice some helper functions (:pull:`324`)
 * add more unit tests (:issue:`311`, :pull:`324`)
+* ``cdm_reader_mapper.cdm_mapper``: split `map_and_convert` into multiple helper functions (:issue:`333`, :pull:`343`)
 
 Bug fixes
 ^^^^^^^^^
