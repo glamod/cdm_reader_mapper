@@ -131,6 +131,10 @@ def test_get_cdm_atts(cdm_tables):
     _assert_dict_keys(cdm_atts, expected_tables)
 
 
+def test_get_cdm_atts_invalid():
+    assert get_cdm_atts("invalid") == {}
+
+
 @pytest.mark.parametrize(
     "dataset,cdm_tables",
     [
