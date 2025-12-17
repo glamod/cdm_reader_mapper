@@ -2,19 +2,135 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 import os
-from copy import deepcopy
-from io import StringIO
 
 import pandas as pd
-import xarray as xr
+
+from itertools import zip_longest
 
 from .. import properties
 from ..schemas import schemas
-from .configurator import Configurator
-from .utilities import validate_path
+from .utilities import validate_path, process_textfilereader
+from .utilities import convert_dtypes, remove_boolean_values, adjust_dtype
+
+from . import converters, decoders
+from .validators import validate
+
+
+def _apply_multiindex(df: pd.DataFrame, length) -> pd.DataFrame:
+    if length == 1:
+        return df
+
+    df.columns = pd.MultiIndex.from_tuples(
+        [col if isinstance(col, tuple) else (None, col) for col in df.columns],
+    )
+    return df
+
+
+def _validate_sentinel(i: int, line: str, sentinel: str) -> bool:
+    return line.startswith(sentinel, i)
+
+
+def _get_index(section, order, length):
+    if length == 1:
+        return section
+    return (order, section)
+
+
+def _get_ignore(section_dict) -> bool:
+    ignore = section_dict.get("ignore", False)
+    if isinstance(ignore, str):
+        ignore = ast.literal_eval(ignore)
+    return bool(ignore)
+
+
+def _parse_fixed_width(
+    line: str,
+    i: int,
+    header: dict,
+    compiled_elements: list,
+    sections: list,
+    out: dict,
+) -> int:
+    section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
+    delimiter = header.get("delimiter")
+    sentinel = header.get("sentinel")
+
+    bad_sentinel = sentinel is not None and not _validate_sentinel(i, line, sentinel)
+    k = i + section_length
+
+    for index, na_value, field_length, ignore in compiled_elements:
+        if isinstance(index, tuple):
+            in_sections = index[0] in sections
+        else:
+            in_sections = index in sections
+
+        missing = True
+
+        j = i if bad_sentinel else i + field_length
+        if j > k:
+            missing = False
+            j = k
+
+        if not ignore and in_sections:
+            value = line[i:j]
+            if not value.strip() or value == na_value:
+                value = True
+            if i == j and missing:
+                value = False
+            out[index] = value
+
+        if delimiter and line[j : j + len(delimiter)] == delimiter:
+            j += len(delimiter)
+
+        i = j
+
+    return i
+
+
+def _parse_delimited(
+    line: str,
+    i: int,
+    order: str,
+    header: dict,
+    elements: dict,
+    olength: int,
+    out: dict,
+) -> int:
+    delimiter = header["delimiter"]
+    fields = next(csv.reader([line[i:]], delimiter=delimiter))
+
+    for name, value in zip_longest(elements.keys(), fields):
+        out[_get_index(name, order, olength)] = (
+            value.strip() if value is not None else None
+        )
+        if value is not None:
+            i += len(value)
+
+    return i
+
+
+def _convert_and_decode(
+    df,
+    converter_dict,
+    converter_kwargs,
+    decoder_dict,
+) -> pd.DataFrame:
+    for section in converter_dict.keys():
+        if section not in df.columns:
+            continue
+        if section in decoder_dict.keys():
+            decoded = decoder_dict[section](df[section])
+            decoded.index = df[section].index
+            df[section] = decoded
+
+        converted = converter_dict[section](df[section], **converter_kwargs[section])
+        converted.index = df[section].index
+        df[section] = converted
+    return df
 
 
 class FileReader:
@@ -30,7 +146,6 @@ class FileReader:
         year_init=None,
         year_end=None,
     ):
-        # 0. VALIDATE INPUT
         if not imodel and not ext_schema_path:
             logging.error(
                 "A valid input data model name or path to data model must be provided"
@@ -48,10 +163,6 @@ class FileReader:
         self.year_end = year_end
         self.ext_table_path = ext_table_path
 
-        # 1. GET DATA MODEL
-        # Schema reader will return empty if cannot read schema or is not valid
-        # and will log the corresponding error
-        # multiple_reports_per_line error also while reading schema
         logging.info("READING DATA MODEL SCHEMA FILE...")
         if ext_schema_path or ext_schema_file:
             self.schema = schemas.read_schema(
@@ -60,28 +171,107 @@ class FileReader:
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
-    def _adjust_schema(self, ds, dtypes) -> dict:
-        sections = deepcopy(self.schema["sections"])
-        for section in sections.keys():
-            elements = sections[section]["elements"]
-            for data_var in elements.keys():
-                not_in_data_vars = data_var not in ds.data_vars
-                not_in_glb_attrs = data_var not in ds.attrs
-                not_in_data_dims = data_var not in ds.dims
-                if not_in_data_vars and not_in_glb_attrs and not_in_data_dims:
-                    del self.schema["sections"][section]["elements"][data_var]
-                    continue
-                for attr, value in elements[data_var].items():
-                    if value != "__from_file__":
-                        continue
-                    if attr in ds[data_var].attrs:
-                        self.schema["sections"][section]["elements"][data_var][attr] = (
-                            ds[data_var].attrs[attr]
-                        )
-                    else:
-                        del self.schema["sections"][section]["elements"][data_var][attr]
+        parsing_order = self.schema["header"].get("parsing_order")
+        sections_ = [x.get(y) for x in parsing_order for y in x]
+        self.orders = [y for x in sections_ for y in x]
+        self.olength = len(self.orders)
 
-    def _select_years(self, df) -> pd.DataFrame:
+        self._build_compiled_specs_and_convertdecode()
+
+    def _build_compiled_specs_and_convertdecode(self):
+        compiled_specs = []
+        disable_reads = []
+        dtypes = {}
+        converter_dict = {}
+        converter_kwargs = {}
+        decoder_dict = {}
+
+        for order in self.orders:
+            section = self.schema["sections"][order]
+            header = section["header"]
+            elements = section["elements"]
+
+            disable_read = header.get("disable_read", False)
+            if disable_reads:
+                disable_reads.append(order)
+
+            compiled_elements = []
+            for name, meta in elements.items():
+                index = _get_index(name, order, self.olength)
+                ignore = _get_ignore(meta)
+
+                compiled_elements.append(
+                    (
+                        index,
+                        meta.get("missing_value"),
+                        meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
+                        ignore,
+                    )
+                )
+
+                if disable_read:
+                    continue
+
+                if ignore:
+                    continue
+
+                ctype = meta.get("column_type")
+                dtype = properties.pandas_dtypes.get(ctype)
+
+                if dtype:
+                    dtypes[index] = dtype
+
+                conv_func = converters.get(ctype)
+                if conv_func:
+                    converter_dict[index] = conv_func
+
+                conv_kwargs = {
+                    k: meta.get(k)
+                    for k in properties.data_type_conversion_args.get(ctype, [])
+                }
+                if conv_kwargs:
+                    converter_kwargs[index] = conv_kwargs
+
+                encoding = meta.get("encoding")
+                if encoding:
+                    dec_func = decoders.get(encoding, {}).get(ctype)
+                    if dec_func:
+                        decoder_dict[index] = dec_func
+
+            compiled_specs.append(
+                (
+                    order,
+                    header,
+                    elements,
+                    compiled_elements,
+                    header.get("format") == "delimited",
+                )
+            )
+
+        self.dtypes, self.parse_dates = convert_dtypes(dtypes)
+
+        self.disable_reads = disable_reads
+
+        self.convert_decode = {
+            "converter_dict": converter_dict,
+            "converter_kwargs": converter_kwargs,
+            "decoder_dict": decoder_dict,
+        }
+
+        self.compiled_specs = compiled_specs
+
+    def _apply_or_chunk(self, data, func, func_args=[], func_kwargs={}, **kwargs):
+        if not isinstance(data, pd.io.parsers.TextFileReader):
+            return func(data, *func_args, **func_kwargs)
+        return process_textfilereader(
+            data,
+            func,
+            func_args,
+            func_kwargs,
+            **kwargs,
+        )
+
+    def select_years(self, df) -> pd.DataFrame:
         def get_years_from_datetime(date):
             try:
                 return date.year
@@ -105,103 +295,165 @@ class FileReader:
         index = mask[mask].index
         return df.iloc[index].reset_index(drop=True)
 
-    def _read_pandas(self, **kwargs) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        if (enc := kwargs.get("encoding")) is not None:
+    def _read_line(self, line: str) -> dict:
+        i = 0
+        out = {}
+
+        for (
+            order,
+            header,
+            elements,
+            compiled_elements,
+            is_delimited,
+        ) in self.compiled_specs:
+            if header.get("disable_read"):
+                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
+                continue
+
+            if is_delimited:
+                i = _parse_delimited(
+                    line, i, order, header, elements, self.olength, out
+                )
+            else:
+                i = _parse_fixed_width(
+                    line, i, header, compiled_elements, self.sections, out
+                )
+
+        return out
+
+    def open_pandas(self, df) -> pd.DataFrame:
+        """Parse text lines into a Pandas DataFrame."""
+        col = df.columns[0]
+        records = df[col].map(self._read_line)
+        df = pd.DataFrame.from_records(records)
+        return _apply_multiindex(df, self.olength)
+
+    def convert_and_decode_entries(
+        self,
+        data,
+        convert=True,
+        decode=True,
+        converter_dict=None,
+        converter_kwargs=None,
+        decoder_dict=None,
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        """Convert and decode data entries by using a pre-defined data model.
+
+        Overwrite attribute `data` with converted and/or decoded data.
+
+        Parameters
+        ----------
+        data: pd.DataFrame or pd.io.parsers.TextFileReader
+          Data to convert and decode.
+        convert: bool, default: True
+          If True convert entries by using a pre-defined data model.
+        decode: bool, default: True
+          If True decode entries by using a pre-defined data model.
+        converter_dict: dict of {Hashable: func}, optional
+          Functions for converting values in specific columns.
+          If None use information from a pre-defined data model.
+        converter_kwargs: dict of {Hashable: kwargs}, optional
+          Key-word arguments for converting values in specific columns.
+          If None use information from a pre-defined data model.
+        decoder_dict: dict, optional
+          Functions for decoding values in specific columns.
+          If None use information from a pre-defined data model.
+        """
+        if converter_dict is None:
+            converter_dict = self.convert_decode["converter_dict"]
+        if converter_kwargs is None:
+            converter_kwargs = self.convert_decode["converter_kwargs"]
+        if decoder_dict is None:
+            decoder_dict = self.convert_decode["decoder_dict"]
+
+        if not (convert and decode):
+            self.dtypes = "object"
+            return data
+
+        if convert is not True:
+            converter_dict = {}
+            converter_kwargs = {}
+        if decode is not True:
+            decoder_dict = {}
+
+        return _convert_and_decode(
+            data,
+            converter_dict=converter_dict,
+            converter_kwargs=converter_kwargs,
+            decoder_dict=decoder_dict,
+        )
+
+    def validate_entries(
+        self,
+        data,
+        validate_flag,
+        **kwargs,
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        """Validate data entries by using a pre-defined data model.
+
+        Fill attribute `valid` with boolean mask.
+        """
+        if validate_flag is not True:
+            return pd.DataFrame(dtype="boolean")
+
+        return validate(data, schema=self.schema, disables=self.disable_reads, **kwargs)
+
+    def remove_boolean_values(
+        self, data
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        """DOCUMENTATION"""
+        data = data.map(remove_boolean_values)
+        dtype = adjust_dtype(self.dtypes, data)
+        return data.astype(dtype)
+
+    def _apply_schema(
+        self,
+        data,
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        data = self.open_pandas(data)
+        data = self.convert_and_decode_entries(data)
+        data = self.select_years(data)
+        mask = self.validate_entries(
+            data,
+            True,
+            imodel=self.imodel,
+            ext_table_path=self.ext_table_path,
+        )
+        data = self.remove_boolean_values(data)
+        return data, mask
+
+    def open_with_pandas(
+        self,
+        **kwargs,
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        if (enc := getattr(self, "encoding")) is not None:
             logging.info(f"Reading with encoding = {enc}")
-        return pd.read_fwf(
+        to_parse = pd.read_fwf(
             self.source,
             header=None,
             quotechar="\0",
             escapechar="\0",
             dtype=object,
             skip_blank_lines=False,
+            encoding=self.encoding,
+            chunksize=self.chunksize,
             **kwargs,
         )
-
-    def _read_netcdf(self, **kwargs) -> xr.Dataset:
-        ds = xr.open_mfdataset(self.source, **kwargs)
-        self._adjust_schema(ds, ds.dtypes)
-        return ds.squeeze()
-
-    def _read_sections(
-        self,
-        TextParser,
-        order,
-        valid,
-        open_with,
-    ) -> pd.DataFrame:
-        if open_with == "pandas":
-            df = Configurator(
-                df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_pandas()
-        elif open_with == "netcdf":
-            df = Configurator(
-                df=TextParser, schema=self.schema, order=order, valid=valid
-            ).open_netcdf()
-        else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
-
-        self.columns = df.columns
-        return self._select_years(df)
-
-    def get_configurations(self, order, valid) -> dict:
-        """DOCUMENTATION."""
-        config_dict = Configurator(
-            schema=self.schema, order=order, valid=valid
-        ).get_configuration()
-        for attr, val in config_dict["self"].items():
-            setattr(self, attr, val)
-        del config_dict["self"]
-        return config_dict
+        return self._apply_or_chunk(
+            to_parse,
+            self._apply_schema,
+            makecopy=False,
+        )
 
     def open_data(
         self,
-        order,
-        valid,
-        chunksize,
         open_with="pandas",
-        encoding: str | None = None,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
-        encoding = encoding or self.schema["header"].get("encoding")
         if open_with == "netcdf":
-            TextParser = self._read_netcdf()
+            raise NotImplementedError
         elif open_with == "pandas":
-            TextParser = self._read_pandas(
-                encoding=encoding,
+            return self.open_with_pandas(
                 widths=[properties.MAX_FULL_REPORT_WIDTH],
                 skiprows=self.skiprows,
-                chunksize=chunksize,
             )
-        else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
-
-        if isinstance(TextParser, pd.DataFrame) or isinstance(TextParser, xr.Dataset):
-            return self._read_sections(TextParser, order, valid, open_with=open_with)
-        else:
-            data_buffer = StringIO()
-            for i, df_ in enumerate(TextParser):
-                df = self._read_sections(df_, order, valid, open_with=open_with)
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                parse_dates=self.parse_dates,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-            return data
