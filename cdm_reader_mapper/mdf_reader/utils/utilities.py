@@ -2,8 +2,17 @@
 
 from __future__ import annotations
 
+import csv
 import logging
 import os
+
+from io import StringIO
+
+import pandas as pd
+
+from .. import properties
+
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 
 
 def convert_dtypes(dtypes) -> tuple[str]:
@@ -86,3 +95,40 @@ def remove_boolean_values(x) -> str | None:
     if x is False:
         return
     return x
+
+
+def process_textfilereader(
+    reader,
+    func,
+    func_args=[],
+    func_kwargs={},
+    read_kwargs={},
+    write_kwargs={},
+    makecopy=True,
+):
+    data_buffer = StringIO()
+    if makecopy is True:
+        reader = make_copy(reader)
+    for df in reader:
+        df = func(df, *func_args, **func_kwargs)
+        df.to_csv(
+            data_buffer,
+            header=False,
+            mode="a",
+            index=False,
+            quoting=csv.QUOTE_NONE,
+            sep=properties.internal_delimiter,
+            quotechar="\0",
+            escapechar="\0",
+            **write_kwargs,
+        )
+    data_buffer.seek(0)
+    data = pd.read_csv(
+        data_buffer,
+        names=df.columns,
+        delimiter=properties.internal_delimiter,
+        quotechar="\0",
+        escapechar="\0",
+        **read_kwargs,
+    )
+    return data
