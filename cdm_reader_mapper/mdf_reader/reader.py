@@ -12,108 +12,7 @@ import pandas as pd
 from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.core.databundle import DataBundle
 
-from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import validate_arg
-
-
-class MDFFileReader(FileReader):
-    """Class to represent reader output.
-
-    Attributes
-    ----------
-    data : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data
-    mask : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data validation mask
-    attrs : dict
-        a dictionary with the output data elements attributes
-    """
-
-    def __init__(self, *args, **kwargs):
-        FileReader.__init__(self, *args, **kwargs)
-
-    def read(
-        self,
-        chunksize=None,
-        sections=None,
-        skiprows=0,
-        convert_flag=True,
-        decode_flag=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-        validate_flag=True,
-        encoding: str | None = None,
-        **kwargs,
-    ) -> DataBundle:
-        """Read data from disk.
-
-        Parameters
-        ----------
-        chunksize : int, optional
-          Number of reports per chunk.
-        sections : list, optional
-          List with subset of data model sections to output, optional
-          If None read pre-defined data model sections.
-        skiprows : int
-          Number of initial rows to skip from file, default: 0
-        convert_flag: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode_flag: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        validate_flag: bool, default: True
-          Validate data entries by using a pre-defined data model.
-        encoding: str, optional
-          Encoding of the input file, overrides the value in the imodel schema
-        """
-        # 0. VALIDATE INPUT
-        if not validate_arg("sections", sections, list):
-            return
-        if not validate_arg("chunksize", chunksize, int):
-            return
-        if not validate_arg("skiprows", skiprows, int):
-            return
-
-        # 2. READ AND VALIDATE DATA
-        logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
-        # 2.1. Subset data model sections to requested sections
-
-        # 2.2 Homogenize input data to an iterable with dataframes:
-        # a list with a single dataframe or a pd.io.parsers.TextFileReader
-        logging.info("Getting data string from source...")
-        data, mask = self.open_data(
-            # INFO: Set default as "pandas" to account for custom schema
-            open_with=properties.open_file.get(self.imodel, "pandas"),
-            chunksize=chunksize,
-            skiprows=skiprows,
-            encoding=encoding,
-            sections=sections,
-            convert_flag=convert_flag,
-            decode_flag=decode_flag,
-            converter_dict=converter_dict,
-            converter_kwargs=converter_kwargs,
-            decoder_dict=decoder_dict,
-            validate_flag=validate_flag,
-        )
-
-        return DataBundle(
-            data=data,
-            columns=data.columns,
-            dtypes=data.dtypes,
-            parse_dates=self.parser.parse_dates,
-            encoding=self.encoding,
-            mask=mask,
-            imodel=self.imodel,
-        )
 
 
 def read_mdf(
@@ -178,7 +77,7 @@ def read_mdf(
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
-    return MDFFileReader(
+    return FileReader(
         source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,

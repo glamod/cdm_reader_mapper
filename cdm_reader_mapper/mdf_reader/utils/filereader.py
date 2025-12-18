@@ -9,12 +9,18 @@ import pandas as pd
 
 
 from .. import properties
-from .utilities import validate_path, process_textfilereader
-from .utilities import remove_boolean_values
+from .utilities import (
+    validate_path,
+    process_textfilereader,
+    validate_arg,
+    remove_boolean_values,
+)
 
 from .convert_and_decode import convert_and_decode
 from .validators import validate
 from .parser import parse_line, Parser
+
+from cdm_reader_mapper.core.databundle import DataBundle
 
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
@@ -227,3 +233,83 @@ class FileReader:
                 "widths": [properties.MAX_FULL_REPORT_WIDTH],
             }
             return self._open_with_pandas(**func_kwargs)
+
+    def read(
+        self,
+        chunksize=None,
+        sections=None,
+        skiprows=0,
+        convert_flag=True,
+        decode_flag=True,
+        converter_dict=None,
+        converter_kwargs=None,
+        decoder_dict=None,
+        validate_flag=True,
+        encoding: str | None = None,
+        **kwargs,
+    ) -> DataBundle:
+        """Read data from disk.
+
+        Parameters
+        ----------
+        chunksize : int, optional
+          Number of reports per chunk.
+        sections : list, optional
+          List with subset of data model sections to output, optional
+          If None read pre-defined data model sections.
+        skiprows : int
+          Number of initial rows to skip from file, default: 0
+        convert_flag: bool, default: True
+          If True convert entries by using a pre-defined data model.
+        decode_flag: bool, default: True
+          If True decode entries by using a pre-defined data model.
+        converter_dict: dict of {Hashable: func}, optional
+          Functions for converting values in specific columns.
+          If None use information from a pre-defined data model.
+        converter_kwargs: dict of {Hashable: kwargs}, optional
+          Key-word arguments for converting values in specific columns.
+          If None use information from a pre-defined data model.
+        validate_flag: bool, default: True
+          Validate data entries by using a pre-defined data model.
+        encoding: str, optional
+          Encoding of the input file, overrides the value in the imodel schema
+        """
+        # 0. VALIDATE INPUT
+        if not validate_arg("sections", sections, list):
+            return
+        if not validate_arg("chunksize", chunksize, int):
+            return
+        if not validate_arg("skiprows", skiprows, int):
+            return
+
+        # 2. READ AND VALIDATE DATA
+        logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
+        # 2.1. Subset data model sections to requested sections
+
+        # 2.2 Homogenize input data to an iterable with dataframes:
+        # a list with a single dataframe or a pd.io.parsers.TextFileReader
+        logging.info("Getting data string from source...")
+        data, mask = self.open_data(
+            # INFO: Set default as "pandas" to account for custom schema
+            open_with=properties.open_file.get(self.imodel, "pandas"),
+            chunksize=chunksize,
+            skiprows=skiprows,
+            encoding=encoding,
+            sections=sections,
+            convert_flag=convert_flag,
+            decode_flag=decode_flag,
+            converter_dict=converter_dict,
+            converter_kwargs=converter_kwargs,
+            decoder_dict=decoder_dict,
+            validate_flag=validate_flag,
+        )
+
+        return DataBundle(
+            data=data,
+            columns=data.columns,
+            dtypes=data.dtypes,
+            parse_dates=self.parser.parse_dates,
+            encoding=self.encoding,
+            mask=mask,
+            imodel=self.imodel,
+        )
