@@ -14,7 +14,7 @@ from itertools import zip_longest
 from .. import properties
 from ..schemas import schemas
 from .utilities import validate_path, process_textfilereader
-from .utilities import convert_dtypes, remove_boolean_values, adjust_dtype
+from .utilities import convert_dtypes, remove_boolean_values
 
 from .convert_and_decode import Converters, Decoders, convert_and_decode
 from .validators import validate
@@ -311,14 +311,6 @@ class FileReader:
         df = pd.DataFrame.from_records(records)
         return _apply_multiindex(df, self.olength)
 
-    def remove_boolean_values(
-        self, data
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """DOCUMENTATION"""
-        data = data.map(remove_boolean_values)
-        dtype = adjust_dtype(self.dtypes, data)
-        return data.astype(dtype)
-
     def _apply_schema(
         self,
         data,
@@ -338,7 +330,7 @@ class FileReader:
             schema=self.schema,
             disables=self.disable_reads,
         )
-        data = self.remove_boolean_values(data)
+        data = remove_boolean_values(data, self.dtypes)
         return data, mask
 
     def _open_with_pandas(

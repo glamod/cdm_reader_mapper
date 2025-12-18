@@ -87,7 +87,7 @@ def convert_str_boolean(x) -> str | bool:
     return x
 
 
-def remove_boolean_values(x) -> str | None:
+def _remove_boolean_values(x) -> str | None:
     """Remove boolean values."""
     x = convert_str_boolean(x)
     if x is True:
@@ -95,6 +95,13 @@ def remove_boolean_values(x) -> str | None:
     if x is False:
         return
     return x
+
+
+def remove_boolean_values(data, dtypes) -> pd.DataFrame:
+    """DOCUMENTATION"""
+    data = data.map(_remove_boolean_values)
+    dtype = adjust_dtype(dtypes, data)
+    return data.astype(dtype)
 
 
 def process_textfilereader(
