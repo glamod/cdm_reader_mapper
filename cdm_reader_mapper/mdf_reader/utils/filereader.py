@@ -284,28 +284,25 @@ class FileReader:
         return out
 
     def _select_years(self, df) -> pd.DataFrame:
-        def get_years_from_datetime(date):
-            try:
-                return date.year
-            except AttributeError:
-                return date
-
         if self.year_init is None and self.year_end is None:
             return df
 
         data_model = self.imodel.split("_")[0]
-        dates = df[properties.year_column[data_model]]
-        years = dates.apply(lambda x: get_years_from_datetime(x))
-        years = years.astype(int)
+        year_col = properties.year_column[data_model]
 
-        mask = pd.Series([True] * len(years))
-        if self.year_init:
-            mask[years < self.year_init] = False
-        if self.year_end:
-            mask[years > self.year_end] = False
+        years = pd.to_numeric(df[year_col], errors="coerce")
 
-        index = mask[mask].index
-        return df.iloc[index].reset_index(drop=True)
+        mask = pd.Series(True, index=df.index)
+
+        if self.year_init is not None:
+            mask &= years >= self.year_init
+
+        if self.year_end is not None:
+            mask &= years <= self.year_end
+
+        mask &= years.notna()
+
+        return df.loc[mask].reset_index(drop=True)
 
     def _open_pandas(self, df) -> pd.DataFrame:
         """Parse text lines into a Pandas DataFrame."""
