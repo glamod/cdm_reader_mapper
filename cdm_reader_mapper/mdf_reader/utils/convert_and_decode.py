@@ -165,8 +165,8 @@ class Converters:
 
 def convert_and_decode(
     data,
-    convert=True,
-    decode=True,
+    convert_flag=True,
+    decode_flag=True,
     converter_dict=None,
     converter_kwargs=None,
     decoder_dict=None,
@@ -200,13 +200,13 @@ def convert_and_decode(
     if decoder_dict is None:
         decoder_dict = {}
 
-    if not (convert and decode):
+    if not (convert_flag and decode_flag):
         return data
 
-    if convert is not True:
+    if convert_flag is not True:
         converter_dict = {}
         converter_kwargs = {}
-    if decode is not True:
+    if decode_flag is not True:
         decoder_dict = {}
 
     for section, conv_func in converter_dict.items():

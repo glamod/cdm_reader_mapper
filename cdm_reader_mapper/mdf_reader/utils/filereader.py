@@ -137,22 +137,39 @@ class FileReader:
     def _apply_schema(
         self,
         data,
+        convert_flag,
+        decode_flag,
+        converter_dict,
+        converter_kwargs,
+        decoder_dict,
+        validate_flag,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         data = self._open_pandas(data)
+        if converter_dict is None:
+            converter_dict = self.parser.convert_decode["converter_dict"]
+        if converter_kwargs is None:
+            converter_kwargs = self.parser.convert_decode["converter_kwargs"]
+        if decoder_dict is None:
+            decoder_dict = self.parser.convert_decode["decoder_dict"]
         data = convert_and_decode(
             data,
-            converter_dict=self.parser.convert_decode["converter_dict"],
-            converter_kwargs=self.parser.convert_decode["converter_kwargs"],
-            decoder_dict=self.parser.convert_decode["decoder_dict"],
+            convert_flag=convert_flag,
+            decode_flag=decode_flag,
+            converter_dict=converter_dict,
+            converter_kwargs=converter_kwargs,
+            decoder_dict=decoder_dict,
         )
         data = self._select_years(data)
-        mask = validate(
-            data,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.parser.schema,
-            disables=self.parser.disable_reads,
-        )
+        if validate_flag:
+            mask = validate(
+                data,
+                imodel=self.imodel,
+                ext_table_path=self.ext_table_path,
+                schema=self.parser.schema,
+                disables=self.parser.disable_reads,
+            )
+        else:
+            mask = pd.DataFrame(True, index=data.index, columns=data.columns)
         data = remove_boolean_values(data, self.parser.dtypes)
         return data, mask
 
@@ -166,11 +183,12 @@ class FileReader:
             escapechar="\0",
             dtype=object,
             skip_blank_lines=False,
-            **kwargs,
+            **self.pd_kwargs,
         )
         return _apply_or_chunk(
             to_parse,
             self._apply_schema,
+            func_kwargs=kwargs,
             makecopy=False,
         )
 
@@ -181,8 +199,22 @@ class FileReader:
         chunksize=None,
         skiprows=0,
         sections=None,
+        convert_flag=True,
+        decode_flag=True,
+        converter_dict=None,
+        converter_kwargs=None,
+        decoder_dict=None,
+        validate_flag=True,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
+        func_kwargs = {
+            "convert_flag": convert_flag,
+            "decode_flag": decode_flag,
+            "converter_dict": converter_dict,
+            "converter_kwargs": converter_kwargs,
+            "decoder_dict": decoder_dict,
+            "validate_flag": validate_flag,
+        }
         if open_with == "netcdf":
             raise NotImplementedError
         elif open_with == "pandas":
@@ -194,4 +226,4 @@ class FileReader:
                 "skiprows": skiprows,
                 "widths": [properties.MAX_FULL_REPORT_WIDTH],
             }
-            return self._open_with_pandas(**self.pd_kwargs)
+            return self._open_with_pandas(**func_kwargs)

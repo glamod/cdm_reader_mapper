@@ -40,11 +40,12 @@ class MDFFileReader(FileReader):
         chunksize=None,
         sections=None,
         skiprows=0,
-        convert=True,
-        decode=True,
+        convert_flag=True,
+        decode_flag=True,
         converter_dict=None,
         converter_kwargs=None,
-        validate=True,
+        decoder_dict=None,
+        validate_flag=True,
         encoding: str | None = None,
         **kwargs,
     ) -> DataBundle:
@@ -59,9 +60,9 @@ class MDFFileReader(FileReader):
           If None read pre-defined data model sections.
         skiprows : int
           Number of initial rows to skip from file, default: 0
-        convert: bool, default: True
+        convert_flag: bool, default: True
           If True convert entries by using a pre-defined data model.
-        decode: bool, default: True
+        decode_flag: bool, default: True
           If True decode entries by using a pre-defined data model.
         converter_dict: dict of {Hashable: func}, optional
           Functions for converting values in specific columns.
@@ -69,7 +70,7 @@ class MDFFileReader(FileReader):
         converter_kwargs: dict of {Hashable: kwargs}, optional
           Key-word arguments for converting values in specific columns.
           If None use information from a pre-defined data model.
-        validate: bool, default: True
+        validate_flag: bool, default: True
           Validate data entries by using a pre-defined data model.
         encoding: str, optional
           Encoding of the input file, overrides the value in the imodel schema
@@ -96,6 +97,12 @@ class MDFFileReader(FileReader):
             skiprows=skiprows,
             encoding=encoding,
             sections=sections,
+            convert_flag=convert_flag,
+            decode_flag=decode_flag,
+            converter_dict=converter_dict,
+            converter_kwargs=converter_kwargs,
+            decoder_dict=decoder_dict,
+            validate_flag=validate_flag,
         )
 
         return DataBundle(
