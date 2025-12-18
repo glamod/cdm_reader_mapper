@@ -79,13 +79,14 @@ class FileReader:
         self.xr_kwargs = {}
 
         self.sections = None
-        self.encoding = None
 
         self.parser = Parser(
             imodel=imodel,
             ext_schema_path=ext_schema_path,
             ext_schema_file=ext_schema_file,
         )
+
+        self.encoding = self.parser.encoding
 
     def _read_line(self, line: str) -> dict:
         i = 0
