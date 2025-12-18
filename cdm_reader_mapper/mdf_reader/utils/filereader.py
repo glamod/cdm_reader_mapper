@@ -87,6 +87,7 @@ class FileReader:
         )
 
         self.encoding = self.parser.encoding
+        self.parse_dates = self.parser.parse_dates
 
     def _read_line(self, line: str) -> dict:
         i = 0
@@ -309,7 +310,7 @@ class FileReader:
             data=data,
             columns=data.columns,
             dtypes=data.dtypes,
-            parse_dates=self.parser.parse_dates,
+            parse_dates=self.parse_dates,
             encoding=self.encoding,
             mask=mask,
             imodel=self.imodel,
