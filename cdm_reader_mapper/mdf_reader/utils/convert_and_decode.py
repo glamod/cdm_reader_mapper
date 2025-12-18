@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import pandas as pd
 
@@ -30,7 +30,7 @@ def to_numeric(x, scale, offset):
         decimal_places = max_decimal_places(offset, scale, x)
         result = offset + x * scale
         return result.quantize(Decimal("1." + "0" * decimal_places))
-    except ValueError:
+    except (InvalidOperation, ValueError):
         return False
 
 
