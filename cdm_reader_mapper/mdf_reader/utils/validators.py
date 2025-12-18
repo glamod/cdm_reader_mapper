@@ -104,7 +104,7 @@ def validate_codes(elements, data, schema, imodel, ext_table_path) -> pd.DataFra
 
 def _get_elements(elements, element_atts, key) -> list[str]:
     def _condition(x):
-        column_types = element_atts.get(x).get("column_type")
+        column_types = element_atts.get(x, {}).get("column_type")
         if key == "numeric_types":
             return column_types in properties.numeric_types
         return column_types == key
