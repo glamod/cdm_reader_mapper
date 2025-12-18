@@ -17,8 +17,8 @@ from .validators import validate
 from .parser import parse_fixed_width, parse_delimited, Parser
 
 
-def _apply_multiindex(df: pd.DataFrame, length) -> pd.DataFrame:
-    if length == 1:
+def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
+    if not df.columns.map(lambda x: isinstance(x, tuple)).all():
         return df
 
     df.columns = pd.MultiIndex.from_tuples(
@@ -133,7 +133,7 @@ class FileReader:
         col = df.columns[0]
         records = df[col].map(self._read_line)
         df = pd.DataFrame.from_records(records)
-        return _apply_multiindex(df, self.parser.olength)
+        return _apply_multiindex(df)
 
     def _apply_schema(
         self,
@@ -187,10 +187,10 @@ class FileReader:
         if open_with == "netcdf":
             raise NotImplementedError
         elif open_with == "pandas":
-            self.sections = sections or self.parser.orders
+            self.sections = sections
             self.encoding = encoding or self.parser.encoding
             self.pd_kwargs = {
-                "encoding": encoding,
+                "encoding": self.encoding,
                 "chunksize": chunksize,
                 "skiprows": skiprows,
                 "widths": [properties.MAX_FULL_REPORT_WIDTH],

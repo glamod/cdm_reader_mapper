@@ -94,7 +94,9 @@ def parse_fixed_width(
     k = i + section_length
 
     for index, na_value, field_length, ignore in compiled_elements:
-        if isinstance(index, tuple):
+        if not sections:
+            in_sections = True
+        elif isinstance(index, tuple):
             in_sections = index[0] in sections
         else:
             in_sections = index in sections
@@ -175,7 +177,7 @@ class Parser:
         for order in self.orders:
             section = self.schema["sections"][order]
             header = section["header"]
-            elements = section["elements"]
+            elements = section.get("elements", {})
 
             if header.get("disable_read", False):
                 disable_reads.append(order)
