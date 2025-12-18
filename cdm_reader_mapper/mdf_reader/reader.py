@@ -85,8 +85,6 @@ class MDFFileReader(FileReader):
         # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
         # 2.1. Subset data model sections to requested sections
-        if sections is None:
-            sections = self.orders
 
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
@@ -104,7 +102,7 @@ class MDFFileReader(FileReader):
             data=data,
             columns=data.columns,
             dtypes=data.dtypes,
-            parse_dates=self.parse_dates,
+            parse_dates=self.parser.parse_dates,
             encoding=self.encoding,
             mask=mask,
             imodel=self.imodel,
