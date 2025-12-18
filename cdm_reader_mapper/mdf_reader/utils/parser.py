@@ -32,6 +32,52 @@ def _get_ignore(section_dict) -> bool:
     return bool(ignore)
 
 
+def _compile_elements(
+    order, olength, elements, converter_dict, converter_kwargs, decoder_dict, dtypes
+):
+    compiled_elements = []
+
+    for name, meta in elements.items():
+        index = _get_index(name, order, olength)
+        ignore = _get_ignore(meta)
+
+        compiled_elements.append(
+            (
+                index,
+                meta.get("missing_value"),
+                meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
+                ignore,
+            )
+        )
+
+        if meta.get("disable_read", False) or ignore:
+            continue
+
+        ctype = meta.get("column_type")
+        dtype = properties.pandas_dtypes.get(ctype)
+
+        if dtype:
+            dtypes[index] = dtype
+
+        conv_func = Converters(ctype).converter()
+        if conv_func:
+            converter_dict[index] = conv_func
+
+        conv_kwargs = {
+            k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])
+        }
+        if conv_kwargs:
+            converter_kwargs[index] = conv_kwargs
+
+        encoding = meta.get("encoding")
+        if encoding:
+            dec_func = Decoders(ctype, encoding).decoder()
+            if dec_func:
+                decoder_dict[index] = dec_func
+
+    return compiled_elements
+
+
 def parse_fixed_width(
     line: str,
     i: int,
@@ -109,14 +155,16 @@ class Parser:
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
+        self.build_parsing_order()
+        self.build_compiled_specs_and_convertdecode()
+
+    def build_parsing_order(self):
         parsing_order = self.schema["header"].get("parsing_order")
         sections_ = [x.get(y) for x in parsing_order for y in x]
         self.orders = [y for x in sections_ for y in x]
         self.olength = len(self.orders)
 
-        self._build_compiled_specs_and_convertdecode()
-
-    def _build_compiled_specs_and_convertdecode(self):
+    def build_compiled_specs_and_convertdecode(self):
         compiled_specs = []
         disable_reads = []
         dtypes = {}
@@ -129,52 +177,18 @@ class Parser:
             header = section["header"]
             elements = section["elements"]
 
-            disable_read = header.get("disable_read", False)
-            if disable_reads:
+            if header.get("disable_read", False):
                 disable_reads.append(order)
 
-            compiled_elements = []
-            for name, meta in elements.items():
-                index = _get_index(name, order, self.olength)
-                ignore = _get_ignore(meta)
-
-                compiled_elements.append(
-                    (
-                        index,
-                        meta.get("missing_value"),
-                        meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
-                        ignore,
-                    )
-                )
-
-                if disable_read:
-                    continue
-
-                if ignore:
-                    continue
-
-                ctype = meta.get("column_type")
-                dtype = properties.pandas_dtypes.get(ctype)
-
-                if dtype:
-                    dtypes[index] = dtype
-
-                conv_func = Converters(ctype).converter()
-                if conv_func:
-                    converter_dict[index] = conv_func
-
-                conv_kwargs = {
-                    k: meta.get(k)
-                    for k in properties.data_type_conversion_args.get(ctype, [])
-                }
-                if conv_kwargs:
-                    converter_kwargs[index] = conv_kwargs
-
-                encoding = meta.get("encoding")
-                if encoding:
-                    dec_func = Decoders(ctype, encoding).decoder()
-                    if dec_func:
-                        decoder_dict[index] = dec_func
+            compiled_elements = _compile_elements(
+                order,
+                self.olength,
+                elements,
+                converter_dict,
+                converter_kwargs,
+                decoder_dict,
+                dtypes,
+            )
 
             compiled_specs.append(
                 (
