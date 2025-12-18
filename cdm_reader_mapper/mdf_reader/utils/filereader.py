@@ -14,7 +14,7 @@ from .utilities import remove_boolean_values
 
 from .convert_and_decode import convert_and_decode
 from .validators import validate
-from .parser import parse_fixed_width, parse_delimited, Parser
+from .parser import parse_line, Parser
 
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
@@ -85,25 +85,24 @@ class FileReader:
         i = 0
         out = {}
 
-        for (
-            order,
-            header,
-            elements,
-            compiled_elements,
-            is_delimited,
-        ) in self.parser.compiled_specs:
+        for order, spec in self.parser.compiled_specs.items():
+            header = spec.get("header")
+            elements = spec.get("elements")
+            is_delimited = header.get("is_delimited")
+
             if header.get("disable_read"):
                 out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
 
-            if is_delimited:
-                i = parse_delimited(
-                    line, i, order, header, elements, self.parser.olength, out
-                )
-            else:
-                i = parse_fixed_width(
-                    line, i, header, compiled_elements, self.sections, out
-                )
+            i = parse_line(
+                line,
+                i,
+                header,
+                elements,
+                self.sections,
+                out,
+                is_delimited=is_delimited,
+            )
 
         return out
 

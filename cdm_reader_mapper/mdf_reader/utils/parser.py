@@ -32,23 +32,28 @@ def _get_ignore(section_dict) -> bool:
     return bool(ignore)
 
 
+def _is_in_sections(index, sections):
+    if not sections:
+        return True
+    elif isinstance(index, tuple):
+        return index[0] in sections
+    return index in sections
+
+
 def _compile_elements(
     order, olength, elements, converter_dict, converter_kwargs, decoder_dict, dtypes
 ):
-    compiled_elements = []
+    compiled_elements = {}
 
     for name, meta in elements.items():
         index = _get_index(name, order, olength)
         ignore = _get_ignore(meta)
 
-        compiled_elements.append(
-            (
-                index,
-                meta.get("missing_value"),
-                meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
-                ignore,
-            )
-        )
+        compiled_elements[index] = {
+            "missing_value": meta.get("missing_value"),
+            "field_length": meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
+            "ignore": ignore,
+        }
 
         if meta.get("disable_read", False) or ignore:
             continue
@@ -78,11 +83,11 @@ def _compile_elements(
     return compiled_elements
 
 
-def parse_fixed_width(
+def _parse_fixed_width(
     line: str,
     i: int,
     header: dict,
-    compiled_elements: list,
+    elements: dict,
     sections: list,
     out: dict,
 ) -> int:
@@ -93,13 +98,10 @@ def parse_fixed_width(
     bad_sentinel = sentinel is not None and not _validate_sentinel(i, line, sentinel)
     k = i + section_length
 
-    for index, na_value, field_length, ignore in compiled_elements:
-        if not sections:
-            in_sections = True
-        elif isinstance(index, tuple):
-            in_sections = index[0] in sections
-        else:
-            in_sections = index in sections
+    for index, spec in elements.items():
+        missing_value = spec.get("missing_value")
+        field_length = spec.get("field_length")
+        ignore = spec.get("ignore")
 
         missing = True
 
@@ -108,9 +110,9 @@ def parse_fixed_width(
             missing = False
             j = k
 
-        if not ignore and in_sections:
+        if not ignore and _is_in_sections(index, sections):
             value = line[i:j]
-            if not value.strip() or value == na_value:
+            if not value.strip() or value == missing_value:
                 value = True
             if i == j and missing:
                 value = False
@@ -124,26 +126,30 @@ def parse_fixed_width(
     return i
 
 
-def parse_delimited(
+def _parse_delimited(
     line: str,
     i: int,
-    order: str,
     header: dict,
     elements: dict,
-    olength: int,
+    sections: list,
     out: dict,
 ) -> int:
     delimiter = header["delimiter"]
     fields = next(csv.reader([line[i:]], delimiter=delimiter))
 
-    for name, value in zip_longest(elements.keys(), fields):
-        out[_get_index(name, order, olength)] = (
-            value.strip() if value is not None else None
-        )
+    for index, value in zip_longest(elements.keys(), fields):
+        if _is_in_sections(index, sections):
+            out[index] = value.strip() if value is not None else None
         if value is not None:
             i += len(value)
 
     return i
+
+
+def parse_line(*args, is_delimited):
+    if is_delimited:
+        return _parse_delimited(*args)
+    return _parse_fixed_width(*args)
 
 
 class Parser:
@@ -167,7 +173,7 @@ class Parser:
         self.olength = len(self.orders)
 
     def build_compiled_specs_and_convertdecode(self):
-        compiled_specs = []
+        compiled_specs = {}
         disable_reads = []
         dtypes = {}
         converter_dict = {}
@@ -192,15 +198,11 @@ class Parser:
                 dtypes,
             )
 
-            compiled_specs.append(
-                (
-                    order,
-                    header,
-                    elements,
-                    compiled_elements,
-                    header.get("format") == "delimited",
-                )
-            )
+            compiled_specs[order] = {
+                "header": header,
+                "elements": compiled_elements,
+                "is_delimited": header.get("format") == "delimited",
+            }
 
         self.encoding = self.schema["header"].get("encoding", "utf-8")
 
