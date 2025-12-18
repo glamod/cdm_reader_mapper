@@ -94,7 +94,7 @@ class FileReader:
         for order, spec in self.parser.compiled_specs.items():
             header = spec.get("header")
             elements = spec.get("elements")
-            is_delimited = header.get("is_delimited")
+            is_delimited = spec.get("is_delimited")
 
             if header.get("disable_read"):
                 out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
@@ -225,7 +225,7 @@ class FileReader:
             raise NotImplementedError
         elif open_with == "pandas":
             self.sections = sections
-            self.encoding = encoding or self.parser.encoding
+            self.encoding = encoding or self.encoding
             self.pd_kwargs = {
                 "encoding": self.encoding,
                 "chunksize": chunksize,
