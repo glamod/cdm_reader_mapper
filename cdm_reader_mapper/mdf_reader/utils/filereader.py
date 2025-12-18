@@ -314,21 +314,6 @@ class FileReader:
         df = pd.DataFrame.from_records(records)
         return _apply_multiindex(df, self.olength)
 
-    def validate_entries(
-        self,
-        data,
-        validate_flag,
-        **kwargs,
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """Validate data entries by using a pre-defined data model.
-
-        Fill attribute `valid` with boolean mask.
-        """
-        if validate_flag is not True:
-            return pd.DataFrame(dtype="boolean")
-
-        return validate(data, schema=self.schema, disables=self.disable_reads, **kwargs)
-
     def remove_boolean_values(
         self, data
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
@@ -349,11 +334,12 @@ class FileReader:
             decoder_dict=self.convert_decode["decoder_dict"],
         )
         data = self._select_years(data)
-        mask = self.validate_entries(
+        mask = validate(
             data,
-            True,
             imodel=self.imodel,
             ext_table_path=self.ext_table_path,
+            schema=self.schema,
+            disables=self.disable_reads,
         )
         data = self.remove_boolean_values(data)
         return data, mask
