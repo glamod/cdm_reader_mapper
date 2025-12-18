@@ -82,29 +82,22 @@ class MDFFileReader(FileReader):
         if not validate_arg("skiprows", skiprows, int):
             return
 
-        self.chunksize = chunksize
-        self.skiprows = skiprows
-
         # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
         # 2.1. Subset data model sections to requested sections
         if sections is None:
             sections = self.orders
 
-        self.sections = sections
-
         # 2.2 Homogenize input data to an iterable with dataframes:
         # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
-        # self.configurations = self.get_configurations(read_sections_list, sections)
-        if encoding is not None:
-            self.encoding = encoding
-        else:
-            self.encoding = self.schema["header"].get("encoding", "utf-8")
-
         data, mask = self.open_data(
             # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
+            chunksize=chunksize,
+            skiprows=skiprows,
+            encoding=encoding,
+            sections=sections,
         )
 
         return DataBundle(
