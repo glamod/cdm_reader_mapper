@@ -16,7 +16,7 @@ from ..schemas import schemas
 from .utilities import validate_path, process_textfilereader
 from .utilities import convert_dtypes, remove_boolean_values, adjust_dtype
 
-from . import converters, decoders
+from .convert_and_decode import Converters, Decoders, convert_and_decode
 from .validators import validate
 
 
@@ -113,26 +113,6 @@ def _parse_delimited(
     return i
 
 
-def _convert_and_decode(
-    df,
-    converter_dict,
-    converter_kwargs,
-    decoder_dict,
-) -> pd.DataFrame:
-    for section in converter_dict.keys():
-        if section not in df.columns:
-            continue
-        if section in decoder_dict.keys():
-            decoded = decoder_dict[section](df[section])
-            decoded.index = df[section].index
-            df[section] = decoded
-
-        converted = converter_dict[section](df[section], **converter_kwargs[section])
-        converted.index = df[section].index
-        df[section] = converted
-    return df
-
-
 class FileReader:
     """Class to read marine-meteorological data."""
 
@@ -178,6 +158,12 @@ class FileReader:
 
         self._build_compiled_specs_and_convertdecode()
 
+        self.pd_kwargs = {}
+        self.xr_kwargs = {}
+
+        self.sections = None
+        self.encoding = None
+
     def _build_compiled_specs_and_convertdecode(self):
         compiled_specs = []
         disable_reads = []
@@ -221,7 +207,7 @@ class FileReader:
                 if dtype:
                     dtypes[index] = dtype
 
-                conv_func = converters.get(ctype)
+                conv_func = Converters(ctype).converter()
                 if conv_func:
                     converter_dict[index] = conv_func
 
@@ -234,7 +220,7 @@ class FileReader:
 
                 encoding = meta.get("encoding")
                 if encoding:
-                    dec_func = decoders.get(encoding, {}).get(ctype)
+                    dec_func = Decoders(ctype, encoding).decoder()
                     if dec_func:
                         decoder_dict[index] = dec_func
 
@@ -271,30 +257,6 @@ class FileReader:
             **kwargs,
         )
 
-    def select_years(self, df) -> pd.DataFrame:
-        def get_years_from_datetime(date):
-            try:
-                return date.year
-            except AttributeError:
-                return date
-
-        if self.year_init is None and self.year_end is None:
-            return df
-
-        data_model = self.imodel.split("_")[0]
-        dates = df[properties.year_column[data_model]]
-        years = dates.apply(lambda x: get_years_from_datetime(x))
-        years = years.astype(int)
-
-        mask = pd.Series([True] * len(years))
-        if self.year_init:
-            mask[years < self.year_init] = False
-        if self.year_end:
-            mask[years > self.year_end] = False
-
-        index = mask[mask].index
-        return df.iloc[index].reset_index(drop=True)
-
     def _read_line(self, line: str) -> dict:
         i = 0
         out = {}
@@ -321,67 +283,36 @@ class FileReader:
 
         return out
 
-    def open_pandas(self, df) -> pd.DataFrame:
+    def _select_years(self, df) -> pd.DataFrame:
+        def get_years_from_datetime(date):
+            try:
+                return date.year
+            except AttributeError:
+                return date
+
+        if self.year_init is None and self.year_end is None:
+            return df
+
+        data_model = self.imodel.split("_")[0]
+        dates = df[properties.year_column[data_model]]
+        years = dates.apply(lambda x: get_years_from_datetime(x))
+        years = years.astype(int)
+
+        mask = pd.Series([True] * len(years))
+        if self.year_init:
+            mask[years < self.year_init] = False
+        if self.year_end:
+            mask[years > self.year_end] = False
+
+        index = mask[mask].index
+        return df.iloc[index].reset_index(drop=True)
+
+    def _open_pandas(self, df) -> pd.DataFrame:
         """Parse text lines into a Pandas DataFrame."""
         col = df.columns[0]
         records = df[col].map(self._read_line)
         df = pd.DataFrame.from_records(records)
         return _apply_multiindex(df, self.olength)
-
-    def convert_and_decode_entries(
-        self,
-        data,
-        convert=True,
-        decode=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """Convert and decode data entries by using a pre-defined data model.
-
-        Overwrite attribute `data` with converted and/or decoded data.
-
-        Parameters
-        ----------
-        data: pd.DataFrame or pd.io.parsers.TextFileReader
-          Data to convert and decode.
-        convert: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        decoder_dict: dict, optional
-          Functions for decoding values in specific columns.
-          If None use information from a pre-defined data model.
-        """
-        if converter_dict is None:
-            converter_dict = self.convert_decode["converter_dict"]
-        if converter_kwargs is None:
-            converter_kwargs = self.convert_decode["converter_kwargs"]
-        if decoder_dict is None:
-            decoder_dict = self.convert_decode["decoder_dict"]
-
-        if not (convert and decode):
-            self.dtypes = "object"
-            return data
-
-        if convert is not True:
-            converter_dict = {}
-            converter_kwargs = {}
-        if decode is not True:
-            decoder_dict = {}
-
-        return _convert_and_decode(
-            data,
-            converter_dict=converter_dict,
-            converter_kwargs=converter_kwargs,
-            decoder_dict=decoder_dict,
-        )
 
     def validate_entries(
         self,
@@ -410,9 +341,14 @@ class FileReader:
         self,
         data,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        data = self.open_pandas(data)
-        data = self.convert_and_decode_entries(data)
-        data = self.select_years(data)
+        data = self._open_pandas(data)
+        data = convert_and_decode(
+            data,
+            converter_dict=self.convert_decode["converter_dict"],
+            converter_kwargs=self.convert_decode["converter_kwargs"],
+            decoder_dict=self.convert_decode["decoder_dict"],
+        )
+        data = self._select_years(data)
         mask = self.validate_entries(
             data,
             True,
@@ -422,12 +358,9 @@ class FileReader:
         data = self.remove_boolean_values(data)
         return data, mask
 
-    def open_with_pandas(
-        self,
-        **kwargs,
+    def _open_with_pandas(
+        self, **kwargs
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        if (enc := getattr(self, "encoding")) is not None:
-            logging.info(f"Reading with encoding = {enc}")
         to_parse = pd.read_fwf(
             self.source,
             header=None,
@@ -435,8 +368,6 @@ class FileReader:
             escapechar="\0",
             dtype=object,
             skip_blank_lines=False,
-            encoding=self.encoding,
-            chunksize=self.chunksize,
             **kwargs,
         )
         return self._apply_or_chunk(
@@ -448,12 +379,24 @@ class FileReader:
     def open_data(
         self,
         open_with="pandas",
+        encoding=None,
+        chunksize=None,
+        skiprows=0,
+        sections=None,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
         if open_with == "netcdf":
             raise NotImplementedError
         elif open_with == "pandas":
-            return self.open_with_pandas(
-                widths=[properties.MAX_FULL_REPORT_WIDTH],
-                skiprows=self.skiprows,
-            )
+            if encoding is None:
+                encoding = self.schema["header"].get("encoding", "utf-8")
+
+            self.sections = sections
+            self.encoding = encoding
+            self.pd_kwargs = {
+                "encoding": encoding,
+                "chunksize": chunksize,
+                "skiprows": skiprows,
+                "widths": [properties.MAX_FULL_REPORT_WIDTH],
+            }
+            return self._open_with_pandas(**self.pd_kwargs)
