@@ -74,7 +74,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         "icoads_r300_d700",
         "icoads_r302_d792",
         "icoads_r302_d992",
-        # "craid",
+        "craid",
         "gdac",
     ],
 )
@@ -85,8 +85,6 @@ def test_read_mdf_test_data_basic(data_model):
 @pytest.mark.parametrize(
     "data_model, kwargs",
     [
-        ("icoads_r300_d714", {}),
-        # ("craid", {}),
         # ("icoads_r300_d714", {"chunksize": 3}),
         # ("icoads_r300_d721", {"chunksize": 3}),
         (
@@ -166,7 +164,7 @@ def test_read_mdf_test_data_drop_base():
             "all",
         ),
         ("gdac", {"year_init": 2002}, [0, 1, 2, 3, 4]),
-        # ("craid", {"year_end": 2003}, "all"),
+        ("craid", {"year_end": 2003}, "all"),
     ],
 )
 def test_read_mdf_test_data_drop_idx(data_model, kwargs, drop_idx):

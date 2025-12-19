@@ -6,6 +6,7 @@ import ast
 import csv
 import logging
 
+from copy import deepcopy
 from itertools import zip_longest
 
 from .. import properties
@@ -40,19 +41,20 @@ def _is_in_sections(index, sections):
     return index in sections
 
 
-def _compile_elements(
+def _element_specs(
     order, olength, elements, converter_dict, converter_kwargs, decoder_dict, dtypes
 ):
-    compiled_elements = {}
+    element_specs = {}
 
     for name, meta in elements.items():
         index = _get_index(name, order, olength)
         ignore = _get_ignore(meta)
 
-        compiled_elements[index] = {
+        element_specs[name] = {
             "missing_value": meta.get("missing_value"),
             "field_length": meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
             "ignore": ignore,
+            "index": index,
         }
 
         if meta.get("disable_read", False) or ignore:
@@ -80,7 +82,36 @@ def _compile_elements(
             if dec_func:
                 decoder_dict[index] = dec_func
 
-    return compiled_elements
+    return element_specs
+
+
+def _order_specs(orders, sections, *args):
+    order_specs = {}
+    disable_reads = []
+
+    olength = len(orders)
+    for order in orders:
+        section = sections[order]
+        header = section["header"]
+        elements = section.get("elements", {})
+
+        if header.get("disable_read", False):
+            disable_reads.append(order)
+
+        element_specs = _element_specs(
+            order,
+            olength,
+            elements,
+            *args,
+        )
+
+        order_specs[order] = {
+            "header": header,
+            "elements": element_specs,
+            "is_delimited": header.get("format") == "delimited",
+        }
+
+    return order_specs, disable_reads
 
 
 def _parse_fixed_width(
@@ -98,10 +129,11 @@ def _parse_fixed_width(
     bad_sentinel = sentinel is not None and not _validate_sentinel(i, line, sentinel)
     k = i + section_length
 
-    for index, spec in elements.items():
+    for element, spec in elements.items():
         missing_value = spec.get("missing_value")
         field_length = spec.get("field_length")
         ignore = spec.get("ignore")
+        index = spec.get("index")
 
         missing = True
 
@@ -173,42 +205,23 @@ class Parser:
         self.olength = len(self.orders)
 
     def build_compiled_specs_and_convertdecode(self):
-        compiled_specs = {}
-        disable_reads = []
         dtypes = {}
         converter_dict = {}
         converter_kwargs = {}
         decoder_dict = {}
 
-        for order in self.orders:
-            section = self.schema["sections"][order]
-            header = section["header"]
-            elements = section.get("elements", {})
-
-            if header.get("disable_read", False):
-                disable_reads.append(order)
-
-            compiled_elements = _compile_elements(
-                order,
-                self.olength,
-                elements,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-                dtypes,
-            )
-
-            compiled_specs[order] = {
-                "header": header,
-                "elements": compiled_elements,
-                "is_delimited": header.get("format") == "delimited",
-            }
+        self.order_specs, self.disable_reads = _order_specs(
+            self.orders,
+            self.schema["sections"],
+            converter_dict,
+            converter_kwargs,
+            decoder_dict,
+            dtypes,
+        )
 
         self.encoding = self.schema["header"].get("encoding", "utf-8")
 
         self.dtypes, self.parse_dates = convert_dtypes(dtypes)
-
-        self.disable_reads = disable_reads
 
         self.convert_decode = {
             "converter_dict": converter_dict,
@@ -216,4 +229,33 @@ class Parser:
             "decoder_dict": decoder_dict,
         }
 
-        self.compiled_specs = compiled_specs
+    def adjust_schema(self, ds) -> dict:
+        sections = deepcopy(self.schema["sections"])
+
+        for section_name, section in sections.items():
+            elements = section["elements"]
+            schema_elements = self.schema["sections"][section_name]["elements"]
+            spec_elements = self.order_specs[section_name]["elements"]
+
+            for data_var, attrs in elements.items():
+
+                if (
+                    data_var not in ds.data_vars
+                    and data_var not in ds.attrs
+                    and data_var not in ds.dims
+                ):
+                    spec_elements[data_var]["ignore"] = True
+                    schema_elements.pop(data_var, None)
+                    continue
+
+                for attr, value in list(attrs.items()):
+                    if value != "__from_file__":
+                        continue
+
+                    ds_attrs = ds[data_var].attrs
+                    if attr in ds_attrs:
+                        schema_elements[data_var][attr] = ds_attrs[attr]
+                    else:
+                        schema_elements[data_var].pop(attr, None)
+
+        return self.schema

@@ -5,8 +5,9 @@ from __future__ import annotations
 import logging
 import os
 
+import numpy as np
 import pandas as pd
-
+import xarray as xr
 
 from .. import properties
 from .utilities import (
@@ -89,31 +90,6 @@ class FileReader:
         self.encoding = self.parser.encoding
         self.parse_dates = self.parser.parse_dates
 
-    def _read_line(self, line: str) -> dict:
-        i = 0
-        out = {}
-
-        for order, spec in self.parser.compiled_specs.items():
-            header = spec.get("header")
-            elements = spec.get("elements")
-            is_delimited = spec.get("is_delimited")
-
-            if header.get("disable_read"):
-                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
-                continue
-
-            i = parse_line(
-                line,
-                i,
-                header,
-                elements,
-                self.sections,
-                out,
-                is_delimited=is_delimited,
-            )
-
-        return out
-
     def _select_years(self, df) -> pd.DataFrame:
         if self.year_init is None and self.year_end is None:
             return df
@@ -135,14 +111,85 @@ class FileReader:
 
         return df.loc[mask].reset_index(drop=True)
 
-    def _open_pandas(self, df) -> pd.DataFrame:
-        """Parse text lines into a Pandas DataFrame."""
+    def _parse_line(self, line: str) -> dict:
+        i = 0
+        out = {}
+
+        for order, spec in self.parser.order_specs.items():
+            header = spec.get("header")
+            elements = spec.get("elements")
+            is_delimited = spec.get("is_delimited")
+
+            if header.get("disable_read"):
+                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
+                continue
+
+            i = parse_line(
+                line,
+                i,
+                header,
+                elements,
+                self.sections,
+                out,
+                is_delimited=is_delimited,
+            )
+
+        return out
+
+    def _parse_netcdf(self, ds) -> pd.DataFrame:
+        """Parse netcdf arrays into a pandas DataFrame."""
+
+        def replace_empty_strings(series):
+            if series.dtype == "object":
+                series = series.str.decode("utf-8")
+                series = series.str.strip()
+                series = series.map(lambda x: True if x == "" else x)
+            return series
+
+        missing_values = []
+        attrs = {}
+        renames = {}
+        disables = []
+
+        for order, ospec in self.parser.order_specs.items():
+            header = ospec.get("header")
+            disable_read = header.get("disable_read")
+            if disable_read is True:
+                disables.append(order)
+                continue
+
+            elements = ospec.get("elements")
+            for element, espec in elements.items():
+                ignore = espec.get("ignore")
+                index = espec.get("index")
+                if ignore is True:
+                    continue
+                if element in ds.data_vars:
+                    renames[element] = index
+                elif element in ds.dims:
+                    renames[element] = index
+                elif element in ds.attrs:
+                    attrs[index] = ds.attrs[element]
+                else:
+                    missing_values.append(index)
+
+        df = ds[renames.keys()].to_dataframe().reset_index()
+        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
+        df = df.rename(columns=renames)
+        df = df.assign(**attrs)
+        df[disables] = np.nan
+        df = df.apply(lambda x: replace_empty_strings(x))
+        df[missing_values] = False
+        return df
+
+    def _parse_pandas(self, df) -> pd.DataFrame:
+        """Parse text lines into a pandas DataFrame."""
         col = df.columns[0]
-        records = df[col].map(self._read_line)
+        records = df[col].map(self._parse_line)
         df = pd.DataFrame.from_records(records)
         return _apply_multiindex(df)
 
-    def _apply_schema(
+    def _process_data(
         self,
         data,
         convert_flag,
@@ -151,8 +198,15 @@ class FileReader:
         converter_kwargs,
         decoder_dict,
         validate_flag,
+        parse_mode="pandas",
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        data = self._open_pandas(data)
+        if parse_mode == "pandas":
+            data = self._parse_pandas(data)
+        elif parse_mode == "netcdf":
+            data = self._parse_netcdf(data)
+        else:
+            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+
         if converter_dict is None:
             converter_dict = self.parser.convert_decode["converter_dict"]
         if converter_kwargs is None:
@@ -181,10 +235,11 @@ class FileReader:
         data = remove_boolean_values(data, self.parser.dtypes)
         return data, mask
 
-    def _open_with_pandas(
-        self, **kwargs
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        to_parse = pd.read_fwf(
+    def _open_with_xarray(self) -> xr.Dataset:
+        return xr.open_mfdataset(self.source).squeeze()
+
+    def _open_with_pandas(self) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        return pd.read_fwf(
             self.source,
             header=None,
             quotechar="\0",
@@ -192,12 +247,6 @@ class FileReader:
             dtype=object,
             skip_blank_lines=False,
             **self.pd_kwargs,
-        )
-        return _apply_or_chunk(
-            to_parse,
-            self._apply_schema,
-            func_kwargs=kwargs,
-            makecopy=False,
         )
 
     def open_data(
@@ -222,11 +271,13 @@ class FileReader:
             "converter_kwargs": converter_kwargs,
             "decoder_dict": decoder_dict,
             "validate_flag": validate_flag,
+            "parse_mode": open_with,
         }
+        self.sections = sections
         if open_with == "netcdf":
-            raise NotImplementedError
+            to_parse = self._open_with_xarray()
+            self.parser.adjust_schema(to_parse)
         elif open_with == "pandas":
-            self.sections = sections
             self.encoding = encoding or self.encoding
             self.pd_kwargs = {
                 "encoding": self.encoding,
@@ -234,7 +285,16 @@ class FileReader:
                 "skiprows": skiprows,
                 "widths": [properties.MAX_FULL_REPORT_WIDTH],
             }
-            return self._open_with_pandas(**func_kwargs)
+            to_parse = self._open_with_pandas()
+        else:
+            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+
+        return _apply_or_chunk(
+            to_parse,
+            self._process_data,
+            func_kwargs=func_kwargs,
+            makecopy=False,
+        )
 
     def read(
         self,
