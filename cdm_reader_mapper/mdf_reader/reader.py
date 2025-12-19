@@ -13,18 +13,29 @@ from cdm_reader_mapper.common.json_dict import open_json_file
 from cdm_reader_mapper.core.databundle import DataBundle
 
 from .utils.filereader import FileReader
+from .utils.utilities import validate_arg, validate_path
 
 
 def read_mdf(
     source,
-    imodel=None,
-    ext_schema_path=None,
-    ext_schema_file=None,
-    ext_table_path=None,
-    year_init=None,
-    year_end=None,
+    imodel: str | None = None,
+    ext_schema_path: str | None = None,
+    ext_schema_file: str | None = None,
+    ext_table_path: str | None = None,
+    year_init: int | None = None,
+    year_end: int | None = None,
     encoding: str | None = None,
-    **kwargs,
+    chunksize: int | None = None,
+    skiprows: int = 0,
+    convert_flag: bool = True,
+    converter_dict: dict | None = None,
+    converter_kwargs: dict | None = None,
+    decode_flag: bool = True,
+    decoder_dict: dict | None = None,
+    validate_flag: bool = True,
+    sections: list | None = None,
+    pd_kwargs: dict | None = None,
+    xr_kwargs: dict | None = None,
 ) -> DataBundle:
     """Read data files compliant with a user specific data model.
 
@@ -57,6 +68,32 @@ def read_mdf(
         Right border of time axis.
     encoding : str, optional
         The encoding of the input file. Overrides the value in the imodel schema file.
+    chunksize : int, optional
+          Number of reports per chunk.
+    skiprows : int
+          Number of initial rows to skip from file, default: 0
+    convert_flag: bool, default: True
+          If True convert entries by using a pre-defined data model.
+    converter_dict: dict of {Hashable: func}, optional
+          Functions for converting values in specific columns.
+          If None use information from a pre-defined data model.
+    converter_kwargs: dict of {Hashable: kwargs}, optional
+          Key-word arguments for converting values in specific columns.
+          If None use information from a pre-defined data model.
+    decode_flag: bool, default: True
+          If True decode entries by using a pre-defined data model.
+    decoder_dict: dict of {Hashable: func}, optional
+          Functions for decoding values in specific columns.
+          If None use information from a pre-defined data model.
+    validate_flag: bool, default: True
+          Validate data entries by using a pre-defined data model.
+    sections : list, optional
+          List with subset of data model sections to output, optional
+          If None read pre-defined data model sections.
+    pd_kwargs: dict, optional
+          Additional pandas arguments
+    xr_kwargs: dict, optional
+          Additional xarray arguments
 
     Returns
     -------
@@ -77,15 +114,57 @@ def read_mdf(
         datefmt="%Y%m%d %H:%M:%S",
         filename=None,
     )
+
+    # validate_file(source, "source")
+
+    if ext_schema_file:
+        validate_path("ext_schema_path", ext_schema_path)
+
+    validate_arg("sections", sections, list)
+    validate_arg("chunksize", chunksize, int)
+    validate_arg("skiprows", skiprows, int)
+
+    if pd_kwargs is None:
+        pd_kwargs = {}
+
+    pd_kwargs["encoding"] = encoding
+    pd_kwargs["chunksize"] = chunksize
+    pd_kwargs["skiprows"] = skiprows
+
+    convert_kwargs = {
+        "convert_flag": convert_flag,
+        "converter_dict": converter_dict,
+        "converter_kwargs": converter_kwargs,
+    }
+
+    decode_kwargs = {
+        "decode_flag": decode_flag,
+        "decoder_dict": decoder_dict,
+    }
+
+    validate_kwargs = {
+        "validate_flag": validate_flag,
+        "ext_table_path": ext_table_path,
+    }
+
+    select_kwargs = {
+        "sections": sections,
+        "year_init": year_init,
+        "year_end": year_end,
+    }
+
     return FileReader(
-        source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,
-        ext_table_path=ext_table_path,
-        year_init=year_init,
-        year_end=year_end,
-    ).read(encoding=encoding, **kwargs)
+    ).read(
+        source=source,
+        pd_kwargs=pd_kwargs,
+        convert_kwargs=convert_kwargs,
+        decode_kwargs=decode_kwargs,
+        validate_kwargs=validate_kwargs,
+        select_kwargs=select_kwargs,
+    )
 
 
 def read_data(

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import logging
 import os
 
 from io import StringIO
@@ -43,10 +42,10 @@ def validate_arg(arg_name, arg_value, arg_type) -> bool:
         Returns True if type of `arg_value` equals `arg_type`
     """
     if arg_value and not isinstance(arg_value, arg_type):
-        logging.error(
-            f"Argument {arg_name} must be {arg_type}, input type is {type(arg_value)}"
+        raise ValueError(
+            f"Argument {arg_name} must be {arg_type} or None, not {type(arg_value)}"
         )
-        return False
+
     return True
 
 
@@ -65,9 +64,28 @@ def validate_path(arg_name, arg_value) -> bool:
     boolean
         Returns True if `arg_name` is an existing directory.
     """
-    if arg_value and not os.path.isdir(arg_value):
-        logging.error(f"{arg_name} could not find path {arg_value}")
-        return False
+    if not os.path.isdir(arg_value):
+        raise FileNotFoundError(f"{arg_name}: could not find path {arg_value}")
+    return True
+
+
+def validate_file(arg_name, arg_value) -> bool:
+    """Validate input argument is an existing file.
+
+    Parameters
+    ----------
+    arg_name : str
+        Name of the argument
+    arg_value : str
+        Value of the argument
+
+    Returns
+    -------
+    boolean
+        Returns True if `arg_name` is an existing file.
+    """
+    if not os.path.isfile(arg_value):
+        raise FileNotFoundError(f"{arg_name}: could not find file {arg_value}")
     return True
 
 

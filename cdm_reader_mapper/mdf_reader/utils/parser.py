@@ -151,6 +151,7 @@ def _parse_fixed_width(
                 value = True
             if i == j and missing:
                 value = False
+
             out[index] = value
 
         if delimiter and line[j : j + len(delimiter)] == delimiter:
@@ -191,15 +192,22 @@ def parse_line(*args, is_delimited):
 class Parser:
 
     def __init__(self, imodel, ext_schema_path, ext_schema_file):
+
+        self.imodel = imodel
+
         logging.info("READING DATA MODEL SCHEMA FILE...")
         if ext_schema_path or ext_schema_file:
+
             self.schema = schemas.read_schema(
                 ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
             )
-        else:
+        elif imodel:
             self.schema = schemas.read_schema(imodel=imodel)
+        else:
+            raise ValueError(
+                "One of ['imodel', 'ext_schema_path', 'ext_schema_file'] must be set."
+            )
 
-        self.sections = None
         self.build_parsing_order()
         self.build_compiled_specs_and_convertdecode()
 
@@ -290,13 +298,14 @@ class Parser:
 
         return out
 
-    def parse_pandas(self, df) -> pd.DataFrame:
+    def parse_pandas(self, df, sections) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
+        self.sections = sections
         col = df.columns[0]
         records = df[col].map(self._parse_line)
         return pd.DataFrame.from_records(records)
 
-    def parse_netcdf(self, ds) -> pd.DataFrame:
+    def parse_netcdf(self, ds, sections) -> pd.DataFrame:
         """Parse netcdf arrays into a pandas DataFrame."""
 
         def replace_empty_strings(series):
@@ -314,7 +323,7 @@ class Parser:
         for order, ospec in self.order_specs.items():
             header = ospec.get("header")
             disable_read = header.get("disable_read")
-            if not _is_in_sections(order, self.sections):
+            if not _is_in_sections(order, sections):
                 continue
 
             if disable_read is True:

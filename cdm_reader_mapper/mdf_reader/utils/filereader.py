@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import logging
-import os
 
 import pandas as pd
 import xarray as xr
 
 from .. import properties
 from .utilities import (
-    validate_path,
     process_textfilereader,
-    validate_arg,
     remove_boolean_values,
 )
 
@@ -45,70 +42,31 @@ def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-class FileReader:
+def _select_years(df, selection, year_col) -> pd.DataFrame:
+    year_init, year_end = selection
+    if year_init is None and year_end is None:
+        return df
+
+    years = pd.to_numeric(df[year_col], errors="coerce")
+
+    mask = pd.Series(True, index=df.index)
+
+    if year_init is not None:
+        mask &= years >= year_init
+
+    if year_end is not None:
+        mask &= years <= year_end
+
+    mask &= years.notna()
+
+    return df.loc[mask].reset_index(drop=True)
+
+
+class FileReader(Parser):
     """Class to read marine-meteorological data."""
 
-    def __init__(
-        self,
-        source,
-        imodel=None,
-        ext_schema_path=None,
-        ext_schema_file=None,
-        ext_table_path=None,
-        year_init=None,
-        year_end=None,
-    ):
-        if not imodel and not ext_schema_path:
-            logging.error(
-                "A valid input data model name or path to data model must be provided"
-            )
-            return
-        if not os.path.isfile(source):
-            logging.error(f"Can't find input data file {source}")
-            return
-        if not validate_path("ext_schema_path", ext_schema_path):
-            return
-
-        self.source = source
-        self.imodel = imodel
-        self.year_init = year_init
-        self.year_end = year_end
-        self.ext_table_path = ext_table_path
-
-        self.pd_kwargs = {}
-        self.xr_kwargs = {}
-
-        self.sections = None
-
-        self.parser = Parser(
-            imodel=imodel,
-            ext_schema_path=ext_schema_path,
-            ext_schema_file=ext_schema_file,
-        )
-
-        self.encoding = self.parser.encoding
-        self.parse_dates = self.parser.parse_dates
-
-    def _select_years(self, df) -> pd.DataFrame:
-        if self.year_init is None and self.year_end is None:
-            return df
-
-        data_model = self.imodel.split("_")[0]
-        year_col = properties.year_column[data_model]
-
-        years = pd.to_numeric(df[year_col], errors="coerce")
-
-        mask = pd.Series(True, index=df.index)
-
-        if self.year_init is not None:
-            mask &= years >= self.year_init
-
-        if self.year_end is not None:
-            mask &= years <= self.year_end
-
-        mask &= years.notna()
-
-        return df.loc[mask].reset_index(drop=True)
+    def __init__(self, *args, **kwargs):
+        Parser.__init__(self, *args, **kwargs)
 
     def _process_data(
         self,
@@ -119,24 +77,32 @@ class FileReader:
         converter_kwargs,
         decoder_dict,
         validate_flag,
+        ext_table_path,
+        sections,
+        year_init,
+        year_end,
         parse_mode="pandas",
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         if parse_mode == "pandas":
-            data = self.parser.parse_pandas(data)
+            data = self.parse_pandas(data, sections)
         elif parse_mode == "netcdf":
-            data = self.parser.parse_netcdf(data)
+            data = self.parse_netcdf(data, sections)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         data = _apply_multiindex(data)
-        data = self._select_years(data)
+
+        data_model = self.imodel.split("_")[0]
+        year_col = properties.year_column[data_model]
+
+        data = _select_years(data, [year_init, year_end], year_col)
 
         if converter_dict is None:
-            converter_dict = self.parser.convert_decode["converter_dict"]
+            converter_dict = self.convert_decode["converter_dict"]
         if converter_kwargs is None:
-            converter_kwargs = self.parser.convert_decode["converter_kwargs"]
+            converter_kwargs = self.convert_decode["converter_kwargs"]
         if decoder_dict is None:
-            decoder_dict = self.parser.convert_decode["decoder_dict"]
+            decoder_dict = self.convert_decode["decoder_dict"]
 
         data = convert_and_decode(
             data,
@@ -151,66 +117,64 @@ class FileReader:
             mask = validate(
                 data,
                 imodel=self.imodel,
-                ext_table_path=self.ext_table_path,
-                schema=self.parser.schema,
-                disables=self.parser.disable_reads,
+                ext_table_path=ext_table_path,
+                schema=self.schema,
+                disables=self.disable_reads,
             )
         else:
             mask = pd.DataFrame(True, index=data.index, columns=data.columns)
-        data = remove_boolean_values(data, self.parser.dtypes)
+        data = remove_boolean_values(data, self.dtypes)
         return data, mask
 
-    def _open_with_xarray(self) -> xr.Dataset:
-        return xr.open_mfdataset(self.source).squeeze()
+    def _open_with_xarray(self, source, **kwargs) -> xr.Dataset:
+        return xr.open_mfdataset(source).squeeze()
 
-    def _open_with_pandas(self) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        return pd.read_fwf(
-            self.source,
-            header=None,
-            quotechar="\0",
-            escapechar="\0",
-            dtype=object,
-            skip_blank_lines=False,
-            **self.pd_kwargs,
-        )
+    def _open_with_pandas(
+        self, source, **kwargs
+    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+        return pd.read_fwf(source, **kwargs)
 
     def open_data(
         self,
+        source,
         open_with="pandas",
-        encoding=None,
-        chunksize=None,
-        skiprows=0,
-        sections=None,
-        convert_flag=True,
-        decode_flag=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-        validate_flag=True,
+        pd_kwargs=None,
+        xr_kwargs=None,
+        convert_kwargs=None,
+        decode_kwargs=None,
+        validate_kwargs=None,
+        select_kwargs=None,
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         """DOCUMENTATION."""
         func_kwargs = {
-            "convert_flag": convert_flag,
-            "decode_flag": decode_flag,
-            "converter_dict": converter_dict,
-            "converter_kwargs": converter_kwargs,
-            "decoder_dict": decoder_dict,
-            "validate_flag": validate_flag,
+            **convert_kwargs,
+            **decode_kwargs,
+            **validate_kwargs,
+            **select_kwargs,
             "parse_mode": open_with,
         }
-        self.parser.sections = sections or self.parser.sections
         if open_with == "netcdf":
-            to_parse = self._open_with_xarray()
-            self.parser.adjust_schema(to_parse)
+            to_parse = self._open_with_xarray(source, **xr_kwargs)
+            self.adjust_schema(to_parse)
         elif open_with == "pandas":
-            self.encoding = encoding or self.encoding
-            self.pd_kwargs = {
-                "encoding": self.encoding,
-                "chunksize": chunksize,
-                "skiprows": skiprows,
-                "widths": [properties.MAX_FULL_REPORT_WIDTH],
-            }
-            to_parse = self._open_with_pandas()
+            if pd_kwargs.get("encoding"):
+                self.encoding = pd_kwargs["encoding"]
+            else:
+                pd_kwargs["encoding"] = self.encoding
+            if not pd_kwargs.get("widths"):
+                pd_kwargs["widths"] = [properties.MAX_FULL_REPORT_WIDTH]
+            if not pd_kwargs.get("header"):
+                pd_kwargs["header"] = None
+            if not pd_kwargs.get("quotechar"):
+                pd_kwargs["quotechar"] = "\0"
+            if not pd_kwargs.get("escapechar"):
+                pd_kwargs["escapechar"] = "\0"
+            if not pd_kwargs.get("dtype"):
+                pd_kwargs["dtype"] = object
+            if not pd_kwargs.get("skip_blank_lines"):
+                pd_kwargs["skip_blank_lines"] = False
+
+            to_parse = self._open_with_pandas(source, **pd_kwargs)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
@@ -223,51 +187,26 @@ class FileReader:
 
     def read(
         self,
-        chunksize=None,
-        sections=None,
-        skiprows=0,
-        convert_flag=True,
-        decode_flag=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-        validate_flag=True,
-        encoding: str | None = None,
-        **kwargs,
+        source: str,
+        pd_kwargs: dict | None = None,
+        xr_kwargs: dict | None = None,
+        convert_kwargs: dict | None = None,
+        decode_kwargs: dict | None = None,
+        validate_kwargs: dict | None = None,
+        select_kwargs: dict | None = None,
     ) -> DataBundle:
-        """Read data from disk.
-
-        Parameters
-        ----------
-        chunksize : int, optional
-          Number of reports per chunk.
-        sections : list, optional
-          List with subset of data model sections to output, optional
-          If None read pre-defined data model sections.
-        skiprows : int
-          Number of initial rows to skip from file, default: 0
-        convert_flag: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode_flag: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        validate_flag: bool, default: True
-          Validate data entries by using a pre-defined data model.
-        encoding: str, optional
-          Encoding of the input file, overrides the value in the imodel schema
-        """
-        # 0. VALIDATE INPUT
-        if not validate_arg("sections", sections, list):
-            return
-        if not validate_arg("chunksize", chunksize, int):
-            return
-        if not validate_arg("skiprows", skiprows, int):
-            return
+        if pd_kwargs is None:
+            pd_kwargs = {}
+        if xr_kwargs is None:
+            xr_kwargs = {}
+        if convert_kwargs is None:
+            convert_kwargs = {}
+        if decode_kwargs is None:
+            decode_kwargs = {}
+        if validate_kwargs is None:
+            validate_kwargs = {}
+        if select_kwargs is None:
+            select_kwargs = {}
 
         # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
@@ -278,17 +217,14 @@ class FileReader:
         logging.info("Getting data string from source...")
         data, mask = self.open_data(
             # INFO: Set default as "pandas" to account for custom schema
+            source,
             open_with=properties.open_file.get(self.imodel, "pandas"),
-            chunksize=chunksize,
-            skiprows=skiprows,
-            encoding=encoding,
-            sections=sections,
-            convert_flag=convert_flag,
-            decode_flag=decode_flag,
-            converter_dict=converter_dict,
-            converter_kwargs=converter_kwargs,
-            decoder_dict=decoder_dict,
-            validate_flag=validate_flag,
+            pd_kwargs=pd_kwargs,
+            xr_kwargs=xr_kwargs,
+            convert_kwargs=convert_kwargs,
+            decode_kwargs=decode_kwargs,
+            validate_kwargs=validate_kwargs,
+            select_kwargs=select_kwargs,
         )
 
         return DataBundle(
