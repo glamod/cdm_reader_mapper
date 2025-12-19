@@ -45,7 +45,14 @@ def _is_in_sections(index, sections):
 
 
 def _element_specs(
-    order, olength, elements, converter_dict, converter_kwargs, decoder_dict, dtypes
+    order,
+    olength,
+    elements,
+    converter_dict,
+    converter_kwargs,
+    decoder_dict,
+    validation_dict,
+    dtypes,
 ):
     element_specs = {}
 
@@ -63,11 +70,29 @@ def _element_specs(
         if meta.get("disable_read", False) or ignore:
             continue
 
+        validation_dict[index] = {}
+
         ctype = meta.get("column_type")
+        if ctype:
+            validation_dict[index]["column_type"] = ctype
+
         dtype = properties.pandas_dtypes.get(ctype)
 
         if dtype:
             dtypes[index] = dtype
+
+        vmin = meta.get("valid_min")
+
+        if vmin:
+            validation_dict[index]["valid_min"] = vmin
+
+        vmax = meta.get("valid_max")
+        if vmax:
+            validation_dict[index]["valid_max"] = vmax
+
+        ctable = meta.get("codetable")
+        if ctable:
+            validation_dict[index]["codetable"] = ctable
 
         conv_func = Converters(ctype).converter()
         if conv_func:
@@ -84,7 +109,6 @@ def _element_specs(
             dec_func = Decoders(ctype, encoding).decoder()
             if dec_func:
                 decoder_dict[index] = dec_func
-
     return element_specs
 
 
@@ -222,6 +246,7 @@ class Parser:
         converter_dict = {}
         converter_kwargs = {}
         decoder_dict = {}
+        validation_dict = {}
 
         self.order_specs, self.disable_reads = _order_specs(
             self.orders,
@@ -229,6 +254,7 @@ class Parser:
             converter_dict,
             converter_kwargs,
             decoder_dict,
+            validation_dict,
             dtypes,
         )
 
@@ -241,6 +267,8 @@ class Parser:
             "converter_kwargs": converter_kwargs,
             "decoder_dict": decoder_dict,
         }
+
+        self.validation = validation_dict
 
     def adjust_schema(self, ds) -> dict:
         sections = deepcopy(self.schema["sections"])

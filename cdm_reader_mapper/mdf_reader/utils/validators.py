@@ -9,7 +9,6 @@ import pandas as pd
 
 from .. import properties
 from ..codes import codes
-from ..schemas import schemas
 from .utilities import convert_str_boolean
 
 
@@ -131,7 +130,7 @@ def validate(
     data,
     imodel,
     ext_table_path,
-    schema,
+    attributes,
     disables=None,
 ) -> pd.DataFrame:
     """Validate data.
@@ -145,8 +144,8 @@ def validate(
         e.g. icoads_r300_d704
     ext_table_path: str
         Path to the code tables for an external data model
-    schema: dict
-        Data model schema.
+    attributes: dict
+        Data model attributes.
     disables: list, optional
         List of column names to be ignored.
 
@@ -174,7 +173,7 @@ def validate(
     # data model and flatten the schema to get a simple and sequential list
     # of elements included in the input data
     elements = [x for x in data if x not in disables]
-    element_atts = schemas.df_schema(elements, schema)
+    element_atts = {element: attributes[element] for element in elements}
 
     # See what elements we need to validate
     numeric_elements = _get_elements(elements, element_atts, "numeric_types")

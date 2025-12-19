@@ -118,7 +118,7 @@ class FileReader(Parser):
                 data,
                 imodel=self.imodel,
                 ext_table_path=ext_table_path,
-                schema=self.schema,
+                attributes=self.validation,
                 disables=self.disable_reads,
             )
         else:
