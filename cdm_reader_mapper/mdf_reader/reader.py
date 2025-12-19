@@ -9,8 +9,8 @@ from io import StringIO as StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common.json_dict import open_json_file
-from cdm_reader_mapper.core.databundle import DataBundle
+from ..common.json_dict import open_json_file
+from ..core.databundle import DataBundle
 
 from .utils.filereader import FileReader
 from .utils.utilities import validate_arg, validate_path

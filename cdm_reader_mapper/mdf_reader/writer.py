@@ -8,8 +8,8 @@ from io import StringIO as StringIO
 
 import pandas as pd
 
-from cdm_reader_mapper.common import get_filename
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from ..common import get_filename
+from ..common.pandas_TextParser_hdlr import make_copy
 
 
 def _update_dtypes(dtypes, columns) -> dict:
