@@ -9,6 +9,9 @@ import logging
 from copy import deepcopy
 from itertools import zip_longest
 
+import numpy as np
+import pandas as pd
+
 from .. import properties
 from ..schemas import schemas
 from .utilities import convert_dtypes
@@ -169,7 +172,8 @@ def _parse_delimited(
     delimiter = header["delimiter"]
     fields = next(csv.reader([line[i:]], delimiter=delimiter))
 
-    for index, value in zip_longest(elements.keys(), fields):
+    for element, value in zip_longest(elements.keys(), fields):
+        index = elements[element].get("index")
         if _is_in_sections(index, sections):
             out[index] = value.strip() if value is not None else None
         if value is not None:
@@ -195,6 +199,7 @@ class Parser:
         else:
             self.schema = schemas.read_schema(imodel=imodel)
 
+        self.sections = None
         self.build_parsing_order()
         self.build_compiled_specs_and_convertdecode()
 
@@ -259,3 +264,84 @@ class Parser:
                         schema_elements[data_var].pop(attr, None)
 
         return self.schema
+
+    def _parse_line(self, line: str) -> dict:
+        i = 0
+        out = {}
+
+        for order, spec in self.order_specs.items():
+            header = spec.get("header")
+            elements = spec.get("elements")
+            is_delimited = spec.get("is_delimited")
+
+            if header.get("disable_read"):
+                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
+                continue
+
+            i = parse_line(
+                line,
+                i,
+                header,
+                elements,
+                self.sections,
+                out,
+                is_delimited=is_delimited,
+            )
+
+        return out
+
+    def parse_pandas(self, df) -> pd.DataFrame:
+        """Parse text lines into a pandas DataFrame."""
+        col = df.columns[0]
+        records = df[col].map(self._parse_line)
+        return pd.DataFrame.from_records(records)
+
+    def parse_netcdf(self, ds) -> pd.DataFrame:
+        """Parse netcdf arrays into a pandas DataFrame."""
+
+        def replace_empty_strings(series):
+            if series.dtype == "object":
+                series = series.str.decode("utf-8")
+                series = series.str.strip()
+                series = series.map(lambda x: True if x == "" else x)
+            return series
+
+        missing_values = []
+        attrs = {}
+        renames = {}
+        disables = []
+
+        for order, ospec in self.order_specs.items():
+            header = ospec.get("header")
+            disable_read = header.get("disable_read")
+            if not _is_in_sections(order, self.sections):
+                continue
+
+            if disable_read is True:
+                disables.append(order)
+                continue
+
+            elements = ospec.get("elements")
+            for element, espec in elements.items():
+                ignore = espec.get("ignore")
+                index = espec.get("index")
+                if ignore:
+                    continue
+                if element in ds.data_vars:
+                    renames[element] = index
+                elif element in ds.dims:
+                    renames[element] = index
+                elif element in ds.attrs:
+                    attrs[index] = ds.attrs[element]
+                else:
+                    missing_values.append(index)
+
+        df = ds[renames.keys()].to_dataframe().reset_index()
+        df = df[renames.keys()]
+        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
+        df = df.rename(columns=renames)
+        df = df.assign(**attrs)
+        df[disables] = np.nan
+        df = df.apply(lambda x: replace_empty_strings(x))
+        df[missing_values] = False
+        return df

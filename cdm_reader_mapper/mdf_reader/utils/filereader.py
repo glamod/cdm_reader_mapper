@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import os
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -19,19 +18,9 @@ from .utilities import (
 
 from .convert_and_decode import convert_and_decode
 from .validators import validate
-from .parser import parse_line, Parser
+from .parser import Parser
 
 from cdm_reader_mapper.core.databundle import DataBundle
-
-
-def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
-    if not df.columns.map(lambda x: isinstance(x, tuple)).all():
-        return df
-
-    df.columns = pd.MultiIndex.from_tuples(
-        [col if isinstance(col, tuple) else (None, col) for col in df.columns],
-    )
-    return df
 
 
 def _apply_or_chunk(data, func, func_args=[], func_kwargs={}, **kwargs):
@@ -44,6 +33,16 @@ def _apply_or_chunk(data, func, func_args=[], func_kwargs={}, **kwargs):
         func_kwargs,
         **kwargs,
     )
+
+
+def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
+    if not df.columns.map(lambda x: isinstance(x, tuple)).all():
+        return df
+
+    df.columns = pd.MultiIndex.from_tuples(
+        [col if isinstance(col, tuple) else (None, col) for col in df.columns],
+    )
+    return df
 
 
 class FileReader:
@@ -111,84 +110,6 @@ class FileReader:
 
         return df.loc[mask].reset_index(drop=True)
 
-    def _parse_line(self, line: str) -> dict:
-        i = 0
-        out = {}
-
-        for order, spec in self.parser.order_specs.items():
-            header = spec.get("header")
-            elements = spec.get("elements")
-            is_delimited = spec.get("is_delimited")
-
-            if header.get("disable_read"):
-                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
-                continue
-
-            i = parse_line(
-                line,
-                i,
-                header,
-                elements,
-                self.sections,
-                out,
-                is_delimited=is_delimited,
-            )
-
-        return out
-
-    def _parse_netcdf(self, ds) -> pd.DataFrame:
-        """Parse netcdf arrays into a pandas DataFrame."""
-
-        def replace_empty_strings(series):
-            if series.dtype == "object":
-                series = series.str.decode("utf-8")
-                series = series.str.strip()
-                series = series.map(lambda x: True if x == "" else x)
-            return series
-
-        missing_values = []
-        attrs = {}
-        renames = {}
-        disables = []
-
-        for order, ospec in self.parser.order_specs.items():
-            header = ospec.get("header")
-            disable_read = header.get("disable_read")
-            if disable_read is True:
-                disables.append(order)
-                continue
-
-            elements = ospec.get("elements")
-            for element, espec in elements.items():
-                ignore = espec.get("ignore")
-                index = espec.get("index")
-                if ignore is True:
-                    continue
-                if element in ds.data_vars:
-                    renames[element] = index
-                elif element in ds.dims:
-                    renames[element] = index
-                elif element in ds.attrs:
-                    attrs[index] = ds.attrs[element]
-                else:
-                    missing_values.append(index)
-
-        df = ds[renames.keys()].to_dataframe().reset_index()
-        attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
-        df = df.rename(columns=renames)
-        df = df.assign(**attrs)
-        df[disables] = np.nan
-        df = df.apply(lambda x: replace_empty_strings(x))
-        df[missing_values] = False
-        return df
-
-    def _parse_pandas(self, df) -> pd.DataFrame:
-        """Parse text lines into a pandas DataFrame."""
-        col = df.columns[0]
-        records = df[col].map(self._parse_line)
-        df = pd.DataFrame.from_records(records)
-        return _apply_multiindex(df)
-
     def _process_data(
         self,
         data,
@@ -201,11 +122,14 @@ class FileReader:
         parse_mode="pandas",
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         if parse_mode == "pandas":
-            data = self._parse_pandas(data)
+            data = self.parser.parse_pandas(data)
         elif parse_mode == "netcdf":
-            data = self._parse_netcdf(data)
+            data = self.parser.parse_netcdf(data)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+
+        data = _apply_multiindex(data)
+        data = self._select_years(data)
 
         if converter_dict is None:
             converter_dict = self.parser.convert_decode["converter_dict"]
@@ -213,6 +137,7 @@ class FileReader:
             converter_kwargs = self.parser.convert_decode["converter_kwargs"]
         if decoder_dict is None:
             decoder_dict = self.parser.convert_decode["decoder_dict"]
+
         data = convert_and_decode(
             data,
             convert_flag=convert_flag,
@@ -221,7 +146,7 @@ class FileReader:
             converter_kwargs=converter_kwargs,
             decoder_dict=decoder_dict,
         )
-        data = self._select_years(data)
+
         if validate_flag:
             mask = validate(
                 data,
@@ -273,7 +198,7 @@ class FileReader:
             "validate_flag": validate_flag,
             "parse_mode": open_with,
         }
-        self.sections = sections
+        self.parser.sections = sections or self.parser.sections
         if open_with == "netcdf":
             to_parse = self._open_with_xarray()
             self.parser.adjust_schema(to_parse)
