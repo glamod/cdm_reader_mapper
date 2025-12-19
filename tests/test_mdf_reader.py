@@ -10,6 +10,14 @@ from cdm_reader_mapper.mdf_reader.reader import (
     read_mdf,
     read_data,
 )
+from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
+
+
+def _get_columns(columns, select):
+    if isinstance(columns, pd.MultiIndex):
+        return columns.get_level_values(0).isin(select)
+    mask = [(type(c) is tuple and c[0] in select) or (c in select) for c in columns]
+    return columns[mask]
 
 
 def _drop_rows(df, drops):
@@ -37,8 +45,9 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         result.mask = result.mask.read()
 
     if select:
-        expected.data = expected.data[select]
-        expected.mask = expected.mask[select]
+        selected = _get_columns(expected.data.columns, select)
+        expected.data = expected.data[selected]
+        expected.mask = expected.mask[selected]
 
     if drop:
         result.data = result.data.drop(columns=drop)
@@ -49,6 +58,9 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     if drop_idx:
         expected.data = _drop_rows(expected.data, drop_idx)
         expected.mask = _drop_rows(expected.mask, drop_idx)
+
+    expected.data = _apply_multiindex(expected.data)
+    expected.mask = _apply_multiindex(expected.mask)
 
     pd.testing.assert_frame_equal(result.data, expected.data)
     pd.testing.assert_frame_equal(result.mask, expected.mask)
@@ -143,6 +155,7 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
             {"sections": ["core", "c99"]},
             ["core", "c99"],
         ),
+        ("craid", {"sections": ["drifter_measurements"]}, ["drifter_measurements"]),
     ],
 )
 def test_read_mdf_test_data_select(data_model, kwargs, select):
