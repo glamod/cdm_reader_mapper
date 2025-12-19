@@ -64,8 +64,8 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
-from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
+from ..common import logging_hdlr, pandas_TextParser_hdlr
+from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
 from .datetime import correction_functions as corr_f_dt
