@@ -229,5 +229,7 @@ def validate(
         True,
     )
 
-    mask[disables] = np.nan
+    for disable in disables:
+        if disable in mask.columns:
+            mask[disables] = np.nan
     return mask.astype("boolean")
