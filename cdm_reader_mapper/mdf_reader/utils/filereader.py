@@ -149,7 +149,7 @@ class FileReader(Parser):
         }
         if open_with == "netcdf":
             to_parse = xr.open_mfdataset(source, xr_kwargs).squeeze()
-            self.adjust_schema(to_parse)
+            self.adjust_elements(to_parse)
             write_kwargs, read_kwargs = {}, {}
         elif open_with == "pandas":
             if pd_kwargs.get("encoding"):

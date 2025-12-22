@@ -59,6 +59,7 @@ def validate_numeric(elements, data, schema) -> pd.DataFrame:
         logging.warning(
             "Corresponding upper and/or lower bounds set to +/-inf for validation"
         )
+
     mask[elements] = (
         (data[elements] >= [lower.get(x) for x in elements])
         & (data[elements] <= [upper.get(x) for x in elements])

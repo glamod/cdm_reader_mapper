@@ -18,42 +18,7 @@ from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 from .. import properties
 
 
-def convert_dtype_to_default(dtype, section, element) -> str:
-    """Convert data type to defaults (int, float)."""
-    if dtype is None:
-        return
-    elif dtype == "float":
-        return dtype
-    elif dtype == "int":
-        return properties.pandas_int
-    elif "float" in dtype.lower():
-        logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to float."
-        )
-        return "float"
-    elif "int" in dtype.lower():
-        logging.warning(
-            f"Set column type of ({section}, {element}) from deprecated {dtype} to int."
-        )
-        return properties.pandas_int
-    return dtype
-
-
-def _read_schema(schema) -> dict:
-    """DOCUMENTATION."""
-    if not schema["header"]:
-        if not schema["sections"]:
-            logging.error(
-                f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema['name']}"
-            )
-            return
-        schema["header"] = dict()
-
-    if schema["header"].get("multiple_reports_per_line"):
-        logging.error("Multiple reports per line data model: not yet supported")
-        return
-
-    # 3.2. Make no section formats be internally treated as 1 section format
+def make_dummy_sections(schema):
     if not schema.get("sections"):
         if not schema.get("elements"):
             logging.error(
@@ -81,34 +46,10 @@ def _read_schema(schema) -> dict:
         ].get("format")
         schema["header"].pop("format", None)
 
-    # 3.3. Make parsing order explicit
+
+def make_parsing_order(schema):
     if not schema["header"].get("parsing_order"):  # assume sequential
         schema["header"]["parsing_order"] = [{"s": list(schema["sections"].keys())}]
-
-    # 3.4. Make disable_read and field_layout explicit: this is ruled by delimiter being set,
-    # unless explicitly set
-    for section in schema["sections"].keys():
-        if schema["sections"][section]["header"].get("disable_read"):
-            continue
-        else:
-            schema["sections"][section]["header"]["disable_read"] = False
-        if not schema["sections"][section]["header"].get("field_layout"):
-            delimiter = schema["sections"][section]["header"].get("delimiter")
-            schema["sections"][section]["header"]["field_layout"] = (
-                "delimited" if delimiter else "fixed_width"
-            )
-        for element in schema["sections"][section]["elements"].keys():
-            column_type = schema["sections"][section]["elements"][element].get(
-                "column_type"
-            )
-            schema["sections"][section]["elements"][element]["column_type"] = (
-                convert_dtype_to_default(
-                    column_type,
-                    section,
-                    element,
-                )
-            )
-    return schema
 
 
 def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict:
@@ -151,12 +92,16 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict
             logging.error(f"Can't find input schema file {schema_files}")
             return
         schema_files = Path(schema_files)
-    else:
+    elif imodel:
         imodel = imodel.split("_")
         if imodel[0] not in properties.supported_data_models:
             logging.error("Input data model " f"{imodel[0]}" " not supported")
             return
         schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
+    else:
+        raise ValueError(
+            "One of ['imodel', 'ext_schema_path', 'ext_schema_file'] must be set."
+        )
 
     if isinstance(schema_files, Path):
         schema_files = [schema_files]
@@ -165,12 +110,19 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict
     schema = combine_dicts(schema_files, base=f"{properties._base}.schemas")
     schema["name"] = schema_files
 
-    # 3. Expand schema
-    # Fill in the initial schema to "full complexity": to homogenize schema,
-    # explicitly add info that is implicit to given situations/data models
+    if not schema["header"]:
+        if not schema["sections"]:
+            raise KeyError(
+                f"'sections' block needs to be defined in a schema with no header. Error in data model schema file {schema['name']}"
+            )
+        schema["header"] = dict()
 
-    # One report per record: make sure later changes are reflected in MULTIPLE
-    # REPORTS PER RECORD case below if we ever use it!
-    # Currently only supported case: one report per record (line)
-    # 3.1. First check for no header case: sequential sections
-    return _read_schema(schema)
+    if schema["header"].get("multiple_reports_per_line"):
+        raise NotImplementedError(
+            "Multiple reports per line data model: not yet supported"
+        )
+
+    make_dummy_sections(schema)
+    make_parsing_order(schema)
+
+    return schema

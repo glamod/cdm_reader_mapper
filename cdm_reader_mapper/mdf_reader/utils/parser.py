@@ -44,6 +44,22 @@ def _is_in_sections(index, sections):
     return index in sections
 
 
+def _convert_dtype_to_default(dtype) -> str:
+    if dtype is None:
+        return
+    elif dtype == "float":
+        return dtype
+    elif dtype == "int":
+        return properties.pandas_int
+    elif "float" in dtype.lower():
+        logging.warning(f"Set column type from deprecated {dtype} to float.")
+        return "float"
+    elif "int" in dtype.lower():
+        logging.warning(f"Set column type from deprecated {dtype} to int.")
+        return properties.pandas_int
+    return dtype
+
+
 def _element_specs(
     order,
     olength,
@@ -57,41 +73,45 @@ def _element_specs(
     element_specs = {}
 
     for name, meta in elements.items():
+
         index = _get_index(name, order, olength)
         ignore = _get_ignore(meta)
+        ctype = meta.get("column_type")
+        ctype = _convert_dtype_to_default(ctype)
 
         element_specs[name] = {
+            "index": index,
+            "ignore": ignore,
+            "column_type": ctype,
             "missing_value": meta.get("missing_value"),
             "field_length": meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
-            "ignore": ignore,
-            "index": index,
         }
 
         if meta.get("disable_read", False) or ignore:
             continue
 
+        c = ("core", "W")
+
         validation_dict[index] = {}
 
-        ctype = meta.get("column_type")
         if ctype:
             validation_dict[index]["column_type"] = ctype
 
         dtype = properties.pandas_dtypes.get(ctype)
 
-        if dtype:
+        if dtype is not None:
             dtypes[index] = dtype
 
         vmin = meta.get("valid_min")
-
-        if vmin:
+        if vmin is not None:
             validation_dict[index]["valid_min"] = vmin
 
         vmax = meta.get("valid_max")
-        if vmax:
+        if vmax is not None:
             validation_dict[index]["valid_max"] = vmax
 
         ctable = meta.get("codetable")
-        if ctable:
+        if ctable is not None:
             validation_dict[index]["codetable"] = ctable
 
         conv_func = Converters(ctype).converter()
@@ -109,6 +129,7 @@ def _element_specs(
             dec_func = Decoders(ctype, encoding).decoder()
             if dec_func:
                 decoder_dict[index] = dec_func
+
     return element_specs
 
 
@@ -124,6 +145,10 @@ def _order_specs(orders, sections, *args):
 
         if header.get("disable_read", False):
             disable_reads.append(order)
+
+        if not header.get("field_layout"):
+            delimiter = header.get("delimiter")
+            header["field_layout"] = "delimited" if delimiter else "fixed_width"
 
         element_specs = _element_specs(
             order,
@@ -220,28 +245,21 @@ class Parser:
         self.imodel = imodel
 
         logging.info("READING DATA MODEL SCHEMA FILE...")
-        if ext_schema_path or ext_schema_file:
+        schema = schemas.read_schema(
+            imodel=imodel,
+            ext_schema_path=ext_schema_path,
+            ext_schema_file=ext_schema_file,
+        )
+        self.schema = schema
+        self.build_parsing_order(schema)
+        self.build_compiled_specs_and_convertdecode(schema)
 
-            self.schema = schemas.read_schema(
-                ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
-            )
-        elif imodel:
-            self.schema = schemas.read_schema(imodel=imodel)
-        else:
-            raise ValueError(
-                "One of ['imodel', 'ext_schema_path', 'ext_schema_file'] must be set."
-            )
-
-        self.build_parsing_order()
-        self.build_compiled_specs_and_convertdecode()
-
-    def build_parsing_order(self):
-        parsing_order = self.schema["header"].get("parsing_order")
+    def build_parsing_order(self, schema):
+        parsing_order = schema["header"].get("parsing_order")
         sections_ = [x.get(y) for x in parsing_order for y in x]
         self.orders = [y for x in sections_ for y in x]
-        self.olength = len(self.orders)
 
-    def build_compiled_specs_and_convertdecode(self):
+    def build_compiled_specs_and_convertdecode(self, schema):
         dtypes = {}
         converter_dict = {}
         converter_kwargs = {}
@@ -250,7 +268,7 @@ class Parser:
 
         self.order_specs, self.disable_reads = _order_specs(
             self.orders,
-            self.schema["sections"],
+            schema["sections"],
             converter_dict,
             converter_kwargs,
             decoder_dict,
@@ -258,7 +276,7 @@ class Parser:
             dtypes,
         )
 
-        self.encoding = self.schema["header"].get("encoding", "utf-8")
+        self.encoding = schema["header"].get("encoding", "utf-8")
 
         self.dtypes, self.parse_dates = convert_dtypes(dtypes)
 
@@ -270,36 +288,33 @@ class Parser:
 
         self.validation = validation_dict
 
-    def adjust_schema(self, ds) -> dict:
-        sections = deepcopy(self.schema["sections"])
-
-        for section_name, section in sections.items():
-            elements = section["elements"]
-            schema_elements = self.schema["sections"][section_name]["elements"]
-            spec_elements = self.order_specs[section_name]["elements"]
-
-            for data_var, attrs in elements.items():
-
+    def adjust_elements(self, ds) -> dict:
+        validation = deepcopy(self.validation)
+        for order, ospecs in self.order_specs.items():
+            elements = ospecs["elements"]
+            for element, especs in elements.items():
                 if (
-                    data_var not in ds.data_vars
-                    and data_var not in ds.attrs
-                    and data_var not in ds.dims
+                    element not in ds.data_vars
+                    and element not in ds.attrs
+                    and element not in ds.dims
                 ):
-                    spec_elements[data_var]["ignore"] = True
-                    schema_elements.pop(data_var, None)
+                    elements[element]["ignore"] = True
                     continue
 
-                for attr, value in list(attrs.items()):
+                index = especs.get("index")
+
+                if index not in self.validation:
+                    continue
+
+                for attr, value in validation[index].items():
                     if value != "__from_file__":
                         continue
 
-                    ds_attrs = ds[data_var].attrs
+                    ds_attrs = ds[element].attrs
                     if attr in ds_attrs:
-                        schema_elements[data_var][attr] = ds_attrs[attr]
+                        self.validation[index][attr] = ds_attrs[attr]
                     else:
-                        schema_elements[data_var].pop(attr, None)
-
-        return self.schema
+                        self.validation[index].pop(attr, None)
 
     def _parse_line(self, line: str) -> dict:
         i = 0

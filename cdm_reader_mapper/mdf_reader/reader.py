@@ -13,7 +13,7 @@ from ..common.json_dict import open_json_file
 from ..core.databundle import DataBundle
 
 from .utils.filereader import FileReader
-from .utils.utilities import validate_arg, validate_path
+from .utils.utilities import validate_arg
 
 
 def read_mdf(
@@ -115,9 +115,6 @@ def read_mdf(
         filename=None,
     )
 
-    if ext_schema_file:
-        validate_path("ext_schema_path", ext_schema_path)
-
     validate_arg("sections", sections, list)
     validate_arg("chunksize", chunksize, int)
     validate_arg("skiprows", skiprows, int)
@@ -151,11 +148,13 @@ def read_mdf(
         "year_end": year_end,
     }
 
-    return FileReader(
+    filereader = FileReader(
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,
-    ).read(
+    )
+
+    return filereader.read(
         source=source,
         pd_kwargs=pd_kwargs,
         convert_kwargs=convert_kwargs,
