@@ -115,8 +115,6 @@ def read_mdf(
         filename=None,
     )
 
-    # validate_file(source, "source")
-
     if ext_schema_file:
         validate_path("ext_schema_path", ext_schema_path)
 

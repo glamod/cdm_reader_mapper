@@ -123,16 +123,10 @@ class FileReader(Parser):
             )
         else:
             mask = pd.DataFrame(True, index=data.index, columns=data.columns)
+
+        self.columns = data.columns
         data = remove_boolean_values(data, self.dtypes)
         return data, mask
-
-    def _open_with_xarray(self, source, **kwargs) -> xr.Dataset:
-        return xr.open_mfdataset(source).squeeze()
-
-    def _open_with_pandas(
-        self, source, **kwargs
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        return pd.read_fwf(source, **kwargs)
 
     def open_data(
         self,
@@ -154,8 +148,9 @@ class FileReader(Parser):
             "parse_mode": open_with,
         }
         if open_with == "netcdf":
-            to_parse = self._open_with_xarray(source, **xr_kwargs)
+            to_parse = xr.open_mfdataset(source, xr_kwargs).squeeze()
             self.adjust_schema(to_parse)
+            write_kwargs, read_kwargs = {}, {}
         elif open_with == "pandas":
             if pd_kwargs.get("encoding"):
                 self.encoding = pd_kwargs["encoding"]
@@ -174,7 +169,19 @@ class FileReader(Parser):
             if not pd_kwargs.get("skip_blank_lines"):
                 pd_kwargs["skip_blank_lines"] = False
 
-            to_parse = self._open_with_pandas(source, **pd_kwargs)
+            write_kwargs = {"encoding": pd_kwargs["encoding"]}
+            read_kwargs = (
+                {
+                    "chunksize": pd_kwargs["chunksize"] or None,
+                    "dtype": self.dtypes,
+                },
+                {
+                    "chunksize": pd_kwargs["chunksize"] or None,
+                    "dtype": "boolean",
+                },
+            )
+
+            to_parse = pd.read_fwf(source, **pd_kwargs)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
@@ -183,6 +190,8 @@ class FileReader(Parser):
             self._process_data,
             func_kwargs=func_kwargs,
             makecopy=False,
+            write_kwargs=write_kwargs,
+            read_kwargs=read_kwargs,
         )
 
     def read(
@@ -229,8 +238,8 @@ class FileReader(Parser):
 
         return DataBundle(
             data=data,
-            columns=data.columns,
-            dtypes=data.dtypes,
+            columns=self.columns,
+            dtypes=self.dtypes,
             parse_dates=self.parse_dates,
             encoding=self.encoding,
             mask=mask,

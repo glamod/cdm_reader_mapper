@@ -46,8 +46,8 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
 
     if select:
         selected = _get_columns(expected.data.columns, select)
-        expected.data = expected.data[selected]
-        expected.mask = expected.mask[selected]
+        expected.data = expected.data.loc[:, selected]
+        expected.mask = expected.mask.loc[:, selected]
 
     if drop:
         result.data = result.data.drop(columns=drop)
@@ -97,8 +97,8 @@ def test_read_mdf_test_data_basic(data_model):
 @pytest.mark.parametrize(
     "data_model, kwargs",
     [
-        # ("icoads_r300_d714", {"chunksize": 3}),
-        # ("icoads_r300_d721", {"chunksize": 3}),
+        ("icoads_r300_d714", {"chunksize": 3}),
+        ("icoads_r300_d721", {"chunksize": 3}),
         (
             "icoads_r300_d703",
             {
@@ -148,7 +148,7 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
 @pytest.mark.parametrize(
     "data_model, kwargs, select",
     [
-        # ("icoads_r300_d714", {"sections": ["c99"], "chunksize": 3}, ["c99"]),
+        ("icoads_r300_d714", {"sections": ["c99"], "chunksize": 3}, ["c99"]),
         ("icoads_r300_d714", {"sections": ["c99"]}, ["c99"]),
         (
             "icoads_r300_d714",

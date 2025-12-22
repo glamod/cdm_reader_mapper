@@ -125,35 +125,57 @@ def remove_boolean_values(data, dtypes) -> pd.DataFrame:
 def process_textfilereader(
     reader,
     func,
-    func_args=[],
-    func_kwargs={},
+    func_args=(),
+    func_kwargs=None,
     read_kwargs={},
     write_kwargs={},
     makecopy=True,
 ):
-    data_buffer = StringIO()
+    if func_kwargs is None:
+        func_kwargs = {}
+
+    buffers = []
+    columns = []
+
     if makecopy is True:
         reader = make_copy(reader)
+
     for df in reader:
-        df = func(df, *func_args, **func_kwargs)
-        df.to_csv(
-            data_buffer,
-            header=False,
-            mode="a",
-            index=False,
-            quoting=csv.QUOTE_NONE,
-            sep=properties.internal_delimiter,
-            quotechar="\0",
-            escapechar="\0",
-            **write_kwargs,
+        outputs = func(df, *func_args, **func_kwargs)
+        if not isinstance(outputs, tuple):
+            outputs = (outputs,)
+
+        if not buffers:
+            buffers = [StringIO() for _ in outputs]
+            columns = [out.columns for out in outputs]
+
+        for buffer, out_df in zip(buffers, outputs):
+            out_df.to_csv(
+                buffer,
+                header=False,
+                mode="a",
+                index=False,
+                quoting=csv.QUOTE_NONE,
+                sep=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+                **write_kwargs,
+            )
+
+    if isinstance(read_kwargs, dict):
+        read_kwargs = tuple(read_kwargs for _ in range(buffers))
+
+    result_dfs = []
+    for buffer, cols, rk in zip(buffers, columns, read_kwargs):
+        buffer.seek(0)
+        result_dfs.append(
+            pd.read_csv(
+                buffer,
+                names=cols,
+                delimiter=properties.internal_delimiter,
+                quotechar="\0",
+                escapechar="\0",
+                **rk,
+            )
         )
-    data_buffer.seek(0)
-    data = pd.read_csv(
-        data_buffer,
-        names=df.columns,
-        delimiter=properties.internal_delimiter,
-        quotechar="\0",
-        escapechar="\0",
-        **read_kwargs,
-    )
-    return data
+    return tuple(result_dfs)

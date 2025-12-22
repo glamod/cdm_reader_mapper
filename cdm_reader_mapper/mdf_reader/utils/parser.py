@@ -331,6 +331,7 @@ class Parser:
         self.sections = sections
         col = df.columns[0]
         records = df[col].map(self._parse_line)
+        records = records.to_list()
         return pd.DataFrame.from_records(records)
 
     def parse_netcdf(self, ds, sections) -> pd.DataFrame:
