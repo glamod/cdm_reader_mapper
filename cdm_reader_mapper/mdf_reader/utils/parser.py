@@ -172,6 +172,7 @@ def _parse_fixed_width(
     header: dict,
     elements: dict,
     sections: list,
+    excludes: list,
     out: dict,
 ) -> int:
     section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
@@ -194,7 +195,11 @@ def _parse_fixed_width(
             missing = False
             j = k
 
-        if not ignore and _is_in_sections(index, sections):
+        if (
+            not ignore
+            and _is_in_sections(index, sections)
+            and not _is_in_sections(index, excludes)
+        ):
             value = line[i:j]
             if not value.strip() or value == missing_value:
                 value = True
@@ -217,6 +222,7 @@ def _parse_delimited(
     header: dict,
     elements: dict,
     sections: list,
+    excludes: list,
     out: dict,
 ) -> int:
     delimiter = header["delimiter"]
@@ -224,7 +230,7 @@ def _parse_delimited(
 
     for element, value in zip_longest(elements.keys(), fields):
         index = elements[element].get("index")
-        if _is_in_sections(index, sections):
+        if _is_in_sections(index, sections) and not _is_in_sections(index, excludes):
             out[index] = value.strip() if value is not None else None
         if value is not None:
             i += len(value)
@@ -326,6 +332,8 @@ class Parser:
             is_delimited = spec.get("is_delimited")
 
             if header.get("disable_read"):
+                if order in self._excludes:
+                    continue
                 out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
                 continue
 
@@ -334,22 +342,24 @@ class Parser:
                 i,
                 header,
                 elements,
-                self.sections,
+                self._sections,
+                self._excludes,
                 out,
                 is_delimited=is_delimited,
             )
 
         return out
 
-    def parse_pandas(self, df, sections) -> pd.DataFrame:
+    def parse_pandas(self, df, sections, excludes) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
-        self.sections = sections
+        self._sections = sections
+        self._excludes = excludes
         col = df.columns[0]
         records = df[col].map(self._parse_line)
         records = records.to_list()
         return pd.DataFrame.from_records(records)
 
-    def parse_netcdf(self, ds, sections) -> pd.DataFrame:
+    def parse_netcdf(self, ds, sections, excludes) -> pd.DataFrame:
         """Parse netcdf arrays into a pandas DataFrame."""
 
         def replace_empty_strings(series):
@@ -368,6 +378,8 @@ class Parser:
             header = ospec.get("header")
             disable_read = header.get("disable_read")
             if not _is_in_sections(order, sections):
+                continue
+            if order in excludes:
                 continue
 
             if disable_read is True:

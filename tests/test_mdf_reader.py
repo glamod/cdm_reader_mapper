@@ -50,10 +50,14 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         expected.mask = expected.mask.loc[:, selected]
 
     if drop:
-        result.data = result.data.drop(columns=drop)
-        result.mask = result.mask.drop(columns=drop)
-        expected.data = expected.data.drop(columns=drop)
-        expected.mask = expected.mask.drop(columns=drop)
+        # print(drop)
+        # print(expected.data.columns)
+        # exit()
+        unselected = _get_columns(expected.data.columns, drop)
+        # print(unselected)
+        # exit()
+        expected.data = expected.data.drop(columns=unselected)
+        expected.mask = expected.mask.drop(columns=unselected)
 
     if drop_idx:
         expected.data = _drop_rows(expected.data, drop_idx)
@@ -150,6 +154,7 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
     [
         ("icoads_r300_d714", {"sections": ["c99"], "chunksize": 3}, ["c99"]),
         ("icoads_r300_d714", {"sections": ["c99"]}, ["c99"]),
+        ("icoads_r300_d714", {"sections": "c99"}, ["c99"]),
         (
             "icoads_r300_d714",
             {"sections": ["core", "c99"]},
@@ -162,8 +167,24 @@ def test_read_mdf_test_data_select(data_model, kwargs, select):
     _read_mdf_test_data(data_model, select=select, **kwargs)
 
 
-def test_read_mdf_test_data_drop_base():
-    _read_mdf_test_data("icoads_r300_mixed", drop=["c99"], encoding="cp1252")
+@pytest.mark.parametrize(
+    "data_model, kwargs, drop",
+    [
+        ("icoads_r300_d714", {"excludes": ["c98"]}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": "c98"}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": ["c5", "c98"]}, ["c5", "c98"]),
+        ("icoads_r300_mixed", {"excludes": ["c99"], "encoding": "cp1252"}, ["c99"]),
+        ("icoads_r300_mixed", {"excludes": "c99", "encoding": "cp1252"}, ["c99"]),
+        (
+            "craid",
+            {"excludes": ["drifter_measurements", "drifter_history"]},
+            ["drifter_measurements", "drifter_history"],
+        ),
+        ("gdac", {"excludes": "AAAA"}, ["AAAA"]),
+    ],
+)
+def test_read_mdf_test_data_exclude(data_model, kwargs, drop):
+    _read_mdf_test_data(data_model, drop=drop, **kwargs)
 
 
 @pytest.mark.parametrize(

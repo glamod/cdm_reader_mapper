@@ -33,7 +33,8 @@ def read_mdf(
     decode_flag: bool = True,
     decoder_dict: dict | None = None,
     validate_flag: bool = True,
-    sections: list | None = None,
+    sections: str | list | None = None,
+    excludes: str | list | None = None,
     pd_kwargs: dict | None = None,
     xr_kwargs: dict | None = None,
 ) -> DataBundle:
@@ -142,8 +143,15 @@ def read_mdf(
         "ext_table_path": ext_table_path,
     }
 
+    if sections and isinstance(sections, str):
+        sections = [sections]
+
+    if excludes and isinstance(excludes, str):
+        excludes = [excludes]
+
     select_kwargs = {
         "sections": sections,
+        "excludes": excludes,
         "year_init": year_init,
         "year_end": year_end,
     }

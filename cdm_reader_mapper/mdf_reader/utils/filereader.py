@@ -79,14 +79,15 @@ class FileReader(Parser):
         validate_flag,
         ext_table_path,
         sections,
+        excludes,
         year_init,
         year_end,
         parse_mode="pandas",
     ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
         if parse_mode == "pandas":
-            data = self.parse_pandas(data, sections)
+            data = self.parse_pandas(data, sections, excludes)
         elif parse_mode == "netcdf":
-            data = self.parse_netcdf(data, sections)
+            data = self.parse_netcdf(data, sections, excludes)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 

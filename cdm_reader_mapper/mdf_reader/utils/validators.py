@@ -167,6 +167,7 @@ def validate(
         return
 
     mask = pd.DataFrame(index=data.index, columns=data.columns, dtype="boolean")
+
     if data.empty:
         return mask
 
@@ -231,5 +232,6 @@ def validate(
 
     for disable in disables:
         if disable in mask.columns:
-            mask[disables] = np.nan
+            mask[disable] = np.nan
+
     return mask.astype("boolean")
