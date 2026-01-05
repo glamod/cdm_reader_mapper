@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -17,7 +18,7 @@ def _get_columns(columns, select):
     if isinstance(columns, pd.MultiIndex):
         return columns.get_level_values(0).isin(select)
     mask = [(type(c) is tuple and c[0] in select) or (c in select) for c in columns]
-    return columns[mask]
+    return np.array(mask)
 
 
 def _drop_rows(df, drops):
@@ -50,14 +51,9 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         expected.mask = expected.mask.loc[:, selected]
 
     if drop:
-        # print(drop)
-        # print(expected.data.columns)
-        # exit()
         unselected = _get_columns(expected.data.columns, drop)
-        # print(unselected)
-        # exit()
-        expected.data = expected.data.drop(columns=unselected)
-        expected.mask = expected.mask.drop(columns=unselected)
+        expected.data = expected.data.loc[:, ~unselected]
+        expected.mask = expected.mask.loc[:, ~unselected]
 
     if drop_idx:
         expected.data = _drop_rows(expected.data, drop_idx)
