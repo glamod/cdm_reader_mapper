@@ -116,7 +116,6 @@ def read_mdf(
         filename=None,
     )
 
-    validate_arg("sections", sections, list)
     validate_arg("chunksize", chunksize, int)
     validate_arg("skiprows", skiprows, int)
 
@@ -148,6 +147,9 @@ def read_mdf(
 
     if excludes and isinstance(excludes, str):
         excludes = [excludes]
+
+    validate_arg("sections", sections, list)
+    validate_arg("excludes", excludes, list)
 
     select_kwargs = {
         "sections": sections,
