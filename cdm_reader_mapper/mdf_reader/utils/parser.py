@@ -37,9 +37,9 @@ def _get_ignore(section_dict) -> bool:
 
 
 def _is_in_sections(index, sections):
-    if not sections:
+    if sections is None:
         return True
-    elif isinstance(index, tuple):
+    if isinstance(index, tuple):
         return index[0] in sections
     return index in sections
 
@@ -89,8 +89,6 @@ def _element_specs(
 
         if meta.get("disable_read", False) or ignore:
             continue
-
-        c = ("core", "W")
 
         validation_dict[index] = {}
 
@@ -191,6 +189,7 @@ def _parse_fixed_width(
         missing = True
 
         j = i if bad_sentinel else i + field_length
+
         if j > k:
             missing = False
             j = k
@@ -347,13 +346,12 @@ class Parser:
                 out,
                 is_delimited=is_delimited,
             )
-
         return out
 
     def parse_pandas(self, df, sections, excludes) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
         self._sections = sections
-        self._excludes = excludes
+        self._excludes = excludes or []
         col = df.columns[0]
         records = df[col].map(self._parse_line)
         records = records.to_list()
@@ -374,12 +372,14 @@ class Parser:
         renames = {}
         disables = []
 
+        excludes = excludes or []
+
         for order, ospec in self.order_specs.items():
             header = ospec.get("header")
             disable_read = header.get("disable_read")
             if not _is_in_sections(order, sections):
                 continue
-            if order in excludes:
+            if _is_in_sections(order, excludes):
                 continue
 
             if disable_read is True:
