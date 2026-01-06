@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import ast
-import logging
 import os
 from io import StringIO as StringIO
 
@@ -109,13 +108,6 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    logging.basicConfig(
-        format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
-        level=logging.INFO,
-        datefmt="%Y%m%d %H:%M:%S",
-        filename=None,
-    )
-
     validate_arg("chunksize", chunksize, int)
     validate_arg("skiprows", skiprows, int)
 

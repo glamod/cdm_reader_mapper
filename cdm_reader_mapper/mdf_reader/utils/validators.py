@@ -79,13 +79,6 @@ def validate(
     pd.DataFrame
       Validated boolean mask.
     """
-    logging.basicConfig(
-        format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
-        level=logging.INFO,
-        datefmt="%Y%m%d %H:%M:%S",
-        filename=None,
-    )
-
     if not isinstance(data, pd.DataFrame):
         logging.error("input data must be a pandas DataFrame.")
         return None
