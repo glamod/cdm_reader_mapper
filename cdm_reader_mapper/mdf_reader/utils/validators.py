@@ -11,9 +11,12 @@ from ..codes import codes
 from .utilities import convert_str_boolean
 
 
-def _mask_boolean(x, boolean) -> bool:
-    x = convert_str_boolean(x)
-    return x is boolean
+def _is_false(x):
+    return x is False
+
+
+def _is_true(x):
+    return x is True
 
 
 def validate_datetime(series):
@@ -21,37 +24,27 @@ def validate_datetime(series):
     return dates.notna() | series.isna()
 
 
-def validate_numeric(series, atts):
-    converted = series.map(convert_str_boolean)
+def validate_numeric(series, valid_min, valid_max):
+    converted = series.apply(convert_str_boolean)
     numeric = pd.to_numeric(converted, errors="coerce")
-    lower = atts.get("valid_min", -np.inf)
-    upper = atts.get("valid_max", np.inf)
-    return ((numeric >= lower) & numeric <= upper) | numeric.isna()
+    valid_range = (numeric >= valid_min) & (numeric <= valid_max)
+    return valid_range | numeric.isna()
 
 
 def validate_str(series):
-    return pd.Series(True, index=series.index)
+    return pd.Series(True, index=series.index, dtype="boolean")
 
 
-def validate_codes(series, atts, imodel, ext_table_path):
-    code_table_name = atts.get("codetable")
-    if not code_table_name:
-        logging.error(f"Code table not defined for element {series.name}")
+def validate_codes(series, code_table, column_type):
+    if not code_table:
+        logging.error(f"Code table not found for element {series.name}")
         return pd.Series(False, index=series.index)
 
-    table = codes.read_table(
-        code_table_name, imodel=imodel, ext_table_path=ext_table_path
-    )
-    if not table:
-        logging.error(
-            f"Code table not found for element {series.name} in {ext_table_path}"
-        )
-        return pd.Series(False, index=series.index)
-
-    keys = set(table)
-    dtype = properties.pandas_dtypes.get(atts.get("column_type"), object)
+    keys = set(code_table)
+    dtype = properties.pandas_dtypes.get(column_type, object)
     converted = series.astype(dtype)
-    return converted.isna() | converted.astype(str).isin(keys)
+    as_str = converted.astype(str)
+    return converted.isna() | as_str.isin(keys)
 
 
 def validate(
@@ -95,42 +88,70 @@ def validate(
 
     if not isinstance(data, pd.DataFrame):
         logging.error("input data must be a pandas DataFrame.")
-        return
+        return None
 
-    mask = pd.DataFrame(index=data.index, columns=data.columns, dtype="boolean")
+    mask = pd.DataFrame(pd.NA, index=data.index, columns=data.columns, dtype="boolean")
     if data.empty:
         return mask
 
     disables = disables or []
     elements = [c for c in data.columns if c not in disables]
-    element_atts = {element: attributes[element] for element in elements}
+    element_atts = {
+        element: attributes[element] for element in elements if element in attributes
+    }
 
     validated_columns = []
+    validated_dtypes = set(properties.numeric_types) | {"datetime", "key"}
+
+    basic_functions = {
+        "datetime": validate_datetime,
+        "str": validate_str,
+    }
+
     for column in data.columns:
+        if column in disables:
+            continue
+
+        if column not in attributes:
+            continue
+
         series = data[column]
-        column_atts = attributes[column]
+        column_atts = element_atts.get(column, {})
         column_type = column_atts.get("column_type")
 
         if column_type in properties.numeric_types:
-            column_mask = validate_numeric(series, element_atts.get(column, {}))
-        elif column_type == "datetime":
-            column_mask = validate_datetime(series)
-        elif column_type == "str":
-            column_mask = validate_str(series)
+            valid_min = column_atts.get("valid_min", -np.inf)
+            valid_max = column_atts.get("valid_max", np.inf)
+            column_mask = validate_numeric(series, valid_min, valid_max)
         elif column_type == "key":
-            column_mask = validate_codes(
-                series, element_atts.get(column), imodel, ext_table_path
+            code_table_name = column_atts.get("codetable")
+            code_table = codes.read_table(
+                code_table_name, imodel=imodel, ext_table_path=ext_table_path
             )
+            column_mask = validate_codes(
+                series,
+                code_table,
+                column_type,
+            )
+        elif column_type in basic_functions:
+            column_mask = basic_functions[column_type](series)
         else:
+            logging.warning(
+                f"Unknown column_type '{column_type}' for column '{column}'"
+            )
             continue
 
         mask[column] = column_mask
-        if column_type != "str":
+        if column_type in validated_dtypes:
             validated_columns.append(column)
 
-    false_mask = data[validated_columns].map(_mask_boolean, boolean=False)
-    true_mask = data[validated_columns].map(_mask_boolean, boolean=True)
-    mask[validated_columns] = mask[validated_columns].mask(false_mask, False)
-    mask[validated_columns] = mask[validated_columns].mask(true_mask, True)
-    mask.loc[:, mask.columns.intersection(disables)] = pd.NA
+    # Explicit boolean literals ("True"/"False") override validation results
+    if validated_columns:
+        validated_columns = list(dict.fromkeys(validated_columns))
+        to_bool = data[validated_columns].applymap(convert_str_boolean)
+        false_mask = to_bool.applymap(_is_false)
+        true_mask = to_bool.applymap(_is_true)
+        mask[validated_columns] = mask[validated_columns].mask(false_mask, False)
+        mask[validated_columns] = mask[validated_columns].mask(true_mask, True)
+
     return mask.astype("boolean")

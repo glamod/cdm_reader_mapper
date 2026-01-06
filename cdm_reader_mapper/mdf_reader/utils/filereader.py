@@ -218,12 +218,8 @@ class FileReader(Parser):
         if select_kwargs is None:
             select_kwargs = {}
 
-        # 2. READ AND VALIDATE DATA
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
-        # 2.1. Subset data model sections to requested sections
 
-        # 2.2 Homogenize input data to an iterable with dataframes:
-        # a list with a single dataframe or a pd.io.parsers.TextFileReader
         logging.info("Getting data string from source...")
         data, mask = self.open_data(
             # INFO: Set default as "pandas" to account for custom schema
