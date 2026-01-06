@@ -5,26 +5,14 @@ from __future__ import annotations
 import json
 import logging
 from io import StringIO as StringIO
+from pathlib import Path
 
 import pandas as pd
 
+from .utils.utilities import join, update_column_names, update_dtypes
+
 from ..common import get_filename
 from ..common.pandas_TextParser_hdlr import make_copy
-
-
-def _update_dtypes(dtypes, columns) -> dict:
-    if isinstance(dtypes, dict):
-        dtypes = {k: v for k, v in dtypes.items() if k in columns}
-    return dtypes
-
-
-def _update_col_names(dtypes, col_o, col_n) -> str | dict:
-    if isinstance(dtypes, str):
-        return dtypes
-    if col_o in dtypes.keys():
-        dtypes[col_n] = dtypes[col_o]
-        del dtypes[col_o]
-    return dtypes
 
 
 def write_data(
@@ -100,16 +88,9 @@ def write_data(
     ----
     Use this function after reading MDF data.
     """
-
-    def _join(col):
-        if isinstance(col, (list, tuple)):
-            return ":".join(str(c) for c in col)
-        return str(col)
-        
     dtypes = dtypes or {}
     if isinstance(parse_dates, bool):
         parse_dates = []
-        
 
     if not isinstance(data, pd.io.parsers.TextFileReader):
         data_list = [data]
@@ -124,12 +105,12 @@ def write_data(
     else:
         mask_list = make_copy(mask)
 
-    info = {"dtypes": dtypes.copy(), "parse_dates": [_join(p) for p in parse_dates]}
+    info = {"dtypes": dtypes.copy(), "parse_dates": [join(p) for p in parse_dates]}
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    
+
     filename_data = get_filename(
         [prefix, "data", suffix], path=out_dir, extension=extension
     )
@@ -139,31 +120,34 @@ def write_data(
     filename_info = get_filename(
         [prefix, "info", suffix], path=out_dir, extension="json"
     )
-    
-    for i, (data_df, mask_df) in enumerate(zip(data, mask)):
+
+    for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
         if col_subset is not None:
             data_df = data_df[col_subset]
             mask_df = mask_df[col_subset]
-            
-        header_flag = (i==0)
-        if header_flag:
-            new_header = [_join(c) for c in df.columns]
-            info["dtypes"] = { _join(k): v for k, v in info["dtypes"].items() if _join(k) in new_header }
-            info["parse_dates"] = [p for p in info["parse_dates"] if p in new_header]
+
+        mode = "w" if i == 0 else "a"
+        header = [join(c) for c in data_df.columns] if i == 0 else False
+
+        if i == 0:
+            info["dtypes"] = update_dtypes(info["dtypes"], data_df.columns)
+            for col in data_df.columns:
+                info["dtypes"] = update_column_names(info["dtypes"], col, join(col))
+            info["parse_dates"] = [p for p in info["parse_dates"] if p in header]
             info["encoding"] = encoding
-            
+
         csv_kwargs = dict(
-            header=header_flag,
-            mode = "w" if i == 0 else "a",
+            header=header,
+            mode=mode,
             index=False,
             sep=delimiter,
             encoding=encoding,
             **kwargs,
         )
-        
+
         data_df.to_csv(filename_data, **csv_kwargs)
         if not mask_df.empty:
             mask_df.to_csv(filename_mask, **csv_kwargs)
 
     with open(filename_info, "w") as fileObj:
-            json.dump(info, fileObj, indent=4)
+        json.dump(info, fileObj, indent=4)

@@ -2,16 +2,94 @@
 
 from __future__ import annotations
 
+import ast
 import csv
+import logging
 import os
 
 from io import StringIO
+from pathlib import Path
 
 import pandas as pd
 
 from .. import properties
 
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+
+
+def as_list(x):
+    """Ensure the input is a list; keep None as None."""
+    if x is None:
+        return None
+    if isinstance(x, str):
+        return [x]
+    return list(x)
+
+
+def as_path(value, name: str) -> Path:
+    """Ensure the input is a Path-like object."""
+    if isinstance(value, (str, os.PathLike)):
+        return Path(value)
+    raise TypeError(f"{name} must be str or Path-like")
+
+
+def join(col) -> str:
+    """Join multi-level columns as colon-separated string."""
+    if isinstance(col, (list, tuple)):
+        return ":".join(str(c) for c in col)
+    return str(col)
+
+
+def update_dtypes(dtypes: dict, columns) -> dict:
+    """Filter dtypes dict to only include columns in 'columns'."""
+    if isinstance(dtypes, dict):
+        dtypes = {k: v for k, v in dtypes.items() if k in columns}
+    return dtypes
+
+
+def update_column_names(dtypes: dict | str, col_o, col_n) -> dict | str:
+    """Rename column in dtypes dict if present."""
+    if isinstance(dtypes, str):
+        return dtypes
+    if col_o in dtypes.keys():
+        dtypes[col_n] = dtypes[col_o]
+        del dtypes[col_o]
+    return dtypes
+
+
+def update_column_labels(columns):
+    """Convert string column labels to tuples if needed."""
+    new_cols = []
+    all_tuples = True
+
+    for col in columns:
+        try:
+            col_ = ast.literal_eval(col)
+        except Exception:
+            if isinstance(col, str) and ":" in col:
+                col_ = tuple(col.split(":"))
+            else:
+                col_ = col
+        all_tuples &= isinstance(col_, tuple)
+        new_cols.append(col_)
+
+    if all_tuples:
+        return pd.MultiIndex.from_tuples(new_cols)
+    return pd.Index(new_cols)
+
+
+def read_csv(filepath, col_subset=None, **kwargs) -> pd.DataFrame:
+    """Safe CSV reader that handles missing files and column subsets."""
+    if filepath is None or not Path(filepath).is_file():
+        logging.warning(f"File not found: {filepath}")
+        return pd.DataFrame()
+
+    df = pd.read_csv(filepath, delimiter=",", **kwargs)
+    df.columns = update_column_labels(df.columns)
+    if col_subset is not None:
+        df = df[col_subset]
+
+    return df
 
 
 def convert_dtypes(dtypes) -> tuple[str]:
@@ -49,47 +127,7 @@ def validate_arg(arg_name, arg_value, arg_type) -> bool:
     return True
 
 
-def validate_path(arg_name, arg_value) -> bool:
-    """Validate input argument is an existing directory.
-
-    Parameters
-    ----------
-    arg_name : str
-        Name of the argument
-    arg_value : str
-        Value of the argument
-
-    Returns
-    -------
-    boolean
-        Returns True if `arg_name` is an existing directory.
-    """
-    if not os.path.isdir(arg_value):
-        raise FileNotFoundError(f"{arg_name}: could not find path {arg_value}")
-    return True
-
-
-def validate_file(arg_name, arg_value) -> bool:
-    """Validate input argument is an existing file.
-
-    Parameters
-    ----------
-    arg_name : str
-        Name of the argument
-    arg_value : str
-        Value of the argument
-
-    Returns
-    -------
-    boolean
-        Returns True if `arg_name` is an existing file.
-    """
-    if not os.path.isfile(arg_value):
-        raise FileNotFoundError(f"{arg_name}: could not find file {arg_value}")
-    return True
-
-
-def adjust_dtype(dtype, df) -> dict:
+def _adjust_dtype(dtype, df) -> dict:
     """Adjust dtypes to DataFrame."""
     if not isinstance(dtype, dict):
         return dtype
@@ -116,9 +154,8 @@ def _remove_boolean_values(x) -> str | None:
 
 
 def remove_boolean_values(data, dtypes) -> pd.DataFrame:
-    """DOCUMENTATION"""
     data = data.map(_remove_boolean_values)
-    dtype = adjust_dtype(dtypes, data)
+    dtype = _adjust_dtype(dtypes, data)
     return data.astype(dtype)
 
 

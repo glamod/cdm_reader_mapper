@@ -2,15 +2,7 @@
 
 from __future__ import annotations
 
-import ast
-import os
 from io import StringIO as StringIO
-from pathlib import Path
-
-from dataclasses import dataclass
-from typing import Dict, Callable, Any
-
-import pandas as pd
 
 from cdm_reader_mapper import DataBundle
 
@@ -19,69 +11,22 @@ from ..common.json_dict import open_json_file
 from .utils.filereader import FileReader
 from .utils.utilities import validate_arg
 
-def _as_list(x):
-    if x is None:
-        return None
-    if isinstance(x, str):
-        return [x]
-    return list(x)
-    
-def _as_path(value, name: str) -> Path:
-    if isinstance(value, (str, os.PathLike)):
-        return Path(value)
-    raise TypeError(f"{name} must be str or Path-like")
+from .utils.utilities import as_list, as_path, read_csv
 
-def _update_column_labels(columns):
-        new_cols = []
-        all_tuples = True
-        
-        for col in columns:
-            try:
-                col_ = ast.literal_eval(col)
-            except Exception:
-                if isinstance(col, str) and ":" in col:
-                  col_ = tuple(col.split(":"))
-                else:
-                  col_ = col
-                  
-            all_tuples &= isinstance(col_, tuple)
-            new_cols.append(col_)
-
-        if all_tuples:
-            return pd.MultiIndex.from_tuples(new_cols)
-
-        return pd.Index(new_cols)
-
-def _read_csv(filepath, col_subset=None, **kwargs):
-        if filepath is None:
-            logging.warning(f"No file selected")
-            return pd.DataFrame()
-        filepath = _as_path(filepath, "filepath")
-        if not filepath.exists():
-            logging.warning(f"File not found: {filepath}")
-            return pd.DataFrame()
-
-        # MDF data is always comma-delimited
-        df = pd.read_csv(filepath, delimiter=",", **kwargs)
-        df.columns = _update_column_labels(df.columns)
-        if col_subset is not None:
-            df = df[col_subset]
-
-        return df    
 
 def validate_read_mdf_args(
-  *,
-  source,
-  imodel,
-  ext_schema_path,
-  ext_schema_file,
-  year_init,
-  year_end,
-  chunksize,
-  skiprows,
+    *,
+    source,
+    imodel,
+    ext_schema_path,
+    ext_schema_file,
+    year_init,
+    year_end,
+    chunksize,
+    skiprows,
 ):
-    source = _as_path(source, "source")
-        
+    source = as_path(source, "source")
+
     if not source.exists():
         raise FileNotFoundError(f"Source file not found: {source}")
 
@@ -101,7 +46,7 @@ def validate_read_mdf_args(
     if year_init is not None and year_end is not None:
         if year_init > year_end:
             raise ValueError("year_init must be <= year_end")
-                
+
 
 def read_mdf(
     source,
@@ -197,54 +142,51 @@ def read_mdf(
     write_tables : Write CDM tables to disk.
     """
     validate_read_mdf_args(
-      source=source,
-      imodel=imodel,
-      ext_schema_path=ext_schema_path,
-      ext_schema_file=ext_schema_file,
-      year_init=year_init,
-      year_end=year_end,
-      chunksize=chunksize,
-      skiprows=skiprows,
+        source=source,
+        imodel=imodel,
+        ext_schema_path=ext_schema_path,
+        ext_schema_file=ext_schema_file,
+        year_init=year_init,
+        year_end=year_end,
+        chunksize=chunksize,
+        skiprows=skiprows,
     )
 
-    if pd_kwargs is None:
-        pd_kwargs = {}
-
+    pd_kwargs = pd_kwargs or {}
     pd_kwargs.setdefault("encoding", encoding)
     pd_kwargs.setdefault("chunksize", chunksize)
     pd_kwargs.setdefault("skiprows", skiprows)
-    
-    if xr_kwargs is None:
-        xr_kwargs = {}
 
-    convert_kwargs = {
-        "convert_flag": convert_flag,
-        "converter_dict": converter_dict,
-        "converter_kwargs": converter_kwargs,
-    }
+    xr_kwargs = xr_kwargs or {}
 
-    decode_kwargs = {
-        "decode_flag": decode_flag,
-        "decoder_dict": decoder_dict,
-    }
+    convert_kwargs = dict(
+        convert_flag=convert_flag,
+        converter_dict=converter_dict,
+        converter_kwargs=converter_kwargs,
+    )
 
-    validate_kwargs = {
-        "validate_flag": validate_flag,
-        "ext_table_path": ext_table_path,
-    }
+    decode_kwargs = dict(
+        decode_flag=decode_flag,
+        decoder_dict=decoder_dict,
+    )
 
-    sections = _as_list(sections)
-    excludes = _as_list(excludes)
+    validate_kwargs = dict(
+        validate_flag=validate_flag,
+        ext_table_path=ext_table_path,
+    )
+
+    sections = as_list(sections)
+    excludes = as_list(excludes)
 
     validate_arg("sections", sections, list)
     validate_arg("excludes", excludes, list)
 
-    select_kwargs = {
-        "sections": sections,
-        "excludes": excludes,
-        "year_init": year_init,
-        "year_end": year_end,
-    }
+    select_kwargs = dict(
+        sections=sections,
+        excludes=excludes,
+        year_init=year_init,
+        year_end=year_end,
+    )
 
     filereader = FileReader(
         imodel=imodel,
@@ -311,26 +253,22 @@ def read_data(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    if info is None:
-        info_dict = {}
-    else:
-        info_dict = open_json_file(info)
-
+    info_dict = open_json_file(info) if info else {}
     dtype = info_dict.get("dtypes", "object")
     parse_dates = info_dict.get("parse_dates", False)
     encoding = encoding or info_dict.get("encoding", None)
-    
+
     pd_kwargs = kwargs.copy()
     pd_kwargs.setdefault("dtype", dtype)
     pd_kwargs.setdefault("parse_dates", parse_dates)
     pd_kwargs.setdefault("encoding", encoding)
 
-    data = _read_csv(
+    data = read_csv(
         source,
         col_subset=col_subset,
         **pd_kwargs,
     )
-    mask = _read_csv(mask, col_subset=col_subset, dtype="boolean")
+    mask = read_csv(mask, col_subset=col_subset, dtype="boolean")
     if not mask.empty:
         mask = mask.reindex(columns=data.columns)
 
