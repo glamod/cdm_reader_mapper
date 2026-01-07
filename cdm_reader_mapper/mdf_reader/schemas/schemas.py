@@ -93,11 +93,11 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict
             return
         schema_files = Path(schema_files)
     elif imodel:
-        imodel = imodel.split("_")
-        if imodel[0] not in properties.supported_data_models:
-            logging.error("Input data model " f"{imodel[0]}" " not supported")
+        isplit = imodel.split("_")
+        if isplit[0] not in properties.supported_data_models:
+            logging.error("Input data model " f"{isplit[0]}" " not supported")
             return
-        schema_files = collect_json_files(*imodel, base=f"{properties._base}.schemas")
+        schema_files = collect_json_files(*isplit, base=f"{properties._base}.schemas")
     else:
         raise ValueError(
             "One of ['imodel', 'ext_schema_path', 'ext_schema_file'] must be set."

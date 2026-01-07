@@ -253,16 +253,12 @@ class Parser:
         ext_schema_path: str | None,
         ext_schema_file: str | None,
     ):
-
-        self.imodel = imodel
-
         logging.info("READING DATA MODEL SCHEMA FILE...")
         schema = schemas.read_schema(
             imodel=imodel,
             ext_schema_path=ext_schema_path,
             ext_schema_file=ext_schema_file,
         )
-        self.schema = schema
         self.config = self._build_config(schema)
 
     def _build_config(self, schema: dict) -> ParserConfig:
