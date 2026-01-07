@@ -23,30 +23,29 @@ def _validate_sentinel(i: int, line: str, sentinel: str) -> bool:
     return line.startswith(sentinel, i)
 
 
-def _get_index(section, order, length):
+def _get_index(section: str, order: str, length: int) -> str | tuple[str, str]:
     if length == 1:
         return section
     return (order, section)
 
 
-def _get_ignore(section_dict) -> bool:
+def _get_ignore(section_dict: dict) -> bool:
     ignore = section_dict.get("ignore", False)
     if isinstance(ignore, str):
         ignore = ast.literal_eval(ignore)
     return bool(ignore)
 
 
-def _is_in_sections(index, sections):
+def _is_in_sections(index: str | tuple, sections: list | None) -> bool:
     if sections is None:
         return True
-    if isinstance(index, tuple):
-        return index[0] in sections
-    return index in sections
+    key = index[0] if isinstance(index, tuple) else index
+    return key in sections
 
 
-def _convert_dtype_to_default(dtype) -> str:
+def _convert_dtype_to_default(dtype: str | None) -> str | None:
     if dtype is None:
-        return
+        return None
     elif dtype == "float":
         return dtype
     elif dtype == "int":
@@ -61,15 +60,15 @@ def _convert_dtype_to_default(dtype) -> str:
 
 
 def _element_specs(
-    order,
-    olength,
-    elements,
-    converter_dict,
-    converter_kwargs,
-    decoder_dict,
-    validation_dict,
-    dtypes,
-):
+    order: str,
+    olength: int,
+    elements: dict,
+    converter_dict: dict,
+    converter_kwargs: dict,
+    decoder_dict: dict,
+    validation_dict: dict,
+    dtypes: dict,
+) -> dict:
     element_specs = {}
 
     for name, meta in elements.items():
@@ -131,7 +130,7 @@ def _element_specs(
     return element_specs
 
 
-def _order_specs(orders, sections, *args):
+def _order_specs(orders: list, sections: dict, *args) -> tuple[dict, list]:
     order_specs = {}
     disable_reads = []
 
@@ -237,7 +236,7 @@ def _parse_delimited(
     return i
 
 
-def parse_line(*args, is_delimited):
+def parse_line(*args, is_delimited: bool) -> int:
     if is_delimited:
         return _parse_delimited(*args)
     return _parse_fixed_width(*args)
@@ -245,7 +244,7 @@ def parse_line(*args, is_delimited):
 
 class Parser:
 
-    def __init__(self, imodel, ext_schema_path, ext_schema_file):
+    def __init__(self, imodel: str | None, ext_schema_path: str | None, ext_schema_file: str | None):
 
         self.imodel = imodel
 
@@ -259,12 +258,12 @@ class Parser:
         self.build_parsing_order(schema)
         self.build_compiled_specs_and_convertdecode(schema)
 
-    def build_parsing_order(self, schema):
+    def build_parsing_order(self, schema: dict):
         parsing_order = schema["header"].get("parsing_order")
         sections_ = [x.get(y) for x in parsing_order for y in x]
         self.orders = [y for x in sections_ for y in x]
 
-    def build_compiled_specs_and_convertdecode(self, schema):
+    def build_compiled_specs_and_convertdecode(self, schema: dict):
         dtypes = {}
         converter_dict = {}
         converter_kwargs = {}
@@ -293,7 +292,7 @@ class Parser:
 
         self.validation = validation_dict
 
-    def adjust_elements(self, ds) -> dict:
+    def adjust_elements(self, ds: xr.Dataset):
         validation = deepcopy(self.validation)
         for order, ospecs in self.order_specs.items():
             elements = ospecs["elements"]
@@ -348,7 +347,7 @@ class Parser:
             )
         return out
 
-    def parse_pandas(self, df, sections, excludes) -> pd.DataFrame:
+    def parse_pandas(self, df: pd.DataFrame, sections: list | None, excludes: list | None) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
         self._sections = sections
         self._excludes = excludes or []
@@ -357,7 +356,7 @@ class Parser:
         records = records.to_list()
         return pd.DataFrame.from_records(records)
 
-    def parse_netcdf(self, ds, sections, excludes) -> pd.DataFrame:
+    def parse_netcdf(self, ds: xr.Dataset, sections: list | None, excludes: list | None) -> pd.DataFrame:
         """Parse netcdf arrays into a pandas DataFrame."""
 
         def replace_empty_strings(series):
