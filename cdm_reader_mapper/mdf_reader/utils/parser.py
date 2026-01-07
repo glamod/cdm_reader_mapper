@@ -11,12 +11,14 @@ from itertools import zip_longest
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 from .. import properties
 from ..schemas import schemas
 from .utilities import convert_dtypes
 
 from .convert_and_decode import Converters, Decoders
+
 
 @dataclass(frozen=True)
 class ParserConfig:
@@ -30,6 +32,7 @@ class ParserConfig:
     validation: dict
     encoding: str
     columns: pd.Index | pd.MultiIndex | None = None
+
 
 def _validate_sentinel(i: int, line: str, sentinel: str) -> bool:
     return line.startswith(sentinel, i)
@@ -70,6 +73,7 @@ def _convert_dtype_to_default(dtype: str | None) -> str | None:
         return properties.pandas_int
     return dtype
 
+
 def _build_element_specs(
     order: str,
     olength: int,
@@ -108,7 +112,9 @@ def _build_element_specs(
         conv_func = Converters(ctype).converter()
         if conv_func:
             converter_dict[index] = conv_func
-        conv_kwargs = {k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])}
+        conv_kwargs = {
+            k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])
+        }
         if conv_kwargs:
             converter_kwargs[index] = conv_kwargs
         encoding = meta.get("encoding")
@@ -116,14 +122,14 @@ def _build_element_specs(
             dec_func = Decoders(ctype, encoding).decoder()
             if dec_func:
                 decoder_dict[index] = dec_func
-                
+
         # Validation
         validation_dict[index] = {}
         if ctype:
             validation_dict[index]["column_type"] = ctype
         for k in ("valid_min", "valid_max", "codetable"):
             if meta.get(k) is not None:
-                validation_dict[index][k] = meta[k]                
+                validation_dict[index][k] = meta[k]
 
     return element_specs
 
@@ -204,6 +210,7 @@ def parse_line(*args, is_delimited: bool) -> int:
         return _parse_delimited(*args)
     return _parse_fixed_width(*args)
 
+
 def parse_line_with_config(
     line: str,
     config: ParserConfig,
@@ -240,7 +247,12 @@ def parse_line_with_config(
 
 class Parser:
 
-    def __init__(self, imodel: str | None, ext_schema_path: str | None, ext_schema_file: str | None):
+    def __init__(
+        self,
+        imodel: str | None,
+        ext_schema_path: str | None,
+        ext_schema_file: str | None,
+    ):
 
         self.imodel = imodel
 
@@ -252,79 +264,81 @@ class Parser:
         )
         self.schema = schema
         self.config = self._build_config(schema)
-        
+
     def _build_config(self, schema: dict) -> ParserConfig:
-      """Build a ParserConfig from a schema."""
-      # Parsing order
-      parsing_order = schema["header"].get("parsing_order", [])
-      sections = [x.get(y) for x in parsing_order for y in x]
-      orders = [y for x in sections for y in x]
+        """Build a ParserConfig from a schema."""
+        # Parsing order
+        parsing_order = schema["header"].get("parsing_order", [])
+        sections = [x.get(y) for x in parsing_order for y in x]
+        orders = [y for x in sections for y in x]
 
-      # Initialize dicts
-      dtypes = {}
-      converter_dict = {}
-      converter_kwargs = {}
-      decoder_dict = {}
-      validation_dict = {}
-      order_specs = {}
-      disable_reads = []
+        # Initialize dicts
+        dtypes = {}
+        converter_dict = {}
+        converter_kwargs = {}
+        decoder_dict = {}
+        validation_dict = {}
+        order_specs = {}
+        disable_reads = []
 
-      olength = len(orders)
-      for order in orders:
-        section = schema["sections"][order]
-        header = section["header"]
-        elements = section.get("elements", {})
+        olength = len(orders)
+        for order in orders:
+            section = schema["sections"][order]
+            header = section["header"]
+            elements = section.get("elements", {})
 
-        if header.get("disable_read", False):
-            disable_reads.append(order)
+            if header.get("disable_read", False):
+                disable_reads.append(order)
 
-        if not header.get("field_layout"):
-            header["field_layout"] = "delimited" if header.get("delimiter") else "fixed_width"
+            if not header.get("field_layout"):
+                header["field_layout"] = (
+                    "delimited" if header.get("delimiter") else "fixed_width"
+                )
 
-        element_specs = _build_element_specs(
-            order,
-            olength,
-            elements,
-            dtypes,
-            validation_dict,
-            converter_dict,
-            converter_kwargs,
-            decoder_dict,
-        )
+            element_specs = _build_element_specs(
+                order,
+                olength,
+                elements,
+                dtypes,
+                validation_dict,
+                converter_dict,
+                converter_kwargs,
+                decoder_dict,
+            )
 
-        order_specs[order] = {
-            "header": header,
-            "elements": element_specs,
-            "is_delimited": header.get("format") == "delimited",
+            order_specs[order] = {
+                "header": header,
+                "elements": element_specs,
+                "is_delimited": header.get("format") == "delimited",
+            }
+
+        encoding = schema["header"].get("encoding", "utf-8")
+        dtypes, parse_dates = convert_dtypes(dtypes)
+
+        convert_decode = {
+            "converter_dict": converter_dict,
+            "converter_kwargs": converter_kwargs,
+            "decoder_dict": decoder_dict,
         }
 
-      encoding = schema["header"].get("encoding", "utf-8")
-      dtypes, parse_dates = convert_dtypes(dtypes)
-
-      convert_decode = {
-        "converter_dict": converter_dict,
-        "converter_kwargs": converter_kwargs,
-        "decoder_dict": decoder_dict,
-      }
-
-      return ParserConfig(
-        imodel=schema.get("imodel"),
-        orders=orders,
-        order_specs=order_specs,
-        disable_reads=disable_reads,
-        dtypes=dtypes,
-        parse_dates=parse_dates,
-        convert_decode=convert_decode,
-        validation=validation_dict,
-        encoding=encoding,
-      )        
+        return ParserConfig(
+            imodel=schema.get("imodel"),
+            orders=orders,
+            order_specs=order_specs,
+            disable_reads=disable_reads,
+            dtypes=dtypes,
+            parse_dates=parse_dates,
+            convert_decode=convert_decode,
+            validation=validation_dict,
+            encoding=encoding,
+        )
 
     def update_xr_config(self, ds: xr.Dataset) -> ParserConfig:
         new_order_specs = deepcopy(self.config.order_specs)
         new_validation = deepcopy(self.config.validation)
         for order, ospecs in list(self.config.order_specs.items()):
             elements = ospecs["elements"]
-            
+
             for element, especs in elements.items():
                 if (
                     element not in ds.data_vars
@@ -347,20 +361,21 @@ class Parser:
                         new_validation[index][attr] = ds_attrs[attr]
                     else:
                         new_validation[index].pop(attr, None)
-                        
+
         return replace(
             self.config,
             order_specs=new_order_specs,
             validation=new_validation,
         )
 
-        
     def update_pd_config(self, pd_kwargs: dict) -> ParserConfig:
         if "encoding" in pd_kwargs and pd_kwargs["encoding"]:
             return replace(self.config, encoding=pd_kwargs["encoding"])
         return self.config
 
-    def parse_pandas(self, df: pd.DataFrame, sections: list | None, excludes: list | None) -> pd.DataFrame:
+    def parse_pandas(
+        self, df: pd.DataFrame, sections: list | None, excludes: list | None
+    ) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
         col = df.columns[0]
         records = df[col].map(
@@ -374,7 +389,9 @@ class Parser:
         records = records.to_list()
         return pd.DataFrame.from_records(records)
 
-    def parse_netcdf(self, ds: xr.Dataset, sections: list | None, excludes: list | None) -> pd.DataFrame:
+    def parse_netcdf(
+        self, ds: xr.Dataset, sections: list | None, excludes: list | None
+    ) -> pd.DataFrame:
         """Parse netcdf arrays into a pandas DataFrame."""
 
         def replace_empty_strings(series):

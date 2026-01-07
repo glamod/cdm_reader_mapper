@@ -35,7 +35,8 @@ def _apply_or_chunk(data, func, func_args=None, func_kwargs=None, **kwargs):
         func_kwargs,
         **kwargs,
     )
-    
+
+
 def _merge_kwargs(*dicts):
     merged = {}
     for d in dicts:
@@ -43,7 +44,8 @@ def _merge_kwargs(*dicts):
             if k in merged:
                 raise ValueError(f"Duplicate kwarg '{k}' in open_data()")
             merged[k] = d[k]
-    return merged    
+    return merged
+
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
     if not df.columns.map(lambda x: isinstance(x, tuple)).all():
@@ -160,7 +162,7 @@ class FileReader(Parser):
         decode_kwargs = decode_kwargs or {}
         validate_kwargs = validate_kwargs or {}
         select_kwargs = select_kwargs or {}
-        
+
         func_kwargs = _merge_kwargs(
             convert_kwargs,
             decode_kwargs,
@@ -176,7 +178,7 @@ class FileReader(Parser):
         elif open_with == "pandas":
             config = self.update_pd_config(pd_kwargs)
             pd_kwargs["encoding"] = config.encoding
-                
+
             pd_kwargs.setdefault("widths", [properties.MAX_FULL_REPORT_WIDTH])
             pd_kwargs.setdefault("header", None)
             pd_kwargs.setdefault("quotechar", "\0")
@@ -193,7 +195,7 @@ class FileReader(Parser):
             to_parse = pd.read_fwf(source, **pd_kwargs)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
-            
+
         func_kwargs["config"] = config
 
         return _apply_or_chunk(
@@ -215,9 +217,6 @@ class FileReader(Parser):
         validate_kwargs: dict | None = None,
         select_kwargs: dict | None = None,
     ) -> DataBundle:
-        """
-        Note: open_data() mutates self.columns, self.dtypes, self.parse_dates, self.encoding.
-        """
         pd_kwargs = pd_kwargs or {}
         xr_kwargs = xr_kwargs or {}
         convert_kwargs = convert_kwargs or {}
@@ -239,10 +238,10 @@ class FileReader(Parser):
             validate_kwargs=validate_kwargs,
             select_kwargs=select_kwargs,
         )
-        
+
         if not isinstance(result, tuple) or len(result) != 3:
             raise RuntimeError("open_data() must return (data, mask, config)")
-            
+
         data, mask, config = result
 
         return DataBundle(

@@ -181,14 +181,14 @@ def process_textfilereader(
         outputs = func(df, *func_args, **func_kwargs)
         if not isinstance(outputs, tuple):
             outputs = (outputs,)
-            
+
         output_dfs = []
         output_add = []
         for out in outputs:
             if isinstance(out, pd.DataFrame):
-              output_dfs.append(out)
+                output_dfs.append(out)
             else:
-              output_add.append(out)
+                output_add.append(out)
 
         if not buffers:
             buffers = [StringIO() for _ in output_dfs]
