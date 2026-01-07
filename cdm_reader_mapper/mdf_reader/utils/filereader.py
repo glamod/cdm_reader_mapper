@@ -18,7 +18,13 @@ from .utilities import (
 
 from .convert_and_decode import convert_and_decode
 from .validators import validate
-from .parser import Parser
+from .parser import (
+    update_xr_config,
+    update_pd_config,
+    parse_pandas,
+    parse_netcdf,
+    build_parser_config,
+)
 
 from cdm_reader_mapper.core.databundle import DataBundle
 
@@ -80,9 +86,9 @@ def _select_years(df, selection, year_col) -> pd.DataFrame:
 class FileReader:
     """Class to read marine-meteorological data."""
 
-    def __init__(self, *args, **kwargs):
-        self.parser = Parser(*args, **kwargs)
-        self.config = self.parser.config
+    def __init__(self, imodel, *args, **kwargs):
+        self.imodel = imodel
+        self.config = build_parser_config(imodel, *args, **kwargs)
 
     def _process_data(
         self,
@@ -102,16 +108,15 @@ class FileReader:
         parse_mode="pandas",
     ) -> pd.DataFrame | TextFileReader:
         if parse_mode == "pandas":
-            data = self.parser.parse_pandas(data, sections, excludes)
+            data = parse_pandas(data, config, sections, excludes)
         elif parse_mode == "netcdf":
-            data = self.parser.parse_netcdf(data, sections, excludes)
+            data = parse_netcdf(data, config, sections, excludes)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         data = _apply_multiindex(data)
-        imodel = self.config.imodel
 
-        data_model = imodel.split("_")[0]
+        data_model = self.imodel.split("_")[0]
         year_col = properties.year_column[data_model]
 
         data = _select_years(data, [year_init, year_end], year_col)
@@ -135,7 +140,7 @@ class FileReader:
         if validate_flag:
             mask = validate(
                 data,
-                imodel=imodel,
+                imodel=self.imodel,
                 ext_table_path=ext_table_path,
                 attributes=config.validation,
                 disables=config.disable_reads,
@@ -175,10 +180,10 @@ class FileReader:
 
         if open_with == "netcdf":
             to_parse = xr.open_mfdataset(source, **xr_kwargs).squeeze()
-            config = self.parser.update_xr_config(to_parse)
+            config = update_xr_config(to_parse, self.config)
             write_kwargs, read_kwargs = {}, {}
         elif open_with == "pandas":
-            config = self.parser.update_pd_config(pd_kwargs)
+            config = update_pd_config(pd_kwargs, self.config)
             pd_kwargs["encoding"] = config.encoding
 
             pd_kwargs.setdefault("widths", [properties.MAX_FULL_REPORT_WIDTH])
@@ -226,15 +231,13 @@ class FileReader:
         validate_kwargs = validate_kwargs or {}
         select_kwargs = select_kwargs or {}
 
-        imodel = self.config.imodel
-
-        logging.info(f"EXTRACTING DATA FROM MODEL: {imodel}")
+        logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
 
         logging.info("Reading and parsing source data...")
         result = self.open_data(
             source,
             # INFO: Set default as "pandas" to account for custom schema
-            open_with=properties.open_file.get(imodel, "pandas"),
+            open_with=properties.open_file.get(self.imodel, "pandas"),
             pd_kwargs=pd_kwargs,
             xr_kwargs=xr_kwargs,
             convert_kwargs=convert_kwargs,
@@ -255,5 +258,5 @@ class FileReader:
             parse_dates=config.parse_dates,
             encoding=config.encoding,
             mask=mask,
-            imodel=config.imodel,
+            imodel=self.imodel,
         )
