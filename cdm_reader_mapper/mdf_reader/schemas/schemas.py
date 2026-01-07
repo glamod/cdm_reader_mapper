@@ -124,5 +124,6 @@ def read_schema(imodel=None, ext_schema_path=None, ext_schema_file=None) -> dict
 
     make_dummy_sections(schema)
     make_parsing_order(schema)
+    schema["imodel"] = imodel
 
     return schema

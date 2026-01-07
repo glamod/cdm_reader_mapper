@@ -7,6 +7,9 @@ import logging
 import pandas as pd
 import xarray as xr
 
+from dataclasses import replace
+from pandas.io.parsers import TextFileReader
+
 from .. import properties
 from .utilities import (
     process_textfilereader,
@@ -20,8 +23,10 @@ from .parser import Parser
 from cdm_reader_mapper.core.databundle import DataBundle
 
 
-def _apply_or_chunk(data, func, func_args=[], func_kwargs={}, **kwargs):
-    if not isinstance(data, pd.io.parsers.TextFileReader):
+def _apply_or_chunk(data, func, func_args=None, func_kwargs=None, **kwargs):
+    func_args = func_args or []
+    func_kwargs = func_kwargs or {}
+    if not isinstance(data, TextFileReader):
         return func(data, *func_args, **func_kwargs)
     return process_textfilereader(
         data,
@@ -30,7 +35,15 @@ def _apply_or_chunk(data, func, func_args=[], func_kwargs={}, **kwargs):
         func_kwargs,
         **kwargs,
     )
-
+    
+def _merge_kwargs(*dicts):
+    merged = {}
+    for d in dicts:
+        for k in d:
+            if k in merged:
+                raise ValueError(f"Duplicate kwarg '{k}' in open_data()")
+            merged[k] = d[k]
+    return merged    
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
     if not df.columns.map(lambda x: isinstance(x, tuple)).all():
@@ -82,8 +95,9 @@ class FileReader(Parser):
         excludes,
         year_init,
         year_end,
+        config,
         parse_mode="pandas",
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+    ) -> pd.DataFrame | TextFileReader:
         if parse_mode == "pandas":
             data = self.parse_pandas(data, sections, excludes)
         elif parse_mode == "netcdf":
@@ -99,11 +113,11 @@ class FileReader(Parser):
         data = _select_years(data, [year_init, year_end], year_col)
 
         if converter_dict is None:
-            converter_dict = self.convert_decode["converter_dict"]
+            converter_dict = config.convert_decode["converter_dict"]
         if converter_kwargs is None:
-            converter_kwargs = self.convert_decode["converter_kwargs"]
+            converter_kwargs = config.convert_decode["converter_kwargs"]
         if decoder_dict is None:
-            decoder_dict = self.convert_decode["decoder_dict"]
+            decoder_dict = config.convert_decode["decoder_dict"]
 
         data = convert_and_decode(
             data,
@@ -119,15 +133,15 @@ class FileReader(Parser):
                 data,
                 imodel=self.imodel,
                 ext_table_path=ext_table_path,
-                attributes=self.validation,
-                disables=self.disable_reads,
+                attributes=config.validation,
+                disables=config.disable_reads,
             )
         else:
             mask = pd.DataFrame(True, index=data.index, columns=data.columns)
 
-        self.columns = data.columns
-        data = remove_boolean_values(data, self.dtypes)
-        return data, mask
+        data = remove_boolean_values(data, config.dtypes)
+        config = replace(config, columns=data.columns)
+        return data, mask, config
 
     def open_data(
         self,
@@ -139,52 +153,48 @@ class FileReader(Parser):
         decode_kwargs=None,
         validate_kwargs=None,
         select_kwargs=None,
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """DOCUMENTATION."""
-        func_kwargs = {
-            **convert_kwargs,
-            **decode_kwargs,
-            **validate_kwargs,
-            **select_kwargs,
-            "parse_mode": open_with,
-        }
+    ) -> tuple[pd.DataFrame, pd.DataFrame] | tuple[TextFileReader, TextFileReader]:
+        pd_kwargs = dict(pd_kwargs or {})
+        xr_kwargs = dict(xr_kwargs or {})
+        convert_kwargs = convert_kwargs or {}
+        decode_kwargs = decode_kwargs or {}
+        validate_kwargs = validate_kwargs or {}
+        select_kwargs = select_kwargs or {}
+        
+        func_kwargs = _merge_kwargs(
+            convert_kwargs,
+            decode_kwargs,
+            validate_kwargs,
+            select_kwargs,
+        )
+        func_kwargs["parse_mode"] = open_with
+
         if open_with == "netcdf":
-            to_parse = xr.open_mfdataset(source, xr_kwargs).squeeze()
-            self.adjust_elements(to_parse)
+            to_parse = xr.open_mfdataset(source, **xr_kwargs).squeeze()
+            config = self.update_xr_config(to_parse)
             write_kwargs, read_kwargs = {}, {}
         elif open_with == "pandas":
-            if pd_kwargs.get("encoding"):
-                self.encoding = pd_kwargs["encoding"]
-            else:
-                pd_kwargs["encoding"] = self.encoding
-            if not pd_kwargs.get("widths"):
-                pd_kwargs["widths"] = [properties.MAX_FULL_REPORT_WIDTH]
-            if not pd_kwargs.get("header"):
-                pd_kwargs["header"] = None
-            if not pd_kwargs.get("quotechar"):
-                pd_kwargs["quotechar"] = "\0"
-            if not pd_kwargs.get("escapechar"):
-                pd_kwargs["escapechar"] = "\0"
-            if not pd_kwargs.get("dtype"):
-                pd_kwargs["dtype"] = object
-            if not pd_kwargs.get("skip_blank_lines"):
-                pd_kwargs["skip_blank_lines"] = False
+            config = self.update_pd_config(pd_kwargs)
+            pd_kwargs["encoding"] = config.encoding
+                
+            pd_kwargs.setdefault("widths", [properties.MAX_FULL_REPORT_WIDTH])
+            pd_kwargs.setdefault("header", None)
+            pd_kwargs.setdefault("quotechar", "\0")
+            pd_kwargs.setdefault("escapechar", "\0")
+            pd_kwargs.setdefault("dtype", object)
+            pd_kwargs.setdefault("skip_blank_lines", False)
 
             write_kwargs = {"encoding": pd_kwargs["encoding"]}
+            chunksize = pd_kwargs.get("chunksize")
             read_kwargs = (
-                {
-                    "chunksize": pd_kwargs["chunksize"] or None,
-                    "dtype": self.dtypes,
-                },
-                {
-                    "chunksize": pd_kwargs["chunksize"] or None,
-                    "dtype": "boolean",
-                },
+                {"chunksize": chunksize, "dtype": config.dtypes},
+                {"chunksize": chunksize, "dtype": "boolean"},
             )
-
             to_parse = pd.read_fwf(source, **pd_kwargs)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            
+        func_kwargs["config"] = config
 
         return _apply_or_chunk(
             to_parse,
@@ -205,25 +215,22 @@ class FileReader(Parser):
         validate_kwargs: dict | None = None,
         select_kwargs: dict | None = None,
     ) -> DataBundle:
-        if pd_kwargs is None:
-            pd_kwargs = {}
-        if xr_kwargs is None:
-            xr_kwargs = {}
-        if convert_kwargs is None:
-            convert_kwargs = {}
-        if decode_kwargs is None:
-            decode_kwargs = {}
-        if validate_kwargs is None:
-            validate_kwargs = {}
-        if select_kwargs is None:
-            select_kwargs = {}
+        """
+        Note: open_data() mutates self.columns, self.dtypes, self.parse_dates, self.encoding.
+        """
+        pd_kwargs = pd_kwargs or {}
+        xr_kwargs = xr_kwargs or {}
+        convert_kwargs = convert_kwargs or {}
+        decode_kwargs = decode_kwargs or {}
+        validate_kwargs = validate_kwargs or {}
+        select_kwargs = select_kwargs or {}
 
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
 
-        logging.info("Getting data string from source...")
-        data, mask = self.open_data(
-            # INFO: Set default as "pandas" to account for custom schema
+        logging.info("Reading and parsing source data...")
+        result = self.open_data(
             source,
+            # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
             pd_kwargs=pd_kwargs,
             xr_kwargs=xr_kwargs,
@@ -232,13 +239,18 @@ class FileReader(Parser):
             validate_kwargs=validate_kwargs,
             select_kwargs=select_kwargs,
         )
+        
+        if not isinstance(result, tuple) or len(result) != 3:
+            raise RuntimeError("open_data() must return (data, mask, config)")
+            
+        data, mask, config = result
 
         return DataBundle(
             data=data,
-            columns=self.columns,
-            dtypes=self.dtypes,
-            parse_dates=self.parse_dates,
-            encoding=self.encoding,
+            columns=config.columns,
+            dtypes=config.dtypes,
+            parse_dates=config.parse_dates,
+            encoding=config.encoding,
             mask=mask,
-            imodel=self.imodel,
+            imodel=config.imodel,
         )

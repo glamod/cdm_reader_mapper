@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import ast
 import csv
 import logging
 
+from dataclasses import dataclass, replace
 from copy import deepcopy
 from itertools import zip_longest
 
@@ -18,6 +18,18 @@ from .utilities import convert_dtypes
 
 from .convert_and_decode import Converters, Decoders
 
+@dataclass(frozen=True)
+class ParserConfig:
+    imodel: str
+    orders: list[str]
+    order_specs: dict
+    disable_reads: list[str]
+    dtypes: dict
+    parse_dates: list[str]
+    convert_decode: dict
+    validation: dict
+    encoding: str
+    columns: pd.Index | pd.MultiIndex | None = None
 
 def _validate_sentinel(i: int, line: str, sentinel: str) -> bool:
     return line.startswith(sentinel, i)
@@ -32,7 +44,7 @@ def _get_index(section: str, order: str, length: int) -> str | tuple[str, str]:
 def _get_ignore(section_dict: dict) -> bool:
     ignore = section_dict.get("ignore", False)
     if isinstance(ignore, str):
-        ignore = ast.literal_eval(ignore)
+        ignore = ignore.lower() in {"true", "1", "yes"}
     return bool(ignore)
 
 
@@ -230,16 +242,47 @@ def _parse_delimited(
         index = elements[element].get("index")
         if _is_in_sections(index, sections) and not _is_in_sections(index, excludes):
             out[index] = value.strip() if value is not None else None
-        if value is not None:
-            i += len(value)
 
-    return i
+    return len(line)
 
 
 def parse_line(*args, is_delimited: bool) -> int:
     if is_delimited:
         return _parse_delimited(*args)
     return _parse_fixed_width(*args)
+
+def parse_line_with_config(
+    line: str,
+    config: ParserConfig,
+    sections: list | None,
+    excludes: list | None,
+) -> dict:
+    i = 0
+    out = {}
+    excludes = excludes or []
+
+    for order, spec in config.order_specs.items():
+        header = spec["header"]
+        elements = spec["elements"]
+
+        if header.get("disable_read"):
+            if order in excludes:
+                continue
+            out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
+            continue
+
+        i = parse_line(
+            line,
+            i,
+            header,
+            elements,
+            sections,
+            excludes,
+            out,
+            is_delimited=spec["is_delimited"],
+        )
+
+    return out
 
 
 class Parser:
@@ -255,23 +298,23 @@ class Parser:
             ext_schema_file=ext_schema_file,
         )
         self.schema = schema
-        self.build_parsing_order(schema)
-        self.build_compiled_specs_and_convertdecode(schema)
-
-    def build_parsing_order(self, schema: dict):
+        self.config = self._build_config(schema)
+    
+    def _build_config(self, schema: dict) -> ParserConfig:
+        # parsing order
         parsing_order = schema["header"].get("parsing_order")
-        sections_ = [x.get(y) for x in parsing_order for y in x]
-        self.orders = [y for x in sections_ for y in x]
-
-    def build_compiled_specs_and_convertdecode(self, schema: dict):
+        sections = [x.get(y) for x in parsing_order for y in x]
+        orders = [y for x in sections for y in x]
+        
+        #compiled specs
         dtypes = {}
         converter_dict = {}
         converter_kwargs = {}
         decoder_dict = {}
         validation_dict = {}
-
-        self.order_specs, self.disable_reads = _order_specs(
-            self.orders,
+        
+        order_specs, disable_reads = _order_specs(
+            orders,
             schema["sections"],
             converter_dict,
             converter_kwargs,
@@ -279,23 +322,34 @@ class Parser:
             validation_dict,
             dtypes,
         )
+        
+        encoding = schema["header"].get("encoding", "utf-8")
+        dtypes, parse_dates = convert_dtypes(dtypes)                
 
-        self.encoding = schema["header"].get("encoding", "utf-8")
-
-        self.dtypes, self.parse_dates = convert_dtypes(dtypes)
-
-        self.convert_decode = {
+        convert_decode = {
             "converter_dict": converter_dict,
             "converter_kwargs": converter_kwargs,
             "decoder_dict": decoder_dict,
         }
+        
+        return ParserConfig(
+            imodel=schema["imodel"],
+            orders=orders,
+            order_specs=order_specs,
+            disable_reads=disable_reads,
+            dtypes=dtypes,
+            parse_dates=parse_dates,
+            convert_decode=convert_decode,
+            validation=validation_dict,
+            encoding=encoding,            
+        )
 
-        self.validation = validation_dict
-
-    def adjust_elements(self, ds: xr.Dataset):
-        validation = deepcopy(self.validation)
-        for order, ospecs in self.order_specs.items():
+    def update_xr_config(self, ds: xr.Dataset) -> ParserConfig:
+        new_order_specs = deepcopy(self.config.order_specs)
+        new_validation = deepcopy(self.config.validation)
+        for order, ospecs in list(self.config.order_specs.items()):
             elements = ospecs["elements"]
+            
             for element, especs in elements.items():
                 if (
                     element not in ds.data_vars
@@ -306,53 +360,42 @@ class Parser:
                     continue
 
                 index = especs.get("index")
-
-                if index not in self.validation:
+                if index not in new_validation:
                     continue
 
-                for attr, value in validation[index].items():
-                    if value != "__from_file__":
+                for attr in list(new_validation[index].keys()):
+                    if new_validation[index][attr] != "__from_file__":
                         continue
 
                     ds_attrs = ds[element].attrs
                     if attr in ds_attrs:
-                        self.validation[index][attr] = ds_attrs[attr]
+                        new_validation[index][attr] = ds_attrs[attr]
                     else:
-                        self.validation[index].pop(attr, None)
+                        new_validation[index].pop(attr, None)
+                        
+        return replace(
+            self.config,
+            order_specs=new_order_specs,
+            validation=new_validation,
+        )
 
-    def _parse_line(self, line: str) -> dict:
-        i = 0
-        out = {}
-
-        for order, spec in self.order_specs.items():
-            header = spec.get("header")
-            elements = spec.get("elements")
-            is_delimited = spec.get("is_delimited")
-
-            if header.get("disable_read"):
-                if order in self._excludes:
-                    continue
-                out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
-                continue
-
-            i = parse_line(
-                line,
-                i,
-                header,
-                elements,
-                self._sections,
-                self._excludes,
-                out,
-                is_delimited=is_delimited,
-            )
-        return out
+        
+    def update_pd_config(self, pd_kwargs: dict) -> ParserConfig:
+        if "encoding" in pd_kwargs and pd_kwargs["encoding"]:
+            return replace(self.config, encoding=pd_kwargs["encoding"])
+        return self.config
 
     def parse_pandas(self, df: pd.DataFrame, sections: list | None, excludes: list | None) -> pd.DataFrame:
         """Parse text lines into a pandas DataFrame."""
-        self._sections = sections
-        self._excludes = excludes or []
         col = df.columns[0]
-        records = df[col].map(self._parse_line)
+        records = df[col].map(
+            lambda line: parse_line_with_config(
+                line,
+                self.config,
+                sections,
+                excludes,
+            )
+        )
         records = records.to_list()
         return pd.DataFrame.from_records(records)
 
@@ -373,7 +416,7 @@ class Parser:
 
         excludes = excludes or []
 
-        for order, ospec in self.order_specs.items():
+        for order, ospec in self.config.order_specs.items():
             header = ospec.get("header")
             disable_read = header.get("disable_read")
             if not _is_in_sections(order, sections):
