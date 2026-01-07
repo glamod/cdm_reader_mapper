@@ -70,25 +70,23 @@ def _convert_dtype_to_default(dtype: str | None) -> str | None:
         return properties.pandas_int
     return dtype
 
-
-def _element_specs(
+def _build_element_specs(
     order: str,
     olength: int,
     elements: dict,
+    dtypes: dict,
+    validation_dict: dict,
     converter_dict: dict,
     converter_kwargs: dict,
     decoder_dict: dict,
-    validation_dict: dict,
-    dtypes: dict,
 ) -> dict:
+    """Build specs for all elements in a section and update related dicts."""
     element_specs = {}
 
     for name, meta in elements.items():
-
         index = _get_index(name, order, olength)
         ignore = _get_ignore(meta)
-        ctype = meta.get("column_type")
-        ctype = _convert_dtype_to_default(ctype)
+        ctype = _convert_dtype_to_default(meta.get("column_type"))
 
         element_specs[name] = {
             "index": index,
@@ -98,81 +96,36 @@ def _element_specs(
             "field_length": meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
         }
 
-        if meta.get("disable_read", False) or ignore:
+        if ignore or meta.get("disable_read", False):
             continue
 
-        validation_dict[index] = {}
-
-        if ctype:
-            validation_dict[index]["column_type"] = ctype
-
+        # Pandas dtype
         dtype = properties.pandas_dtypes.get(ctype)
-
         if dtype is not None:
             dtypes[index] = dtype
 
-        vmin = meta.get("valid_min")
-        if vmin is not None:
-            validation_dict[index]["valid_min"] = vmin
-
-        vmax = meta.get("valid_max")
-        if vmax is not None:
-            validation_dict[index]["valid_max"] = vmax
-
-        ctable = meta.get("codetable")
-        if ctable is not None:
-            validation_dict[index]["codetable"] = ctable
-
+        # Conversion & decoding
         conv_func = Converters(ctype).converter()
         if conv_func:
             converter_dict[index] = conv_func
-
-        conv_kwargs = {
-            k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])
-        }
+        conv_kwargs = {k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])}
         if conv_kwargs:
             converter_kwargs[index] = conv_kwargs
-
         encoding = meta.get("encoding")
         if encoding:
             dec_func = Decoders(ctype, encoding).decoder()
             if dec_func:
                 decoder_dict[index] = dec_func
+                
+        # Validation
+        validation_dict[index] = {}
+        if ctype:
+            validation_dict[index]["column_type"] = ctype
+        for k in ("valid_min", "valid_max", "codetable"):
+            if meta.get(k) is not None:
+                validation_dict[index][k] = meta[k]                
 
     return element_specs
-
-
-def _order_specs(orders: list, sections: dict, *args) -> tuple[dict, list]:
-    order_specs = {}
-    disable_reads = []
-
-    olength = len(orders)
-    for order in orders:
-        section = sections[order]
-        header = section["header"]
-        elements = section.get("elements", {})
-
-        if header.get("disable_read", False):
-            disable_reads.append(order)
-
-        if not header.get("field_layout"):
-            delimiter = header.get("delimiter")
-            header["field_layout"] = "delimited" if delimiter else "fixed_width"
-
-        element_specs = _element_specs(
-            order,
-            olength,
-            elements,
-            *args,
-        )
-
-        order_specs[order] = {
-            "header": header,
-            "elements": element_specs,
-            "is_delimited": header.get("format") == "delimited",
-        }
-
-    return order_specs, disable_reads
 
 
 def _parse_fixed_width(
@@ -299,50 +252,72 @@ class Parser:
         )
         self.schema = schema
         self.config = self._build_config(schema)
-    
+        
     def _build_config(self, schema: dict) -> ParserConfig:
-        # parsing order
-        parsing_order = schema["header"].get("parsing_order")
-        sections = [x.get(y) for x in parsing_order for y in x]
-        orders = [y for x in sections for y in x]
-        
-        #compiled specs
-        dtypes = {}
-        converter_dict = {}
-        converter_kwargs = {}
-        decoder_dict = {}
-        validation_dict = {}
-        
-        order_specs, disable_reads = _order_specs(
-            orders,
-            schema["sections"],
+      """Build a ParserConfig from a schema."""
+      # Parsing order
+      parsing_order = schema["header"].get("parsing_order", [])
+      sections = [x.get(y) for x in parsing_order for y in x]
+      orders = [y for x in sections for y in x]
+
+      # Initialize dicts
+      dtypes = {}
+      converter_dict = {}
+      converter_kwargs = {}
+      decoder_dict = {}
+      validation_dict = {}
+      order_specs = {}
+      disable_reads = []
+
+      olength = len(orders)
+      for order in orders:
+        section = schema["sections"][order]
+        header = section["header"]
+        elements = section.get("elements", {})
+
+        if header.get("disable_read", False):
+            disable_reads.append(order)
+
+        if not header.get("field_layout"):
+            header["field_layout"] = "delimited" if header.get("delimiter") else "fixed_width"
+
+        element_specs = _build_element_specs(
+            order,
+            olength,
+            elements,
+            dtypes,
+            validation_dict,
             converter_dict,
             converter_kwargs,
             decoder_dict,
-            validation_dict,
-            dtypes,
         )
-        
-        encoding = schema["header"].get("encoding", "utf-8")
-        dtypes, parse_dates = convert_dtypes(dtypes)                
 
-        convert_decode = {
-            "converter_dict": converter_dict,
-            "converter_kwargs": converter_kwargs,
-            "decoder_dict": decoder_dict,
+        order_specs[order] = {
+            "header": header,
+            "elements": element_specs,
+            "is_delimited": header.get("format") == "delimited",
         }
-        
-        return ParserConfig(
-            imodel=schema["imodel"],
-            orders=orders,
-            order_specs=order_specs,
-            disable_reads=disable_reads,
-            dtypes=dtypes,
-            parse_dates=parse_dates,
-            convert_decode=convert_decode,
-            validation=validation_dict,
-            encoding=encoding,            
-        )
+
+      encoding = schema["header"].get("encoding", "utf-8")
+      dtypes, parse_dates = convert_dtypes(dtypes)
+
+      convert_decode = {
+        "converter_dict": converter_dict,
+        "converter_kwargs": converter_kwargs,
+        "decoder_dict": decoder_dict,
+      }
+
+      return ParserConfig(
+        imodel=schema.get("imodel"),
+        orders=orders,
+        order_specs=order_specs,
+        disable_reads=disable_reads,
+        dtypes=dtypes,
+        parse_dates=parse_dates,
+        convert_decode=convert_decode,
+        validation=validation_dict,
+        encoding=encoding,
+      )        
 
     def update_xr_config(self, ds: xr.Dataset) -> ParserConfig:
         new_order_specs = deepcopy(self.config.order_specs)
