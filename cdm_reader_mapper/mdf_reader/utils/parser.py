@@ -23,7 +23,6 @@ from .convert_and_decode import Converters, Decoders
 @dataclass(frozen=True)
 class ParserConfig:
     imodel: str
-    orders: list[str]
     order_specs: dict
     disable_reads: list[str]
     dtypes: dict
@@ -319,7 +318,6 @@ class Parser:
 
         return ParserConfig(
             imodel=schema.get("imodel"),
-            orders=orders,
             order_specs=order_specs,
             disable_reads=disable_reads,
             dtypes=dtypes,
