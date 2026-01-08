@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
+from typing import Callable, Any
 
 import pandas as pd
 
@@ -10,51 +11,140 @@ from .. import properties
 from .utilities import convert_str_boolean
 
 
-def max_decimal_places(*decimals):
-    """Get maximum number of decimal places for each Decimal number."""
-    decimal_places = [
-        -d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0 for d in decimals
-    ]
-    return max(decimal_places)
+def max_decimal_places(*decimals: Decimal) -> int:
+    """
+    Return the maximum number of decimal places among Decimal values.
+
+    Parameters
+    ----------
+    decimals : Decimal
+        One or more Decimal values.
+
+    Returns
+    -------
+    int
+        Maximum number of decimal places.
+    """
+    return max(
+        (-d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0) for d in decimals
+    )
 
 
-def to_numeric(x, scale, offset):
+def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
+    """
+    Convert a value to a scaled Decimal with offset applied.
+
+    Rules
+    -----
+    - Boolean values are returned unchanged
+    - Empty or invalid values return False
+    - Strings are stripped and spaces replaced with zeros
+    - Result is quantized to the maximum decimal precision
+      of input, scale, or offset
+
+    Parameters
+    ----------
+    x : Any
+        Input value to convert.
+    scale : Decimal
+        Scale factor.
+    offset : Decimal
+        Offset value.
+
+    Returns
+    -------
+    Decimal | bool
+        Converted Decimal value, boolean, or False if invalid.
+    """
     x = convert_str_boolean(x)
+
     if isinstance(x, bool):
         return x
+
     if isinstance(x, str):
         x = x.strip()
-        x.replace(" ", "0")
+        x = x.replace(" ", "0")
+
     try:
-        x = Decimal(str(x))
-        decimal_places = max_decimal_places(offset, scale, x)
-        result = offset + x * scale
+        x_dec = Decimal(str(x))
+        decimal_places = max_decimal_places(offset, scale, x_dec)
+        result = offset + x_dec * scale
+
+        if decimal_places == 0:
+            return result
+
         return result.quantize(Decimal("1." + "0" * decimal_places))
-    except (InvalidOperation, ValueError):
+
+    except (InvalidOperation, TypeError, ValueError):
         return False
 
 
 class Decoders:
+    """
+    Registry-based decoder dispatcher for column-wise decoding.
 
-    def __init__(self, dtype, encoding="base36"):
+    Currently supports Base36 decoding for numeric-like fields.
+    """
+
+    def __init__(self, dtype: str, encoding: str = "base36") -> None:
+        """
+        Initialization.
+
+        Parameters
+        ----------
+        dtype : str
+            Target data type name (e.g. numeric field type)
+        encoding : str, default "base36"
+            Encoding scheme to use
+        """
         self.dtype = dtype
         self.encoding = encoding
 
         self._registry = {"key": self.base36}
-        for dtype in properties.numeric_types:
-            self._registry[dtype] = self.base36
 
-    def decoder(self):
+        for numeric_type in properties.numeric_types:
+            self._registry[numeric_type] = self.base36
+
+    def decoder(self) -> Callable[[pd.Series], pd.Series] | None:
+        """
+        Return the decoder function for the configured dtype and encoding.
+
+        Returns
+        -------
+        callable or None
+            Decoder function accepting a pandas Series, or None if encoding
+            is unsupported.
+
+        Raises
+        ------
+        KeyError
+            If no decoder is registered for the given dtype.
+        """
         if self.encoding != "base36":
-            return
+            return None
 
         try:
             return self._registry[self.dtype]
-        except KeyError:
-            raise KeyError(f"No converter registered for '{self.dtype}'")
+        except KeyError as exc:
+            raise KeyError(f"No converter registered for '{self.dtype}'") from exc
 
-    def base36(self, data) -> pd.Series:
-        """DOCUMENTATION."""
+    def base36(self, data: pd.Series) -> pd.Series:
+        """
+        Decode a pandas Series from Base36 to stringified base-10 integers.
+
+        Boolean values are preserved.
+        Invalid values raise ValueError via `int(..., 36)`.
+
+        Parameters
+        ----------
+        data : pd.Series
+            Input Series containing base36-encoded values
+
+        Returns
+        -------
+        pd.Series
+            Decoded Series with stringified integers or booleans
+        """
 
         def _base36(x):
             x = convert_str_boolean(x)
@@ -62,13 +152,26 @@ class Decoders:
                 return x
             return str(int(str(x), 36))
 
-        return data.apply(lambda x: _base36(x))
+        return data.apply(_base36)
 
 
 class Converters:
-    """Class for converting pandas DataFrame."""
+    """
+    Registry-based converter for pandas Series.
 
-    def __init__(self, dtype):
+    Converts object-typed Series into numeric, datetime, or cleaned object
+    representations based on the configured dtype.
+    """
+
+    def __init__(self, dtype: str) -> None:
+        """
+        Initialization.
+
+        Parameters
+        ----------
+        dtype : str
+            Target output dtype identifier
+        """
         self.dtype = dtype
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
@@ -86,44 +189,55 @@ class Converters:
             "key": self.object_to_object,
         }
 
-        for dtype in properties.numeric_types:
-            self._registry[dtype] = self.object_to_numeric
+        for numeric_type in properties.numeric_types:
+            self._registry[numeric_type] = self.object_to_numeric
 
-    def converter(self):
-        try:
-            return self._registry[self.dtype]
-        except KeyError:
-            raise KeyError(f"No converter registered for '{self.dtype}'")
-
-    def object_to_numeric(self, data, scale=None, offset=None) -> pd.Series:
+    def converter(self) -> Callable[..., pd.Series]:
         """
-        Convert the object type elements of a pandas series to numeric type.
-
-        Right spaces are treated as zeros. Scale and offset can optionally be applied.
-        The final data type according to the class dtype.
-
-        Parameters
-        ----------
-        self : dtype, numeric_scale and numeric_offset
-            Pandas dataframe with a column per report sections.
-            The sections in the columns as a block strings.
-        data : pandas.Series
-            Series with data to convert. Data must be object type
-
-        Keyword Arguments
-        -----------------
-        scale : numeric, optional
-            Scale to apply after conversion to numeric
-        offset : numeric, optional
-            Offset to apply after conversion to numeric
-        column_name : str, optional
-            Name of the column being processed
+        Return the converter function registered for the configured dtype.
 
         Returns
         -------
-        data : pandas.Series
-            Data series of type self.dtype
+        callable
+            Converter function
 
+        Raises
+        ------
+        KeyError
+            If no converter is registered for the dtype
+        """
+        try:
+            return self._registry[self.dtype]
+        except KeyError as exc:
+            raise KeyError(f"No converter registered for '{self.dtype}'") from exc
+
+    def object_to_numeric(
+        self,
+        data: pd.Series,
+        scale: float | int | None = None,
+        offset: float | int | None = None,
+    ) -> pd.Series:
+        """
+        Convert object Series to numeric using Decimal arithmetic.
+
+        - Right spaces are treated as zeros
+        - Optional scale and offset may be applied
+        - Boolean values are preserved
+        - Invalid conversions return False
+
+        Parameters
+        ----------
+        data : pd.Series
+            Object-typed Series
+        scale : numeric, optional
+            Scale factor
+        offset : numeric, optional
+            Offset value
+
+        Returns
+        -------
+        pd.Series
+            Converted Series
         """
         if data.dtype != "object":
             return data
@@ -140,8 +254,26 @@ class Converters:
 
         return data.apply(lambda x: to_numeric(x, scale, offset))
 
-    def object_to_object(self, data, disable_white_strip=False) -> pd.Series:
-        """DOCUMENTATION."""
+    def object_to_object(
+        self,
+        data: pd.Series,
+        disable_white_strip: bool | str = False,
+    ) -> pd.Series:
+        """
+        Clean object Series by stripping whitespace and nullifying empty strings.
+
+        Parameters
+        ----------
+        data : pd.Series
+            Object-typed Series
+        disable_white_strip : bool or {"l", "r"}, default False
+            Control whitespace stripping behavior
+
+        Returns
+        -------
+        pd.Series
+            Cleaned Series
+        """
         if data.dtype != "object":
             return data
 
@@ -156,20 +288,41 @@ class Converters:
             lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
         )
 
-    def object_to_datetime(self, data, datetime_format="%Y%m%d") -> pd.DateTimeIndex:
-        """DOCUMENTATION."""
+    def object_to_datetime(
+        self,
+        data: pd.Series,
+        datetime_format: str = "%Y%m%d",
+    ) -> pd.Series:
+        """
+        Convert object Series to pandas datetime.
+
+        Invalid values are coerced to NaT.
+
+        Parameters
+        ----------
+        data : pd.Series
+            Object-typed Series
+        datetime_format : str, default "%Y%m%d"
+            Datetime parsing format
+
+        Returns
+        -------
+        pd.Series
+            Datetime Series
+        """
         if data.dtype != "object":
             return data
+
         return pd.to_datetime(data, format=datetime_format, errors="coerce")
 
 
 def convert_and_decode(
-    data,
-    convert_flag=True,
-    decode_flag=True,
-    converter_dict=None,
-    converter_kwargs=None,
-    decoder_dict=None,
+    data: pd.DataFrame,
+    convert_flag: bool = True,
+    decode_flag: bool = True,
+    converter_dict: dict[str, Callable[[pd.Series], pd.Series]] | None = None,
+    converter_kwargs: dict[str, dict] | None = None,
+    decoder_dict: dict[str, Callable[[pd.Series], pd.Series]] | None = None,
 ) -> pd.DataFrame:
     """Convert and decode data entries by using a pre-defined data model.
 
@@ -177,49 +330,41 @@ def convert_and_decode(
 
     Parameters
     ----------
-    data: pd.DataFrame
-      Data to convert and decode.
-    convert: bool, default: True
-      If True convert entries by using a pre-defined data model.
-    decode: bool, default: True
-      If True decode entries by using a pre-defined data model.
-    converter_dict: dict of {Hashable: func}, optional
-      Functions for converting values in specific columns.
-      If None use information from a pre-defined data model.
-    converter_kwargs: dict of {Hashable: kwargs}, optional
-      Key-word arguments for converting values in specific columns.
-      If None use information from a pre-defined data model.
-    decoder_dict: dict, optional
-      Functions for decoding values in specific columns.
-      If None use information from a pre-defined data model.
+    data : pd.DataFrame
+        Data to convert and decode.
+    convert_flag : bool, default True
+        If True, apply converters to the columns defined in `converter_dict`.
+    decode_flag : bool, default True
+        If True, apply decoders to the columns defined in `decoder_dict`.
+    converter_dict : dict[str, callable], optional
+        Column-specific converter functions. If None, defaults to empty dict.
+    converter_kwargs : dict[str, dict], optional
+        Keyword arguments for each converter function.
+    decoder_dict : dict[str, callable], optional
+        Column-specific decoder functions. If None, defaults to empty dict.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with converted and decoded columns.
     """
-    if converter_dict is None:
-        converter_dict = {}
-    if converter_kwargs is None:
-        converter_kwargs = {}
-    if decoder_dict is None:
-        decoder_dict = {}
+    converter_dict = converter_dict or {}
+    converter_kwargs = converter_kwargs or {}
+    decoder_dict = decoder_dict or {}
 
-    if not (convert_flag and decode_flag):
-        return data
+    if decode_flag:
+        for column, dec_func in decoder_dict.items():
+            if column in data.columns:
+                decoded = dec_func(data[column])
+                decoded.index = data[column].index
+                data[column] = decoded
 
-    if convert_flag is not True:
-        converter_dict = {}
-        converter_kwargs = {}
-    if decode_flag is not True:
-        decoder_dict = {}
-
-    for section, conv_func in converter_dict.items():
-        if section not in data.columns:
-            continue
-
-        if section in decoder_dict.keys():
-            decoded = decoder_dict[section](data[section])
-            decoded.index = data[section].index
-            data[section] = decoded
-
-        converted = conv_func(data[section], **converter_kwargs[section])
-        converted.index = data[section].index
-        data[section] = converted
+    if convert_flag:
+        for column, conv_func in converter_dict.items():
+            if column in data.columns:
+                kwargs = converter_kwargs.get(column, {})
+                converted = conv_func(data[column], **kwargs)
+                converted.index = data[column].index
+                data[column] = converted
 
     return data

@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+from typing import Optional, Dict
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
@@ -23,53 +24,60 @@ from .. import properties
 
 
 def read_table(
-    code_table_name,
-    imodel=None,
-    ext_table_path=None,
-) -> dict:
+    code_table_name: str,
+    imodel: Optional[str] = None,
+    ext_table_path: Optional[str] = None,
+) -> Dict:
     """
-    Read a data model code table file to a dictionary.
+    Load a data model code table into a Python dictionary.
 
-    It completes the code table to the full complexity
-    the data reader expects, by appending information
-    on secondary keys and expanding range keys.
+    The code table may define secondary keys, range expansions, or other
+    structures required by the data reader. This function resolves the
+    file location either from an external path or an internal data model.
 
-    Parameter
-    ---------
-    code_table_name: str
-        The external code table file.
-    imodel: str, optional
-        Name of internally available input data model.
-        e.g. icoads_r300_d704
-    ext_table_path: str, optional
-        The path to the external code table file.
-        One of ``imodel`` and ``ext_table_path`` must be set.
+    Parameters
+    ----------
+    code_table_name : str
+        The name of the code table (without file extension).  
+        e.g., `"ICOADS.C0.IM"`
+    imodel : str, optional
+        Internal data model name, e.g., `"icoads_r300_d704"`. Required if
+        `ext_table_path` is not provided.
+    ext_table_path : str, optional
+        External path containing the code table file. If set, this path
+        takes precedence over `imodel`.
 
     Returns
     -------
-    dict
-        Code table
+    Dict
+        The fully combined code table dictionary.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified table file cannot be found.
+    ValueError
+        If neither `imodel` nor `ext_table_path` is provided.
     """
-    # 1. Validate input
     if ext_table_path:
-        table_path = os.path.abspath(ext_table_path)
-        table_files = os.path.join(table_path, code_table_name + ".json")
-        if not os.path.isfile(table_files):
-            logging.error(f"Can't find input code table file {table_files}")
-            return
-        table_files = Path(table_files)
-    else:
-        imodel = imodel.split("_")
+        table_path = Path(ext_table_path).resolve()
+        table_file = table_path / f"{code_table_name}.json"
+        if not table_file.is_file():
+            raise FileNotFoundError(f"Can't find input code table file {table_file}")
+        table_files = [table_file]
+    elif imodel:
+        parts = imodel.split("_")
         table_files = collect_json_files(
-            *imodel,
+            *parts,
             base=f"{properties._base}.codes",
             name=code_table_name,
         )
 
-    if isinstance(table_files, Path):
-        table_files = [table_files]
-    # 2. Get tables
+        if isinstance(table_files, Path):
+          table_files = [table_files]
+    else:
+        raise ValueError("One of 'imodel' or 'ext_table_path' must be set")
+
     tables = [open_json_file(ifile) for ifile in table_files]
 
-    # 3. Combine tables
     return combine_dicts(tables)
