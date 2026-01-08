@@ -33,14 +33,8 @@ class ParserConfig:
     columns: pd.Index | pd.MultiIndex | None = None
 
 
-def _validate_sentinel(i: int, line: str, sentinel: str) -> bool:
-    return line.startswith(sentinel, i)
-
-
 def _get_index(section: str, order: str, length: int) -> str | tuple[str, str]:
-    if length == 1:
-        return section
-    return (order, section)
+    return section if length == 1 else (order, section)
 
 
 def _get_ignore(section_dict: dict) -> bool:
@@ -48,13 +42,6 @@ def _get_ignore(section_dict: dict) -> bool:
     if isinstance(ignore, str):
         ignore = ignore.lower() in {"true", "1", "yes"}
     return bool(ignore)
-
-
-def _is_in_sections(index: str | tuple, sections: list | None) -> bool:
-    if sections is None:
-        return True
-    key = index[0] if isinstance(index, tuple) else index
-    return key in sections
 
 
 def _convert_dtype_to_default(dtype: str | None) -> str | None:
@@ -78,41 +65,42 @@ def _parse_fixed_width(
     i: int,
     header: dict,
     elements: dict,
-    sections: list | None,
-    excludes: list | None,
+    sections: set | None,
+    excludes: set,
     out: dict,
 ) -> int:
     section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
     delimiter = header.get("delimiter")
     sentinel = header.get("sentinel")
 
-    bad_sentinel = sentinel is not None and not _validate_sentinel(i, line, sentinel)
     section_end = i + section_length
-
+    bad_sentinel = sentinel is not None and not line.startswith(sentinel, i)
     line_len = len(line)
     delim_len = len(delimiter) if delimiter else 0
 
     for spec in elements.values():
         field_length = spec.get("field_length", 0)
         index = spec.get("index")
+        ignore = spec.get("ignore", False)
+        missing_value = spec.get("missing_value")
 
+        missing = True
         j = i if bad_sentinel else i + field_length
         if j > section_end:
+            missing = False
             j = section_end
 
-        if (
-            not spec.get("ignore")
-            and _is_in_sections(index, sections)
-            and not _is_in_sections(index, excludes)
-        ):
-            if i < j:
-                value = line[i:j]
-                if not value.strip() or value == spec.get("missing_value"):
-                    value = True
-            else:
-                value = False
+        if not ignore:
+            key = index[0] if isinstance(index, tuple) else index
+            if (sections is None or key in sections) and key not in excludes:
+                if i < j:
+                    value = line[i:j]
+                    if not value.strip() or value == missing_value:
+                        value = True
+                else:
+                    value = False if missing else True
 
-            out[index] = value
+                out[index] = value
 
         if (
             delimiter
@@ -131,16 +119,18 @@ def _parse_delimited(
     i: int,
     header: dict,
     elements: dict,
-    sections: list,
-    excludes: list,
+    sections: set | None,
+    excludes: set,
     out: dict,
 ) -> int:
     delimiter = header["delimiter"]
     fields = next(csv.reader([line[i:]], delimiter=delimiter))
 
     for element, value in zip_longest(elements.keys(), fields):
-        index = elements[element].get("index")
-        if _is_in_sections(index, sections) and not _is_in_sections(index, excludes):
+        index = elements[element]["index"]
+        key = index[0] if isinstance(index, tuple) else index
+
+        if (sections is None or key in sections) and key not in excludes:
             out[index] = value.strip() if value is not None else None
 
     return len(line)
@@ -149,55 +139,44 @@ def _parse_delimited(
 def _parse_line_with_config(
     line: str,
     config: ParserConfig,
-    sections: list | None,
-    excludes: list | None,
+    sections: set | None,
+    excludes: set,
 ) -> dict:
     i = 0
     out = {}
-    excludes = excludes or []
+    max_width = properties.MAX_FULL_REPORT_WIDTH
 
     for order, spec in config.order_specs.items():
         header = spec["header"]
         elements = spec["elements"]
 
         if header.get("disable_read"):
-            if order in excludes:
-                continue
-            out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
+            if order not in excludes:
+                out[order] = line[i : i + max_width]
+            i += header.get("length", max_width)
             continue
 
         if spec["is_delimited"]:
-            parse_func = _parse_delimited
+            i = _parse_delimited(line, i, header, elements, sections, excludes, out)
         else:
-            parse_func = _parse_fixed_width
-
-        i = parse_func(
-            line,
-            i,
-            header,
-            elements,
-            sections,
-            excludes,
-            out,
-        )
+            i = _parse_fixed_width(line, i, header, elements, sections, excludes, out)
 
     return out
 
 
 def parse_pandas(
-    df: pd.DataFrame, config: ParserConfig, sections: list | None, excludes: list | None
+    df: pd.DataFrame,
+    config: ParserConfig,
+    sections: list | None,
+    excludes: list | None,
 ) -> pd.DataFrame:
-    """Parse text lines into a pandas DataFrame."""
     col = df.columns[0]
-    records = df[col].map(
-        lambda line: _parse_line_with_config(
-            line,
-            config,
-            sections,
-            excludes,
-        )
-    )
-    records = records.to_list()
+
+    sections = set(sections) if sections is not None else None
+    excludes = set(excludes) if excludes else set()
+
+    parse = _parse_line_with_config
+    records = df[col].map(lambda line: parse(line, config, sections, excludes))
     return pd.DataFrame.from_records(records)
 
 
@@ -207,28 +186,22 @@ def parse_netcdf(
     sections: list | None,
     excludes: list | None,
 ) -> pd.DataFrame:
-    """Parse netcdf arrays into a pandas DataFrame."""
-
-    def replace_empty_strings(series: pd.Series) -> pd.Series:
-        if series.dtype == "object":
-            series = series.str.decode("utf-8")
-            series = series.str.strip()
-            series = series.map(lambda x: True if x == "" else x)
-        return series
-
-    excludes = excludes or []
+    sections = set(sections) if sections is not None else None
+    excludes = set(excludes) if excludes else set()
 
     missing_values = []
     attrs = {}
     renames = {}
     disables = []
 
-    is_in_sections = _is_in_sections
+    data_vars = ds.data_vars
+    dims = ds.dims
+    ds_attrs = ds.attrs
 
     for order, ospec in config.order_specs.items():
-        if not is_in_sections(order, sections):
+        if sections is not None and order not in sections:
             continue
-        if is_in_sections(order, excludes):
+        if order in excludes:
             continue
 
         header = ospec.get("header", {})
@@ -240,26 +213,28 @@ def parse_netcdf(
             if espec.get("ignore"):
                 continue
 
-            index = espec.get("index")
+            index = espec["index"]
 
-            if element in ds.data_vars or element in ds.dims:
+            if element in data_vars or element in dims:
                 renames[element] = index
-            elif element in ds.attrs:
-                attrs[index] = ds.attrs[element]
+            elif element in ds_attrs:
+                attrs[index] = ds_attrs[element]
             else:
                 missing_values.append(index)
 
-    df = ds[renames.keys()].to_dataframe().reset_index()
-    df = df[renames.keys()]
+    df = ds[list(renames)].to_dataframe().reset_index()
+    df = df[list(renames)].rename(columns=renames)
 
-    df = df.rename(columns=renames)
-    attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
-    df = df.assign(**attrs)
+    if attrs:
+        df = df.assign(**{k: v.replace("\n", "; ") for k, v in attrs.items()})
 
     if disables:
         df[disables] = np.nan
 
-    df = df.apply(replace_empty_strings)
+    obj_cols = df.select_dtypes(include="object").columns
+    for col in obj_cols:
+        s = df[col].str.decode("utf-8").str.strip()
+        df[col] = s.map(lambda x: True if x == "" else x)
 
     if missing_values:
         df[missing_values] = False
@@ -277,7 +252,6 @@ def build_parser_config(
         imodel=imodel, ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
     )
 
-    # Flatten parsing order
     orders = [
         order
         for group in schema["header"]["parsing_order"]
@@ -286,7 +260,6 @@ def build_parser_config(
     ]
     olength = len(orders)
 
-    # Initialize ParserConfig containers
     dtypes: dict = {}
     validation: dict = {}
     order_specs: dict = {}
@@ -299,7 +272,6 @@ def build_parser_config(
         section = schema["sections"][order]
         header = section["header"]
 
-        # Normalize field_layout in-place
         field_layout = header.get("field_layout") or (
             "delimited" if header.get("delimiter") else "fixed_width"
         )
@@ -310,7 +282,6 @@ def build_parser_config(
         if header.get("disable_read"):
             disable_reads.append(order)
 
-        # Build element specs
         element_specs = {}
         for name, meta in elements.items():
             index = _get_index(name, order, olength)
@@ -330,12 +301,10 @@ def build_parser_config(
             if ignore or meta.get("disable_read", False):
                 continue
 
-            # Pandas dtype
             dtype = properties.pandas_dtypes.get(ctype)
             if dtype is not None:
                 dtypes[index] = dtype
 
-            # Conversion & decoding
             conv_func = Converters(ctype).converter()
             if conv_func:
                 converters[index] = conv_func
@@ -351,7 +320,6 @@ def build_parser_config(
                 if dec_func:
                     decoders[index] = dec_func
 
-            # Validation
             validation[index] = {}
             if ctype:
                 validation[index]["column_type"] = ctype
@@ -359,14 +327,12 @@ def build_parser_config(
                 if meta.get(k) is not None:
                     validation[index][k] = meta[k]
 
-        # Save section config
         order_specs[order] = {
             "header": header,
             "elements": element_specs,
             "is_delimited": header.get("format") == "delimited",
         }
 
-    # Convert dtypes & parse_dates
     dtypes, parse_dates = convert_dtypes(dtypes)
 
     return ParserConfig(
