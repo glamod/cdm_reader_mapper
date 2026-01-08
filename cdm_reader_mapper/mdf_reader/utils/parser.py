@@ -22,7 +22,6 @@ from .convert_and_decode import Converters, Decoders
 
 @dataclass(frozen=True)
 class ParserConfig:
-    imodel: str
     order_specs: dict
     disable_reads: list[str]
     dtypes: dict
@@ -336,7 +335,6 @@ def build_parser_config(
     dtypes, parse_dates = convert_dtypes(dtypes)
 
     return ParserConfig(
-        imodel=schema.get("imodel"),
         order_specs=order_specs,
         disable_reads=disable_reads,
         dtypes=dtypes,

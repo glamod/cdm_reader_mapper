@@ -135,7 +135,6 @@ def read_schema(
     enriched = {
         **raw_schema,
         "name": schema_files,
-        "imodel": imodel,
     }
 
     return _normalize_schema(enriched)

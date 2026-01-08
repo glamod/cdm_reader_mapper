@@ -204,7 +204,6 @@ class FileReader:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
         func_kwargs["config"] = config
-
         return _apply_or_chunk(
             to_parse,
             self._process_data,
