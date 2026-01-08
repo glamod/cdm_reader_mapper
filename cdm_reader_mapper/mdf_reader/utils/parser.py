@@ -78,8 +78,8 @@ def _parse_fixed_width(
     i: int,
     header: dict,
     elements: dict,
-    sections: list,
-    excludes: list,
+    sections: list | None,
+    excludes: list | None,
     out: dict,
 ) -> int:
     section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
@@ -87,37 +87,39 @@ def _parse_fixed_width(
     sentinel = header.get("sentinel")
 
     bad_sentinel = sentinel is not None and not _validate_sentinel(i, line, sentinel)
-    k = i + section_length
+    section_end = i + section_length
 
-    for element, spec in elements.items():
-        missing_value = spec.get("missing_value")
-        field_length = spec.get("field_length")
-        ignore = spec.get("ignore")
+    line_len = len(line)
+    delim_len = len(delimiter) if delimiter else 0
+
+    for spec in elements.values():
+        field_length = spec.get("field_length", 0)
         index = spec.get("index")
 
-        missing = True
-
         j = i if bad_sentinel else i + field_length
-
-        if j > k:
-            missing = False
-            j = k
+        if j > section_end:
+            j = section_end
 
         if (
-            not ignore
+            not spec.get("ignore")
             and _is_in_sections(index, sections)
             and not _is_in_sections(index, excludes)
         ):
-            value = line[i:j]
-            if not value.strip() or value == missing_value:
-                value = True
-            if i == j and missing:
+            if i < j:
+                value = line[i:j]
+                if not value.strip() or value == spec.get("missing_value"):
+                    value = True
+            else:
                 value = False
 
             out[index] = value
 
-        if delimiter and line[j : j + len(delimiter)] == delimiter:
-            j += len(delimiter)
+        if (
+            delimiter
+            and j + delim_len <= line_len
+            and line[j : j + delim_len] == delimiter
+        ):
+            j += delim_len
 
         i = j
 
@@ -144,12 +146,6 @@ def _parse_delimited(
     return len(line)
 
 
-def _parse_line(*args, is_delimited: bool) -> int:
-    if is_delimited:
-        return _parse_delimited(*args)
-    return _parse_fixed_width(*args)
-
-
 def _parse_line_with_config(
     line: str,
     config: ParserConfig,
@@ -170,7 +166,12 @@ def _parse_line_with_config(
             out[order] = line[i : properties.MAX_FULL_REPORT_WIDTH]
             continue
 
-        i = _parse_line(
+        if spec["is_delimited"]:
+            parse_func = _parse_delimited
+        else:
+            parse_func = _parse_fixed_width
+
+        i = parse_func(
             line,
             i,
             header,
@@ -178,7 +179,6 @@ def _parse_line_with_config(
             sections,
             excludes,
             out,
-            is_delimited=spec["is_delimited"],
         )
 
     return out
@@ -202,45 +202,47 @@ def parse_pandas(
 
 
 def parse_netcdf(
-    ds: xr.Dataset, config: ParserConfig, sections: list | None, excludes: list | None
+    ds: xr.Dataset,
+    config: ParserConfig,
+    sections: list | None,
+    excludes: list | None,
 ) -> pd.DataFrame:
     """Parse netcdf arrays into a pandas DataFrame."""
 
-    def replace_empty_strings(series):
+    def replace_empty_strings(series: pd.Series) -> pd.Series:
         if series.dtype == "object":
             series = series.str.decode("utf-8")
             series = series.str.strip()
             series = series.map(lambda x: True if x == "" else x)
         return series
 
+    excludes = excludes or []
+
     missing_values = []
     attrs = {}
     renames = {}
     disables = []
 
-    excludes = excludes or []
+    is_in_sections = _is_in_sections
 
     for order, ospec in config.order_specs.items():
-        header = ospec.get("header")
-        disable_read = header.get("disable_read")
-        if not _is_in_sections(order, sections):
+        if not is_in_sections(order, sections):
             continue
-        if _is_in_sections(order, excludes):
+        if is_in_sections(order, excludes):
             continue
 
-        if disable_read is True:
+        header = ospec.get("header", {})
+        if header.get("disable_read") is True:
             disables.append(order)
             continue
 
-        elements = ospec.get("elements")
-        for element, espec in elements.items():
-            ignore = espec.get("ignore")
-            index = espec.get("index")
-            if ignore:
+        for element, espec in ospec.get("elements", {}).items():
+            if espec.get("ignore"):
                 continue
-            if element in ds.data_vars:
-                renames[element] = index
-            elif element in ds.dims:
+
+            index = espec.get("index")
+
+            if element in ds.data_vars or element in ds.dims:
                 renames[element] = index
             elif element in ds.attrs:
                 attrs[index] = ds.attrs[element]
@@ -249,12 +251,19 @@ def parse_netcdf(
 
     df = ds[renames.keys()].to_dataframe().reset_index()
     df = df[renames.keys()]
-    attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
+
     df = df.rename(columns=renames)
+    attrs = {k: v.replace("\n", "; ") for k, v in attrs.items()}
     df = df.assign(**attrs)
-    df[disables] = np.nan
-    df = df.apply(lambda x: replace_empty_strings(x))
-    df[missing_values] = False
+
+    if disables:
+        df[disables] = np.nan
+
+    df = df.apply(replace_empty_strings)
+
+    if missing_values:
+        df[missing_values] = False
+
     return df
 
 

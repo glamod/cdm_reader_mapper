@@ -76,7 +76,6 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
     sections = schema.get("sections")
     elements = schema.get("elements")
 
-    # 1. Move elements to dummy section if sections missing
     if not sections:
         if not elements:
             raise KeyError("Schema has no sections and no elements")
@@ -85,10 +84,8 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
             k: header[k] for k in ("delimiter", "field_layout", "format") if k in header
         }
         sections = {level: {"header": dummy_header, "elements": elements}}
-        # Remove top-level elements
         schema = {k: v for k, v in schema.items() if k != "elements"}
 
-    # 2. Ensure header
     header = {
         **header,
         "parsing_order": header.get("parsing_order") or [{"s": list(sections.keys())}],
