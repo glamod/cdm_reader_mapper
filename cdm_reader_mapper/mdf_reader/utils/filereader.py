@@ -108,9 +108,9 @@ class FileReader:
         parse_mode="pandas",
     ) -> pd.DataFrame | TextFileReader:
         if parse_mode == "pandas":
-            data = parse_pandas(data, config, sections, excludes)
+            data = parse_pandas(data, config.order_specs, sections, excludes)
         elif parse_mode == "netcdf":
-            data = parse_netcdf(data, config, sections, excludes)
+            data = parse_netcdf(data, config.order_specs, sections, excludes)
         else:
             raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
 
