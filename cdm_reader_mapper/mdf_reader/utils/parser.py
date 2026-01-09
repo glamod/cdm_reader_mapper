@@ -8,6 +8,7 @@ import logging
 from dataclasses import dataclass, replace
 from copy import deepcopy
 from itertools import zip_longest
+from typing import TypedDict, Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -20,9 +21,45 @@ from .utilities import convert_dtypes
 from .convert_and_decode import Converters, Decoders
 
 
+class OrderSpec(TypedDict):
+    """
+    Parsing specification for a single section.
+
+    Defines the header configuration, element layout, and parsing mode
+    (fixed-width or delimited) for a section.
+    """
+
+    header: dict[str, Any]
+    elements: dict[str, dict[str, Any]]
+    is_delimited: bool
+
+
 @dataclass(frozen=True)
 class ParserConfig:
-    order_specs: dict
+    """
+    Configuration for dataset parsing.
+
+    Parameters
+    ----------
+    order_specs : dict
+        Column ordering specifications.
+    disable_reads : list[str]
+        Columns or sources to skip during parsing.
+    dtypes : dict
+        Column data type mappings.
+    parse_dates : list[str]
+        Columns to parse as datetimes.
+    convert_decode : dict
+        Value conversion or decoding rules.
+    validation : dict
+        Validation rules for parsed data.
+    encoding : str
+        Text encoding used when reading input data.
+    columns : pd.Index or pd.MultiIndex or None, optional
+        Explicit column index to apply. If None, inferred from input.
+    """
+
+    order_specs: OrderSpec
     disable_reads: list[str]
     dtypes: dict
     parse_dates: list[str]
@@ -33,10 +70,12 @@ class ParserConfig:
 
 
 def _get_index(section: str, order: str, length: int) -> str | tuple[str, str]:
+    """Build an index key based on section count."""
     return section if length == 1 else (order, section)
 
 
-def _get_ignore(section_dict: dict) -> bool:
+def _get_ignore(section_dict: dict[str, Any]) -> bool:
+    """Determine whether a section should be ignored."""
     ignore = section_dict.get("ignore", False)
     if isinstance(ignore, str):
         ignore = ignore.lower() in {"true", "1", "yes"}
@@ -44,6 +83,7 @@ def _get_ignore(section_dict: dict) -> bool:
 
 
 def _convert_dtype_to_default(dtype: str | None) -> str | None:
+    """Normalize deprecated or aliased dtype strings."""
     if dtype is None:
         return None
     elif dtype == "float":
@@ -62,12 +102,13 @@ def _convert_dtype_to_default(dtype: str | None) -> str | None:
 def _parse_fixed_width(
     line: str,
     i: int,
-    header: dict,
-    elements: dict,
+    header: dict[str, Any],
+    elements: dict[str, dict[str, Any]],
     sections: set | None,
     excludes: set,
-    out: dict,
+    out: dict[Any, Any],
 ) -> int:
+    """Parse a fixed-width section of a line into an output dictionary."""
     section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
     delimiter = header.get("delimiter")
     sentinel = header.get("sentinel")
@@ -116,12 +157,13 @@ def _parse_fixed_width(
 def _parse_delimited(
     line: str,
     i: int,
-    header: dict,
-    elements: dict,
+    header: dict[str, Any],
+    elements: dict[str, dict[str, Any]],
     sections: set | None,
     excludes: set,
-    out: dict,
+    out: dict[Any, Any],
 ) -> int:
+    """Parse a delimiter-separated section of a line into an output dictionary."""
     delimiter = header["delimiter"]
     fields = next(csv.reader([line[i:]], delimiter=delimiter))
 
@@ -135,17 +177,18 @@ def _parse_delimited(
     return len(line)
 
 
-def _parse_line_with_config(
+def _parse_line(
     line: str,
-    config: ParserConfig,
+    order_specs: dict[str, OrderSpec],
     sections: set | None,
     excludes: set,
-) -> dict:
+) -> dict[str, dict[Any, Any]]:
+    """Parse a line using the provided parser configuration."""
     i = 0
     out = {}
     max_width = properties.MAX_FULL_REPORT_WIDTH
 
-    for order, spec in config.order_specs.items():
+    for order, spec in order_specs.items():
         header = spec["header"]
         elements = spec["elements"]
 
@@ -165,26 +208,159 @@ def _parse_line_with_config(
 
 def parse_pandas(
     df: pd.DataFrame,
-    config: ParserConfig,
-    sections: list | None,
-    excludes: list | None,
+    order_specs: dict[str, OrderSpec],
+    sections: Iterable[str] | None = None,
+    excludes: Iterable[str] | None = None,
 ) -> pd.DataFrame:
+    """
+    Parse a pandas DataFrame containing raw record lines.
+
+    Each row of the input DataFrame is expected to contain a single
+    fixed-width or delimiter-separated record, which is parsed according
+    to the provided order specifications.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame with exactly one column (column index ``0``),
+        where each row contains a raw record string.
+    order_specs : dict[str, OrderSpec]
+        Mapping of section names to parsing specifications. Each specification
+        defines the header configuration, element layout, and parsing mode
+        for a section.
+    sections : iterable of str or None
+        Section names to include. If None, all sections are parsed.
+    excludes : iterable of str or None
+        Section names to exclude from parsing.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame constructed from parsed records. Columns are derived
+        from element indices and may be strings or tuples.
+
+    Examples
+    --------
+    Example ``order_specs`` structure::
+
+        order_specs = {
+            "core": {
+                "header": {
+                    "sentinel": None,
+                    "length": 108,
+                    "field_layout": "fixed_width",
+                },
+                "elements": {
+                    "YR": {
+                        "index": ("core", "YR"),
+                        "field_length": 4,
+                        "ignore": False,
+                        "column_type": "Int64",
+                        "missing_value": None,
+                    },
+                    "MO": {
+                        "index": ("core", "MO"),
+                        "field_length": 2,
+                        "ignore": False,
+                        "column_type": "Int64",
+                        "missing_value": None,
+                    },
+                },
+                "is_delimited": False,
+            }
+        }
+
+    Notes
+    -----
+    - Ignored elements (``ignore=True``) are skipped.
+    - Disabled sections (``disable_read=True``) are included as raw strings in the output.
+    - Missing elements are filled with ``False``.
+    - Object-type columns are stripped, decoded from UTF-8 if necessary, and empty
+      strings are replaced with ``True``.
+    - No type conversion is performed at this stage.
+    """
     col = df.columns[0]
 
     sections = set(sections) if sections is not None else None
     excludes = set(excludes) if excludes else set()
 
-    parse = _parse_line_with_config
-    records = df[col].map(lambda line: parse(line, config, sections, excludes))
+    records = df[col].map(
+        lambda line: _parse_line(line, order_specs, sections, excludes)
+    )
     return pd.DataFrame.from_records(records)
 
 
 def parse_netcdf(
     ds: xr.Dataset,
-    config: ParserConfig,
-    sections: list | None,
-    excludes: list | None,
+    order_specs: dict[str, OrderSpec],
+    sections: Iterable[str] | None = None,
+    excludes: Iterable[str] | None = None,
 ) -> pd.DataFrame:
+    """
+    Parse an xarray Dataset into a pandas DataFrame based on order specifications.
+
+    This function converts an xarray Dataset into a tabular pandas DataFrame
+    according to parsing rules defined in `order_specs`. Data variables, dimensions,
+    and global attributes are mapped to columns as specified, with ignored or missing
+    elements handled automatically.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        Input Dataset containing data variables, dimensions, and attributes.
+    order_specs : dict[str, OrderSpec]
+        Mapping of section names to parsing specifications. Each specification
+        defines the header configuration, element layout, and parsing mode
+        for a section.
+    sections : iterable of str or None
+        Section names to include. If None, all sections are parsed.
+    excludes : iterable of str or None
+        Section names to exclude from parsing.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame constructed from the Dataset according to the parsing specification.
+        Columns are derived from element indices. Missing fields are filled with
+        False, disabled sections with NaN, and empty strings are converted to True.
+
+    Examples
+    --------
+    Example ``order_specs`` structure::
+
+        order_specs = {
+            "global_attributes": {
+                "header": {
+                    "disable_read": True,
+                },
+                "elements": {
+                    "title": {
+                        "index": ("global_attributes", "title"),
+                        "ignore": False,
+                        "column_type": "str",
+                        "missing_value": None,
+                    },
+                    "institution": {
+                        "index": ("global_attributes", "institution"),
+                        "ignore": False,
+                        "column_type": "str",
+                        "missing_value": None,
+                    },
+                },
+                "is_delimited": False,
+            }
+        }
+
+    Notes
+    -----
+    - Variables, dimensions, and global attributes in `ds` are mapped to columns
+      according to the element `index`.
+    - Ignored elements (`ignore=True`) are skipped.
+    - Disabled sections (`disable_read=True`) are added as columns filled with NaN.
+    - Missing elements are added as columns filled with False.
+    - Object-type columns are decoded from UTF-8, stripped, and empty strings
+      replaced with True.
+    """
     sections = set(sections) if sections is not None else None
     excludes = set(excludes) if excludes else set()
 
@@ -197,7 +373,7 @@ def parse_netcdf(
     dims = ds.dims
     ds_attrs = ds.attrs
 
-    for order, ospec in config.order_specs.items():
+    for order, ospec in order_specs.items():
         if sections is not None and order not in sections:
             continue
         if order in excludes:
@@ -326,11 +502,11 @@ def build_parser_config(
                 if meta.get(k) is not None:
                     validation[index][k] = meta[k]
 
-        order_specs[order] = {
-            "header": header,
-            "elements": element_specs,
-            "is_delimited": header.get("format") == "delimited",
-        }
+        order_specs[order] = OrderSpec(
+            header=header,
+            elements=element_specs,
+            is_delimited=header.get("format") == "delimited",
+        )
 
     dtypes, parse_dates = convert_dtypes(dtypes)
 
