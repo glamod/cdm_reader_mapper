@@ -108,7 +108,12 @@ class FileReader:
     decode, and validate data from multiple sources (FWF, CSV, NetCDF).
     """
 
-    def __init__(self, imodel: str, *args, **kwargs):
+    def __init__(
+        self,
+        imodel: str | None = None,
+        ext_schema_path: str | None = None,
+        ext_schema_file: str | None = None,
+    ):
         """
         Initialize FileReader with a data model and parser configuration.
 
@@ -120,7 +125,11 @@ class FileReader:
             Arguments passed to ``build_parser_config``.
         """
         self.imodel: str = imodel
-        self.config: ParserConfig = build_parser_config(imodel, *args, **kwargs)
+        self.config: ParserConfig = build_parser_config(
+            imodel=imodel,
+            ext_schema_path=ext_schema_path,
+            ext_schema_file=ext_schema_file,
+        )
 
     def _process_data(
         self,
