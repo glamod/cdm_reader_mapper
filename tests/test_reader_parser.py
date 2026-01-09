@@ -405,8 +405,43 @@ def test_parse_pandas(order_specs):
     assert_frame_equal(out, exp)
 
 
-def test_parse_netcdf():
-    raise NotImplementedError
+def test_parse_netcdf(order_specs):
+    ds = xr.Dataset(
+        {
+            "YR": ("time", [2010, 2010, 2010]),
+            "MO": ("time", [7, 7, 7]),
+            "DY": ("time", [1, 2, 3]),
+            "HR": ("time", [10, 20, 30]),
+        },
+        coords={"time": [0, 1, 2]},
+        attrs={"source": "fake"},
+    )
+    out = parse_netcdf(
+        ds=ds,
+        order_specs=order_specs,
+    )
+
+    data = {
+        ("core", "YR"): [2010, 2010, 2010],
+        ("core", "MO"): [7, 7, 7],
+        ("core", "DY"): [1, 2, 3],
+        ("core", "HR"): [10, 20, 30],
+        ("c1", "ATTI"): [False, False, False],
+        ("c1", "ATTL"): [False, False, False],
+        ("c1", "BSI"): [False, False, False],
+        ("c5", "ATTI"): [False, False, False],
+        ("c5", "ATTL"): [False, False, False],
+        ("c5", "OS"): [False, False, False],
+        ("c5", "OP"): [False, False, False],
+        ("c98", "ATTI"): [False, False, False],
+        ("c98", "UID"): [False, False, False],
+        ("c99_data", "control_No"): [False, False, False],
+        ("c99_data", "name"): [False, False, False],
+    }
+
+    exp = pd.DataFrame(data, columns=list(data.keys()))
+
+    assert_frame_equal(out, exp)
 
 
 def test_update_pd_config_updates_encoding(base_config_pd):
