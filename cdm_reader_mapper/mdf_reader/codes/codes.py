@@ -25,9 +25,9 @@ from .. import properties
 
 def read_table(
     code_table_name: str,
-    imodel: Optional[str] = None,
-    ext_table_path: Optional[str] = None,
-) -> Dict:
+    imodel: str | None = None,
+    ext_table_path: str | None = None,
+) -> dict:
     """
     Load a data model code table into a Python dictionary.
 
@@ -38,7 +38,7 @@ def read_table(
     Parameters
     ----------
     code_table_name : str
-        The name of the code table (without file extension).  
+        The name of the code table (without file extension).
         e.g., `"ICOADS.C0.IM"`
     imodel : str, optional
         Internal data model name, e.g., `"icoads_r300_d704"`. Required if
@@ -74,7 +74,7 @@ def read_table(
         )
 
         if isinstance(table_files, Path):
-          table_files = [table_files]
+            table_files = [table_files]
     else:
         raise ValueError("One of 'imodel' or 'ext_table_path' must be set")
 
