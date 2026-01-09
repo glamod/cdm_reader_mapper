@@ -9,6 +9,8 @@ import xarray as xr  # noqa
 
 from pandas.testing import assert_frame_equal
 
+from types import MethodType
+
 from cdm_reader_mapper.mdf_reader.utils.parser import (
     _get_index,
     _get_ignore,
@@ -18,7 +20,107 @@ from cdm_reader_mapper.mdf_reader.utils.parser import (
     _parse_line,
     parse_pandas,
     parse_netcdf,  # noqa
+    update_pd_config,
+    update_xr_config,
+    ParserConfig,
+    build_parser_config,
 )
+
+
+@pytest.fixture
+def order_specs():
+    return {
+        "core": {
+            "header": {},
+            "elements": {
+                "YR": {"index": ("core", "YR"), "field_length": 4},
+                "MO": {"index": ("core", "MO"), "field_length": 2},
+                "DY": {"index": ("core", "DY"), "field_length": 2},
+                "HR": {"index": ("core", "HR"), "field_length": 4},
+            },
+            "is_delimited": False,
+        },
+        "c1": {
+            "header": {"sentinel": " 165"},
+            "elements": {
+                "ATTI": {"index": ("c1", "ATTI"), "field_length": 2},
+                "ATTL": {"index": ("c1", "ATTL"), "field_length": 2},
+                "BSI": {"index": ("c1", "BSI"), "field_length": 1},
+            },
+            "is_delimited": False,
+        },
+        "c5": {
+            "header": {"sentinel": " 594"},
+            "elements": {
+                "ATTI": {"index": ("c5", "ATTI"), "field_length": 2},
+                "ATTL": {"index": ("c5", "ATTL"), "field_length": 2},
+                "OS": {"index": ("c5", "OS"), "field_length": 1},
+                "OP": {"index": ("c5", "OP"), "field_length": 1},
+            },
+            "is_delimited": False,
+        },
+        "c98": {
+            "header": {"sentinel": "9815"},
+            "elements": {
+                "ATTI": {"index": ("c98", "ATTI"), "field_length": 2},
+                "ATTL": {"index": ("c98", "ATTL"), "field_length": 2, "ignore": True},
+                "UID": {"index": ("c98", "UID"), "field_length": 6},
+            },
+            "is_delimited": False,
+        },
+        "c99_data": {
+            "header": {"delimiter": "}"},
+            "elements": {
+                "control_No": {"index": ("c99_data", "control_No")},
+                "name": {"index": ("c99_data", "name")},
+            },
+            "is_delimited": True,
+        },
+    }
+
+
+@pytest.fixture
+def base_config_pd():
+    return ParserConfig(
+        order_specs={},
+        disable_reads=[],
+        dtypes={},
+        parse_dates=[],
+        convert_decode={},
+        validation={},
+        encoding="utf-8",
+        columns=None,
+    )
+
+
+@pytest.fixture
+def base_config_xr():
+    return ParserConfig(
+        order_specs={
+            "core": {
+                "elements": {
+                    "TEMP": {
+                        "index": ("core", "TEMP"),
+                        "ignore": False,
+                    },
+                    "PRES": {
+                        "index": ("core", "PRES"),
+                        "ignore": False,
+                    },
+                }
+            }
+        },
+        disable_reads=[],
+        dtypes={},
+        parse_dates=[],
+        convert_decode={},
+        validation={
+            ("core", "TEMP"): {"units": "__from_file__"},
+            ("core", "PRES"): {"units": "__from_file__"},
+        },
+        encoding="utf-8",
+        columns=None,
+    )
 
 
 def test_get_index_single_length():
@@ -239,58 +341,6 @@ def test_parse_delimited():
     }
 
 
-@pytest.fixture
-def order_specs():
-    return {
-        "core": {
-            "header": {},
-            "elements": {
-                "YR": {"index": ("core", "YR"), "field_length": 4},
-                "MO": {"index": ("core", "MO"), "field_length": 2},
-                "DY": {"index": ("core", "DY"), "field_length": 2},
-                "HR": {"index": ("core", "HR"), "field_length": 4},
-            },
-            "is_delimited": False,
-        },
-        "c1": {
-            "header": {"sentinel": " 165"},
-            "elements": {
-                "ATTI": {"index": ("c1", "ATTI"), "field_length": 2},
-                "ATTL": {"index": ("c1", "ATTL"), "field_length": 2},
-                "BSI": {"index": ("c1", "BSI"), "field_length": 1},
-            },
-            "is_delimited": False,
-        },
-        "c5": {
-            "header": {"sentinel": " 594"},
-            "elements": {
-                "ATTI": {"index": ("c5", "ATTI"), "field_length": 2},
-                "ATTL": {"index": ("c5", "ATTL"), "field_length": 2},
-                "OS": {"index": ("c5", "OS"), "field_length": 1},
-                "OP": {"index": ("c5", "OP"), "field_length": 1},
-            },
-            "is_delimited": False,
-        },
-        "c98": {
-            "header": {"sentinel": "9815"},
-            "elements": {
-                "ATTI": {"index": ("c98", "ATTI"), "field_length": 2},
-                "ATTL": {"index": ("c98", "ATTL"), "field_length": 2, "ignore": True},
-                "UID": {"index": ("c98", "UID"), "field_length": 6},
-            },
-            "is_delimited": False,
-        },
-        "c99_data": {
-            "header": {"delimiter": "}"},
-            "elements": {
-                "control_No": {"index": ("c99_data", "control_No")},
-                "name": {"index": ("c99_data", "name")},
-            },
-            "is_delimited": True,
-        },
-    }
-
-
 def test_parse_line(order_specs):
     line = "2010 7 1     165 9815IS7NQU13615}Peder Aneus"
     out = _parse_line(
@@ -353,3 +403,159 @@ def test_parse_pandas(order_specs):
     exp = pd.DataFrame(data, columns=list(data.keys()))
 
     assert_frame_equal(out, exp)
+
+
+def test_parse_netcdf():
+    raise NotImplementedError
+
+
+def test_update_pd_config_updates_encoding(base_config_pd):
+    pd_kwargs = {"encoding": "latin-1"}
+
+    new_config = update_pd_config(pd_kwargs, base_config_pd)
+
+    assert new_config.encoding == "latin-1"
+    assert base_config_pd.encoding == "utf-8"
+    assert new_config is not base_config_pd
+
+
+def test_update_pd_config_no_encoding_key(base_config_pd):
+    pd_kwargs = {"sep": ","}
+
+    new_config = update_pd_config(pd_kwargs, base_config_pd)
+
+    assert new_config is base_config_pd
+
+
+def test_update_pd_config_empty_encoding(base_config_pd):
+    pd_kwargs = {"encoding": ""}
+
+    new_config = update_pd_config(pd_kwargs, base_config_pd)
+
+    assert new_config is base_config_pd
+
+
+def test_update_pd_config_none_encoding(base_config_pd):
+    pd_kwargs = {"encoding": None}
+
+    new_config = update_pd_config(pd_kwargs, base_config_pd)
+
+    assert new_config is base_config_pd
+
+
+def test_update_xr_config_ignores_missing_elements(base_config_xr):
+    ds = xr.Dataset(
+        data_vars={
+            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+        }
+    )
+
+    new_config = update_xr_config(ds, base_config_xr)
+
+    elements = new_config.order_specs["core"]["elements"]
+    assert elements["PRES"]["ignore"] is True
+    assert elements["TEMP"]["ignore"] is False
+
+
+def test_update_xr_config_populates_validation_from_attrs(base_config_xr):
+    ds = xr.Dataset(
+        data_vars={
+            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+            "PRES": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
+        }
+    )
+
+    new_config = update_xr_config(ds, base_config_xr)
+
+    assert new_config.validation[("core", "TEMP")]["units"] == "K"
+    assert new_config.validation[("core", "PRES")]["units"] == "hPa"
+
+
+def test_update_xr_config_removes_missing_validation_attrs(base_config_xr):
+    ds = xr.Dataset(
+        data_vars={
+            "TEMP": xr.DataArray([1, 2, 3], attrs={}),
+            "PRES": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
+        }
+    )
+
+    new_config = update_xr_config(ds, base_config_xr)
+
+    assert "units" not in new_config.validation[("core", "TEMP")]
+    assert new_config.validation[("core", "PRES")]["units"] == "hPa"
+
+
+def test_update_xr_config_does_not_mutate_original(base_config_xr):
+    ds = xr.Dataset(
+        data_vars={
+            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+        }
+    )
+
+    _ = update_xr_config(ds, base_config_xr)
+
+    assert base_config_xr.order_specs["core"]["elements"]["PRES"]["ignore"] is False
+    assert base_config_xr.validation[("core", "TEMP")]["units"] == "__from_file__"
+
+
+def test_build_parser_config_imodel():
+    config = build_parser_config("icoads")
+
+    assert isinstance(config, ParserConfig)
+
+    assert hasattr(config, "order_specs")
+    assert isinstance(config.order_specs, dict)
+    assert "core" in config.order_specs
+    spec = config.order_specs["core"]
+    assert isinstance(spec, dict)
+    assert "header" in spec
+    assert isinstance(spec["header"], dict)
+    assert "elements" in spec
+    assert isinstance(spec["elements"], dict)
+    assert "is_delimited" in spec
+    assert isinstance(spec["is_delimited"], bool)
+
+    assert hasattr(config, "disable_reads")
+    assert isinstance(config.disable_reads, list)
+    assert all(isinstance(x, str) for x in config.disable_reads)
+
+    assert hasattr(config, "dtypes")
+    assert isinstance(config.dtypes, dict)
+    assert all(isinstance(x, tuple) for x in config.dtypes.keys())
+    assert all(isinstance(x, str) for x in config.dtypes.values())
+
+    assert hasattr(config, "parse_dates")
+    assert isinstance(config.parse_dates, list)
+    assert config.parse_dates == []
+
+    assert hasattr(config, "convert_decode")
+    assert isinstance(config.convert_decode, dict)
+
+    assert "converter_dict" in config.convert_decode
+    converter_dict = config.convert_decode["converter_dict"]
+    assert isinstance(converter_dict, dict)
+    assert all(isinstance(x, tuple) for x in converter_dict.keys())
+    assert all(isinstance(x, MethodType) for x in converter_dict.values())
+
+    assert "converter_kwargs" in config.convert_decode
+    converter_kwargs = config.convert_decode["converter_kwargs"]
+    assert isinstance(converter_kwargs, dict)
+    assert all(isinstance(x, tuple) for x in converter_kwargs.keys())
+    assert all(isinstance(x, dict) for x in converter_kwargs.values())
+
+    assert "decoder_dict" in config.convert_decode
+    decoder_dict = config.convert_decode["converter_dict"]
+    assert isinstance(decoder_dict, dict)
+    assert all(isinstance(x, tuple) for x in decoder_dict.keys())
+    assert all(isinstance(x, MethodType) for x in decoder_dict.values())
+
+    assert hasattr(config, "validation")
+    assert isinstance(config.validation, dict)
+    assert all(isinstance(x, tuple) for x in config.validation.keys())
+    assert all(isinstance(x, dict) for x in config.validation.values())
+
+    assert hasattr(config, "encoding")
+    assert isinstance(config.encoding, str)
+
+    assert hasattr(config, "columns")
+    assert config.columns is None

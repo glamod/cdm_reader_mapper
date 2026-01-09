@@ -421,9 +421,48 @@ def build_parser_config(
     ext_schema_path: str | None = None,
     ext_schema_file: str | None = None,
 ) -> ParserConfig:
-    """Build ParserConfig from a normalized schema."""
+    """
+    Build a ParserConfig from a normalized schema definition.
+
+    This function reads a schema definition and constructs a fully populated
+    :py:class:`ParserConfig` instance. The resulting configuration contains
+    parsing order specifications, data types, converters, decoders, validation
+    rules, and encoding information required to parse raw input records.
+
+    Parameters
+    ----------
+    imodel : str or None, optional
+        Internal model identifier used to locate the schema.
+    ext_schema_path : str or None, optional
+        Path to an external schema directory.
+    ext_schema_file : str or None, optional
+        Filename of an external schema definition.
+
+    Returns
+    -------
+    ParserConfig
+        Fully initialized parser configuration derived from the schema.
+
+    Notes
+    -----
+    - Section parsing order is derived from ``schema["header"]["parsing_order"]``.
+    - Sections marked with ``disable_read=True`` are recorded in
+      ``ParserConfig.disable_reads``.
+    - Elements marked as ignored or disabled are excluded from dtype,
+      conversion, and validation setup.
+    - Column indices may be strings or tuples depending on the number of
+      sections in the schema.
+    - Deprecated or aliased column types are normalized via
+      ``_convert_dtype_to_default``.
+    - Converter and decoder functions are resolved dynamically based on
+      column type and encoding.
+    - Validation rules may include value ranges and code tables, as defined
+      in the schema.
+    """
     schema: SchemaDict = read_schema(
-        imodel=imodel, ext_schema_path=ext_schema_path, ext_schema_file=ext_schema_file
+        imodel=imodel,
+        ext_schema_path=ext_schema_path,
+        ext_schema_file=ext_schema_file,
     )
 
     orders = [
@@ -434,24 +473,23 @@ def build_parser_config(
     ]
     olength = len(orders)
 
-    dtypes: dict = {}
-    validation: dict = {}
-    order_specs: dict = {}
+    dtypes: dict[Any, Any] = {}
+    validation: dict[Any, dict[str, Any]] = {}
+    order_specs: dict[str, OrderSpec] = {}
     disable_reads: list[str] = []
-    converters: dict = {}
-    converter_kwargs: dict = {}
-    decoders: dict = {}
+    converters: dict[Any, Any] = {}
+    converter_kwargs: dict[Any, dict[str, Any]] = {}
+    decoders: dict[Any, Any] = {}
 
     for order in orders:
         section = schema["sections"][order]
         header = section["header"]
-
         elements = section.get("elements", {})
 
         if header.get("disable_read"):
             disable_reads.append(order)
 
-        element_specs = {}
+        element_specs: dict[str, dict[str, Any]] = {}
         for name, meta in elements.items():
             index = _get_index(name, order, olength)
             ignore = _get_ignore(meta)
@@ -476,12 +514,14 @@ def build_parser_config(
             conv_func = Converters(ctype).converter()
             if conv_func:
                 converters[index] = conv_func
+
             conv_args = {
                 k: meta.get(k)
                 for k in properties.data_type_conversion_args.get(ctype, [])
             }
             if conv_args:
                 converter_kwargs[index] = conv_args
+
             encoding = meta.get("encoding")
             if encoding:
                 dec_func = Decoders(ctype, encoding).decoder()
@@ -519,6 +559,27 @@ def build_parser_config(
 
 
 def update_xr_config(ds: xr.Dataset, config: ParserConfig) -> ParserConfig:
+    """
+    Update a ParserConfig instance using metadata from an xarray Dataset.
+
+    This function adjusts the parser configuration based on the contents of
+    the provided Dataset. Elements not present in the Dataset are marked as
+    ignored, and validation rules marked as ``"__from_file__"`` are populated
+    from Dataset variable attributes when available.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        Input Dataset containing data variables, dimensions, and attributes.
+    config : ParserConfig
+        Existing parser configuration.
+
+    Returns
+    -------
+    ParserConfig
+        Updated parser configuration with modified order specifications and
+        validation rules derived from the Dataset.
+    """
     new_order_specs = deepcopy(config.order_specs)
     new_validation = deepcopy(config.validation)
 
@@ -555,7 +616,28 @@ def update_xr_config(ds: xr.Dataset, config: ParserConfig) -> ParserConfig:
     )
 
 
-def update_pd_config(pd_kwargs: dict, config: ParserConfig) -> ParserConfig:
+def update_pd_config(pd_kwargs: dict[str, Any], config: ParserConfig) -> ParserConfig:
+    """
+    Update a ParserConfig instance using pandas keyword arguments.
+
+    Currently, only the ``encoding`` option is supported. If an encoding
+    is provided in ``pd_kwargs``, a new ParserConfig instance is returned
+    with the updated encoding. Otherwise, the original configuration is
+    returned unchanged.
+
+    Parameters
+    ----------
+    pd_kwargs : dict[str, Any]
+        Keyword arguments intended for pandas I/O functions.
+    config : ParserConfig
+        Existing parser configuration.
+
+    Returns
+    -------
+    ParserConfig
+        Updated parser configuration if applicable, otherwise the original
+        configuration.
+    """
     if "encoding" in pd_kwargs and pd_kwargs["encoding"]:
         return replace(config, encoding=pd_kwargs["encoding"])
     return config

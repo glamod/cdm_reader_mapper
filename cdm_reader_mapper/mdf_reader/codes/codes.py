@@ -12,7 +12,6 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Dict
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
