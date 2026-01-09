@@ -248,7 +248,6 @@ def parse_pandas(
                 "header": {
                     "sentinel": None,
                     "length": 108,
-                    "field_layout": "fixed_width",
                 },
                 "elements": {
                     "YR": {
@@ -447,11 +446,6 @@ def build_parser_config(
         section = schema["sections"][order]
         header = section["header"]
 
-        field_layout = header.get("field_layout") or (
-            "delimited" if header.get("delimiter") else "fixed_width"
-        )
-        header = {**header, "field_layout": field_layout}
-
         elements = section.get("elements", {})
 
         if header.get("disable_read"):
@@ -461,12 +455,10 @@ def build_parser_config(
         for name, meta in elements.items():
             index = _get_index(name, order, olength)
             ignore = _get_ignore(meta)
-            ctype = _convert_dtype_to_default(meta.get("column_type"))
 
             element_specs[name] = {
                 "index": index,
                 "ignore": ignore,
-                "column_type": ctype,
                 "missing_value": meta.get("missing_value"),
                 "field_length": meta.get(
                     "field_length", properties.MAX_FULL_REPORT_WIDTH
@@ -476,6 +468,7 @@ def build_parser_config(
             if ignore or meta.get("disable_read", False):
                 continue
 
+            ctype = _convert_dtype_to_default(meta.get("column_type"))
             dtype = properties.pandas_dtypes.get(ctype)
             if dtype is not None:
                 dtypes[index] = dtype
