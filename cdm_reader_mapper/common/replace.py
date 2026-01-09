@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
+from . import logging_hdlr
 
 
 def replace_columns(

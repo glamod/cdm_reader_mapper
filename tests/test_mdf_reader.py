@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -10,6 +11,14 @@ from cdm_reader_mapper.mdf_reader.reader import (
     read_mdf,
     read_data,
 )
+from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
+
+
+def _get_columns(columns, select):
+    if isinstance(columns, pd.MultiIndex):
+        return columns.get_level_values(0).isin(select)
+    mask = [(type(c) is tuple and c[0] in select) or (c in select) for c in columns]
+    return np.array(mask)
 
 
 def _drop_rows(df, drops):
@@ -37,18 +46,21 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         result.mask = result.mask.read()
 
     if select:
-        expected.data = expected.data[select]
-        expected.mask = expected.mask[select]
+        selected = _get_columns(expected.data.columns, select)
+        expected.data = expected.data.loc[:, selected]
+        expected.mask = expected.mask.loc[:, selected]
 
     if drop:
-        result.data = result.data.drop(columns=drop)
-        result.mask = result.mask.drop(columns=drop)
-        expected.data = expected.data.drop(columns=drop)
-        expected.mask = expected.mask.drop(columns=drop)
+        unselected = _get_columns(expected.data.columns, drop)
+        expected.data = expected.data.loc[:, ~unselected]
+        expected.mask = expected.mask.loc[:, ~unselected]
 
     if drop_idx:
         expected.data = _drop_rows(expected.data, drop_idx)
         expected.mask = _drop_rows(expected.mask, drop_idx)
+
+    expected.data = _apply_multiindex(expected.data)
+    expected.mask = _apply_multiindex(expected.mask)
 
     pd.testing.assert_frame_equal(result.data, expected.data)
     pd.testing.assert_frame_equal(result.mask, expected.mask)
@@ -78,7 +90,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         "gdac",
     ],
 )
-def test_read_mdf_test_data(data_model):
+def test_read_mdf_test_data_basic(data_model):
     _read_mdf_test_data(data_model)
 
 
@@ -137,19 +149,38 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
     "data_model, kwargs, select",
     [
         ("icoads_r300_d714", {"sections": ["c99"], "chunksize": 3}, ["c99"]),
+        ("icoads_r300_d714", {"sections": ["c99"]}, ["c99"]),
+        ("icoads_r300_d714", {"sections": "c99"}, ["c99"]),
         (
             "icoads_r300_d714",
-            {"sections": ["core", "c99"], "chunksize": 3},
+            {"sections": ["core", "c99"]},
             ["core", "c99"],
         ),
+        ("craid", {"sections": ["drifter_measurements"]}, ["drifter_measurements"]),
     ],
 )
 def test_read_mdf_test_data_select(data_model, kwargs, select):
     _read_mdf_test_data(data_model, select=select, **kwargs)
 
 
-def test_read_mdf_test_data_drop():
-    _read_mdf_test_data("icoads_r300_mixed", drop=["c99"], encoding="cp1252")
+@pytest.mark.parametrize(
+    "data_model, kwargs, drop",
+    [
+        ("icoads_r300_d714", {"excludes": ["c98"]}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": "c98"}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": ["c5", "c98"]}, ["c5", "c98"]),
+        ("icoads_r300_mixed", {"excludes": ["c99"], "encoding": "cp1252"}, ["c99"]),
+        ("icoads_r300_mixed", {"excludes": "c99", "encoding": "cp1252"}, ["c99"]),
+        (
+            "craid",
+            {"excludes": ["drifter_measurements", "drifter_history"]},
+            ["drifter_measurements", "drifter_history"],
+        ),
+        ("gdac", {"excludes": "AAAA"}, ["AAAA"]),
+    ],
+)
+def test_read_mdf_test_data_exclude(data_model, kwargs, drop):
+    _read_mdf_test_data(data_model, drop=drop, **kwargs)
 
 
 @pytest.mark.parametrize(
