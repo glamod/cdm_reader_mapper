@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Callable, Any, Sequence, Mapping
+
 import pandas as pd
 import xarray as xr
 
@@ -24,12 +26,20 @@ from .parser import (
     parse_pandas,
     parse_netcdf,
     build_parser_config,
+    ParserConfig,
 )
 
 from cdm_reader_mapper.core.databundle import DataBundle
 
 
-def _apply_or_chunk(data, func, func_args=None, func_kwargs=None, **kwargs):
+def _apply_or_chunk(
+    data: pd.DataFrame | TextFileReader,
+    func: Callable[..., Any],
+    func_args: Sequence[Any] | None = None,
+    func_kwargs: Mapping[str, Any] | None = None,
+    **kwargs: Mapping[str, Any],
+):
+    """Apply a function directly or chunk-wise depending on input type."""
     func_args = func_args or []
     func_kwargs = func_kwargs or {}
     if not isinstance(data, TextFileReader):
@@ -43,7 +53,8 @@ def _apply_or_chunk(data, func, func_args=None, func_kwargs=None, **kwargs):
     )
 
 
-def _merge_kwargs(*dicts):
+def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
+    """Merge multiple keyword-argument dictionaries."""
     merged = {}
     for d in dicts:
         for k in d:
@@ -54,6 +65,7 @@ def _merge_kwargs(*dicts):
 
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
+    """Convert tuple-based columns to a pandas MultiIndex."""
     if not df.columns.map(lambda x: isinstance(x, tuple)).all():
         return df
 
@@ -63,7 +75,12 @@ def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _select_years(df, selection, year_col) -> pd.DataFrame:
+def _select_years(
+    df: pd.DataFrame,
+    selection: tuple[int | None, int | None],
+    year_col,
+) -> pd.DataFrame:
+    """Filter rows of a DataFrame by a year range."""
     year_init, year_end = selection
     if year_init is None and year_end is None:
         return df
@@ -84,49 +101,104 @@ def _select_years(df, selection, year_col) -> pd.DataFrame:
 
 
 class FileReader:
-    """Class to read marine-meteorological data."""
+    """
+    Class to read marine-meteorological data.
 
-    def __init__(self, imodel, *args, **kwargs):
-        self.imodel = imodel
-        self.config = build_parser_config(imodel, *args, **kwargs)
+    Provides a high-level interface to read, parse, filter, convert,
+    decode, and validate data from multiple sources (FWF, CSV, NetCDF).
+    """
+
+    def __init__(self, imodel: str, *args, **kwargs):
+        """
+        Initialize FileReader with a data model and parser configuration.
+
+        Parameters
+        ----------
+        imodel : str
+            Name of the data model (e.g., 'ICOADS').
+        args, kwargs
+            Arguments passed to ``build_parser_config``.
+        """
+        self.imodel: str = imodel
+        self.config: ParserConfig = build_parser_config(imodel, *args, **kwargs)
 
     def _process_data(
         self,
-        data,
-        convert_flag,
-        decode_flag,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-        validate_flag,
-        ext_table_path,
-        sections,
-        excludes,
-        year_init,
-        year_end,
-        config,
-        parse_mode="pandas",
-    ) -> pd.DataFrame | TextFileReader:
+        data: pd.DataFrame | TextFileReader,
+        convert_flag: bool = False,
+        decode_flag: bool = False,
+        converter_dict: dict | None = None,
+        converter_kwargs: dict | None = None,
+        decoder_dict: dict | None = None,
+        validate_flag: bool = False,
+        ext_table_path: str | None = None,
+        sections: Sequence[str] | None = None,
+        excludes: Sequence[str] | None = None,
+        year_init: int | None = None,
+        year_end: int | None = None,
+        config: ParserConfig | None = None,
+        parse_mode: str = "pandas",
+    ) -> tuple[pd.DataFrame, pd.DataFrame, ParserConfig]:
+        """
+        Core processing of raw data: parse, filter, convert, decode, validate.
+
+        Parameters
+        ----------
+        data : pandas.DataFrame or TextFileReader
+            Input data.
+        convert_flag : bool
+            Whether to apply converters.
+        decode_flag : bool
+            Whether to apply decoders.
+        converter_dict : dict, optional
+            Mapping of columns to converter functions.
+        converter_kwargs : dict, optional
+            Keyword arguments for converters.
+        decoder_dict : dict, optional
+            Mapping of columns to decoder functions.
+        validate_flag : bool
+            Whether to apply validation.
+        ext_table_path : str, optional
+            Path to external validation tables.
+        sections : sequence of str, optional
+            Sections to include.
+        excludes : sequence of str, optional
+            Sections to exclude.
+        year_init : int, optional
+            Initial year for filtering.
+        year_end : int, optional
+            End year for filtering.
+        config : ParserConfig, optional
+            Parser configuration.
+        parse_mode : str
+            Parsing backend ('pandas' or 'netcdf').
+
+        Returns
+        -------
+        tuple of (data, mask, config)
+            - data : pandas.DataFrame with parsed, filtered, converted data
+            - mask : pandas.DataFrame with boolean mask for validation
+            - config : ParserConfig updated with final columns
+        """
+        config = config or self.config
+
         if parse_mode == "pandas":
             data = parse_pandas(data, config.order_specs, sections, excludes)
         elif parse_mode == "netcdf":
             data = parse_netcdf(data, config.order_specs, sections, excludes)
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            raise ValueError("parse_mode must be 'pandas' or 'netcdf'")
 
         data = _apply_multiindex(data)
 
         data_model = self.imodel.split("_")[0]
         year_col = properties.year_column[data_model]
 
-        data = _select_years(data, [year_init, year_end], year_col)
+        data = _select_years(data, (year_init, year_end), year_col)
 
-        if converter_dict is None:
-            converter_dict = config.convert_decode["converter_dict"]
-        if converter_kwargs is None:
-            converter_kwargs = config.convert_decode["converter_kwargs"]
-        if decoder_dict is None:
-            decoder_dict = config.convert_decode["decoder_dict"]
+        converter_dict = converter_dict or config.convert_decode["converter_dict"]
+        converter_kwargs = converter_kwargs or config.convert_decode["converter_kwargs"]
+        decoder_dict = decoder_dict or config.convert_decode["decoder_dict"]
 
         data = convert_and_decode(
             data,
@@ -150,19 +222,50 @@ class FileReader:
 
         data = remove_boolean_values(data, config.dtypes)
         config = replace(config, columns=data.columns)
+
         return data, mask, config
 
     def open_data(
         self,
-        source,
-        open_with="pandas",
-        pd_kwargs=None,
-        xr_kwargs=None,
-        convert_kwargs=None,
-        decode_kwargs=None,
-        validate_kwargs=None,
-        select_kwargs=None,
-    ) -> tuple[pd.DataFrame, pd.DataFrame] | tuple[TextFileReader, TextFileReader]:
+        source: str,
+        open_with: str = "pandas",
+        pd_kwargs: dict | None = None,
+        xr_kwargs: dict | None = None,
+        convert_kwargs: dict | None = None,
+        decode_kwargs: dict | None = None,
+        validate_kwargs: dict | None = None,
+        select_kwargs: dict | None = None,
+    ) -> (
+        tuple[pd.DataFrame, pd.DataFrame, ParserConfig]
+        | tuple[TextFileReader, TextFileReader, ParserConfig]
+    ):
+        """
+        Open and parse source data according to parser configuration.
+
+        Parameters
+        ----------
+        source : str
+            Path or pattern for input file(s).
+        open_with : str
+            Parser backend: 'pandas' or 'netcdf'.
+        pd_kwargs: dict, optional
+            Additional key-word arguments for parsing pandas-readable data.
+        xr_kwargs: dict, optional
+            Additional key-word arguments for parsing xarray-readable data.
+        convert_kwargs: dict, optional
+            Additional key-word arguments for data conversion.
+        decode_kwargs: dict, optional
+            Additional key-word arguments for data decoding.
+        validate_kwargs: dict, optional
+            Additional key-word arguments for data validation.
+        select_kwargs : dict, optional
+            Additional key-word arguments for selecting/filtering data.
+
+        Returns
+        -------
+        tuple
+            (data, mask, config) or chunked equivalents if using TextFileReader.
+        """
         pd_kwargs = dict(pd_kwargs or {})
         xr_kwargs = dict(xr_kwargs or {})
         convert_kwargs = convert_kwargs or {}
@@ -185,7 +288,6 @@ class FileReader:
         elif open_with == "pandas":
             config = update_pd_config(pd_kwargs, self.config)
             pd_kwargs["encoding"] = config.encoding
-
             pd_kwargs.setdefault("widths", [properties.MAX_FULL_REPORT_WIDTH])
             pd_kwargs.setdefault("header", None)
             pd_kwargs.setdefault("quotechar", "\0")
@@ -199,11 +301,13 @@ class FileReader:
                 {"chunksize": chunksize, "dtype": config.dtypes},
                 {"chunksize": chunksize, "dtype": "boolean"},
             )
+
             to_parse = pd.read_fwf(source, **pd_kwargs)
         else:
-            raise ValueError("open_with has to be one of ['pandas', 'netcdf']")
+            raise ValueError("open_with must be 'pandas' or 'netcdf'")
 
         func_kwargs["config"] = config
+
         return _apply_or_chunk(
             to_parse,
             self._process_data,
@@ -223,19 +327,41 @@ class FileReader:
         validate_kwargs: dict | None = None,
         select_kwargs: dict | None = None,
     ) -> DataBundle:
-        pd_kwargs = pd_kwargs or {}
-        xr_kwargs = xr_kwargs or {}
-        convert_kwargs = convert_kwargs or {}
-        decode_kwargs = decode_kwargs or {}
-        validate_kwargs = validate_kwargs or {}
-        select_kwargs = select_kwargs or {}
+        """
+        Read and process data from the given source.
 
+        Parameters
+        ----------
+        source : str
+            Path to input file(s).
+        pd_kwargs: dict, optional
+            Additional key-word arguments for parsing pandas-readable data.
+        xr_kwargs: dict, optional
+            Additional key-word arguments for parsing xarray-readable data.
+        convert_kwargs: dict, optional
+            Additional key-word arguments for data conversion.
+        decode_kwargs: dict, optional
+            Additional key-word arguments for data decoding.
+        validate_kwargs: dict, optional
+            Additional key-word arguments for data validation.
+        select_kwargs : dict, optional
+            Additional key-word arguments for selecting/filtering data.
+
+        Notes
+        -----
+        All kwargs are forwarded to ``open_data`` to customize the
+        parsing, conversion, decoding, validation, and selection steps.
+
+        Returns
+        -------
+        DataBundle
+            Container with processed data, mask, columns, dtypes, and metadata.
+        """
         logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
-
         logging.info("Reading and parsing source data...")
+
         result = self.open_data(
             source,
-            # INFO: Set default as "pandas" to account for custom schema
             open_with=properties.open_file.get(self.imodel, "pandas"),
             pd_kwargs=pd_kwargs,
             xr_kwargs=xr_kwargs,
