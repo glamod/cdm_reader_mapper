@@ -133,7 +133,7 @@ def update_column_names(
     """
     if isinstance(dtypes, str):
         return dtypes
-    if col_o in dtypes.keys():
+    if col_o != col_n and col_o in dtypes.keys():
         dtypes[col_n] = dtypes[col_o]
         del dtypes[col_o]
     return dtypes
