@@ -286,7 +286,7 @@ def parse_pandas(
     records = df[col].map(
         lambda line: _parse_line(line, order_specs, sections, excludes)
     )
-    return pd.DataFrame.from_records(records)
+    return pd.DataFrame.from_records(records.to_list())
 
 
 def parse_netcdf(
