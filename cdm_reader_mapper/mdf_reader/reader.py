@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from io import StringIO as StringIO
+from pathlib import Path
 
 from cdm_reader_mapper import DataBundle
 
@@ -16,15 +17,28 @@ from .utils.utilities import as_list, as_path, read_csv
 
 def validate_read_mdf_args(
     *,
-    source,
-    imodel,
-    ext_schema_path,
-    ext_schema_file,
-    year_init,
-    year_end,
-    chunksize,
-    skiprows,
+    source: str | Path,
+    imodel: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
+    year_init: int | None = None,
+    year_end: int | None = None,
+    chunksize: int | None = None,
+    skiprows: int | None = None,
 ):
+    """
+    Validate arguments for reading an MDF file.
+
+    This function performs validation on file paths and numeric arguments
+    required for reading an MDF dataset.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the source file does not exist.
+    ValueError
+        If required arguments are missing or numeric constraints are violated.
+    """
     source = as_path(source, "source")
 
     if not source.exists():
@@ -40,7 +54,7 @@ def validate_read_mdf_args(
         raise ValueError("chunksize must be a positive integer")
 
     validate_arg("skiprows", skiprows, int)
-    if skiprows < 0:
+    if skiprows is not None and skiprows < 0:
         raise ValueError("skiprows must be >= 0")
 
     if year_init is not None and year_end is not None:
@@ -58,7 +72,7 @@ def read_mdf(
     year_end: int | None = None,
     encoding: str | None = None,
     chunksize: int | None = None,
-    skiprows: int = 0,
+    skiprows: int = None,
     convert_flag: bool = True,
     converter_dict: dict | None = None,
     converter_kwargs: dict | None = None,
@@ -93,8 +107,6 @@ def read_mdf(
     ext_schema_file: str, optional
         The external input data model schema file.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-    ext_table_path: str, optional
-        The path to the external input data model code tables.
     year_init: str or int, optional
         Left border of time axis.
     year_end: str or int, optional
@@ -103,7 +115,7 @@ def read_mdf(
         The encoding of the input file. Overrides the value in the imodel schema file.
     chunksize : int, optional
           Number of reports per chunk.
-    skiprows : int
+    skiprows : int, optional
           Number of initial rows to skip from file, default: 0
     convert_flag: bool, default: True
           If True convert entries by using a pre-defined data model.
@@ -141,6 +153,8 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
+    if skiprows is None:
+        skiprows = 0
     validate_read_mdf_args(
         source=source,
         imodel=imodel,

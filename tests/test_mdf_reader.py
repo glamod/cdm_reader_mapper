@@ -10,6 +10,7 @@ from cdm_reader_mapper import test_data, DataBundle
 from cdm_reader_mapper.mdf_reader.reader import (
     read_mdf,
     read_data,
+    validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
 
@@ -373,3 +374,104 @@ def test_read_data_encoding():
     assert len(db) == 5
     assert db.shape == (5, 341)
     assert db.size == 1705
+
+
+def test_validate_read_mdf_args_pass(tmp_path):
+    source = tmp_path / "file.mdf"
+    source.touch()
+
+    validate_read_mdf_args(
+        source=source,
+        imodel=object(),
+        ext_schema_path=None,
+        ext_schema_file=None,
+        year_init=2000,
+        year_end=2020,
+        chunksize=100,
+        skiprows=0,
+    )
+
+
+def test_validate_read_mdf_args_invalid_source(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        validate_read_mdf_args(
+            source=tmp_path / "missing.mdf",
+            imodel=object(),
+            ext_schema_path=None,
+            ext_schema_file=None,
+            year_init=None,
+            year_end=None,
+            chunksize=None,
+            skiprows=0,
+        )
+
+
+def test_validate_read_mdf_args_missing_all_sources(tmp_path):
+    source = tmp_path / "file.mdf"
+    source.touch()
+
+    with pytest.raises(
+        ValueError,
+        match="One of imodel or ext_schema_path/ext_schema_file must be provided",
+    ):
+        validate_read_mdf_args(
+            source=source,
+            imodel=None,
+            ext_schema_path=None,
+            ext_schema_file=None,
+            year_init=None,
+            year_end=None,
+            chunksize=None,
+            skiprows=0,
+        )
+
+
+def test_validate_read_mdf_args_invalid_chunksize(tmp_path):
+    source = tmp_path / "file.mdf"
+    source.touch()
+
+    with pytest.raises(ValueError, match="chunksize must be a positive integer"):
+        validate_read_mdf_args(
+            source=source,
+            imodel=object(),
+            ext_schema_path=None,
+            ext_schema_file=None,
+            year_init=None,
+            year_end=None,
+            chunksize=0,
+            skiprows=0,
+        )
+
+
+def test_validate_read_mdf_args_invalid_skiprows(tmp_path):
+    source = tmp_path / "file.mdf"
+    source.touch()
+
+    with pytest.raises(ValueError, match="skiprows must be >= 0"):
+        validate_read_mdf_args(
+            source=source,
+            imodel=object(),
+            ext_schema_path=None,
+            ext_schema_file=None,
+            year_init=None,
+            year_end=None,
+            chunksize=None,
+            skiprows=-1,
+        )
+
+
+def test_validate_read_mdf_args_invalid_years(tmp_path):
+    source = tmp_path / "file.mdf"
+    source.touch()
+
+    with pytest.raises(ValueError, match="year_init must be <= year_end"):
+        validate_read_mdf_args(
+            source=source,
+            imodel=object(),
+            ext_schema_path=None,
+            ext_schema_file=None,
+            year_init=2021,
+            year_end=2020,
+            chunksize=None,
+            skiprows=0,
+        )
