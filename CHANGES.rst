@@ -16,7 +16,7 @@ New features and enhancements
 * new parameter in function `map_model` (:pull:`327`)
 
   * `drop_duplicates`: If True remove duplicated rows (default: True)
-  * `drop_missing_obs`: If True remove observation rows tihout a valid `observation_value` (default: True)
+  * `drop_missing_obs`: If True remove observation rows without a valid `observation_value` (default: True)
 
 * new Pub47 testdata (test_data["test_pub47"]) (:pull:`327`)
 
@@ -32,7 +32,7 @@ Internal changes
 * update .gitignore (:pull:``324`)
 * update and add docstrings for multiple functions (:pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: update mapping functions for more readability (:pull:`324`)
-* ``cdm_reader_mapper.cdm_mapper``: introdice some helper functions (:pull:`324`)
+* ``cdm_reader_mapper.cdm_mapper``: introduce some helper functions (:pull:`324`)
 * add more unit tests (:issue:`311`, :pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: split `map_and_convert` into multiple helper functions (:issue:`333`, :pull:`343`)
 * exclude tests/*.py from `pre-commit` codespell hook (:pull:`345`)
