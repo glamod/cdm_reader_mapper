@@ -22,7 +22,8 @@ New features and enhancements
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
-* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_covnert` to helepr function `_map_and_convert` (:pull:`343`)
+* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_convert` to helepr function `_map_and_convert` (:pull:`343`)
+* replace `logging.error` with `raise` error statements (:pull:`345`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -34,6 +35,22 @@ Internal changes
 * ``cdm_reader_mapper.cdm_mapper``: introdice some helper functions (:pull:`324`)
 * add more unit tests (:issue:`311`, :pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: split `map_and_convert` into multiple helper functions (:issue:`333`, :pull:`343`)
+* exclude tests/*.py from `pre-commit` codespell hook (:pull:`345`)
+* replace many `os` functions with `pathlib.Path` (:pull:`345`)
+* re-work `mdf_reader` (:issue:`334`, :pull:`345`)
+
+  * remove `reader.MDFFileReader` class
+  * remove `utils.configurator` module
+  * remove both `utils.decoder` and `mdf_reader.utils.converter` modules
+  * introduce `utils.parser` module: bunch of functions to parse input data into MDF data
+  * introduce `utils.convert_and_decode`: make converter and decoder functions more modular
+  * make `utils.validator` module more modular
+  * `utils.filereader.FileReader` uses `utils.parser` function for parsing
+  * move many helper function to `utils.utilities`
+  * serialize `schemas.schemas` module
+
+* add type hints and docstrings to `mdf_reader` (:pull:`345`)
+* add unit tests for `mdf_reader` module to testing suite (:pull:`345`)
 
 Bug fixes
 ^^^^^^^^^
