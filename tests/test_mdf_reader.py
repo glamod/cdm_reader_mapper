@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import test_data
+from cdm_reader_mapper import test_data, DataBundle
 from cdm_reader_mapper.mdf_reader.reader import (
     read_mdf,
     read_data,
@@ -199,3 +199,177 @@ def test_read_mdf_test_data_exclude(data_model, kwargs, drop):
 )
 def test_read_mdf_test_data_drop_idx(data_model, kwargs, drop_idx):
     _read_mdf_test_data(data_model, drop_idx=drop_idx, **kwargs)
+
+
+def test_read_data_basic():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    mask = test_data[f"test_{data_model}"]["mdf_mask"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+    db = read_data(data, mask, info)
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.MultiIndex)
+    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.parse_dates, list)
+    assert isinstance(db.encoding, str)
+    assert db.encoding == "cp1252"
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
+
+
+def test_read_data_no_mask():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+    db = read_data(data, info=info)
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.MultiIndex)
+    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.parse_dates, list)
+    assert isinstance(db.encoding, str)
+    assert db.encoding == "cp1252"
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
+
+
+def test_read_data_no_info():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+
+    db = read_data(data)
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.MultiIndex)
+    assert db.dtypes == "object"
+    assert db.parse_dates is False
+    assert db.encoding is None
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
+
+
+def test_read_data_col_subset():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+    db = read_data(data, info=info, col_subset="core")
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.Index)
+    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.parse_dates, list)
+    assert isinstance(db.encoding, str)
+    assert db.encoding == "cp1252"
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 48)
+    assert db.size == 240
+
+
+def test_read_data_encoding():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    db = read_data(data, encoding="cp1252")
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.Index)
+    assert db.dtypes == "object"
+    assert db.parse_dates is False
+    assert isinstance(db.encoding, str)
+    assert db.encoding == "cp1252"
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
