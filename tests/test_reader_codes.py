@@ -17,7 +17,7 @@ def tmp_json_file(tmp_path: Path) -> tuple[Path, dict]:
 
 
 def test_read_table_with_imodel():
-    result = read_table("ICOADS.c99.SEALUMI", imodel="icoads_r300_d781")
+    result = read_table("ICOADS.C99.SEALUMI", imodel="icoads_r300_d781")
     assert isinstance(result, dict)
     assert result == {"0": "no", "1": "yes", "9": "missing", "8": "unknown"}
 
