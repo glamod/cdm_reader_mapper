@@ -126,6 +126,11 @@ def write_data(
             data_df = data_df[col_subset]
             mask_df = mask_df[col_subset]
 
+        if isinstance(data_df, pd.Series):
+            data_df = data_df.to_frame()
+        if isinstance(mask_df, pd.Series):
+            mask_df = mask_df.to_frame()
+
         mode = "w" if i == 0 else "a"
         header = [join(c) for c in data_df.columns] if i == 0 else False
 
@@ -133,6 +138,7 @@ def write_data(
             info["dtypes"] = update_dtypes(info["dtypes"], data_df.columns)
             for col in data_df.columns:
                 info["dtypes"] = update_column_names(info["dtypes"], col, join(col))
+
             info["parse_dates"] = [p for p in info["parse_dates"] if p in header]
             info["encoding"] = encoding
 
