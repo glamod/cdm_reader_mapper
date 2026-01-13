@@ -326,8 +326,8 @@ def process_textfilereader(
     func: Callable,
     func_args: tuple = (),
     func_kwargs: dict[str, Any] | None = None,
-    read_kwargs: dict[str, Any] | tuple[dict[str, Any], ...] = {},
-    write_kwargs: dict[str, Any] = {},
+    read_kwargs: dict[str, Any] | tuple[dict[str, Any], ...] | None = None,
+    write_kwargs: dict[str, Any] | None = None,
     makecopy: bool = True,
 ) -> tuple[pd.DataFrame, ...]:
     """
@@ -363,6 +363,10 @@ def process_textfilereader(
     """
     if func_kwargs is None:
         func_kwargs = {}
+    if read_kwargs is None:
+        read_kwargs = {}
+    if write_kwargs is None:
+        write_kwargs = {}
 
     buffers = []
     columns = []
