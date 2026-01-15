@@ -2,342 +2,87 @@
 
 from __future__ import annotations
 
-import ast
-import csv
-import logging
-import os
 from io import StringIO as StringIO
+from pathlib import Path
 
-import pandas as pd
+from cdm_reader_mapper import DataBundle
 
-from cdm_reader_mapper.common.json_dict import open_json_file
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-from cdm_reader_mapper.core.databundle import DataBundle
+from ..common.json_dict import open_json_file
 
-from . import properties
 from .utils.filereader import FileReader
-from .utils.utilities import adjust_dtype, remove_boolean_values, validate_arg
-from .utils.validators import validate
+from .utils.utilities import validate_arg
+
+from .utils.utilities import as_list, as_path, read_csv
 
 
-class MDFFileReader(FileReader):
-    """Class to represent reader output.
-
-    Attributes
-    ----------
-    data : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data
-    mask : pd.DataFrame or pd.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the output data validation mask
-    attrs : dict
-        a dictionary with the output data elements attributes
+def validate_read_mdf_args(
+    *,
+    source: str | Path,
+    imodel: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
+    year_init: int | None = None,
+    year_end: int | None = None,
+    chunksize: int | None = None,
+    skiprows: int | None = None,
+):
     """
+    Validate arguments for reading an MDF file.
 
-    def __init__(self, *args, **kwargs):
-        FileReader.__init__(self, *args, **kwargs)
+    This function performs validation on file paths and numeric arguments
+    required for reading an MDF dataset.
 
-    def _convert_and_decode(
-        self,
-        df,
-        converter_dict,
-        converter_kwargs,
-        decoder_dict,
-    ) -> pd.DataFrame:
-        for section in converter_dict.keys():
-            if section not in df.columns:
-                continue
-            if section in decoder_dict.keys():
-                decoded = decoder_dict[section](df[section])
-                decoded.index = df[section].index
-                df[section] = decoded
+    Raises
+    ------
+    FileNotFoundError
+        If the source file does not exist.
+    ValueError
+        If required arguments are missing or numeric constraints are violated.
+    """
+    source = as_path(source, "source")
 
-            converted = converter_dict[section](
-                df[section], **converter_kwargs[section]
-            )
-            converted.index = df[section].index
-            df[section] = converted
-        return df
+    if not source.exists():
+        raise FileNotFoundError(f"Source file not found: {source}")
 
-    def _validate(self, df) -> pd.DataFrame:
-        return validate(
-            data=df,
-            imodel=self.imodel,
-            ext_table_path=self.ext_table_path,
-            schema=self.schema,
-            disables=self.disable_reads,
+    if not imodel and not (ext_schema_path or ext_schema_file):
+        raise ValueError(
+            "One of imodel or ext_schema_path/ext_schema_file must be provided"
         )
 
-    def convert_and_decode_entries(
-        self,
-        data,
-        convert=True,
-        decode=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        decoder_dict=None,
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """Convert and decode data entries by using a pre-defined data model.
+    validate_arg("chunksize", chunksize, int)
+    if chunksize is not None and chunksize <= 0:
+        raise ValueError("chunksize must be a positive integer")
 
-        Overwrite attribute `data` with converted and/or decoded data.
+    validate_arg("skiprows", skiprows, int)
+    if skiprows is not None and skiprows < 0:
+        raise ValueError("skiprows must be >= 0")
 
-        Parameters
-        ----------
-        data: pd.DataFrame or pd.io.parsers.TextFileReader
-          Data to convert and decode.
-        convert: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        decoder_dict: dict, optional
-          Functions for decoding values in specific columns.
-          If None use information from a pre-defined data model.
-        """
-        if converter_dict is None:
-            converter_dict = self.configurations["convert_decode"]["converter_dict"]
-        if converter_kwargs is None:
-            converter_kwargs = self.configurations["convert_decode"]["converter_kwargs"]
-        if decoder_dict is None:
-            decoder_dict = self.configurations["convert_decode"]["decoder_dict"]
-        if not (convert and decode):
-            self.dtypes = "object"
-            return data
-        if convert is not True:
-            converter_dict = {}
-            converter_kwargs = {}
-        if decode is not True:
-            decoder_dict = {}
-
-        if isinstance(data, pd.DataFrame):
-            data = self._convert_and_decode(
-                data,
-                converter_dict,
-                converter_kwargs,
-                decoder_dict,
-            )
-        else:
-            data_buffer = StringIO()
-            TextParser = make_copy(data)
-            for i, df_ in enumerate(TextParser):
-                df = self._convert_and_decode(
-                    df_,
-                    converter_dict,
-                    converter_kwargs,
-                    decoder_dict,
-                )
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=object,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-        return data
-
-    def validate_entries(
-        self, data, validate
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """Validate data entries by using a pre-defined data model.
-
-        Fill attribute `valid` with boolean mask.
-        """
-        if validate is not True:
-            mask = pd.DataFrame(dtype="boolean")
-        elif isinstance(data, pd.DataFrame):
-            mask = self._validate(data)
-        else:
-            data_buffer = StringIO()
-            TextParser_ = make_copy(data)
-            for i, df_ in enumerate(TextParser_):
-                mask_ = self._validate(df_)
-                mask_.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                )
-            data_buffer.seek(0)
-            mask = pd.read_csv(
-                data_buffer,
-                names=df_.columns,
-                chunksize=self.chunksize,
-                dtype="boolean",
-            )
-        return mask
-
-    def remove_boolean_values(
-        self, data
-    ) -> pd.DataFrame | pd.io.parsers.TextFileReader:
-        """DOCUMENTATION"""
-        if isinstance(data, pd.DataFrame):
-            data = data.map(remove_boolean_values)
-            dtype = adjust_dtype(self.dtypes, data)
-            return data.astype(dtype)
-        else:
-            data_buffer = StringIO()
-            TextParser = make_copy(data)
-            for i, df_ in enumerate(TextParser):
-                df = df_.map(remove_boolean_values)
-                dtype = adjust_dtype(self.dtypes, df)
-                date_columns = []
-                df.to_csv(
-                    data_buffer,
-                    header=False,
-                    mode="a",
-                    encoding=self.encoding,
-                    index=False,
-                    quoting=csv.QUOTE_NONE,
-                    sep=properties.internal_delimiter,
-                    quotechar="\0",
-                    escapechar="\0",
-                )
-            date_columns = []
-            for i, element in enumerate(list(dtype)):
-                if dtype.get(element) == "datetime":
-                    date_columns.append(i)
-            dtype = adjust_dtype(dtype, df)
-            data_buffer.seek(0)
-            data = pd.read_csv(
-                data_buffer,
-                names=df.columns,
-                chunksize=self.chunksize,
-                dtype=dtype,
-                parse_dates=date_columns,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-            )
-        return data
-
-    def read(
-        self,
-        chunksize=None,
-        sections=None,
-        skiprows=0,
-        convert=True,
-        decode=True,
-        converter_dict=None,
-        converter_kwargs=None,
-        validate=True,
-        encoding: str | None = None,
-        **kwargs,
-    ) -> DataBundle:
-        """Read data from disk.
-
-        Parameters
-        ----------
-        chunksize : int, optional
-          Number of reports per chunk.
-        sections : list, optional
-          List with subset of data model sections to output, optional
-          If None read pre-defined data model sections.
-        skiprows : int
-          Number of initial rows to skip from file, default: 0
-        convert: bool, default: True
-          If True convert entries by using a pre-defined data model.
-        decode: bool, default: True
-          If True decode entries by using a pre-defined data model.
-        converter_dict: dict of {Hashable: func}, optional
-          Functions for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        converter_kwargs: dict of {Hashable: kwargs}, optional
-          Key-word arguments for converting values in specific columns.
-          If None use information from a pre-defined data model.
-        validate: bool, default: True
-          Validate data entries by using a pre-defined data model.
-        encoding: str, optional
-          Encoding of the input file, overrides the value in the imodel schema
-        """
-        # 0. VALIDATE INPUT
-        if not validate_arg("sections", sections, list):
-            return
-        if not validate_arg("chunksize", chunksize, int):
-            return
-        if not validate_arg("skiprows", skiprows, int):
-            return
-
-        self.chunksize = chunksize
-        self.skiprows = skiprows
-
-        # 2. READ AND VALIDATE DATA
-        logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
-        # 2.1. Subset data model sections to requested sections
-        parsing_order = self.schema["header"].get("parsing_order")
-        sections_ = [x.get(y) for x in parsing_order for y in x]
-        read_sections_list = [y for x in sections_ for y in x]
-        if sections is None:
-            sections = read_sections_list
-
-        # 2.2 Homogenize input data to an iterable with dataframes:
-        # a list with a single dataframe or a pd.io.parsers.TextFileReader
-        logging.info("Getting data string from source...")
-        self.configurations = self.get_configurations(read_sections_list, sections)
-        self.encoding = encoding or self.encoding
-        data = self.open_data(
-            read_sections_list,
-            sections,
-            # INFO: Set default as "pandas" to account for custom schema
-            open_with=properties.open_file.get(self.imodel, "pandas"),
-            encoding=self.encoding,
-            chunksize=chunksize,
-        )
-
-        # 2.3. Extract, read and validate data in same loop
-        logging.info("Extracting and reading sections")
-        data = self.convert_and_decode_entries(
-            data,
-            convert=convert,
-            decode=decode,
-        )
-        mask = self.validate_entries(data, validate)
-
-        # 3. Create output DataBundle object
-        logging.info("Create an output DataBundle object")
-        data = self.remove_boolean_values(data)
-        return DataBundle(
-            data=data,
-            columns=self.columns,
-            dtypes=self.dtypes,
-            parse_dates=self.parse_dates,
-            encoding=self.encoding,
-            mask=mask,
-            imodel=self.imodel,
-        )
+    if year_init is not None and year_end is not None:
+        if year_init > year_end:
+            raise ValueError("year_init must be <= year_end")
 
 
 def read_mdf(
     source,
-    imodel=None,
-    ext_schema_path=None,
-    ext_schema_file=None,
-    ext_table_path=None,
-    year_init=None,
-    year_end=None,
+    imodel: str | None = None,
+    ext_schema_path: str | None = None,
+    ext_schema_file: str | None = None,
+    ext_table_path: str | None = None,
+    year_init: int | None = None,
+    year_end: int | None = None,
     encoding: str | None = None,
-    **kwargs,
+    chunksize: int | None = None,
+    skiprows: int = None,
+    convert_flag: bool = True,
+    converter_dict: dict | None = None,
+    converter_kwargs: dict | None = None,
+    decode_flag: bool = True,
+    decoder_dict: dict | None = None,
+    validate_flag: bool = True,
+    sections: str | list | None = None,
+    excludes: str | list | None = None,
+    pd_kwargs: dict | None = None,
+    xr_kwargs: dict | None = None,
 ) -> DataBundle:
     """Read data files compliant with a user specific data model.
 
@@ -362,14 +107,38 @@ def read_mdf(
     ext_schema_file: str, optional
         The external input data model schema file.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-    ext_table_path: str, optional
-        The path to the external input data model code tables.
     year_init: str or int, optional
         Left border of time axis.
     year_end: str or int, optional
         Right border of time axis.
     encoding : str, optional
         The encoding of the input file. Overrides the value in the imodel schema file.
+    chunksize : int, optional
+          Number of reports per chunk.
+    skiprows : int, optional
+          Number of initial rows to skip from file, default: 0
+    convert_flag: bool, default: True
+          If True convert entries by using a pre-defined data model.
+    converter_dict: dict of {Hashable: func}, optional
+          Functions for converting values in specific columns.
+          If None use information from a pre-defined data model.
+    converter_kwargs: dict of {Hashable: kwargs}, optional
+          Key-word arguments for converting values in specific columns.
+          If None use information from a pre-defined data model.
+    decode_flag: bool, default: True
+          If True decode entries by using a pre-defined data model.
+    decoder_dict: dict of {Hashable: func}, optional
+          Functions for decoding values in specific columns.
+          If None use information from a pre-defined data model.
+    validate_flag: bool, default: True
+          Validate data entries by using a pre-defined data model.
+    sections : list, optional
+          List with subset of data model sections to output, optional
+          If None read pre-defined data model sections.
+    pd_kwargs: dict, optional
+          Additional pandas arguments
+    xr_kwargs: dict, optional
+          Additional xarray arguments
 
     Returns
     -------
@@ -384,28 +153,70 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-
-    def get_list_element(lst, idx):
-        try:
-            return lst[idx]
-        except IndexError:
-            return None
-
-    logging.basicConfig(
-        format="%(levelname)s\t[%(asctime)s](%(filename)s)\t%(message)s",
-        level=logging.INFO,
-        datefmt="%Y%m%d %H:%M:%S",
-        filename=None,
-    )
-    return MDFFileReader(
+    if skiprows is None:
+        skiprows = 0
+    validate_read_mdf_args(
         source=source,
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,
-        ext_table_path=ext_table_path,
         year_init=year_init,
         year_end=year_end,
-    ).read(encoding=encoding, **kwargs)
+        chunksize=chunksize,
+        skiprows=skiprows,
+    )
+
+    pd_kwargs = pd_kwargs or {}
+    pd_kwargs.setdefault("encoding", encoding)
+    pd_kwargs.setdefault("chunksize", chunksize)
+    pd_kwargs.setdefault("skiprows", skiprows)
+
+    xr_kwargs = xr_kwargs or {}
+
+    convert_kwargs = dict(
+        convert_flag=convert_flag,
+        converter_dict=converter_dict,
+        converter_kwargs=converter_kwargs,
+    )
+
+    decode_kwargs = dict(
+        decode_flag=decode_flag,
+        decoder_dict=decoder_dict,
+    )
+
+    validate_kwargs = dict(
+        validate_flag=validate_flag,
+        ext_table_path=ext_table_path,
+    )
+
+    sections = as_list(sections)
+    excludes = as_list(excludes)
+
+    validate_arg("sections", sections, list)
+    validate_arg("excludes", excludes, list)
+
+    select_kwargs = dict(
+        sections=sections,
+        excludes=excludes,
+        year_init=year_init,
+        year_end=year_end,
+    )
+
+    filereader = FileReader(
+        imodel=imodel,
+        ext_schema_path=ext_schema_path,
+        ext_schema_file=ext_schema_file,
+    )
+
+    return filereader.read(
+        source=source,
+        pd_kwargs=pd_kwargs,
+        xr_kwargs=xr_kwargs,
+        convert_kwargs=convert_kwargs,
+        decode_kwargs=decode_kwargs,
+        validate_kwargs=validate_kwargs,
+        select_kwargs=select_kwargs,
+    )
 
 
 def read_data(
@@ -456,52 +267,25 @@ def read_data(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-
-    def _update_column_labels(columns):
-        new_cols = []
-        for col in columns:
-            try:
-                col_ = ast.literal_eval(col)
-            except SyntaxError:
-                col_ = tuple(col.split(":"))
-            except ValueError:
-                col_ = col
-            new_cols.append(col_)
-
-        if all(isinstance(c, tuple) for c in new_cols):
-            return pd.MultiIndex.from_tuples(new_cols)
-
-        return pd.Index(new_cols)
-
-    def _read_csv(ifile, col_subset=None, **kwargs):
-        if ifile is None or not os.path.isfile(ifile):
-            return pd.DataFrame()
-
-        df = pd.read_csv(ifile, delimiter=",", **kwargs)
-        df.columns = _update_column_labels(df.columns)
-        if col_subset is not None:
-            df = df[col_subset]
-
-        return df
-
-    if info is None:
-        info_dict = {}
-    else:
-        info_dict = open_json_file(info)
-
+    info_dict = open_json_file(info) if info else {}
     dtype = info_dict.get("dtypes", "object")
     parse_dates = info_dict.get("parse_dates", False)
-    if encoding is None:
-        encoding = info_dict.get("encoding", None)
+    encoding = encoding or info_dict.get("encoding", None)
 
-    data = _read_csv(
+    pd_kwargs = kwargs.copy()
+    pd_kwargs.setdefault("dtype", dtype)
+    pd_kwargs.setdefault("parse_dates", parse_dates)
+    pd_kwargs.setdefault("encoding", encoding)
+
+    data = read_csv(
         source,
         col_subset=col_subset,
-        dtype=dtype,
-        parse_dates=parse_dates,
-        encoding=encoding,
+        **pd_kwargs,
     )
-    mask = _read_csv(mask, col_subset=col_subset, dtype="boolean")
+    mask = read_csv(mask, col_subset=col_subset, dtype="boolean")
+    if not mask.empty:
+        mask = mask.reindex(columns=data.columns)
+
     return DataBundle(
         data=data,
         columns=data.columns,
