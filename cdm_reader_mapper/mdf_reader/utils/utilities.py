@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Iterable, Iterator, Sequence
+from typing import Any, Callable, Iterable, Iterator, Sequence, Generator
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -407,10 +407,36 @@ def _write_chunks_to_disk(current_dfs: list, temp_dirs: list, chunk_counter: int
     for i, df_out in enumerate(current_dfs):
         if i < len(temp_dirs):
             file_path = Path(temp_dirs[i].name) / f"part_{chunk_counter:05d}.parquet"
-            # Fix: Ensure index=False to prevent index "ghosting"
             df_out.to_parquet(
                 file_path, engine="pyarrow", compression="snappy", index=False
             )
+
+
+def _initialize_storage(current_dfs: list) -> tuple[list, list, list]:
+    """Creates temp directories and captures schemas from the first chunk."""
+    temp_dirs = []
+    to_cleanup = []
+    schemas = [df.columns for df in current_dfs]
+
+    for _ in range(len(current_dfs)):
+        t = tempfile.TemporaryDirectory()
+        temp_dirs.append(t)
+        to_cleanup.append(t)
+
+    return temp_dirs, to_cleanup, schemas
+
+
+def _parquet_generator(temp_dir_obj, schema) -> Generator[pd.DataFrame]:
+    """Yields DataFrames from a temp directory, restoring schema."""
+    try:
+        files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
+        for f in files:
+            df = pd.read_parquet(f)
+            if schema is not None:
+                df.columns = schema
+            yield df
+    finally:
+        temp_dir_obj.cleanup()
 
 
 def process_disk_backed(
@@ -429,7 +455,9 @@ def process_disk_backed(
     if func_kwargs is None:
         func_kwargs = {}
 
+    # State variables
     temp_dirs: list[tempfile.TemporaryDirectory] = []
+    column_schemas = []
     output_non_df = []
     directories_to_cleanup = []
 
@@ -452,15 +480,14 @@ def process_disk_backed(
             if new_meta:
                 output_non_df.extend(new_meta)
 
-            # Initialize temp dirs on the first valid chunk
-            if not accumulators_initialized:
-                if current_dfs:
-                    for _ in range(len(current_dfs)):
-                        t = tempfile.TemporaryDirectory()
-                        temp_dirs.append(t)
-                        directories_to_cleanup.append(t)
-                    accumulators_initialized = True
+            # Initialize storage
+            if not accumulators_initialized and current_dfs:
+                temp_dirs, directories_to_cleanup, column_schemas = _initialize_storage(
+                    current_dfs
+                )
+                accumulators_initialized = True
 
+            # Write DataFrames
             if accumulators_initialized:
                 _write_chunks_to_disk(current_dfs, temp_dirs, chunk_counter)
 
@@ -469,24 +496,17 @@ def process_disk_backed(
         if not accumulators_initialized:
             return tuple(output_non_df)
 
-        # Create generators that own the temp directories
-        def create_generator(temp_dir_obj):
-            try:
-                files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
-                for f in files:
-                    yield pd.read_parquet(f)
-            finally:
-                temp_dir_obj.cleanup()
+        # Finalize Iterators
+        final_iterators = [
+            ParquetStreamReader(_parquet_generator(d, s))
+            for d, s in zip(temp_dirs, column_schemas)
+        ]
 
-        final_iterators = [ParquetStreamReader(create_generator(d)) for d in temp_dirs]
-
-        # Explicitly clear this list. This transfers ownership of the TempDirectory
-        # objects to the closures created above.
+        # Transfer ownership to generators
         directories_to_cleanup.clear()
 
         return tuple(final_iterators + output_non_df)
 
     finally:
-        # Safety net: cleans up only if we crashed or failed to hand off ownership
         for d in directories_to_cleanup:
             d.cleanup()
