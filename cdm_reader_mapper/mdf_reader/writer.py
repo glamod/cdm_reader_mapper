@@ -5,33 +5,21 @@ from __future__ import annotations
 import json
 import logging
 from io import StringIO as StringIO
+from pathlib import Path
 
 import pandas as pd
 
-from cdm_reader_mapper.common import get_filename
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from .utils.utilities import join, update_column_names, update_dtypes
 
-
-def _update_dtypes(dtypes, columns) -> dict:
-    if isinstance(dtypes, dict):
-        dtypes = {k: v for k, v in dtypes.items() if k in columns}
-    return dtypes
-
-
-def _update_col_names(dtypes, col_o, col_n) -> str | dict:
-    if isinstance(dtypes, str):
-        return dtypes
-    if col_o in dtypes.keys():
-        dtypes[col_n] = dtypes[col_o]
-        del dtypes[col_o]
-    return dtypes
+from ..common import get_filename
+from ..common.pandas_TextParser_hdlr import make_copy
 
 
 def write_data(
     data,
     mask=None,
-    dtypes={},
-    parse_dates=False,
+    dtypes: dict | None = None,
+    parse_dates: list | bool = False,
     encoding="utf-8",
     out_dir=".",
     prefix=None,
@@ -100,30 +88,29 @@ def write_data(
     ----
     Use this function after reading MDF data.
     """
-
-    def _join(col):
-        if isinstance(col, (list, tuple)):
-            return ":".join(col)
-        return col
+    dtypes = dtypes or {}
+    if isinstance(parse_dates, bool):
+        parse_dates = []
 
     if not isinstance(data, pd.io.parsers.TextFileReader):
-        data = [data]
+        data_list = [data]
     else:
-        data = make_copy(data)
+        data_list = make_copy(data)
 
     if mask is None:
         mask = pd.DataFrame()
 
     if not isinstance(mask, pd.io.parsers.TextFileReader):
-        mask = [mask]
+        mask_list = [mask]
     else:
-        mask = make_copy(mask)
+        mask_list = make_copy(mask)
 
-    info = {}
-    info["dtypes"] = dtypes
-    info["parse_dates"] = [_join(parse_date) for parse_date in parse_dates]
+    info = {"dtypes": dtypes.copy(), "parse_dates": [join(p) for p in parse_dates]}
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
     filename_data = get_filename(
         [prefix, "data", suffix], path=out_dir, extension=extension
     )
@@ -133,37 +120,40 @@ def write_data(
     filename_info = get_filename(
         [prefix, "info", suffix], path=out_dir, extension="json"
     )
-    for i, (data_df, mask_df) in enumerate(zip(data, mask)):
+
+    for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
         if col_subset is not None:
             data_df = data_df[col_subset]
             mask_df = mask_df[col_subset]
-        header = False
-        mode = "a"
-        if i == 0:
-            mode = "w"
-            header = []
-            info["dtypes"] = _update_dtypes(info["dtypes"], data_df.columns)
-            for col in data_df.columns:
-                col_ = _join(col)
-                header.append(col_)
-                info["dtypes"] = _update_col_names(info["dtypes"], col, col_)
 
-            info["parse_dates"] = [
-                parse_date for parse_date in info["parse_dates"] if parse_date in header
-            ]
+        if isinstance(data_df, pd.Series):
+            data_df = data_df.to_frame()
+        if isinstance(mask_df, pd.Series):
+            mask_df = mask_df.to_frame()
+
+        mode = "w" if i == 0 else "a"
+        header = [join(c) for c in data_df.columns] if i == 0 else False
+
+        if i == 0:
+            info["dtypes"] = update_dtypes(info["dtypes"], data_df.columns)
+            for col in data_df.columns:
+                info["dtypes"] = update_column_names(info["dtypes"], col, join(col))
+
+            info["parse_dates"] = [p for p in info["parse_dates"] if p in header]
             info["encoding"] = encoding
 
-        kwargs = {
-            "header": header,
-            "mode": mode,
-            "encoding": encoding,
-            "index": False,
-            "sep": delimiter,
-        }
-        data_df.to_csv(filename_data, **kwargs)
-        if not mask_df.empty:
-            mask_df.to_csv(filename_mask, **kwargs)
+        csv_kwargs = dict(
+            header=header,
+            mode=mode,
+            index=False,
+            sep=delimiter,
+            encoding=encoding,
+            **kwargs,
+        )
 
-    if info:
-        with open(filename_info, "w") as fileObj:
-            json.dump(info, fileObj, indent=4)
+        data_df.to_csv(filename_data, **csv_kwargs)
+        if not mask_df.empty:
+            mask_df.to_csv(filename_mask, **csv_kwargs)
+
+    with open(filename_info, "w") as fileObj:
+        json.dump(info, fileObj, indent=4)

@@ -12,7 +12,7 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.common import pandas_TextParser_hdlr
+from . import pandas_TextParser_hdlr
 
 
 def _count_by_cat(series) -> dict:
