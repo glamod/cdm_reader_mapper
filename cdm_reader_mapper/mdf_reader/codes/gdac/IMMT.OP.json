@@ -1,12 +1,12 @@
 {
-  "0": "unknown",
-  "1": "selected ship",
-  "2": "supplementary ship",
-  "3": "auxiliary ship",
-  "4": "registered VOSClim ship",
-  "5": "fixed sea station (e.g., rig or platform)",
-  "6": "coastal station",
-  "7": "[reserved]",
-  "8": "[reserved]",
-  "9": "others / data buoy"
+  "0": "Unknown",
+  "1": "Selected ship",
+  "2": "Supplementary ship",
+  "3": "Auxiliary ship",
+  "4": "Registered VOSClim ship",
+  "5": "Fixed sea station (e.g., rig or platform)",
+  "6": "Coastal station",
+  "7": "Reserved",
+  "8": "Reserved",
+  "9": "Others/data buoy"
 }

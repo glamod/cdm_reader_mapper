@@ -1,0 +1,9 @@
+{
+  "1": "Manned, Included",
+  "2": "Manned, Omitted (no significant phenomenon to report)",
+  "3": "Manned, Omitted (no observation, data not available)",
+  "4": "Automatic, Included using Code tables 4677 and 4561",
+  "5": "Automatic, Omitted (no significant phenomenon to report)",
+  "6": "Automatic, Omitted (no observation, data not available)",
+  "7": "Automatic, Included using Code tables 4680 and 4531"
+}

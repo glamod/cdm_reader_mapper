@@ -136,7 +136,7 @@ def _get_file(
 # idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
     name: str | os.PathLike,
-    github_url: str = "https://github.com/glamod/cdm-testdata",
+    github_url: str = "https://github.com/JanWillruth/cdm-testdata",
     branch: str = "main",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
