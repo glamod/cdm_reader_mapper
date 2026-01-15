@@ -3,19 +3,12 @@
 from __future__ import annotations
 
 import ast
-import csv
 import logging
 import os
-
-from io import StringIO
-from pathlib import Path
-from typing import Any, Iterable, Callable
-
 import pandas as pd
-
-from .. import properties
-
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+import tempfile
+from pathlib import Path
+from typing import Any, Callable, Iterable, Iterator, Sequence
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -321,106 +314,179 @@ def remove_boolean_values(data, dtypes) -> pd.DataFrame:
     return data.astype(dtype)
 
 
-def process_textfilereader(
+class ParquetStreamReader:
+    """A wrapper that mimics pandas.io.parsers.TextFileReader."""
+
+    def __init__(self, generator: Iterator[pd.DataFrame]):
+        self._generator = generator
+        self._closed = False
+        self._buffer = []
+
+    def __iter__(self):
+        """Allows: for df in reader: ..."""
+        return self
+
+    def __next__(self):
+        """Allows: next(reader)"""
+        return next(self._generator)
+
+    def prepend(self, chunk: pd.DataFrame):
+        """
+        Push a chunk back onto the front of the stream.
+        Useful for peeking at the first chunk without losing it.
+        """
+        # Insert at 0 ensures FIFO order (peeking logic)
+        self._buffer.insert(0, chunk)
+
+    def get_chunk(self):
+        """
+        Safe for Large Files.
+        Returns the next single chunk from disk.
+        (Note: 'size' is ignored here as chunks are pre-determined by the write step)
+        """
+        if self._closed:
+            raise ValueError("I/O operation on closed file.")
+
+        try:
+            return next(self._generator)
+        except StopIteration:
+            raise ValueError("No more data to read (End of stream).")
+
+    def read(self):
+        """
+        WARNING: unsafe for Files > RAM.
+        Reads ALL remaining data into memory at once.
+        """
+        if self._closed:
+            raise ValueError("I/O operation on closed file.")
+
+        # Consume the entire rest of the stream
+        chunks = list(self._generator)
+
+        if not chunks:
+            return pd.DataFrame()
+
+        return pd.concat(chunks, ignore_index=True)
+
+    def close(self):
+        """Close the stream and release resources."""
+        if not self._closed:
+            self._generator.close()
+            self._closed = True
+
+    def __enter__(self):
+        """Allows: with ParquetStreamReader(...) as reader: ..."""
+        return self
+
+    def __exit__(self, _exc_type, _exc_val, _exc_tb):
+        """Allows: with ParquetStreamReader(...) as reader: ..."""
+        self.close()
+
+
+def _sort_chunk_outputs(
+    outputs: tuple, accumulators_initialized: bool
+) -> tuple[list[pd.DataFrame], list[Any]]:
+    """Separates DataFrames from metadata in the function output."""
+    current_dfs = []
+    new_metadata = []
+
+    for out in outputs:
+        if isinstance(out, pd.DataFrame):
+            current_dfs.append(out)
+        elif isinstance(out, list) and out and isinstance(out[0], pd.DataFrame):
+            current_dfs.extend(out)
+        elif not accumulators_initialized:
+            # Only capture metadata from the first chunk
+            new_metadata.append(out)
+
+    return current_dfs, new_metadata
+
+
+def _write_chunks_to_disk(current_dfs: list, temp_dirs: list, chunk_counter: int):
+    """Writes the current batch of DataFrames to their respective temp directories."""
+    for i, df_out in enumerate(current_dfs):
+        if i < len(temp_dirs):
+            file_path = Path(temp_dirs[i].name) / f"part_{chunk_counter:05d}.parquet"
+            # Fix: Ensure index=False to prevent index "ghosting"
+            df_out.to_parquet(
+                file_path, engine="pyarrow", compression="snappy", index=False
+            )
+
+
+def process_disk_backed(
     reader: Iterable[pd.DataFrame],
     func: Callable,
-    func_args: tuple = (),
+    func_args: Sequence[Any] | None = None,
     func_kwargs: dict[str, Any] | None = None,
-    read_kwargs: dict[str, Any] | tuple[dict[str, Any], ...] | None = None,
-    write_kwargs: dict[str, Any] | None = None,
     makecopy: bool = True,
-) -> tuple[pd.DataFrame, ...]:
+) -> tuple[Any, ...]:
     """
-    Process a stream of DataFrames using a function and return processed results.
-
-    Each DataFrame from `reader` is passed to `func`, which can return one or more
-    DataFrames or other outputs. DataFrame outputs are concatenated in memory and
-    returned as a tuple along with any additional non-DataFrame outputs.
-
-    Parameters
-    ----------
-    reader : Iterable[pd.DataFrame]
-        An iterable of DataFrames (e.g., a CSV reader returning chunks).
-    func : Callable
-        Function to apply to each DataFrame.
-    func_args : tuple, optional
-        Positional arguments passed to `func`.
-    func_kwargs : dict, optional
-        Keyword arguments passed to `func`.
-    read_kwargs : dict or tuple of dict, optional
-        Arguments to pass to `pd.read_csv` when reconstructing output DataFrames.
-    write_kwargs : dict, optional
-        Arguments to pass to `DataFrame.to_csv` when buffering output.
-    makecopy : bool, default True
-        If True, makes a copy of each input DataFrame before processing.
-
-    Returns
-    -------
-    tuple
-        A tuple containing:
-            - One or more processed DataFrames (in the same order as returned by `func`)
-            - Any additional outputs from `func` that are not DataFrames
+    Consumes a stream of DataFrames, processes them, and returns a tuple of
+    results. DataFrames are cached to disk (Parquet) and returned as generators.
     """
+    if func_args is None:
+        func_args = ()
     if func_kwargs is None:
         func_kwargs = {}
-    if read_kwargs is None:
-        read_kwargs = {}
-    if write_kwargs is None:
-        write_kwargs = {}
 
-    buffers = []
-    columns = []
+    temp_dirs: list[tempfile.TemporaryDirectory] = []
+    output_non_df = []
+    directories_to_cleanup = []
 
-    if makecopy is True:
-        reader = make_copy(reader)
+    try:
+        accumulators_initialized = False
+        chunk_counter = 0
 
-    output_add = []
+        for df in reader:
+            if makecopy:
+                df = df.copy()
 
-    for df in reader:
-        outputs = func(df, *func_args, **func_kwargs)
-        if not isinstance(outputs, tuple):
-            outputs = (outputs,)
+            outputs = func(df, *func_args, **func_kwargs)
+            if not isinstance(outputs, tuple):
+                outputs = (outputs,)
 
-        output_dfs = []
-        first_chunk = not buffers
-
-        for out in outputs:
-            if isinstance(out, pd.DataFrame):
-                output_dfs.append(out)
-            elif first_chunk:
-                output_add.append(out)
-
-        if not buffers:
-            buffers = [StringIO() for _ in output_dfs]
-            columns = [out.columns for out in output_dfs]
-
-        for buffer, out_df in zip(buffers, output_dfs):
-            out_df.to_csv(
-                buffer,
-                header=False,
-                mode="a",
-                index=False,
-                quoting=csv.QUOTE_NONE,
-                sep=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-                **write_kwargs,
+            # Sort outputs
+            current_dfs, new_meta = _sort_chunk_outputs(
+                outputs, accumulators_initialized
             )
+            if new_meta:
+                output_non_df.extend(new_meta)
 
-    if isinstance(read_kwargs, dict):
-        read_kwargs = tuple(read_kwargs for _ in range(len(buffers)))
+            # Initialize temp dirs on the first valid chunk
+            if not accumulators_initialized:
+                if current_dfs:
+                    for _ in range(len(current_dfs)):
+                        t = tempfile.TemporaryDirectory()
+                        temp_dirs.append(t)
+                        directories_to_cleanup.append(t)
+                    accumulators_initialized = True
 
-    result_dfs = []
-    for buffer, cols, rk in zip(buffers, columns, read_kwargs):
-        buffer.seek(0)
-        result_dfs.append(
-            pd.read_csv(
-                buffer,
-                names=cols,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-                **rk,
-            )
-        )
-    return tuple(result_dfs + output_add)
+            if accumulators_initialized:
+                _write_chunks_to_disk(current_dfs, temp_dirs, chunk_counter)
+
+            chunk_counter += 1
+
+        if not accumulators_initialized:
+            return tuple(output_non_df)
+
+        # Create generators that own the temp directories
+        def create_generator(temp_dir_obj):
+            try:
+                files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
+                for f in files:
+                    yield pd.read_parquet(f)
+            finally:
+                temp_dir_obj.cleanup()
+
+        final_iterators = [ParquetStreamReader(create_generator(d)) for d in temp_dirs]
+
+        # Explicitly clear this list. This transfers ownership of the TempDirectory
+        # objects to the closures created above.
+        directories_to_cleanup.clear()
+
+        return tuple(final_iterators + output_non_df)
+
+    finally:
+        # Safety net: cleans up only if we crashed or failed to hand off ownership
+        for d in directories_to_cleanup:
+            d.cleanup()

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from typing import Callable, Any, Sequence, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 import pandas as pd
 import xarray as xr
@@ -14,8 +14,9 @@ from pandas.io.parsers import TextFileReader
 
 from .. import properties
 from .utilities import (
-    process_textfilereader,
+    process_disk_backed,
     remove_boolean_values,
+    ParquetStreamReader,
 )
 
 from .convert_and_decode import convert_and_decode
@@ -39,18 +40,21 @@ def _apply_or_chunk(
     func_kwargs: Mapping[str, Any] | None = None,
     **kwargs: Mapping[str, Any],
 ):
-    """Apply a function directly or chunk-wise depending on input type."""
+    """Apply a function directly or chunk-wise.  If data is an iterator, it uses disk-backed streaming."""
     func_args = func_args or []
     func_kwargs = func_kwargs or {}
-    if not isinstance(data, TextFileReader):
-        return func(data, *func_args, **func_kwargs)
-    return process_textfilereader(
-        data,
-        func,
-        func_args,
-        func_kwargs,
-        **kwargs,
-    )
+    if not isinstance(data, (TextFileReader, ParquetStreamReader)):
+        result = func(data, *func_args, **func_kwargs)
+    else:
+        result = process_disk_backed(
+            data,
+            func,
+            func_args,
+            func_kwargs,
+            **kwargs,
+        )
+
+    return result
 
 
 def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
@@ -293,7 +297,6 @@ class FileReader:
         if open_with == "netcdf":
             to_parse = xr.open_mfdataset(source, **xr_kwargs).squeeze()
             config = update_xr_config(to_parse, self.config)
-            write_kwargs, read_kwargs = {}, {}
         elif open_with == "pandas":
             config = update_pd_config(pd_kwargs, self.config)
             pd_kwargs["encoding"] = config.encoding
@@ -303,14 +306,6 @@ class FileReader:
             pd_kwargs.setdefault("escapechar", "\0")
             pd_kwargs.setdefault("dtype", object)
             pd_kwargs.setdefault("skip_blank_lines", False)
-
-            write_kwargs = {"encoding": pd_kwargs["encoding"]}
-            chunksize = pd_kwargs.get("chunksize")
-            read_kwargs = (
-                {"chunksize": chunksize, "dtype": config.dtypes},
-                {"chunksize": chunksize, "dtype": "boolean"},
-            )
-
             to_parse = pd.read_fwf(source, **pd_kwargs)
         else:
             raise ValueError("open_with must be 'pandas' or 'netcdf'")
@@ -322,8 +317,6 @@ class FileReader:
             self._process_data,
             func_kwargs=func_kwargs,
             makecopy=False,
-            write_kwargs=write_kwargs,
-            read_kwargs=read_kwargs,
         )
 
     def read(

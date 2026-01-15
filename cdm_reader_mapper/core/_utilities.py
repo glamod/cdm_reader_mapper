@@ -7,13 +7,11 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
-
 from cdm_reader_mapper.common import (
     get_length,
 )
 
-from io import StringIO as StringIO
+from cdm_reader_mapper.mdf_reader.utils.utilities import process_disk_backed
 
 
 def _copy(value):
@@ -22,8 +20,8 @@ def _copy(value):
         return deepcopy(value)
     elif isinstance(value, pd.DataFrame):
         return value.copy()
-    elif isinstance(value, pd.io.parsers.TextFileReader):
-        return make_copy(value)
+    elif hasattr(value, "copy"):
+        return value.copy()
     return value
 
 
@@ -38,58 +36,82 @@ def method(attr_func, *args, **kwargs):
 
 
 def reader_method(DataBundle, data, attr, *args, **kwargs):
-    """Handles operations on chunked DataFrame (TextFileReader)."""
-    data_buffer = StringIO()
-    TextParser = make_copy(data)
-    read_params = [
-        "chunksize",
-        "parse_dates",
-        "date_parser",
-        "infer_datetime_format",
-    ]
-    write_dict = {"header": None, "mode": "a", "index": True}
-    read_dict = {x: TextParser.orig_options.get(x) for x in read_params}
-    inplace = kwargs.get("inplace", False)
-    for df_ in TextParser:
-        attr_func = getattr(df_, attr)
-        result_df = method(attr_func, *args, **kwargs)
-        if result_df is None:
-            result_df = df_
-        result_df.to_csv(data_buffer, **write_dict)
-    dtypes = {}
-    for k, v in result_df.dtypes.items():
-        if v == "object":
-            v = "str"
-        dtypes[k] = v
-    read_dict["dtype"] = dtypes
-    read_dict["names"] = result_df.columns
-    data_buffer.seek(0)
-    TextParser = pd.read_csv(data_buffer, **read_dict)
+    """
+    Handles operations on chunked data (ParquetStreamReader).
+    Uses process_disk_backed to stream processing without loading into RAM.
+    """
+    inplace = kwargs.pop("inplace", False)
+
+    # Define the transformation function to apply per chunk
+    def apply_operation(df):
+        # Fetch the attribute (method or property) from the chunk
+        attr_obj = getattr(df, attr)
+
+        # Use the 'method' helper to execute it (call or subscript)
+        result = method(attr_obj, *args, **kwargs)
+
+        # If the operation was inplace on the DataFrame (returns None), yield the modified DataFrame itself.
+        if result is None:
+            return df
+        return result
+
+    # Process stream using Disk-Backed Parquet Engine
+    result_tuple = process_disk_backed(
+        data,
+        apply_operation,
+        makecopy=True,
+    )
+
+    # The result is a tuple: (ParquetStreamReader, [extra_outputs])
+    new_reader = result_tuple[0]
+
+    # Handle inplace logic
     if inplace:
-        DataBundle._data = TextParser
-        return
-    return TextParser
+        DataBundle._data = new_reader
+        return None
+
+    return new_reader
 
 
-def combine_attribute_values(attr_func, TextParser, attr):
-    """Collect values of the attribute across all chunks and combine them."""
-    combined_values = [attr_func]
-    for chunk in TextParser:
+def combine_attribute_values(first_value, iterator, attr):
+    """
+    Collect values of an attribute across all chunks and combine them.
+
+    Parameters
+    ----------
+    first_value : Any
+        The value from the first chunk (already read).
+    iterator : Iterator/ParquetStreamReader
+        The stream positioned at the second chunk.
+    attr : str
+        The attribute name to fetch from remaining chunks.
+    """
+    combined_values = [first_value]
+
+    # Iterate through the rest of the stream
+    for chunk in iterator:
         combined_values.append(getattr(chunk, attr))
 
-    if isinstance(attr_func, pd.Index):
-        combined_index = combined_values[0]
+    # Logic to merge results based on type
+    if isinstance(first_value, pd.Index):
+        combined_index = first_value
         for idx in combined_values[1:]:
             combined_index = combined_index.union(idx)
         return combined_index
-    if isinstance(attr_func, (int, float)):
+
+    if isinstance(first_value, (int, float)):
         return sum(combined_values)
-    if isinstance(attr_func, tuple) and len(attr_func) == 2:
+
+    if isinstance(first_value, tuple) and len(first_value) == 2:
+        # Tuple usually implies shape (rows, cols)
+        # Sum rows (0), keep cols (1) constant
         first_ = sum(value[0] for value in combined_values)
-        second_ = attr_func[1]
+        second_ = first_value[1]
         return (first_, second_)
-    if isinstance(attr_func, (list, np.ndarray)):
+
+    if isinstance(first_value, (list, np.ndarray)):
         return np.concatenate(combined_values)
+
     return combined_values
 
 
@@ -151,19 +173,43 @@ class _DataBundle:
             if not callable(attr_func):
                 return attr_func
             return SubscriptableMethod(attr_func)
-        elif isinstance(data, pd.io.parsers.TextFileReader):
+        elif hasattr(data, "get_chunk") and hasattr(data, "prepend"):
+            # This allows db.read(), db.close(), db.get_chunk() to work
+            if hasattr(data, attr):
+                return getattr(data, attr)
 
-            def wrapped_reader_method(*args, **kwargs):
-                return reader_method(self, data, attr, *args, **kwargs)
+            try:
+                first_chunk = data.get_chunk()
+            except ValueError:
+                raise ValueError("Cannot access attribute on empty data stream.")
 
-            TextParser = make_copy(data)
-            first_chunk = next(TextParser)
-            attr_func = getattr(first_chunk, attr)
-            if callable(attr_func):
+            if not hasattr(first_chunk, attr):
+                # Restore state before raising error
+                data.prepend(first_chunk)
+                raise AttributeError(f"DataFrame chunk has no attribute '{attr}'.")
+
+            attr_value = getattr(first_chunk, attr)
+
+            if callable(attr_value):
+                # METHOD CALL (e.g., .dropna(), .fillna())
+                # Put the chunk BACK so the reader_method sees the full stream.
+                data.prepend(first_chunk)
+
+                def wrapped_reader_method(*args, **kwargs):
+                    return reader_method(self, data, attr, *args, **kwargs)
+
                 return SubscriptableMethod(wrapped_reader_method)
-            return combine_attribute_values(attr_func, TextParser, attr)
+            else:
+                # PROPERTY ACCESS (e.g., .shape, .dtypes)
+                # DO NOT put the chunk back yet. Pass the 'first_value'
+                # and the 'data' iterator (which is now at chunk 2) to the combiner.
+                # The combiner will consume the rest.
+                return combine_attribute_values(attr_value, data, attr)
 
-        raise TypeError("'data' is neither a DataFrame nor a TextFileReader object.")
+        else:
+            raise TypeError(
+                f"'data' is {type(data)}, expected DataFrame or ParquetStreamReader."
+            )
 
     def __repr__(self) -> str:
         """Return a string representation for :py:attr:`data`."""
