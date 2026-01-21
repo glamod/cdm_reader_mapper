@@ -1,0 +1,86 @@
+{
+  "observation_id": {
+    "sections": "MAROB",
+    "elements": "ID",
+    "transform": "string_add",
+    "kwargs": {
+      "separator": "-"
+    }
+  },
+  "report_id": {
+    "sections": "MAROB",
+    "elements": "ID",
+    "transform": "string_add",
+    "kwargs": {
+      "separator": "-"
+    }
+  },
+  "data_policy_licence": "UNKNOWN",
+  "date_time": {
+    "sections": "MAROB",
+    "elements": "MESSZEIT"
+  },
+  "date_time_meaning": {
+    "default": 2
+  },
+  "observation_duration": "UNKNOWN",
+  "longitude": {
+    "sections": "MAROB",
+    "elements": "GEOGR_LAENGE"
+  },
+  "latitude": {
+    "sections": "MAROB",
+    "elements": "GEOGR_BREITE"
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "value_significance": {
+    "default": 2
+  },
+  "conversion_flag": {
+    "default": 0
+  },
+  "location_precision": {
+    "sections": "MAROB",
+    "elements": [
+      "GEOGR_LAENGE",
+      "GEOGR_BREITE"
+    ],
+    "transform": "location_accuracy",
+    "decimal_places": 0
+  },
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "numerical_precision": {},
+  "sensor_automation_status": {
+    "default": 5
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "processing_level": {
+    "default": 3
+  },
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {
+    "sections": "MAROB",
+    "elements": "KURZNAME"
+  }
+}

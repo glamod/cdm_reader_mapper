@@ -1,0 +1,40 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WS"
+    }
+  },
+  "z_coordinate": {
+    "sections": "WIND",
+    "elements": "SENSORHOEHE_WAS_FF"
+  },
+  "observation_height_above_station_surface": {
+    "sections": "WIND",
+    "elements": "SENSORHOEHE_WAS_FF"
+  },
+  "observed_variable": {
+    "default": 107
+  },
+  "observation_value": {
+    "sections": "WIND",
+    "elements": "WINDGESCHWINDIGKEIT"
+  },
+  "units": {
+    "default": 731
+  },
+  "quality_flag": {
+    "sections": "WIND",
+    "elements": "WINDGESCHWINDIGKEIT_FLAG"
+  },
+  "original_precision": {},
+  "original_units": {
+    "default": 731
+  },
+  "original_value": {
+    "sections": "WIND",
+    "elements": "WINDGESCHWINDIGKEIT"
+  },
+  "conversion_flag": {
+    "default": 2
+  }
+}

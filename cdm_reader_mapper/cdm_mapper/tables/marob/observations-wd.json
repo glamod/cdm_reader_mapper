@@ -1,0 +1,39 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WD"
+    }
+  },
+  "z_coordinate": {
+    "sections": "WIND",
+    "elements": "SENSORHOEHE_WAS_FF"
+  },
+  "observation_height_above_station_surface": {
+    "sections": "WIND",
+    "elements": "SENSORHOEHE_WAS_FF"
+  },
+  "observed_variable": {
+    "default": 106
+  },
+  "observation_value": {
+    "sections": "WIND",
+    "elements": "WINDRICHTUNG"
+  },
+  "units": {
+    "default": 320
+  },
+  "quality_flag": {
+    "sections": "WIND",
+    "elements": "WINDRICHTUNG_FLAG"
+  },
+  "original_units": {
+    "default": 320
+  },
+  "original_value": {
+    "sections": "WIND",
+    "elements": "WINDRICHTUNG"
+  },
+  "conversion_flag": {
+    "default": 2
+  }
+}
