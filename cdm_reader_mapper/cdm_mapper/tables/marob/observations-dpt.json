@@ -1,0 +1,39 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "DPT"
+    }
+  },
+  "z_coordinate": {
+    "sections": "LUFT",
+    "elements": "SENSORHOEHE_WAS_TT"
+  },
+  "observation_height_above_station_surface": {
+    "sections": "LUFT",
+    "elements": "SENSORHOEHE_WAS_TT"
+  },
+  "observed_variable": {
+    "default": 36
+  },
+  "observation_value": {
+    "sections": "LUFT",
+    "elements": "TAUPUNKTTEMPERATUR"
+  },
+  "units": {
+    "default": 5
+  },
+  "quality_flag": {
+    "sections": "LUFT",
+    "elements": "TAUPUNKTTEMPERATUR_FLAG"
+  },
+  "original_units": {
+    "default": 5
+  },
+  "original_value": {
+    "sections": "LUFT",
+    "elements": "TAUPUNKTTEMPERATUR"
+  },
+  "conversion_method": {
+    "default": 1
+  }
+}

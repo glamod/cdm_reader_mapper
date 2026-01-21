@@ -1,0 +1,39 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "SLP"
+    }
+  },
+  "z_coordinate": {
+    "sections": "LUFT",
+    "elements": "SENSORHOEHE_WAS_TT"
+  },
+  "observation_height_above_station_surface": {
+    "sections": "LUFT",
+    "elements": "SENSORHOEHE_WAS_TT"
+  },
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "sections": "LUFT",
+    "elements": "LUFTDRUCK_STATIONSHOEHE"
+  },
+  "units": {
+    "default": 32
+  },
+  "quality_flag": {
+    "sections": "LUFT",
+    "elements": "LUFTDRUCK_STATIONSHOEHE_FLAG"
+  },
+  "original_units": {
+    "default": 32
+  },
+  "original_value": {
+    "sections": "LUFT",
+    "elements": "LUFTDRUCK_STATIONSHOEHE"
+  },
+  "conversion_method": {
+    "default": 7
+  }
+}
