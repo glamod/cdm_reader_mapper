@@ -22,7 +22,7 @@ New features and enhancements
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
-* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_convert` to helepr function `_map_and_convert` (:pull:`343`)
+* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_convert` to helper function `_map_and_convert` (:pull:`343`)
 * replace `logging.error` with `raise` error statements (:pull:`345`)
 
 Internal changes
