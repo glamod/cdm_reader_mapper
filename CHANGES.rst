@@ -3,6 +3,14 @@
 Changelog
 =========
 
+2.2.1 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+* ``cdm_reader_mapper.cdm_mapper``: set indexes to input data indexed when setting default values (:pull:`356`)
+
 2.2.0 (2026-01-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)

@@ -213,7 +213,7 @@ def _extract_input_data(idata, elements, cols, default, logger):
     """Extract the relevant input data based on `elements`."""
 
     def _return_default():
-        return pd.Series(_default(default, len(idata))), True
+        return pd.Series(_default(default, len(idata)), index=idata.index), True
 
     if not elements:
         return _return_default()
