@@ -3,11 +3,19 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from io import StringIO
+
 from cdm_reader_mapper import DataBundle
 
 
+def make_parser(text, **kwargs):
+    """Helper: create a TextFileReader similar to user code."""
+    buffer = StringIO(text)
+    return pd.read_csv(buffer, chunksize=2, **kwargs)
+
+
 @pytest.fixture
-def sample_df():
+def sample_db_df():
     data = pd.DataFrame(
         {
             "A": [19, 26, 27, 41, 91],
@@ -24,6 +32,17 @@ def sample_df():
 
 
 @pytest.fixture
+def sample_db_reader():
+    text = "A,B,\n19,0\n26,1\n27,2\n41,3\n91,4"
+    reader_data = make_parser(text)
+
+    text = "A,B,\nTrue,True\nTrue,True\nTrue,True\nFalse,False\nTrue,False"
+    reader_mask = make_parser(text)
+
+    return DataBundle(data=reader_data, mask=reader_mask)
+
+
+@pytest.fixture
 def sample_data():
     return pd.DataFrame({"C": [20, 21, 22, 23, 24]})
 
@@ -33,30 +52,52 @@ def sample_mask():
     return pd.DataFrame({"C": [True, False, True, False, False]})
 
 
-def test_len(sample_df):
-    assert len(sample_df) == 5
+def test_len_df(sample_db_df):
+    assert len(sample_db_df) == 5
 
 
-def test_print(sample_df, capsys):
-    print(sample_df)
+def test_len_reader(sample_db_reader):
+    assert len(sample_db_reader) == 5
+
+
+def test_print_df(sample_db_df, capsys):
+    print(sample_db_df)
 
     captured = capsys.readouterr()
 
     assert captured.out.strip() != ""
 
-    for col in sample_df.data.columns:
+    for col in sample_db_df.columns:
         assert col in captured.out
 
 
-def test_copy(sample_df):
-    db_cp = sample_df.copy()
+def test_print_reader(sample_db_reader, capsys):
+    print(sample_db_reader)
 
-    pd.testing.assert_frame_equal(sample_df.data, db_cp.data)
-    pd.testing.assert_frame_equal(sample_df.mask, db_cp.mask)
+    captured = capsys.readouterr()
+
+    assert captured.out.strip() != ""
 
 
-def test_add(sample_data, sample_mask):
+def test_copy_df(sample_db_df):
+    db_cp = sample_db_df.copy()
+
+    pd.testing.assert_frame_equal(sample_db_df.data, db_cp.data)
+    pd.testing.assert_frame_equal(sample_db_df.mask, db_cp.mask)
+
+
+def test_copy_reader(sample_db_reader):
+    db_cp = sample_db_reader.copy()
+
+    pd.testing.assert_frame_equal(sample_db_reader.data.read(), db_cp.data.read())
+    pd.testing.assert_frame_equal(sample_db_reader.mask.read(), db_cp.mask.read())
+
+
+def test_add_df(sample_db_df):
     db = DataBundle()
+
+    sample_data = sample_db_df.data
+    sample_mask = sample_db_df.mask
 
     db_add = db.add({"data": sample_data})
     pd.testing.assert_frame_equal(db_add.data, sample_data)
@@ -73,26 +114,38 @@ def test_add(sample_data, sample_mask):
     pd.testing.assert_frame_equal(db_add.mask, sample_mask)
 
 
-def test_stack_v(sample_df, sample_data, sample_mask):
+def test_add_reader(sample_db_reader):
+    raise NotImplementedError
+
+
+def test_stack_v_df(sample_db_df, sample_data, sample_mask):
     db = DataBundle(data=sample_data, mask=sample_mask)
-    expected_data = pd.concat([sample_df.data, db.data], ignore_index=True)
-    expected_mask = pd.concat([sample_df.mask, db.mask], ignore_index=True)
+    expected_data = pd.concat([sample_db_df.data, db.data], ignore_index=True)
+    expected_mask = pd.concat([sample_db_df.mask, db.mask], ignore_index=True)
 
-    sample_df.stack_v(db)
+    sample_db_df.stack_v(db)
 
-    pd.testing.assert_frame_equal(sample_df.data, expected_data)
-    pd.testing.assert_frame_equal(sample_df.mask, expected_mask)
+    pd.testing.assert_frame_equal(sample_db_df.data, expected_data)
+    pd.testing.assert_frame_equal(sample_db_df.mask, expected_mask)
 
 
-def test_stack_h(sample_df, sample_data, sample_mask):
+def test_stack_v_reader():
+    raise NotImplementedError
+
+
+def test_stack_h_df(sample_db_df, sample_data, sample_mask):
     db = DataBundle(data=sample_data, mask=sample_mask)
-    expected_data = pd.concat([sample_df.data, db.data], axis=1)
-    expected_mask = pd.concat([sample_df.mask, db.mask], axis=1)
+    expected_data = pd.concat([sample_db_df.data, db.data], axis=1)
+    expected_mask = pd.concat([sample_db_df.mask, db.mask], axis=1)
 
-    sample_df.stack_h(db)
+    sample_db_df.stack_h(db)
 
-    pd.testing.assert_frame_equal(sample_df.data, expected_data)
-    pd.testing.assert_frame_equal(sample_df.mask, expected_mask)
+    pd.testing.assert_frame_equal(sample_db_df.data, expected_data)
+    pd.testing.assert_frame_equal(sample_db_df.mask, expected_mask)
+
+
+def test_stack_h_reader():
+    raise NotImplementedError
 
 
 @pytest.mark.parametrize(
@@ -106,8 +159,8 @@ def test_stack_h(sample_df, sample_data, sample_mask):
 )
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def test_select_operators(
-    sample_df,
+def test_select_operators_df(
+    sample_db_df,
     func,
     args,
     idx_exp,
@@ -115,10 +168,12 @@ def test_select_operators(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_df, func)(*args, reset_index=reset_index, inverse=inverse)
+    result = getattr(sample_db_df, func)(
+        *args, reset_index=reset_index, inverse=inverse
+    )
 
-    expected = sample_df.data
-    expected_mask = sample_df.mask
+    expected = sample_db_df.data
+    expected_mask = sample_db_df.mask
     selected = result.data
     selected_mask = result.mask
 
@@ -138,6 +193,10 @@ def test_select_operators(
     pd.testing.assert_frame_equal(expected_mask, selected_mask)
 
 
+def test_select_operators_reader():
+    raise NotImplementedError
+
+
 @pytest.mark.parametrize(
     "func, args, idx_exp, idx_rej",
     [
@@ -149,8 +208,8 @@ def test_select_operators(
 )
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def test_split_operators(
-    sample_df,
+def test_split_operators_df(
+    sample_db_df,
     func,
     args,
     idx_exp,
@@ -158,10 +217,12 @@ def test_split_operators(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_df, func)(*args, reset_index=reset_index, inverse=inverse)
+    result = getattr(sample_db_df, func)(
+        *args, reset_index=reset_index, inverse=inverse
+    )
 
-    expected = sample_df.data
-    expected_mask = sample_df.mask
+    expected = sample_db_df.data
+    expected_mask = sample_db_df.mask
     selected = result[0].data
     selected_mask = result[0].mask
     rejected = result[1].data
@@ -191,19 +252,28 @@ def test_split_operators(
     pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
 
 
-def test_unique(sample_df):
-    result = sample_df.unique(columns=("A"))
+def test_split_operators_reader():
+    raise NotImplementedError
+
+
+def test_unique_df(sample_db_df):
+    result = sample_db_df.unique(columns=("A"))
     assert result == {"A": {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
-def test_replace_columns(sample_df):
+def test_unique_reader(sample_db_reader):
+    result = sample_db_reader.unique(columns=("A"))
+    assert result == {"A": {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
+
+
+def test_replace_columns(sample_db_df):
     df_corr = pd.DataFrame(
         {
             "A_new": [101, 201, 301, 401, 501],
             "B": range(5),
         }
     )
-    result = sample_df.replace_columns(
+    result = sample_db_df.replace_columns(
         df_corr,
         subset=["B", "A"],
         rep_map={"A": "A_new"},
