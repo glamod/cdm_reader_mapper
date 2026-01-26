@@ -20,6 +20,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from pandas.io.parsers import TextFileReader
+
 from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
 
 from . import properties
@@ -41,7 +43,7 @@ def _check_input_data_type(data, logger):
             return _log_and_return_empty("Input data is empty")
         return [data]
 
-    elif isinstance(data, pd.io.parsers.TextFileReader):
+    elif isinstance(data, TextFileReader):
         logger.debug("Input is a pd.TextFileReader")
         if not pandas_TextParser_hdlr.is_not_empty(data):
             return _log_and_return_empty("Input data is empty")
@@ -373,6 +375,7 @@ def _process_chunk(
     drop_missing_obs,
     drop_duplicates,
     logger,
+    is_reader,
 ):
     """Process one chunk of input data."""
     for table, mapping in imodel_maps.items():
@@ -392,13 +395,17 @@ def _process_chunk(
         )
 
         table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
-        table_df.to_csv(
-            cdm_tables[table]["buffer"],
-            header=False,
-            index=False,
-            mode="a",
-        )
-        cdm_tables[table]["columns"] = table_df.columns
+
+        if is_reader:
+            table_df.to_csv(
+                cdm_tables[table]["buffer"],
+                header=False,
+                index=False,
+                mode="a",
+            )
+            cdm_tables[table]["columns"] = table_df.columns
+        else:
+            cdm_tables[table]["df"] = table_df.astype(object)
 
 
 def _finalize_output(cdm_tables, logger):
@@ -408,18 +415,23 @@ def _finalize_output(cdm_tables, logger):
     for table, meta in cdm_tables.items():
         logger.debug(f"\tParse datetime by reader; Table: {table}")
 
-        meta["buffer"].seek(0)
-        df = pd.read_csv(
-            meta["buffer"],
-            names=meta["columns"],
-            na_values=[],
-            dtype="object",
-            keep_default_na=False,
-        )
-
-        meta["buffer"].close()
+        if "df" not in meta:
+            meta["buffer"].seek(0)
+            df = pd.read_csv(
+                meta["buffer"],
+                names=meta["columns"],
+                na_values=[],
+                dtype="object",
+                keep_default_na=False,
+            )
+            meta["buffer"].close()
+        else:
+            df = meta.get("df", pd.DataFrame())
 
         final_tables.append(df)
+
+    if not final_tables:
+        return pd.DataFrame()
 
     return pd.concat(final_tables, axis=1, join="outer").reset_index(drop=True)
 
@@ -450,6 +462,8 @@ def _map_and_convert(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
+    is_reader = isinstance(data_iter, TextFileReader)
+
     for idata in data_iter:
         _process_chunk(
             idata=idata,
@@ -462,6 +476,7 @@ def _map_and_convert(
             drop_missing_obs=drop_missing_obs,
             drop_duplicates=drop_duplicates,
             logger=logger,
+            is_reader=is_reader,
         )
 
     return _finalize_output(cdm_tables, logger)
