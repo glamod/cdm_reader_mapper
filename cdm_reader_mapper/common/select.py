@@ -21,6 +21,7 @@ def _split_df(
     inverse: bool = False,
     return_rejected: bool = False,
 ):
+
     if inverse:
         selected = df[~mask]
         rejected = df[mask] if return_rejected else df.iloc[0:0]
@@ -44,7 +45,6 @@ def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **
     else:
         mask_sel = mask.all(axis=1) if boolean else ~mask.any(axis=1)
         mask_sel = mask_sel.fillna(boolean)
-
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
@@ -81,7 +81,17 @@ def _split_text_reader(
     buffer_sel = StringIO()
     buffer_rej = StringIO()
 
-    write_opts = {"header": None, "mode": "a", "index": not reset_index}
+    read_params = [
+        "chunksize",
+        "names",
+        "dtype",
+        "parse_dates",
+        "date_parser",
+        "infer_datetime_format",
+    ]
+
+    write_dict = {"header": None, "mode": "a", "index": not reset_index}
+    read_dict = {x: reader.orig_options.get(x) for x in read_params}
 
     for chunk in reader:
         sel, rej = func(
@@ -91,17 +101,15 @@ def _split_text_reader(
             inverse=inverse,
             return_rejected=return_rejected,
         )
-        sel.to_csv(buffer_sel, **write_opts)
+        sel.to_csv(buffer_sel, **write_dict)
         if return_rejected:
-            rej.to_csv(buffer_rej, **write_opts)
+            rej.to_csv(buffer_rej, **write_dict)
 
     buffer_sel.seek(0)
     buffer_rej.seek(0)
 
-    selected = pd.read_csv(buffer_sel, chunksize=2)
-    rejected = (
-        pd.read_csv(buffer_rej, chunksize=2) if return_rejected else selected.iloc[0:0]
-    )
+    selected = pd.read_csv(buffer_sel, **read_dict)
+    rejected = pd.read_csv(buffer_rej, **read_dict)
 
     return selected, rejected
 
