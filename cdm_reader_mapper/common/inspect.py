@@ -12,13 +12,14 @@ from typing import Any
 
 import pandas as pd
 
-from . import pandas_TextParser_hdlr
+from .pandas_TextParser_hdlr import make_copy
+from .pandas_TextParser_hdlr import get_length as get_length_hdlr
 
 
 def _count_by_cat(series) -> dict:
     """Count unique values in a pandas Series, including NaNs."""
     counts = series.value_counts(dropna=False)
-    counts.index = counts.index.map(lambda x: "nan" if pd.isna(x) else x)
+    counts.index = counts.index.where(~counts.index.isna(), "nan")
     return counts.to_dict()
 
 
@@ -51,29 +52,24 @@ def count_by_cat(
     if not isinstance(columns, list):
         columns = [columns]
 
-    counts = {}
+    counts = {col: {} for col in columns}
 
     if isinstance(data, pd.DataFrame):
         for column in columns:
             counts[column] = _count_by_cat(data[column])
         return counts
 
-    for column in columns:
-        data_cp = pandas_TextParser_hdlr.make_copy(data)
-        count_dicts = []
+    data_cp = make_copy(data)
+    if data_cp is None:
+        return counts
 
-        for df in data_cp:
-            count_dicts.append(_count_by_cat(df[column]))
+    for chunk in data_cp:
+        for column in columns:
+            chunk_counts = _count_by_cat(chunk[column])
+            for k, v in chunk_counts.items():
+                counts[column][k] = counts[column].get(k, 0) + v
 
-        data_cp.close()
-
-        merged_counts = {}
-        for d in count_dicts:
-            for k, v in d.items():
-                merged_counts[k] = merged_counts.get(k, 0) + v
-
-        counts[column] = merged_counts
-
+    data_cp.close()
     return counts
 
 
@@ -98,4 +94,4 @@ def get_length(data: pd.DataFrame | pd.io.parsers.TextFileReader) -> int:
     """
     if not isinstance(data, pd.io.parsers.TextFileReader):
         return len(data)
-    return pandas_TextParser_hdlr.get_length(data)
+    return get_length_hdlr(data)

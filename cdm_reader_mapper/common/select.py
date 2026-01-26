@@ -9,186 +9,133 @@ Created on Wed Jul  3 09:48:18 2019
 from __future__ import annotations
 
 from io import StringIO
-from typing import Sequence, Iterable, Callable
+from typing import Iterable, Callable
 
 import pandas as pd
 
 
-def _select_rows_by_index(
+def _split_by_boolean_df(
     df: pd.DataFrame,
-    index_list: str | int | Sequence,
-    **kwargs,
-) -> pd.DataFrame:
-    """Select rows from a DataFrame based on index values."""
-    reset_index = kwargs.get("reset_index", False)
-    inverse = kwargs.get("inverse", False)
-
-    if isinstance(index_list, str):
-        index_list = [index_list]
-    if isinstance(index_list, list):
-        index_list = pd.Index(index_list)
-    index = df.index.isin(index_list)
-    if inverse is True:
-        in_df = df[~index]
+    mask: pd.DataFrame,
+    boolean: bool,
+    reset_index: bool = False,
+    inverse: bool = False,
+    return_rejected: bool = False,
+):
+    if mask.empty:
+        selected_mask = pd.Series(boolean, index=df.index)
     else:
-        in_df = df[index]
+        selected_mask = mask.all(axis=1) if boolean else ~mask.any(axis=1)
+        selected_mask = selected_mask.fillna(boolean)
 
-    if reset_index is True:
-        in_df = in_df.reset_index(drop=True)
+    selected = df[selected_mask]
+    rejected = df[~selected_mask] if return_rejected else df.iloc[0:0]
 
-    in_df.__dict__["_prev_index"] = index_list
-    return in_df
+    if reset_index:
+        selected = selected.reset_index(drop=True)
+        rejected = rejected.reset_index(drop=True)
+
+    return selected, rejected
 
 
-def _split_by_index(
+def _split_by_column_df(
     df: pd.DataFrame,
-    indexes: str | Sequence,
-    **kwargs,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split a DataFrame into two parts based on index values."""
-    return_rejected = kwargs.get("return_rejected", False)
+    col: str,
+    values: Iterable,
+    reset_index: bool = False,
+    inverse: bool = False,
+    return_rejected: bool = False,
+):
+    mask = df[col].isin(values)
 
-    out1 = _select_rows_by_index(
-        df,
-        indexes,
-        **kwargs,
-    )
-    if return_rejected is True:
-        index2 = [idx for idx in df.index if idx not in indexes]
-        out2 = _select_rows_by_index(df, index2, **kwargs)
-    else:
-        out2 = pd.DataFrame(columns=out1.columns)
-        out2.__dict__["_prev_index"] = pd.Index([])
+    if inverse:
+        mask = ~mask
 
-    return out1, out2
+    selected = df[mask]
+    rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
+    if reset_index:
+        selected = selected.reset_index(drop=True)
+        rejected = rejected.reset_index(drop=True)
 
-def _split_by_boolean_mask_(
-    df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split a DataFrame based on a boolean mask using `_split_by_index`."""
-    if mask.empty:
-        if boolean:
-            indexes = df.index
-        else:
-            indexes = df.index.difference(df.index)
-        return _split_by_index(df, indexes, **kwargs)
-
-    if boolean is True:
-        global_mask = mask.all(axis=1)
-    else:
-        global_mask = ~(mask.any(axis=1))
-
-    indexes = global_mask[global_mask.fillna(boolean)].index
-    return _split_by_index(df, indexes, **kwargs)
+    return selected, rejected
 
 
-def _split_by_boolean_mask(
-    df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split a DataFrame based on strict boolean masks (all-True or all-False)."""
-    if mask.empty:
-        selected = pd.Series(boolean, index=df.index)
-    else:
-        selected = mask.all(axis=1) if boolean else ~mask.any(axis=1)
-        selected = selected.fillna(boolean)
+def _split_by_index_df(
+    df: pd.DataFrame,
+    index,
+    reset_index: bool = False,
+    inverse: bool = False,
+    return_rejected: bool = False,
+):
+    index = pd.Index(index if isinstance(index, Iterable) else [index])
+    mask = df.index.isin(index)
 
-    indexes = selected[selected].index
-    return _split_by_index(df, indexes, **kwargs)
+    if inverse:
+        mask = ~mask
 
+    selected = df[mask]
+    rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
-def _split_by_column_values(
-    df: pd.DataFrame, col: str, values: Iterable, **kwargs
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split a DataFrame based on entries in a specific column using `_split_by_index`."""
-    in_df = df.loc[df[col].isin(values)]
-    index = list(in_df.index)
-    return _split_by_index(
-        df,
-        index,
-        **kwargs,
-    )
+    if reset_index:
+        selected = selected.reset_index(drop=True)
+        rejected = rejected.reset_index(drop=True)
+
+    return selected, rejected
 
 
-def _split_by_index_values(
-    df: pd.DataFrame, index, **kwargs
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split a DataFrame based on index values using `_split_by_index`."""
-    return _split_by_index(df, index, **kwargs)
+def _split_text_reader(
+    readers,
+    func: Callable,
+    *args,
+    reset_index=False,
+    inverse=False,
+    return_rejected=False,
+):
+    buffer_sel = StringIO()
+    buffer_rej = StringIO()
 
+    write_opts = {"header": None, "mode": "a", "index": not reset_index}
 
-def _split_parser(
-    data, *args, func=None, reset_index=False, inverse=False, return_rejected=False
-) -> tuple[pd.io.parsers.TextFileReader]:
-    """Common pandas TextFileReader selection function."""
-    read_params = [
-        "chunksize",
-        "names",
-        "dtype",
-        "parse_dates",
-        "date_parser",
-        "infer_datetime_format",
-    ]
-    write_dict = {"header": None, "mode": "a", "index": not reset_index}
-    read_dict = {x: data[0].orig_options.get(x) for x in read_params}
-    buffer1 = StringIO()
-    buffer2 = StringIO()
-    _prev_index1 = None
-    _prev_index2 = None
-    for zipped in zip(*data):
-        if not isinstance(zipped, tuple):
-            zipped = tuple(zipped)
-        out1, out2 = func(
-            *zipped,
+    for chunks in zip(*readers):
+        sel, rej = func(
+            *chunks,
             *args,
             reset_index=reset_index,
             inverse=inverse,
             return_rejected=return_rejected,
         )
-        if _prev_index1 is None:
-            _prev_index1 = out1.__dict__["_prev_index"]
-        else:
-            _prev_index1 = _prev_index1.union(out1.__dict__["_prev_index"])
-        if _prev_index2 is None:
-            _prev_index2 = out2.__dict__["_prev_index"]
-        else:
-            _prev_index2 = _prev_index2.union(out2.__dict__["_prev_index"])
-        out1.to_csv(buffer1, **write_dict)
-        if return_rejected is True:
-            out2.to_csv(buffer2, **write_dict)
-    dtypes = {}
-    for k, v in out1.dtypes.items():
-        if v == "object":
-            v = "str"
-        dtypes[k] = v
-    read_dict["dtype"] = dtypes
-    buffer1.seek(0)
-    buffer2.seek(0)
-    TextParser1 = pd.read_csv(buffer1, **read_dict)
-    TextParser1.__dict__["_prev_index"] = _prev_index1
-    TextParser2 = pd.read_csv(buffer2, **read_dict)
-    TextParser2.__dict__["_prev_index"] = _prev_index2
-    return TextParser1, TextParser2
+        sel.to_csv(buffer_sel, **write_opts)
+        if return_rejected:
+            rej.to_csv(buffer_rej, **write_opts)
+
+    buffer_sel.seek(0)
+    buffer_rej.seek(0)
+
+    selected = pd.read_csv(buffer_sel)
+    rejected = pd.read_csv(buffer_rej) if return_rejected else selected.iloc[0:0]
+
+    return selected, rejected
 
 
-def _split(
-    data: pd.DataFrame | Iterable[pd.DataFrame],
-    func: Callable[..., tuple[pd.DataFrame, pd.DataFrame]],
+def _split_dispatch(
+    data,
+    func: Callable,
     *args,
     **kwargs,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Apply a split function to one or more DataFrames.
+):
+    if isinstance(data, pd.DataFrame):
+        return func(data, *args, **kwargs)
 
-    - If `data` is a single DataFrame, pass it to `func`.
-    - If `data` is a list of DataFrames, only the first is used here
-      (TextFileReader logic is handled separately).
-    """
-    if not isinstance(data, list):
-        data = [data]
-    if isinstance(data[0], pd.io.parsers.TextFileReader):
-        return _split_parser(data, *args, func=func, **kwargs)
-    return func(*data, *args, **kwargs)
+    if isinstance(data, list) and isinstance(data[0], pd.io.parsers.TextFileReader):
+        return _split_text_reader(
+            data,
+            func,
+            *args,
+            **kwargs,
+        )
+
+    raise TypeError("Unsupported input type for split operation.")
 
 
 def split_by_boolean(
@@ -227,10 +174,10 @@ def split_by_boolean(
         Tuple ``(selected, rejected)`` returned by the underlying
         ``split_dataframe_by_boolean`` implementation.
     """
-    func = _split_by_boolean_mask
-    return _split(
-        [data, mask],
-        func,
+    return _split_dispatch(
+        data,
+        _split_by_boolean_df,
+        mask,
         boolean,
         reset_index=reset_index,
         inverse=inverse,
@@ -343,12 +290,10 @@ def split_by_column_entries(
     (pandas.DataFrame, pandas.DataFrame)
         Selected rows (column value in provided list) and rejected rows.
     """
-    func = _split_by_column_values
-    col = next(iter(selection.keys()))
-    values = next(iter(selection.values()))
-    return _split(
+    col, values = next(iter(selection.items()))
+    return _split_dispatch(
         data,
-        func,
+        _split_by_column_df,
         col,
         values,
         reset_index=reset_index,
@@ -385,10 +330,9 @@ def split_by_index(
     (pandas.DataFrame, pandas.DataFrame)
         Selected rows (index in given list) and rejected rows.
     """
-    func = _split_by_index_values
-    return _split(
+    return _split_dispatch(
         data,
-        func,
+        _split_by_index_df,
         index,
         reset_index=reset_index,
         inverse=inverse,
