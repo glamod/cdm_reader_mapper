@@ -80,22 +80,20 @@ def _is_empty(value):
 
 def _drop_duplicated_rows(df) -> pd.DataFrame:
     """Drop duplicates from list."""
+    list_cols = [
+        col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()
+    ]
 
-    def list_to_tuple(v):
-        if isinstance(v, list):
-            v = tuple(v)
-        return v
+    for col in list_cols:
+        df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
 
-    def tuple_to_list(v):
-        if isinstance(v, tuple):
-            v = list(v)
-        return v
+    df.drop_duplicates(ignore_index=True, inplace=True)
 
-    dtypes = df.dtypes
-    df = df.map(list_to_tuple)
-    df = df.drop_duplicates(ignore_index=True)
-    df = df.map(tuple_to_list)
-    return df.astype(dtypes)
+    for col in list_cols:
+        if df[col].apply(lambda x: isinstance(x, tuple)).any():
+            df[col] = df[col].apply(lambda x: list(x) if isinstance(x, tuple) else x)
+
+    return df
 
 
 def _get_nested_value(ndict, keys) -> Any | None:
@@ -209,7 +207,7 @@ def _fill_value(series, fill_value) -> pd.Series:
     return series.fillna(value=fill_value).infer_objects(copy=False)
 
 
-def _extract_input_data(idata, elements, cols, default, logger):
+def _extract_input_data(idata, elements, default, logger):
     """Extract the relevant input data based on `elements`."""
 
     def _return_default():
@@ -220,18 +218,14 @@ def _extract_input_data(idata, elements, cols, default, logger):
 
     logger.debug(f"\telements: {' '.join(map(str, elements))}")
 
-    missing_elements = [e for e in elements if e not in cols]
-    if missing_elements:
-        logger.warning(
-            "Missing elements from input data: {}".format(
-                ",".join(map(str, missing_elements))
-            )
-        )
-        return _return_default()
+    cols = idata.columns
 
-    data = idata[elements]
-    if len(elements) == 1:
-        data = data.iloc[:, 0]
+    for e in elements:
+        if e not in cols:
+            logger.warning(f"Missing element from input data: {e}")
+            return _return_default()
+
+    data = idata[elements[0]] if len(elements) == 1 else idata[elements]
 
     if _is_empty(data):
         return _return_default()
@@ -245,7 +239,6 @@ def _column_mapping(
     imodel_functions,
     atts,
     codes_subset,
-    cols,
     column,
     logger,
 ):
@@ -264,40 +257,46 @@ def _column_mapping(
     data, used_default = _extract_input_data(
         idata,
         elements,
-        cols,
         default,
         logger,
     )
 
-    if transform and not used_default:
-        data = _transform(
-            data,
-            imodel_functions,
-            transform,
-            kwargs,
-            logger=logger,
-        )
+    if not used_default:
+        if transform:
+            data = _transform(
+                data,
+                imodel_functions,
+                transform,
+                kwargs,
+                logger=logger,
+            )
+        elif code_table:
+            data = _code_table(
+                data,
+                imodel_functions.imodel,
+                code_table,
+                logger=logger,
+            )
 
-    elif code_table and not used_default:
-        data = _code_table(
-            data,
-            imodel_functions.imodel,
-            code_table,
-            logger=logger,
-        )
+    if not isinstance(data, pd.Series):
+        data = pd.Series(data, index=idata.index, copy=False)
 
-    data = pd.Series(data, index=idata.index, name=column)
-    data = _fill_value(data, fill_value)
-    atts["decimal_places"] = _decimal_places(decimal_places)
+    data.name = column
 
-    return data, atts
+    if fill_value is not None:
+        data = _fill_value(data, fill_value)
+
+    if atts:
+        atts["decimal_places"] = _decimal_places(decimal_places)
+        data = _convert_dtype(data, atts)
+
+    return data
 
 
 def _table_mapping(
     idata,
     mapping,
     atts,
-    cols,
     null_label,
     imodel_functions,
     codes_subset,
@@ -306,31 +305,32 @@ def _table_mapping(
     drop_duplicates,
     logger,
 ) -> pd.DataFrame:
-    columns = (
-        [x for x in atts.keys() if x in idata.columns]
-        if not cdm_complete
-        else list(atts.keys())
-    )
-
-    table_df = pd.DataFrame(index=idata.index, columns=columns)
+    columns = list(atts) if cdm_complete else [c for c in atts if c in idata.columns]
+    out = {}
 
     for column in columns:
         if column not in mapping.keys():
+            out[column] = pd.Series(
+                [null_label] * len(idata), index=idata.index, name=column
+            )
             continue
 
         logger.debug(f"\tElement: {column}")
 
-        table_df[column], atts[column] = _column_mapping(
+        out[column] = _column_mapping(
             idata,
             mapping[column],
             imodel_functions,
             atts[column],
             codes_subset,
-            cols,
             column,
             logger,
         )
-        table_df[column] = _convert_dtype(table_df[column], atts.get(column))
+
+    if not out:
+        return pd.DataFrame(index=idata.index)
+
+    table_df = pd.DataFrame(out, index=idata.index)
 
     if drop_missing_obs is True and "observation_value" in table_df:
         table_df = table_df.dropna(subset=["observation_value"])
@@ -345,16 +345,21 @@ def _prepare_cdm_tables(cdm_subset):
     """Prepare table buffers and attributes for CDM tables."""
     if isinstance(cdm_subset, str):
         cdm_subset = [cdm_subset]
+
     cdm_atts = get_cdm_atts(cdm_subset)
     if not cdm_atts:
         return {}
-    return {
-        table: {
+
+    tables = {}
+    for table, atts in cdm_atts.items():
+        for col, meta in atts.items():
+            meta["decimal_places"] = _decimal_places(meta.get("decimal_places"))
+        tables[table] = {
             "buffer": StringIO(),
-            "atts": deepcopy(cdm_atts.get(table)),
+            "atts": atts,
         }
-        for table in cdm_subset
-    }
+
+    return tables
 
 
 def _process_chunk(
@@ -362,7 +367,6 @@ def _process_chunk(
     imodel_maps,
     imodel_functions,
     cdm_tables,
-    cols,
     null_label,
     codes_subset,
     cdm_complete,
@@ -378,7 +382,6 @@ def _process_chunk(
             idata=idata,
             mapping=mapping,
             atts=deepcopy(cdm_tables[table]["atts"]),
-            cols=cols,
             null_label=null_label,
             imodel_functions=imodel_functions,
             codes_subset=codes_subset,
@@ -448,13 +451,11 @@ def _map_and_convert(
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
     for idata in data_iter:
-        cols = list(idata.columns)
         _process_chunk(
             idata=idata,
             imodel_maps=imodel_maps,
             imodel_functions=imodel_functions,
             cdm_tables=cdm_tables,
-            cols=cols,
             null_label=null_label,
             codes_subset=codes_subset,
             cdm_complete=cdm_complete,
