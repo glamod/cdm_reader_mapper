@@ -14,78 +14,64 @@ from typing import Iterable, Callable
 import pandas as pd
 
 
-def _split_by_boolean_df(
+def _split_df(
     df: pd.DataFrame,
     mask: pd.DataFrame,
-    boolean: bool,
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
 ):
-    if mask.empty:
-        selected_mask = pd.Series(boolean, index=df.index)
+    if inverse:
+        selected = df[~mask]
+        rejected = df[mask] if return_rejected else df.iloc[0:0]
     else:
-        selected_mask = mask.all(axis=1) if boolean else ~mask.any(axis=1)
-        selected_mask = selected_mask.fillna(boolean)
+        selected = df[mask]
+        rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
-    selected = df[selected_mask]
-    rejected = df[~selected_mask] if return_rejected else df.iloc[0:0]
+    selected.attrs["_prev_index"] = mask.index[mask]
+    rejected.attrs["_prev_index"] = mask.index[~mask]
 
     if reset_index:
         selected = selected.reset_index(drop=True)
         rejected = rejected.reset_index(drop=True)
 
     return selected, rejected
+
+
+def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs):
+    if mask.empty:
+        mask_sel = pd.Series(boolean, index=df.index)
+    else:
+        mask_sel = mask.all(axis=1) if boolean else ~mask.any(axis=1)
+        mask_sel = mask_sel.fillna(boolean)
+
+    return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
 def _split_by_column_df(
     df: pd.DataFrame,
     col: str,
     values: Iterable,
-    reset_index: bool = False,
-    inverse: bool = False,
-    return_rejected: bool = False,
+    **kwargs,
 ):
-    mask = df[col].isin(values)
+    mask_sel = df[col].isin(values)
 
-    if inverse:
-        mask = ~mask
-
-    selected = df[mask]
-    rejected = df[~mask] if return_rejected else df.iloc[0:0]
-
-    if reset_index:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
-
-    return selected, rejected
+    return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
 def _split_by_index_df(
     df: pd.DataFrame,
     index,
-    reset_index: bool = False,
-    inverse: bool = False,
-    return_rejected: bool = False,
+    **kwargs,
 ):
     index = pd.Index(index if isinstance(index, Iterable) else [index])
-    mask = df.index.isin(index)
+    mask_sel = pd.Series(df.index.isin(index), index=df.index)
 
-    if inverse:
-        mask = ~mask
-
-    selected = df[mask]
-    rejected = df[~mask] if return_rejected else df.iloc[0:0]
-
-    if reset_index:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
-
-    return selected, rejected
+    return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
 def _split_text_reader(
-    readers,
+    reader,
     func: Callable,
     *args,
     reset_index=False,
@@ -97,9 +83,9 @@ def _split_text_reader(
 
     write_opts = {"header": None, "mode": "a", "index": not reset_index}
 
-    for chunks in zip(*readers):
+    for chunk in reader:
         sel, rej = func(
-            *chunks,
+            chunk,
             *args,
             reset_index=reset_index,
             inverse=inverse,
@@ -112,8 +98,10 @@ def _split_text_reader(
     buffer_sel.seek(0)
     buffer_rej.seek(0)
 
-    selected = pd.read_csv(buffer_sel)
-    rejected = pd.read_csv(buffer_rej) if return_rejected else selected.iloc[0:0]
+    selected = pd.read_csv(buffer_sel, chunksize=2)
+    rejected = (
+        pd.read_csv(buffer_rej, chunksize=2) if return_rejected else selected.iloc[0:0]
+    )
 
     return selected, rejected
 
@@ -127,7 +115,7 @@ def _split_dispatch(
     if isinstance(data, pd.DataFrame):
         return func(data, *args, **kwargs)
 
-    if isinstance(data, list) and isinstance(data[0], pd.io.parsers.TextFileReader):
+    if isinstance(data, pd.io.parsers.TextFileReader):
         return _split_text_reader(
             data,
             func,

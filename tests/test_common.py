@@ -132,8 +132,19 @@ def sample_df():
 
 
 @pytest.fixture
+def sample_reader():
+    text = ",A,B,C\n10,1,x,True\n11,2,y,False\n12,3,z,True\n13,4,x,False\n14,5,y,True"
+    return make_parser(text, index_col=0)
+
+
+@pytest.fixture
 def empty_df():
     return pd.DataFrame(columns=["A", "B", "C"])
+
+
+@pytest.fixture
+def empty_reader():
+    return make_parser("A,B,C")
 
 
 @pytest.fixture
@@ -312,8 +323,21 @@ def tmp_json_file(tmp_path):
 #    assert list(rejected.index) == [10, 12, 14]
 
 
-def test_split_by_index_public(sample_df):
-    selected, rejected = split_by_index(sample_df, [11, 13], return_rejected=True)
+@pytest.mark.parametrize("TextFileReader", [False, True])
+def test_split_by_index_public(sample_df, sample_reader, TextFileReader):
+    if TextFileReader:
+        data = sample_reader
+    else:
+        data = sample_df
+    selected, rejected = split_by_index(data, [11, 13], return_rejected=True)
+
+    if TextFileReader:
+        selected = selected.read()
+        rejected = rejected.read()
+
+    print(selected)
+    print(rejected)
+
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
 
