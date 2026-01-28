@@ -138,6 +138,14 @@ def _split_text_reader(
         if return_rejected:
             rej.to_csv(buffer_rej, **write_dict)
 
+    dtypes = {}
+    for col, dtype in sel.dtypes.items():
+        if dtype == "object":
+            dtype = "str"
+        dtypes[col] = dtype
+
+    read_dict["dtype"] = dtypes
+
     buffer_sel.seek(0)
     buffer_rej.seek(0)
 
