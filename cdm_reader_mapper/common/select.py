@@ -93,14 +93,47 @@ def _split_text_reader(
     write_dict = {"header": None, "mode": "a", "index": not reset_index}
     read_dict = {x: reader.orig_options.get(x) for x in read_params}
 
-    for chunk in reader:
+    new_args = []
+    new_readers = []
+
+    prev_index_sel = None
+    prev_index_rej = None
+
+    for d in args:
+        if isinstance(d, pd.io.parsers.TextFileReader):
+            new_readers.append(d)
+        else:
+            new_args.append(d)
+
+    readers = [reader] + new_readers
+
+    for zipped in zip(*readers):
+
+        if not isinstance(zipped, tuple):
+            zipped = tuple(zipped)
+
         sel, rej = func(
-            chunk,
-            *args,
+            *zipped,
+            *new_args,
             reset_index=reset_index,
             inverse=inverse,
             return_rejected=return_rejected,
         )
+
+        sel_prev_index = sel.attrs["_prev_index"]
+
+        if prev_index_sel is None:
+            prev_index_sel = sel_prev_index
+        else:
+            prev_index_sel = prev_index_sel.union(sel_prev_index)
+
+        rej_prev_index = rej.attrs["_prev_index"]
+
+        if prev_index_rej is None:
+            prev_index_rej = rej_prev_index
+        else:
+            prev_index_rej = prev_index_rej.union(rej_prev_index)
+
         sel.to_csv(buffer_sel, **write_dict)
         if return_rejected:
             rej.to_csv(buffer_rej, **write_dict)
@@ -111,6 +144,9 @@ def _split_text_reader(
     selected = pd.read_csv(buffer_sel, **read_dict)
     rejected = pd.read_csv(buffer_rej, **read_dict)
 
+    selected.attrs = {"_prev_index": prev_index_sel}
+    rejected.attrs = {"_prev_index": prev_index_rej}
+
     return selected, rejected
 
 
@@ -120,6 +156,7 @@ def _split_dispatch(
     *args,
     **kwargs,
 ):
+
     if isinstance(data, pd.DataFrame):
         return func(data, *args, **kwargs)
 
