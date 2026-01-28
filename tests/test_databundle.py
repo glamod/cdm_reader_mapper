@@ -43,6 +43,17 @@ def sample_db_reader():
 
 
 @pytest.fixture
+def sample_db_reader_multi():
+    text = "19,0\n26,1\n27,2\n41,3\n91,4"
+    reader_data = make_parser(text, names=[("A", "a"), ("B", "b")])
+
+    text = "True,True\nTrue,True\nTrue,True\nFalse,False\nTrue,False"
+    reader_mask = make_parser(text, names=["A", "B"])
+
+    return DataBundle(data=reader_data, mask=reader_mask)
+
+
+@pytest.fixture
 def sample_data():
     return pd.DataFrame({"C": [20, 21, 22, 23, 24]})
 
@@ -386,6 +397,31 @@ def test_split_operators_reader(
         expected_data2 = expected_data2.reset_index(drop=True)
         expected_mask1 = expected_mask1.reset_index(drop=True)
         expected_mask2 = expected_mask2.reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(expected_data1, selected_data)
+    pd.testing.assert_frame_equal(expected_data2, rejected_data)
+    pd.testing.assert_frame_equal(expected_mask1, selected_mask)
+    pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
+
+
+def test_split_by_index_multi(sample_db_reader_multi):
+    result = sample_db_reader_multi.split_by_column_entries({("A", "a"): [26, 41]})
+
+    data = sample_db_reader_multi.data.read()
+    mask = sample_db_reader_multi.mask.read()
+
+    selected_data = result[0].data.read()
+    selected_mask = result[0].mask.read()
+    rejected_data = result[1].data.read()
+    rejected_mask = result[1].mask.read()
+
+    idx1 = data.index.isin([1, 3])
+    idx2 = data.index.isin([0, 2, 4])
+
+    expected_data1 = data[idx1]
+    expected_data2 = data[idx2]
+    expected_mask1 = mask[idx1]
+    expected_mask2 = mask[idx2]
 
     pd.testing.assert_frame_equal(expected_data1, selected_data)
     pd.testing.assert_frame_equal(expected_data2, rejected_data)

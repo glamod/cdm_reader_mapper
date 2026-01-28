@@ -138,6 +138,25 @@ def sample_reader():
 
 
 @pytest.fixture
+def sample_df_multi():
+    return pd.DataFrame(
+        {
+            "A": [1, 2, 3, 4, 5],
+            "B": ["x", "y", "z", "x", "y"],
+            "C": [True, False, True, False, True],
+        },
+        index=[10, 11, 12, 13, 14],
+    )
+
+
+@pytest.fixture
+def sample_reader_multi():
+    text = "10,1,x,True\n11,2,y,False\n12,3,z,True\n13,4,x,False\n14,5,y,True"
+    reader = make_parser(text, names=[("A", "a"), ("B", "b"), ("C", "c")])
+    return reader
+
+
+@pytest.fixture
 def empty_df():
     return pd.DataFrame(columns=["A", "B", "C"])
 
@@ -179,6 +198,30 @@ def tmp_json_file(tmp_path):
 
 def test_split_df(sample_df):
     mask = pd.Series([True, False, False, True, False], index=sample_df.index)
+    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    assert list(selected.index) == [10, 13]
+    assert list(rejected.index) == [11, 12, 14]
+
+
+def _test_split_df_false_mask(sample_df):
+    mask = pd.Series([False, False, False, False, False], index=sample_df.index)
+    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    assert list(selected.index) == [10, 13]
+    assert list(rejected.index) == [11, 12, 14]
+
+
+def test_split_df_multiindex(sample_df):
+    mask = pd.Series([True, False, False, True, False], index=sample_df.index)
+    sample_df.columns = pd.MultiIndex.from_tuples(
+        [
+            ("A", "a"),
+            (
+                "B",
+                "b",
+            ),
+            ("C", "c"),
+        ]
+    )
     selected, rejected = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
@@ -324,6 +367,18 @@ def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
     if TextFileReader:
         selected = selected.read()
         rejected = rejected.read()
+
+    assert list(selected.index) == [11, 13]
+    assert list(rejected.index) == [10, 12, 14]
+
+
+def test_split_by_index_multiindex(sample_reader_multi):
+    selected, rejected = split_by_index(
+        sample_reader_multi, [11, 13], return_rejected=True
+    )
+
+    selected = selected.read()
+    rejected = rejected.read()
 
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
