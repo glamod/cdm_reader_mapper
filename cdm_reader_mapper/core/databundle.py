@@ -117,7 +117,8 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         for name, data in addition.items():
-            setattr(db_, f"_{name}", data)
+            data_cp = _copy(data)
+            setattr(db_, f"_{name}", data_cp)
         return self._return_db(db_, inplace)
 
     def stack_v(
@@ -139,7 +140,8 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
+        * This is only working with DataFrames, not with TextFileReaders!
+        * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Returns
         -------
@@ -175,7 +177,8 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        The DataFrames in the :py:class:`~DataBundle` may have different data columns!
+        * This is only working with DataFrames, not with TextFileReaders!
+        * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples
         --------
