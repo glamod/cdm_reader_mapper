@@ -7,7 +7,6 @@ import xarray as xr
 
 from io import StringIO
 
-from pandas.io.parsers import TextFileReader
 from pandas.testing import assert_frame_equal, assert_index_equal
 
 from cdm_reader_mapper import DataBundle
@@ -21,6 +20,7 @@ from cdm_reader_mapper.mdf_reader.utils.filereader import (
     _select_years,
     FileReader,
 )
+from cdm_reader_mapper.mdf_reader.utils.utilities import ParquetStreamReader
 
 
 def f(x, y):
@@ -79,8 +79,8 @@ def test_apply_or_chunk_textfilereader():
     buffer = StringIO("test\n1\n2\n3\n4")
     read_kwargs = {"chunksize": 2}
     reader = pd.read_csv(buffer, **read_kwargs)
-    (out,) = _apply_or_chunk(reader, f, func_args=[2], read_kwargs=read_kwargs)
-    assert isinstance(out, TextFileReader)
+    (out,) = _apply_or_chunk(reader, f, func_args=[2])
+    assert isinstance(out, ParquetStreamReader)
     assert_frame_equal(out.read(), pd.DataFrame({"test": [3, 4, 5, 6]}))
 
 
