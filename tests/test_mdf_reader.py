@@ -13,6 +13,7 @@ from cdm_reader_mapper.mdf_reader.reader import (
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
+from cdm_reader_mapper.mdf_reader.utils.utilities import ParquetStreamReader
 
 
 def _get_columns(columns, select):
@@ -397,8 +398,8 @@ def test_read_data_textfilereader():
     ]:
         assert hasattr(db, attr)
 
-    assert isinstance(db.data, pd.io.parsers.TextFileReader)
-    assert isinstance(db.mask, pd.io.parsers.TextFileReader)
+    assert isinstance(db.data, ParquetStreamReader)
+    assert isinstance(db.mask, ParquetStreamReader)
     assert isinstance(db.columns, pd.MultiIndex)
     assert isinstance(db.dtypes, dict)
     assert db.parse_dates == []
