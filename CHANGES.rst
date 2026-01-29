@@ -3,7 +3,7 @@
 Changelog
 =========
 
-2.2.1 (unreleased)
+2.2.1 (2026-01-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
