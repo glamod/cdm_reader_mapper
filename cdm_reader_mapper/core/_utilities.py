@@ -13,6 +13,8 @@ from cdm_reader_mapper.common import (
 
 from cdm_reader_mapper.mdf_reader.utils.utilities import process_disk_backed
 
+from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+
 
 def _copy(value):
     """Make copy of value"""
@@ -20,6 +22,8 @@ def _copy(value):
         return deepcopy(value)
     elif isinstance(value, pd.DataFrame):
         return value.copy()
+    elif isinstance(value, pd.io.parsers.TextFileReader):
+        return make_copy(value)
     elif hasattr(value, "copy"):
         return value.copy()
     return value
