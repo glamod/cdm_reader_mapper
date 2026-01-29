@@ -3,6 +3,22 @@
 Changelog
 =========
 
+2.2.2 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``mdf_reader.read_data`` now supports chunking (:pull:`360`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``DataBundle.stack_v`` and ``DataBundle.stack_h`` only support `pd.DataFrames` as input, otherwise raises an `ValueError` (:pull:`360`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* re-work internal structure for more readability and better performance (:pull:`360`)
+
 2.2.1 (2026-01-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)

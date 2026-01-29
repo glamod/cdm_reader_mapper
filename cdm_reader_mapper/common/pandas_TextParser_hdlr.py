@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-read_params = [
+_READ_CSV_KWARGS = [
     "chunksize",
     "names",
     "dtype",
@@ -22,7 +22,37 @@ read_params = [
 ]
 
 
-def make_copy(Parser: TextFileReader) -> TextFileReader | None:
+def _get_raw_buffer(parser: TextFileReader) -> str | None:
+    if hasattr(parser, "_raw_buffer"):
+        return parser._raw_buffer
+
+    f = getattr(parser.handles, "handle", None)
+    if f is None:
+        raise ValueError("TextFileReader has no accessible handle for copying.")
+
+    try:
+        f = parser.handles.handle
+        raw = f.getvalue()
+        parser._raw_buffer = raw
+        return raw
+    except Exception as e:
+        raise RuntimeError("Failed to read raw buffer") from e
+
+
+def _new_reader_from_buffer(parser: TextFileReader) -> TextFileReader | None:
+    raw = _get_raw_buffer(parser)
+    if raw is None:
+        return None
+
+    read_dict = read_dict = {
+        k: parser.orig_options.get(k)
+        for k in _READ_CSV_KWARGS
+        if k in parser.orig_options
+    }
+    return pd.read_csv(StringIO(raw), **read_dict)
+
+
+def make_copy(parser: TextFileReader) -> TextFileReader | None:
     """
     Create a duplicate of a pandas TextFileReader object.
 
@@ -43,16 +73,12 @@ def make_copy(Parser: TextFileReader) -> TextFileReader | None:
       only for in-memory file-like objects such as `StringIO`.
     """
     try:
-        f = Parser.handles.handle
-        new_ref = StringIO(f.getvalue())
-        read_dict = {k: Parser.orig_options.get(k) for k in read_params}
-        return pd.read_csv(new_ref, **read_dict)
-    except Exception:
-        logger.error("Failed to copy TextParser", exc_info=True)
-        return None
+        return _new_reader_from_buffer(parser)
+    except Exception as e:
+        raise RuntimeError(f"Failed to copy TextParser: {e}") from e
 
 
-def restore(Parser: TextFileReader) -> TextFileReader | None:
+def restore(parser: TextFileReader) -> TextFileReader | None:
     """
     Restore a TextFileReader to its initial read position and state.
 
@@ -66,17 +92,10 @@ def restore(Parser: TextFileReader) -> TextFileReader | None:
     pandas.io.parsers.TextFileReader or None
         Restored TextFileReader, or None if restoration fails.
     """
-    try:
-        f = Parser.handles.handle
-        f.seek(0)
-        read_dict = {k: Parser.orig_options.get(k) for k in read_params}
-        return pd.read_csv(f, **read_dict)
-    except Exception:
-        logger.error("Failed to restore TextParser", exc_info=True)
-        return None
+    return make_copy(parser)
 
 
-def is_not_empty(Parser: TextFileReader) -> bool | None:
+def is_not_empty(parser: TextFileReader) -> bool | None:
     """
     Determine whether a TextFileReader contains at least one row.
 
@@ -92,27 +111,24 @@ def is_not_empty(Parser: TextFileReader) -> bool | None:
         False if empty.
         None if an error occurs.
     """
-    try:
-        parser_copy = make_copy(Parser)
-        if parser_copy is None:
-            return None
-    except Exception:
-        logger.error(
-            f"Failed to process input. Input type is {type(Parser)}",
-            exc_info=True,
-        )
+    if hasattr(parser, "_is_not_empty"):
+        return parser._is_not_empty
+
+    reader = make_copy(parser)
+    if reader is None:
         return None
 
     try:
-        chunk = parser_copy.get_chunk()
-        parser_copy.close()
-        return len(chunk) > 0
-    except Exception:
-        logger.debug("Error while checking emptiness", exc_info=True)
+        chunk = next(reader)
+        result = not chunk.empty
+        parser._is_not_empty = result
+        return result
+    except StopIteration:
+        parser._is_not_empty = False
         return False
 
 
-def get_length(Parser: TextFileReader) -> int | None:
+def get_length(parser: TextFileReader) -> int | None:
     """
     Count total rows in a TextFileReader (consuming a copied stream).
 
@@ -126,22 +142,18 @@ def get_length(Parser: TextFileReader) -> int | None:
     int or None
         Total number of rows, or None if processing fails.
     """
-    try:
-        parser_copy = make_copy(Parser)
-        if parser_copy is None:
-            return None
-    except Exception:
-        logger.error(
-            f"Failed to process input. Input type is {type(Parser)}",
-            exc_info=True,
-        )
+    if hasattr(parser, "_row_count"):
+        return parser._row_count
+
+    reader = make_copy(parser)
+    if reader is None:
         return None
 
     total = 0
     try:
-        for df in parser_copy:
-            total += len(df)
+        for chunk in reader:
+            total += len(chunk)
+        parser._row_count = total
         return total
-    except Exception:
-        logger.error("Failed while counting rows", exc_info=True)
-        return None
+    except Exception as e:
+        raise RuntimeError("Failed while counting rows") from e
