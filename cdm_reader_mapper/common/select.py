@@ -11,6 +11,11 @@ from __future__ import annotations
 from io import StringIO
 from typing import Iterable, Callable
 
+from cdm_reader_mapper.mdf_reader.utils.utilities import (
+    process_disk_backed,
+    ParquetStreamReader,
+)
+
 import pandas as pd
 
 
@@ -176,7 +181,15 @@ def _split_dispatch(
             **kwargs,
         )
 
-    raise TypeError("Unsupported input type for split operation.")
+    if isinstance(data, ParquetStreamReader):
+        return process_disk_backed(
+            data,
+            func,
+            *args,
+            **kwargs,
+        )
+
+    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
 
 
 def split_by_boolean(
