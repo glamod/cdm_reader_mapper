@@ -289,7 +289,6 @@ def read_data(
     mask, _ = read_csv(
         mask, col_subset=col_subset, columns=infos["columns"], **pd_kwargs
     )
-
     return DataBundle(
         data=data,
         columns=infos["columns"],

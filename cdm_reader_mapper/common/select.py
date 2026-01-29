@@ -11,7 +11,7 @@ from __future__ import annotations
 from io import StringIO
 from typing import Iterable, Callable
 
-from cdm_reader_mapper.mdf_reader.utils.utilities import (
+from cdm_reader_mapper.common.iterators import (
     process_disk_backed,
     ParquetStreamReader,
 )

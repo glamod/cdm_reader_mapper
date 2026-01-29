@@ -13,11 +13,7 @@ from dataclasses import replace
 from pandas.io.parsers import TextFileReader
 
 from .. import properties
-from .utilities import (
-    process_disk_backed,
-    remove_boolean_values,
-    ParquetStreamReader,
-)
+from .utilities import remove_boolean_values
 
 from .convert_and_decode import convert_and_decode
 from .validators import validate
@@ -31,6 +27,7 @@ from .parser import (
 )
 
 from cdm_reader_mapper.core.databundle import DataBundle
+from cdm_reader_mapper.common.iterators import ParquetStreamReader, process_disk_backed
 
 
 def _apply_or_chunk(

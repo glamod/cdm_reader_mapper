@@ -20,7 +20,7 @@ from cdm_reader_mapper.mdf_reader.utils.filereader import (
     _select_years,
     FileReader,
 )
-from cdm_reader_mapper.mdf_reader.utils.utilities import ParquetStreamReader
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 
 
 def f(x, y):

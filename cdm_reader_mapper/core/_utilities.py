@@ -11,7 +11,7 @@ from cdm_reader_mapper.common import (
     get_length,
 )
 
-from cdm_reader_mapper.mdf_reader.utils.utilities import process_disk_backed
+from cdm_reader_mapper.common.iterators import process_disk_backed
 
 from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
 

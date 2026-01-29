@@ -13,7 +13,7 @@ from cdm_reader_mapper.mdf_reader.reader import (
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
-from cdm_reader_mapper.mdf_reader.utils.utilities import ParquetStreamReader
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 
 
 def _get_columns(columns, select):

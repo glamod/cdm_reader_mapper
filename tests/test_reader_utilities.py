@@ -20,9 +20,9 @@ from cdm_reader_mapper.mdf_reader.utils.utilities import (
     convert_str_boolean,
     _remove_boolean_values,
     remove_boolean_values,
-    process_disk_backed,
-    ParquetStreamReader,
 )
+
+from cdm_reader_mapper.common.iterators import ParquetStreamReader, process_disk_backed
 
 
 def make_parser(text: str, chunksize: int = 1) -> pd.io.parsers.TextFileReader:
