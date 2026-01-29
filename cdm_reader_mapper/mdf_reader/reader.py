@@ -277,19 +277,23 @@ def read_data(
     pd_kwargs.setdefault("parse_dates", parse_dates)
     pd_kwargs.setdefault("encoding", encoding)
 
-    data = read_csv(
+    data, infos = read_csv(
         source,
         col_subset=col_subset,
         **pd_kwargs,
     )
-    mask = read_csv(mask, col_subset=col_subset, dtype="boolean")
-    if not mask.empty:
-        mask = mask.reindex(columns=data.columns)
+
+    pd_kwargs = kwargs.copy()
+    pd_kwargs.setdefault("dtype", "boolean")
+
+    mask, _ = read_csv(
+        mask, col_subset=col_subset, columns=infos["columns"], **pd_kwargs
+    )
 
     return DataBundle(
         data=data,
-        columns=data.columns,
-        dtypes=dtype,
+        columns=infos["columns"],
+        dtypes=infos["dtypes"].to_dict(),
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,

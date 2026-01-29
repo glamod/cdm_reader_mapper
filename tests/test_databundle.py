@@ -5,7 +5,7 @@ import pytest
 
 from io import StringIO
 
-from cdm_reader_mapper import DataBundle
+from cdm_reader_mapper import DataBundle, read_data, test_data
 
 
 def make_parser(text, **kwargs):
@@ -61,6 +61,26 @@ def sample_data():
 @pytest.fixture
 def sample_mask():
     return pd.DataFrame({"C": [True, False, True, False, False]})
+
+
+@pytest.fixture
+def sample_db_df_testdata():
+    data_model = "icoads_r300_d714"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    mask = test_data[f"test_{data_model}"]["mdf_mask"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+
+    return read_data(data, mask=mask, info=info)
+
+
+@pytest.fixture
+def sample_db_reader_testdata():
+    data_model = "icoads_r300_d714"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    mask = test_data[f"test_{data_model}"]["mdf_mask"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+
+    return read_data(data, mask=mask, info=info, chunksize=2)
 
 
 def test_len_df(sample_db_df):
@@ -289,6 +309,37 @@ def test_select_operators_reader(
         expected_mask = expected_mask.reset_index(drop=True)
 
     pd.testing.assert_frame_equal(expected_data, selected_data)
+    pd.testing.assert_frame_equal(expected_mask, selected_mask)
+
+
+@pytest.mark.parametrize(
+    "func, args, idx_exp",
+    [
+        # ("select_where_all_true", [], [0, 1, 2], [3, 4]),
+        # ("select_where_all_false", [], [3], [0, 1, 2, 4]),
+        ("select_where_index_isin", [[0, 2, 4]], [0, 2, 4]),
+        # ("select_where_entry_isin", [{("core", "ID"): [25629, 26558]}], [1, 3]),
+    ],
+)
+def test_select_operators_testdata_reader(
+    sample_db_reader_testdata,
+    func,
+    args,
+    idx_exp,
+):
+    result = getattr(sample_db_reader_testdata, func)(*args)
+    data = sample_db_reader_testdata.data.read()
+    mask = sample_db_reader_testdata.mask.read()
+
+    selected_data = result.data.read()
+    selected_mask = result.mask.read()
+
+    idx = data.index.isin(idx_exp)
+
+    expected_data = data[idx]
+    expected_mask = mask[idx]
+
+    pd.testing.assert_frame_equal(expected_data, selected_data, check_dtype=False)
     pd.testing.assert_frame_equal(expected_mask, selected_mask)
 
 

@@ -296,7 +296,7 @@ def test_read_data_no_info():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
-    assert db.dtypes == "object"
+    assert isinstance(db.dtypes, dict)
     assert db.parse_dates is False
     assert db.encoding is None
     assert db.imodel is None
@@ -364,8 +364,44 @@ def test_read_data_encoding():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.Index)
-    assert db.dtypes == "object"
+    assert isinstance(db.dtypes, dict)
     assert db.parse_dates is False
+    assert isinstance(db.encoding, str)
+    assert db.encoding == "cp1252"
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
+
+
+def test_read_data_textfilereader():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    mask = test_data[f"test_{data_model}"]["mdf_mask"]
+    info = test_data[f"test_{data_model}"]["mdf_info"]
+    db = read_data(data, mask=mask, info=info, chunksize=3)
+
+    assert isinstance(db, DataBundle)
+
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
+
+    assert isinstance(db.data, pd.io.parsers.TextFileReader)
+    assert isinstance(db.mask, pd.io.parsers.TextFileReader)
+    assert isinstance(db.columns, pd.MultiIndex)
+    assert isinstance(db.dtypes, dict)
+    assert db.parse_dates == []
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
     assert db.imodel is None

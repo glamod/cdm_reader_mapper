@@ -75,7 +75,7 @@ def make_copy(parser: TextFileReader) -> TextFileReader | None:
     try:
         return _new_reader_from_buffer(parser)
     except Exception as e:
-        raise RuntimeError("Failed to copy TextParser") from e
+        raise RuntimeError(f"Failed to copy TextParser: {e}") from e
 
 
 def restore(parser: TextFileReader) -> TextFileReader | None:
