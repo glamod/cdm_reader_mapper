@@ -5,12 +5,12 @@
     }
   },
   "z_coordinate": {
-    "sections": "LUFT",
-    "elements": "SENSORHOEHE_WAS_TT"
+    "sections": "MAROB",
+    "elements": "BAROMETERHOEHE_MSL"
   },
   "observation_height_above_station_surface": {
-    "sections": "LUFT",
-    "elements": "SENSORHOEHE_WAS_TT"
+    "sections": "MAROB",
+    "elements": "BAROMETERHOEHE_MSL"
   },
   "observed_variable": {
     "default": 58
