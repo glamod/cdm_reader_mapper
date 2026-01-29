@@ -117,7 +117,8 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         for name, data in addition.items():
-            setattr(db_, f"_{name}", data)
+            data_cp = _copy(data)
+            setattr(db_, f"_{name}", data_cp)
         return self._return_db(db_, inplace)
 
     def stack_v(
@@ -139,7 +140,8 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
+        * This is only working with DataFrames, not with TextFileReaders!
+        * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Returns
         -------
@@ -175,7 +177,8 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        The DataFrames in the :py:class:`~DataBundle` may have different data columns!
+        * This is only working with DataFrames, not with TextFileReaders!
+        * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples
         --------
@@ -236,7 +239,7 @@ class DataBundle(_DataBundle):
         _mask = _copy(db_._mask)
         db_._data = split_by_boolean_true(db_._data, _mask, **kwargs)[0]
         if do_mask is True:
-            _prev_index = db_._data.__dict__["_prev_index"]
+            _prev_index = db_._data.attrs["_prev_index"]
             db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
@@ -284,7 +287,7 @@ class DataBundle(_DataBundle):
         _mask = _copy(db_._mask)
         db_._data = split_by_boolean_false(db_._data, _mask, **kwargs)[0]
         if do_mask is True:
-            _prev_index = db_._data.__dict__["_prev_index"]
+            _prev_index = db_._data.attrs["_prev_index"]
             db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
@@ -336,7 +339,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
         if do_mask is True:
-            _prev_index = db_._data.__dict__["_prev_index"]
+            _prev_index = db_._data.attrs["_prev_index"]
             db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
@@ -385,7 +388,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         db_._data = split_by_index(db_._data, index, **kwargs)[0]
         if do_mask is True:
-            _prev_index = db_._data.__dict__["_prev_index"]
+            _prev_index = db_._data.attrs["_prev_index"]
             db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
         return self._return_db(db_, inplace)
 
@@ -428,7 +431,8 @@ class DataBundle(_DataBundle):
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.__dict__["_prev_index"]
+            _prev_index = db1_._data.attrs["_prev_index"]
+
             db1_._mask, db2_._mask = split_by_index(
                 db1_._mask, _prev_index, return_rejected=True, **kwargs
             )
@@ -473,7 +477,7 @@ class DataBundle(_DataBundle):
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.__dict__["_prev_index"]
+            _prev_index = db1_._data.attrs["_prev_index"]
             db1_._mask, db2_._mask = split_by_index(
                 db1_._mask, _prev_index, return_rejected=True, **kwargs
             )
@@ -522,7 +526,7 @@ class DataBundle(_DataBundle):
             db1_._data, selection, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.__dict__["_prev_index"]
+            _prev_index = db1_._data.attrs["_prev_index"]
             db1_._mask, db2_._mask = split_by_index(
                 db1_._mask, _prev_index, return_rejected=True, **kwargs
             )

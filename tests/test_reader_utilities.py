@@ -167,20 +167,31 @@ def test_update_column_labels_mixed():
 
 def test_read_csv_file_exists(tmp_csv_file):
     file_path, data = tmp_csv_file
-    df = read_csv(file_path)
+    df, info = read_csv(file_path)
     pd.testing.assert_frame_equal(df, data)
+
+    assert "columns" in info
+    pd.testing.assert_index_equal(info["columns"], df.columns)
+    assert "dtypes" in info
+    pd.testing.assert_series_equal(info["dtypes"], df.dtypes)
 
 
 def test_read_csv_file_missing(tmp_path):
     missing_file = tmp_path / "missing.csv"
-    df = read_csv(missing_file)
+    df, info = read_csv(missing_file)
     assert df.empty
+    assert info == {}
 
 
 def test_read_csv_with_col_subset(tmp_csv_file):
     file_path, _ = tmp_csv_file
-    df = read_csv(file_path, col_subset=["B"])
+    df, info = read_csv(file_path, col_subset=["B"])
     assert list(df.columns) == ["B"]
+
+    assert "columns" in info
+    pd.testing.assert_index_equal(info["columns"], df.columns)
+    assert "dtypes" in info
+    pd.testing.assert_series_equal(info["dtypes"], df.dtypes)
 
 
 def test_convert_dtypes_basic():

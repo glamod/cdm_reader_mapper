@@ -173,7 +173,43 @@ def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiI
     return pd.Index(new_cols)
 
 
-def read_csv(filepath, col_subset=None, **kwargs) -> pd.DataFrame:
+def update_and_select(
+    df: pd.DataFrame,
+    subset: str | list | None = None,
+    columns: pd.Index | pd.MultiIndex | None = None,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """
+    Update string column labels and select subset from DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to be updated
+    subset : str or list, optional
+        Column names to be selected
+    columns:
+        Column labels for re-indexing.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict]
+        - The CSV as a DataFrame. Empty if file does not exist.
+        - dictionary containing data column labels and data types
+    """
+    df.columns = update_column_labels(df.columns)
+    if subset is not None:
+        df = df[subset]
+    if columns is not None and not df.empty:
+        df = df.reindex(columns=columns)
+    return df, {"columns": df.columns, "dtypes": df.dtypes}
+
+
+def read_csv(
+    filepath: Path,
+    col_subset: str | list | None = None,
+    columns: pd.Index | pd.MultiIndex | None = None,
+    **kwargs,
+) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """
     Safe CSV reader that handles missing files and column subsets.
 
@@ -183,24 +219,38 @@ def read_csv(filepath, col_subset=None, **kwargs) -> pd.DataFrame:
         Path to the CSV file.
     col_subset : list of str, optional
         Subset of columns to read from the CSV.
+    columns:
+        Column labels for re-indexing.
     kwargs : any
         Additional keyword arguments passed to pandas.read_csv.
 
     Returns
     -------
-    pd.DataFrame
-        The CSV as a DataFrame. Empty if file does not exist.
+    tuple[pd.DataFrame, dict]
+        - The CSV as a DataFrame. Empty if file does not exist.
+        - dictionary containing data column labels and data types
     """
     if filepath is None or not Path(filepath).is_file():
         logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame()
+        return pd.DataFrame(), {}
 
-    df = pd.read_csv(filepath, delimiter=",", **kwargs)
-    df.columns = update_column_labels(df.columns)
-    if col_subset is not None:
-        df = df[col_subset]
+    data = pd.read_csv(filepath, delimiter=",", **kwargs)
 
-    return df
+    if isinstance(data, pd.DataFrame):
+        data, info = update_and_select(data, subset=col_subset, columns=columns)
+        return data, info
+
+    write_kwargs = {}
+    if "encoding" in kwargs:
+        write_kwargs["encoding"] = kwargs["encoding"]
+
+    data, info = process_disk_backed(
+        data,
+        func=update_and_select,
+        func_kwargs={"subset": col_subset, "columns": columns},
+        makecopy=False,
+    )
+    return data, info
 
 
 def convert_dtypes(dtypes) -> tuple[str]:

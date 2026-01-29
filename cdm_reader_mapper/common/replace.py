@@ -73,26 +73,23 @@ def replace_columns(
     # Check inargs
     if not isinstance(df_l, pd.DataFrame) or not isinstance(df_r, pd.DataFrame):
         logger.error("Input left and right data must be pandas DataFrames.")
-        return
+        return None
 
-    if pivot_c:
+    if pivot_c is not None:
         pivot_l = pivot_r = pivot_c
 
-    if not (pivot_l and pivot_r):
+    if pivot_l is None or pivot_r is None:
         logger.error(
             "Pivot columns must be declared using `pivot_c` or both `pivot_l` and `pivot_r`."
         )
-        return
-
-    df_l = df_l.copy().set_index(pivot_l, drop=False)
-    df_r = df_r.copy().set_index(pivot_r, drop=False)
+        return None
 
     if rep_map is None:
         if rep_c is None:
             logger.error(
                 "Replacement columns must be declared using `rep_c` or `rep_map`."
             )
-            return
+            return None
         if isinstance(rep_c, str):
             rep_c = [rep_c]
         rep_map = {col: col for col in rep_c}
@@ -104,12 +101,18 @@ def replace_columns(
         )
         return None
 
-    # Build right-side replacement DataFrame with left-column names
-    df_r_l = df_r[list(rep_map.values())].rename(
-        columns={v: k for k, v in rep_map.items()}
+    out = df_l.copy()
+    right_lookup = (
+        df_r[[pivot_r, *rep_map.values()]]
+        .set_index(pivot_r)
+        .rename(columns={v: k for k, v in rep_map.items()})
     )
 
-    # Apply update
-    df_l.update(df_r_l)
+    # Align once using reindex (vectorized, C-level)
+    aligned = right_lookup.reindex(out[pivot_l].values)
 
-    return df_l.reset_index(drop=True)
+    # Assign columns directly (fastest path)
+    for col in aligned.columns:
+        out[col] = aligned[col].values
+
+    return out
