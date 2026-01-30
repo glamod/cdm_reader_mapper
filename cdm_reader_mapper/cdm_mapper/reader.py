@@ -47,6 +47,8 @@ from __future__ import annotations
 import glob
 import os
 
+from typing import Literal
+
 import pandas as pd
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
@@ -56,16 +58,30 @@ from . import properties
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
-def _read_file(ifile, table, col_subset, **kwargs):
+def _read_file(
+    ifile: str,
+    table: str,
+    col_subset: str | list | None,
+    data_format: Literal["csv", "parquet", "feather"],
+    **kwargs,
+) -> pd.DataFrame:
     usecols = get_usecols(table, col_subset)
-    return pd.read_csv(ifile, usecols=usecols, **kwargs)
+    if data_format == "csv":
+        return pd.read_csv(ifile, usecols=usecols, **kwargs)
+    if data_format == "parquet":
+        return pd.read_parquet(ifile, columns=usecols, **kwargs)
+    if data_format == "feather":
+        return pd.read_feather(ifile, columns=usecols, **kwargs)
+    raise ValueError(
+        f"data_format must be one of [csv, parquet, feather] not {data_format}."
+    )
 
 
 def _read_single_file(
-    ifile,
-    cdm_subset=None,
-    col_subset=None,
-    null_label="null",
+    ifile: str,
+    cdm_subset: str | list | None = None,
+    col_subset: str | list | None = None,
+    null_label: str = "null",
     **kwargs,
 ) -> pd.DataFrame:
     if not isinstance(cdm_subset, list):
@@ -80,13 +96,13 @@ def _read_single_file(
 
 
 def _read_multiple_files(
-    inp_dir,
-    prefix=None,
-    suffix=None,
-    extension="psv",
-    cdm_subset=None,
-    col_subset=None,
-    null_label="null",
+    inp_dir: str,
+    prefix: str | None = None,
+    suffix: str | None = None,
+    extension: str = "psv",
+    cdm_subset: str | list | None = None,
+    col_subset: str | list | None = None,
+    null_label: str = "null",
     logger=None,
     **kwargs,
 ) -> list[pd.DataFrame]:
@@ -108,6 +124,7 @@ def _read_multiple_files(
         if table not in properties.cdm_tables:
             logger.warning(f"Requested table {table} not defined in CDM")
             continue
+
         logger.info(f"Getting file path for pattern {table}")
         pattern_ = get_filename(
             [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
@@ -141,15 +158,16 @@ def _read_multiple_files(
 
 
 def read_tables(
-    source,
-    prefix=None,
-    suffix=None,
-    extension="psv",
-    cdm_subset=None,
-    col_subset=None,
-    delimiter="|",
-    na_values=None,
-    null_label="null",
+    source: str,
+    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    prefix: str | None = None,
+    suffix: str | None = None,
+    extension: str | None = None,
+    cdm_subset: str | list | None = None,
+    col_subset: str | list | dict | None = None,
+    delimiter: str = "|",
+    na_values: str | None = None,
+    null_label: str = "null",
     **kwargs,
 ) -> DataBundle:
     """
@@ -157,15 +175,17 @@ def read_tables(
 
     Parameters
     ----------
-    source: str, optional
+    source: str
         The file (including path) or the path to the file(s) to be read.
+    data_format: {"csv", "parquet", "feather"}, default: "csv"
+        Format of input data file(s).
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
     suffix: str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
-    extension: str
+    extension: str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
         Default: psv
@@ -213,6 +233,11 @@ def read_tables(
     write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
+    if data_format not in ["csv", "parquet", "feather"]:
+        raise ValueError(
+            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+        )
+
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
     kwargs = {
@@ -224,6 +249,9 @@ def read_tables(
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
+    if extension is None:
+        extension = data_format
+
     if os.path.isfile(source):
         df_list = [
             _read_single_file(
@@ -231,6 +259,7 @@ def read_tables(
                 cdm_subset=cdm_subset,
                 col_subset=col_subset,
                 null_label=null_label,
+                data_format=data_format,
                 **kwargs,
             )
         ]
@@ -243,18 +272,17 @@ def read_tables(
             cdm_subset=cdm_subset,
             col_subset=col_subset,
             null_label=null_label,
+            data_format=data_format,
             logger=logger,
             **kwargs,
         )
     else:
-        logger.error(
-            f"Source is neither a valid file name nor a valid directory path: {source}"
+        raise FileNotFoundError(
+            f"Source is neither a valid file name nor a valid directory path: {source}."
         )
-        return DataBundle(data=pd.DataFrame())
 
     if len(df_list) == 0:
-        logger.error("All tables empty in file system")
-        return DataBundle(data=pd.DataFrame(), mode="tables")
+        raise ValueError("All tables empty in file system.")
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
