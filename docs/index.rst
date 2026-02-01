@@ -63,10 +63,11 @@ In addition, the **cdm_reader_mapper.DataBundle** object has several main method
    example_notebooks/read_overview.ipynb
    example_notebooks/CLIWOC_datamodel.ipynb
    example_notebooks/CDM_mapper_example_deck704.ipynb
+   api
    contributing
    authors
-   api
    changes
+   security
 
 
 About
