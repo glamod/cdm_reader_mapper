@@ -291,7 +291,7 @@ def read_data(
         pd_kwargs.setdefault("dtype", "boolean")
 
         mask, _ = read_csv(
-            mask_file, col_subset=col_subset, columns=infos["columns"], **pd_kwargs
+            mask_file, col_subset=col_subset, column_names=infos["columns"], **pd_kwargs
         )
     elif data_format == "parquet":
         data, infos = read_parquet(
@@ -303,7 +303,7 @@ def read_data(
         mask, _ = read_parquet(
             mask_file,
             col_subset=col_subset,
-            columns=infos["columns"] ** kwargs,
+            column_names=infos["columns"] ** kwargs,
         )
     elif data_format == "feather":
         data, infos = read_feather(
@@ -315,7 +315,7 @@ def read_data(
         mask, _ = read_feather(
             mask_file,
             col_subset=col_subset,
-            columns=infos["columns"] ** kwargs,
+            column_names=infos["columns"] ** kwargs,
         )
     else:
         raise ValueError(

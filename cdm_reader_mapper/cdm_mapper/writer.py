@@ -60,9 +60,10 @@ def _table_to_file(
         data.to_parquet(filename, **kwargs)
     elif data_format == "feather":
         data.to_feather(filename, **kwargs)
-    raise ValueError(
-        f"data_format must be one of [csv, parquet, feather] not {data_format}."
-    )
+    else:
+        raise ValueError(
+            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+        )
 
 
 def write_tables(
@@ -163,6 +164,9 @@ def write_tables(
 
     if out_dir is None:
         out_dir = "."
+
+    if extension is None:
+        extension = data_format
 
     for table in cdm_subset:
         if table not in data:

@@ -99,7 +99,7 @@ def _read_multiple_files(
     inp_dir: str,
     prefix: str | None = None,
     suffix: str | None = None,
-    extension: str = "psv",
+    extension: str | None = None,
     cdm_subset: str | list | None = None,
     col_subset: str | list | None = None,
     null_label: str = "null",
@@ -114,12 +114,12 @@ def _read_multiple_files(
     files = glob.glob(pattern)
 
     if len(files) == 0:
-        logger.error(f"No files found matching pattern {pattern}")
-        return [pd.DataFrame()]
+        raise FileNotFoundError(f"No files found matching pattern {pattern}")
 
     df_list = []
     if not isinstance(cdm_subset, list):
         cdm_subset = [cdm_subset]
+
     for table in cdm_subset:
         if table not in properties.cdm_tables:
             logger.warning(f"Requested table {table} not defined in CDM")

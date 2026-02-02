@@ -14,8 +14,9 @@ def db_exp():
     for table in cdm_tables:
         cdm_path = test_data[pattern][f"cdm_{table}"].parent
 
-    db = read(cdm_path, suffix=f"{imodel}*", mode="tables")
+    db = read(cdm_path, suffix=f"{imodel}*", extension="psv", mode="tables")
     db.imodel = imodel
+    print(db)
     return db
 
 
@@ -28,11 +29,19 @@ def test_write_data(tmp_path, db_exp):
 def test_write_header(tmp_path, db_exp):
     table = "header"
     db_exp.write(
-        out_dir=tmp_path, suffix=f"{db_exp.imodel}_{table}_all", cdm_subset=table
+        out_dir=tmp_path,
+        suffix=f"{db_exp.imodel}_{table}_all",
+        extension="psv",
+        cdm_subset=table,
     )
     db_res = read(
-        tmp_path, suffix=f"{db_exp.imodel}_{table}_all", cdm_subset=table, mode="tables"
+        tmp_path,
+        suffix=f"{db_exp.imodel}_{table}_all",
+        cdm_subset=table,
+        extension="psv",
+        mode="tables",
     )
+
     table_exp = db_exp[table].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res[table])
 
@@ -88,8 +97,13 @@ def test_write_filename_dict_observations(tmp_path, db_exp):
     filename_dict = {
         "observations-sst": f"observations-sst-{db_exp.imodel}_filename_dict_all.psv",
     }
-    db_exp.write(out_dir=tmp_path, filename=filename_dict)
-    db_res = read(tmp_path, suffix=f"{db_exp.imodel}_filename_dict_all", mode="tables")
+    db_exp.write(out_dir=tmp_path, filename=filename_dict, extension="psv")
+    db_res = read(
+        tmp_path,
+        suffix=f"{db_exp.imodel}_filename_dict_all",
+        mode="tables",
+        extension="psv",
+    )
     table_exp = db_exp["observations-sst"].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res.data["observations-sst"])
 

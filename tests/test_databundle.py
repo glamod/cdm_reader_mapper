@@ -70,7 +70,7 @@ def sample_db_df_testdata():
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    return read_data(data, mask=mask, info=info)
+    return read_data(data_file=data, mask_file=mask, info_file=info)
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ def sample_db_reader_testdata():
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    return read_data(data, mask=mask, info=info, chunksize=2)
+    return read_data(data_file=data, mask_file=mask, info_file=info, chunksize=2)
 
 
 def test_len_df(sample_db_df):

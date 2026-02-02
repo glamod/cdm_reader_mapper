@@ -38,7 +38,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    expected = read_data(data, mask=mask, info=info)
+    expected = read_data(data_file=data, mask_file=mask, info_file=info)
 
     if not isinstance(result.data, pd.DataFrame):
         result.data = result.data.read()
@@ -242,7 +242,7 @@ def test_read_data_no_mask():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, info=info)
+    db = read_data(data_file=data, info_file=info)
 
     assert isinstance(db, DataBundle)
 
@@ -277,7 +277,7 @@ def test_read_data_no_info():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
 
-    db = read_data(data)
+    db = read_data(data_file=data)
 
     assert isinstance(db, DataBundle)
 
@@ -311,7 +311,7 @@ def test_read_data_col_subset():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, info=info, col_subset="core")
+    db = read_data(data_file=data, info_file=info, col_subset="core")
 
     assert isinstance(db, DataBundle)
 
@@ -345,7 +345,7 @@ def test_read_data_col_subset():
 def test_read_data_encoding():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    db = read_data(data, encoding="cp1252")
+    db = read_data(data_file=data, encoding="cp1252")
 
     assert isinstance(db, DataBundle)
 
@@ -381,7 +381,7 @@ def test_read_data_textfilereader():
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, mask=mask, info=info, chunksize=3)
+    db = read_data(data_file=data, mask_file=mask, info_file=info, chunksize=3)
 
     assert isinstance(db, DataBundle)
 
