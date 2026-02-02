@@ -230,9 +230,9 @@ def _read_data_from_file(
         return update_and_select(data, subset=col_subset, column_names=column_names)
 
     if iterator is True:
-        write_kwargs = {}
+        writer_kwargs = {}
         if "encoding" in reader_kwargs:
-            write_kwargs["encoding"] = reader_kwargs["encoding"]
+            writer_kwargs["encoding"] = reader_kwargs["encoding"]
 
         return process_textfilereader(
             data,
@@ -242,7 +242,7 @@ def _read_data_from_file(
                 "column_names": column_names,
             },
             read_kwargs=reader_kwargs,
-            write_kwargs=write_kwargs,
+            write_kwargs=writer_kwargs,
             makecopy=False,
         )
 
@@ -506,14 +506,9 @@ def process_textfilereader(
             - One or more processed DataFrames (in the same order as returned by `func`)
             - Any additional outputs from `func` that are not DataFrames
     """
-    if func_kwargs is None:
-        func_kwargs = {}
-    if read_kwargs is None:
-        read_kwargs = {}
-    if write_kwargs is None:
-        write_kwargs = {}
-
-    read_kwargs = {k: v for k, v in read_kwargs.items() if k != "delimiter"}
+    func_kwargs = func_kwargs or {}
+    read_kwargs = read_kwargs or {}
+    write_kwargs = write_kwargs or {}
 
     buffers = []
     columns = []
@@ -560,6 +555,7 @@ def process_textfilereader(
     result_dfs = []
     for buffer, cols, rk in zip(buffers, columns, read_kwargs):
         buffer.seek(0)
+        rk = {k: v for k, v in rk.items() if k != "delimiter"}
         result_dfs.append(
             pd.read_csv(
                 buffer,
