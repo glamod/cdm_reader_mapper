@@ -280,7 +280,7 @@ def read_csv(
         reader=pd.read_csv,
         col_subset=col_subset,
         column_names=column_names,
-        reader_kwargs={"delimiter": ",", **kwargs},
+        reader_kwargs=kwargs,
         iterator=True,
     )
 
@@ -512,6 +512,8 @@ def process_textfilereader(
         read_kwargs = {}
     if write_kwargs is None:
         write_kwargs = {}
+
+    read_kwargs = {k: v for k, v in read_kwargs.items() if k != "delimiter"}
 
     buffers = []
     columns = []

@@ -27,7 +27,8 @@ def _normalize_data_chunks(
     data: pd.DataFrame | TextFileReader | None,
 ) -> list | TextFileReader:
     """Helper function to normalize data chunks."""
-    data = data or pd.DataFrame()
+    if data is None:
+        data = pd.DataFrame()
     if isinstance(data, pd.DataFrame):
         return [data]
     if isinstance(data, TextFileReader):

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Callable, Any
+
+import pandas as pd
 
 from cdm_reader_mapper import DataBundle
 
@@ -13,6 +15,13 @@ from .utils.filereader import FileReader
 from .utils.utilities import validate_arg
 
 from .utils.utilities import as_list, as_path, read_csv, read_parquet, read_feather
+
+
+READERS = {
+    "csv": read_csv,
+    "parquet": read_parquet,
+    "feather": read_feather,
+}
 
 
 def validate_read_mdf_args(
@@ -219,6 +228,34 @@ def read_mdf(
     )
 
 
+def _read_data(
+    data_file: str,
+    mask_file: str,
+    reader: Callable[..., Any],
+    col_subset: str | list | tuple | None,
+    data_kwargs: dict,
+    mask_kwargs: dict,
+):
+    """Helper function for reading data files from disk."""
+    data, info = reader(
+        data_file,
+        col_subset=col_subset,
+        **data_kwargs,
+    )
+
+    if mask_file is None:
+        mask = pd.DataFrame()
+    else:
+        mask, _ = reader(
+            mask_file,
+            col_subset=col_subset,
+            column_names=info["columns"],
+            **mask_kwargs,
+        )
+
+    return data, mask, info
+
+
 def read_data(
     data_file: str,
     mask_file: str | None = None,
@@ -270,62 +307,38 @@ def read_data(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
+    if data_format not in ["csv", "parquet", "feather"]:
+        raise ValueError(
+            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+        )
+
+    data_kwargs = kwargs.copy()
+    mask_kwargs = kwargs.copy()
     if data_format == "csv":
         info_dict = open_json_file(info_file) if info_file else {}
         dtype = info_dict.get("dtypes", "object")
         parse_dates = info_dict.get("parse_dates", False)
         encoding = encoding or info_dict.get("encoding", None)
 
-        pd_kwargs = kwargs.copy()
-        pd_kwargs.setdefault("dtype", dtype)
-        pd_kwargs.setdefault("parse_dates", parse_dates)
-        pd_kwargs.setdefault("encoding", encoding)
+        data_kwargs.setdefault("dtype", dtype)
+        data_kwargs.setdefault("parse_dates", parse_dates)
+        data_kwargs.setdefault("encoding", encoding)
 
-        data, infos = read_csv(
-            data_file,
-            col_subset=col_subset,
-            **pd_kwargs,
-        )
+        mask_kwargs.setdefault("dtype", "boolean")
 
-        pd_kwargs = kwargs.copy()
-        pd_kwargs.setdefault("dtype", "boolean")
-
-        mask, _ = read_csv(
-            mask_file, col_subset=col_subset, column_names=infos["columns"], **pd_kwargs
-        )
-    elif data_format == "parquet":
-        data, infos = read_parquet(
-            data_file,
-            col_subset=col_subset,
-            **kwargs,
-        )
-
-        mask, _ = read_parquet(
-            mask_file,
-            col_subset=col_subset,
-            column_names=infos["columns"] ** kwargs,
-        )
-    elif data_format == "feather":
-        data, infos = read_feather(
-            data_file,
-            col_subset=col_subset,
-            **kwargs,
-        )
-
-        mask, _ = read_feather(
-            mask_file,
-            col_subset=col_subset,
-            column_names=infos["columns"] ** kwargs,
-        )
-    else:
-        raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
-        )
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        reader=READERS[data_format],
+        col_subset=col_subset,
+        data_kwargs=data_kwargs,
+        mask_kwargs=mask_kwargs,
+    )
 
     return DataBundle(
         data=data,
-        columns=infos["columns"],
-        dtypes=infos["dtypes"].to_dict(),
+        columns=info["columns"],
+        dtypes=info["dtypes"].to_dict(),
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,
