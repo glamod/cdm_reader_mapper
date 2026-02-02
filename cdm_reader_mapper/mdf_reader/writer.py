@@ -6,7 +6,7 @@ import json
 import logging
 from io import StringIO as StringIO
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Any
 
 import pandas as pd
 from pandas.io.parsers import TextFileReader
@@ -15,6 +15,38 @@ from .utils.utilities import join, update_column_names, update_dtypes
 
 from ..common import get_filename
 from ..common.pandas_TextParser_hdlr import make_copy
+
+WRITERS = {
+    "csv": "to_csv",
+    "parquet": "to_parquet",
+    "feather": "to_feather",
+}
+
+
+def _normalize_data_chunks(
+    data: pd.DataFrame | TextFileReader | None,
+) -> list | TextFileReader:
+    """Helper function to normalize data chunks."""
+    data = data or pd.DataFrame()
+    if isinstance(data, pd.DataFrame):
+        return [data]
+    if isinstance(data, TextFileReader):
+        return make_copy(data)
+    raise TypeError(f"Unsupported data type found: {type(data)}.")
+
+
+def _write_data(
+    data_df: pd.DataFrame,
+    mask_df: pd.DataFrame,
+    data_fn: str,
+    mask_fn: str,
+    writer: str,
+    write_kwargs: dict[str, Any],
+) -> None:
+    """Helper function to write data on disk."""
+    getattr(data_df, writer)(data_fn, **write_kwargs)
+    if not mask_df.empty:
+        getattr(mask_df, writer)(mask_fn, **write_kwargs)
 
 
 def write_data(
@@ -96,25 +128,14 @@ def write_data(
             f"data_format must be one of [csv, parquet, feather] not {data_format}."
         )
 
-    if extension is None:
-        extension = data_format
+    extension = extension or data_format
 
     dtypes = dtypes or {}
     if isinstance(parse_dates, bool):
         parse_dates = []
 
-    if not isinstance(data, TextFileReader):
-        data_list = [data]
-    else:
-        data_list = make_copy(data)
-
-    if mask is None:
-        mask = pd.DataFrame()
-
-    if not isinstance(mask, TextFileReader):
-        mask_list = [mask]
-    else:
-        mask_list = make_copy(mask)
+    data_list = _normalize_data_chunks(data)
+    mask_list = _normalize_data_chunks(mask)
 
     info = {"dtypes": dtypes.copy(), "parse_dates": [join(p) for p in parse_dates]}
 
@@ -153,9 +174,9 @@ def write_data(
             info["parse_dates"] = [p for p in info["parse_dates"] if p in header]
             info["encoding"] = encoding
 
+        write_kwargs = {}
         if data_format == "csv":
-
-            csv_kwargs = dict(
+            write_kwargs = dict(
                 header=header,
                 mode=mode,
                 index=False,
@@ -164,19 +185,14 @@ def write_data(
                 **kwargs,
             )
 
-            data_df.to_csv(filename_data, **csv_kwargs)
-            if not mask_df.empty:
-                mask_df.to_csv(filename_mask, **csv_kwargs)
-
-        elif data_format == "parquet":
-            data_df.to_parquet(filename_data, **kwargs)
-            if not mask_df.empty:
-                mask_df.to_parquet(filename_mask, **kwargs)
-
-        elif data_format == "feather":
-            data_df.to_feather(filename_data, **kwargs)
-            if not mask_df.empty:
-                mask_df.to_feather(filename_mask, **kwargs)
+        _write_data(
+            data_df=data_df,
+            mask_df=mask_df,
+            data_fn=filename_data,
+            mask_fn=filename_mask,
+            writer=WRITERS[data_format],
+            write_kwargs=write_kwargs,
+        )
 
     with open(filename_info, "w") as fileObj:
         json.dump(info, fileObj, indent=4)

@@ -162,11 +162,9 @@ def write_tables(
     elif filename is None:
         filename = {}
 
-    if out_dir is None:
-        out_dir = "."
+    out_dir = out_dir or "."
 
-    if extension is None:
-        extension = data_format
+    extension = extension or data_format
 
     for table in cdm_subset:
         if table not in data:

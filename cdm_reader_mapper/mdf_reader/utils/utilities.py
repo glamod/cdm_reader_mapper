@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ast
 import csv
-import logging
 import os
 
 from io import StringIO
@@ -211,6 +210,45 @@ def update_and_select(
     return df, {"columns": df.columns, "dtypes": df.dtypes}
 
 
+def _read_data_from_file(
+    filepath: Path,
+    reader: Callable[..., Any],
+    col_subset: str | list | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
+    reader_kwargs: dict | None = None,
+    iterator: bool = False,
+) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
+    """Helper file reader."""
+    if filepath is None or not Path(filepath).is_file():
+        raise FileNotFoundError(f"File not found: {filepath}")
+
+    reader_kwargs = reader_kwargs or {}
+
+    data = reader(filepath, **reader_kwargs)
+
+    if isinstance(data, pd.DataFrame):
+        return update_and_select(data, subset=col_subset, column_names=column_names)
+
+    if iterator is True:
+        write_kwargs = {}
+        if "encoding" in reader_kwargs:
+            write_kwargs["encoding"] = reader_kwargs["encoding"]
+
+        return process_textfilereader(
+            data,
+            func=update_and_select,
+            func_kwargs={
+                "subset": col_subset,
+                "column_names": column_names,
+            },
+            read_kwargs=reader_kwargs,
+            write_kwargs=write_kwargs,
+            makecopy=False,
+        )
+
+    raise ValueError(f"Unsupported reader return type: {type(data)}")
+
+
 def read_csv(
     filepath: Path,
     col_subset: str | list | None = None,
@@ -237,31 +275,14 @@ def read_csv(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_csv(filepath, delimiter=",", **kwargs)
-
-    if isinstance(data, pd.DataFrame):
-        data, info = update_and_select(
-            data, subset=col_subset, column_names=column_names
-        )
-        return data, info
-
-    write_kwargs = {}
-    if "encoding" in kwargs:
-        write_kwargs["encoding"] = kwargs["encoding"]
-
-    data, info = process_textfilereader(
-        data,
-        func=update_and_select,
-        func_kwargs={"subset": col_subset, "column_names": column_names},
-        read_kwargs=kwargs,
-        write_kwargs=write_kwargs,
-        makecopy=False,
+    return _read_data_from_file(
+        filepath,
+        reader=pd.read_csv,
+        col_subset=col_subset,
+        column_names=column_names,
+        reader_kwargs={"delimiter": ",", **kwargs},
+        iterator=True,
     )
-    return data, info
 
 
 def read_parquet(
@@ -290,15 +311,13 @@ def read_parquet(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_parquet(filepath, **kwargs)
-
-    data, info = update_and_select(data, subset=col_subset, column_names=column_names)
-
-    return data, info
+    return _read_data_from_file(
+        filepath,
+        reader=pd.read_parquet,
+        col_subset=col_subset,
+        column_names=column_names,
+        reader_kwargs=kwargs,
+    )
 
 
 def read_feather(
@@ -327,14 +346,13 @@ def read_feather(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_feather(filepath, **kwargs)
-
-    data, info = update_and_select(data, subset=col_subset, column_names=column_names)
-    return data, info
+    return _read_data_from_file(
+        filepath,
+        reader=pd.read_feather,
+        col_subset=col_subset,
+        column_names=column_names,
+        reader_kwargs=kwargs,
+    )
 
 
 def convert_dtypes(dtypes) -> tuple[str]:

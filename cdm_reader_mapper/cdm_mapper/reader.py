@@ -249,8 +249,7 @@ def read_tables(
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
-    if extension is None:
-        extension = data_format
+    extension = extension or data_format
 
     if os.path.isfile(source):
         df_list = [

@@ -153,8 +153,8 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    if skiprows is None:
-        skiprows = 0
+    skiprows = skiprows or 0
+
     validate_read_mdf_args(
         source=source,
         imodel=imodel,
