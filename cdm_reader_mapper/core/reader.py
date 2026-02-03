@@ -2,15 +2,27 @@
 
 from __future__ import annotations
 
+from typing import get_args
+
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.mdf_reader.reader import read_mdf, read_data
 
 from .databundle import DataBundle
 
+from ..properties import SupportedReadModes
+
+supported_read_modes = get_args(SupportedReadModes)
+
+READERS = {
+    "mdf": read_mdf,
+    "data": read_data,
+    "tables": read_tables,
+}
+
 
 def read(
-    source,
-    mode="mdf",
+    source: str,
+    mode: SupportedReadModes = "mdf",
     **kwargs,
 ) -> DataBundle:
     """Read either original marine-meteorological data or MDF data or CDM tables from disk.
@@ -19,14 +31,12 @@ def read(
     ----------
     source: str
         Source of the input data.
-    mode: str, {mdf, data, tables}
+    mode: str, {mdf, data, tables}, default: mdf
         Read data mode:
 
           * "mdf" to read original marine-meteorological data from disk and convert them to MDF data
           * "data" to read MDF data from disk
           * "tables" to read CDM tables from disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
-
-        Default: mdf
 
     Returns
     -------
@@ -46,14 +56,9 @@ def read(
     `kwargs` are the keyword arguments for the specific `mode` reader.
 
     """
-    match mode.lower():
-        case "mdf":
-            return read_mdf(source, **kwargs)
-        case "data":
-            return read_data(source, **kwargs)
-        case "tables":
-            return read_tables(source, **kwargs)
-        case _:
-            raise ValueError(
-                f"No valid mode: {mode}. Choose one of ['mdf', 'data', 'tables']"
-            )
+    if mode not in supported_read_modes:
+        raise ValueError(
+            f"No valid mode: {mode}. Choose one of {supported_read_modes}."
+        )
+
+    return READERS[mode](source, **kwargs)

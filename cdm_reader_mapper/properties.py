@@ -11,3 +11,7 @@ ObjectTypes = Literal["str", "object", "key", "datetime"]
 SupportedDataModels = Literal["craid", "gdac", "icoads", "pub47"]
 
 SupportedFileTypes = Literal["csv", "parquet", "feather"]
+
+SupportedReadModes = Literal["mdf", "data", "tables"]
+
+SupportedWriteModes = Literal["data", "tables"]
