@@ -47,7 +47,7 @@ from __future__ import annotations
 import glob
 import os
 
-from typing import Any, Callable, get_args
+from typing import get_args
 
 import pandas as pd
 
@@ -65,21 +65,29 @@ READERS = {
     "feather": pd.read_feather,
 }
 
+READER_KWARGS = {
+    "csv": "usecols",
+    "parquet": "columns",
+    "feather": "columns",
+}
+
 
 def _read_file(
     ifile: str,
     table: str,
-    reader: Callable[..., Any],
     col_subset: str | list | None,
+    data_format: SupportedFileTypes,
     **kwargs,
 ) -> pd.DataFrame:
     usecols = get_usecols(table, col_subset)
-    return reader(ifile, usecols=usecols, **kwargs)
+    reader = READERS[data_format]
+    reader_kwargs = {READER_KWARGS[data_format]: usecols, **kwargs}
+    return reader(ifile, **reader_kwargs)
 
 
 def _read_single_file(
     ifile: str,
-    reader: Callable[..., Any],
+    data_format: SupportedFileTypes,
     cdm_subset: str | list | None = None,
     col_subset: str | list | None = None,
     null_label: str = "null",
@@ -88,7 +96,11 @@ def _read_single_file(
     if not isinstance(cdm_subset, list):
         cdm_subset = [cdm_subset]
     dfi_ = _read_file(
-        ifile, table=cdm_subset[0], reader=reader, col_subset=col_subset, **kwargs
+        ifile,
+        table=cdm_subset[0],
+        data_format=data_format,
+        col_subset=col_subset,
+        **kwargs,
     )
     if dfi_.empty:
         return pd.DataFrame()
@@ -100,7 +112,7 @@ def _read_single_file(
 
 def _read_multiple_files(
     inp_dir: str,
-    reader: Callable[..., Any],
+    data_format: SupportedFileTypes,
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
@@ -143,7 +155,7 @@ def _read_multiple_files(
 
         dfi = _read_single_file(
             paths_[0],
-            reader=reader,
+            data_format=data_format,
             cdm_subset=[table],
             col_subset=col_subset,
             null_label=null_label,
@@ -244,16 +256,16 @@ def read_tables(
             f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
-    reader = READERS[data_format]
-
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
-    kwargs = {
-        "delimiter": delimiter,
-        "dtype": "object",
-        "na_values": na_values,
-        "keep_default_na": False,
-    }
+    if data_format == "csv":
+        kwargs = {
+            "delimiter": delimiter,
+            "dtype": "object",
+            "na_values": na_values,
+            "keep_default_na": False,
+            **kwargs,
+        }
     # See if subset, if any of the tables is not as specs
     cdm_subset = get_cdm_subset(cdm_subset)
 
@@ -263,7 +275,7 @@ def read_tables(
         df_list = [
             _read_single_file(
                 source,
-                reader=reader,
+                data_format=data_format,
                 cdm_subset=cdm_subset,
                 col_subset=col_subset,
                 null_label=null_label,
@@ -273,7 +285,7 @@ def read_tables(
     elif os.path.isdir(source):
         df_list = _read_multiple_files(
             source,
-            reader=reader,
+            data_format=data_format,
             prefix=prefix,
             suffix=suffix,
             extension=extension,

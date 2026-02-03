@@ -34,7 +34,18 @@ def db_data():
     return db
 
 
-def test_write_data(tmp_path, db_tables):
+def test_write_data_csv(tmp_path, db_data):
+    db_data.write(out_dir=tmp_path, data_format="csv")
+    db_res = read(
+        os.path.join(tmp_path, "data.csv"),
+        info_file=os.path.join(tmp_path, "info.json"),
+        data_format="csv",
+        mode="data",
+    )
+    pd.testing.assert_frame_equal(db_data.data, db_res.data)
+
+
+def test_write_tables_csv(tmp_path, db_tables):
     db_tables.write(out_dir=tmp_path, suffix=f"{db_tables.imodel}_all")
     db_res = read(tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables")
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)
@@ -141,7 +152,7 @@ def test_write_col_subset(tmp_path, db_tables):
     pd.testing.assert_frame_equal(table_exp, db_res[table])
 
 
-def test_write_parquet(tmp_path, db_data):
+def test_write_data_parquet(tmp_path, db_data):
     db_data.write(out_dir=tmp_path, data_format="parquet")
     db_res = read(
         os.path.join(tmp_path, "data.parquet"), data_format="parquet", mode="data"
@@ -149,9 +160,29 @@ def test_write_parquet(tmp_path, db_data):
     pd.testing.assert_frame_equal(db_data.data, db_res.data)
 
 
-def test_write_feather(tmp_path, db_data):
+def test_write_data_feather(tmp_path, db_data):
     db_data.write(out_dir=tmp_path, data_format="feather")
     db_res = read(
         os.path.join(tmp_path, "data.feather"), data_format="feather", mode="data"
     )
     pd.testing.assert_frame_equal(db_data.data, db_res.data)
+
+
+def test_write_tables_parquet(tmp_path, db_tables):
+    db_tables.write(
+        out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="parquet"
+    )
+    db_res = read(
+        tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="parquet"
+    )
+    pd.testing.assert_frame_equal(db_tables.data, db_res.data)
+
+
+def test_write_tables_feather(tmp_path, db_tables):
+    db_tables.write(
+        out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="feather"
+    )
+    db_res = read(
+        tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="feather"
+    )
+    pd.testing.assert_frame_equal(db_tables.data, db_res.data)
