@@ -138,7 +138,10 @@ def write_data(
     data_list = _normalize_data_chunks(data)
     mask_list = _normalize_data_chunks(mask)
 
-    info = {"dtypes": dtypes.copy(), "parse_dates": [join(p) for p in parse_dates]}
+    info = {
+        "dtypes": {k: str(v) for k, v in dtypes.items()},
+        "parse_dates": [join(p) for p in parse_dates],
+    }
 
     logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
     out_dir = Path(out_dir)

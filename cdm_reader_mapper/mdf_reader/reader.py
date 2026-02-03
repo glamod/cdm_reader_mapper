@@ -314,6 +314,7 @@ def read_data(
 
     data_kwargs = kwargs.copy()
     mask_kwargs = kwargs.copy()
+    parse_dates = False
     if data_format == "csv":
         info_dict = open_json_file(info_file) if info_file else {}
         dtype = info_dict.get("dtypes", "object")
