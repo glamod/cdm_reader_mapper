@@ -231,7 +231,7 @@ def read_mdf(
 
 def _read_data(
     data_file: str,
-    mask_file: str,
+    mask_file: str | None,
     reader: Callable[..., Any],
     col_subset: str | list | tuple | None,
     data_kwargs: dict,
@@ -341,7 +341,7 @@ def read_data(
     return DataBundle(
         data=data,
         columns=info["columns"],
-        dtypes=info["dtypes"].to_dict(),
+        dtypes=info["dtypes"],
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,
