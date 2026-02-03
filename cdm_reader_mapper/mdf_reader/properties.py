@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, object_types, supported_data_models  # noqa
+from typing import get_args
+
+from ..properties import NumericTypes, ObjectTypes, SupportedDataModels  # noqa
 
 _base = "cdm_reader_mapper.mdf_reader"
 
@@ -17,16 +19,16 @@ year_column = {
 }
 
 pandas_dtypes = {}
-for dtype in object_types:
+for dtype in get_args(ObjectTypes):
     pandas_dtypes[dtype] = "object"
-pandas_dtypes.update({x: x for x in numeric_types})
+pandas_dtypes.update({x: x for x in get_args(NumericTypes)})
 pandas_dtypes["datetime"] = "datetime"
 
 pandas_int = "Int64"
 
 # ....and how they are managed
 data_type_conversion_args = {}
-for dtype in numeric_types:
+for dtype in get_args(NumericTypes):
     data_type_conversion_args[dtype] = ["scale", "offset"]
 data_type_conversion_args["str"] = ["disable_white_strip"]
 data_type_conversion_args["object"] = ["disable_white_strip"]

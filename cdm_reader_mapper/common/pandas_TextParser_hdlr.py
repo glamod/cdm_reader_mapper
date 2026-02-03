@@ -1,6 +1,7 @@
 """Utilities for handling pandas TextParser objects safely."""
 
 from __future__ import annotations
+
 import pandas as pd
 from pandas.io.parsers import TextFileReader
 from io import StringIO

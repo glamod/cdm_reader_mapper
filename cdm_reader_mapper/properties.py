@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
-numeric_types = ["Int64", "int", "float"]
+from typing import Literal
 
-object_types = ["str", "object", "key", "datetime"]
+NumericTypes = Literal["Int64", "int", "float"]
 
-supported_data_models = ["craid", "gdac", "icoads", "pub47"]
+ObjectTypes = Literal["str", "object", "key", "datetime"]
+
+SupportedDataModels = Literal["craid", "gdac", "icoads", "pub47"]
+
+SupportedFileTypes = Literal["csv", "parquet", "feather"]
