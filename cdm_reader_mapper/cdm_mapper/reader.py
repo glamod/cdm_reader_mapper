@@ -47,14 +47,15 @@ from __future__ import annotations
 import glob
 import os
 
-from typing import Literal
+from typing import get_args
 
 import pandas as pd
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 from cdm_reader_mapper.core.databundle import DataBundle
 
-from . import properties
+from ..properties import SupportedFileTypes
+from .properties import cdm_tables
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
@@ -62,7 +63,7 @@ def _read_file(
     ifile: str,
     table: str,
     col_subset: str | list | None,
-    data_format: Literal["csv", "parquet", "feather"],
+    data_format: SupportedFileTypes,
     **kwargs,
 ) -> pd.DataFrame:
     usecols = get_usecols(table, col_subset)
@@ -73,7 +74,7 @@ def _read_file(
     if data_format == "feather":
         return pd.read_feather(ifile, columns=usecols, **kwargs)
     raise ValueError(
-        f"data_format must be one of [csv, parquet, feather] not {data_format}."
+        f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}."
     )
 
 
@@ -121,7 +122,7 @@ def _read_multiple_files(
         cdm_subset = [cdm_subset]
 
     for table in cdm_subset:
-        if table not in properties.cdm_tables:
+        if table not in cdm_tables:
             logger.warning(f"Requested table {table} not defined in CDM")
             continue
 
@@ -159,7 +160,7 @@ def _read_multiple_files(
 
 def read_tables(
     source: str,
-    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    data_format: SupportedFileTypes = "csv",
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
@@ -233,9 +234,10 @@ def read_tables(
     write_data : Write MDF data and validation mask to disk.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    if data_format not in ["csv", "parquet", "feather"]:
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
         raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+            f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
     # Because how the printers are written, they modify the original data frame!,

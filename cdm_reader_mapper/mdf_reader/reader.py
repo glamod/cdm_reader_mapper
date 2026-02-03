@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, Callable, Any
+from typing import Callable, Any, get_args
 
 import pandas as pd
 
@@ -16,6 +16,7 @@ from .utils.utilities import validate_arg
 
 from .utils.utilities import as_list, as_path, read_csv, read_parquet, read_feather
 
+from ..properties import SupportedFileTypes
 
 READERS = {
     "csv": read_csv,
@@ -260,7 +261,7 @@ def read_data(
     data_file: str,
     mask_file: str | None = None,
     info_file: str | None = None,
-    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    data_format: SupportedFileTypes = "csv",
     imodel: str | None = None,
     col_subset: str | list | tuple | None = None,
     encoding: str | None = None,
@@ -307,9 +308,10 @@ def read_data(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    if data_format not in ["csv", "parquet", "feather"]:
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
         raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+            f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
     data_kwargs = kwargs.copy()

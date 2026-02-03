@@ -6,7 +6,7 @@ import json
 import logging
 from io import StringIO as StringIO
 from pathlib import Path
-from typing import Literal, Any
+from typing import Any, get_args
 
 import pandas as pd
 from pandas.io.parsers import TextFileReader
@@ -15,6 +15,8 @@ from .utils.utilities import join, update_column_names, update_dtypes
 
 from ..common import get_filename
 from ..common.pandas_TextParser_hdlr import make_copy
+
+from ..properties import SupportedFileTypes
 
 WRITERS = {
     "csv": "to_csv",
@@ -53,7 +55,7 @@ def _write_data(
 def write_data(
     data: pd.DataFrame | TextFileReader,
     mask: pd.DataFrame | TextFileReader | None = None,
-    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    data_format: SupportedFileTypes = "csv",
     dtypes: dict | None = None,
     parse_dates: list | bool = False,
     encoding: str = "utf-8",
@@ -124,9 +126,10 @@ def write_data(
     ----
     Use this function after reading MDF data.
     """
-    if data_format not in ["csv", "parquet", "feather"]:
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
         raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+            f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
     extension = extension or data_format

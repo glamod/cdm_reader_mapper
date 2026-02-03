@@ -27,18 +27,20 @@ import os
 import pandas as pd
 
 from pathlib import Path
-from typing import Literal
+from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
+from ..properties import SupportedFileTypes
+
 
 def _table_to_file(
     data: pd.DataFrame,
     filename=None,
-    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    data_format: SupportedFileTypes = "csv",
     delimiter: str = "|",
     encoding: str = "utf-8",
     **kwargs,
@@ -62,13 +64,13 @@ def _table_to_file(
         data.to_feather(filename, **kwargs)
     else:
         raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+            f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}."
         )
 
 
 def write_tables(
     data: pd.DataFrame,
-    data_format: Literal["csv", "parquet", "feather"] = "csv",
+    data_format: SupportedFileTypes = "csv",
     out_dir: str | None = None,
     prefix: str | None = None,
     suffix: str | None = None,
@@ -139,9 +141,10 @@ def write_tables(
     Use this function after reading CDM tables.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    if data_format not in ["csv", "parquet", "feather"]:
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
         raise ValueError(
-            f"data_format must be one of [csv, parquet, feather] not {data_format}."
+            f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
     cdm_subset = get_cdm_subset(cdm_subset)
