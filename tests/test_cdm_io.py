@@ -26,8 +26,8 @@ def example_data():
 
 @pytest.fixture
 def csv_path(tmp_path, example_data):
-    header_file = tmp_path / "header-test.csv"
-    obssst_file = tmp_path / "observations-sst-test.csv"
+    header_file = tmp_path / "header.csv"
+    obssst_file = tmp_path / "observations-sst.csv"
 
     example_data["header"].to_csv(header_file, index=False)
     example_data["observations-sst"].to_csv(obssst_file, index=False)
@@ -37,8 +37,8 @@ def csv_path(tmp_path, example_data):
 
 @pytest.fixture
 def parquet_path(tmp_path, example_data):
-    header_file = tmp_path / "header-test.parquet"
-    obssst_file = tmp_path / "observations-sst-test.parquet"
+    header_file = tmp_path / "header.parquet"
+    obssst_file = tmp_path / "observations-sst.parquet"
 
     example_data["header"].to_parquet(header_file, index=False)
     example_data["observations-sst"].to_parquet(obssst_file, index=False)
@@ -48,8 +48,8 @@ def parquet_path(tmp_path, example_data):
 
 @pytest.fixture
 def feather_path(tmp_path, example_data):
-    header_file = tmp_path / "header-test.feather"
-    obssst_file = tmp_path / "observations-sst-test.feather"
+    header_file = tmp_path / "header.feather"
+    obssst_file = tmp_path / "observations-sst.feather"
 
     example_data["header"].to_feather(
         header_file,
@@ -75,24 +75,24 @@ def test_read_data_feather(feather_path, example_data):
 
 
 def test_write_data_csv(tmp_path, example_data):
-    write_tables(example_data, out_dir=tmp_path, suffix="test")
-    data_header = pd.read_csv(tmp_path / "header-test.csv", delimiter="|")
-    data_obssst = pd.read_csv(tmp_path / "observations-sst-test.csv", delimiter="|")
+    write_tables(example_data, out_dir=tmp_path)
+    data_header = pd.read_csv(tmp_path / "header.csv", delimiter="|")
+    data_obssst = pd.read_csv(tmp_path / "observations-sst.csv", delimiter="|")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
     pd.testing.assert_frame_equal(example_data["observations-sst"], data_obssst)
 
 
 def test_write_data_parquet(tmp_path, example_data):
-    write_tables(example_data, out_dir=tmp_path, suffix="test", data_format="parquet")
-    data_header = pd.read_parquet(tmp_path / "header-test.parquet")
-    data_obssst = pd.read_parquet(tmp_path / "observations-sst-test.parquet")
+    write_tables(example_data, out_dir=tmp_path, data_format="parquet")
+    data_header = pd.read_parquet(tmp_path / "header.parquet")
+    data_obssst = pd.read_parquet(tmp_path / "observations-sst.parquet")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
     pd.testing.assert_frame_equal(example_data["observations-sst"], data_obssst)
 
 
 def test_write_data_feather(tmp_path, example_data):
-    write_tables(example_data, out_dir=tmp_path, suffix="test", data_format="feather")
-    data_header = pd.read_feather(tmp_path / "header-test.feather")
-    data_obssst = pd.read_feather(tmp_path / "observations-sst-test.feather")
+    write_tables(example_data, out_dir=tmp_path, data_format="feather")
+    data_header = pd.read_feather(tmp_path / "header.feather")
+    data_obssst = pd.read_feather(tmp_path / "observations-sst.feather")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
     pd.testing.assert_frame_equal(example_data["observations-sst"], data_obssst)

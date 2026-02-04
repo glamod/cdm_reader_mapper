@@ -143,9 +143,12 @@ def _read_multiple_files(
             continue
 
         logger.info(f"Getting file path for pattern {table}")
-        pattern_ = get_filename(
-            [prefix, table, f"*{suffix}"], path=inp_dir, extension=extension
-        )
+        _pattern = [table]
+        if prefix:
+            _pattern = [prefix] + _pattern
+        if suffix:
+            _pattern = _pattern + [f"*{suffix}"]
+        pattern_ = get_filename(_pattern, path=inp_dir, extension=extension)
         paths_ = glob.glob(pattern_)
         if len(paths_) != 1:
             logger.warning(
