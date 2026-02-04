@@ -104,6 +104,7 @@ def _read_single_file(
     )
     if dfi_.empty:
         return pd.DataFrame()
+
     dfi_ = dfi_.set_index("report_id", drop=False)
     if null_label in dfi_.index:
         return dfi_.drop(index=null_label)
