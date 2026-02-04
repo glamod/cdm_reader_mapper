@@ -56,7 +56,7 @@ def write_data(
     data: pd.DataFrame | TextFileReader,
     mask: pd.DataFrame | TextFileReader | None = None,
     data_format: SupportedFileTypes = "csv",
-    dtypes: dict | None = None,
+    dtypes: pd.Series | dict | None = None,
     parse_dates: list | bool = False,
     encoding: str = "utf-8",
     out_dir: str = ".",
@@ -134,7 +134,9 @@ def write_data(
 
     extension = extension or data_format
 
-    dtypes = dtypes or {}
+    if not isinstance(dtypes, (dict, pd.Series)):
+        dtypes = {}
+
     if isinstance(parse_dates, bool):
         parse_dates = []
 
