@@ -40,6 +40,7 @@ imodel_lineages = {
     "icoads_r300_d714": icoads_lineage + " with supplemental data recovery",
     "icoads_r302": ". Initial conversion from ICOADS R3.0.2T NRT",
     "craid": ". Initial conversion from C-RAID",
+    "marob": ". Initial conversion from DWD MAROB data base",
 }
 
 c2k_methods = {
