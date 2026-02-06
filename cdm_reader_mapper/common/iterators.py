@@ -7,7 +7,18 @@ import tempfile
 import pandas as pd
 
 from pathlib import Path
-from typing import Any, Callable, Generator, Iterable, Iterator, Sequence
+
+from numbers import Number
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+    ByteString,
+)
 
 
 class ParquetStreamReader:
@@ -135,11 +146,21 @@ def _parquet_generator(temp_dir_obj, schema) -> Generator[pd.DataFrame]:
         temp_dir_obj.cleanup()
 
 
+def is_valid_iterable(reader: Any) -> bool:
+    """Check if reader is a valid Iterable."""
+    if not isinstance(reader, Iterable):
+        return False
+    if isinstance(reader, (Number, Mapping, ByteString, str)):
+        return False
+    return True
+
+
 def process_disk_backed(
     reader: Iterable[pd.DataFrame],
     func: Callable,
     func_args: Sequence[Any] | None = None,
     func_kwargs: dict[str, Any] | None = None,
+    requested_types: type | list[type] | tuple[type] = (pd.DataFrame, pd.Series),
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
     """
@@ -157,11 +178,27 @@ def process_disk_backed(
     output_non_df = []
     directories_to_cleanup = []
 
+    if not isinstance(requested_types, (list, tuple)):
+        requested_types = (requested_types,)
+
+    reader = iter(reader)
+
+    try:
+        first = next(reader)
+    except StopIteration:
+        raise ValueError("Iterable is empty.")
+
     try:
         accumulators_initialized = False
         chunk_counter = 0
 
-        for df in reader:
+        for df in [first] + list(reader):
+            if not isinstance(df, requested_types):
+                raise TypeError(
+                    "Unsupported data type in Iterable: {type(df)}"
+                    "Requested types are: {requested_types} "
+                )
+
             if makecopy:
                 df = df.copy()
 

@@ -64,7 +64,7 @@ from typing import Any, Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_disk_backed
+from ..common.iterators import process_disk_backed, is_valid_iterable
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -96,15 +96,13 @@ def _correct_dt(
     logger.info(f'Applying "{datetime_correction}" datetime correction')
     try:
         trans = getattr(corr_f_dt, datetime_correction)
-    except AttributeError as e:
-        logger.error(f"Correction function '{datetime_correction}' not found.")
-        raise e
+    except AttributeError:
+        raise AttributeError(f"Correction function '{datetime_correction}' not found.")
 
     try:
         return trans(data)
     except Exception as e:
-        logger.error("Error applying datetime correction", exc_info=True)
-        raise e
+        raise RuntimeError("func '{trans.__name__}' could not be executed") from e
 
 
 def _correct_pt(
@@ -170,7 +168,7 @@ def correct_datetime(
     imodel: str,
     log_level: str = "INFO",
     _base=_base,
-) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """Apply ICOADS deck specific datetime corrections.
 
     Parameters
@@ -188,17 +186,21 @@ def correct_datetime(
 
     Returns
     -------
-    pandas.DataFrame or pandas.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the adjusted data
+    pandas.DataFrame or Iterable[pd.DataFrame]
+        A pandas.DataFrame or Iterable[pd.DataFrame] with the adjusted data.
 
     Raises
     ------
     ValueError
         If `_correct_dt` raises an error during correction.
+    TypeError
+        If `data` is not a pd.DataFrame or an Iterable[pd.DataFrame].
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.datetime"
+
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
@@ -217,26 +219,27 @@ def correct_datetime(
 
     if isinstance(data, pd.DataFrame):
         return _correct_dt(data, imodel, dck, correction_method, log_level=log_level)
-
-    return process_disk_backed(
-        data,
-        _correct_dt,
-        func_kwargs={
-            "data_model": imodel,
-            "dck": dck,
-            "correction_method": correction_method,
-            "log_level": log_level,
-        },
-        makecopy=False,
-    )[0]
+    elif is_valid_iterable(data):
+        return process_disk_backed(
+            data,
+            _correct_dt,
+            func_kwargs={
+                "data_model": imodel,
+                "dck": dck,
+                "correction_method": correction_method,
+                "log_level": log_level,
+            },
+            makecopy=False,
+        )[0]
+    raise TypeError(f"Unsupported data type: {type(data)}")
 
 
 def correct_pt(
-    data: pd.DataFrame | pd.io.parsers.TextFileReader,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
     log_level="INFO",
     _base=_base,
-) -> pd.DataFrame | pd.io.parsers.TextFileReader:
+) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """Apply ICOADS deck specific platform ID corrections.
 
     Parameters
@@ -253,20 +256,25 @@ def correct_pt(
     Returns
     -------
     pandas.DataFrame or pandas.io.parsers.TextFileReader
-        a pandas.DataFrame or pandas.io.parsers.TextFileReader
-        with the adjusted data
+        A pandas.DataFrame or Iterable[pd.DataFrame] with the adjusted data.
 
     Raises
     ------
     ValueError
         If `_correct_pt` raises an error during correction.
+        If platform column is not defined in properties file.
+    TypeError
+        If `data` is not a pd.DataFrame or an Iterable[pd.DataFrame].
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.platform_type"
 
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
+
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {imodel} has to deck information.")
+        logger.warning(f"Dataset {imodel} has no deck information.")
         return data
 
     dck = mrd[2]
@@ -281,22 +289,24 @@ def correct_pt(
     pt_col = properties.metadata_datamodels["platform"].get(mrd[0])
 
     if not pt_col:
-        logger.error(
-            f"Data model {imodel} platform column not defined in properties file"
+        raise ValueError(
+            f"Data model {imodel} platform column not defined in properties file."
         )
-        return data
 
     if isinstance(data, pd.DataFrame):
         return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
-
-    return process_disk_backed(
-        data,
-        _correct_pt,
-        func_kwargs={
-            "imodel": imodel,
-            "dck": dck,
-            "pt_col": pt_col,
-            "fix_methods": fix_methods,
-            "log_level": log_level,
-        },
-    )[0]
+    elif is_valid_iterable(data):
+        return process_disk_backed(
+            data,
+            _correct_pt,
+            func_kwargs={
+                "imodel": imodel,
+                "dck": dck,
+                "pt_col": pt_col,
+                "fix_methods": fix_methods,
+                "log_level": log_level,
+            },
+            requested_types=pd.DataFrame,
+            makecopy=False,
+        )[0]
+    raise TypeError(f"Unsupported data type: {type(data)}")
