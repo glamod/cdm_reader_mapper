@@ -4,10 +4,6 @@
       "append": "WS"
     }
   },
-  "z_coordinate": {
-    "sections": "WIND",
-    "elements": "SENSORHOEHE_WAS_FF"
-  },
   "observation_height_above_station_surface": {
     "sections": "WIND",
     "elements": "SENSORHOEHE_WAS_FF"
@@ -17,7 +13,11 @@
   },
   "observation_value": {
     "sections": "WIND",
-    "elements": "WINDGESCHWINDIGKEIT"
+    "elements": "WINDGESCHWINDIGKEIT",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 0.277
+    }
   },
   "units": {
     "default": 731
@@ -28,7 +28,7 @@
   },
   "original_precision": {},
   "original_units": {
-    "default": 731
+    "default": 741
   },
   "original_value": {
     "sections": "WIND",

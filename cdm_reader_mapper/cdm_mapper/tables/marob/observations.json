@@ -5,7 +5,7 @@
     "transform": "string_add",
     "kwargs": {
       "separator": "-",
-      "prepend": "MAROBSHIP"
+      "prepend": "DWD_MAROBSHIP"
     }
   },
   "report_id": {
@@ -13,11 +13,12 @@
     "elements": "ID",
     "transform": "string_add",
     "kwargs": {
-      "separator": "-"
+      "separator": "-",
+      "prepend": "DWD_MAROBSHIP"
     }
   },
   "data_policy_licence": {
-    "default": 0
+    "default": 1
   },
   "date_time": {
     "sections": "MAROB",
@@ -63,7 +64,9 @@
   },
   "numerical_precision": {},
   "sensor_automation_status": {
-    "default": 5
+    "sections": "MAROB",
+    "elements": "DATENQUELLE_ID",
+    "transform": "UNKNOWN"
   },
   "exposure_of_sensor": {
     "default": 3
@@ -86,6 +89,6 @@
   },
   "source_id": {
     "sections": "MAROB",
-    "elements": "UNKNOWN"
+    "elements": "DATENQUELLE_ID"
   }
 }

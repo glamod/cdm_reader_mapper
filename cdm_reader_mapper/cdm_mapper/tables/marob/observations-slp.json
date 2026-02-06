@@ -4,10 +4,6 @@
       "append": "SLP"
     }
   },
-  "z_coordinate": {
-    "sections": "MAROB",
-    "elements": "BAROMETERHOEHE_MSL"
-  },
   "observation_height_above_station_surface": {
     "sections": "MAROB",
     "elements": "BAROMETERHOEHE_MSL"
@@ -17,7 +13,12 @@
   },
   "observation_value": {
     "sections": "LUFT",
-    "elements": "LUFTDRUCK_STATIONSHOEHE"
+    "elements": "LUFTDRUCK_STATIONSHOEHE",
+    "transform": "float_scale",
+    "kwargs": {
+      "factor": 100
+    },
+    "decimal_places": 0
   },
   "units": {
     "default": 32
@@ -27,7 +28,7 @@
     "elements": "LUFTDRUCK_STATIONSHOEHE_FLAG"
   },
   "original_units": {
-    "default": 32
+    "default": 530
   },
   "original_value": {
     "sections": "LUFT",

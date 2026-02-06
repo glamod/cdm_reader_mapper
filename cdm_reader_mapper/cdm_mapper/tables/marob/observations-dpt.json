@@ -4,10 +4,6 @@
       "append": "DPT"
     }
   },
-  "z_coordinate": {
-    "sections": "LUFT",
-    "elements": "SENSORHOEHE_WAS_TT"
-  },
   "observation_height_above_station_surface": {
     "sections": "LUFT",
     "elements": "SENSORHOEHE_WAS_TT"
@@ -17,7 +13,9 @@
   },
   "observation_value": {
     "sections": "LUFT",
-    "elements": "TAUPUNKTTEMPERATUR"
+    "elements": "TAUPUNKTTEMPERATUR",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
   },
   "units": {
     "default": 5
@@ -27,7 +25,7 @@
     "elements": "TAUPUNKTTEMPERATUR_FLAG"
   },
   "original_units": {
-    "default": 5
+    "default": 60
   },
   "original_value": {
     "sections": "LUFT",

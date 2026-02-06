@@ -4,20 +4,19 @@
       "append": "SST"
     }
   },
-  "z_coordinate": {
-    "sections": "WASSER",
-    "elements": "MESSTIEFE"
-  },
   "observation_height_above_station_surface": {
     "sections": "WASSER",
-    "elements": "MESSTIEFE"
+    "elements": "MESSTIEFE",
+    "transform": "float_opposite"
   },
   "observed_variable": {
     "default": 95
   },
   "observation_value": {
     "sections": "WASSER",
-    "elements": "WASSERTEMPERATUR"
+    "elements": "WASSERTEMPERATUR",
+    "transform": "temperature_celsius_to_kelvin",
+    "decimal_places": 2
   },
   "units": {
     "default": 5
@@ -27,7 +26,7 @@
     "elements": "WASSERTEMPERATUR_FLAG"
   },
   "original_units": {
-    "default": 5
+    "default": 60
   },
   "original_value": {
     "sections": "WASSER",

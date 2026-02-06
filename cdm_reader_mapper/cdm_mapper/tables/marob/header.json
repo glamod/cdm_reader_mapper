@@ -5,7 +5,7 @@
     "transform": "string_add",
     "kwargs": {
       "separator": "-",
-      "prepend": "MAROBSHIP"
+      "prepend": "DWD_MAROBSHIP"
     }
   },
   "application_area": {
@@ -16,18 +16,18 @@
       11
     ]
   },
-  "observing_programme": "UNKNOWN",
+  "observing_programme": {
+    "default": 56
+  },
   "report_type": {
     "default": 0
   },
-  "station_name": "UNKNOWN",
   "station_type": {
     "default": 2
   },
   "platform_type": {
     "default": 2
   },
-  "platform_sub_type": "UNKNOWN",
   "primary_station_id": {
     "section": "MAROB",
     "elements": "KENNUNG"
@@ -56,13 +56,7 @@
     "decimal_places": 0
   },
   "location_quality": {
-    "sections": "MAROB",
-    "elements": [
-      "GEOGR_LAENGE_FLAG",
-      "GEOGR_BREITE_FLAG"
-    ],
-    "fill_value": "0",
-    "transform": "UNKNOWN"
+    "fill_value": 3
   },
   "crs": {
     "default": 0
@@ -76,8 +70,8 @@
     "elements": "FAHRTRICHTUNG"
   },
   "height_of_station_above_local_ground": {
-    "sections": "MAROB",
-    "elements": "STATIONSHOEHE_MSL"
+    "default": 0,
+    "decimal_places": 1
   },
   "height_of_station_above_sea_level": {
     "sections": "MAROB",
@@ -91,9 +85,12 @@
     "elements": "MESSZEIT"
   },
   "report_duration": {
-    "default": 11
+    "default": 15
   },
-  "report_time_accuracy": "UNKNOWN",
+  "report_time_accuracy": {
+    "default": 1,
+    "decimal_places": 0
+  },
   "report_time_quality": {
     "sections": "MAROB",
     "elements": "MESSZEIT_FLAG"
@@ -112,14 +109,10 @@
   },
   "source_id": {
     "sections": "MAROB",
-    "elements": [
-      "ORIGIN_CENTER",
-      "ORIGIN_SUBCENTER"
-    ],
-    "transform": "string_add"
+    "elements": "DATENQUELLE_ID"
   },
   "source_record_id": {
     "sections": "MAROB",
-    "elements": "UNKNOWN"
+    "elements": "ID"
   }
 }
