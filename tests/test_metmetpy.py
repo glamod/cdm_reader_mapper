@@ -787,23 +787,20 @@ def test_correct_pt_valid_iterable():
 
 
 def test_get_id_col_not_defined():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({"X": [1, 2, 3]})
-    result = _get_id_col(df, "unknown_model", logger)
-    assert result is None
+    with pytest.raises(ValueError, match="ID column not defined in properties file"):
+        _get_id_col(df, "unknown_model")
 
 
 def test_get_id_col_missing_in_data():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({"X": [1, 2, 3]})
-    result = _get_id_col(df, "icoads", logger)
-    assert result is None
+    with pytest.raises(ValueError, match="No ID columns found."):
+        _get_id_col(df, "icoads")
 
 
 def test_get_id_col_single_column_present():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({("core", "ID"): [1, 2, 3], ("other", "ID"): [4, 5, 6]})
-    result = _get_id_col(df, "icoads", logger)
+    result = _get_id_col(df, "icoads")
     assert result == ("core", "ID")
 
 
@@ -895,8 +892,9 @@ def test_validate_id_textfilereader():
     )
     result = validate_id(parser, "icoads_r300_d201", blank=False, log_level="CRITICAL")
     expected = pd.Series([True, False, True], name=ID)
+
     pd.testing.assert_series_equal(
-        result.reset_index(drop=True), expected, check_dtype=False
+        result.read().reset_index(drop=True), expected, check_dtype=False
     )
 
 
@@ -944,5 +942,5 @@ def test_validate_datetime_textfilereader(csv_text, expected):
     )
     result = validate_datetime(parser, "icoads", log_level="CRITICAL")
     pd.testing.assert_series_equal(
-        result.reset_index(drop=True), expected, check_dtype=False
+        result.read().reset_index(drop=True), expected, check_dtype=False
     )

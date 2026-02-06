@@ -195,6 +195,7 @@ def correct_datetime(
         If `_correct_dt` raises an error during correction.
     TypeError
         If `data` is not a pd.DataFrame or an Iterable[pd.DataFrame].
+        If `data` is a pd.Series.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.datetime"
@@ -219,7 +220,8 @@ def correct_datetime(
 
     if isinstance(data, pd.DataFrame):
         return _correct_dt(data, imodel, dck, correction_method, log_level=log_level)
-    elif is_valid_iterable(data):
+
+    if is_valid_iterable(data):
         return process_disk_backed(
             data,
             _correct_dt,
@@ -229,6 +231,7 @@ def correct_datetime(
                 "correction_method": correction_method,
                 "log_level": log_level,
             },
+            requested_types=pd.DataFrame,
             makecopy=False,
         )[0]
     raise TypeError(f"Unsupported data type: {type(data)}")
@@ -265,6 +268,7 @@ def correct_pt(
         If platform column is not defined in properties file.
     TypeError
         If `data` is not a pd.DataFrame or an Iterable[pd.DataFrame].
+        If `data` is a pd.Series.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.platform_type"
@@ -295,7 +299,8 @@ def correct_pt(
 
     if isinstance(data, pd.DataFrame):
         return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
-    elif is_valid_iterable(data):
+
+    if is_valid_iterable(data):
         return process_disk_backed(
             data,
             _correct_pt,
