@@ -241,8 +241,6 @@ def read_csv(
         data, info = update_and_select(data, subset=col_subset, columns=columns)
         return data, info
 
-    write_kwargs = {}
-
     data, info = process_disk_backed(
         data,
         func=update_and_select,
