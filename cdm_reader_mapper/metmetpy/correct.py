@@ -59,12 +59,12 @@ invocation) logging an error.
 
 from __future__ import annotations
 
-from io import StringIO
-from typing import Any
+from typing import Any, Iterable
 
 import pandas as pd
 
-from ..common import logging_hdlr, pandas_TextParser_hdlr
+from ..common import logging_hdlr
+from ..common.iterators import process_disk_backed
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -166,7 +166,7 @@ def _correct_pt(
 
 
 def correct_datetime(
-    data: pd.DataFrame | pd.io.parsers.TextFileReader,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
     log_level: str = "INFO",
     _base=_base,
@@ -175,7 +175,7 @@ def correct_datetime(
 
     Parameters
     ----------
-    data: pandas.DataFrame or pandas.io.parsers.TextFileReader
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
     imodel: str
         Name of internally available data model.
@@ -217,27 +217,18 @@ def correct_datetime(
 
     if isinstance(data, pd.DataFrame):
         return _correct_dt(data, imodel, dck, correction_method, log_level=log_level)
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data.orig_options.get(x) for x in read_params}
 
-        buffer = StringIO()
-        data_ = pandas_TextParser_hdlr.make_copy(data)
-        for df in data_:
-            df = _correct_dt(df, imodel, dck, correction_method, log_level=log_level)
-            df.to_csv(buffer, header=False, index=False, mode="a")
-
-        buffer.seek(0)
-        return pd.read_csv(buffer, **read_dict)
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return process_disk_backed(
+        data,
+        _correct_dt,
+        func_kwargs={
+            "data_model": imodel,
+            "dck": dck,
+            "correction_method": correction_method,
+            "log_level": log_level,
+        },
+        makecopy=False,
+    )[0]
 
 
 def correct_pt(
@@ -297,22 +288,15 @@ def correct_pt(
 
     if isinstance(data, pd.DataFrame):
         return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
-    elif isinstance(data, pd.io.parsers.TextFileReader):
-        read_params = [
-            "chunksize",
-            "names",
-            "dtype",
-            "parse_dates",
-            "date_parser",
-            "infer_datetime_format",
-        ]
-        read_dict = {x: data.orig_options.get(x) for x in read_params}
-        buffer = StringIO()
-        for df in data:
-            df = _correct_pt(df, imodel, dck, pt_col, fix_methods, log_level="INFO")
-            df.to_csv(buffer, header=False, index=False, mode="a")
 
-        buffer.seek(0)
-        return pd.read_csv(buffer, **read_dict)
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return process_disk_backed(
+        data,
+        _correct_pt,
+        func_kwargs={
+            "imodel": imodel,
+            "dck": dck,
+            "pt_col": pt_col,
+            "fix_methods": fix_methods,
+            "log_level": log_level,
+        },
+    )[0]
