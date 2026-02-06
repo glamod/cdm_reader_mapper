@@ -242,8 +242,6 @@ def read_csv(
         return data, info
 
     write_kwargs = {}
-    if "encoding" in kwargs:
-        write_kwargs["encoding"] = kwargs["encoding"]
 
     data, info = process_disk_backed(
         data,
