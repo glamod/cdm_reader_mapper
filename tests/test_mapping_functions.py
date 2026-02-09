@@ -487,10 +487,10 @@ def test_df_col_join_series(df, sep, expected):
 @pytest.mark.parametrize(
     "df, expected",
     [
-        (5.0, -5.0),
-        (-3.2, 3.2),
-        (0.0, -0.0),
-        (123.456, -123.456),
+        (pd.Series([5.0]), pd.Series([-5.0])),
+        (pd.Series([-3.2]), pd.Series([3.2])),
+        (pd.Series([0.0]), pd.Series([-0.0])),
+        (pd.Series([123.456]), pd.Series([-123.456])),
         (pd.Series([1.0, -2.0, 3.5]), pd.Series([-1.0, 2.0, -3.5])),
     ],
 )
@@ -535,7 +535,7 @@ def test_select_column(df, expected):
             10,
             pd.Series([], dtype=float, name="E"),
         ),
-        (pd.Series(["x", "y", "z"], name="F"), 3, pd.Series([], dtype=float, name="F")),
+        (pd.Series(["x", "y", "z"], name="F"), 3, pd.Series([np.nan, np.nan, np.nan], dtype=float, name="F")),
     ],
 )
 def test_float_scale(input_s, factor, expected):

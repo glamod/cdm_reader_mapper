@@ -213,16 +213,15 @@ def _fill_value(series, fill_value) -> pd.Series:
 def _extract_input_data(idata, elements, default, logger):
     """Extract the relevant input data based on `elements`."""
 
-    def _return_default():
+    def _return_default(bool):
+        return pd.Series(_default(default, len(idata)), index=idata.index), bool
+
+    if not elements:
         if default is None:
             bool = False
         else:
             bool = True
-
-        return pd.Series(_default(default, len(idata)), index=idata.index), bool
-
-    if not elements:
-        return _return_default()
+        return _return_default(bool)
 
     logger.debug(f"\telements: {' '.join(map(str, elements))}")
 
@@ -231,12 +230,12 @@ def _extract_input_data(idata, elements, default, logger):
     for e in elements:
         if e not in cols:
             logger.warning(f"Missing element from input data: {e}")
-            return _return_default()
+            return _return_default(True)
 
     data = idata[elements[0]] if len(elements) == 1 else idata[elements]
 
     if _is_empty(data):
-        return _return_default()
+        return _return_default(True)
 
     return data, False
 

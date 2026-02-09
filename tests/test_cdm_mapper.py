@@ -345,10 +345,11 @@ def test_convert_dtype(value, atts, expected):
         ("report_id", [("c98", "UID")], None, False, "idata"),
         ("latitude", [("core", "LAT")], None, True, [None, None, None, None]),
         ("location_quality", [("c1", "LZ")], None, False, "idata"),
+        
     ],
 )
 def test_extract_input_data(
-    imodel_maps, data_header, column, elements, default, use_default, exp
+    data_header, column, elements, default, use_default, exp
 ):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     result = _extract_input_data(
@@ -360,6 +361,8 @@ def test_extract_input_data(
     assert isinstance(result, tuple)
 
     assert result[1] is use_default
+    
+    print(result)
 
     if exp == "idata":
         exp = data_header[elements[0]]
@@ -397,6 +400,20 @@ def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expe
     )
     pd.testing.assert_series_equal(result, pd.Series(expected, name=column))
 
+def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    mapping_column = imodel_maps["header"]["history"]
+    column_atts = get_cdm_atts("header")["header"]["history"]
+    result = _column_mapping(
+        data_header,
+        mapping_column,
+        imodel_functions,
+        column_atts,
+        None,
+        "history",
+        logger,
+    )
+    assert result.str.contains("Initial conversion from ICOADS R3.0.0T").all()  
 
 def test_table_mapping(
     imodel_maps, imodel_functions, data_header, data_header_expected
