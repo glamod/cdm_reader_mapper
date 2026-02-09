@@ -8,19 +8,21 @@ Created on Wed Jul  3 09:48:18 2019
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Iterable, Mapping
 
 import pandas as pd
 
-from .pandas_TextParser_hdlr import make_copy
-from .pandas_TextParser_hdlr import get_length as get_length_hdlr
+from .iterators import process_disk_backed, is_valid_iterable
 
 
-def _count_by_cat(series) -> dict:
+def _count_by_cat(df, columns) -> dict:
     """Count unique values in a pandas Series, including NaNs."""
-    counts = series.value_counts(dropna=False)
-    counts.index = counts.index.where(~counts.index.isna(), "nan")
-    return counts.to_dict()
+    count_dict = {}
+    for column in columns:
+        counts = df[column].value_counts(dropna=False)
+        counts.index = counts.index.where(~counts.index.isna(), "nan")
+        count_dict[column] = counts.to_dict()
+    return count_dict
 
 
 def count_by_cat(
@@ -47,39 +49,56 @@ def count_by_cat(
     -----
     - Works with large files via TextFileReader by iterating through chunks.
     """
+
+    def merge_sum_dicts(*dicts):
+        """Recursively merge dictionaries, summing numeric values at the leaves."""
+        result = {}
+
+        for d in dicts:
+            for key, value in d.items():
+                if key not in result:
+                    result[key] = value
+                else:
+                    if isinstance(value, Mapping) and isinstance(result[key], Mapping):
+                        result[key] = merge_sum_dicts(result[key], value)
+                    else:
+                        result[key] += value
+
+        return result
+
     if columns is None:
         columns = data.columns
     if not isinstance(columns, list):
         columns = [columns]
 
-    counts = {col: {} for col in columns}
-
     if isinstance(data, pd.DataFrame):
-        for column in columns:
-            counts[column] = _count_by_cat(data[column])
-        return counts
+        return _count_by_cat(data, columns)
 
-    data_cp = make_copy(data)
-    if data_cp is None:
-        return counts
+    if is_valid_iterable(data):
+        dicts = process_disk_backed(
+            data,
+            _count_by_cat,
+            func_kwargs={"columns": columns},
+            non_data_output="acc",
+            makecopy=False,
+        )
+        return merge_sum_dicts(*dicts)
 
-    for chunk in data_cp:
-        for column in columns:
-            chunk_counts = _count_by_cat(chunk[column])
-            for k, v in chunk_counts.items():
-                counts[column][k] = counts[column].get(k, 0) + v
-
-    data_cp.close()
-    return counts
+    raise TypeError(f"Unsupported data type: {type(data)}")
 
 
-def get_length(data: pd.DataFrame | pd.io.parsers.TextFileReader) -> int:
+def _get_length(data: pd.DataFrame):
+    """Get length pd.DataFrame."""
+    return len(data)
+
+
+def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     """
     Get the total number of rows in a pandas object.
 
     Parameters
     ----------
-    data : pandas.DataFrame or pandas.io.parsers.TextFileReader
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
 
     Returns
@@ -92,6 +111,19 @@ def get_length(data: pd.DataFrame | pd.io.parsers.TextFileReader) -> int:
     - Works with large files via TextFileReader by using a specialized handler
       to count rows without loading the entire file into memory.
     """
-    if not isinstance(data, pd.io.parsers.TextFileReader):
-        return len(data)
-    return get_length_hdlr(data)
+    if isinstance(data, pd.DataFrame):
+        return _get_length(data)
+
+    if hasattr(data, "_row_count"):
+        return data._row_count
+
+    if is_valid_iterable(data):
+        result = process_disk_backed(
+            data,
+            _get_length,
+            non_data_output="acc",
+            makecopy=False,
+        )
+        return sum(result)
+
+    raise TypeError(f"Unsupported data type: {type(data)}")
