@@ -180,7 +180,7 @@ def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiI
     return pd.Index(new_cols)
 
 
-def read_csv(filepath, col_subset=None, **kwargs) -> pd.DataFrame:
+def read_csv(filepath, delimiter=",", col_subset=None, **kwargs) -> pd.DataFrame:
     """
     Safe CSV reader that handles missing files and column subsets.
 
@@ -202,7 +202,7 @@ def read_csv(filepath, col_subset=None, **kwargs) -> pd.DataFrame:
         logging.warning(f"File not found: {filepath}")
         return pd.DataFrame()
 
-    df = pd.read_csv(filepath, delimiter=",", **kwargs)
+    df = pd.read_csv(filepath, delimiter=delimiter, **kwargs)
     df.columns = update_column_labels(df.columns)
     if col_subset is not None:
         df = df[col_subset]
