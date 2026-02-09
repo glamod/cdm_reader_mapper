@@ -3,7 +3,31 @@
 Changelog
 =========
 
-2.1.2 (unreleased)
+2.2.2 (unreleased)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ``mdf_reader.read_data`` now supports chunking (:pull:`360`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+* ``DataBundle.stack_v`` and ``DataBundle.stack_h`` only support `pd.DataFrames` as input, otherwise raises an `ValueError` (:pull:`360`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+* re-work internal structure for more readability and better performance (:pull:`360`)
+
+2.2.1 (2026-01-23)
+------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+* ``cdm_reader_mapper.cdm_mapper``: set indexes to input data indexed when setting default values (:pull:`356`)
+
+2.2.0 (2026-01-23)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Joseph Siddons (:user:`jtsiddons`)
 
@@ -22,7 +46,7 @@ New features and enhancements
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
-* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_convert` to helepr function `_map_and_convert` (:pull:`343`)
+* ``cdm_reader_mapper.cdm_mapper``: rename `map_and_convert` to helper function `_map_and_convert` (:pull:`343`)
 * replace `logging.error` with `raise` error statements (:pull:`345`)
 
 Internal changes
