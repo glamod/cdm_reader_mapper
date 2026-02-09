@@ -8,15 +8,11 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-from io import StringIO
 from typing import Iterable, Callable
 
-from cdm_reader_mapper.common.iterators import (
-    process_disk_backed,
-    ParquetStreamReader,
-)
-
 import pandas as pd
+
+from .iterators import process_disk_backed, is_valid_iterable
 
 
 def _split_df(
@@ -75,94 +71,6 @@ def _split_by_index_df(
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
-def _split_text_reader(
-    reader,
-    func: Callable,
-    *args,
-    reset_index=False,
-    inverse=False,
-    return_rejected=False,
-):
-    buffer_sel = StringIO()
-    buffer_rej = StringIO()
-
-    read_params = [
-        "chunksize",
-        "names",
-        "dtype",
-        "parse_dates",
-        "date_parser",
-        "infer_datetime_format",
-    ]
-
-    write_dict = {"header": None, "mode": "a", "index": not reset_index}
-    read_dict = {x: reader.orig_options.get(x) for x in read_params}
-
-    new_args = []
-    new_readers = []
-
-    prev_index_sel = None
-    prev_index_rej = None
-
-    for d in args:
-        if isinstance(d, pd.io.parsers.TextFileReader):
-            new_readers.append(d)
-        else:
-            new_args.append(d)
-
-    readers = [reader] + new_readers
-
-    for zipped in zip(*readers):
-
-        if not isinstance(zipped, tuple):
-            zipped = tuple(zipped)
-
-        sel, rej = func(
-            *zipped,
-            *new_args,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-        sel_prev_index = sel.attrs["_prev_index"]
-
-        if prev_index_sel is None:
-            prev_index_sel = sel_prev_index
-        else:
-            prev_index_sel = prev_index_sel.union(sel_prev_index)
-
-        rej_prev_index = rej.attrs["_prev_index"]
-
-        if prev_index_rej is None:
-            prev_index_rej = rej_prev_index
-        else:
-            prev_index_rej = prev_index_rej.union(rej_prev_index)
-
-        sel.to_csv(buffer_sel, **write_dict)
-        if return_rejected:
-            rej.to_csv(buffer_rej, **write_dict)
-
-    dtypes = {}
-    for col, dtype in sel.dtypes.items():
-        if dtype == "object":
-            dtype = "str"
-        dtypes[col] = dtype
-
-    read_dict["dtype"] = dtypes
-
-    buffer_sel.seek(0)
-    buffer_rej.seek(0)
-
-    selected = pd.read_csv(buffer_sel, **read_dict)
-    rejected = pd.read_csv(buffer_rej, **read_dict)
-
-    selected.attrs = {"_prev_index": prev_index_sel}
-    rejected.attrs = {"_prev_index": prev_index_rej}
-
-    return selected, rejected
-
-
 def _split_dispatch(
     data,
     func: Callable,
@@ -173,20 +81,12 @@ def _split_dispatch(
     if isinstance(data, pd.DataFrame):
         return func(data, *args, **kwargs)
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        return _split_text_reader(
-            data,
-            func,
-            *args,
-            **kwargs,
-        )
-
-    if isinstance(data, ParquetStreamReader):
+    if is_valid_iterable(data):
         return process_disk_backed(
             data,
             func,
-            *args,
-            **kwargs,
+            func_args=args,
+            func_kwargs=kwargs,
         )
 
     raise TypeError(f"Unsupported input type for split operation: {type(data)}.")

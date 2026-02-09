@@ -364,6 +364,8 @@ def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
     if TextFileReader:
         selected = selected.read()
         rejected = rejected.read()
+        
+    print(selected)
 
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
