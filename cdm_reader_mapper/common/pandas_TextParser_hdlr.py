@@ -126,34 +126,3 @@ def is_not_empty(parser: TextFileReader) -> bool | None:
     except StopIteration:
         parser._is_not_empty = False
         return False
-
-
-def get_length(parser: TextFileReader) -> int | None:
-    """
-    Count total rows in a TextFileReader (consuming a copied stream).
-
-    Parameters
-    ----------
-    Parser : pandas.io.parsers.TextFileReader
-        The parser to measure.
-
-    Returns
-    -------
-    int or None
-        Total number of rows, or None if processing fails.
-    """
-    if hasattr(parser, "_row_count"):
-        return parser._row_count
-
-    reader = make_copy(parser)
-    if reader is None:
-        return None
-
-    total = 0
-    try:
-        for chunk in reader:
-            total += len(chunk)
-        parser._row_count = total
-        return total
-    except Exception as e:
-        raise RuntimeError("Failed while counting rows") from e
