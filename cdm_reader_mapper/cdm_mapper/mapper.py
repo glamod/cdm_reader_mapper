@@ -155,6 +155,7 @@ def _transform(
 ) -> pd.Series:
     """Apply a transformation function from imodel_functions to a pandas Series."""
     logger.debug(f"Applying transform: {transform}")
+
     if kwargs:
         logger.debug(f"With kwargs: {', '.join(kwargs.keys())}")
     try:
@@ -213,7 +214,12 @@ def _extract_input_data(idata, elements, cols, default, logger):
     """Extract the relevant input data based on `elements`."""
 
     def _return_default():
-        return pd.Series(_default(default, len(idata))), True
+        if default is None:
+            bool = False
+        else:
+            bool = True
+
+        return pd.Series(_default(default, len(idata))), bool
 
     if not elements:
         return _return_default()
@@ -516,6 +522,15 @@ def map_model(
       DataFrame with MultiIndex columns (cdm_table, column_name).
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+
+    if imodel is None:
+        logger.error("Input data model 'imodel' is not defined.")
+        return
+
+    if not isinstance(imodel, str):
+        logger.error(f"Input data model type is not supported: {type(imodel)}")
+        return
+
     imodel = imodel.split("_")
     if imodel[0] not in properties.supported_data_models:
         logger.error("Input data model " f"{imodel[0]}" " not supported")

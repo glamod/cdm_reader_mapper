@@ -634,11 +634,15 @@ class DataBundle(_DataBundle):
         db_._columns = db_._data.columns
         return self._return_db(db_, inplace)
 
-    def correct_datetime(self, inplace=False) -> DataBundle | None:
+    def correct_datetime(
+        self, imodel=None, inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Correct datetime information in :py:attr:`data`.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with datetime-corrected values in :py:attr:`data`.
@@ -663,12 +667,18 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`correct_datetime`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        db_._data = correct_datetime(db_._data, db_._imodel)
+        db_._data = correct_datetime(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
-    def validate_datetime(self) -> pd.DataFrame:
+    def validate_datetime(self, imodel=None, **kwargs) -> pd.DataFrame:
         """Validate datetime information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
 
         Returns
         -------
@@ -691,13 +701,16 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`validate_datetime`
         """
-        return validate_datetime(self._data, self._imodel)
+        imodel = imodel or self._imodel
+        return validate_datetime(self._data, imodel, **kwargs)
 
-    def correct_pt(self, inplace=False) -> DataBundle | None:
+    def correct_pt(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
         """Correct platform type information in :py:attr:`data`.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with platform-corrected values in :py:attr:`data`.
@@ -722,12 +735,18 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`correct_pt`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        db_._data = correct_pt(db_._data, db_._imodel)
+        db_._data = correct_pt(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
-    def validate_id(self, **kwargs) -> pd.DataFrame:
+    def validate_id(self, imodel=None, **kwargs) -> pd.DataFrame:
         """Validate station id information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
 
         Returns
         -------
@@ -750,13 +769,16 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`validate_id`
         """
-        return validate_id(self._data, self._imodel, **kwargs)
+        imodel = imodel or self._imodel
+        return validate_id(self._data, imodel, **kwargs)
 
-    def map_model(self, inplace=False, **kwargs) -> DataBundle | None:
+    def map_model(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
         """Map :py:attr:`data` to the Common Data Model.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
@@ -775,15 +797,30 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`map_model`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        _tables = map_model(db_._data, db_._imodel, **kwargs)
+        _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
         db_._columns = _tables.columns
         db_._data = _tables
         return self._return_db(db_, inplace)
 
-    def write(self, **kwargs) -> None:
+    def write(
+        self, dtypes=None, parse_dates=None, encoding=None, mode=None, **kwargs
+    ) -> None:
         """Write :py:attr:`data` on disk.
+
+        Parameters
+        ----------
+        dtypes: dict, optional
+          Data types of ``data``.
+        parse_dates: list, optional
+          Information how to parse dates on ``data``
+        encoding: str, optional
+          The encoding of the input file. Overrides the value in the imodel schema file.
+        mode: str, optional
+          Data mode ("data" or "tables")
+          Default: "data"
 
         Examples
         --------
@@ -803,13 +840,17 @@ class DataBundle(_DataBundle):
         If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
         If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
         """
+        dtypes = dtypes or self._dtypes
+        parse_dates = parse_dates or self._parse_dates
+        encoding = encoding or self._encoding
+        mode = mode or self._mode
         write(
             data=self._data,
             mask=self._mask,
-            dtypes=self._dtypes,
-            parse_dates=self._parse_dates,
-            encoding=self._encoding,
-            mode=self._mode,
+            dtypes=dtypes,
+            parse_dates=parse_dates,
+            encoding=encoding,
+            mode=mode,
             **kwargs,
         )
 
@@ -955,7 +996,7 @@ class DataBundle(_DataBundle):
         Returns
         -------
         :py:class:`~DataBundle` or None
-            DataBundle without duplictaed rows or None if ``inplace=True``.
+            DataBundle without duplicated rows or None if ``inplace=True``.
 
         Note
         ----
@@ -986,4 +1027,35 @@ class DataBundle(_DataBundle):
         db_.DupDetect.remove_duplicates(**kwargs)
         header_ = db_.DupDetect.result
         db_._data = db_._data[db_._data.index.isin(header_.index)]
+        return self._return_db(db_, inplace)
+
+    def convert_comma_as_decimal_float(
+        self, columns, inplace=False
+    ) -> DataBundle | None:
+        """Replace commas with dots and convert to floats.
+
+        Parameters
+        ----------
+        columns: list, pd.Index or pd.MultiIndex
+            List of commas to convert.
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing no duplicates.
+            Default: False
+
+        Returns
+        -------
+        :py:class:`~DataBundle` or None
+            DataBundle without converted ffloat entries or None if ``inplace=True``.
+        """
+        if not isinstance(self._data, pd.DataFrame):
+            raise NotImplementedError(
+                f"This function is only implemented for pd.DataFrames, not {type(self._data)}."
+            )
+
+        db_ = self._get_db(inplace)
+        for column in columns:
+            db_._data[column] = (
+                db_[column].astype(str).str.replace(",", ".", regex=False).astype(float)
+            )
         return self._return_db(db_, inplace)
