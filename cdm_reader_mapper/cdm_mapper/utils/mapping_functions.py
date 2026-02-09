@@ -285,7 +285,7 @@ def to_int(value: Any) -> int | pd.NA:
 
 
 class mapping_functions:
-    """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, and IMMT datasets."""
+    """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
 
     def __init__(self, imodel):
         self.imodel = imodel
@@ -503,6 +503,28 @@ class mapping_functions:
         data_1d = series.values.ravel()
         return pd.to_datetime(data_1d, format=format, errors="coerce")
 
+    def datetime_marob(
+        self, series: pd.Series, format: str = "%d.%m.%y %H:%M:%S,%f"
+    ) -> pd.DatetimeIndex:
+        """
+        Convert C-RAID date strings to pandas datetime.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of date strings.
+        format : str, optional
+            Datetime format string (default: "%Y-%m-%d %H:%M:%S.%f").
+
+        Returns
+        -------
+        pd.DatetimeIndex
+            DatetimeIndex of converted dates.
+        """
+        if series.empty:
+            return pd.DatetimeIndex([])
+        return pd.to_datetime(series, format=format, errors="coerce")
+
     def df_col_join(self, df: pd.DataFrame, sep: str) -> pd.Series:
         """
         Join all columns of a pandas DataFrame into a single Series of strings.
@@ -538,6 +560,7 @@ class mapping_functions:
         pd.Series
           Series with negated values.
         """
+        series = series.astype(float)
         return -series
 
     def select_column(self, df: pd.DataFrame) -> pd.Series:
@@ -581,9 +604,9 @@ class mapping_functions:
         pd.Series
           Scaled Series, or empty float Series if input is non-numeric.
         """
-        if pd.api.types.is_numeric_dtype(series):
-            return series * factor
-        return pd.Series(dtype=float, name=series.name)
+        scaled = pd.to_numeric(series, errors="coerce") * factor
+        scaled.name = series.name
+        return scaled
 
     def integer_to_float(self, s: pd.Series) -> pd.Series:
         """
@@ -844,6 +867,54 @@ class mapping_functions:
             result = result.iloc[:, 0]
         return pd.Series(result, dtype=float)
 
+    def velocity_kmh_in_ms(self, series: pd.Series) -> pd.Series:
+        """
+        Convert velocity from kilometers per hour in meters per second.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of velocity in kilometers per hour.
+
+        Returns
+        -------
+        pd.Series
+            Series of velocity in meters per second.
+        """
+        return self.float_scale(series, 1 / 3.6)
+
+    def velocity_kn_in_ms(self, series: pd.Series) -> pd.Series:
+        """
+        Convert velocity from knots in meters per second.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of velocity in kilometers per hour.
+
+        Returns
+        -------
+        pd.Series
+            Series of velocity in meters per second.
+        """
+        return self.float_scale(series, 1852.0 / 3600.0)
+
+    def pressue_hpa_in_pa(self, series: pd.Series) -> pd.Series:
+        """
+        Convert pressure from hPa in Pa.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of presuure in hPa.
+
+        Returns
+        -------
+        pd.Series
+            Series of pressure in Pa.
+        """
+        return self.float_scale(series, 100)
+
     def time_accuracy(self, series: pd.Series) -> pd.Series:
         """
         Map time accuracy codes to seconds.
@@ -970,3 +1041,34 @@ class mapping_functions:
         lon = df["LoLoLoLo"].copy()
         lon[df["Qc"].isin([5, 7])] *= -1
         return lon
+
+    def marob_location_quality(self, df: pd.DataFrame) -> pd.Series:
+        """
+        Get MAROB location quality.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input DataFrame with columns 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG'.
+
+        Returns
+        -------
+        pd.Series
+            Series of location quality flags.
+
+        Raises
+        ------
+        KeyError
+            If required columns are missing.
+        """
+        return np.nan
+        # if (
+        #    "GEOGR_BREITE_FLAG" not in df.columns
+        #    or "GEOGR_LAENGE_FLAG" not in df.columns
+        # ):
+        #    raise KeyError(
+        #        "DataFrame must contain 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG' columns"
+        #    )
+        # lat_flag = df["GEOGR_BREITE_FLAG"]
+        # lon_flag = df["GEOGR_LAENGE_FLAG"]
+        # return pd.Series([None] * len(lat_flag), index=lat_flag.idx)
