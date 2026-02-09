@@ -87,6 +87,7 @@ def _split_dispatch(
             func,
             func_args=args,
             func_kwargs=kwargs,
+            makecopy=False,
         )
 
     raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
