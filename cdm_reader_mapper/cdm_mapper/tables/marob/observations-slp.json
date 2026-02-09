@@ -5,34 +5,31 @@
     }
   },
   "observation_height_above_station_surface": {
-    "sections": "MAROB",
-    "elements": "BAROMETERHOEHE_MSL"
+    "elements": "BAROMETERHOEHE_MSL",
+    "decimal_places": 1
   },
   "observed_variable": {
     "default": 58
   },
   "observation_value": {
-    "sections": "LUFT",
     "elements": "LUFTDRUCK_STATIONSHOEHE",
-    "transform": "float_scale",
-    "kwargs": {
-      "factor": 100
-    },
+    "transform": "pressue_hpa_in_pa",
     "decimal_places": 0
   },
   "units": {
     "default": 32
   },
   "quality_flag": {
-    "sections": "LUFT",
-    "elements": "LUFTDRUCK_STATIONSHOEHE_FLAG"
+    "elements": "LUFTDRUCK_STATIONSHOEHE_FLAG",
+    "code_table": "quality_flag",
+    "fill_value": 2
   },
   "original_units": {
     "default": 530
   },
   "original_value": {
-    "sections": "LUFT",
-    "elements": "LUFTDRUCK_STATIONSHOEHE"
+    "elements": "LUFTDRUCK_STATIONSHOEHE",
+    "decimal_places": 1
   },
   "conversion_method": {
     "default": 7

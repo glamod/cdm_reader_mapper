@@ -5,34 +5,32 @@
     }
   },
   "observation_height_above_station_surface": {
-    "sections": "WIND",
-    "elements": "SENSORHOEHE_WAS_FF"
+    "elements": "SENSORHOEHE_WAS_FF",
+    "decimal_places": 1
   },
   "observed_variable": {
     "default": 107
   },
   "observation_value": {
-    "sections": "WIND",
     "elements": "WINDGESCHWINDIGKEIT",
-    "transform": "float_scale",
-    "kwargs": {
-      "factor": 0.277
-    }
+    "transform": "velocity_kmh_in_ms",
+    "decimal_places": 1
   },
   "units": {
     "default": 731
   },
   "quality_flag": {
-    "sections": "WIND",
-    "elements": "WINDGESCHWINDIGKEIT_FLAG"
+    "elements": "WINDGESCHWINDIGKEIT_FLAG",
+    "code_table": "quality_flag",
+    "fill_value": 2
   },
   "original_precision": {},
   "original_units": {
     "default": 741
   },
   "original_value": {
-    "sections": "WIND",
-    "elements": "WINDGESCHWINDIGKEIT"
+    "elements": "WINDGESCHWINDIGKEIT",
+    "decimal_places": 1
   },
   "conversion_flag": {
     "default": 2

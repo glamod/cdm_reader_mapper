@@ -1,6 +1,5 @@
 {
   "observation_id": {
-    "sections": "MAROB",
     "elements": "ID",
     "transform": "string_add",
     "kwargs": {
@@ -9,7 +8,6 @@
     }
   },
   "report_id": {
-    "sections": "MAROB",
     "elements": "ID",
     "transform": "string_add",
     "kwargs": {
@@ -21,8 +19,8 @@
     "default": 1
   },
   "date_time": {
-    "sections": "MAROB",
-    "elements": "MESSZEIT"
+    "elements": "MESSZEIT",
+    "transform": "datetime_marob"
   },
   "date_time_meaning": {
     "default": 2
@@ -31,12 +29,12 @@
     "default": 8
   },
   "longitude": {
-    "sections": "MAROB",
-    "elements": "GEOGR_LAENGE"
+    "elements": "GEOGR_LAENGE",
+    "decimal_places": 1
   },
   "latitude": {
-    "sections": "MAROB",
-    "elements": "GEOGR_BREITE"
+    "elements": "GEOGR_BREITE",
+    "decimal_places": 1
   },
   "crs": {
     "default": 0
@@ -50,23 +48,13 @@
   "conversion_flag": {
     "default": 2
   },
-  "location_precision": {
-    "sections": "MAROB",
-    "elements": [
-      "GEOGR_LAENGE",
-      "GEOGR_BREITE"
-    ],
-    "transform": "location_accuracy",
-    "decimal_places": 0
-  },
   "spatial_representativeness": {
     "default": 3
   },
   "numerical_precision": {},
   "sensor_automation_status": {
-    "sections": "MAROB",
     "elements": "DATENQUELLE_ID",
-    "transform": "UNKNOWN"
+    "code_table": "sensor_automation_status"
   },
   "exposure_of_sensor": {
     "default": 3
@@ -88,7 +76,6 @@
     "default": 0
   },
   "source_id": {
-    "sections": "MAROB",
     "elements": "DATENQUELLE_ID"
   }
 }

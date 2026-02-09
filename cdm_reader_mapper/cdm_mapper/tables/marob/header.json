@@ -1,6 +1,5 @@
 {
   "report_id": {
-    "sections": "MAROB",
     "elements": "ID",
     "transform": "string_add",
     "kwargs": {
@@ -29,7 +28,6 @@
     "default": 2
   },
   "primary_station_id": {
-    "section": "MAROB",
     "elements": "KENNUNG"
   },
   "station_record_number": {
@@ -39,50 +37,40 @@
     "fill_value": 5
   },
   "longitude": {
-    "sections": "MAROB",
-    "elements": "GEOGR_LAENGE"
+    "elements": "GEOGR_LAENGE",
+    "decimal_places": 1
   },
   "latitude": {
-    "sections": "MAROB",
-    "elements": "GEOGR_BREITE"
-  },
-  "location_accuracy": {
-    "sections": "MAROB",
-    "elements": [
-      "GEOGR_LAENGE",
-      "GEOGR_BREITE"
-    ],
-    "transform": "location_accuracy",
-    "decimal_places": 0
-  },
-  "location_quality": {
-    "fill_value": 3
+    "elements": "GEOGR_BREITE",
+    "decimal_places": 1
   },
   "crs": {
     "default": 0
   },
   "station_speed": {
-    "sections": "NAVIGATION",
-    "elements": "FAHRTGESCHWINDIGKEIT"
+    "elements": "FAHRTGESCHWINDIGKEIT",
+    "transform": "velocity_kn_in_ms",
+    "decimal_places": 2
   },
   "station_course": {
-    "sections": "NAVIGATION",
-    "elements": "FAHRTRICHTUNG"
+    "elements": "FAHRTRICHTUNG",
+    "decimal_places": 0
   },
   "height_of_station_above_local_ground": {
     "default": 0,
     "decimal_places": 1
   },
   "height_of_station_above_sea_level": {
-    "sections": "MAROB",
-    "elements": "STATIONSHOEHE_MSL"
+    "elements": "STATIONSHOEHE_MSL",
+    "fill_value": 0,
+    "decimal_places": 1
   },
   "report_meaning_of_timestamp": {
     "default": 2
   },
   "report_timestamp": {
-    "sections": "MAROB",
-    "elements": "MESSZEIT"
+    "elements": "MESSZEIT",
+    "transform": "datetime_marob"
   },
   "report_duration": {
     "default": 15
@@ -92,8 +80,8 @@
     "decimal_places": 0
   },
   "report_time_quality": {
-    "sections": "MAROB",
-    "elements": "MESSZEIT_FLAG"
+    "elements": "MESSZEIT_FLAG",
+    "code_table": "report_time_quality"
   },
   "report_quality": {
     "default": 2
@@ -108,11 +96,9 @@
     "transform": "lineage"
   },
   "source_id": {
-    "sections": "MAROB",
     "elements": "DATENQUELLE_ID"
   },
   "source_record_id": {
-    "sections": "MAROB",
     "elements": "ID"
   }
 }

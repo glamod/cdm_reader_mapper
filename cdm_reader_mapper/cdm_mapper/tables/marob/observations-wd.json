@@ -5,29 +5,30 @@
     }
   },
   "observation_height_above_station_surface": {
-    "sections": "WIND",
-    "elements": "SENSORHOEHE_WAS_FF"
+    "elements": "SENSORHOEHE_WAS_FF",
+    "decimal_places": 1
   },
   "observed_variable": {
     "default": 106
   },
   "observation_value": {
-    "sections": "WIND",
-    "elements": "WINDRICHTUNG"
+    "elements": "WINDRICHTUNG",
+    "decimal_places": 0
   },
   "units": {
     "default": 320
   },
   "quality_flag": {
-    "sections": "WIND",
-    "elements": "WINDRICHTUNG_FLAG"
+    "elements": "WINDRICHTUNG_FLAG",
+    "code_table": "quality_flag",
+    "fill_value": 2
   },
   "original_units": {
     "default": 320
   },
   "original_value": {
-    "sections": "WIND",
-    "elements": "WINDRICHTUNG"
+    "elements": "WINDRICHTUNG",
+    "decimal_places": 0
   },
   "conversion_flag": {
     "default": 2

@@ -5,14 +5,13 @@
     }
   },
   "observation_height_above_station_surface": {
-    "sections": "LUFT",
-    "elements": "SENSORHOEHE_WAS_TT"
+    "elements": "SENSORHOEHE_WAS_TT",
+    "decimal_places": 1
   },
   "observed_variable": {
     "default": 85
   },
   "observation_value": {
-    "sections": "LUFT",
     "elements": "LUFTTEMPERATUR",
     "transform": "temperature_celsius_to_kelvin",
     "decimal_places": 2
@@ -21,15 +20,16 @@
     "default": 5
   },
   "quality_flag": {
-    "sections": "LUFT",
-    "elements": "LUFTTEMPERATUR_FLAG"
+    "elements": "LUFTTEMPERATUR_FLAG",
+    "code_table": "quality_flag",
+    "fill_value": 2
   },
   "original_units": {
     "default": 60
   },
   "original_value": {
-    "sections": "LUFT",
-    "elements": "LUFTTEMPERATUR"
+    "elements": "LUFTTEMPERATUR",
+    "decimal_places": 1
   },
   "conversion_method": {
     "default": 1
