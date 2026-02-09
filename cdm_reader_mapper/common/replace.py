@@ -19,13 +19,14 @@ Replacement arguments:
 
 from __future__ import annotations
 
+from typing import Iterable
 
 import pandas as pd
 
-from . import logging_hdlr
+from .iterators import process_disk_backed, is_valid_iterable
 
 
-def replace_columns(
+def _replace_columns(
     df_l: pd.DataFrame,
     df_r: pd.DataFrame,
     pivot_c: str | None = None,
@@ -33,73 +34,35 @@ def replace_columns(
     pivot_r: str | None = None,
     rep_c: str | list[str] | None = None,
     rep_map: dict[str, str] | None = None,
-    log_level: str = "INFO",
-) -> pd.DataFrame | None:
-    """
-    Replace columns in one DataFrame using row-matching from another.
-
-    Parameters
-    ----------
-    df_l : pandas.DataFrame
-        The left DataFrame whose columns will be replaced.
-    df_r : pandas.DataFrame
-        The right DataFrame providing replacement values.
-    pivot_c : str, optional
-        A single pivot column present in both DataFrames.
-        Overrides `pivot_l` and `pivot_r`.
-    pivot_l : str, optional
-        Pivot column in `df_l`. Used only when `pivot_c` is not supplied.
-    pivot_r : str, optional
-        Pivot column in `df_r`. Used only when `pivot_c` is not supplied.
-    rep_c : str or list of str, optional
-        One or more column names to replace in `df_l`.
-        Ignored if `rep_map` is supplied.
-    rep_map : dict, optional
-        Mapping between left and right column names as `{left_col: right_col}`.
-    log_level : str, optional
-        Logging level to use.
-
-    Returns
-    -------
-    pandas.DataFrame or None
-        Updated DataFrame with replacements applied, or `None` if validation fails.
-
-    Notes
-    -----
-    This function logs errors and returns `None` instead of raising exceptions.
-    """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
-
+):
+    """Helper function to replace columns in DataFrame."""
     # Check inargs
     if not isinstance(df_l, pd.DataFrame) or not isinstance(df_r, pd.DataFrame):
-        logger.error("Input left and right data must be pandas DataFrames.")
-        return None
+        raise TypeError("Input left and right data must be pandas DataFrames.")
 
     if pivot_c is not None:
         pivot_l = pivot_r = pivot_c
 
     if pivot_l is None or pivot_r is None:
-        logger.error(
+        raise ValueError(
             "Pivot columns must be declared using `pivot_c` or both `pivot_l` and `pivot_r`."
         )
-        return None
 
     if rep_map is None:
         if rep_c is None:
-            logger.error(
+            raise ValueError(
                 "Replacement columns must be declared using `rep_c` or `rep_map`."
             )
-            return None
+
         if isinstance(rep_c, str):
             rep_c = [rep_c]
         rep_map = {col: col for col in rep_c}
 
     missing_cols = [src for src in rep_map.values() if src not in df_r.columns]
     if missing_cols:
-        logger.error(
+        raise ValueError(
             f"Replacement source columns not found in right DataFrame: {missing_cols}."
         )
-        return None
 
     out = df_l.copy()
     right_lookup = (
@@ -116,3 +79,69 @@ def replace_columns(
         out[col] = aligned[col].values
 
     return out
+
+
+def replace_columns(
+    df_l: pd.DataFrame | Iterable[pd.dataFrame],
+    df_r: pd.DataFrame | Iterable[pd.dataFrame],
+    pivot_c: str | None = None,
+    pivot_l: str | None = None,
+    pivot_r: str | None = None,
+    rep_c: str | list[str] | None = None,
+    rep_map: dict[str, str] | None = None,
+) -> pd.DataFrame:
+    """
+    Replace columns in one DataFrame using row-matching from another.
+
+    Parameters
+    ----------
+    df_l : pandas.DataFrame or Iterable[pd.dataFrame]
+        The left DataFrame whose columns will be replaced.
+    df_r : pandas.DataFrame or Iterable[pd.dataFrame]
+        The right DataFrame providing replacement values.
+    pivot_c : str, optional
+        A single pivot column present in both DataFrames.
+        Overrides `pivot_l` and `pivot_r`.
+    pivot_l : str, optional
+        Pivot column in `df_l`. Used only when `pivot_c` is not supplied.
+    pivot_r : str, optional
+        Pivot column in `df_r`. Used only when `pivot_c` is not supplied.
+    rep_c : str or list of str, optional
+        One or more column names to replace in `df_l`.
+        Ignored if `rep_map` is supplied.
+    rep_map : dict, optional
+        Mapping between left and right column names as `{left_col: right_col}`.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Updated DataFrame with replacements applied.
+
+    Notes
+    -----
+    This function logs errors and returns `None` instead of raising exceptions.
+    """
+    kwargs = {
+        "pivot_c": pivot_c,
+        "pivot_l": pivot_l,
+        "pivot_r": pivot_r,
+        "rep_c": rep_c,
+        "rep_map": rep_map,
+    }
+    if isinstance(df_l, pd.DataFrame):
+        return _replace_columns(
+            df_l,
+            df_r,
+            **kwargs,
+        )
+
+    if is_valid_iterable(df_l):
+        return process_disk_backed(
+            df_l,
+            _replace_columns,
+            func_args=df_r,
+            func_kwargs=kwargs,
+            makecopy=False,
+        )
+
+    raise TypeError(f"Unsupported input type for split operation: {type(df_l)}.")
