@@ -284,6 +284,27 @@ def to_int(value: Any) -> int | pd.NA:
         return pd.NA
 
 
+def series_strptime(series: pd.Series, format: str) -> pd.Series:
+    """
+    Convert series with strings to series with datetime.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Series with strings.
+    format : str
+        String time format.
+
+    Returns
+    -------
+    pd.Series
+        Series with datetime
+    """
+    if series.empty:
+        return pd.Series([])
+    return pd.to_datetime(series, format=format, errors="coerce")
+
+
 class mapping_functions:
     """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
 
@@ -498,32 +519,27 @@ class mapping_functions:
         pd.DatetimeIndex
             DatetimeIndex of converted dates.
         """
-        if series.empty:
-            return pd.DatetimeIndex([])
-        data_1d = series.values.ravel()
-        return pd.to_datetime(data_1d, format=format, errors="coerce")
+        return series_strptime(series, format)
 
     def datetime_marob(
         self, series: pd.Series, format: str = "%d.%m.%y %H:%M:%S,%f"
-    ) -> pd.DatetimeIndex:
+    ) -> pd.Series:
         """
-        Convert C-RAID date strings to pandas datetime.
+        Convert MAROB date strings to pandas datetime.
 
         Parameters
         ----------
         series : pd.Series
             Series of date strings.
         format : str, optional
-            Datetime format string (default: "%Y-%m-%d %H:%M:%S.%f").
+            Datetime format string (default: "%d.%m.%y %H:%M:%S,%f").
 
         Returns
         -------
-        pd.DatetimeIndex
-            DatetimeIndex of converted dates.
+        pd.Series
+            Series of converted dates.
         """
-        if series.empty:
-            return pd.DatetimeIndex([])
-        return pd.to_datetime(series, format=format, errors="coerce")
+        return series_strptime(series, format)
 
     def df_col_join(self, df: pd.DataFrame, sep: str) -> pd.Series:
         """
