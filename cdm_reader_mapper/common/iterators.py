@@ -15,6 +15,7 @@ from typing import (
     Generator,
     Iterable,
     Iterator,
+    Literal,
     Mapping,
     Sequence,
     ByteString,
@@ -96,7 +97,6 @@ def _sort_chunk_outputs(
     """Separates DataFrames from metadata in the function output."""
     current_data = []
     new_metadata = []
-
     for out in outputs:
         if isinstance(out, requested_types):
             current_data.append(out)
@@ -105,7 +105,6 @@ def _sort_chunk_outputs(
         elif not accumulators_initialized:
             # Only capture metadata from the first chunk
             new_metadata.append(out)
-
     return current_data, new_metadata
 
 
@@ -187,6 +186,7 @@ def process_disk_backed(
     func_args: Sequence[Any] | None = None,
     func_kwargs: dict[str, Any] | None = None,
     requested_types: type | list[type] | tuple[type] = (pd.DataFrame, pd.Series),
+    non_data_output: Literal["first", "acc"] = "first",
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
     """
@@ -233,8 +233,11 @@ def process_disk_backed(
                 outputs = (outputs,)
 
             # Sort outputs
+            accumulate_outputs = (
+                accumulators_initialized if non_data_output != "acc" else False
+            )
             current_data, new_meta = _sort_chunk_outputs(
-                outputs, accumulators_initialized, requested_types
+                outputs, accumulate_outputs, requested_types
             )
 
             if new_meta:
@@ -264,6 +267,9 @@ def process_disk_backed(
 
         # Transfer ownership to generators
         directories_to_cleanup.clear()
+
+        if non_data_output == "acc" and chunk_counter > 0:
+            output_non_data = [output_non_data]
 
         return tuple(final_iterators + output_non_data)
 
