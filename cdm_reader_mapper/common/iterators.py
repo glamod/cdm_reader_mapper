@@ -6,6 +6,9 @@ import tempfile
 
 import pandas as pd
 
+import pyarrow as pa
+import pyarrow.parquet as pq
+
 from pathlib import Path
 
 from numbers import Number
@@ -74,7 +77,7 @@ class ParquetStreamReader:
         if not chunks:
             return pd.DataFrame()
 
-        return pd.concat(chunks, ignore_index=True)
+        return pd.concat(chunks)
 
     def close(self):
         """Close the stream and release resources."""
@@ -115,9 +118,11 @@ def _write_chunks_to_disk(current_data: list, temp_dirs: list, chunk_counter: in
             if isinstance(data_out, pd.Series):
                 data_out = data_out.to_frame()
             file_path = Path(temp_dirs[i].name) / f"part_{chunk_counter:05d}.parquet"
-            data_out.to_parquet(
-                file_path, engine="pyarrow", compression="snappy", index=False
-            )
+            data_out = data_out.reset_index()
+
+            table = pa.Table.from_pandas(data_out, preserve_index=False)
+
+            pq.write_table(table, file_path, compression="snappy")
 
 
 def _initialize_storage(
@@ -158,6 +163,7 @@ def _parquet_generator(
         files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
         for f in files:
             data = pd.read_parquet(f)
+            data = data.set_index("index")
             if schema is not None:
                 data.columns = schema
 
