@@ -345,12 +345,9 @@ def test_convert_dtype(value, atts, expected):
         ("report_id", [("c98", "UID")], None, False, "idata"),
         ("latitude", [("core", "LAT")], None, True, [None, None, None, None]),
         ("location_quality", [("c1", "LZ")], None, False, "idata"),
-        
     ],
 )
-def test_extract_input_data(
-    data_header, column, elements, default, use_default, exp
-):
+def test_extract_input_data(data_header, column, elements, default, use_default, exp):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     result = _extract_input_data(
         data_header,
@@ -361,7 +358,7 @@ def test_extract_input_data(
     assert isinstance(result, tuple)
 
     assert result[1] is use_default
-    
+
     print(result)
 
     if exp == "idata":
@@ -400,6 +397,7 @@ def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expe
     )
     pd.testing.assert_series_equal(result, pd.Series(expected, name=column))
 
+
 def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     mapping_column = imodel_maps["header"]["history"]
@@ -413,7 +411,8 @@ def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
         "history",
         logger,
     )
-    assert result.str.contains("Initial conversion from ICOADS R3.0.0T").all()  
+    assert result.str.contains("Initial conversion from ICOADS R3.0.0T").all()
+
 
 def test_table_mapping(
     imodel_maps, imodel_functions, data_header, data_header_expected

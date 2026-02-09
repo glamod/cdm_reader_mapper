@@ -443,26 +443,52 @@ def test_datetime_utcnow():
     "df, expected",
     [
         (
-            pd.DataFrame([["2025-11-02 10:30:00.000"]]),
-            pd.DatetimeIndex([pd.Timestamp("2025-11-02 10:30:00")]),
+            pd.Series(["2025-11-02 10:30:00.000"]),
+            pd.Series(pd.Timestamp("2025-11-02 10:30:00")),
         ),
         (
-            pd.DataFrame([["2025-11-02 10:30:00.000"], ["2025-12-03 15:45:00.123"]]),
-            pd.DatetimeIndex(
+            pd.Series(["2025-11-02 10:30:00.000", "2025-12-03 15:45:00.123"]),
+            pd.Series(
                 [
                     pd.Timestamp("2025-11-02 10:30:00"),
                     pd.Timestamp("2025-12-03 15:45:00.123"),
                 ]
             ),
         ),
-        (pd.DataFrame([["invalid"]]), pd.DatetimeIndex([pd.NaT])),
-        (pd.DataFrame([]), pd.DatetimeIndex([])),
+        (pd.Series(["invalid"]), pd.Series([pd.NaT])),
+        (pd.Series([]), pd.Series([])),
     ],
 )
 def test_datetime_craid(df, expected):
     obj = mapping_functions("dummy_model")
     result = obj.datetime_craid(df)
-    pd.testing.assert_index_equal(result, expected)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "df, expected",
+    [
+        (
+            pd.Series(["02.11.25 10:30:00,000"]),
+            pd.Series([pd.Timestamp("2025-11-02 10:30:00")]),
+        ),
+        (
+            pd.Series(["02.11.25 10:30:00,000", "03.12.25 15:45:00,123"]),
+            pd.Series(
+                [
+                    pd.Timestamp("2025-11-02 10:30:00"),
+                    pd.Timestamp("2025-12-03 15:45:00.123"),
+                ]
+            ),
+        ),
+        (pd.Series(["invalid"]), pd.Series([pd.NaT])),
+        (pd.Series([]), pd.Series([])),
+    ],
+)
+def test_datetime_marob(df, expected):
+    obj = mapping_functions("dummy_model")
+    result = obj.datetime_marob(df)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -535,7 +561,11 @@ def test_select_column(df, expected):
             10,
             pd.Series([], dtype=float, name="E"),
         ),
-        (pd.Series(["x", "y", "z"], name="F"), 3, pd.Series([np.nan, np.nan, np.nan], dtype=float, name="F")),
+        (
+            pd.Series(["x", "y", "z"], name="F"),
+            3,
+            pd.Series([np.nan, np.nan, np.nan], dtype=float, name="F"),
+        ),
     ],
 )
 def test_float_scale(input_s, factor, expected):
@@ -820,6 +850,52 @@ def test_string_join_add(df, prepend, append, separator, zfill_col, zfill, expec
 def test_temperature_celsius_to_kelvin(input_df, imodel, expected):
     obj = mapping_functions(imodel)
     result = obj.temperature_celsius_to_kelvin(input_df)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "input_values, expected_values",
+    [
+        ([0, 36, 72], [0.0, 10.0, 20.0]),
+        ([3.6, 7.2], [1.0, 2.0]),
+        ([0], [0.0]),
+    ],
+)
+def test_velocity_kmh_in_ms(input_values, expected_values):
+    obj = mapping_functions("dummy_model")
+    series = pd.Series(input_values)
+    expected = pd.Series(expected_values)
+    result = obj.velocity_kmh_in_ms(series)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "input_values, expected_values",
+    [
+        ([0, 10, 20], [0.0, 5.14444444444, 10.2888888889]),
+        ([1, 2], [0.51444444444, 1.0288888889]),
+    ],
+)
+def test_velocity_kn_in_ms(input_values, expected_values):
+    obj = mapping_functions("dummy_model")
+    series = pd.Series(input_values)
+    expected = pd.Series(expected_values)
+    result = obj.velocity_kn_in_ms(series)
+    pd.testing.assert_series_equal(result, expected, atol=1e-8)
+
+
+@pytest.mark.parametrize(
+    "input_values, expected_values",
+    [
+        ([1013, 1000, 950], [101300, 100000, 95000]),
+        ([0], [0]),
+    ],
+)
+def test_pressure_hpa_in_pa(input_values, expected_values):
+    obj = mapping_functions("dummy_model")
+    series = pd.Series(input_values)
+    expected = pd.Series(expected_values)
+    result = obj.pressue_hpa_in_pa(series)
     pd.testing.assert_series_equal(result, expected)
 
 
