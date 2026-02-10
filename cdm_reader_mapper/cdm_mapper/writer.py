@@ -27,44 +27,59 @@ import os
 import pandas as pd
 
 from pathlib import Path
+from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
+from ..properties import SupportedFileTypes
 
-def _table_to_ascii(
-    data,
-    delimiter="|",
-    encoding="utf-8",
-    col_subset=None,
+
+def _table_to_file(
+    data: pd.DataFrame,
     filename=None,
+    data_format: SupportedFileTypes = "csv",
+    delimiter: str = "|",
+    encoding: str = "utf-8",
+    **kwargs,
 ) -> None:
     data = data.dropna(how="all")
-    header = True
-    wmode = "w"
-    data.to_csv(
-        filename,
-        index=False,
-        sep=delimiter,
-        header=header,
-        mode=wmode,
-        encoding=encoding,
-    )
+    if data_format == "csv":
+        header = True
+        wmode = "w"
+        data.to_csv(
+            filename,
+            index=False,
+            header=header,
+            mode=wmode,
+            sep=delimiter,
+            encoding=encoding,
+            **kwargs,
+        )
+    elif data_format == "parquet":
+        data.to_parquet(filename, **kwargs)
+    elif data_format == "feather":
+        data.to_feather(filename, **kwargs)
+    else:
+        raise ValueError(
+            f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}."
+        )
 
 
 def write_tables(
-    data,
-    out_dir=None,
-    prefix=None,
-    suffix=None,
-    extension="psv",
-    filename=None,
-    cdm_subset=None,
-    col_subset=None,
-    delimiter="|",
-    encoding="utf-8",
+    data: pd.DataFrame,
+    data_format: SupportedFileTypes = "csv",
+    out_dir: str | None = None,
+    prefix: str | None = None,
+    suffix: str | None = None,
+    extension: str | None = None,
+    filename: str | dict | None = None,
+    cdm_subset: str | list | None = None,
+    col_subset: str | list | dict | None = None,
+    delimiter: str = "|",
+    encoding: str = "utf-8",
     **kwargs,
 ) -> None:
     """Write pandas.DataFrame to CDM-table file on file system.
@@ -73,6 +88,8 @@ def write_tables(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
+    data_format: {"csv", "parquet", "feather"}, default: "csv"
+        Format of input data file(s).
     out_dir: str, optional
         Path to the output directory.
         Default: current directory
@@ -80,9 +97,8 @@ def write_tables(
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
     suffix: str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-    extension: str
+    extension: str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-        Default: psv
     filename: str or dict, optional
         Name of the output file name(s).
         List one filename for each table name in ``data`` ({<table>:<filename>}).
@@ -125,6 +141,11 @@ def write_tables(
     Use this function after reading CDM tables.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
+        raise ValueError(
+            f"data_format must be one of {supported_file_types}, not {data_format}."
+        )
 
     cdm_subset = get_cdm_subset(cdm_subset)
 
@@ -144,8 +165,9 @@ def write_tables(
     elif filename is None:
         filename = {}
 
-    if out_dir is None:
-        out_dir = "."
+    out_dir = out_dir or "."
+
+    extension = extension or data_format
 
     for table in cdm_subset:
         if table not in data:
@@ -164,9 +186,10 @@ def write_tables(
             filename_ = os.path.join(out_dir, filename_)
 
         logger.info(f"Writing table {table}: {filename_}")
-        _table_to_ascii(
+        _table_to_file(
             cdm_table,
             delimiter=delimiter,
             encoding=encoding,
             filename=filename_,
+            data_format=data_format,
         )

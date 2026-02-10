@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from io import StringIO
-from typing import Any
+from typing import Any, get_args
 
 import numpy as np
 import pandas as pd
@@ -547,7 +547,7 @@ def map_model(
         return
 
     imodel = imodel.split("_")
-    if imodel[0] not in properties.supported_data_models:
+    if imodel[0] not in get_args(properties.SupportedDataModels):
         logger.error("Input data model " f"{imodel[0]}" " not supported")
         return
 
