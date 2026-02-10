@@ -1,0 +1,12 @@
+{
+  "0": "No QC has been performed",
+  "1": "Manual QC only",
+  "2": "Automated QC only (such as using only MQC)",
+  "3": "Automated QC only (with time sequence checks)",
+  "4": "Manual and automated QC (superficial)",
+  "5": "Manual and automated QC (superficial; with time-sequence checks)",
+  "6": "Manual and automated QC (intensive; with time-sequence checks)",
+  "7": "Reserved",
+  "8": "Reserved",
+  "9": "National system of QC (information to be furnished to WMO)"
+}

@@ -1,0 +1,6 @@
+{
+  "0": "Wind speed estimated (m/s)",
+  "1": "Wind speed obtained from anemometer (m/s)",
+  "3": "Wind speed estimated (knots)",
+  "4": "Wind speed obtained from anemometer (knots)"
+}

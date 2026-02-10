@@ -1,0 +1,8 @@
+{
+  "0": "Positive or zero measured dew-point temperature",
+  "1": "Negative measured dew-point temperature",
+  "2": "Iced measured dew-point temperature",
+  "5": "Positive or zero computed dew-point temperature",
+  "6": "Negative computed dew-point temperature",
+  "7": "Iced computed dew-point temperature"
+}
