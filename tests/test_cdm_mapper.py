@@ -354,7 +354,6 @@ def test_extract_input_data(
     result = _extract_input_data(
         data_header,
         elements,
-        data_header.columns,
         default,
         logger,
     )
@@ -373,13 +372,13 @@ def test_extract_input_data(
 @pytest.mark.parametrize(
     "column, expected",
     [
-        ("duplicate_status", [4, 4, 4, 4]),
-        ("platform_type", [2, 33, 32, 45]),
+        ("duplicate_status", ["4", "4", "4", "4"]),
+        ("platform_type", ["2", "33", "32", "45"]),
         (
             "report_id",
             ["ICOADS-30-5012", "ICOADS-30-8960", "ICOADS-30-0037", "ICOADS-30-1000"],
         ),
-        ("location_quality", [2.0, "0", "0", "0"]),
+        ("location_quality", ["2", "0", "0", "0"]),
         ("latitude", [None, None, None, None]),
     ],
 )
@@ -387,13 +386,12 @@ def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expe
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     mapping_column = imodel_maps["header"][column]
     column_atts = get_cdm_atts("header")["header"][column]
-    result, _ = _column_mapping(
+    result = _column_mapping(
         data_header,
         mapping_column,
         imodel_functions,
         column_atts,
         None,
-        data_header.columns,
         column,
         logger,
     )
@@ -409,7 +407,6 @@ def test_table_mapping(
         data_header,
         imodel_maps["header"],
         table_atts,
-        data_header.columns,
         "null",
         imodel_functions,
         None,
@@ -577,7 +574,7 @@ def test_map_model_pub47():
         "gdac",
     ],
 )
-def test_map_model_test_data(data_model):
+def test_map_model_test_data_basic(data_model):
     _map_model_test_data(data_model)
 
 
