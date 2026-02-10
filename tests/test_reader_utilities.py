@@ -178,9 +178,8 @@ def test_read_csv_file_exists(tmp_csv_file):
 
 def test_read_csv_file_missing(tmp_path):
     missing_file = tmp_path / "missing.csv"
-    df, info = read_csv(missing_file)
-    assert df.empty
-    assert info == {}
+    with pytest.raises(FileNotFoundError):
+        read_csv(missing_file)
 
 
 def test_read_csv_with_col_subset(tmp_csv_file):

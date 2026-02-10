@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from io import StringIO as StringIO
 from pathlib import Path
+from typing import Callable, Any, get_args
+
+import pandas as pd
 
 from cdm_reader_mapper import DataBundle
 
@@ -12,7 +14,15 @@ from ..common.json_dict import open_json_file
 from .utils.filereader import FileReader
 from .utils.utilities import validate_arg
 
-from .utils.utilities import as_list, as_path, read_csv
+from .utils.utilities import as_list, as_path, read_csv, read_parquet, read_feather
+
+from ..properties import SupportedFileTypes
+
+READERS = {
+    "csv": read_csv,
+    "parquet": read_parquet,
+    "feather": read_feather,
+}
 
 
 def validate_read_mdf_args(
@@ -153,8 +163,8 @@ def read_mdf(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    if skiprows is None:
-        skiprows = 0
+    skiprows = skiprows or 0
+
     validate_read_mdf_args(
         source=source,
         imodel=imodel,
@@ -219,12 +229,41 @@ def read_mdf(
     )
 
 
+def _read_data(
+    data_file: str,
+    mask_file: str | None,
+    reader: Callable[..., Any],
+    col_subset: str | list | tuple | None,
+    data_kwargs: dict,
+    mask_kwargs: dict,
+):
+    """Helper function for reading data files from disk."""
+    data, info = reader(
+        data_file,
+        col_subset=col_subset,
+        **data_kwargs,
+    )
+
+    if mask_file is None:
+        mask = pd.DataFrame()
+    else:
+        mask, _ = reader(
+            mask_file,
+            col_subset=col_subset,
+            column_names=info["columns"],
+            **mask_kwargs,
+        )
+
+    return data, mask, info
+
+
 def read_data(
-    source,
-    mask=None,
-    info=None,
-    imodel=None,
-    col_subset=None,
+    data_file: str,
+    mask_file: str | None = None,
+    info_file: str | None = None,
+    data_format: SupportedFileTypes = "csv",
+    imodel: str | None = None,
+    col_subset: str | list | tuple | None = None,
     encoding: str | None = None,
     **kwargs,
 ) -> DataBundle:
@@ -232,12 +271,14 @@ def read_data(
 
     Parameters
     ----------
-    source: str
+    data_file: str
         The data file (including path) to be read.
-    mask: str, optional
+    mask_file: str, optional
         The validation file (including path) to be read.
-    info: str, optional
+    info_file: str, optional
         The information file (including path) to be read.
+    data_format: {"csv", "parquet", "feather"}, default: "csv"
+        Format of input data file(s).
     imodel: str, optional
         Name of internally available input data model.
         e.g. icoads_r300_d704
@@ -267,32 +308,39 @@ def read_data(
     write_data : Write MDF data and validation mask to disk.
     write_tables : Write CDM tables to disk.
     """
-    info_dict = open_json_file(info) if info else {}
-    dtype = info_dict.get("dtypes", "object")
-    parse_dates = info_dict.get("parse_dates", False)
-    encoding = encoding or info_dict.get("encoding", None)
+    supported_file_types = get_args(SupportedFileTypes)
+    if data_format not in supported_file_types:
+        raise ValueError(
+            f"data_format must be one of {supported_file_types}, not {data_format}."
+        )
 
-    pd_kwargs = kwargs.copy()
-    pd_kwargs.setdefault("dtype", dtype)
-    pd_kwargs.setdefault("parse_dates", parse_dates)
-    pd_kwargs.setdefault("encoding", encoding)
+    data_kwargs = kwargs.copy()
+    mask_kwargs = kwargs.copy()
+    parse_dates = False
+    if data_format == "csv":
+        info_dict = open_json_file(info_file) if info_file else {}
+        dtype = info_dict.get("dtypes", "object")
+        parse_dates = info_dict.get("parse_dates", False)
+        encoding = encoding or info_dict.get("encoding", None)
 
-    data, infos = read_csv(
-        source,
+        data_kwargs.setdefault("dtype", dtype)
+        data_kwargs.setdefault("parse_dates", parse_dates)
+        data_kwargs.setdefault("encoding", encoding)
+
+        mask_kwargs.setdefault("dtype", "boolean")
+
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        reader=READERS[data_format],
         col_subset=col_subset,
-        **pd_kwargs,
-    )
-
-    pd_kwargs = kwargs.copy()
-    pd_kwargs.setdefault("dtype", "boolean")
-
-    mask, _ = read_csv(
-        mask, col_subset=col_subset, columns=infos["columns"], **pd_kwargs
+        data_kwargs=data_kwargs,
+        mask_kwargs=mask_kwargs,
     )
     return DataBundle(
         data=data,
-        columns=infos["columns"],
-        dtypes=infos["dtypes"].to_dict(),
+        columns=info["columns"],
+        dtypes=info["dtypes"],
         parse_dates=parse_dates,
         mask=mask,
         imodel=imodel,

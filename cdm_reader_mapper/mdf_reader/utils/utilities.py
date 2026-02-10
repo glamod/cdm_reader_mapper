@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import ast
+
 import logging
+import csv
 import os
 import pandas as pd
 from pathlib import Path
@@ -177,7 +179,7 @@ def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiI
 def update_and_select(
     df: pd.DataFrame,
     subset: str | list | None = None,
-    columns: pd.Index | pd.MultiIndex | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     """
     Update string column labels and select subset from DataFrame.
@@ -200,15 +202,54 @@ def update_and_select(
     df.columns = update_column_labels(df.columns)
     if subset is not None:
         df = df[subset]
-    if columns is not None and not df.empty:
-        df = df.reindex(columns=columns)
+    if column_names is not None and not df.empty:
+        df = df.reindex(columns=column_names)
     return df, {"columns": df.columns, "dtypes": df.dtypes}
+
+
+def _read_data_from_file(
+    filepath: Path,
+    reader: Callable[..., Any],
+    col_subset: str | list | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
+    reader_kwargs: dict | None = None,
+    iterator: bool = False,
+) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
+    """Helper file reader."""
+    if filepath is None or not Path(filepath).is_file():
+        raise FileNotFoundError(f"File not found: {filepath}")
+
+    reader_kwargs = reader_kwargs or {}
+
+    data = reader(filepath, **reader_kwargs)
+
+    if isinstance(data, pd.DataFrame):
+        return update_and_select(data, subset=col_subset, column_names=column_names)
+
+    if iterator is True:
+        writer_kwargs = {}
+        if "encoding" in reader_kwargs:
+            writer_kwargs["encoding"] = reader_kwargs["encoding"]
+
+        return process_textfilereader(
+            data,
+            func=update_and_select,
+            func_kwargs={
+                "subset": col_subset,
+                "column_names": column_names,
+            },
+            read_kwargs=reader_kwargs,
+            write_kwargs=writer_kwargs,
+            makecopy=False,
+        )
+
+    raise ValueError(f"Unsupported reader return type: {type(data)}")
 
 
 def read_csv(
     filepath: Path,
     col_subset: str | list | None = None,
-    columns: pd.Index | pd.MultiIndex | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """
@@ -220,7 +261,7 @@ def read_csv(
         Path to the CSV file.
     col_subset : list of str, optional
         Subset of columns to read from the CSV.
-    columns:
+    column_names:
         Column labels for re-indexing.
     kwargs : any
         Additional keyword arguments passed to pandas.read_csv.
@@ -236,6 +277,96 @@ def read_csv(
         return pd.DataFrame(), {}
 
     data = pd.read_csv(filepath, delimiter=",", **kwargs)
+
+    if isinstance(data, pd.DataFrame):
+        data, info = update_and_select(data, subset=col_subset, columns=columns)
+        return data, info
+
+    data, info = process_disk_backed(
+        data,
+        func=update_and_select,
+        func_kwargs={"subset": col_subset, "columns": columns},
+        makecopy=False,
+    )
+    return data, info
+
+
+def read_parquet(
+    filepath: Path,
+    col_subset: str | list | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
+    **kwargs,
+) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
+    """
+    Safe CSV reader that handles missing files and column subsets.
+
+    Parameters
+    ----------
+    filepath : str or Path or None
+        Path to the CSV file.
+    col_subset : list of str, optional
+        Subset of columns to read from the CSV.
+    column_names:
+        Column labels for re-indexing.
+    kwargs : any
+        Additional keyword arguments passed to pandas.read_csv.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict]
+        - The PARQUET as a DataFrame. Empty if file does not exist.
+        - dictionary containing data column labels and data types
+    """
+    if filepath is None or not Path(filepath).is_file():
+        logging.warning(f"File not found: {filepath}")
+        return pd.DataFrame(), {}
+
+    data = pd.read_parquet(filepath, **kwargs)
+
+    if isinstance(data, pd.DataFrame):
+        data, info = update_and_select(data, subset=col_subset, columns=columns)
+        return data, info
+
+    data, info = process_disk_backed(
+        data,
+        func=update_and_select,
+        func_kwargs={"subset": col_subset, "columns": columns},
+        makecopy=False,
+    )
+    return data, info
+
+
+def read_feather(
+    filepath: Path,
+    col_subset: str | list | None = None,
+    column_names: pd.Index | pd.MultiIndex | None = None,
+    **kwargs,
+) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
+    """
+    Safe CSV reader that handles missing files and column subsets.
+
+    Parameters
+    ----------
+    filepath : str or Path or None
+        Path to the CSV file.
+    col_subset : list of str, optional
+        Subset of columns to read from the CSV.
+    column_names:
+        Column labels for re-indexing.
+    kwargs : any
+        Additional keyword arguments passed to pandas.read_csv.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict]
+        - The CSV as a DataFrame. Empty if file does not exist.
+        - dictionary containing data column labels and data types
+    """
+    if filepath is None or not Path(filepath).is_file():
+        logging.warning(f"File not found: {filepath}")
+        return pd.DataFrame(), {}
+
+    data = pd.read_feather(filepath, **kwargs)
 
     if isinstance(data, pd.DataFrame):
         data, info = update_and_select(data, subset=col_subset, columns=columns)

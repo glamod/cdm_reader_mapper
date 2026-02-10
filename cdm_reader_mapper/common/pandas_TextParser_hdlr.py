@@ -1,6 +1,7 @@
 """Utilities for handling pandas TextParser objects safely."""
 
 from __future__ import annotations
+
 import pandas as pd
 from pandas.io.parsers import TextFileReader
 from io import StringIO
@@ -8,7 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-_READ_CSV_KWARGS = [
+READ_CSV_KWARGS = [
     "chunksize",
     "names",
     "dtype",
@@ -46,7 +47,7 @@ def _new_reader_from_buffer(parser: TextFileReader) -> TextFileReader | None:
 
     read_dict = read_dict = {
         k: parser.orig_options.get(k)
-        for k in _READ_CSV_KWARGS
+        for k in READ_CSV_KWARGS
         if k in parser.orig_options
     }
     return pd.read_csv(StringIO(raw), **read_dict)

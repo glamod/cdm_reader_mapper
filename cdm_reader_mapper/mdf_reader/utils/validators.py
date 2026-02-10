@@ -6,11 +6,14 @@ import logging
 import numpy as np
 import pandas as pd
 
-from typing import Any, Iterable
+from typing import Any, Iterable, get_args
 
 from .. import properties
 from ..codes import codes
 from .utilities import convert_str_boolean
+
+
+numeric_types = get_args(properties.NumericTypes)
 
 
 def _is_false(x: Any) -> bool:
@@ -173,7 +176,7 @@ def validate(
     }
 
     validated_columns = []
-    validated_dtypes = set(properties.numeric_types) | {"datetime", "key"}
+    validated_dtypes = set(numeric_types) | {"datetime", "key"}
 
     basic_functions = {
         "datetime": validate_datetime,
@@ -188,7 +191,7 @@ def validate(
         column_atts = element_atts.get(column, {})
         column_type = column_atts.get("column_type")
 
-        if column_type in properties.numeric_types:
+        if column_type in numeric_types:
             valid_min = column_atts.get("valid_min", -np.inf)
             valid_max = column_atts.get("valid_max", np.inf)
             column_mask = validate_numeric(series, valid_min, valid_max)
