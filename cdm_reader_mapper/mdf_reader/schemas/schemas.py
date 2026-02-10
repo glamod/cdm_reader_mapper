@@ -10,7 +10,7 @@ requirements of the data reader tool
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, get_args
 
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
@@ -109,7 +109,7 @@ def _resolve_schema_files(
     if imodel:
         parts = imodel.split("_")
         model = parts[0]
-        if model not in properties.supported_data_models:
+        if model not in get_args(properties.SupportedDataModels):
             raise ValueError(f"Input data model {model} not supported")
 
         return collect_json_files(*parts, base=f"{properties._base}.schemas")

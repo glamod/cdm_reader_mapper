@@ -132,6 +132,7 @@ def _get_test_data(imodel):
         suffix=f"{imodel}*",
         cdm_subset="header",
         mode="tables",
+        extension="psv",
     )
 
 

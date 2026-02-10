@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..properties import numeric_types, object_types, supported_data_models  # noqa
+from ..properties import NumericTypes, ObjectTypes, SupportedDataModels  # noqa
 
 _base = "cdm_reader_mapper.cdm_mapper"
 
