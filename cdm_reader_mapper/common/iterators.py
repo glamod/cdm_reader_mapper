@@ -25,10 +25,13 @@ from typing import (
 class ParquetStreamReader:
     """A wrapper that mimics pandas.io.parsers.TextFileReader."""
 
-    def __init__(self, generator: Iterator[pd.DataFrame | pd.Series]):
+    def __init__(
+        self, generator: Iterator[pd.DataFrame | pd.Series], reset_index=False
+    ):
         self._generator = generator
         self._closed = False
         self._buffer = []
+        self._reset_index = reset_index
 
     def __iter__(self):
         """Allows: for df in reader: ..."""
@@ -60,7 +63,9 @@ class ParquetStreamReader:
         except StopIteration:
             raise ValueError("No more data to read (End of stream).")
 
-    def read(self):
+    def read(
+        self,
+    ):
         """
         WARNING: unsafe for Files > RAM.
         Reads ALL remaining data into memory at once.
@@ -75,7 +80,7 @@ class ParquetStreamReader:
             return pd.DataFrame()
 
         df = pd.concat(chunks)
-        if df.index.has_duplicates:
+        if self._reset_index is True:
             df = df.reset_index(drop=True)
         return df
 
@@ -201,6 +206,7 @@ def process_disk_backed(
     func_kwargs: dict[str, Any] | None = None,
     requested_types: type | list[type] | tuple[type] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
+    reset_index=False,
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
     """
@@ -294,7 +300,7 @@ def process_disk_backed(
 
         # Finalize Iterators
         final_iterators = [
-            ParquetStreamReader(_parquet_generator(d, t, s))
+            ParquetStreamReader(_parquet_generator(d, t, s), reset_index=reset_index)
             for d, (t, s) in zip(temp_dirs, column_schemas)
         ]
 

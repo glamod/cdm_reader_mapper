@@ -20,50 +20,15 @@ from typing import Any, get_args
 import numpy as np
 import pandas as pd
 
-from pandas.io.parsers import TextFileReader
+from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common.iterators import is_valid_iterable, process_disk_backed
 
 from . import properties
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps
 from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
-
-
-def _check_input_data_type(data, logger):
-    """Check whether inpuit data type is valid."""
-
-    def _log_and_return_empty(msg):
-        logger.error(msg)
-
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if data.empty:
-            return _log_and_return_empty("Input data is empty")
-        return [data]
-
-    elif isinstance(data, TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        if not pandas_TextParser_hdlr.is_not_empty(data):
-            return _log_and_return_empty("Input data is empty")
-
-        return data
-
-    return _log_and_return_empty("Input data type " f"{type(data)}" " not supported")
-
-
-def _normalize_input_data(data, logger):
-    """Return an iterator of DataFrames irrespective of input type."""
-    data = _check_input_data_type(data, logger)
-
-    if data is None:
-        return iter(())
-
-    if isinstance(data, list):
-        return iter(data)
-
-    return data
 
 
 def _is_empty(value):
@@ -364,7 +329,7 @@ def _prepare_cdm_tables(cdm_subset):
     return tables
 
 
-def _process_chunk(
+def _map_data_model(
     idata,
     imodel_maps,
     imodel_functions,
@@ -375,9 +340,14 @@ def _process_chunk(
     drop_missing_obs,
     drop_duplicates,
     logger,
-    is_reader,
 ):
     """Process one chunk of input data."""
+    if ":" in idata.columns[0]:
+        idata.columns = pd.MultiIndex.from_tuples(
+            col.split(":") for col in idata.columns
+        )
+
+    all_tables = []
     for table, mapping in imodel_maps.items():
         logger.debug(f"Table: {table}")
 
@@ -395,91 +365,10 @@ def _process_chunk(
         )
 
         table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
+        table_df = table_df.astype(object)
+        all_tables.append(table_df)
 
-        if is_reader:
-            table_df.to_csv(
-                cdm_tables[table]["buffer"],
-                header=False,
-                index=False,
-                mode="a",
-            )
-            cdm_tables[table]["columns"] = table_df.columns
-        else:
-            cdm_tables[table]["df"] = table_df.astype(object)
-
-
-def _finalize_output(cdm_tables, logger):
-    """Turn buffers into DataFrames and combine all tables."""
-    final_tables = []
-
-    for table, meta in cdm_tables.items():
-        logger.debug(f"\tParse datetime by reader; Table: {table}")
-
-        if "df" not in meta:
-            meta["buffer"].seek(0)
-            df = pd.read_csv(
-                meta["buffer"],
-                names=meta["columns"],
-                na_values=[],
-                dtype="object",
-                keep_default_na=False,
-            )
-            meta["buffer"].close()
-        else:
-            df = meta.get("df", pd.DataFrame())
-
-        final_tables.append(df)
-
-    if not final_tables:
-        return pd.DataFrame()
-
-    return pd.concat(final_tables, axis=1, join="outer").reset_index(drop=True)
-
-
-def _map_and_convert(
-    data_model,
-    *sub_models,
-    data=None,
-    cdm_subset=None,
-    codes_subset=None,
-    cdm_complete=True,
-    drop_missing_obs=True,
-    drop_duplicates=True,
-    null_label="null",
-    logger=None,
-) -> pd.DataFrame:
-    """Map and convert MDF data to CDM tables."""
-    data_iter = _normalize_input_data(data, logger)
-
-    if data_iter is None:
-        return pd.DataFrame()
-
-    if not cdm_subset:
-        cdm_subset = properties.cdm_tables
-
-    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
-    imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
-
-    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
-
-    is_reader = isinstance(data_iter, TextFileReader)
-
-    for idata in data_iter:
-        _process_chunk(
-            idata=idata,
-            imodel_maps=imodel_maps,
-            imodel_functions=imodel_functions,
-            cdm_tables=cdm_tables,
-            null_label=null_label,
-            codes_subset=codes_subset,
-            cdm_complete=cdm_complete,
-            drop_missing_obs=drop_missing_obs,
-            drop_duplicates=drop_duplicates,
-            logger=logger,
-            is_reader=is_reader,
-        )
-
-    return _finalize_output(cdm_tables, logger)
+    return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
 
 
 def map_model(
@@ -532,20 +421,49 @@ def map_model(
       DataFrame with MultiIndex columns (cdm_table, column_name).
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    imodel = imodel.split("_")
-    if imodel[0] not in get_args(properties.SupportedDataModels):
-        logger.error("Input data model " f"{imodel[0]}" " not supported")
-        return
 
-    return _map_and_convert(
-        imodel[0],
-        *imodel[1:],
-        data=data,
-        cdm_subset=cdm_subset,
-        codes_subset=codes_subset,
-        null_label=null_label,
-        cdm_complete=cdm_complete,
-        drop_missing_obs=drop_missing_obs,
-        drop_duplicates=drop_duplicates,
-        logger=logger,
-    )
+    data_model = imodel.split("_")
+    if data_model[0] not in get_args(properties.SupportedDataModels):
+        raise ValueError("Input data model " f"{data_model[0]}" " not supported")
+
+    if not cdm_subset:
+        cdm_subset = properties.cdm_tables
+
+    imodel_maps = get_imodel_maps(*data_model, cdm_tables=cdm_subset)
+    imodel_functions = mapping_functions(imodel)
+
+    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
+
+    if isinstance(data, pd.DataFrame):
+        return _map_data_model(
+            idata=data,
+            imodel_maps=imodel_maps,
+            imodel_functions=imodel_functions,
+            cdm_tables=cdm_tables,
+            null_label=null_label,
+            codes_subset=codes_subset,
+            cdm_complete=cdm_complete,
+            drop_missing_obs=drop_missing_obs,
+            drop_duplicates=drop_duplicates,
+            logger=logger,
+        )
+
+    if is_valid_iterable(data):
+        return process_disk_backed(
+            data,
+            _map_data_model,
+            func_kwargs={
+                "imodel_maps": imodel_maps,
+                "imodel_functions": imodel_functions,
+                "cdm_tables": cdm_tables,
+                "null_label": null_label,
+                "codes_subset": codes_subset,
+                "cdm_complete": cdm_complete,
+                "drop_missing_obs": drop_missing_obs,
+                "drop_duplicates": drop_duplicates,
+                "logger": logger,
+            },
+            reset_index=True,
+        )[0]
+
+    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
