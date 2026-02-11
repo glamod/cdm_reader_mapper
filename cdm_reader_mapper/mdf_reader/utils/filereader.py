@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import logging
 
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence, Iterable
 
 import pandas as pd
 import xarray as xr
 
 from dataclasses import replace
-from pandas.io.parsers import TextFileReader
 
 from .. import properties
 from .utilities import remove_boolean_values
@@ -27,11 +26,11 @@ from .parser import (
 )
 
 from cdm_reader_mapper.core.databundle import DataBundle
-from cdm_reader_mapper.common.iterators import ParquetStreamReader, process_disk_backed
+from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterable
 
 
 def _apply_or_chunk(
-    data: pd.DataFrame | TextFileReader,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
     func: Callable[..., Any],
     func_args: Sequence[Any] | None = None,
     func_kwargs: Mapping[str, Any] | None = None,
@@ -40,10 +39,10 @@ def _apply_or_chunk(
     """Apply a function directly or chunk-wise.  If data is an iterator, it uses disk-backed streaming."""
     func_args = func_args or []
     func_kwargs = func_kwargs or {}
-    if not isinstance(data, (TextFileReader, ParquetStreamReader)):
-        result = func(data, *func_args, **func_kwargs)
-    else:
-        result = process_disk_backed(
+    if isinstance(data, pd.DataFrame):
+        return func(data, *func_args, **func_kwargs)
+    if is_valid_iterable(data):
+        return process_disk_backed(
             data,
             func,
             func_args,
@@ -51,7 +50,7 @@ def _apply_or_chunk(
             **kwargs,
         )
 
-    return result
+    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
 
 
 def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
@@ -134,7 +133,7 @@ class FileReader:
 
     def _process_data(
         self,
-        data: pd.DataFrame | TextFileReader,
+        data: pd.DataFrame | Iterable[pd.DataFrame],
         convert_flag: bool = False,
         decode_flag: bool = False,
         converter_dict: dict | None = None,
@@ -154,7 +153,7 @@ class FileReader:
 
         Parameters
         ----------
-        data : pandas.DataFrame or TextFileReader
+        data : pandas.DataFrame or Iterable[pd.DataFrame]
             Input data.
         convert_flag : bool
             Whether to apply converters.
@@ -247,7 +246,7 @@ class FileReader:
         select_kwargs: dict | None = None,
     ) -> (
         tuple[pd.DataFrame, pd.DataFrame, ParserConfig]
-        | tuple[TextFileReader, TextFileReader, ParserConfig]
+        | tuple[Iterable[pd.DataFrame], Iterable[pd.DataFrame], ParserConfig]
     ):
         """
         Open and parse source data according to parser configuration.
@@ -274,7 +273,7 @@ class FileReader:
         Returns
         -------
         tuple
-            (data, mask, config) or chunked equivalents if using TextFileReader.
+            (data, mask, config) or chunked equivalents if using Iterable[pd.DataFrame].
         """
         pd_kwargs = dict(pd_kwargs or {})
         xr_kwargs = dict(xr_kwargs or {})
