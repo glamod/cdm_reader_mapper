@@ -375,6 +375,9 @@ class FileReader:
 
         data, mask, config = result
 
+        if isinstance(config, dict) and 0 in config and isinstance(config[0], list):
+            config = config[0][0]
+
         return DataBundle(
             data=data,
             columns=config.columns,

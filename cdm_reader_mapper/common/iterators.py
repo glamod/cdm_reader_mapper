@@ -11,7 +11,6 @@ import pyarrow.parquet as pq
 
 from pathlib import Path
 
-from numbers import Number
 from typing import (
     Any,
     Callable,
@@ -19,9 +18,7 @@ from typing import (
     Iterable,
     Iterator,
     Literal,
-    Mapping,
     Sequence,
-    ByteString,
 )
 
 
@@ -77,7 +74,10 @@ class ParquetStreamReader:
         if not chunks:
             return pd.DataFrame()
 
-        return pd.concat(chunks)
+        df = pd.concat(chunks)
+        if df.index.has_duplicates:
+            df = df.reset_index(drop=True)
+        return df
 
     def close(self):
         """Close the stream and release resources."""
@@ -108,6 +108,7 @@ def _sort_chunk_outputs(
         elif not accumulators_initialized:
             # Only capture metadata from the first chunk
             new_metadata.append(out)
+
     return current_data, new_metadata
 
 
@@ -156,6 +157,11 @@ def _parquet_generator(
     temp_dir_obj, data_type, schema
 ) -> Generator[pd.DataFrame | pd.Series]:
     """Yields DataFrames from a temp directory, restoring schema."""
+
+    def _is_tuple_like(s):
+        s = s.strip()
+        return s.startswith("(") and s.endswith(")")
+
     if isinstance(schema, (tuple, list)):
         schema = [schema]
 
@@ -163,7 +169,9 @@ def _parquet_generator(
         files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
         for f in files:
             data = pd.read_parquet(f)
-            data = data.set_index("index")
+            idx = "('index', '')" if _is_tuple_like(data.columns[0]) else "index"
+            if idx in data.columns:
+                data = data.set_index(idx).rename_axis(None)
             if schema is not None:
                 data.columns = schema
 
@@ -179,9 +187,9 @@ def _parquet_generator(
 
 def is_valid_iterable(reader: Any) -> bool:
     """Check if reader is a valid Iterable."""
-    if not isinstance(reader, Iterable):
+    if not isinstance(reader, Iterator):
         return False
-    if isinstance(reader, (Number, Mapping, ByteString, str)):
+    if not isinstance(reader, Iterable):
         return False
     return True
 
@@ -207,34 +215,44 @@ def process_disk_backed(
     # State variables
     temp_dirs: list[tempfile.TemporaryDirectory] = []
     column_schemas = []
-    output_non_data = []
+    output_non_data = {}
     directories_to_cleanup = []
 
     if not isinstance(requested_types, (list, tuple)):
         requested_types = (requested_types,)
 
-    reader = iter(reader)
+    args_reader = []
+    args = []
+    for arg in func_args:
+        if is_valid_iterable(arg):
+            args_reader.append(arg)
+        else:
+            args.append(arg)
 
-    try:
-        first = next(reader)
-    except StopIteration:
-        raise ValueError("Iterable is empty.")
+    kwargs = {}
+    for k, v in func_kwargs.items():
+        if is_valid_iterable(v):
+            args_reader.append(v)
+        else:
+            kwargs[k] = v
+
+    readers = [reader] + args_reader
 
     try:
         accumulators_initialized = False
         chunk_counter = 0
 
-        for data in [first] + list(reader):
-            if not isinstance(data, requested_types):
+        for items in zip(*readers):
+            if not isinstance(items[0], requested_types):
                 raise TypeError(
-                    "Unsupported data type in Iterable: {type(data)}"
+                    "Unsupported data type in Iterable: {type(items[0])}"
                     "Requested types are: {requested_types} "
                 )
 
             if makecopy:
-                data = data.copy()
+                items = tuple(df.copy() for df in items)
 
-            outputs = func(data, *func_args, **func_kwargs)
+            outputs = func(*items, *args, **kwargs)
             if not isinstance(outputs, tuple):
                 outputs = (outputs,)
 
@@ -247,7 +265,13 @@ def process_disk_backed(
             )
 
             if new_meta:
-                output_non_data.extend(new_meta)
+                j = 0
+                for meta in new_meta:
+                    if j in output_non_data:
+                        output_non_data[j].append(meta)
+                    else:
+                        output_non_data[j] = [meta]
+                    j += 1
 
             # Initialize storage
             if not accumulators_initialized and current_data:
@@ -262,8 +286,11 @@ def process_disk_backed(
 
             chunk_counter += 1
 
+        if chunk_counter == 0:
+            raise ValueError("Iterable is empty.")
+
         if not accumulators_initialized:
-            return tuple(output_non_data)
+            return output_non_data
 
         # Finalize Iterators
         final_iterators = [
@@ -274,10 +301,7 @@ def process_disk_backed(
         # Transfer ownership to generators
         directories_to_cleanup.clear()
 
-        if non_data_output == "acc" and chunk_counter > 0:
-            output_non_data = [output_non_data]
-
-        return tuple(final_iterators + output_non_data)
+        return tuple(final_iterators + [output_non_data])
 
     finally:
         for d in directories_to_cleanup:

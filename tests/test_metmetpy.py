@@ -7,6 +7,8 @@ import pytest
 
 from io import StringIO
 
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
+
 from cdm_reader_mapper.metmetpy import properties
 from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
 from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
@@ -663,11 +665,13 @@ def test_correct_datetime_series():
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2), {1, 2}])
 def test_correct_datetime_invalid_iterable_entries(data):
-    with pytest.raises(TypeError, match="Unsupported data type in Iterable"):
+    with pytest.raises(TypeError, match="Unsupported data type"):
         correct_datetime(data, "icoads_r300_d201")
 
 
-@pytest.mark.parametrize("data", [[], ()])
+@pytest.mark.parametrize(
+    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
+)
 def test_correct_datetime_empty_iterable(data):
     with pytest.raises(ValueError, match="Iterable is empty."):
         correct_datetime(data, "icoads_r300_d201")
@@ -676,7 +680,7 @@ def test_correct_datetime_empty_iterable(data):
 def test_correct_datetime_valid_iterable():
     df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
     df2 = pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]})
-    result = correct_datetime([df1, df2], "icoads_r300_d201")
+    result = correct_datetime(iter([df1, df2]), "icoads_r300_d201")
 
     exp = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
     pd.testing.assert_frame_equal(result.read(), exp)
@@ -767,11 +771,13 @@ def test_correct_pt_series():
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2), {1, 2}])
 def test_correct_pt_invalid_iterable_entries(data):
-    with pytest.raises(TypeError, match="Unsupported data type in Iterable"):
+    with pytest.raises(TypeError, match="Unsupported data type"):
         correct_pt(data, "icoads_r300_d993")
 
 
-@pytest.mark.parametrize("data", [[], ()])
+@pytest.mark.parametrize(
+    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
+)
 def test_correct_pt_empty_iterable(data):
     with pytest.raises(ValueError, match="Iterable is empty."):
         correct_pt(data, "icoads_r300_d993")
@@ -780,7 +786,7 @@ def test_correct_pt_empty_iterable(data):
 def test_correct_pt_valid_iterable():
     df1 = pd.DataFrame({PT: [None, "7", None]})
     df2 = pd.DataFrame({PT: ["6", "7", None]})
-    result = correct_pt([df1, df2], "icoads_r300_d993")
+    result = correct_pt(iter([df1, df2]), "icoads_r300_d993")
 
     exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
     pd.testing.assert_frame_equal(result.read(), exp)

@@ -22,7 +22,6 @@ def _split_df(
     inverse: bool = False,
     return_rejected: bool = False,
 ):
-
     if inverse:
         selected = df[~mask]
         rejected = df[mask] if return_rejected else df.iloc[0:0]
@@ -30,14 +29,14 @@ def _split_df(
         selected = df[mask]
         rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
-    selected.attrs["_prev_index"] = mask.index[mask]
-    rejected.attrs["_prev_index"] = mask.index[~mask]
+    selected_idx = mask.index[mask]
+    rejected_idx = mask.index[~mask]
 
     if reset_index:
         selected = selected.reset_index(drop=True)
         rejected = rejected.reset_index(drop=True)
 
-    return selected, rejected
+    return selected, rejected, selected_idx, rejected_idx
 
 
 def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs):
@@ -56,6 +55,7 @@ def _split_by_column_df(
     **kwargs,
 ):
     mask_sel = df[col].isin(values)
+    mask_sel.name = col
 
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
@@ -67,7 +67,6 @@ def _split_by_index_df(
 ):
     index = pd.Index(index if isinstance(index, Iterable) else [index])
     mask_sel = pd.Series(df.index.isin(index), index=df.index)
-
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
@@ -77,18 +76,23 @@ def _split_dispatch(
     *args,
     **kwargs,
 ):
-
     if isinstance(data, pd.DataFrame):
         return func(data, *args, **kwargs)
 
     if is_valid_iterable(data):
-        return process_disk_backed(
+        selected, rejected, out_dict = process_disk_backed(
             data,
             func,
             func_args=args,
             func_kwargs=kwargs,
             makecopy=False,
+            non_data_output="acc",
         )
+
+        selected_idx = pd.Index([]).append(out_dict[0])
+        rejected_idx = pd.Index([]).append(out_dict[1])
+
+        return selected, rejected, selected_idx, rejected_idx
 
     raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
 

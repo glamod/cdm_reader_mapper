@@ -195,14 +195,14 @@ def tmp_json_file(tmp_path):
 
 def test_split_df(sample_df):
     mask = pd.Series([True, False, False, True, False], index=sample_df.index)
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
 
 def _test_split_df_false_mask(sample_df):
     mask = pd.Series([False, False, False, False, False], index=sample_df.index)
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
@@ -219,7 +219,7 @@ def test_split_df_multiindex(sample_df):
             ("C", "c"),
         ]
     )
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
@@ -235,7 +235,7 @@ def test_split_by_boolean_df(
     sample_df, column, boolean, expected_selected, expected_rejected
 ):
     mask = sample_df[[column]]
-    selected, rejected = _split_by_boolean_df(
+    selected, rejected, _, _ = _split_by_boolean_df(
         sample_df, mask, boolean=boolean, return_rejected=True
     )
     assert list(selected.index) == expected_selected
@@ -244,7 +244,7 @@ def test_split_by_boolean_df(
 
 def test_split_by_boolean_df_empty_mask(sample_df):
     mask = pd.DataFrame(columns=sample_df.columns)
-    selected, rejected = _split_by_boolean_df(
+    selected, rejected, _, _ = _split_by_boolean_df(
         sample_df, mask, boolean=True, return_rejected=True
     )
     assert list(selected.index) == list(sample_df.index)
@@ -262,7 +262,7 @@ def test_split_by_boolean_df_empty_mask(sample_df):
 def test_split_by_column_df(
     sample_df, col, values, return_rejected, expected_selected, expected_rejected
 ):
-    selected, rejected = _split_by_column_df(
+    selected, rejected, _, _ = _split_by_column_df(
         sample_df, col, values, return_rejected=return_rejected
     )
     assert list(selected.index) == expected_selected
@@ -285,7 +285,7 @@ def test_split_by_index_df(
     expected_selected,
     expected_rejected,
 ):
-    selected, rejected = _split_by_index_df(
+    selected, rejected, _, _ = _split_by_index_df(
         sample_df, index_list, inverse=inverse, return_rejected=return_rejected
     )
     assert list(selected.index) == expected_selected
@@ -299,7 +299,7 @@ def test_split_wrapper_index(sample_df, sample_reader, TextFileReader):
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data, _split_by_index_df, [11, 13], return_rejected=True
     )
 
@@ -318,7 +318,7 @@ def test_split_wrapper_column(sample_df, sample_reader, TextFileReader):
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data, _split_by_column_df, "B", ["y"], return_rejected=True
     )
 
@@ -337,7 +337,7 @@ def test_split_wrapper_boolean(sample_df, sample_reader, boolean_mask, TextFileR
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data,
         _split_by_boolean_df,
         boolean_mask[["mask1"]],
@@ -359,20 +359,18 @@ def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
         data = sample_reader
     else:
         data = sample_df
-    selected, rejected = split_by_index(data, [11, 13], return_rejected=True)
+    selected, rejected, _, _ = split_by_index(data, [11, 13], return_rejected=True)
 
     if TextFileReader:
         selected = selected.read()
         rejected = rejected.read()
-
-    print(selected)
 
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
 
 
 def test_split_by_index_multiindex(sample_reader_multi):
-    selected, rejected = split_by_index(
+    selected, rejected, _, _ = split_by_index(
         sample_reader_multi, [11, 13], return_rejected=True
     )
 
@@ -390,7 +388,7 @@ def test_split_by_column_entries_basic(sample_df, sample_reader, TextFileReader)
     else:
         data = sample_df
 
-    selected, rejected = split_by_column_entries(
+    selected, rejected, _, _ = split_by_column_entries(
         data, {"B": ["y"]}, return_rejected=True
     )
 
@@ -411,7 +409,7 @@ def test_split_by_boolean_basic_false(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, boolean_mask, boolean=False, return_rejected=True
     )
 
@@ -432,7 +430,7 @@ def test_split_by_boolean_basic_true(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, boolean_mask, boolean=True, return_rejected=True
     )
 
@@ -453,7 +451,7 @@ def test_split_by_boolean_true_basic(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean_true(
+    selected, rejected, _, _ = split_by_boolean_true(
         data, boolean_mask_true, return_rejected=True
     )
 
@@ -474,7 +472,7 @@ def test_split_by_boolean_false_basic(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean_false(
+    selected, rejected, _, _ = split_by_boolean_false(
         data, boolean_mask, return_rejected=True
     )
 
@@ -493,7 +491,7 @@ def test_split_by_index_empty(empty_df, empty_reader, TextFileReader):
     else:
         data = empty_df
 
-    selected, rejected = split_by_index(data, [0, 1], return_rejected=True)
+    selected, rejected, _, _ = split_by_index(data, [0, 1], return_rejected=True)
 
     if TextFileReader:
         selected = selected.read()
@@ -510,7 +508,9 @@ def test_split_by_column_empty(empty_df, empty_reader, TextFileReader):
     else:
         data = empty_df
 
-    selected, rejected = split_by_column_entries(data, {"A": [1]}, return_rejected=True)
+    selected, rejected, _, _ = split_by_column_entries(
+        data, {"A": [1]}, return_rejected=True
+    )
 
     if TextFileReader:
         selected = selected.read()
@@ -528,7 +528,7 @@ def test_split_by_boolean_empty(empty_df, empty_reader, TextFileReader):
         data = empty_df
 
     mask = empty_df.astype(bool)
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, mask, boolean=True, return_rejected=True
     )
 
@@ -556,25 +556,28 @@ def test_rep_map_different_names():
     assert out["a"].tolist() == [10, 20]
 
 
-def test_missing_pivot_returns_none():
+def test_missing_pivot_raises():
     df_l = pd.DataFrame({"id": [1]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, rep_c="x") is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, rep_c="x")
 
 
-def test_missing_replacement_returns_none():
+def test_missing_replacement_raises():
     df_l = pd.DataFrame({"id": [1]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, pivot_c="id") is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, pivot_c="id")
 
 
-def test_missing_source_col_returns_none():
+def test_missing_source_col_raises():
     df_l = pd.DataFrame({"id": [1], "a": [10]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, pivot_c="id", rep_map={"a": "missing"}) is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, pivot_c="id", rep_map={"a": "missing"})
 
 
 def test_index_reset():

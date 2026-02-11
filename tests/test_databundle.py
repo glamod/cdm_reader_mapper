@@ -315,7 +315,7 @@ def test_select_operators_reader(
 @pytest.mark.parametrize(
     "func, args, idx_exp",
     [
-        # ("select_where_all_true", [], [0, 1, 2], [3, 4]),
+        # ("select_where_all_true", [[0, 1, 2]], [3, 4]),
         # ("select_where_all_false", [], [3], [0, 1, 2, 4]),
         ("select_where_index_isin", [[0, 2, 4]], [0, 2, 4]),
         # ("select_where_entry_isin", [{("core", "ID"): [25629, 26558]}], [1, 3]),

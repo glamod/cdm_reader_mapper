@@ -182,6 +182,7 @@ class _DataBundle:
             if hasattr(data, attr):
                 return getattr(data, attr)
 
+            data.get_chunk()
             try:
                 first_chunk = data.get_chunk()
             except ValueError:

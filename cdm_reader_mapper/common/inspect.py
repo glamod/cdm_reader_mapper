@@ -82,7 +82,7 @@ def count_by_cat(
             non_data_output="acc",
             makecopy=False,
         )
-        return merge_sum_dicts(*dicts)
+        return merge_sum_dicts(*dicts[0])
 
     raise TypeError(f"Unsupported data type: {type(data)}")
 
@@ -124,6 +124,7 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
             non_data_output="acc",
             makecopy=False,
         )
-        return sum(result)
+        print(result)
+        return sum(result[0])
 
     raise TypeError(f"Unsupported data type: {type(data)}")

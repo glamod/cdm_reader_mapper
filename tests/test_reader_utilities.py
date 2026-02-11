@@ -246,7 +246,7 @@ def test_remove_boolean_values():
     assert result["B"].dtype.name == "int64"
 
 
-def test_process_textfilereader(sample_reader):
+def test_process_textfilereader_basic(sample_reader):
     reader_out, extra_out = process_disk_backed(sample_reader, sample_func)
     assert isinstance(reader_out, ParquetStreamReader)
 
@@ -258,14 +258,19 @@ def test_process_textfilereader(sample_reader):
     assert chunk2.shape == (1, 2)
     assert chunk2.iloc[0]["B"] == 8
 
-    assert extra_out == {"note": "first_chunk_only"}
+    assert isinstance(extra_out, dict)
+    assert 0 in extra_out
+    assert isinstance(extra_out[0], list)
+    assert len(extra_out[0]) == 1
+    assert isinstance(extra_out[0][0], dict)
+    assert extra_out[0][0] == {"note": "first_chunk_only"}
 
     with pytest.raises(ValueError, match="No more data"):
         reader_out.get_chunk()
 
 
 def test_process_textfilereader_only_df(sample_reader):
-    (reader_out,) = process_disk_backed(sample_reader, sample_func_only_df)
+    reader_out, extra_out = process_disk_backed(sample_reader, sample_func_only_df)
     assert isinstance(reader_out, ParquetStreamReader)
 
     chunk1 = reader_out.get_chunk()
@@ -275,6 +280,8 @@ def test_process_textfilereader_only_df(sample_reader):
     chunk2 = reader_out.get_chunk()
     assert chunk2.shape == (1, 2)
     assert chunk2.iloc[0]["B"] == 8
+
+    assert extra_out == {}
 
 
 def test_process_textfilereader_makecopy_flag(sample_reader):
@@ -291,4 +298,9 @@ def test_process_textfilereader_makecopy_flag(sample_reader):
     assert chunk2.shape == (1, 2)
     assert chunk2.iloc[0]["B"] == 8
 
-    assert extra_out == {"note": "first_chunk_only"}
+    assert isinstance(extra_out, dict)
+    assert 0 in extra_out
+    assert isinstance(extra_out[0], list)
+    assert len(extra_out[0]) == 1
+    assert isinstance(extra_out[0][0], dict)
+    assert extra_out[0][0] == {"note": "first_chunk_only"}

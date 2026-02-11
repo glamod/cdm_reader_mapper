@@ -416,6 +416,7 @@ def test_read_data_textfilereader():
     assert isinstance(db.mode, str)
     assert db.mode == "data"
     assert len(db) == 5
+    print(db.shape)
     assert db.shape == (5, 341)
     assert db.size == 1705
 

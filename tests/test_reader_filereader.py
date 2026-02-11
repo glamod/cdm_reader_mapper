@@ -79,9 +79,10 @@ def test_apply_or_chunk_textfilereader():
     buffer = StringIO("test\n1\n2\n3\n4")
     read_kwargs = {"chunksize": 2}
     reader = pd.read_csv(buffer, **read_kwargs)
-    (out,) = _apply_or_chunk(reader, f, func_args=[2])
+    out, out_dict = _apply_or_chunk(reader, f, func_args=[2])
     assert isinstance(out, ParquetStreamReader)
     assert_frame_equal(out.read(), pd.DataFrame({"test": [3, 4, 5, 6]}))
+    assert out_dict == {}
 
 
 @pytest.fixture

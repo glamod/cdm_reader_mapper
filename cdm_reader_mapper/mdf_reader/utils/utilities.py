@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import ast
 
-import logging
-import csv
 import os
 import pandas as pd
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
-from cdm_reader_mapper.common.iterators import process_disk_backed
+from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterable
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -224,26 +222,22 @@ def _read_data_from_file(
     data = reader(filepath, **reader_kwargs)
 
     if isinstance(data, pd.DataFrame):
-        return update_and_select(data, subset=col_subset, column_names=column_names)
-
-    if iterator is True:
-        writer_kwargs = {}
-        if "encoding" in reader_kwargs:
-            writer_kwargs["encoding"] = reader_kwargs["encoding"]
-
-        return process_textfilereader(
-            data,
-            func=update_and_select,
-            func_kwargs={
-                "subset": col_subset,
-                "column_names": column_names,
-            },
-            read_kwargs=reader_kwargs,
-            write_kwargs=writer_kwargs,
-            makecopy=False,
+        data, info = update_and_select(
+            data, subset=col_subset, column_names=column_names
         )
 
-    raise ValueError(f"Unsupported reader return type: {type(data)}")
+    elif is_valid_iterable(data):
+        data, info = process_disk_backed(
+            data,
+            func=update_and_select,
+            func_kwargs={"subset": col_subset, "column_names": column_names},
+            makecopy=False,
+        )
+        info = info[0][0]
+    else:
+        raise ValueError(f"Unsupported reader return type: {type(data)}")
+
+    return data, info
 
 
 def read_csv(
@@ -272,23 +266,13 @@ def read_csv(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_csv(filepath, delimiter=",", **kwargs)
-
-    if isinstance(data, pd.DataFrame):
-        data, info = update_and_select(data, subset=col_subset, columns=columns)
-        return data, info
-
-    data, info = process_disk_backed(
-        data,
-        func=update_and_select,
-        func_kwargs={"subset": col_subset, "columns": columns},
-        makecopy=False,
+    return _read_data_from_file(
+        filepath,
+        pd.read_csv,
+        col_subset,
+        column_names,
+        reader_kwargs=kwargs,
     )
-    return data, info
 
 
 def read_parquet(
@@ -317,23 +301,13 @@ def read_parquet(
         - The PARQUET as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_parquet(filepath, **kwargs)
-
-    if isinstance(data, pd.DataFrame):
-        data, info = update_and_select(data, subset=col_subset, columns=columns)
-        return data, info
-
-    data, info = process_disk_backed(
-        data,
-        func=update_and_select,
-        func_kwargs={"subset": col_subset, "columns": columns},
-        makecopy=False,
+    return _read_data_from_file(
+        filepath,
+        pd.read_parquet,
+        col_subset,
+        column_names,
+        reader_kwargs=kwargs,
     )
-    return data, info
 
 
 def read_feather(
@@ -362,23 +336,13 @@ def read_feather(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    if filepath is None or not Path(filepath).is_file():
-        logging.warning(f"File not found: {filepath}")
-        return pd.DataFrame(), {}
-
-    data = pd.read_feather(filepath, **kwargs)
-
-    if isinstance(data, pd.DataFrame):
-        data, info = update_and_select(data, subset=col_subset, columns=columns)
-        return data, info
-
-    data, info = process_disk_backed(
-        data,
-        func=update_and_select,
-        func_kwargs={"subset": col_subset, "columns": columns},
-        makecopy=False,
+    return _read_data_from_file(
+        filepath,
+        pd.read_feather,
+        col_subset,
+        column_names,
+        reader_kwargs=kwargs,
     )
-    return data, info
 
 
 def convert_dtypes(dtypes) -> tuple[str]:
