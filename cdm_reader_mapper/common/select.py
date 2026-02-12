@@ -12,7 +12,7 @@ from typing import Iterable, Callable
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterable
+from .iterators import process_disk_backed, is_valid_iterator
 
 
 def _split_df(
@@ -21,6 +21,7 @@ def _split_df(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
+    running_index: int = 0,
 ):
     if inverse:
         selected = df[~mask]
@@ -33,8 +34,8 @@ def _split_df(
     rejected_idx = mask.index[~mask]
 
     if reset_index:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
+        selected.index = range(running_index, running_index + len(selected))
+        rejected.index = range(running_index, running_index + len(rejected))
 
     return selected, rejected, selected_idx, rejected_idx
 
@@ -79,7 +80,7 @@ def _split_dispatch(
     if isinstance(data, pd.DataFrame):
         return func(data, *args, **kwargs)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         selected, rejected, out_dict = process_disk_backed(
             data,
             func,
@@ -87,6 +88,7 @@ def _split_dispatch(
             func_kwargs=kwargs,
             makecopy=False,
             non_data_output="acc",
+            running_index=True,
         )
 
         selected_idx = pd.Index([]).append(out_dict[0])

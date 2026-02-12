@@ -64,7 +64,7 @@ from typing import Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_disk_backed, is_valid_iterable
+from ..common.iterators import process_disk_backed, is_valid_iterator
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -220,7 +220,7 @@ def validate_id(
     if isinstance(data, (pd.DataFrame, pd.Series)):
         return _validate_id(data, mrd, combined_compiled, na_values)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             _validate_id,
@@ -277,7 +277,7 @@ def validate_datetime(
     if isinstance(data, (pd.DataFrame, pd.Series)):
         return _validate_datetime(data, model)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             _validate_datetime,

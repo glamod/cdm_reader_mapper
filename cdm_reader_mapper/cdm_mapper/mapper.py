@@ -23,7 +23,7 @@ import pandas as pd
 from cdm_reader_mapper.common import logging_hdlr
 
 from cdm_reader_mapper.common.iterators import (
-    is_valid_iterable,
+    is_valid_iterator,
     process_disk_backed,
     parquet_stream_from_iterable,
     ParquetStreamReader,
@@ -454,11 +454,11 @@ def map_model(
         )
 
     if (
-        is_valid_iterable(data) and not isinstance(data, ParquetStreamReader)
+        is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
     ) or isinstance(data, (list, tuple)):
         data = parquet_stream_from_iterable(data)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             _map_data_model,

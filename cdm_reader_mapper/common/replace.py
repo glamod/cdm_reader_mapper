@@ -23,7 +23,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterable
+from .iterators import process_disk_backed, is_valid_iterator
 
 
 def _replace_columns(
@@ -135,7 +135,7 @@ def replace_columns(
             **kwargs,
         )
 
-    if is_valid_iterable(df_l):
+    if is_valid_iterator(df_l):
         return process_disk_backed(
             df_l,
             _replace_columns,

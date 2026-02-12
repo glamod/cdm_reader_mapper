@@ -64,7 +64,7 @@ from typing import Any, Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_disk_backed, is_valid_iterable
+from ..common.iterators import process_disk_backed, is_valid_iterator
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -224,7 +224,7 @@ def correct_datetime(
     if isinstance(data, pd.DataFrame):
         return _correct_dt(data, imodel, dck, correction_method, log_level=log_level)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             _correct_dt,
@@ -304,7 +304,7 @@ def correct_pt(
     if isinstance(data, pd.DataFrame):
         return _correct_pt(data, imodel, dck, pt_col, fix_methods, log_level="INFO")
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             _correct_pt,

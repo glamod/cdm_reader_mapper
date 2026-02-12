@@ -27,10 +27,27 @@ from typing import (
 class ParquetStreamReader:
     """A wrapper that mimics pandas.io.parsers.TextFileReader."""
 
-    def __init__(self, generator: Iterator[pd.DataFrame | pd.Series]):
-        self._generator = generator
+    def __init__(
+        self,
+        source: (
+            Iterator[pd.DataFrame | pd.Series]
+            | Callable[[], Iterator[pd.DataFrame | pd.Series]]
+        ),
+    ):
         self._closed = False
-        self._buffer = []
+        self._buffer: list[pd.DataFrame | pd.Series] = []
+
+        if callable(source):
+            # factory that produces a fresh iterator
+            self._factory = source
+        elif isinstance(source, Iterator):
+            self._factory = lambda: source
+        else:
+            raise TypeError(
+                "ParquetStreamReader expects an iterator or a factory callable."
+            )
+
+        self._generator = self._factory()
 
     def __iter__(self):
         """Allows: for df in reader: ..."""
@@ -38,6 +55,10 @@ class ParquetStreamReader:
 
     def __next__(self):
         """Allows: next(reader)"""
+        if self._closed:
+            raise ValueError("I/O operation on closed stream.")
+        if self._buffer:
+            return self._buffer.pop(0)
         return next(self._generator)
 
     def prepend(self, chunk: pd.DataFrame | pd.Series):
@@ -54,234 +75,200 @@ class ParquetStreamReader:
         Returns the next single chunk from disk.
         (Note: 'size' is ignored here as chunks are pre-determined by the write step)
         """
-        if self._closed:
-            raise ValueError("I/O operation on closed file.")
-
-        try:
-            return next(self._generator)
-        except StopIteration:
-            raise ValueError("No more data to read (End of stream).")
+        return next(self)
 
     def read(
         self,
-        reset_index=False,
+        # reset_index=False,
     ):
         """
         WARNING: unsafe for Files > RAM.
         Reads ALL remaining data into memory at once.
         """
-        if self._closed:
-            raise ValueError("I/O operation on closed file.")
-
         # Consume the entire rest of the stream
-        chunks = list(self._generator)
+        chunks = list(self)
 
         if not chunks:
             return pd.DataFrame()
 
         df = pd.concat(chunks)
-        if reset_index is True:
-            df = df.reset_index(drop=True)
+        # if reset_index is True:
+        #    df = df.reset_index(drop=True)
         return df
 
     def copy(self):
         """Create an independent copy of the stream."""
         if self._closed:
             raise ValueError("Cannot copy a closed stream.")
-
-        psr1, psr2 = itertools.tee(self._generator)
-
-        self._generator = psr1
-
-        return ParquetStreamReader(psr2)
+        self._generator, new_gen = itertools.tee(self._generator)
+        return ParquetStreamReader(new_gen)
 
     def empty(self):
-        psr_copy = self.copy()
+        """Return True if stream is empty."""
+        copy_reader = self.copy()
+
         try:
-            first_batch = next(psr_copy)
+            next(copy_reader)
+            return False
         except StopIteration:
             return True
 
-        if not first_batch:
-            return True
-
-        return False
-
     def close(self):
         """Close the stream and release resources."""
-        if not self._closed:
-            self._generator.close()
-            self._closed = True
+        self._closed = True
 
     def __enter__(self):
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         return self
 
-    def __exit__(self, _exc_type, _exc_val, _exc_tb):
+    def __exit__(self, *_):
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         self.close()
 
 
 def _sort_chunk_outputs(
-    outputs: tuple, accumulators_initialized: bool, requested_types: tuple[type]
+    outputs: tuple, capture_meta: bool, requested_types: tuple[type, ...]
 ) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
     """Separates DataFrames from metadata in the function output."""
-    current_data = []
-    new_metadata = []
+    data, meta = [], []
     for out in outputs:
         if isinstance(out, requested_types):
-            current_data.append(out)
+            data.append(out)
         elif isinstance(out, list) and out and isinstance(out[0], requested_types):
-            current_data.extend(out)
-        elif not accumulators_initialized:
+            data.extend(out)
+        elif capture_meta:
             # Only capture metadata from the first chunk
-            new_metadata.append(out)
+            meta.append(out)
 
-    return current_data, new_metadata
-
-
-def _write_chunks_to_disk(current_data: list, temp_dirs: list, chunk_counter: int):
-    """Writes the current batch of DataFrames to their respective temp directories."""
-    for i, data_out in enumerate(current_data):
-        if i < len(temp_dirs):
-            if isinstance(data_out, pd.Series):
-                data_out = data_out.to_frame()
-            file_path = Path(temp_dirs[i].name) / f"part_{chunk_counter:05d}.parquet"
-            data_out = data_out.reset_index()
-
-            table = pa.Table.from_pandas(data_out, preserve_index=False)
-
-            pq.write_table(table, file_path, compression="snappy")
+    return data, meta
 
 
 def _initialize_storage(
-    current_data: list[pd.DataFrame | pd.Series],
-) -> tuple[list, list, list]:
+    first_batch: list[pd.DataFrame | pd.Series],
+) -> tuple[list, list]:
     """Creates temp directories and captures schemas from the first chunk."""
-
-    def _get_columns(data):
-        if isinstance(data, pd.DataFrame):
-            return type(data), data.columns
-        if isinstance(data, pd.Series):
-            return type(data), data.name
-        raise TypeError(
-            f"Unsupported data type: {type(data)}."
-            "Use one of [pd.DataFrame, pd.Series]."
-        )
-
     temp_dirs = []
-    to_cleanup = []
-    schemas = [_get_columns(df) for df in current_data]
+    schemas = []
 
-    for _ in range(len(current_data)):
-        t = tempfile.TemporaryDirectory()
-        temp_dirs.append(t)
-        to_cleanup.append(t)
+    for obj in first_batch:
+        if isinstance(obj, pd.DataFrame):
+            schemas.append((pd.DataFrame, obj.columns))
+        elif isinstance(obj, pd.Series):
+            schemas.append((pd.Series, obj.name))
+        else:
+            raise TypeError(
+                f"Unsupported data type: {type(obj)}."
+                "Use one of [pd.DataFrame, pd.Series]."
+            )
 
-    return temp_dirs, to_cleanup, schemas
+        temp_dirs.append(tempfile.TemporaryDirectory())
+
+    return temp_dirs, schemas
+
+
+def _write_chunks_to_disk(
+    batch: list[pd.DataFrame | pd.Series],
+    temp_dirs: list[tempfile.TemporaryDirectory],
+    chunk_counter: int,
+) -> None:
+    """Writes the current batch of DataFrames to their respective temp directories."""
+    for i, data_out in enumerate(batch):
+        if isinstance(data_out, pd.Series):
+            data_out = data_out.to_frame()
+
+        file_path = Path(temp_dirs[i].name) / f"part_{chunk_counter:05d}.parquet"
+
+        table = pa.Table.from_pandas(data_out, preserve_index=True)
+        pq.write_table(table, file_path, compression="snappy")
 
 
 def _parquet_generator(
-    temp_dir_obj, data_type, schema
+    temp_dir, data_type, schema
 ) -> Generator[pd.DataFrame | pd.Series]:
     """Yields DataFrames from a temp directory, restoring schema."""
-
-    def _is_tuple_like(s):
-        s = s.strip()
-        return s.startswith("(") and s.endswith(")")
-
-    if isinstance(schema, (tuple, list)):
-        schema = [schema]
-
     try:
-        files = sorted(Path(temp_dir_obj.name).glob("*.parquet"))
+        files = sorted(Path(temp_dir.name).glob("*.parquet"))
+
         for f in files:
-            data = pd.read_parquet(f)
-            idx = "('index', '')" if _is_tuple_like(data.columns[0]) else "index"
-            if idx in data.columns:
-                data = data.set_index(idx).rename_axis(None)
-            if schema is not None:
-                data.columns = schema
+            df = pd.read_parquet(f)
 
-            if data_type == pd.Series:
-                data = data.iloc[:, 0]
-                if schema is None:
-                    data.name = schema
+            if data_type is pd.Series:
+                s = df.iloc[:, 0].copy()
+                s.name = schema
+                yield s
+            else:
+                yield df
 
-            yield data
     finally:
-        temp_dir_obj.cleanup()
-
-
-def _build_parquet_stream_readers(
-    chunk_batches: Iterable[list[pd.DataFrame | pd.Series]],
-) -> list[ParquetStreamReader]:
-    """Materialize chunk batches to parquet and return ParquetStreamReaders."""
-    chunk_iter = iter(chunk_batches)
-
-    try:
-        first_batch = next(chunk_iter)
-    except StopIteration:
-        raise ValueError("No data provided.")
-
-    if not first_batch:
-        raise ValueError("First batch is empty.")
-
-    temp_dirs, to_cleanup, schemas = _initialize_storage(first_batch)
-
-    _write_chunks_to_disk(first_batch, temp_dirs, chunk_counter=0)
-
-    chunk_counter = 1
-
-    for batch in chunk_iter:
-        if len(batch) != len(temp_dirs):
-            raise ValueError("Inconsistent number of outputs per chunk.")
-
-        _write_chunks_to_disk(batch, temp_dirs, chunk_counter)
-        chunk_counter += 1
-
-    readers = [
-        ParquetStreamReader(_parquet_generator(d, t, s))  # , reset_index=reset_index
-        for d, (t, s) in zip(temp_dirs, schemas)
-    ]
-
-    to_cleanup.clear()
-
-    return readers
-
-
-def is_valid_iterable(reader: Any) -> bool:
-    """Check if reader is a valid Iterable."""
-    if not isinstance(reader, Iterator):
-        return False
-    if not isinstance(reader, Iterable):
-        return False
-    return True
+        temp_dir.cleanup()
 
 
 def parquet_stream_from_iterable(
     iterable: Iterable[pd.DataFrame | pd.Series],
-    *,
-    reset_index: bool = False,
 ) -> ParquetStreamReader:
-    """Convert an iterable od pd.DataFrames/Series into a ParquetStreamReader.."""
-    batches = ([chunk] for chunk in iterable)
+    """
+    Stream an iterable of DataFrame/Series to parquet
+    and return a disk-backed ParquetStreamReader.
 
-    readers = _build_parquet_stream_readers(
-        batches,
-    )
+    Memory usage remains constant.
+    """
+    iterator = iter(iterable)
 
-    return readers[0]
+    try:
+        first = next(iterator)
+    except StopIteration:
+        raise ValueError("Iterable is empty.")
+
+    if not isinstance(first, (pd.DataFrame, pd.Series)):
+        raise TypeError("Iterable must contain pd.DataFrame or pd.Series objects.")
+
+    temp_dir = tempfile.TemporaryDirectory()
+    temp_dirs = [temp_dir]
+
+    if isinstance(first, pd.DataFrame):
+        data_type = pd.DataFrame
+        schema = first.columns
+    else:
+        data_type = pd.Series
+        schema = first.name
+
+    _write_chunks_to_disk([first], temp_dirs, chunk_counter=0)
+
+    for idx, chunk in enumerate(iterator, start=1):
+
+        if not isinstance(chunk, type(first)):
+            raise TypeError("All chunks must be of the same type.")
+
+        _write_chunks_to_disk([chunk], temp_dirs, chunk_counter=idx)
+
+    return ParquetStreamReader(lambda: _parquet_generator(temp_dir, data_type, schema))
+
+
+def is_valid_iterator(reader: Any) -> bool:
+    """Check if reader is a valid Iterable."""
+    return isinstance(reader, Iterator)
+
+
+def ensure_parquet_reader(obj: Any) -> Any:
+    """Ensure obj is a ParquetStreamReader."""
+    if isinstance(obj, ParquetStreamReader):
+        return obj
+
+    if is_valid_iterator(obj):
+        return parquet_stream_from_iterable(obj)
+
+    return obj
 
 
 def process_disk_backed(
-    reader: Iterable[pd.DataFrame | pd.Series],
+    reader: Iterator[pd.DataFrame | pd.Series],
     func: Callable,
     func_args: Sequence[Any] | None = None,
     func_kwargs: dict[str, Any] | None = None,
-    requested_types: type | list[type] | tuple[type] = (pd.DataFrame, pd.Series),
+    requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
     makecopy: bool = True,
+    running_index: bool = False,
 ) -> tuple[Any, ...]:
     """
     Consumes a stream of DataFrames, processes them, and returns a tuple of
@@ -292,88 +279,84 @@ def process_disk_backed(
     if func_kwargs is None:
         func_kwargs = {}
 
-    # State variables
-    all_batches = []
-    output_non_data = {}
-    directories_to_cleanup = []
-
     if not isinstance(requested_types, (list, tuple)):
         requested_types = (requested_types,)
+
+    reader = ensure_parquet_reader(reader)
 
     args_reader = []
     args = []
     for arg in func_args:
-        if is_valid_iterable(arg):
-            args_reader.append(arg)
+        converted = ensure_parquet_reader(arg)
+        if isinstance(converted, ParquetStreamReader):
+            args_reader.append(converted)
         else:
-            args.append(arg)
+            args.append(converted)
 
     kwargs = {}
     for k, v in func_kwargs.items():
-        if is_valid_iterable(v):
-            args_reader.append(v)
+        converted = ensure_parquet_reader(v)
+        if isinstance(converted, ParquetStreamReader):
+            args_reader.append(converted)
         else:
-            kwargs[k] = v
+            kwargs[k] = converted
 
     readers = [reader] + args_reader
 
     if makecopy:
         readers = [r.copy() for r in readers]
 
-    try:
-        accumulators_initialized = False
-        chunk_counter = 0
+    # State variables
+    temp_dirs = None
+    schemas = None
+    output_non_data: dict[int, list[Any]] = {}
+    chunk_counter: int = 0
+    running_idx = 0
 
-        for items in zip(*readers):
-            if not isinstance(items[0], requested_types):
-                raise TypeError(
-                    f"Unsupported data type in Iterable {items[0]}: {type(items[0])}"
-                    "Requested types are: {requested_types} "
-                )
+    for items in zip(*readers):
 
-            outputs = func(*items, *args, **kwargs)
-            if not isinstance(outputs, tuple):
-                outputs = (outputs,)
-
-            # Sort outputs
-            accumulate_outputs = (
-                accumulators_initialized if non_data_output != "acc" else False
-            )
-            current_data, new_meta = _sort_chunk_outputs(
-                outputs, accumulate_outputs, requested_types
+        if not isinstance(items[0], requested_types):
+            raise TypeError(
+                f"Unsupported data type in Iterable {items[0]}: {type(items[0])}"
+                f"Requested types are: {requested_types} "
             )
 
-            if new_meta:
-                j = 0
-                for meta in new_meta:
-                    if j in output_non_data:
-                        output_non_data[j].append(meta)
-                    else:
-                        output_non_data[j] = [meta]
-                    j += 1
+        if running_index is True:
+            kwargs["running_index"] = running_idx
 
-            # Write DataFrames
-            if current_data:
-                all_batches.append(current_data)
-                accumulators_initialized = True
+        result = func(*items, *args, **kwargs)
+        if not isinstance(result, tuple):
+            result = (result,)
 
-            chunk_counter += 1
+        # Sort outputs
+        capture_meta = non_data_output == "acc" or chunk_counter == 0
 
-        if chunk_counter == 0:
-            raise ValueError("Iterable is empty.")
+        data, meta = _sort_chunk_outputs(result, capture_meta, requested_types)
 
-        if not accumulators_initialized:
-            return output_non_data
+        for i, meta in enumerate(meta):
+            output_non_data.setdefault(i, []).append(meta)
 
-        final_iterators = _build_parquet_stream_readers(
-            all_batches,
-        )
+        # Write DataFrames
+        if data:
+            if temp_dirs is None:
+                temp_dirs, schemas = _initialize_storage(data)
 
-        # Transfer ownership to generators
-        directories_to_cleanup.clear()
+            _write_chunks_to_disk(data, temp_dirs, chunk_counter)
 
-        return tuple(final_iterators + [output_non_data])
+            running_idx += len(data[0])
 
-    finally:
-        for d in directories_to_cleanup:
-            d.cleanup()
+        chunk_counter += 1
+
+    if chunk_counter == 0:
+        raise ValueError("Iterable is empty.")
+
+    # If no data outputs at all
+    if temp_dirs is None:
+        return output_non_data
+
+    final_iterators = [
+        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s))
+        for d, (t, s) in zip(temp_dirs, schemas)
+    ]
+
+    return tuple(final_iterators + [output_non_data])

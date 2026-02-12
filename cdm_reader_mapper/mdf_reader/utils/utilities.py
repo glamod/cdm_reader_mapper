@@ -9,7 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterable
+from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterator
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -226,7 +226,7 @@ def _read_data_from_file(
             data, subset=col_subset, column_names=column_names
         )
 
-    elif is_valid_iterable(data):
+    elif is_valid_iterator(data):
         data, info = process_disk_backed(
             data,
             func=update_and_select,

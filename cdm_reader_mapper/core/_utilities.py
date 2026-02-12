@@ -16,7 +16,7 @@ from cdm_reader_mapper.common import (
 from cdm_reader_mapper.common.iterators import (
     ParquetStreamReader,
     process_disk_backed,
-    is_valid_iterable,
+    is_valid_iterator,
     parquet_stream_from_iterable,
 )
 
@@ -168,12 +168,12 @@ class _DataBundle:
             )
 
         if (
-            is_valid_iterable(data) and not isinstance(data, ParquetStreamReader)
+            is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
         ) or isinstance(data, (list, tuple)):
             data = parquet_stream_from_iterable(data)
 
         if (
-            is_valid_iterable(mask) and not isinstance(mask, ParquetStreamReader)
+            is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)
         ) or isinstance(mask, (list, tuple)):
             mask = parquet_stream_from_iterable(mask)
 
@@ -355,7 +355,7 @@ class _DataBundle:
             data_ = f"_{data}"
             df_ = getattr(db_, data_) if hasattr(db_, data_) else pd.DataFrame()
 
-            if is_valid_iterable(df_):
+            if is_valid_iterator(df_):
                 raise ValueError(
                     "Data must be a pd.DataFrame not a iterable of pd.DataFrames."
                 )

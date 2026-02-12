@@ -12,7 +12,7 @@ from typing import Any, Iterable, Mapping
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterable
+from .iterators import process_disk_backed, is_valid_iterator
 
 
 def _count_by_cat(df, columns) -> dict:
@@ -74,7 +74,7 @@ def count_by_cat(
     if isinstance(data, pd.DataFrame):
         return _count_by_cat(data, columns)
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         dicts = process_disk_backed(
             data,
             _count_by_cat,
@@ -117,7 +117,7 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     if hasattr(data, "_row_count"):
         return data._row_count
 
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         result = process_disk_backed(
             data,
             _get_length,

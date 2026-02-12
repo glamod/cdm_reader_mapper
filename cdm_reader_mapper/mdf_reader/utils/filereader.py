@@ -28,7 +28,7 @@ from .parser import (
 from cdm_reader_mapper.core.databundle import DataBundle
 from cdm_reader_mapper.common.iterators import (
     process_disk_backed,
-    is_valid_iterable,
+    is_valid_iterator,
     ParquetStreamReader,
     parquet_stream_from_iterable,
 )
@@ -47,10 +47,10 @@ def _apply_or_chunk(
     if isinstance(data, (pd.DataFrame, pd.Series, xr.Dataset, xr.DataArray)):
         return func(data, *func_args, **func_kwargs)
     if (
-        is_valid_iterable(data) and not isinstance(data, ParquetStreamReader)
+        is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
     ) or isinstance(data, (list, tuple)):
         data = parquet_stream_from_iterable(data)
-    if is_valid_iterable(data):
+    if is_valid_iterator(data):
         return process_disk_backed(
             data,
             func,
