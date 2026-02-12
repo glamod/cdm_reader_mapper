@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import tempfile
 
+import itertools
+
 import pandas as pd
 
 import pyarrow as pa
@@ -25,13 +27,10 @@ from typing import (
 class ParquetStreamReader:
     """A wrapper that mimics pandas.io.parsers.TextFileReader."""
 
-    def __init__(
-        self, generator: Iterator[pd.DataFrame | pd.Series], reset_index=False
-    ):
+    def __init__(self, generator: Iterator[pd.DataFrame | pd.Series]):
         self._generator = generator
         self._closed = False
         self._buffer = []
-        self._reset_index = reset_index
 
     def __iter__(self):
         """Allows: for df in reader: ..."""
@@ -65,6 +64,7 @@ class ParquetStreamReader:
 
     def read(
         self,
+        reset_index=False,
     ):
         """
         WARNING: unsafe for Files > RAM.
@@ -80,9 +80,32 @@ class ParquetStreamReader:
             return pd.DataFrame()
 
         df = pd.concat(chunks)
-        if self._reset_index is True:
+        if reset_index is True:
             df = df.reset_index(drop=True)
         return df
+
+    def copy(self):
+        """Create an independent copy of the stream."""
+        if self._closed:
+            raise ValueError("Cannot copy a closed stream.")
+
+        psr1, psr2 = itertools.tee(self._generator)
+
+        self._generator = psr1
+
+        return ParquetStreamReader(psr2)
+
+    def empty(self):
+        psr_copy = self.copy()
+        try:
+            first_batch = next(psr_copy)
+        except StopIteration:
+            return True
+
+        if not first_batch:
+            return True
+
+        return False
 
     def close(self):
         """Close the stream and release resources."""
@@ -190,6 +213,43 @@ def _parquet_generator(
         temp_dir_obj.cleanup()
 
 
+def _build_parquet_stream_readers(
+    chunk_batches: Iterable[list[pd.DataFrame | pd.Series]],
+) -> list[ParquetStreamReader]:
+    """Materialize chunk batches to parquet and return ParquetStreamReaders."""
+    chunk_iter = iter(chunk_batches)
+
+    try:
+        first_batch = next(chunk_iter)
+    except StopIteration:
+        raise ValueError("No data provided.")
+
+    if not first_batch:
+        raise ValueError("First batch is empty.")
+
+    temp_dirs, to_cleanup, schemas = _initialize_storage(first_batch)
+
+    _write_chunks_to_disk(first_batch, temp_dirs, chunk_counter=0)
+
+    chunk_counter = 1
+
+    for batch in chunk_iter:
+        if len(batch) != len(temp_dirs):
+            raise ValueError("Inconsistent number of outputs per chunk.")
+
+        _write_chunks_to_disk(batch, temp_dirs, chunk_counter)
+        chunk_counter += 1
+
+    readers = [
+        ParquetStreamReader(_parquet_generator(d, t, s))  # , reset_index=reset_index
+        for d, (t, s) in zip(temp_dirs, schemas)
+    ]
+
+    to_cleanup.clear()
+
+    return readers
+
+
 def is_valid_iterable(reader: Any) -> bool:
     """Check if reader is a valid Iterable."""
     if not isinstance(reader, Iterator):
@@ -199,6 +259,21 @@ def is_valid_iterable(reader: Any) -> bool:
     return True
 
 
+def parquet_stream_from_iterable(
+    iterable: Iterable[pd.DataFrame | pd.Series],
+    *,
+    reset_index: bool = False,
+) -> ParquetStreamReader:
+    """Convert an iterable od pd.DataFrames/Series into a ParquetStreamReader.."""
+    batches = ([chunk] for chunk in iterable)
+
+    readers = _build_parquet_stream_readers(
+        batches,
+    )
+
+    return readers[0]
+
+
 def process_disk_backed(
     reader: Iterable[pd.DataFrame | pd.Series],
     func: Callable,
@@ -206,7 +281,6 @@ def process_disk_backed(
     func_kwargs: dict[str, Any] | None = None,
     requested_types: type | list[type] | tuple[type] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
-    reset_index=False,
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
     """
@@ -219,8 +293,7 @@ def process_disk_backed(
         func_kwargs = {}
 
     # State variables
-    temp_dirs: list[tempfile.TemporaryDirectory] = []
-    column_schemas = []
+    all_batches = []
     output_non_data = {}
     directories_to_cleanup = []
 
@@ -244,6 +317,9 @@ def process_disk_backed(
 
     readers = [reader] + args_reader
 
+    if makecopy:
+        readers = [r.copy() for r in readers]
+
     try:
         accumulators_initialized = False
         chunk_counter = 0
@@ -251,12 +327,9 @@ def process_disk_backed(
         for items in zip(*readers):
             if not isinstance(items[0], requested_types):
                 raise TypeError(
-                    "Unsupported data type in Iterable: {type(items[0])}"
+                    f"Unsupported data type in Iterable {items[0]}: {type(items[0])}"
                     "Requested types are: {requested_types} "
                 )
-
-            if makecopy:
-                items = tuple(df.copy() for df in items)
 
             outputs = func(*items, *args, **kwargs)
             if not isinstance(outputs, tuple):
@@ -279,16 +352,10 @@ def process_disk_backed(
                         output_non_data[j] = [meta]
                     j += 1
 
-            # Initialize storage
-            if not accumulators_initialized and current_data:
-                temp_dirs, directories_to_cleanup, column_schemas = _initialize_storage(
-                    current_data
-                )
-                accumulators_initialized = True
-
             # Write DataFrames
-            if accumulators_initialized:
-                _write_chunks_to_disk(current_data, temp_dirs, chunk_counter)
+            if current_data:
+                all_batches.append(current_data)
+                accumulators_initialized = True
 
             chunk_counter += 1
 
@@ -298,11 +365,9 @@ def process_disk_backed(
         if not accumulators_initialized:
             return output_non_data
 
-        # Finalize Iterators
-        final_iterators = [
-            ParquetStreamReader(_parquet_generator(d, t, s), reset_index=reset_index)
-            for d, (t, s) in zip(temp_dirs, column_schemas)
-        ]
+        final_iterators = _build_parquet_stream_readers(
+            all_batches,
+        )
 
         # Transfer ownership to generators
         directories_to_cleanup.clear()

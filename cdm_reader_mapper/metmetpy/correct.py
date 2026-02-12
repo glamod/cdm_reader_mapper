@@ -84,6 +84,9 @@ def _correct_dt(
     """Apply deck-specific datetime corrections to a dataset."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
+
     # 1. Optional deck specific corrections
     datetime_correction = correction_method.get(dck, {}).get("function")
     if not datetime_correction:
@@ -115,6 +118,9 @@ def _correct_pt(
 ) -> pd.DataFrame:
     """Apply platform-type corrections for a given deck."""
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
 
     deck_fix = fix_methods.get(dck)
     if not deck_fix:
@@ -200,9 +206,6 @@ def correct_datetime(
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.datetime"
 
-    if isinstance(data, pd.Series):
-        raise TypeError("pd.Series is not supported now.")
-
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {imodel} has no deck information.")
@@ -234,6 +237,10 @@ def correct_datetime(
             requested_types=pd.DataFrame,
             makecopy=False,
         )[0]
+
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
+
     raise TypeError(f"Unsupported data type: {type(data)}")
 
 
@@ -273,9 +280,6 @@ def correct_pt(
     logger = logging_hdlr.init_logger(__name__, level=log_level)
     _base = f"{_base}.platform_type"
 
-    if isinstance(data, pd.Series):
-        raise TypeError("pd.Series is not supported now.")
-
     mrd = imodel.split("_")
     if len(mrd) < 3:
         logger.warning(f"Dataset {imodel} has no deck information.")
@@ -314,4 +318,8 @@ def correct_pt(
             requested_types=pd.DataFrame,
             makecopy=False,
         )[0]
+
+    if isinstance(data, pd.Series):
+        raise TypeError("pd.Series is not supported now.")
+
     raise TypeError(f"Unsupported data type: {type(data)}")

@@ -680,10 +680,10 @@ def test_correct_datetime_empty_iterable(data):
 def test_correct_datetime_valid_iterable():
     df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
     df2 = pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]})
-    result = correct_datetime(iter([df1, df2]), "icoads_r300_d201")
+    result = correct_datetime(ParquetStreamReader(iter([df1, df2])), "icoads_r300_d201")
 
     exp = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
-    pd.testing.assert_frame_equal(result.read(), exp)
+    pd.testing.assert_frame_equal(result.read(reset_index=True), exp)
 
 
 @pytest.mark.parametrize(
@@ -786,10 +786,10 @@ def test_correct_pt_empty_iterable(data):
 def test_correct_pt_valid_iterable():
     df1 = pd.DataFrame({PT: [None, "7", None]})
     df2 = pd.DataFrame({PT: ["6", "7", None]})
-    result = correct_pt(iter([df1, df2]), "icoads_r300_d993")
+    result = correct_pt(ParquetStreamReader(iter([df1, df2])), "icoads_r300_d993")
 
     exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
-    pd.testing.assert_frame_equal(result.read(), exp)
+    pd.testing.assert_frame_equal(result.read(reset_index=True), exp)
 
 
 def test_get_id_col_not_defined():

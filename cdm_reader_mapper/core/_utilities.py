@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Iterable, Literal
+
 from copy import deepcopy
 
 import numpy as np
@@ -11,19 +13,22 @@ from cdm_reader_mapper.common import (
     get_length,
 )
 
-from cdm_reader_mapper.common.iterators import process_disk_backed
-
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.common.iterators import (
+    ParquetStreamReader,
+    process_disk_backed,
+    is_valid_iterable,
+    parquet_stream_from_iterable,
+)
 
 
 def _copy(value):
     """Make copy of value"""
     if isinstance(value, dict):
         return deepcopy(value)
-    elif isinstance(value, pd.DataFrame):
+    elif isinstance(value, (pd.DataFrame, pd.Series)):
         return value.copy()
-    elif isinstance(value, pd.io.parsers.TextFileReader):
-        return make_copy(value)
+    elif isinstance(value, ParquetStreamReader):
+        return value.copy()
     elif hasattr(value, "copy"):
         return value.copy()
     return value
@@ -143,15 +148,35 @@ class _DataBundle:
 
     def __init__(
         self,
-        data=pd.DataFrame(),
-        columns=None,
-        dtypes=None,
-        parse_dates=None,
-        encoding=None,
-        mask=pd.DataFrame(),
-        imodel=None,
-        mode="data",
+        data: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
+        columns: pd.Index | pd.MultiIndex | list | None = None,
+        dtypes: pd.Series | dict | None = None,
+        parse_dates: list | bool | None = None,
+        encoding: str | None = None,
+        mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
+        imodel: str | None = None,
+        mode: Literal["data", "tables"] = "data",
     ):
+        if data is None:
+            data = pd.DataFrame(columns=columns, dtype=dtypes)
+        if mask is None:
+            mask = mask or pd.DataFrame(columns=data.columns, dtype=bool)
+
+        if mode not in ["data", "tables"]:
+            raise ValueError(
+                f"'mode' {mode} is not valid, use one of ['data', 'tables']."
+            )
+
+        if (
+            is_valid_iterable(data) and not isinstance(data, ParquetStreamReader)
+        ) or isinstance(data, (list, tuple)):
+            data = parquet_stream_from_iterable(data)
+
+        if (
+            is_valid_iterable(mask) and not isinstance(mask, ParquetStreamReader)
+        ) or isinstance(mask, (list, tuple)):
+            mask = parquet_stream_from_iterable(mask)
+
         self._data = data
         self._columns = columns
         self._dtypes = dtypes
@@ -325,22 +350,26 @@ class _DataBundle:
             other = [other]
         if not isinstance(datasets, list):
             datasets = [datasets]
-        for data in datasets:
-            _data = f"_{data}"
-            _df = getattr(db_, _data) if hasattr(db_, _data) else pd.DataFrame()
 
-            if isinstance(_df, pd.io.parsers.TextFileReader):
-                raise ValueError("Data must be a DataFrame not a TextFileReader.")
+        for data in datasets:
+            data_ = f"_{data}"
+            df_ = getattr(db_, data_) if hasattr(db_, data_) else pd.DataFrame()
+
+            if is_valid_iterable(df_):
+                raise ValueError(
+                    "Data must be a pd.DataFrame not a iterable of pd.DataFrames."
+                )
 
             to_concat = [
-                getattr(concat, _data) for concat in other if hasattr(concat, _data)
+                getattr(concat, data_) for concat in other if hasattr(concat, data_)
             ]
             if not to_concat:
                 continue
-            if not _df.empty:
-                to_concat = [_df] + to_concat
-            _df = pd.concat(to_concat, **kwargs)
-            _df = _df.reset_index(drop=True)
-            setattr(self, f"_{data}", _df)
+            if not df_.empty:
+                to_concat = [df_] + to_concat
+
+            concatenated = pd.concat(to_concat, **kwargs)
+            concatenated = concatenated.reset_index(drop=True)
+            setattr(self, data_, concatenated)
 
         return self._return_db(db_, inplace)

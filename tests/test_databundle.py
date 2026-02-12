@@ -305,6 +305,8 @@ def test_select_operators_reader(
     expected_mask = mask[idx]
 
     if reset_index is True:
+        selected_data = selected_data.reset_index(drop=True)
+        selected_mask = selected_mask.reset_index(drop=True)
         expected_data = expected_data.reset_index(drop=True)
         expected_mask = expected_mask.reset_index(drop=True)
 
@@ -444,6 +446,10 @@ def test_split_operators_reader(
     expected_mask2 = mask[idx2]
 
     if reset_index is True:
+        selected_data = selected_data.reset_index(drop=True)
+        selected_mask = selected_mask.reset_index(drop=True)
+        rejected_data = rejected_data.reset_index(drop=True)
+        rejected_mask = rejected_mask.reset_index(drop=True)
         expected_data1 = expected_data1.reset_index(drop=True)
         expected_data2 = expected_data2.reset_index(drop=True)
         expected_mask1 = expected_mask1.reset_index(drop=True)

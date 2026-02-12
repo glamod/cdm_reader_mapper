@@ -15,14 +15,19 @@ from __future__ import annotations
 
 from copy import deepcopy
 from io import StringIO
-from typing import Any, get_args
+from typing import Any, Iterable, get_args
 
 import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common.iterators import is_valid_iterable, process_disk_backed
+from cdm_reader_mapper.common.iterators import (
+    is_valid_iterable,
+    process_disk_backed,
+    parquet_stream_from_iterable,
+    ParquetStreamReader,
+)
 
 from . import properties
 from .codes.codes import get_code_table
@@ -372,30 +377,30 @@ def _map_data_model(
 
 
 def map_model(
-    data,
-    imodel,
-    cdm_subset=None,
-    codes_subset=None,
-    null_label="null",
-    cdm_complete=True,
-    drop_missing_obs=True,
-    drop_duplicates=True,
-    log_level="INFO",
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    imodel: str,
+    cdm_subset: str | list[str] | None = None,
+    codes_subset: str | list[str] | None = None,
+    null_label: str = "null",
+    cdm_complete: bool = True,
+    drop_missing_obs: bool = True,
+    drop_duplicates: bool = True,
+    log_level: str = "INFO",
 ) -> pd.DataFrame:
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
-    data: pandas.DataFrame, pd.parser.TextFileReader or io.String
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
         input data to map.
     imodel: str
         A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
         CDM in a specific way.
         e.g. ``icoads_r300_d704``
-    cdm_subset: list, optional
+    cdm_subset: str or list, optional
         subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel.
-    codes_subset: list, optional
+    codes_subset: str or list, optional
         subset of code mapping tables to map.
         Default to the full set of code mapping tables defined for the imodel.
     null_label: str
@@ -448,6 +453,11 @@ def map_model(
             logger=logger,
         )
 
+    if (
+        is_valid_iterable(data) and not isinstance(data, ParquetStreamReader)
+    ) or isinstance(data, (list, tuple)):
+        data = parquet_stream_from_iterable(data)
+
     if is_valid_iterable(data):
         return process_disk_backed(
             data,
@@ -463,7 +473,6 @@ def map_model(
                 "drop_duplicates": drop_duplicates,
                 "logger": logger,
             },
-            reset_index=True,
         )[0]
 
     raise TypeError(f"Unsupported input type for split operation: {type(data)}.")

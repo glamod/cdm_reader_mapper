@@ -74,21 +74,19 @@ def _split_dispatch(
     data,
     func: Callable,
     *args,
-    reset_index=False,
     **kwargs,
 ):
     if isinstance(data, pd.DataFrame):
-        return func(data, *args, reset_index=reset_index, **kwargs)
+        return func(data, *args, **kwargs)
 
     if is_valid_iterable(data):
         selected, rejected, out_dict = process_disk_backed(
             data,
             func,
             func_args=args,
-            func_kwargs={"reset_index": reset_index, **kwargs},
+            func_kwargs=kwargs,
             makecopy=False,
             non_data_output="acc",
-            reset_index=reset_index,
         )
 
         selected_idx = pd.Index([]).append(out_dict[0])

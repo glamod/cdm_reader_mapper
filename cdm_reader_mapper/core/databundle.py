@@ -33,7 +33,7 @@ class DataBundle(_DataBundle):
 
     Parameters
     ----------
-    data: pandas.DataFrame, optional
+    data: pd.DataFrame or Iterable[pd.DataFrame], optional
         MDF DataFrame.
     columns: pd.Index, pd.MultiIndex or list, optional
         Column labels of ``data``
@@ -140,7 +140,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Returns
@@ -177,7 +177,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples

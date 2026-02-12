@@ -22,7 +22,11 @@ from cdm_reader_mapper.mdf_reader.utils.utilities import (
     remove_boolean_values,
 )
 
-from cdm_reader_mapper.common.iterators import ParquetStreamReader, process_disk_backed
+from cdm_reader_mapper.common.iterators import (
+    ParquetStreamReader,
+    process_disk_backed,
+    parquet_stream_from_iterable,
+)
 
 
 def make_parser(text: str, chunksize: int = 1) -> pd.io.parsers.TextFileReader:
@@ -34,7 +38,8 @@ def make_parser(text: str, chunksize: int = 1) -> pd.io.parsers.TextFileReader:
 @pytest.fixture
 def sample_reader() -> pd.io.parsers.TextFileReader:
     buffer = StringIO("A,B\n1,2\n3,4\n")
-    return pd.read_csv(buffer, chunksize=1)
+    reader = pd.read_csv(buffer, chunksize=1)
+    return parquet_stream_from_iterable(reader)
 
 
 @pytest.fixture
