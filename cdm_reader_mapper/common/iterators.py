@@ -79,7 +79,6 @@ class ParquetStreamReader:
 
     def read(
         self,
-        # reset_index=False,
     ):
         """
         WARNING: unsafe for Files > RAM.
@@ -92,8 +91,6 @@ class ParquetStreamReader:
             return pd.DataFrame()
 
         df = pd.concat(chunks)
-        # if reset_index is True:
-        #    df = df.reset_index(drop=True)
         return df
 
     def copy(self):
@@ -105,13 +102,36 @@ class ParquetStreamReader:
 
     def empty(self):
         """Return True if stream is empty."""
-        copy_reader = self.copy()
+        copy_stream = self.copy()
 
         try:
-            next(copy_reader)
+            next(copy_stream)
             return False
         except StopIteration:
             return True
+
+    def reset_index(self, drop=False):
+        """Reset indexes continuously."""
+        if self._closed:
+            raise ValueError("Cannot copy a closed stream.")
+
+        offset = 0
+        chunks = []
+
+        for df in self:
+            df = df.copy()
+            n = len(df)
+
+            indexes = range(offset, offset + n)
+            df.index = indexes
+
+            if drop is False:
+                df.insert(0, "index", indexes)
+
+            offset += n
+            chunks.append(df)
+
+        return ParquetStreamReader(lambda: iter(chunks))
 
     def close(self):
         """Close the stream and release resources."""
@@ -232,10 +252,12 @@ def parquet_stream_from_iterable(
         data_type = pd.Series
         schema = first.name
 
+    print(first)
+
     _write_chunks_to_disk([first], temp_dirs, chunk_counter=0)
 
     for idx, chunk in enumerate(iterator, start=1):
-
+        print(chunk)
         if not isinstance(chunk, type(first)):
             raise TypeError("All chunks must be of the same type.")
 
@@ -268,7 +290,6 @@ def process_disk_backed(
     requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
     makecopy: bool = True,
-    running_index: bool = False,
 ) -> tuple[Any, ...]:
     """
     Consumes a stream of DataFrames, processes them, and returns a tuple of
@@ -311,7 +332,6 @@ def process_disk_backed(
     schemas = None
     output_non_data: dict[int, list[Any]] = {}
     chunk_counter: int = 0
-    running_idx = 0
 
     for items in zip(*readers):
 
@@ -320,9 +340,6 @@ def process_disk_backed(
                 f"Unsupported data type in Iterable {items[0]}: {type(items[0])}"
                 f"Requested types are: {requested_types} "
             )
-
-        if running_index is True:
-            kwargs["running_index"] = running_idx
 
         result = func(*items, *args, **kwargs)
         if not isinstance(result, tuple):
@@ -342,8 +359,6 @@ def process_disk_backed(
                 temp_dirs, schemas = _initialize_storage(data)
 
             _write_chunks_to_disk(data, temp_dirs, chunk_counter)
-
-            running_idx += len(data[0])
 
         chunk_counter += 1
 
