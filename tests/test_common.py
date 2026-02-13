@@ -34,14 +34,7 @@ from cdm_reader_mapper.common.select import (
     split_by_index,
 )
 from cdm_reader_mapper.common.replace import replace_columns
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
-    make_copy,
-    restore,
-    is_not_empty,
-)
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
-    get_length as get_length_hdlr,
-)
+
 from cdm_reader_mapper.common.logging_hdlr import init_logger
 from cdm_reader_mapper.common.json_dict import (
     open_json_file,
@@ -66,13 +59,6 @@ def make_parser(text, **kwargs):
     """Helper: create a TextFileReader similar to user code."""
     buffer = StringIO(text)
     return pd.read_csv(buffer, chunksize=2, **kwargs)
-
-
-def make_broken_parser(text: str):
-    """Return a pandas TextFileReader that will fail in make_copy."""
-    parser = pd.read_csv(StringIO(text), chunksize=2)
-    parser.handles.handle = None
-    return parser
 
 
 def compute_md5(content: bytes) -> str:
@@ -198,14 +184,14 @@ def tmp_json_file(tmp_path):
 
 def test_split_df(sample_df):
     mask = pd.Series([True, False, False, True, False], index=sample_df.index)
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
 
 def _test_split_df_false_mask(sample_df):
     mask = pd.Series([False, False, False, False, False], index=sample_df.index)
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
@@ -222,7 +208,7 @@ def test_split_df_multiindex(sample_df):
             ("C", "c"),
         ]
     )
-    selected, rejected = _split_df(sample_df, mask, return_rejected=True)
+    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
@@ -238,7 +224,7 @@ def test_split_by_boolean_df(
     sample_df, column, boolean, expected_selected, expected_rejected
 ):
     mask = sample_df[[column]]
-    selected, rejected = _split_by_boolean_df(
+    selected, rejected, _, _ = _split_by_boolean_df(
         sample_df, mask, boolean=boolean, return_rejected=True
     )
     assert list(selected.index) == expected_selected
@@ -247,7 +233,7 @@ def test_split_by_boolean_df(
 
 def test_split_by_boolean_df_empty_mask(sample_df):
     mask = pd.DataFrame(columns=sample_df.columns)
-    selected, rejected = _split_by_boolean_df(
+    selected, rejected, _, _ = _split_by_boolean_df(
         sample_df, mask, boolean=True, return_rejected=True
     )
     assert list(selected.index) == list(sample_df.index)
@@ -265,7 +251,7 @@ def test_split_by_boolean_df_empty_mask(sample_df):
 def test_split_by_column_df(
     sample_df, col, values, return_rejected, expected_selected, expected_rejected
 ):
-    selected, rejected = _split_by_column_df(
+    selected, rejected, _, _ = _split_by_column_df(
         sample_df, col, values, return_rejected=return_rejected
     )
     assert list(selected.index) == expected_selected
@@ -288,7 +274,7 @@ def test_split_by_index_df(
     expected_selected,
     expected_rejected,
 ):
-    selected, rejected = _split_by_index_df(
+    selected, rejected, _, _ = _split_by_index_df(
         sample_df, index_list, inverse=inverse, return_rejected=return_rejected
     )
     assert list(selected.index) == expected_selected
@@ -302,7 +288,7 @@ def test_split_wrapper_index(sample_df, sample_reader, TextFileReader):
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data, _split_by_index_df, [11, 13], return_rejected=True
     )
 
@@ -321,7 +307,7 @@ def test_split_wrapper_column(sample_df, sample_reader, TextFileReader):
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data, _split_by_column_df, "B", ["y"], return_rejected=True
     )
 
@@ -340,7 +326,7 @@ def test_split_wrapper_boolean(sample_df, sample_reader, boolean_mask, TextFileR
     else:
         data = sample_df
 
-    selected, rejected = _split_dispatch(
+    selected, rejected, _, _ = _split_dispatch(
         data,
         _split_by_boolean_df,
         boolean_mask[["mask1"]],
@@ -362,7 +348,7 @@ def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
         data = sample_reader
     else:
         data = sample_df
-    selected, rejected = split_by_index(data, [11, 13], return_rejected=True)
+    selected, rejected, _, _ = split_by_index(data, [11, 13], return_rejected=True)
 
     if TextFileReader:
         selected = selected.read()
@@ -373,7 +359,7 @@ def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
 
 
 def test_split_by_index_multiindex(sample_reader_multi):
-    selected, rejected = split_by_index(
+    selected, rejected, _, _ = split_by_index(
         sample_reader_multi, [11, 13], return_rejected=True
     )
 
@@ -391,7 +377,7 @@ def test_split_by_column_entries_basic(sample_df, sample_reader, TextFileReader)
     else:
         data = sample_df
 
-    selected, rejected = split_by_column_entries(
+    selected, rejected, _, _ = split_by_column_entries(
         data, {"B": ["y"]}, return_rejected=True
     )
 
@@ -412,7 +398,7 @@ def test_split_by_boolean_basic_false(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, boolean_mask, boolean=False, return_rejected=True
     )
 
@@ -433,7 +419,7 @@ def test_split_by_boolean_basic_true(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, boolean_mask, boolean=True, return_rejected=True
     )
 
@@ -454,7 +440,7 @@ def test_split_by_boolean_true_basic(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean_true(
+    selected, rejected, _, _ = split_by_boolean_true(
         data, boolean_mask_true, return_rejected=True
     )
 
@@ -475,7 +461,7 @@ def test_split_by_boolean_false_basic(
     else:
         data = sample_df
 
-    selected, rejected = split_by_boolean_false(
+    selected, rejected, _, _ = split_by_boolean_false(
         data, boolean_mask, return_rejected=True
     )
 
@@ -494,7 +480,7 @@ def test_split_by_index_empty(empty_df, empty_reader, TextFileReader):
     else:
         data = empty_df
 
-    selected, rejected = split_by_index(data, [0, 1], return_rejected=True)
+    selected, rejected, _, _ = split_by_index(data, [0, 1], return_rejected=True)
 
     if TextFileReader:
         selected = selected.read()
@@ -511,7 +497,9 @@ def test_split_by_column_empty(empty_df, empty_reader, TextFileReader):
     else:
         data = empty_df
 
-    selected, rejected = split_by_column_entries(data, {"A": [1]}, return_rejected=True)
+    selected, rejected, _, _ = split_by_column_entries(
+        data, {"A": [1]}, return_rejected=True
+    )
 
     if TextFileReader:
         selected = selected.read()
@@ -529,7 +517,7 @@ def test_split_by_boolean_empty(empty_df, empty_reader, TextFileReader):
         data = empty_df
 
     mask = empty_df.astype(bool)
-    selected, rejected = split_by_boolean(
+    selected, rejected, _, _ = split_by_boolean(
         data, mask, boolean=True, return_rejected=True
     )
 
@@ -557,25 +545,28 @@ def test_rep_map_different_names():
     assert out["a"].tolist() == [10, 20]
 
 
-def test_missing_pivot_returns_none():
+def test_missing_pivot_raises():
     df_l = pd.DataFrame({"id": [1]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, rep_c="x") is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, rep_c="x")
 
 
-def test_missing_replacement_returns_none():
+def test_missing_replacement_raises():
     df_l = pd.DataFrame({"id": [1]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, pivot_c="id") is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, pivot_c="id")
 
 
-def test_missing_source_col_returns_none():
+def test_missing_source_col_raises():
     df_l = pd.DataFrame({"id": [1], "a": [10]})
     df_r = pd.DataFrame({"id": [1]})
 
-    assert replace_columns(df_l, df_r, pivot_c="id", rep_map={"a": "missing"}) is None
+    with pytest.raises(ValueError):
+        replace_columns(df_l, df_r, pivot_c="id", rep_map={"a": "missing"})
 
 
 def test_index_reset():
@@ -584,79 +575,6 @@ def test_index_reset():
 
     out = replace_columns(df_l, df_r, pivot_c="id", rep_c="x")
     assert list(out.index) == [0, 1]
-
-
-def test_make_copy_basic():
-    parser = make_parser("a,b\n1,2\n3,4\n")
-    cp = make_copy(parser)
-
-    assert cp is not None
-
-    expected = pd.DataFrame({"a": [1, 3], "b": [2, 4]})
-
-    assert cp.get_chunk().equals(expected)
-    assert parser.get_chunk().equals(expected)
-
-
-def test_make_copy_failure_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        make_copy(parser)
-
-
-def test_restore_basic():
-    parser = make_parser("a,b\n1,2\n3,4\n")
-    parser.get_chunk()
-
-    restored = restore(parser)
-    assert restored is not None
-
-    expected = pd.DataFrame({"a": [1, 3], "b": [2, 4]})
-    assert restored.get_chunk().equals(expected)
-
-
-def test_restore_failure_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        restore(parser)
-
-
-def test_is_not_empty_true():
-    parser = make_parser("a,b\n1,2\n")
-    assert is_not_empty(parser) is True
-
-
-def test_is_not_empty_false():
-    parser = make_parser("a,b\n")
-    assert is_not_empty(parser) is False
-
-
-def test_is_not_empty_failure_make_copy_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        is_not_empty(parser)
-
-
-def test_get_length_basic():
-    parser = make_parser("a,b\n1,2\n3,4\n5,6\n")
-    assert get_length_hdlr(parser) == 3
-
-
-def test_get_length_empty():
-    parser = make_parser("a,b\n")
-    assert get_length_hdlr(parser) == 0
-
-
-def test_get_length_failure_due_to_bad_line():
-    parser = make_parser("a,b\n1,2\n1,2,3\n")
-    with pytest.raises(RuntimeError):
-        get_length_hdlr(parser)
-
-
-def test_get_length_failure_make_copy_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        get_length_hdlr(parser)
 
 
 def test_init_logger_returns_logger():
@@ -886,8 +804,8 @@ def test_get_filename_name_part(pattern, expected_name):
     ],
 )
 def test_count_by_cat_i(data, expected):
-    series = pd.Series(data)
-    assert _count_by_cat(series) == expected
+    series = pd.DataFrame(data, columns=["test"])
+    assert _count_by_cat(series, ["test"])["test"] == expected
 
 
 @pytest.mark.parametrize(
@@ -935,16 +853,6 @@ nan,z
     assert result == expected
 
 
-def test_count_by_cat_broken_parser():
-    text = """A,B
-1,x
-2,y
-"""
-    parser = make_broken_parser(text)
-    with pytest.raises(RuntimeError):
-        count_by_cat(parser, ["A", "B"])
-
-
 @pytest.mark.parametrize(
     "data, expected_len",
     [
@@ -952,7 +860,7 @@ def test_count_by_cat_broken_parser():
         (make_parser("A,B\n1,x\n2,y\n3,z"), 3),
     ],
 )
-def test_get_length(data, expected_len):
+def test_get_length_inspect(data, expected_len):
     assert get_length(data) == expected_len
 
 

@@ -8,20 +8,19 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-from io import StringIO
 from typing import Iterable, Callable
 
 import pandas as pd
+
+from .iterators import process_disk_backed, is_valid_iterator
 
 
 def _split_df(
     df: pd.DataFrame,
     mask: pd.DataFrame,
-    reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
 ):
-
     if inverse:
         selected = df[~mask]
         rejected = df[mask] if return_rejected else df.iloc[0:0]
@@ -29,14 +28,9 @@ def _split_df(
         selected = df[mask]
         rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
-    selected.attrs["_prev_index"] = mask.index[mask]
-    rejected.attrs["_prev_index"] = mask.index[~mask]
-
-    if reset_index:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
-
-    return selected, rejected
+    selected_idx = mask.index[mask]
+    rejected_idx = mask.index[~mask]
+    return selected, rejected, selected_idx, rejected_idx
 
 
 def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs):
@@ -55,6 +49,7 @@ def _split_by_column_df(
     **kwargs,
 ):
     mask_sel = df[col].isin(values)
+    mask_sel.name = col
 
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
@@ -66,117 +61,41 @@ def _split_by_index_df(
 ):
     index = pd.Index(index if isinstance(index, Iterable) else [index])
     mask_sel = pd.Series(df.index.isin(index), index=df.index)
-
     return _split_df(df=df, mask=mask_sel, **kwargs)
-
-
-def _split_text_reader(
-    reader,
-    func: Callable,
-    *args,
-    reset_index=False,
-    inverse=False,
-    return_rejected=False,
-):
-    buffer_sel = StringIO()
-    buffer_rej = StringIO()
-
-    read_params = [
-        "chunksize",
-        "names",
-        "dtype",
-        "parse_dates",
-        "date_parser",
-        "infer_datetime_format",
-    ]
-
-    write_dict = {"header": None, "mode": "a", "index": not reset_index}
-    read_dict = {x: reader.orig_options.get(x) for x in read_params}
-
-    new_args = []
-    new_readers = []
-
-    prev_index_sel = None
-    prev_index_rej = None
-
-    for d in args:
-        if isinstance(d, pd.io.parsers.TextFileReader):
-            new_readers.append(d)
-        else:
-            new_args.append(d)
-
-    readers = [reader] + new_readers
-
-    for zipped in zip(*readers):
-
-        if not isinstance(zipped, tuple):
-            zipped = tuple(zipped)
-
-        sel, rej = func(
-            *zipped,
-            *new_args,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-        sel_prev_index = sel.attrs["_prev_index"]
-
-        if prev_index_sel is None:
-            prev_index_sel = sel_prev_index
-        else:
-            prev_index_sel = prev_index_sel.union(sel_prev_index)
-
-        rej_prev_index = rej.attrs["_prev_index"]
-
-        if prev_index_rej is None:
-            prev_index_rej = rej_prev_index
-        else:
-            prev_index_rej = prev_index_rej.union(rej_prev_index)
-
-        sel.to_csv(buffer_sel, **write_dict)
-        if return_rejected:
-            rej.to_csv(buffer_rej, **write_dict)
-
-    dtypes = {}
-    for col, dtype in sel.dtypes.items():
-        if dtype == "object":
-            dtype = "str"
-        dtypes[col] = dtype
-
-    read_dict["dtype"] = dtypes
-
-    buffer_sel.seek(0)
-    buffer_rej.seek(0)
-
-    selected = pd.read_csv(buffer_sel, **read_dict)
-    rejected = pd.read_csv(buffer_rej, **read_dict)
-
-    selected.attrs = {"_prev_index": prev_index_sel}
-    rejected.attrs = {"_prev_index": prev_index_rej}
-
-    return selected, rejected
 
 
 def _split_dispatch(
     data,
     func: Callable,
     *args,
+    reset_index: bool = False,
     **kwargs,
 ):
-
     if isinstance(data, pd.DataFrame):
-        return func(data, *args, **kwargs)
+        selected, rejected, selected_idx, rejected_idx = func(data, *args, **kwargs)
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        return _split_text_reader(
+    elif is_valid_iterator(data):
+        selected, rejected, out_dict = process_disk_backed(
             data,
             func,
-            *args,
-            **kwargs,
+            func_args=args,
+            func_kwargs=kwargs,
+            makecopy=False,
+            non_data_output="acc",
         )
 
-    raise TypeError("Unsupported input type for split operation.")
+        selected_idx = pd.Index([]).append(out_dict[0])
+        rejected_idx = pd.Index([]).append(out_dict[1])
+
+    else:
+        raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
+
+    if reset_index is True:
+        selected = selected.reset_index(drop=True)
+        print(selected)
+        rejected = rejected.reset_index(drop=True)
+
+    return selected, rejected, selected_idx, rejected_idx
 
 
 def split_by_boolean(

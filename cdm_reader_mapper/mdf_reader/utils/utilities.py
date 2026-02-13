@@ -3,18 +3,13 @@
 from __future__ import annotations
 
 import ast
-import csv
+
 import os
-
-from io import StringIO
-from pathlib import Path
-from typing import Any, Iterable, Callable
-
 import pandas as pd
+from pathlib import Path
+from typing import Any, Callable, Iterable
 
-from .. import properties
-
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import make_copy
+from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterator
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -227,26 +222,22 @@ def _read_data_from_file(
     data = reader(filepath, **reader_kwargs)
 
     if isinstance(data, pd.DataFrame):
-        return update_and_select(data, subset=col_subset, column_names=column_names)
-
-    if iterator is True:
-        writer_kwargs = {}
-        if "encoding" in reader_kwargs:
-            writer_kwargs["encoding"] = reader_kwargs["encoding"]
-
-        return process_textfilereader(
-            data,
-            func=update_and_select,
-            func_kwargs={
-                "subset": col_subset,
-                "column_names": column_names,
-            },
-            read_kwargs=reader_kwargs,
-            write_kwargs=writer_kwargs,
-            makecopy=False,
+        data, info = update_and_select(
+            data, subset=col_subset, column_names=column_names
         )
 
-    raise ValueError(f"Unsupported reader return type: {type(data)}")
+    elif is_valid_iterator(data):
+        data, info = process_disk_backed(
+            data,
+            func=update_and_select,
+            func_kwargs={"subset": col_subset, "column_names": column_names},
+            makecopy=False,
+        )
+        info = info[0][0]
+    else:
+        raise ValueError(f"Unsupported reader return type: {type(data)}")
+
+    return data, info
 
 
 def read_csv(
@@ -277,11 +268,10 @@ def read_csv(
     """
     return _read_data_from_file(
         filepath,
-        reader=pd.read_csv,
-        col_subset=col_subset,
-        column_names=column_names,
+        pd.read_csv,
+        col_subset,
+        column_names,
         reader_kwargs=kwargs,
-        iterator=True,
     )
 
 
@@ -308,14 +298,14 @@ def read_parquet(
     Returns
     -------
     tuple[pd.DataFrame, dict]
-        - The CSV as a DataFrame. Empty if file does not exist.
+        - The PARQUET as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
     return _read_data_from_file(
         filepath,
-        reader=pd.read_parquet,
-        col_subset=col_subset,
-        column_names=column_names,
+        pd.read_parquet,
+        col_subset,
+        column_names,
         reader_kwargs=kwargs,
     )
 
@@ -348,9 +338,9 @@ def read_feather(
     """
     return _read_data_from_file(
         filepath,
-        reader=pd.read_feather,
-        col_subset=col_subset,
-        column_names=column_names,
+        pd.read_feather,
+        col_subset,
+        column_names,
         reader_kwargs=kwargs,
     )
 
@@ -464,106 +454,3 @@ def remove_boolean_values(data, dtypes) -> pd.DataFrame:
     data = data.map(_remove_boolean_values)
     dtype = _adjust_dtype(dtypes, data)
     return data.astype(dtype)
-
-
-def process_textfilereader(
-    reader: Iterable[pd.DataFrame],
-    func: Callable,
-    func_args: tuple = (),
-    func_kwargs: dict[str, Any] | None = None,
-    read_kwargs: dict[str, Any] | tuple[dict[str, Any], ...] | None = None,
-    write_kwargs: dict[str, Any] | None = None,
-    makecopy: bool = True,
-) -> tuple[Iterable[pd.DataFrame], ...]:
-    """
-    Process a stream of DataFrames using a function and return processed results.
-
-    Each DataFrame from `reader` is passed to `func`, which can return one or more
-    DataFrames or other outputs. DataFrame outputs are concatenated in memory and
-    returned as a tuple along with any additional non-DataFrame outputs.
-
-    Parameters
-    ----------
-    reader : Iterable[pd.DataFrame]
-        An iterable of DataFrames (e.g., a CSV reader returning chunks).
-    func : Callable
-        Function to apply to each DataFrame.
-    func_args : tuple, optional
-        Positional arguments passed to `func`.
-    func_kwargs : dict, optional
-        Keyword arguments passed to `func`.
-    read_kwargs : dict or tuple of dict, optional
-        Arguments to pass to `pd.read_csv` when reconstructing output DataFrames.
-    write_kwargs : dict, optional
-        Arguments to pass to `DataFrame.to_csv` when buffering output.
-    makecopy : bool, default True
-        If True, makes a copy of each input DataFrame before processing.
-
-    Returns
-    -------
-    tuple
-        A tuple containing:
-            - One or more processed DataFrames (in the same order as returned by `func`)
-            - Any additional outputs from `func` that are not DataFrames
-    """
-    func_kwargs = func_kwargs or {}
-    read_kwargs = read_kwargs or {}
-    write_kwargs = write_kwargs or {}
-
-    buffers = []
-    columns = []
-
-    if makecopy is True:
-        reader = make_copy(reader)
-
-    output_add = []
-
-    for df in reader:
-        outputs = func(df, *func_args, **func_kwargs)
-        if not isinstance(outputs, tuple):
-            outputs = (outputs,)
-
-        output_dfs = []
-        first_chunk = not buffers
-
-        for out in outputs:
-            if isinstance(out, pd.DataFrame):
-                output_dfs.append(out)
-            elif first_chunk:
-                output_add.append(out)
-
-        if not buffers:
-            buffers = [StringIO() for _ in output_dfs]
-            columns = [out.columns for out in output_dfs]
-
-        for buffer, out_df in zip(buffers, output_dfs):
-            out_df.to_csv(
-                buffer,
-                header=False,
-                mode="a",
-                index=False,
-                quoting=csv.QUOTE_NONE,
-                sep=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-                **write_kwargs,
-            )
-
-    if isinstance(read_kwargs, dict):
-        read_kwargs = tuple(read_kwargs for _ in range(len(buffers)))
-
-    result_dfs = []
-    for buffer, cols, rk in zip(buffers, columns, read_kwargs):
-        buffer.seek(0)
-        rk = {k: v for k, v in rk.items() if k != "delimiter"}
-        result_dfs.append(
-            pd.read_csv(
-                buffer,
-                names=cols,
-                delimiter=properties.internal_delimiter,
-                quotechar="\0",
-                escapechar="\0",
-                **rk,
-            )
-        )
-    return tuple(result_dfs + output_add)
