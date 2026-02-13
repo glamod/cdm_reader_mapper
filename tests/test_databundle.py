@@ -402,13 +402,13 @@ def test_split_operators_df(
     "func, args, idx_exp, idx_rej",
     [
         ("split_by_boolean_true", [], [0, 1, 2], [3, 4]),
-        # ("split_by_boolean_false", [], [3], [0, 1, 2, 4]),
-        # ("split_by_index", [[0, 2, 4]], [0, 2, 4], [1, 3]),
-        # ("split_by_column_entries", [{"A": [26, 41]}], [1, 3], [0, 2, 4]),
+        ("split_by_boolean_false", [], [3], [0, 1, 2, 4]),
+        ("split_by_index", [[0, 2, 4]], [0, 2, 4], [1, 3]),
+        ("split_by_column_entries", [{"A": [26, 41]}], [1, 3], [0, 2, 4]),
     ],
 )
-@pytest.mark.parametrize("reset_index", [True])  # [False, True])
-@pytest.mark.parametrize("inverse", [False])  # [False, True])
+@pytest.mark.parametrize("reset_index", [False, True])
+@pytest.mark.parametrize("inverse", [False, True])
 def test_split_operators_reader(
     sample_db_reader,
     func,

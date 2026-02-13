@@ -49,10 +49,10 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     expected = read_data(data_file=data, mask_file=mask, info_file=info)
 
     if not isinstance(result.data, pd.DataFrame):
-        result.data = result.data.read(reset_index=True)
+        result.data = result.data.read()
 
     if not isinstance(result.mask, pd.DataFrame):
-        result.mask = result.mask.read(reset_index=True)
+        result.mask = result.mask.read()
 
     if select:
         selected = _get_columns(expected.data.columns, select)
@@ -158,14 +158,14 @@ def test_read_mdf_test_data_kwargs(data_model, kwargs):
     "data_model, kwargs, select",
     [
         ("icoads_r300_d714", {"sections": ["c99"], "chunksize": 3}, ["c99"]),
-        # ("icoads_r300_d714", {"sections": ["c99"]}, ["c99"]),
-        # ("icoads_r300_d714", {"sections": "c99"}, ["c99"]),
-        # (
-        #    "icoads_r300_d714",
-        #    {"sections": ["core", "c99"]},
-        #    ["core", "c99"],
-        # ),
-        # ("craid", {"sections": ["drifter_measurements"]}, ["drifter_measurements"]),
+        ("icoads_r300_d714", {"sections": ["c99"]}, ["c99"]),
+        ("icoads_r300_d714", {"sections": "c99"}, ["c99"]),
+        (
+            "icoads_r300_d714",
+            {"sections": ["core", "c99"]},
+            ["core", "c99"],
+        ),
+        ("craid", {"sections": ["drifter_measurements"]}, ["drifter_measurements"]),
     ],
 )
 def test_read_mdf_test_data_select(data_model, kwargs, select):
