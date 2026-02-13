@@ -44,6 +44,9 @@
     "elements": "GEOGR_BREITE",
     "decimal_places": 1
   },
+  "location_quality": {
+    "default": 3
+  },
   "crs": {
     "default": 0
   },
@@ -80,8 +83,7 @@
     "decimal_places": 0
   },
   "report_time_quality": {
-    "elements": "MESSZEIT_FLAG",
-    "code_table": "report_time_quality"
+    "default": 2 
   },
   "report_quality": {
     "default": 2

@@ -20,9 +20,7 @@
     "default": 731
   },
   "quality_flag": {
-    "elements": "WINDGESCHWINDIGKEIT_FLAG",
-    "code_table": "quality_flag",
-    "fill_value": 2
+    "default": 2
   },
   "original_precision": {},
   "original_units": {

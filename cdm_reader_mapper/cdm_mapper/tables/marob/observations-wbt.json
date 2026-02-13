@@ -20,9 +20,7 @@
     "default": 5
   },
   "quality_flag": {
-    "elements": "FEUCHTTEMPERATUR_FLAG",
-    "code_table": "quality_flag",
-    "fill_value": 2
+    "default": 2
   },
   "original_units": {
     "default": 60
