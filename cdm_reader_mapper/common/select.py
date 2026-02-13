@@ -18,10 +18,8 @@ from .iterators import process_disk_backed, is_valid_iterator
 def _split_df(
     df: pd.DataFrame,
     mask: pd.DataFrame,
-    reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-    running_index: int = 0,
 ):
     if inverse:
         selected = df[~mask]
@@ -32,11 +30,6 @@ def _split_df(
 
     selected_idx = mask.index[mask]
     rejected_idx = mask.index[~mask]
-
-    if reset_index:
-        selected.index = range(running_index, running_index + len(selected))
-        rejected.index = range(running_index, running_index + len(rejected))
-
     return selected, rejected, selected_idx, rejected_idx
 
 
@@ -75,12 +68,13 @@ def _split_dispatch(
     data,
     func: Callable,
     *args,
+    reset_index: bool = False,
     **kwargs,
 ):
     if isinstance(data, pd.DataFrame):
-        return func(data, *args, **kwargs)
+        selected, rejected, selected_idx, rejected_idx = func(data, *args, **kwargs)
 
-    if is_valid_iterator(data):
+    elif is_valid_iterator(data):
         selected, rejected, out_dict = process_disk_backed(
             data,
             func,
@@ -88,15 +82,20 @@ def _split_dispatch(
             func_kwargs=kwargs,
             makecopy=False,
             non_data_output="acc",
-            running_index=True,
         )
 
         selected_idx = pd.Index([]).append(out_dict[0])
         rejected_idx = pd.Index([]).append(out_dict[1])
 
-        return selected, rejected, selected_idx, rejected_idx
+    else:
+        raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
 
-    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
+    if reset_index is True:
+        selected = selected.reset_index(drop=True)
+        print(selected)
+        rejected = rejected.reset_index(drop=True)
+
+    return selected, rejected, selected_idx, rejected_idx
 
 
 def split_by_boolean(
