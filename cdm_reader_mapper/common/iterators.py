@@ -223,110 +223,15 @@ def _parquet_generator(
         temp_dir.cleanup()
 
 
-def parquet_stream_from_iterable(
-    iterable: Iterable[pd.DataFrame | pd.Series],
-) -> ParquetStreamReader:
-    """
-    Stream an iterable of DataFrame/Series to parquet
-    and return a disk-backed ParquetStreamReader.
-
-    Memory usage remains constant.
-    """
-    iterator = iter(iterable)
-
-    try:
-        first = next(iterator)
-    except StopIteration:
-        raise ValueError("Iterable is empty.")
-
-    if not isinstance(first, (pd.DataFrame, pd.Series)):
-        raise TypeError("Iterable must contain pd.DataFrame or pd.Series objects.")
-
-    temp_dir = tempfile.TemporaryDirectory()
-    temp_dirs = [temp_dir]
-
-    if isinstance(first, pd.DataFrame):
-        data_type = pd.DataFrame
-        schema = first.columns
-    else:
-        data_type = pd.Series
-        schema = first.name
-
-    print(first)
-
-    _write_chunks_to_disk([first], temp_dirs, chunk_counter=0)
-
-    for idx, chunk in enumerate(iterator, start=1):
-        print(chunk)
-        if not isinstance(chunk, type(first)):
-            raise TypeError("All chunks must be of the same type.")
-
-        _write_chunks_to_disk([chunk], temp_dirs, chunk_counter=idx)
-
-    return ParquetStreamReader(lambda: _parquet_generator(temp_dir, data_type, schema))
-
-
-def is_valid_iterator(reader: Any) -> bool:
-    """Check if reader is a valid Iterable."""
-    return isinstance(reader, Iterator)
-
-
-def ensure_parquet_reader(obj: Any) -> Any:
-    """Ensure obj is a ParquetStreamReader."""
-    if isinstance(obj, ParquetStreamReader):
-        return obj
-
-    if is_valid_iterator(obj):
-        return parquet_stream_from_iterable(obj)
-
-    return obj
-
-
-def process_disk_backed(
-    reader: Iterator[pd.DataFrame | pd.Series],
-    func: Callable,
-    func_args: Sequence[Any] | None = None,
-    func_kwargs: dict[str, Any] | None = None,
-    requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
-    non_data_output: Literal["first", "acc"] = "first",
-    makecopy: bool = True,
-) -> tuple[Any, ...]:
-    """
-    Consumes a stream of DataFrames, processes them, and returns a tuple of
-    results. DataFrames are cached to disk (Parquet) and returned as generators.
-    """
-    if func_args is None:
-        func_args = ()
-    if func_kwargs is None:
-        func_kwargs = {}
-
-    if not isinstance(requested_types, (list, tuple)):
-        requested_types = (requested_types,)
-
-    reader = ensure_parquet_reader(reader)
-
-    args_reader = []
-    args = []
-    for arg in func_args:
-        converted = ensure_parquet_reader(arg)
-        if isinstance(converted, ParquetStreamReader):
-            args_reader.append(converted)
-        else:
-            args.append(converted)
-
-    kwargs = {}
-    for k, v in func_kwargs.items():
-        converted = ensure_parquet_reader(v)
-        if isinstance(converted, ParquetStreamReader):
-            args_reader.append(converted)
-        else:
-            kwargs[k] = converted
-
-    readers = [reader] + args_reader
-
-    if makecopy:
-        readers = [r.copy() for r in readers]
-
+def _process_chunks(
+    readers: list[ParquetStreamReader],
+    func: Callable[..., Any],
+    requested_types: tuple[str],
+    static_args: list[Any],
+    static_kwargs: dict[str, Any],
+    non_data_output: str,
+):
+    """Process chunks."""
     # State variables
     temp_dirs = None
     schemas = None
@@ -341,7 +246,7 @@ def process_disk_backed(
                 f"Requested types are: {requested_types} "
             )
 
-        result = func(*items, *args, **kwargs)
+        result = func(*items, *static_args, **static_kwargs)
         if not isinstance(result, tuple):
             result = (result,)
 
@@ -375,3 +280,127 @@ def process_disk_backed(
     ]
 
     return tuple(final_iterators + [output_non_data])
+
+
+def _prepare_readers(
+    reader: Iterator[pd.DataFrame | pd.Series],
+    func_args: Sequence[Any],
+    func_kwargs: dict[str, Any],
+    makecopy: bool,
+) -> tuple[list[ParquetStreamReader], list[Any], dict[str, Any]]:
+    """Prepare readers for chunking."""
+    reader = ensure_parquet_reader(reader)
+
+    args_reader = []
+    args = []
+    for arg in func_args:
+        converted = ensure_parquet_reader(arg)
+        if isinstance(converted, ParquetStreamReader):
+            args_reader.append(converted)
+        else:
+            args.append(converted)
+
+    kwargs = {}
+    for k, v in func_kwargs.items():
+        converted = ensure_parquet_reader(v)
+        if isinstance(converted, ParquetStreamReader):
+            args_reader.append(converted)
+        else:
+            kwargs[k] = converted
+
+    readers = [reader] + args_reader
+
+    if makecopy:
+        readers = [r.copy() for r in readers]
+
+    return readers, args, kwargs
+
+
+def parquet_stream_from_iterable(
+    iterable: Iterable[pd.DataFrame | pd.Series],
+) -> ParquetStreamReader:
+    """
+    Stream an iterable of DataFrame/Series to parquet
+    and return a disk-backed ParquetStreamReader.
+
+    Memory usage remains constant.
+    """
+    iterator = iter(iterable)
+
+    try:
+        first = next(iterator)
+    except StopIteration:
+        raise ValueError("Iterable is empty.")
+
+    if not isinstance(first, (pd.DataFrame, pd.Series)):
+        raise TypeError("Iterable must contain pd.DataFrame or pd.Series objects.")
+
+    temp_dir = tempfile.TemporaryDirectory()
+    temp_dirs = [temp_dir]
+
+    if isinstance(first, pd.DataFrame):
+        data_type = pd.DataFrame
+        schema = first.columns
+    else:
+        data_type = pd.Series
+        schema = first.name
+    _write_chunks_to_disk([first], temp_dirs, chunk_counter=0)
+
+    for idx, chunk in enumerate(iterator, start=1):
+        if not isinstance(chunk, type(first)):
+            raise TypeError("All chunks must be of the same type.")
+
+        _write_chunks_to_disk([chunk], temp_dirs, chunk_counter=idx)
+
+    return ParquetStreamReader(lambda: _parquet_generator(temp_dir, data_type, schema))
+
+
+def is_valid_iterator(reader: Any) -> bool:
+    """Check if reader is a valid Iterable."""
+    return isinstance(reader, Iterator)
+
+
+def ensure_parquet_reader(obj: Any) -> Any:
+    """Ensure obj is a ParquetStreamReader."""
+    if isinstance(obj, ParquetStreamReader):
+        return obj
+
+    if is_valid_iterator(obj):
+        return parquet_stream_from_iterable(obj)
+
+    return obj
+
+
+def process_disk_backed(
+    reader: Iterator[pd.DataFrame | pd.Series],
+    func: Callable[..., Any],
+    func_args: Sequence[Any] | None = None,
+    func_kwargs: dict[str, Any] | None = None,
+    requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
+    non_data_output: Literal["first", "acc"] = "first",
+    makecopy: bool = True,
+) -> tuple[Any, ...]:
+    """
+    Consumes a stream of DataFrames, processes them, and returns a tuple of
+    results. DataFrames are cached to disk (Parquet) and returned as generators.
+    """
+    if func_args is None:
+        func_args = ()
+    if func_kwargs is None:
+        func_kwargs = {}
+
+    if not isinstance(requested_types, (list, tuple)):
+        requested_types = (requested_types,)
+
+    readers, static_args, static_kwargs = _prepare_readers(
+        reader, func_args, func_kwargs, makecopy
+    )
+
+    return _process_chunks(
+        readers,
+        func,
+        requested_types,
+        static_args,
+        static_kwargs,
+        non_data_output,
+    )
