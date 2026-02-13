@@ -2,21 +2,35 @@
 
 from __future__ import annotations
 
+from typing import get_args
+
+import pandas as pd
+from pandas.io.parsers import TextFileReader
+
 from cdm_reader_mapper.cdm_mapper.writer import write_tables
 from cdm_reader_mapper.mdf_reader.writer import write_data
 
+from ..properties import SupportedWriteModes
+
+supported_write_modes = get_args(SupportedWriteModes)
+
+WRITERS = {
+    "data": write_data,
+    "tables": write_tables,
+}
+
 
 def write(
-    data,
-    mode="data",
+    data: pd.DataFrame | TextFileReader,
+    mode: SupportedWriteModes = "data",
     **kwargs,
 ) -> None:
     """Write either MDF data or CDM tables on disk.
 
     Parameters
     ----------
-    data: pandas.DataFrame
-        pandas.DataFrame to export.
+    data: pandas.DataFrame or TextFileReader
+        Data to export.
     mode: str, {data, tables}
         Write data mode:
 
@@ -40,10 +54,9 @@ def write(
     ----
     `kwargs` are the keyword arguments for the specific `mode` reader.
     """
-    match mode.lower():
-        case "data":
-            write_data(data, **kwargs)
-        case "tables":
-            write_tables(data, **kwargs)
-        case _:
-            raise ValueError(f"No valid mode: {mode}. Choose one of ['data', 'tables']")
+    if mode not in supported_write_modes:
+        raise ValueError(
+            f"No valid mode: {mode}. Choose one of {supported_write_modes}."
+        )
+
+    return WRITERS[mode](data, **kwargs)

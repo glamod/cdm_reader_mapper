@@ -10,14 +10,29 @@ Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * ``mdf_reader.read_data`` now supports chunking (:pull:`360`)
+* read and write both `parquet` and `feather` files including new parameter `data_format` (:issue:`353`, :pull:`363`):
+
+  * `mdf_reader.read_data`,
+  * `mdf_reader.write_data`
+  * `cdm_mapper.read_tables`
+  * `cdm_mapper.write_tables`
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * ``DataBundle.stack_v`` and ``DataBundle.stack_h`` only support `pd.DataFrames` as input, otherwise raises an `ValueError` (:pull:`360`)
+* set default for `extension` from `psv` to specified `data_format` (:pull:`363`):
+
+  * `cdm_mapper.read_tables`
+  * `cdm_mapper.write_tables`
+
+* set default for `extension` from ``csv`  to specified `data_format` in `mdf_reader.write_data` (:pull:`363`)
+* `mdf_reader.read_data`: save `dtypes` in return DataBundle as `pd.Series` not `dict` (:pull:`363`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
 * re-work internal structure for more readability and better performance (:pull:`360`)
+* use pre-defined `Literal` constants in `cdm_reader_mapper.properties` (:pull:`363`)
+* `mdf_reader.utils.utilities.read_csv`: parameter `columns` to `column_names` (:pull:`363`)
 
 2.2.1 (2026-01-23)
 ------------------

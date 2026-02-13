@@ -35,11 +35,11 @@ class DataBundle(_DataBundle):
     ----------
     data: pandas.DataFrame, optional
         MDF DataFrame.
-    columns: list, optional
+    columns: pd.Index, pd.MultiIndex or list, optional
         Column labels of ``data``
-    dtypes: dict, optional
+    dtypes: pd.Series or dict, optional
         Data types of ``data``.
-    parse_dates: list, optional
+    parse_dates: list or bool, optional
         Information how to parse dates on ``data``
     mask: pandas.DataFrame, optional
         MDF validation mask

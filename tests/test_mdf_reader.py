@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 
 import numpy as np
@@ -8,11 +9,17 @@ import pytest
 
 from cdm_reader_mapper import test_data, DataBundle
 from cdm_reader_mapper.mdf_reader.reader import (
+    _read_data,
     read_mdf,
     read_data,
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
+from cdm_reader_mapper.mdf_reader.utils.utilities import (
+    read_csv,
+    read_parquet,
+    read_feather,
+)
 
 
 def _get_columns(columns, select):
@@ -38,7 +45,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    expected = read_data(data, mask=mask, info=info)
+    expected = read_data(data_file=data, mask_file=mask, info_file=info)
 
     if not isinstance(result.data, pd.DataFrame):
         result.data = result.data.read()
@@ -226,7 +233,7 @@ def test_read_data_basic():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert isinstance(db.parse_dates, list)
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
@@ -242,7 +249,7 @@ def test_read_data_no_mask():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, info=info)
+    db = read_data(data_file=data, info_file=info)
 
     assert isinstance(db, DataBundle)
 
@@ -261,7 +268,7 @@ def test_read_data_no_mask():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert isinstance(db.parse_dates, list)
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
@@ -277,7 +284,7 @@ def test_read_data_no_info():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
 
-    db = read_data(data)
+    db = read_data(data_file=data)
 
     assert isinstance(db, DataBundle)
 
@@ -296,7 +303,7 @@ def test_read_data_no_info():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert db.parse_dates is False
     assert db.encoding is None
     assert db.imodel is None
@@ -311,7 +318,7 @@ def test_read_data_col_subset():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, info=info, col_subset="core")
+    db = read_data(data_file=data, info_file=info, col_subset="core")
 
     assert isinstance(db, DataBundle)
 
@@ -330,7 +337,7 @@ def test_read_data_col_subset():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.Index)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert isinstance(db.parse_dates, list)
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
@@ -345,7 +352,7 @@ def test_read_data_col_subset():
 def test_read_data_encoding():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    db = read_data(data, encoding="cp1252")
+    db = read_data(data_file=data, encoding="cp1252")
 
     assert isinstance(db, DataBundle)
 
@@ -364,7 +371,7 @@ def test_read_data_encoding():
     assert isinstance(db.data, pd.DataFrame)
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.Index)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert db.parse_dates is False
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
@@ -381,7 +388,7 @@ def test_read_data_textfilereader():
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, mask=mask, info=info, chunksize=3)
+    db = read_data(data_file=data, mask_file=mask, info_file=info, chunksize=3)
 
     assert isinstance(db, DataBundle)
 
@@ -400,7 +407,7 @@ def test_read_data_textfilereader():
     assert isinstance(db.data, pd.io.parsers.TextFileReader)
     assert isinstance(db.mask, pd.io.parsers.TextFileReader)
     assert isinstance(db.columns, pd.MultiIndex)
-    assert isinstance(db.dtypes, dict)
+    assert isinstance(db.dtypes, pd.Series)
     assert db.parse_dates == []
     assert isinstance(db.encoding, str)
     assert db.encoding == "cp1252"
@@ -511,3 +518,208 @@ def test_validate_read_mdf_args_invalid_years(tmp_path):
             chunksize=None,
             skiprows=0,
         )
+
+
+@pytest.fixture
+def example_data():
+    return pd.DataFrame(
+        {
+            "A": [1, 2, 3],
+            "B": [4.0, 5.0, 6.0],
+            "C": ["x", "y", "z"],
+        }
+    )
+
+
+@pytest.fixture
+def example_mask():
+    return pd.DataFrame(
+        {
+            "A": [True, False, True],
+            "B": [True, True, False],
+            "C": [True, True, False],
+        },
+        dtype="boolean",
+    )
+
+
+@pytest.fixture
+def example_info(example_data):
+    return {
+        "columns": example_data.columns,
+        "dtypes": example_data.dtypes,
+        "parse_dates": False,
+        "encoding": None,
+    }
+
+
+@pytest.fixture
+def csv_files(tmp_path, example_data, example_mask, example_info):
+    data_file = tmp_path / "data.csv"
+    mask_file = tmp_path / "mask.csv"
+    info_file = tmp_path / "info.json"
+
+    example_data.to_csv(data_file, index=False)
+    example_mask.to_csv(mask_file, index=False)
+    info = {
+        "columns": list(example_info["columns"]),
+        "dtypes": example_info["dtypes"].astype(str).to_dict(),
+        "parse_dates": example_info["parse_dates"],
+        "encoding": example_info["encoding"],
+    }
+    info_file.write_text(json.dumps(info))
+
+    return data_file, mask_file, info_file
+
+
+@pytest.fixture
+def parquet_files(tmp_path, example_data, example_mask):
+    data_file = tmp_path / "data.parquet"
+    mask_file = tmp_path / "mask.parquet"
+
+    example_data.to_parquet(data_file)
+    example_mask.to_parquet(mask_file)
+
+    return data_file, mask_file
+
+
+@pytest.fixture
+def feather_files(tmp_path, example_data, example_mask):
+    data_file = tmp_path / "data.feather"
+    mask_file = tmp_path / "mask.feather"
+
+    example_data.to_feather(data_file)
+    example_mask.to_feather(mask_file)
+
+    return data_file, mask_file
+
+
+def test_read_data_with_mask_csv(csv_files, example_data, example_mask, example_info):
+    data_file, mask_file, _ = csv_files
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        reader=read_csv,
+        col_subset=None,
+        data_kwargs={},
+        mask_kwargs={"dtype": "boolean"},
+    )
+    pd.testing.assert_frame_equal(data, example_data)
+    pd.testing.assert_frame_equal(mask, example_mask)
+    pd.testing.assert_index_equal(info["columns"], example_info["columns"])
+    pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
+
+
+def test_read_data_with_mask_parquet(
+    parquet_files, example_data, example_mask, example_info
+):
+    data_file, mask_file = parquet_files
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        reader=read_parquet,
+        col_subset=None,
+        data_kwargs={},
+        mask_kwargs={},
+    )
+    pd.testing.assert_frame_equal(data, example_data)
+    pd.testing.assert_frame_equal(mask, example_mask)
+    pd.testing.assert_index_equal(info["columns"], example_info["columns"])
+    pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
+
+
+def test_read_data_with_mask_feather(
+    feather_files, example_data, example_mask, example_info
+):
+    data_file, mask_file = feather_files
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        reader=read_feather,
+        col_subset=None,
+        data_kwargs={},
+        mask_kwargs={},
+    )
+    pd.testing.assert_frame_equal(data, example_data)
+    pd.testing.assert_frame_equal(mask, example_mask)
+    pd.testing.assert_index_equal(info["columns"], example_info["columns"])
+    pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
+
+
+def test_read_data_without_mask_csv(csv_files, example_data, example_info):
+    data_file, _, _ = csv_files
+    data, mask, info = _read_data(
+        data_file=data_file,
+        mask_file=None,
+        reader=read_csv,
+        col_subset=None,
+        data_kwargs={},
+        mask_kwargs={},
+    )
+    pd.testing.assert_frame_equal(data, example_data)
+    assert mask.empty
+    pd.testing.assert_index_equal(info["columns"], example_info["columns"])
+    pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
+
+
+def test_read_data_csv(csv_files, example_data, example_mask):
+    data_file, mask_file, info_file = csv_files
+
+    bundle = read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        info_file=info_file,
+        data_format="csv",
+    )
+
+    assert isinstance(bundle, DataBundle)
+    pd.testing.assert_frame_equal(bundle.data, example_data)
+    pd.testing.assert_frame_equal(bundle.mask, example_mask)
+    pd.testing.assert_index_equal(bundle.columns, example_data.columns)
+    pd.testing.assert_series_equal(bundle.dtypes, example_data.dtypes)
+    assert bundle.parse_dates is False
+    assert bundle.encoding is None
+    assert bundle.imodel is None
+
+
+def test_read_data_parquet(parquet_files, example_data, example_mask):
+    data_file, mask_file = parquet_files
+
+    bundle = read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        data_format="parquet",
+    )
+
+    assert isinstance(bundle, DataBundle)
+    pd.testing.assert_frame_equal(bundle.data, example_data)
+    pd.testing.assert_frame_equal(bundle.mask, example_mask)
+    pd.testing.assert_index_equal(bundle.columns, example_data.columns)
+    pd.testing.assert_series_equal(bundle.dtypes, example_data.dtypes)
+    assert bundle.parse_dates is False
+    assert bundle.encoding is None
+    assert bundle.imodel is None
+
+
+def test_read_data_feather(feather_files, example_data, example_mask):
+    data_file, mask_file = feather_files
+
+    bundle = read_data(
+        data_file=data_file,
+        mask_file=mask_file,
+        data_format="feather",
+    )
+
+    assert isinstance(bundle, DataBundle)
+    pd.testing.assert_frame_equal(bundle.data, example_data)
+    pd.testing.assert_frame_equal(bundle.mask, example_mask)
+    pd.testing.assert_index_equal(bundle.columns, example_data.columns)
+    pd.testing.assert_series_equal(bundle.dtypes, example_data.dtypes)
+    assert bundle.parse_dates is False
+    assert bundle.encoding is None
+    assert bundle.imodel is None
+
+
+def test_read_data_invalid():
+    with pytest.raises(ValueError):
+        read_data("data.invalid", data_format="invalid")
