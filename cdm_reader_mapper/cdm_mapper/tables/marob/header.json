@@ -83,7 +83,7 @@
     "decimal_places": 0
   },
   "report_time_quality": {
-    "default": 2 
+    "default": 2
   },
   "report_quality": {
     "default": 2
