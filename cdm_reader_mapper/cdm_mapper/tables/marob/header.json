@@ -1,0 +1,106 @@
+{
+  "report_id": {
+    "elements": "ID",
+    "transform": "string_add",
+    "kwargs": {
+      "separator": "-",
+      "prepend": "DWD_MAROBSHIP"
+    }
+  },
+  "application_area": {
+    "default": [
+      1,
+      7,
+      10,
+      11
+    ]
+  },
+  "observing_programme": {
+    "default": 56
+  },
+  "report_type": {
+    "default": 0
+  },
+  "station_type": {
+    "default": 2
+  },
+  "platform_type": {
+    "default": 2
+  },
+  "primary_station_id": {
+    "elements": "KENNUNG"
+  },
+  "station_record_number": {
+    "default": 1
+  },
+  "primary_station_id_scheme": {
+    "fill_value": 5
+  },
+  "longitude": {
+    "elements": "GEOGR_LAENGE",
+    "decimal_places": 1
+  },
+  "latitude": {
+    "elements": "GEOGR_BREITE",
+    "decimal_places": 1
+  },
+  "location_quality": {
+    "default": 3
+  },
+  "crs": {
+    "default": 0
+  },
+  "station_speed": {
+    "elements": "FAHRTGESCHWINDIGKEIT",
+    "transform": "velocity_kn_in_ms",
+    "decimal_places": 2
+  },
+  "station_course": {
+    "elements": "FAHRTRICHTUNG",
+    "decimal_places": 0
+  },
+  "height_of_station_above_local_ground": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "height_of_station_above_sea_level": {
+    "elements": "STATIONSHOEHE_MSL",
+    "fill_value": 0,
+    "decimal_places": 1
+  },
+  "report_meaning_of_timestamp": {
+    "default": 2
+  },
+  "report_timestamp": {
+    "elements": "MESSZEIT",
+    "transform": "datetime_marob"
+  },
+  "report_duration": {
+    "default": 15
+  },
+  "report_time_accuracy": {
+    "default": 1,
+    "decimal_places": 0
+  },
+  "report_time_quality": {
+    "default": 2
+  },
+  "report_quality": {
+    "default": 2
+  },
+  "duplicate_status": {
+    "default": 4
+  },
+  "record_timestamp": {
+    "transform": "datetime_utcnow"
+  },
+  "history": {
+    "transform": "lineage"
+  },
+  "source_id": {
+    "elements": "DATENQUELLE_ID"
+  },
+  "source_record_id": {
+    "elements": "ID"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "observation_id": {
+    "elements": "ID",
+    "transform": "string_add",
+    "kwargs": {
+      "separator": "-",
+      "prepend": "DWD_MAROBSHIP"
+    }
+  },
+  "report_id": {
+    "elements": "ID",
+    "transform": "string_add",
+    "kwargs": {
+      "separator": "-",
+      "prepend": "DWD_MAROBSHIP"
+    }
+  },
+  "data_policy_licence": {
+    "default": 1
+  },
+  "date_time": {
+    "elements": "MESSZEIT",
+    "transform": "datetime_marob"
+  },
+  "date_time_meaning": {
+    "default": 2
+  },
+  "observation_duration": {
+    "default": 8
+  },
+  "longitude": {
+    "elements": "GEOGR_LAENGE",
+    "decimal_places": 1
+  },
+  "latitude": {
+    "elements": "GEOGR_BREITE",
+    "decimal_places": 1
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "value_significance": {
+    "default": 2
+  },
+  "conversion_flag": {
+    "default": 2
+  },
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "numerical_precision": {},
+  "sensor_automation_status": {
+    "elements": "DATENQUELLE_ID",
+    "code_table": "sensor_automation_status"
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "processing_level": {
+    "default": 3
+  },
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {
+    "elements": "DATENQUELLE_ID"
+  }
+}

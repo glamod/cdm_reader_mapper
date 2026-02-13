@@ -251,6 +251,7 @@ def _read_data_from_file(
 
 def read_csv(
     filepath: Path,
+    delimiter: str = ",",
     col_subset: str | list | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs,
@@ -280,7 +281,7 @@ def read_csv(
         reader=pd.read_csv,
         col_subset=col_subset,
         column_names=column_names,
-        reader_kwargs=kwargs,
+        reader_kwargs={"delimiter": delimiter, **kwargs},
         iterator=True,
     )
 
