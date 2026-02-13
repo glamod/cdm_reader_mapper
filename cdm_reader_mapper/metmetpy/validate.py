@@ -188,7 +188,6 @@ def validate_id(
 
     Notes
     -----
-    - If `data` is a TextFileReader, it is fully read into a DataFrame.
     - Uses `_get_id_col` to determine which column(s) contain IDs.
     - Uses `_get_patterns` to get regex patterns for the deck.
     - Empty values match "^$" pattern if `blank=True`.
@@ -267,10 +266,6 @@ def validate_datetime(
         If `data` is not a pd.DataFrame or a pd.Series or an Iterable[pd.DataFrame | pd.Series].
     ValueError
         If no columns found for datetime conversion.
-
-    Notes
-    -----
-    - If `data` is a TextFileReader, it is fully read into a DataFrame.
     """
     model = imodel.split("_")[0]
 

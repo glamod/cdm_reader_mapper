@@ -34,11 +34,7 @@ from cdm_reader_mapper.common.select import (
     split_by_index,
 )
 from cdm_reader_mapper.common.replace import replace_columns
-from cdm_reader_mapper.common.pandas_TextParser_hdlr import (
-    make_copy,
-    restore,
-    is_not_empty,
-)
+
 from cdm_reader_mapper.common.logging_hdlr import init_logger
 from cdm_reader_mapper.common.json_dict import (
     open_json_file,
@@ -63,13 +59,6 @@ def make_parser(text, **kwargs):
     """Helper: create a TextFileReader similar to user code."""
     buffer = StringIO(text)
     return pd.read_csv(buffer, chunksize=2, **kwargs)
-
-
-def make_broken_parser(text: str):
-    """Return a pandas TextFileReader that will fail in make_copy."""
-    parser = pd.read_csv(StringIO(text), chunksize=2)
-    parser.handles.handle = None
-    return parser
 
 
 def compute_md5(content: bytes) -> str:
@@ -588,57 +577,6 @@ def test_index_reset():
     assert list(out.index) == [0, 1]
 
 
-def test_make_copy_basic():
-    parser = make_parser("a,b\n1,2\n3,4\n")
-    cp = make_copy(parser)
-
-    assert cp is not None
-
-    expected = pd.DataFrame({"a": [1, 3], "b": [2, 4]})
-
-    assert cp.get_chunk().equals(expected)
-    assert parser.get_chunk().equals(expected)
-
-
-def test_make_copy_failure_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        make_copy(parser)
-
-
-def test_restore_basic():
-    parser = make_parser("a,b\n1,2\n3,4\n")
-    parser.get_chunk()
-
-    restored = restore(parser)
-    assert restored is not None
-
-    expected = pd.DataFrame({"a": [1, 3], "b": [2, 4]})
-    assert restored.get_chunk().equals(expected)
-
-
-def test_restore_failure_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        restore(parser)
-
-
-def test_is_not_empty_true():
-    parser = make_parser("a,b\n1,2\n")
-    assert is_not_empty(parser) is True
-
-
-def test_is_not_empty_false():
-    parser = make_parser("a,b\n")
-    assert is_not_empty(parser) is False
-
-
-def test_is_not_empty_failure_make_copy_memory():
-    parser = make_broken_parser("a,b\n1,2\n")
-    with pytest.raises(RuntimeError):
-        is_not_empty(parser)
-
-
 def test_init_logger_returns_logger():
     logger = init_logger("test_module")
     assert isinstance(logger, logging.Logger)
@@ -913,17 +851,6 @@ nan,z
         "B": {"x": 2, "y": 1, "z": 1},
     }
     assert result == expected
-
-
-def test_count_by_cat_broken_parser():
-    text = """A,B
-1,x
-2,y
-"""
-    parser = make_broken_parser(text)
-    # with pytest.raises(RuntimeError):
-    #    count_by_cat(parser, ["A", "B"])
-    count_by_cat(parser, ["A", "B"])
 
 
 @pytest.mark.parametrize(

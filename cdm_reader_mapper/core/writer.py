@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import get_args
+from typing import Iterable, get_args
 
 import pandas as pd
-from pandas.io.parsers import TextFileReader
 
 from cdm_reader_mapper.cdm_mapper.writer import write_tables
 from cdm_reader_mapper.mdf_reader.writer import write_data
@@ -21,7 +20,7 @@ WRITERS = {
 
 
 def write(
-    data: pd.DataFrame | TextFileReader,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
     mode: SupportedWriteModes = "data",
     **kwargs,
 ) -> None:
@@ -29,7 +28,7 @@ def write(
 
     Parameters
     ----------
-    data: pandas.DataFrame or TextFileReader
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
         Data to export.
     mode: str, {data, tables}
         Write data mode:

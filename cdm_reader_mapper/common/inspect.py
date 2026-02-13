@@ -26,15 +26,15 @@ def _count_by_cat(df, columns) -> dict:
 
 
 def count_by_cat(
-    data: pd.DataFrame | pd.io.parsers.TextFileReader,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
     columns: str | list[str] | tuple | None = None,
 ) -> dict[str, dict[Any, int]]:
     """
-    Count unique values per column in a DataFrame or a TextFileReader.
+    Count unique values per column in a DataFrame or a Iterable of DataFrame.
 
     Parameters
     ----------
-    data : pandas.DataFrame or pd.io.parsers.TextFileReader
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
     columns : str, list or tuple, optional
         Name(s) of the data column(s) to be selected. If None, all columns are used.
@@ -47,7 +47,7 @@ def count_by_cat(
 
     Notes
     -----
-    - Works with large files via TextFileReader by iterating through chunks.
+    - Works with large files via ParquetStreamReader by iterating through chunks.
     """
 
     def merge_sum_dicts(*dicts):
@@ -108,7 +108,7 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
 
     Notes
     -----
-    - Works with large files via TextFileReader by using a specialized handler
+    - Works with large files via ParquetStreamReader by using a specialized handler
       to count rows without loading the entire file into memory.
     """
     if isinstance(data, pd.DataFrame):

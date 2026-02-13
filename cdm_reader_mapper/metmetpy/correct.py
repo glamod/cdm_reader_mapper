@@ -254,7 +254,7 @@ def correct_pt(
 
     Parameters
     ----------
-    data: pandas.DataFrame or pandas.io.parsers.TextFileReader
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
     imodel: str
         Name of internally available data model.
@@ -265,7 +265,7 @@ def correct_pt(
 
     Returns
     -------
-    pandas.DataFrame or pandas.io.parsers.TextFileReader
+    pandas.DataFrame or Iterable[pd.DataFrame]
         A pandas.DataFrame or Iterable[pd.DataFrame] with the adjusted data.
 
     Raises
