@@ -270,7 +270,7 @@ def test_process_textfilereader_basic(sample_reader):
     assert isinstance(extra_out[0][0], dict)
     assert extra_out[0][0] == {"note": "first_chunk_only"}
 
-    with pytest.raises(ValueError, match="No more data"):
+    with pytest.raises(StopIteration):
         reader_out.get_chunk()
 
 

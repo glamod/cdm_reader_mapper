@@ -202,12 +202,14 @@ class _DataBundle:
             if not callable(attr_func):
                 return attr_func
             return SubscriptableMethod(attr_func)
+
         elif hasattr(data, "get_chunk") and hasattr(data, "prepend"):
             # This allows db.read(), db.close(), db.get_chunk() to work
             if hasattr(data, attr):
                 return getattr(data, attr)
 
-            data.get_chunk()
+            data = data.copy()
+
             try:
                 first_chunk = data.get_chunk()
             except ValueError:

@@ -122,9 +122,8 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
             data,
             _get_length,
             non_data_output="acc",
-            makecopy=False,
+            makecopy=True,
         )
-        print(result)
         return sum(result[0])
 
     raise TypeError(f"Unsupported data type: {type(data)}")
