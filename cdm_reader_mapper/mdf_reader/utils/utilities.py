@@ -281,9 +281,10 @@ def read_csv(
         reader=pd.read_csv,
         col_subset=col_subset,
         column_names=column_names,
-        reader_kwargs={delimiter=delimiter, **kwargs},
+        reader_kwargs={"delimiter": delimiter, **kwargs},
         iterator=True,
     )
+
 
 def read_parquet(
     filepath: Path,
