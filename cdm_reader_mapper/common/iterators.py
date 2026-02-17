@@ -281,6 +281,9 @@ def _process_chunks(
     if len(keys) == 1:
         output_non_data = output_non_data[keys[0]]
 
+    if isinstance(output_non_data, list) and len(output_non_data) == 1:
+        output_non_data = output_non_data[0]
+
     if isinstance(non_data_proc, Callable):
         output_non_data = non_data_proc(
             output_non_data, *non_data_proc_args, **non_data_proc_kwargs

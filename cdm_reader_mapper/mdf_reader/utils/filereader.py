@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from typing import Any, Callable, Mapping, Sequence, Iterable
+from typing import Any, Mapping, Sequence, Iterable
 
 import pandas as pd
 import xarray as xr
@@ -26,40 +26,7 @@ from .parser import (
 )
 
 from cdm_reader_mapper.core.databundle import DataBundle
-from cdm_reader_mapper.common.iterators import (
-    process_disk_backed,
-    is_valid_iterator,
-    ParquetStreamReader,
-    parquet_stream_from_iterable,
-)
-
-
-def _apply_or_chunk(
-    data: pd.DataFrame | Iterable[pd.DataFrame],
-    func: Callable[..., Any],
-    func_args: Sequence[Any] | None = None,
-    func_kwargs: Mapping[str, Any] | None = None,
-    **kwargs: Mapping[str, Any],
-):
-    """Apply a function directly or chunk-wise.  If data is an iterator, it uses disk-backed streaming."""
-    func_args = func_args or []
-    func_kwargs = func_kwargs or {}
-    if isinstance(data, (pd.DataFrame, pd.Series, xr.Dataset, xr.DataArray)):
-        return func(data, *func_args, **func_kwargs)
-    if (
-        is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
-    ) or isinstance(data, (list, tuple)):
-        data = parquet_stream_from_iterable(data)
-    if is_valid_iterator(data):
-        return process_disk_backed(
-            data,
-            func,
-            func_args,
-            func_kwargs,
-            **kwargs,
-        )
-
-    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
+from cdm_reader_mapper.common.iterators import process_function
 
 
 def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
@@ -243,6 +210,7 @@ class FileReader:
 
         return data, mask, config
 
+    @process_function()
     def open_data(
         self,
         source: str,
@@ -317,12 +285,12 @@ class FileReader:
 
         func_kwargs["config"] = config
 
-        return _apply_or_chunk(
-            to_parse,
-            self._process_data,
-            func_kwargs=func_kwargs,
-            makecopy=False,
-        )
+        return {
+            "data": to_parse,
+            "func": self._process_data,
+            "func_kwargs": func_kwargs,
+            "makecopy": False,
+        }
 
     def read(
         self,
@@ -382,9 +350,6 @@ class FileReader:
             raise RuntimeError("open_data() must return (data, mask, config)")
 
         data, mask, config = result
-
-        if isinstance(config, dict) and 0 in config and isinstance(config[0], list):
-            config = config[0][0]
 
         return DataBundle(
             data=data,

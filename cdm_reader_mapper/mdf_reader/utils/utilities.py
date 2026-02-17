@@ -9,7 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from cdm_reader_mapper.common.iterators import process_disk_backed, is_valid_iterator
+from cdm_reader_mapper.common.iterators import process_function
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -205,6 +205,7 @@ def update_and_select(
     return df, {"columns": df.columns, "dtypes": df.dtypes}
 
 
+@process_function()
 def _read_data_from_file(
     filepath: Path,
     reader: Callable[..., Any],
@@ -221,23 +222,12 @@ def _read_data_from_file(
 
     data = reader(filepath, **reader_kwargs)
 
-    if isinstance(data, pd.DataFrame):
-        data, info = update_and_select(
-            data, subset=col_subset, column_names=column_names
-        )
-
-    elif is_valid_iterator(data):
-        data, info = process_disk_backed(
-            data,
-            func=update_and_select,
-            func_kwargs={"subset": col_subset, "column_names": column_names},
-            makecopy=False,
-        )
-        info = info[0][0]
-    else:
-        raise ValueError(f"Unsupported reader return type: {type(data)}")
-
-    return data, info
+    return {
+        "data": data,
+        "func": update_and_select,
+        "func_kwargs": {"subset": col_subset, "column_names": column_names},
+        "makecopy": False,
+    }
 
 
 def read_csv(

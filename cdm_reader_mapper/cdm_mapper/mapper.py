@@ -22,12 +22,7 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common.iterators import (
-    is_valid_iterator,
-    process_disk_backed,
-    parquet_stream_from_iterable,
-    ParquetStreamReader,
-)
+from cdm_reader_mapper.common.iterators import process_function
 
 from . import properties
 from .codes.codes import get_code_table
@@ -376,6 +371,7 @@ def _map_data_model(
     return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
 
 
+@process_function(data_only=True)
 def map_model(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
@@ -439,40 +435,19 @@ def map_model(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    if isinstance(data, pd.DataFrame):
-        return _map_data_model(
-            idata=data,
-            imodel_maps=imodel_maps,
-            imodel_functions=imodel_functions,
-            cdm_tables=cdm_tables,
-            null_label=null_label,
-            codes_subset=codes_subset,
-            cdm_complete=cdm_complete,
-            drop_missing_obs=drop_missing_obs,
-            drop_duplicates=drop_duplicates,
-            logger=logger,
-        )
-
-    if (
-        is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
-    ) or isinstance(data, (list, tuple)):
-        data = parquet_stream_from_iterable(data)
-
-    if is_valid_iterator(data):
-        return process_disk_backed(
-            data,
-            _map_data_model,
-            func_kwargs={
-                "imodel_maps": imodel_maps,
-                "imodel_functions": imodel_functions,
-                "cdm_tables": cdm_tables,
-                "null_label": null_label,
-                "codes_subset": codes_subset,
-                "cdm_complete": cdm_complete,
-                "drop_missing_obs": drop_missing_obs,
-                "drop_duplicates": drop_duplicates,
-                "logger": logger,
-            },
-        )[0]
-
-    raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
+    return {
+        "data": data,
+        "func": _map_data_model,
+        "func_kwargs": {
+            "imodel_maps": imodel_maps,
+            "imodel_functions": imodel_functions,
+            "cdm_tables": cdm_tables,
+            "null_label": null_label,
+            "codes_subset": codes_subset,
+            "cdm_complete": cdm_complete,
+            "drop_missing_obs": drop_missing_obs,
+            "drop_duplicates": drop_duplicates,
+            "logger": logger,
+        },
+        "makecopy": False,
+    }
