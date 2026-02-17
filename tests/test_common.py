@@ -26,7 +26,6 @@ from cdm_reader_mapper.common.select import (
     _split_by_index_df,
     _split_by_boolean_df,
     _split_by_column_df,
-    _split_dispatch,
     split_by_boolean,
     split_by_boolean_true,
     split_by_boolean_false,
@@ -279,67 +278,6 @@ def test_split_by_index_df(
     )
     assert list(selected.index) == expected_selected
     assert list(rejected.index) == expected_rejected
-
-
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_wrapper_index(sample_df, sample_reader, TextFileReader):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
-    selected, rejected, _, _ = _split_dispatch(
-        data, _split_by_index_df, [11, 13], return_rejected=True
-    )
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
-
-    assert list(selected.index) == [11, 13]
-    assert list(rejected.index) == [10, 12, 14]
-
-
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_wrapper_column(sample_df, sample_reader, TextFileReader):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
-    selected, rejected, _, _ = _split_dispatch(
-        data, _split_by_column_df, "B", ["y"], return_rejected=True
-    )
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
-
-    assert list(selected.index) == [11, 14]
-    assert list(rejected.index) == [10, 12, 13]
-
-
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_wrapper_boolean(sample_df, sample_reader, boolean_mask, TextFileReader):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
-    selected, rejected, _, _ = _split_dispatch(
-        data,
-        _split_by_boolean_df,
-        boolean_mask[["mask1"]],
-        True,
-        return_rejected=True,
-    )
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
-
-    assert list(selected.index) == [11, 13]
-    assert list(rejected.index) == [10, 12, 14]
 
 
 @pytest.mark.parametrize("TextFileReader", [False, True])

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tempfile
 
+import inspect
 import itertools
 
 import pandas as pd
@@ -233,6 +234,9 @@ def _process_chunks(
     static_args: list[Any],
     static_kwargs: dict[str, Any],
     non_data_output: str,
+    non_data_proc: Callable[..., Any] | None,
+    non_data_proc_args: tuple[Any] | None,
+    non_data_proc_kwargs: dict[str, Any] | None,
 ):
     """Process chunks."""
     # State variables
@@ -273,6 +277,15 @@ def _process_chunks(
     if chunk_counter == 0:
         raise ValueError("Iterable is empty.")
 
+    keys = list(output_non_data.keys())
+    if len(keys) == 1:
+        output_non_data = output_non_data[keys[0]]
+
+    if isinstance(non_data_proc, Callable):
+        output_non_data = non_data_proc(
+            output_non_data, *non_data_proc_args, **non_data_proc_kwargs
+        )
+
     # If no data outputs at all
     if temp_dirs is None:
         return output_non_data
@@ -282,7 +295,12 @@ def _process_chunks(
         for d, (t, s) in zip(temp_dirs, schemas)
     ]
 
-    return tuple(final_iterators + [output_non_data])
+    if isinstance(output_non_data, tuple):
+        output_non_data = list(output_non_data)
+    else:
+        output_non_data = [output_non_data]
+
+    return tuple(final_iterators + output_non_data)
 
 
 def _prepare_readers(
@@ -381,6 +399,9 @@ def process_disk_backed(
     func_kwargs: dict[str, Any] | None = None,
     requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
+    non_data_proc: Callable[..., Any] | None = None,
+    non_data_proc_args: tuple[Any] | None = None,
+    non_data_proc_kwargs: dict[str, Any] | None = None,
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
     """
@@ -399,6 +420,15 @@ def process_disk_backed(
         reader, func_args, func_kwargs, makecopy
     )
 
+    if non_data_proc is not None:
+        if not isinstance(non_data_proc, Callable):
+            raise ValueError(f"Function {non_data_proc} is not callable.")
+
+        if non_data_proc_args is None:
+            non_data_proc_args = ()
+        if non_data_proc_kwargs is None:
+            non_data_proc_kwargs = {}
+
     return _process_chunks(
         readers,
         func,
@@ -406,10 +436,13 @@ def process_disk_backed(
         static_args,
         static_kwargs,
         non_data_output,
+        non_data_proc,
+        non_data_proc_args,
+        non_data_proc_kwargs,
     )
 
 
-def _process_function(result_mapping, data_only=False, postprocessing=None):
+def _process_function(result_mapping, data_only=False):
     if not isinstance(result_mapping, Mapping):
         return result_mapping
 
@@ -450,14 +483,6 @@ def _process_function(result_mapping, data_only=False, postprocessing=None):
     if data_only is True:
         result = result[0]
 
-    if postprocessing is not None:
-        if not isinstance(postprocessing, Callable):
-            raise ValueError(
-                "Postprocessing function {postprocessing} is not callable."
-            )
-
-        result = postprocessing(result)
-
     return result
 
 
@@ -465,12 +490,39 @@ def process_function(data_only=False, postprocessing=None):
     """Decorator to apply function to both pd.DataFrame and Iterable[pd.DataFrame]."""
 
     def decorator(func):
+        sig = inspect.signature(func)
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            bound_args = sig.bind(*args, **kwargs)
+            bound_args.apply_defaults()
+            original_call = bound_args.arguments.copy()
+
             result_mapping = func(*args, **kwargs)
-            return _process_function(
-                result_mapping, data_only=data_only, postprocessing=postprocessing
+            results = _process_function(
+                result_mapping,
+                data_only=data_only,
             )
+
+            if postprocessing is None:
+                return results
+
+            postproc_func = postprocessing.get("func")
+            if not isinstance(postproc_func, Callable):
+                raise ValueError(f"Function {postproc_func} is not callable.")
+            postproc_list = postprocessing.get("kwargs", {})
+            if isinstance(postproc_list, str):
+                postproc_list = [postproc_list]
+
+            postproc_kwargs = {k: original_call[k] for k in postproc_list}
+
+            result_list = []
+            for result in results:
+                if isinstance(result, (pd.DataFrame, pd.Series, ParquetStreamReader)):
+                    result = postproc_func(result, **postproc_kwargs)
+                result_list.append(result)
+
+            return tuple(result_list)
 
         return wrapper
 

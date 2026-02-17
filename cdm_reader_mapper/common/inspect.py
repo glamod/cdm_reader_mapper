@@ -42,7 +42,7 @@ def _count_by_cat(df, columns) -> dict:
     return count_dict
 
 
-@process_function(data_only=True, postprocessing=merge_sum_dicts)
+@process_function()
 def count_by_cat(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     columns: str | list[str] | tuple | None = None,
@@ -78,6 +78,7 @@ def count_by_cat(
         "func_kwargs": {"columns": columns},
         "non_data_output": "acc",
         "makecopy": False,
+        "non_data_proc": merge_sum_dicts,
     }
 
 
@@ -86,7 +87,7 @@ def _get_length(data: pd.DataFrame):
     return len(data)
 
 
-@process_function(data_only=True, postprocessing=sum)
+@process_function()
 def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     """
     Get the total number of rows in a pandas object.
@@ -114,4 +115,5 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
         "func": _get_length,
         "non_data_output": "acc",
         "makecopy": True,
+        "non_data_proc": sum,
     }

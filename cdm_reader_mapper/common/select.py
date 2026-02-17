@@ -8,11 +8,25 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-from typing import Iterable, Callable
+from typing import Iterable
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterator
+from .iterators import ParquetStreamReader, process_function
+
+
+def _concat_indexes(idx_dict):
+    selected_idx = pd.Index([]).append(idx_dict[0])
+    rejected_idx = pd.Index([]).append(idx_dict[1])
+    selected_idx = selected_idx.drop_duplicates()
+    rejected_idx = rejected_idx.drop_duplicates()
+    return selected_idx, rejected_idx
+
+
+def _reset_index(data, reset_index=False):
+    if reset_index is False:
+        return data
+    return data.reset_index(drop=True)
 
 
 def _split_df(
@@ -64,55 +78,35 @@ def _split_by_index_df(
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
-def _split_dispatch(
-    data,
-    func: Callable,
-    *args,
-    reset_index: bool = False,
-    **kwargs,
-):
-    if isinstance(data, pd.DataFrame):
-        selected, rejected, selected_idx, rejected_idx = func(data, *args, **kwargs)
-
-    elif is_valid_iterator(data):
-        selected, rejected, out_dict = process_disk_backed(
-            data,
-            func,
-            func_args=args,
-            func_kwargs=kwargs,
-            makecopy=False,
-            non_data_output="acc",
-        )
-
-        selected_idx = pd.Index([]).append(out_dict[0])
-        rejected_idx = pd.Index([]).append(out_dict[1])
-
-    else:
-        raise TypeError(f"Unsupported input type for split operation: {type(data)}.")
-
-    if reset_index is True:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
-
-    return selected, rejected, selected_idx, rejected_idx
+PSR_KWARGS = {
+    "makecopy": False,
+    "non_data_output": "acc",
+    "non_data_proc": _concat_indexes,
+}
 
 
+@process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
 def split_by_boolean(
-    data: pd.DataFrame,
-    mask: pd.DataFrame,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    mask: pd.DataFrame | Iterable[pd.DataFrame],
     boolean: bool,
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split a DataFrame using a boolean mask via ``split_dataframe_by_boolean``.
 
     Parameters
     ----------
-    data : pandas.DataFrame
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         DataFrame to be split.
-    mask : pandas.DataFrame
+    mask : pandas.DataFrame or Iterable[pd.DataFrame]
         Boolean mask with the same length as ``data``.
     boolean : bool
         Determines mask interpretation:
@@ -129,19 +123,17 @@ def split_by_boolean(
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Tuple ``(selected, rejected)`` returned by the underlying
-        ``split_dataframe_by_boolean`` implementation.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader), pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
-    return _split_dispatch(
-        data,
-        _split_by_boolean_df,
-        mask,
-        boolean,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+    return {
+        "data": data,
+        "func": _split_by_boolean_df,
+        "func_args": (mask, boolean),
+        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+        **PSR_KWARGS,
+    }
 
 
 def split_by_boolean_true(
@@ -165,12 +157,14 @@ def split_by_boolean_true(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, also return rejected rows.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (all mask columns True) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader), pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
     return split_by_boolean(
         data,
@@ -203,12 +197,14 @@ def split_by_boolean_false(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as well.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (any mask column False) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader), pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
     return split_by_boolean(
         data,
@@ -220,6 +216,7 @@ def split_by_boolean_false(
     )
 
 
+@process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
 def split_by_column_entries(
     data: pd.DataFrame,
     selection: dict[str, Iterable],
@@ -242,25 +239,26 @@ def split_by_column_entries(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as the second DataFrame.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (column value in provided list) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader), pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
     col, values = next(iter(selection.items()))
-    return _split_dispatch(
-        data,
-        _split_by_column_df,
-        col,
-        values,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+    return {
+        "data": data,
+        "func": _split_by_column_df,
+        "func_args": (col, values),
+        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+        **PSR_KWARGS,
+    }
 
 
+@process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
 def split_by_index(
     data: pd.DataFrame,
     index,
@@ -282,18 +280,19 @@ def split_by_index(
     inverse : bool, optional
         If ``True``, select rows **not** in ``index``.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as well.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (index in given list) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader), pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
-    return _split_dispatch(
-        data,
-        _split_by_index_df,
-        index,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+    return {
+        "data": data,
+        "func": _split_by_index_df,
+        "func_args": (index,),
+        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+        **PSR_KWARGS,
+    }
