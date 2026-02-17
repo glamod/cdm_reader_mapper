@@ -23,7 +23,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterator
+from .iterators import process_function
 
 
 def _replace_columns(
@@ -81,6 +81,7 @@ def _replace_columns(
     return out
 
 
+@process_function(data_only=True)
 def replace_columns(
     df_l: pd.DataFrame | Iterable[pd.dataFrame],
     df_r: pd.DataFrame | Iterable[pd.dataFrame],
@@ -121,27 +122,16 @@ def replace_columns(
     -----
     This function logs errors and returns `None` instead of raising exceptions.
     """
-    kwargs = {
-        "pivot_c": pivot_c,
-        "pivot_l": pivot_l,
-        "pivot_r": pivot_r,
-        "rep_c": rep_c,
-        "rep_map": rep_map,
+    return {
+        "data": df_l,
+        "func": _replace_columns,
+        "func_args": (df_r,),
+        "func_kwargs": {
+            "pivot_c": pivot_c,
+            "pivot_l": pivot_l,
+            "pivot_r": pivot_r,
+            "rep_c": rep_c,
+            "rep_map": rep_map,
+        },
+        "makecopy": False,
     }
-    if isinstance(df_l, pd.DataFrame):
-        return _replace_columns(
-            df_l,
-            df_r,
-            **kwargs,
-        )
-
-    if is_valid_iterator(df_l):
-        return process_disk_backed(
-            df_l,
-            _replace_columns,
-            func_args=df_r,
-            func_kwargs=kwargs,
-            makecopy=False,
-        )
-
-    raise TypeError(f"Unsupported input type for split operation: {type(df_l)}.")

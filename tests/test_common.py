@@ -529,11 +529,20 @@ def test_split_by_boolean_empty(empty_df, empty_reader, TextFileReader):
     assert rejected.empty
 
 
-def test_basic_replacement():
+def test_basic_replacement_df():
     df_l = pd.DataFrame({"id": [1, 2], "x": [10, 20]})
     df_r = pd.DataFrame({"id": [1, 2], "x": [100, 200]})
 
     out = replace_columns(df_l, df_r, pivot_c="id", rep_c="x")
+    assert out["x"].tolist() == [100, 200]
+
+
+def test_basic_replacement_textfilereader():
+    parser_l = make_parser("id,x\n1,10\n2,20")
+    parser_r = make_parser("id,x\n1,100\n2,200")
+
+    out = replace_columns(parser_l, parser_r, pivot_c="id", rep_c="x")
+    out = out.read()
     assert out["x"].tolist() == [100, 200]
 
 
@@ -837,12 +846,7 @@ def test_count_by_cat_single_column_string():
 
 
 def test_count_by_cat_textfilereader():
-    text = """A,B
-1,x
-2,y
-2,x
-nan,z
-"""
+    text = "A,B\n1,x\n2,y\n2,x\nnan,z"
     parser = make_parser(text)
 
     result = count_by_cat(parser, ["A", "B"])

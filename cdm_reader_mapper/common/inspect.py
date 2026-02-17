@@ -12,7 +12,24 @@ from typing import Any, Iterable, Mapping
 
 import pandas as pd
 
-from .iterators import process_disk_backed, is_valid_iterator
+from .iterators import process_function
+
+
+def merge_sum_dicts(dicts):
+    """Recursively merge dictionaries, summing numeric values at the leaves."""
+    result = {}
+
+    for d in dicts:
+        for key, value in d.items():
+            if key not in result:
+                result[key] = value
+            else:
+                if isinstance(value, Mapping) and isinstance(result[key], Mapping):
+                    result[key] = merge_sum_dicts([result[key], value])
+                else:
+                    result[key] += value
+
+    return result
 
 
 def _count_by_cat(df, columns) -> dict:
@@ -25,6 +42,7 @@ def _count_by_cat(df, columns) -> dict:
     return count_dict
 
 
+@process_function(data_only=True, postprocessing=merge_sum_dicts)
 def count_by_cat(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     columns: str | list[str] | tuple | None = None,
@@ -49,42 +67,18 @@ def count_by_cat(
     -----
     - Works with large files via ParquetStreamReader by iterating through chunks.
     """
-
-    def merge_sum_dicts(*dicts):
-        """Recursively merge dictionaries, summing numeric values at the leaves."""
-        result = {}
-
-        for d in dicts:
-            for key, value in d.items():
-                if key not in result:
-                    result[key] = value
-                else:
-                    if isinstance(value, Mapping) and isinstance(result[key], Mapping):
-                        result[key] = merge_sum_dicts(result[key], value)
-                    else:
-                        result[key] += value
-
-        return result
-
     if columns is None:
         columns = data.columns
     if not isinstance(columns, list):
         columns = [columns]
 
-    if isinstance(data, pd.DataFrame):
-        return _count_by_cat(data, columns)
-
-    if is_valid_iterator(data):
-        dicts = process_disk_backed(
-            data,
-            _count_by_cat,
-            func_kwargs={"columns": columns},
-            non_data_output="acc",
-            makecopy=False,
-        )
-        return merge_sum_dicts(*dicts[0])
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return {
+        "data": data,
+        "func": _count_by_cat,
+        "func_kwargs": {"columns": columns},
+        "non_data_output": "acc",
+        "makecopy": False,
+    }
 
 
 def _get_length(data: pd.DataFrame):
@@ -92,6 +86,7 @@ def _get_length(data: pd.DataFrame):
     return len(data)
 
 
+@process_function(data_only=True, postprocessing=sum)
 def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     """
     Get the total number of rows in a pandas object.
@@ -111,19 +106,12 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     - Works with large files via ParquetStreamReader by using a specialized handler
       to count rows without loading the entire file into memory.
     """
-    if isinstance(data, pd.DataFrame):
-        return _get_length(data)
-
     if hasattr(data, "_row_count"):
         return data._row_count
 
-    if is_valid_iterator(data):
-        result = process_disk_backed(
-            data,
-            _get_length,
-            non_data_output="acc",
-            makecopy=True,
-        )
-        return sum(result[0])
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return {
+        "data": data,
+        "func": _get_length,
+        "non_data_output": "acc",
+        "makecopy": True,
+    }

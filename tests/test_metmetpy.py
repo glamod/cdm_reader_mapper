@@ -650,7 +650,7 @@ def test_correct_datetime_textfilereader():
     pd.testing.assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}])
+@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
 def test_correct_datetime_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_datetime(data, "icoads_r300_d201")
@@ -661,9 +661,11 @@ def test_correct_datetime_series():
         correct_datetime(pd.Series([1, 2, 3]), "icoads_r300_d201")
 
 
-@pytest.mark.parametrize("data", [[1, 2], (1, 2), {1, 2}])
+@pytest.mark.parametrize("data", [[1, 2], (1, 2)])
 def test_correct_datetime_invalid_iterable_entries(data):
-    with pytest.raises(TypeError, match="Unsupported data type"):
+    with pytest.raises(
+        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
+    ):
         correct_datetime(data, "icoads_r300_d201")
 
 
@@ -754,7 +756,7 @@ def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
     pd.testing.assert_frame_equal(result.read(), expected, check_dtype=False)
 
 
-@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}])
+@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
 def test_correct_pt_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_pt(data, "icoads_r300_d993")
@@ -765,9 +767,11 @@ def test_correct_pt_series():
         correct_pt(pd.Series([1, 2, 3]), "icoads_r300_d993")
 
 
-@pytest.mark.parametrize("data", [[1, 2], (1, 2), {1, 2}])
+@pytest.mark.parametrize("data", [[1, 2], (1, 2)])
 def test_correct_pt_invalid_iterable_entries(data):
-    with pytest.raises(TypeError, match="Unsupported data type"):
+    with pytest.raises(
+        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
+    ):
         correct_pt(data, "icoads_r300_d993")
 
 

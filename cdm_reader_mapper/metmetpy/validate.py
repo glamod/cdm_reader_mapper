@@ -64,7 +64,7 @@ from typing import Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_disk_backed, is_valid_iterator
+from ..common.iterators import process_function
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -148,6 +148,7 @@ def _validate_datetime(data: pd.DataFrame | pd.Series, model: str):
     return data_model_datetime.notna()
 
 
+@process_function(data_only=True)
 def validate_id(
     data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
     imodel: str,
@@ -216,24 +217,19 @@ def validate_id(
     na_values = True if "^$" in patterns else False
     combined_compiled = re.compile("|".join(patterns))
 
-    if isinstance(data, (pd.DataFrame, pd.Series)):
-        return _validate_id(data, mrd, combined_compiled, na_values)
-
-    if is_valid_iterator(data):
-        return process_disk_backed(
-            data,
-            _validate_id,
-            func_kwargs={
-                "mrd": mrd,
-                "combined_compiled": combined_compiled,
-                "na_values": na_values,
-            },
-            makecopy=False,
-        )[0]
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return {
+        "data": data,
+        "func": _validate_id,
+        "func_kwargs": {
+            "mrd": mrd,
+            "combined_compiled": combined_compiled,
+            "na_values": na_values,
+        },
+        "makecopy": False,
+    }
 
 
+@process_function(data_only=True)
 def validate_datetime(
     data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
     imodel: str,
@@ -269,17 +265,9 @@ def validate_datetime(
     """
     model = imodel.split("_")[0]
 
-    if isinstance(data, (pd.DataFrame, pd.Series)):
-        return _validate_datetime(data, model)
-
-    if is_valid_iterator(data):
-        return process_disk_backed(
-            data,
-            _validate_datetime,
-            func_kwargs={
-                "model": model,
-            },
-            makecopy=False,
-        )[0]
-
-    raise TypeError(f"Unsupported data type: {type(data)}")
+    return {
+        "data": data,
+        "func": _validate_datetime,
+        "func_kwargs": {"model": model},
+        "makecopy": False,
+    }
