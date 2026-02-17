@@ -92,7 +92,6 @@ def _split_dispatch(
 
     if reset_index is True:
         selected = selected.reset_index(drop=True)
-        print(selected)
         rejected = rejected.reset_index(drop=True)
 
     return selected, rejected, selected_idx, rejected_idx
