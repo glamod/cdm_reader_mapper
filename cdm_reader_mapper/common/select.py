@@ -12,7 +12,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from .iterators import ParquetStreamReader, process_function
+from .iterators import ParquetStreamReader, ProcessFunction, process_function
 
 
 def _concat_indexes(idx_dict):
@@ -127,13 +127,13 @@ def split_by_boolean(
         Selected rows (all mask columns True), rejected rows, original indexes of selection and
         original indexes of rejection.
     """
-    return {
-        "data": data,
-        "func": _split_by_boolean_df,
-        "func_args": (mask, boolean),
-        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+    return ProcessFunction(
+        data=data,
+        func=_split_by_boolean_df,
+        func_args=(mask, boolean),
+        func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
         **PSR_KWARGS,
-    }
+    )
 
 
 def split_by_boolean_true(
@@ -249,13 +249,13 @@ def split_by_column_entries(
         original indexes of rejection.
     """
     col, values = next(iter(selection.items()))
-    return {
-        "data": data,
-        "func": _split_by_column_df,
-        "func_args": (col, values),
-        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+    return ProcessFunction(
+        data=data,
+        func=_split_by_column_df,
+        func_args=(col, values),
+        func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
         **PSR_KWARGS,
-    }
+    )
 
 
 @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
@@ -289,10 +289,10 @@ def split_by_index(
         Selected rows (all mask columns True), rejected rows, original indexes of selection and
         original indexes of rejection.
     """
-    return {
-        "data": data,
-        "func": _split_by_index_df,
-        "func_args": (index,),
-        "func_kwargs": {"inverse": inverse, "return_rejected": return_rejected},
+    return ProcessFunction(
+        data=data,
+        func=_split_by_index_df,
+        func_args=(index,),
+        func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
         **PSR_KWARGS,
-    }
+    )

@@ -23,7 +23,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from .iterators import process_function
+from .iterators import ProcessFunction, process_function
 
 
 def _replace_columns(
@@ -122,16 +122,16 @@ def replace_columns(
     -----
     This function logs errors and returns `None` instead of raising exceptions.
     """
-    return {
-        "data": df_l,
-        "func": _replace_columns,
-        "func_args": (df_r,),
-        "func_kwargs": {
+    return ProcessFunction(
+        data=df_l,
+        func=_replace_columns,
+        func_args=(df_r,),
+        func_kwargs={
             "pivot_c": pivot_c,
             "pivot_l": pivot_l,
             "pivot_r": pivot_r,
             "rep_c": rep_c,
             "rep_map": rep_map,
         },
-        "makecopy": False,
-    }
+        makecopy=False,
+    )

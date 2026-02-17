@@ -264,11 +264,7 @@ def test_process_textfilereader_basic(sample_reader):
     assert chunk2.iloc[0]["B"] == 8
 
     assert isinstance(extra_out, dict)
-    assert 0 in extra_out
-    assert isinstance(extra_out[0], list)
-    assert len(extra_out[0]) == 1
-    assert isinstance(extra_out[0][0], dict)
-    assert extra_out[0][0] == {"note": "first_chunk_only"}
+    assert extra_out == {"note": "first_chunk_only"}
 
     with pytest.raises(StopIteration):
         reader_out.get_chunk()
@@ -304,8 +300,4 @@ def test_process_textfilereader_makecopy_flag(sample_reader):
     assert chunk2.iloc[0]["B"] == 8
 
     assert isinstance(extra_out, dict)
-    assert 0 in extra_out
-    assert isinstance(extra_out[0], list)
-    assert len(extra_out[0]) == 1
-    assert isinstance(extra_out[0][0], dict)
-    assert extra_out[0][0] == {"note": "first_chunk_only"}
+    assert extra_out == {"note": "first_chunk_only"}

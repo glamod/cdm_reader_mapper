@@ -8,6 +8,7 @@ import inspect
 import itertools
 
 import pandas as pd
+import xarray as xr
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -23,9 +24,41 @@ from typing import (
     Iterable,
     Iterator,
     Literal,
-    Mapping,
     Sequence,
 )
+
+
+class ProcessFunction:
+
+    def __init__(
+        self,
+        data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame] | Iterable[pd.Series],
+        func: Callable[..., Any],
+        func_args: Any | list[Any] | tuple[Any] | None = None,
+        func_kwargs: dict[str, Any] | None = None,
+        **kwargs,
+    ):
+        self.data = data
+
+        if not isinstance(func, Callable):
+            raise ValueError(f"Function {func} is not callable.")
+
+        self.func = func
+
+        if func_args is None:
+            func_args = ()
+
+        if not isinstance(func_args, (list, tuple)):
+            func_args = (func_args,)
+
+        self.func_args = func_args
+
+        if func_kwargs is None:
+            func_kwargs = {}
+
+        self.func_kwargs = func_kwargs
+
+        self.kwargs = kwargs
 
 
 class ParquetStreamReader:
@@ -445,25 +478,16 @@ def process_disk_backed(
     )
 
 
-def _process_function(result_mapping, data_only=False):
-    if not isinstance(result_mapping, Mapping):
-        return result_mapping
+def _process_function(results, data_only=False):
+    if not isinstance(results, ProcessFunction):
+        return results
 
-    data = result_mapping.pop("data")
-    if data is None:
-        raise ValueError("Data to be processed is not defined.")
+    data = results.data
+    func = results.func
+    args = results.func_args
+    kwargs = results.func_kwargs
 
-    func = result_mapping.pop("func")
-    if func is None:
-        raise ValueError("Function is not defined.")
-
-    if not isinstance(func, Callable):
-        raise ValueError(f"Function {func} is not callable.")
-
-    args = result_mapping.pop("func_args", ())
-    kwargs = result_mapping.pop("func_kwargs", {})
-
-    if isinstance(data, (pd.DataFrame, pd.Series)):
+    if isinstance(data, (pd.DataFrame, pd.Series, xr.Dataset, xr.DataArray)):
         return func(data, *args, **kwargs)
 
     if is_valid_iterator(data) and not isinstance(data, ParquetStreamReader):
@@ -480,7 +504,7 @@ def _process_function(result_mapping, data_only=False):
         func,
         func_args=args,
         func_kwargs=kwargs,
-        **result_mapping,
+        **results.kwargs,
     )
 
     if data_only is True:
@@ -501,9 +525,9 @@ def process_function(data_only=False, postprocessing=None):
             bound_args.apply_defaults()
             original_call = bound_args.arguments.copy()
 
-            result_mapping = func(*args, **kwargs)
+            result_class = func(*args, **kwargs)
             results = _process_function(
-                result_mapping,
+                result_class,
                 data_only=data_only,
             )
 

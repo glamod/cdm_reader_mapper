@@ -12,7 +12,7 @@ from typing import Any, Iterable, Mapping
 
 import pandas as pd
 
-from .iterators import process_function
+from .iterators import ProcessFunction, process_function
 
 
 def merge_sum_dicts(dicts):
@@ -72,14 +72,14 @@ def count_by_cat(
     if not isinstance(columns, list):
         columns = [columns]
 
-    return {
-        "data": data,
-        "func": _count_by_cat,
-        "func_kwargs": {"columns": columns},
-        "non_data_output": "acc",
-        "makecopy": False,
-        "non_data_proc": merge_sum_dicts,
-    }
+    return ProcessFunction(
+        data=data,
+        func=_count_by_cat,
+        func_kwargs={"columns": columns},
+        non_data_output="acc",
+        makecopy=False,
+        non_data_proc=merge_sum_dicts,
+    )
 
 
 def _get_length(data: pd.DataFrame):
@@ -110,10 +110,10 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
     if hasattr(data, "_row_count"):
         return data._row_count
 
-    return {
-        "data": data,
-        "func": _get_length,
-        "non_data_output": "acc",
-        "makecopy": True,
-        "non_data_proc": sum,
-    }
+    return ProcessFunction(
+        data=data,
+        func=_get_length,
+        non_data_output="acc",
+        makecopy=True,
+        non_data_proc=sum,
+    )

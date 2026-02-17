@@ -22,7 +22,7 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common.iterators import process_function
+from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
 
 from . import properties
 from .codes.codes import get_code_table
@@ -435,10 +435,10 @@ def map_model(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    return {
-        "data": data,
-        "func": _map_data_model,
-        "func_kwargs": {
+    return ProcessFunction(
+        data=data,
+        func=_map_data_model,
+        func_kwargs={
             "imodel_maps": imodel_maps,
             "imodel_functions": imodel_functions,
             "cdm_tables": cdm_tables,
@@ -449,5 +449,5 @@ def map_model(
             "drop_duplicates": drop_duplicates,
             "logger": logger,
         },
-        "makecopy": False,
-    }
+        makecopy=False,
+    )

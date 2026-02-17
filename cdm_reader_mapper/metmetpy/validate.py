@@ -64,7 +64,7 @@ from typing import Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_function
+from ..common.iterators import ProcessFunction, process_function
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -217,16 +217,16 @@ def validate_id(
     na_values = True if "^$" in patterns else False
     combined_compiled = re.compile("|".join(patterns))
 
-    return {
-        "data": data,
-        "func": _validate_id,
-        "func_kwargs": {
+    return ProcessFunction(
+        data=data,
+        func=_validate_id,
+        func_kwargs={
             "mrd": mrd,
             "combined_compiled": combined_compiled,
             "na_values": na_values,
         },
-        "makecopy": False,
-    }
+        makecopy=False,
+    )
 
 
 @process_function(data_only=True)
@@ -265,9 +265,9 @@ def validate_datetime(
     """
     model = imodel.split("_")[0]
 
-    return {
-        "data": data,
-        "func": _validate_datetime,
-        "func_kwargs": {"model": model},
-        "makecopy": False,
-    }
+    return ProcessFunction(
+        data=data,
+        func=_validate_datetime,
+        func_kwargs={"model": model},
+        makecopy=False,
+    )

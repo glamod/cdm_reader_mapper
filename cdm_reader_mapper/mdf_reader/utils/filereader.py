@@ -26,7 +26,7 @@ from .parser import (
 )
 
 from cdm_reader_mapper.core.databundle import DataBundle
-from cdm_reader_mapper.common.iterators import process_function
+from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
 
 
 def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
@@ -285,12 +285,12 @@ class FileReader:
 
         func_kwargs["config"] = config
 
-        return {
-            "data": to_parse,
-            "func": self._process_data,
-            "func_kwargs": func_kwargs,
-            "makecopy": False,
-        }
+        return ProcessFunction(
+            data=to_parse,
+            func=self._process_data,
+            func_kwargs=func_kwargs,
+            makecopy=False,
+        )
 
     def read(
         self,

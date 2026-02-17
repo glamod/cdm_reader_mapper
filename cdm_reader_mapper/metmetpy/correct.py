@@ -64,7 +64,7 @@ from typing import Any, Iterable
 import pandas as pd
 
 from ..common import logging_hdlr
-from ..common.iterators import process_function
+from ..common.iterators import ProcessFunction, process_function
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -225,17 +225,17 @@ def correct_datetime(
 
     correction_method = combine_dicts(replacements_method_files, base=_base)
 
-    return {
-        "data": data,
-        "func": _correct_dt,
-        "func_kwargs": {
+    return ProcessFunction(
+        data=data,
+        func=_correct_dt,
+        func_kwargs={
             "data_model": imodel,
             "dck": dck,
             "correction_method": correction_method,
             "log_level": log_level,
         },
-        "makecopy": False,
-    }
+        makecopy=False,
+    )
 
 
 @process_function(data_only=True)
@@ -299,15 +299,15 @@ def correct_pt(
             f"Data model {imodel} platform column not defined in properties file."
         )
 
-    return {
-        "data": data,
-        "func": _correct_pt,
-        "func_kwargs": {
+    return ProcessFunction(
+        data=data,
+        func=_correct_pt,
+        func_kwargs={
             "imodel": imodel,
             "dck": dck,
             "pt_col": pt_col,
             "fix_methods": fix_methods,
             "log_level": log_level,
         },
-        "makecopy": False,
-    }
+        makecopy=False,
+    )

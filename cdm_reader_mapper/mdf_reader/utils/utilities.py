@@ -9,7 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from cdm_reader_mapper.common.iterators import process_function
+from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -222,12 +222,12 @@ def _read_data_from_file(
 
     data = reader(filepath, **reader_kwargs)
 
-    return {
-        "data": data,
-        "func": update_and_select,
-        "func_kwargs": {"subset": col_subset, "column_names": column_names},
-        "makecopy": False,
-    }
+    return ProcessFunction(
+        data=data,
+        func=update_and_select,
+        func_kwargs={"subset": col_subset, "column_names": column_names},
+        makecopy=False,
+    )
 
 
 def read_csv(
