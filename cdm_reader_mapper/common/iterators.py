@@ -11,6 +11,8 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from functools import wraps
+
 from pathlib import Path
 
 from typing import (
@@ -20,6 +22,7 @@ from typing import (
     Iterable,
     Iterator,
     Literal,
+    Mapping,
     Sequence,
 )
 
@@ -404,3 +407,71 @@ def process_disk_backed(
         static_kwargs,
         non_data_output,
     )
+
+
+def _process_function(result_mapping, data_only=False, postprocessing=None):
+    if not isinstance(result_mapping, Mapping):
+        return result_mapping
+
+    data = result_mapping.pop("data")
+    if data is None:
+        raise ValueError("Data to be processed is not defined.")
+
+    func = result_mapping.pop("func")
+    if func is None:
+        raise ValueError("Function is not defined.")
+
+    if not isinstance(func, Callable):
+        raise ValueError(f"Function {func} is not callable.")
+
+    args = result_mapping.pop("func_args", ())
+    kwargs = result_mapping.pop("func_kwargs", {})
+
+    if isinstance(data, (pd.DataFrame, pd.Series)):
+        return func(data, *args, **kwargs)
+
+    if is_valid_iterator(data) and not isinstance(data, ParquetStreamReader):
+        data = parquet_stream_from_iterable(data)
+
+    if isinstance(data, (list, tuple)):
+        data = parquet_stream_from_iterable(data)
+
+    if not isinstance(data, ParquetStreamReader):
+        raise TypeError(f"Unsupported data type: {type(data)}")
+
+    result = process_disk_backed(
+        data,
+        func,
+        func_args=args,
+        func_kwargs=kwargs,
+        **result_mapping,
+    )
+
+    if data_only is True:
+        result = result[0]
+
+    if postprocessing is not None:
+        if not isinstance(postprocessing, Callable):
+            raise ValueError(
+                "Postprocessing function {postprocessing} is not callable."
+            )
+
+        result = postprocessing(result)
+
+    return result
+
+
+def process_function(data_only=False, postprocessing=None):
+    """Decorator to apply function to both pd.DataFrame and Iterable[pd.DataFrame]."""
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result_mapping = func(*args, **kwargs)
+            return _process_function(
+                result_mapping, data_only=data_only, postprocessing=postprocessing
+            )
+
+        return wrapper
+
+    return decorator
