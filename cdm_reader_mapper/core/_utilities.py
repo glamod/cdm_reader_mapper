@@ -203,7 +203,7 @@ class _DataBundle:
                 return attr_func
             return SubscriptableMethod(attr_func)
 
-        elif hasattr(data, "get_chunk") and hasattr(data, "prepend"):
+        if isinstance(data, ParquetStreamReader):
             # This allows db.read(), db.close(), db.get_chunk() to work
             if hasattr(data, attr):
                 return getattr(data, attr)
@@ -238,10 +238,9 @@ class _DataBundle:
                 # The combiner will consume the rest.
                 return combine_attribute_values(attr_value, data, attr)
 
-        else:
-            raise TypeError(
-                f"'data' is {type(data)}, expected DataFrame or ParquetStreamReader."
-            )
+        raise TypeError(
+            f"'data' is {type(data)}, expected DataFrame or ParquetStreamReader."
+        )
 
     def __repr__(self) -> str:
         """Return a string representation for :py:attr:`data`."""
