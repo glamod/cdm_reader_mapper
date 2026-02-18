@@ -23,7 +23,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from .iterators import ProcessFunction, process_function
+from .iterators import ParquetStreamReader, ProcessFunction, process_function
 
 
 def _replace_columns(
@@ -81,7 +81,6 @@ def _replace_columns(
     return out
 
 
-@process_function(data_only=True)
 def replace_columns(
     df_l: pd.DataFrame | Iterable[pd.dataFrame],
     df_r: pd.DataFrame | Iterable[pd.dataFrame],
@@ -90,7 +89,7 @@ def replace_columns(
     pivot_r: str | None = None,
     rep_c: str | list[str] | None = None,
     rep_map: dict[str, str] | None = None,
-) -> pd.DataFrame:
+) -> pd.DataFrame | ParquetStreamReader:
     """
     Replace columns in one DataFrame using row-matching from another.
 
@@ -122,16 +121,30 @@ def replace_columns(
     -----
     This function logs errors and returns `None` instead of raising exceptions.
     """
-    return ProcessFunction(
-        data=df_l,
-        func=_replace_columns,
-        func_args=(df_r,),
-        func_kwargs={
-            "pivot_c": pivot_c,
-            "pivot_l": pivot_l,
-            "pivot_r": pivot_r,
-            "rep_c": rep_c,
-            "rep_map": rep_map,
-        },
-        makecopy=False,
+
+    @process_function(data_only=True)
+    def _replace_columns_hlp():
+        return ProcessFunction(
+            data=df_l,
+            func=_replace_columns,
+            func_args=(df_r,),
+            func_kwargs={
+                "pivot_c": pivot_c,
+                "pivot_l": pivot_l,
+                "pivot_r": pivot_r,
+                "rep_c": rep_c,
+                "rep_map": rep_map,
+            },
+            makecopy=False,
+        )
+
+    result = _replace_columns_hlp()
+
+    if isinstance(result, pd.DataFrame):
+        return pd.DataFrame(result)
+    elif isinstance(result, ParquetStreamReader):
+        return result
+
+    raise ValueError(
+        f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}."
     )

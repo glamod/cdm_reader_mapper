@@ -256,13 +256,14 @@ def read_csv(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    return _read_data_from_file(
+    result = _read_data_from_file(
         filepath,
         pd.read_csv,
         col_subset,
         column_names,
         reader_kwargs=kwargs,
     )
+    return tuple(result)
 
 
 def read_parquet(
@@ -291,13 +292,14 @@ def read_parquet(
         - The PARQUET as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    return _read_data_from_file(
+    result = _read_data_from_file(
         filepath,
         pd.read_parquet,
         col_subset,
         column_names,
         reader_kwargs=kwargs,
     )
+    return tuple(result)
 
 
 def read_feather(
@@ -326,13 +328,14 @@ def read_feather(
         - The CSV as a DataFrame. Empty if file does not exist.
         - dictionary containing data column labels and data types
     """
-    return _read_data_from_file(
+    result = _read_data_from_file(
         filepath,
         pd.read_feather,
         col_subset,
         column_names,
         reader_kwargs=kwargs,
     )
+    return tuple(result)
 
 
 def convert_dtypes(dtypes) -> tuple[str]:

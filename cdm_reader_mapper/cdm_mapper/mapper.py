@@ -22,7 +22,11 @@ import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from cdm_reader_mapper.common.iterators import (
+    ParquetStreamReader,
+    ProcessFunction,
+    process_function,
+)
 
 from . import properties
 from .codes.codes import get_code_table
@@ -371,7 +375,6 @@ def _map_data_model(
     return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
 
 
-@process_function(data_only=True)
 def map_model(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
@@ -382,7 +385,7 @@ def map_model(
     drop_missing_obs: bool = True,
     drop_duplicates: bool = True,
     log_level: str = "INFO",
-) -> pd.DataFrame:
+) -> pd.DataFrame | ParquetStreamReader:
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
@@ -421,6 +424,26 @@ def map_model(
     cdm_tables: pandas.DataFrame
       DataFrame with MultiIndex columns (cdm_table, column_name).
     """
+
+    @process_function(data_only=True)
+    def _map_model():
+        return ProcessFunction(
+            data=data,
+            func=_map_data_model,
+            func_kwargs={
+                "imodel_maps": imodel_maps,
+                "imodel_functions": imodel_functions,
+                "cdm_tables": cdm_tables,
+                "null_label": null_label,
+                "codes_subset": codes_subset,
+                "cdm_complete": cdm_complete,
+                "drop_missing_obs": drop_missing_obs,
+                "drop_duplicates": drop_duplicates,
+                "logger": logger,
+            },
+            makecopy=False,
+        )
+
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     data_model = imodel.split("_")
@@ -435,19 +458,13 @@ def map_model(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    return ProcessFunction(
-        data=data,
-        func=_map_data_model,
-        func_kwargs={
-            "imodel_maps": imodel_maps,
-            "imodel_functions": imodel_functions,
-            "cdm_tables": cdm_tables,
-            "null_label": null_label,
-            "codes_subset": codes_subset,
-            "cdm_complete": cdm_complete,
-            "drop_missing_obs": drop_missing_obs,
-            "drop_duplicates": drop_duplicates,
-            "logger": logger,
-        },
-        makecopy=False,
+    result = _map_model()
+
+    if isinstance(result, pd.DataFrame):
+        return pd.DataFrame(result)
+    elif isinstance(result, ParquetStreamReader):
+        return result
+
+    raise ValueError(
+        f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}."
     )

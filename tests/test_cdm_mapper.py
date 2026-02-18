@@ -451,6 +451,9 @@ def test_map_model_pub47():
         ("observations-ws", "observation_height_above_station_surface"),
         ("observations-ws", "sensor_id"),
     ]
+    # print(result)
+    # print(type(result))
+    # exit()
     result = result[columns]
 
     exp = np.array(

@@ -241,7 +241,7 @@ class DataBundle(_DataBundle):
             db_._data, _mask, **kwargs
         )
         if do_mask is True:
-            db_._mask = split_by_index(db_._mask, selected_idx, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_all_false(
@@ -290,7 +290,7 @@ class DataBundle(_DataBundle):
             db_._data, _mask, **kwargs
         )
         if do_mask is True:
-            db_._mask = split_by_index(db_._mask, selected_idx, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
@@ -343,7 +343,7 @@ class DataBundle(_DataBundle):
             db_._data, selection, **kwargs
         )
         if do_mask is True:
-            db_._mask = split_by_index(db_._mask, selected_idx, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_index_isin(
@@ -391,7 +391,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         db_._data, _, selected_idx, _ = split_by_index(db_._data, index, **kwargs)
         if do_mask is True:
-            db_._mask = split_by_index(db_._mask, selected_idx, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def split_by_boolean_true(

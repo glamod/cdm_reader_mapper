@@ -1278,31 +1278,31 @@ def test_sort_chunk_outputs_parametrized(
     assert len(meta) == expected_meta_len
 
 
-def make_df():
+def make_df_0():
     return pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
 
-def make_series():
+def make_series_0():
     return pd.Series([1, 2, 3], name="my_series")
 
 
 @pytest.mark.parametrize(
     "inputs,expected_schema_types",
     [
-        ([make_df()], [(pd.DataFrame, make_df().columns)]),
-        ([make_series()], [(pd.Series, "my_series")]),
+        ([make_df_0()], [(pd.DataFrame, make_df_0().columns)]),
+        ([make_series_0()], [(pd.Series, "my_series")]),
         (
-            [make_df(), make_series()],
+            [make_df_0(), make_series_0()],
             [
-                (pd.DataFrame, make_df().columns),
+                (pd.DataFrame, make_df_0().columns),
                 (pd.Series, "my_series"),
             ],
         ),
         (
-            [make_df(), make_df()],
+            [make_df_0(), make_df_0()],
             [
-                (pd.DataFrame, make_df().columns),
-                (pd.DataFrame, make_df().columns),
+                (pd.DataFrame, make_df_0().columns),
+                (pd.DataFrame, make_df_0().columns),
             ],
         ),
     ],
@@ -1349,7 +1349,7 @@ def test_initialize_storage_empty():
         [123],
         ["string"],
         [object()],
-        [make_df(), 42],
+        [make_df_0(), 42],
     ],
 )
 def test_initialize_storage_invalid_type_raises(invalid_input):
@@ -1700,12 +1700,12 @@ def test_metadata_accumulation():
         non_data_proc_kwargs={},
     )
 
-    data_reader, meta = result
+    _, meta = result
 
     assert meta == [1, 2]
 
 
-def test_non_data_proc_applied():
+def test_non_data_proc_applied_helper():
     readers = [make_reader([df(1), df(2)])]
 
     def func(x):
@@ -2030,7 +2030,7 @@ def test_non_data_acc_mode():
     assert [row["a"].iloc[0] for row in output] == [1, 2]
 
 
-def test_non_data_proc_applied():
+def test_non_data_proc_applied_function():
     def func(df):
         return df, df["a"].iloc[0]
 

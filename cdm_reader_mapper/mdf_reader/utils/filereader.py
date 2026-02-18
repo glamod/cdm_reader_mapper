@@ -252,6 +252,16 @@ class FileReader:
         tuple
             (data, mask, config) or chunked equivalents if using Iterable[pd.DataFrame].
         """
+
+        @process_function()
+        def _open_data():
+            return ProcessFunction(
+                data=to_parse,
+                func=self._process_data,
+                func_kwargs=func_kwargs,
+                makecopy=False,
+            )
+
         pd_kwargs = dict(pd_kwargs or {})
         xr_kwargs = dict(xr_kwargs or {})
         convert_kwargs = convert_kwargs or {}
@@ -285,12 +295,8 @@ class FileReader:
 
         func_kwargs["config"] = config
 
-        return ProcessFunction(
-            data=to_parse,
-            func=self._process_data,
-            func_kwargs=func_kwargs,
-            makecopy=False,
-        )
+        result = _open_data()
+        return tuple(result)
 
     def read(
         self,

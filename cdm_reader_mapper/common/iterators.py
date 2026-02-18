@@ -29,6 +29,7 @@ from typing import (
 
 
 class ProcessFunction:
+    """Stores data and a callable function with optional arguments for processing."""
 
     def __init__(
         self,
