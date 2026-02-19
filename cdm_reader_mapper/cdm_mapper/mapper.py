@@ -124,6 +124,7 @@ def _transform(
 ) -> pd.Series:
     """Apply a transformation function from imodel_functions to a pandas Series."""
     logger.debug(f"Applying transform: {transform}")
+
     if kwargs:
         logger.debug(f"With kwargs: {', '.join(kwargs.keys())}")
     try:
@@ -181,11 +182,15 @@ def _fill_value(series, fill_value) -> pd.Series:
 def _extract_input_data(idata, elements, default, logger):
     """Extract the relevant input data based on `elements`."""
 
-    def _return_default():
-        return pd.Series(_default(default, len(idata)), index=idata.index), True
+    def _return_default(bool):
+        return pd.Series(_default(default, len(idata)), index=idata.index), bool
 
     if not elements:
-        return _return_default()
+        if default is None:
+            bool = False
+        else:
+            bool = True
+        return _return_default(bool)
 
     logger.debug(f"\telements: {' '.join(map(str, elements))}")
 
@@ -194,12 +199,12 @@ def _extract_input_data(idata, elements, default, logger):
     for e in elements:
         if e not in cols:
             logger.warning(f"Missing element from input data: {e}")
-            return _return_default()
+            return _return_default(True)
 
     data = idata[elements[0]] if len(elements) == 1 else idata[elements]
 
     if _is_empty(data):
-        return _return_default()
+        return _return_default(True)
 
     return data, False
 
@@ -445,6 +450,22 @@ def map_model(
         )
 
     logger = logging_hdlr.init_logger(__name__, level=log_level)
+<<<<<<< reader_io
+=======
+
+    if imodel is None:
+        logger.error("Input data model 'imodel' is not defined.")
+        return
+
+    if not isinstance(imodel, str):
+        logger.error(f"Input data model type is not supported: {type(imodel)}")
+        return
+
+    imodel = imodel.split("_")
+    if imodel[0] not in get_args(properties.SupportedDataModels):
+        logger.error("Input data model " f"{imodel[0]}" " not supported")
+        return
+>>>>>>> main
 
     data_model = imodel.split("_")
     if data_model[0] not in get_args(properties.SupportedDataModels):

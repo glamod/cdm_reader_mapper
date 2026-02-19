@@ -212,7 +212,6 @@ def _read_data_from_file(
     col_subset: str | list | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
     reader_kwargs: dict | None = None,
-    iterator: bool = False,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """Helper file reader."""
     if filepath is None or not Path(filepath).is_file():
@@ -232,6 +231,7 @@ def _read_data_from_file(
 
 def read_csv(
     filepath: Path,
+    delimiter: str = ",",
     col_subset: str | list | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs,
@@ -258,10 +258,10 @@ def read_csv(
     """
     result = _read_data_from_file(
         filepath,
-        pd.read_csv,
-        col_subset,
-        column_names,
-        reader_kwargs=kwargs,
+        reader=pd.read_csv,
+        col_subset=col_subset,
+        column_names=column_names,
+        reader_kwargs={"delimiter": delimiter, **kwargs},
     )
     return tuple(result)
 

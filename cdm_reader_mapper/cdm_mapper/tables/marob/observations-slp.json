@@ -4,24 +4,29 @@
       "append": "SLP"
     }
   },
+  "observation_height_above_station_surface": {
+    "elements": "BAROMETERHOEHE_MSL",
+    "decimal_places": 1
+  },
   "observed_variable": {
     "default": 58
   },
   "observation_value": {
-    "sections": "core",
-    "elements": "SLP",
+    "elements": "LUFTDRUCK_STATIONSHOEHE",
     "transform": "pressue_hpa_in_pa",
     "decimal_places": 0
   },
   "units": {
     "default": 32
   },
+  "quality_flag": {
+    "default": 2
+  },
   "original_units": {
     "default": 530
   },
   "original_value": {
-    "sections": "core",
-    "elements": "SLP",
+    "elements": "LUFTDRUCK_STATIONSHOEHE",
     "decimal_places": 1
   },
   "conversion_method": {
