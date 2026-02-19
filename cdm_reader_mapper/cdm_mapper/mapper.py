@@ -450,22 +450,12 @@ def map_model(
         )
 
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-<<<<<<< reader_io
-=======
 
     if imodel is None:
-        logger.error("Input data model 'imodel' is not defined.")
-        return
+        raise ValueError("Input data model 'imodel' is not defined.")
 
     if not isinstance(imodel, str):
-        logger.error(f"Input data model type is not supported: {type(imodel)}")
-        return
-
-    imodel = imodel.split("_")
-    if imodel[0] not in get_args(properties.SupportedDataModels):
-        logger.error("Input data model " f"{imodel[0]}" " not supported")
-        return
->>>>>>> main
+        raise TypeError(f"Input data model type is not supported: {type(imodel)}")
 
     data_model = imodel.split("_")
     if data_model[0] not in get_args(properties.SupportedDataModels):
