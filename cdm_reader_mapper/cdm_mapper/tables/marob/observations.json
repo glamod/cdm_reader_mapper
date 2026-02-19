@@ -30,10 +30,12 @@
   },
   "longitude": {
     "elements": "GEOGR_LAENGE",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "latitude": {
     "elements": "GEOGR_BREITE",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "crs": {
@@ -50,6 +52,9 @@
   },
   "spatial_representativeness": {
     "default": 3
+  },
+  "quality_flag": {
+    "default": 2
   },
   "numerical_precision": {},
   "sensor_automation_status": {

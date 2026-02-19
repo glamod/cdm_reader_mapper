@@ -6,6 +6,7 @@
   },
   "observation_height_above_station_surface": {
     "elements": "SENSORHOEHE_WAS_FF",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "observed_variable": {
@@ -14,13 +15,13 @@
   "observation_value": {
     "elements": "WINDGESCHWINDIGKEIT",
     "transform": "velocity_kmh_in_ms",
+    "kwargs": {
+      "convert_to_decimal_float": true
+    },
     "decimal_places": 1
   },
   "units": {
     "default": 731
-  },
-  "quality_flag": {
-    "default": 2
   },
   "original_precision": {},
   "original_units": {
@@ -28,6 +29,7 @@
   },
   "original_value": {
     "elements": "WINDGESCHWINDIGKEIT",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "conversion_flag": {

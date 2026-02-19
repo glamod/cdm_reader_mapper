@@ -6,6 +6,7 @@
   },
   "observation_height_above_station_surface": {
     "elements": "BAROMETERHOEHE_MSL",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "observed_variable": {
@@ -14,19 +15,20 @@
   "observation_value": {
     "elements": "LUFTDRUCK_STATIONSHOEHE",
     "transform": "pressue_hpa_in_pa",
+    "kwargs": {
+      "convert_to_decimal_float": true
+    },
     "decimal_places": 0
   },
   "units": {
     "default": 32
-  },
-  "quality_flag": {
-    "default": 2
   },
   "original_units": {
     "default": 530
   },
   "original_value": {
     "elements": "LUFTDRUCK_STATIONSHOEHE",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "conversion_method": {
