@@ -33,7 +33,7 @@ class DataBundle(_DataBundle):
 
     Parameters
     ----------
-    data: pandas.DataFrame, optional
+    data: pd.DataFrame or Iterable[pd.DataFrame], optional
         MDF DataFrame.
     columns: pd.Index, pd.MultiIndex or list, optional
         Column labels of ``data``
@@ -140,7 +140,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Returns
@@ -177,7 +177,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples
@@ -237,10 +237,11 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data = split_by_boolean_true(db_._data, _mask, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_boolean_true(
+            db_._data, _mask, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_all_false(
@@ -285,10 +286,11 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data = split_by_boolean_false(db_._data, _mask, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_boolean_false(
+            db_._data, _mask, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
@@ -337,10 +339,11 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`split_by_column_entries`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_column_entries(
+            db_._data, selection, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_index_isin(
@@ -386,10 +389,9 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`split_by_index`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_index(db_._data, index, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_index(db_._data, index, **kwargs)
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def split_by_boolean_true(
@@ -427,14 +429,12 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data = split_by_boolean_true(
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_true(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -473,13 +473,12 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data = split_by_boolean_false(
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_false(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -522,13 +521,12 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data = split_by_column_entries(
+        db1_._data, db2_._data, selected_idx, _ = split_by_column_entries(
             db1_._data, selection, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -570,11 +568,11 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data = split_by_index(
+        db1_._data, db2_._data, _, _ = split_by_index(
             db1_._data, index, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, db2_._mask, _, _ = split_by_index(
                 db1_._mask, index, return_rejected=True, **kwargs
             )
         return db1_, db2_

@@ -3,7 +3,7 @@ Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
 
-Maps data contained in a pandas DataFrame (or pd.io.parsers.TextFileReader) to
+Maps data contained in a pandas DataFrame (or Iterable[pd.DataFrame]) to
 the C3S Climate Data Store Common Data Model (CDM) header and observational
 tables using the mapping information available in the tool's mapping library
 for the input data model.
@@ -15,55 +15,24 @@ from __future__ import annotations
 
 from copy import deepcopy
 from io import StringIO
-from typing import Any, get_args
+from typing import Any, Iterable, get_args
 
 import numpy as np
 import pandas as pd
 
-from pandas.io.parsers import TextFileReader
+from cdm_reader_mapper.common import logging_hdlr
 
-from cdm_reader_mapper.common import logging_hdlr, pandas_TextParser_hdlr
+from cdm_reader_mapper.common.iterators import (
+    ParquetStreamReader,
+    ProcessFunction,
+    process_function,
+)
 
 from . import properties
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps
 from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
-
-
-def _check_input_data_type(data, logger):
-    """Check whether inpuit data type is valid."""
-
-    def _log_and_return_empty(msg):
-        logger.error(msg)
-
-    if isinstance(data, pd.DataFrame):
-        logger.debug("Input data is a pd.DataFrame")
-        if data.empty:
-            return _log_and_return_empty("Input data is empty")
-        return [data]
-
-    elif isinstance(data, TextFileReader):
-        logger.debug("Input is a pd.TextFileReader")
-        if not pandas_TextParser_hdlr.is_not_empty(data):
-            return _log_and_return_empty("Input data is empty")
-
-        return data
-
-    return _log_and_return_empty("Input data type " f"{type(data)}" " not supported")
-
-
-def _normalize_input_data(data, logger):
-    """Return an iterator of DataFrames irrespective of input type."""
-    data = _check_input_data_type(data, logger)
-
-    if data is None:
-        return iter(())
-
-    if isinstance(data, list):
-        return iter(data)
-
-    return data
 
 
 def _is_empty(value):
@@ -369,7 +338,7 @@ def _prepare_cdm_tables(cdm_subset):
     return tables
 
 
-def _process_chunk(
+def _map_data_model(
     idata,
     imodel_maps,
     imodel_functions,
@@ -380,9 +349,14 @@ def _process_chunk(
     drop_missing_obs,
     drop_duplicates,
     logger,
-    is_reader,
 ):
     """Process one chunk of input data."""
+    if ":" in idata.columns[0]:
+        idata.columns = pd.MultiIndex.from_tuples(
+            col.split(":") for col in idata.columns
+        )
+
+    all_tables = []
     for table, mapping in imodel_maps.items():
         logger.debug(f"Table: {table}")
 
@@ -400,118 +374,37 @@ def _process_chunk(
         )
 
         table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
+        table_df = table_df.astype(object)
+        all_tables.append(table_df)
 
-        if is_reader:
-            table_df.to_csv(
-                cdm_tables[table]["buffer"],
-                header=False,
-                index=False,
-                mode="a",
-            )
-            cdm_tables[table]["columns"] = table_df.columns
-        else:
-            cdm_tables[table]["df"] = table_df.astype(object)
-
-
-def _finalize_output(cdm_tables, logger):
-    """Turn buffers into DataFrames and combine all tables."""
-    final_tables = []
-
-    for table, meta in cdm_tables.items():
-        logger.debug(f"\tParse datetime by reader; Table: {table}")
-
-        if "df" not in meta:
-            meta["buffer"].seek(0)
-            df = pd.read_csv(
-                meta["buffer"],
-                names=meta["columns"],
-                na_values=[],
-                dtype="object",
-                keep_default_na=False,
-            )
-            meta["buffer"].close()
-        else:
-            df = meta.get("df", pd.DataFrame())
-
-        final_tables.append(df)
-
-    if not final_tables:
-        return pd.DataFrame()
-
-    return pd.concat(final_tables, axis=1, join="outer").reset_index(drop=True)
-
-
-def _map_and_convert(
-    data_model,
-    *sub_models,
-    data=None,
-    cdm_subset=None,
-    codes_subset=None,
-    cdm_complete=True,
-    drop_missing_obs=True,
-    drop_duplicates=True,
-    null_label="null",
-    logger=None,
-) -> pd.DataFrame:
-    """Map and convert MDF data to CDM tables."""
-    data_iter = _normalize_input_data(data, logger)
-
-    if data_iter is None:
-        return pd.DataFrame()
-
-    if not cdm_subset:
-        cdm_subset = properties.cdm_tables
-
-    imodel_maps = get_imodel_maps(data_model, *sub_models, cdm_tables=cdm_subset)
-    imodel_functions = mapping_functions("_".join([data_model] + list(sub_models)))
-
-    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
-
-    is_reader = isinstance(data_iter, TextFileReader)
-
-    for idata in data_iter:
-        _process_chunk(
-            idata=idata,
-            imodel_maps=imodel_maps,
-            imodel_functions=imodel_functions,
-            cdm_tables=cdm_tables,
-            null_label=null_label,
-            codes_subset=codes_subset,
-            cdm_complete=cdm_complete,
-            drop_missing_obs=drop_missing_obs,
-            drop_duplicates=drop_duplicates,
-            logger=logger,
-            is_reader=is_reader,
-        )
-
-    return _finalize_output(cdm_tables, logger)
+    return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
 
 
 def map_model(
-    data,
-    imodel,
-    cdm_subset=None,
-    codes_subset=None,
-    null_label="null",
-    cdm_complete=True,
-    drop_missing_obs=True,
-    drop_duplicates=True,
-    log_level="INFO",
-) -> pd.DataFrame:
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    imodel: str,
+    cdm_subset: str | list[str] | None = None,
+    codes_subset: str | list[str] | None = None,
+    null_label: str = "null",
+    cdm_complete: bool = True,
+    drop_missing_obs: bool = True,
+    drop_duplicates: bool = True,
+    log_level: str = "INFO",
+) -> pd.DataFrame | ParquetStreamReader:
     """Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
-    data: pandas.DataFrame, pd.parser.TextFileReader or io.String
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
         input data to map.
     imodel: str
         A specific mapping from generic data model to CDM, like map a SID-DCK from IMMA1’s core and attachments to
         CDM in a specific way.
         e.g. ``icoads_r300_d704``
-    cdm_subset: list, optional
+    cdm_subset: str or list, optional
         subset of CDM model tables to map.
         Defaults to the full set of CDM tables defined for the imodel.
-    codes_subset: list, optional
+    codes_subset: str or list, optional
         subset of code mapping tables to map.
         Default to the full set of code mapping tables defined for the imodel.
     null_label: str
@@ -536,30 +429,53 @@ def map_model(
     cdm_tables: pandas.DataFrame
       DataFrame with MultiIndex columns (cdm_table, column_name).
     """
+
+    @process_function(data_only=True)
+    def _map_model():
+        return ProcessFunction(
+            data=data,
+            func=_map_data_model,
+            func_kwargs={
+                "imodel_maps": imodel_maps,
+                "imodel_functions": imodel_functions,
+                "cdm_tables": cdm_tables,
+                "null_label": null_label,
+                "codes_subset": codes_subset,
+                "cdm_complete": cdm_complete,
+                "drop_missing_obs": drop_missing_obs,
+                "drop_duplicates": drop_duplicates,
+                "logger": logger,
+            },
+            makecopy=False,
+        )
+
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     if imodel is None:
-        logger.error("Input data model 'imodel' is not defined.")
-        return
+        raise ValueError("Input data model 'imodel' is not defined.")
 
     if not isinstance(imodel, str):
-        logger.error(f"Input data model type is not supported: {type(imodel)}")
-        return
+        raise TypeError(f"Input data model type is not supported: {type(imodel)}")
 
-    imodel = imodel.split("_")
-    if imodel[0] not in get_args(properties.SupportedDataModels):
-        logger.error("Input data model " f"{imodel[0]}" " not supported")
-        return
+    data_model = imodel.split("_")
+    if data_model[0] not in get_args(properties.SupportedDataModels):
+        raise ValueError("Input data model " f"{data_model[0]}" " not supported")
 
-    return _map_and_convert(
-        imodel[0],
-        *imodel[1:],
-        data=data,
-        cdm_subset=cdm_subset,
-        codes_subset=codes_subset,
-        null_label=null_label,
-        cdm_complete=cdm_complete,
-        drop_missing_obs=drop_missing_obs,
-        drop_duplicates=drop_duplicates,
-        logger=logger,
+    if not cdm_subset:
+        cdm_subset = properties.cdm_tables
+
+    imodel_maps = get_imodel_maps(*data_model, cdm_tables=cdm_subset)
+    imodel_functions = mapping_functions(imodel)
+
+    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
+
+    result = _map_model()
+
+    if isinstance(result, pd.DataFrame):
+        return pd.DataFrame(result)
+    elif isinstance(result, ParquetStreamReader):
+        return result
+
+    raise ValueError(
+        f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}."
     )

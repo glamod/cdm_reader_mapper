@@ -6,15 +6,18 @@ import json
 import logging
 from io import StringIO as StringIO
 from pathlib import Path
-from typing import Any, get_args
+from typing import Iterable, get_args
 
 import pandas as pd
-from pandas.io.parsers import TextFileReader
 
 from .utils.utilities import join, update_column_names, update_dtypes
 
 from ..common import get_filename
-from ..common.pandas_TextParser_hdlr import make_copy
+from ..common.iterators import (
+    ParquetStreamReader,
+    is_valid_iterator,
+    parquet_stream_from_iterable,
+)
 
 from ..properties import SupportedFileTypes
 
@@ -26,35 +29,25 @@ WRITERS = {
 
 
 def _normalize_data_chunks(
-    data: pd.DataFrame | TextFileReader | None,
-) -> list | TextFileReader:
+    data: pd.DataFrame | Iterable[pd.DataFrame] | None,
+) -> list | ParquetStreamReader:
     """Helper function to normalize data chunks."""
     if data is None:
         data = pd.DataFrame()
     if isinstance(data, pd.DataFrame):
         return [data]
-    if isinstance(data, TextFileReader):
-        return make_copy(data)
+    if is_valid_iterator(data):
+        if not isinstance(data, ParquetStreamReader):
+            data = parquet_stream_from_iterable(data)
+        return data.copy()
+    if isinstance(data, (list, tuple)):
+        return parquet_stream_from_iterable(data)
     raise TypeError(f"Unsupported data type found: {type(data)}.")
 
 
-def _write_data(
-    data_df: pd.DataFrame,
-    mask_df: pd.DataFrame,
-    data_fn: str,
-    mask_fn: str,
-    writer: str,
-    write_kwargs: dict[str, Any],
-) -> None:
-    """Helper function to write data on disk."""
-    getattr(data_df, writer)(data_fn, **write_kwargs)
-    if not mask_df.empty:
-        getattr(mask_df, writer)(mask_fn, **write_kwargs)
-
-
 def write_data(
-    data: pd.DataFrame | TextFileReader,
-    mask: pd.DataFrame | TextFileReader | None = None,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
     data_format: SupportedFileTypes = "csv",
     dtypes: pd.Series | dict | None = None,
     parse_dates: list | bool = False,
@@ -64,7 +57,7 @@ def write_data(
     suffix: str | None = None,
     extension: str = None,
     filename: str | dict | None = None,
-    col_subset: str | list | tuple | None = None,
+    col_subset: str | list[str] | tuple[str] | None = None,
     delimiter: str = ",",
     **kwargs,
 ) -> None:
@@ -72,10 +65,10 @@ def write_data(
 
     Parameters
     ----------
-    data: pandas.DataFrame
-        pandas.DataFrame to export.
-    mask: pandas.DataFrame, optional
-        validation mask to export.
+    data: pandas.DataFrame or Iterable[pd.DataFrame]
+        Data to export.
+    mask: pandas.DataFrame or Iterable[pd.DataFrame], optional
+        Validation mask to export.
     data_format: {"csv", "parquet", "feather"}, default: "csv"
         Format of output data file(s).
     dtypes: dict, optional
@@ -131,6 +124,9 @@ def write_data(
         raise ValueError(
             f"data_format must be one of {supported_file_types}, not {data_format}."
         )
+
+    if mask is not None and not isinstance(data, type(mask)):
+        raise ValueError("type of 'data' and type of 'mask' do not match.")
 
     extension = extension or data_format
 
@@ -194,14 +190,10 @@ def write_data(
                 **kwargs,
             )
 
-        _write_data(
-            data_df=data_df,
-            mask_df=mask_df,
-            data_fn=filename_data,
-            mask_fn=filename_mask,
-            writer=WRITERS[data_format],
-            write_kwargs=write_kwargs,
-        )
+        writer = WRITERS[data_format]
+        getattr(data_df, writer)(filename_data, **write_kwargs)
+        if not mask_df.empty:
+            getattr(mask_df, writer)(filename_mask, **write_kwargs)
 
     with open(filename_info, "w") as fileObj:
         json.dump(info, fileObj, indent=4)

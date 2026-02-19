@@ -15,6 +15,7 @@ from cdm_reader_mapper.mdf_reader.reader import (
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
     read_csv,
     read_parquet,
@@ -404,8 +405,8 @@ def test_read_data_textfilereader():
     ]:
         assert hasattr(db, attr)
 
-    assert isinstance(db.data, pd.io.parsers.TextFileReader)
-    assert isinstance(db.mask, pd.io.parsers.TextFileReader)
+    assert isinstance(db.data, ParquetStreamReader)
+    assert isinstance(db.mask, ParquetStreamReader)
     assert isinstance(db.columns, pd.MultiIndex)
     assert isinstance(db.dtypes, pd.Series)
     assert db.parse_dates == []

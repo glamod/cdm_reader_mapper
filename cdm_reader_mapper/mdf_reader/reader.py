@@ -337,7 +337,6 @@ def read_data(
         data_kwargs=data_kwargs,
         mask_kwargs=mask_kwargs,
     )
-
     return DataBundle(
         data=data,
         columns=info["columns"],

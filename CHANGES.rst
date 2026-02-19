@@ -17,6 +17,10 @@ New features and enhancements
   * `cdm_mapper.read_tables`
   * `cdm_mapper.write_tables`
 
+* introduce `ParquetStreamReader` to replace `pd.parsers.io.TextfileReader` (:issue:`8`, :pull:`348`)
+* ``cdm_reader.map_model`` now supports both `pd.DataFrame` and `ParquetStreamReader` as output (:pull:`348`)
+* ``common.replace_columns`` now supports both `pd.DataFrame` and `ParquetStreamReader` as output (:pull:`348`)
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 * ``DataBundle.stack_v`` and ``DataBundle.stack_h`` only support `pd.DataFrames` as input, otherwise raises an `ValueError` (:pull:`360`)
@@ -27,12 +31,18 @@ Breaking changes
 
 * set default for `extension` from ``csv`  to specified `data_format` in `mdf_reader.write_data` (:pull:`363`)
 * `mdf_reader.read_data`: save `dtypes` in return DataBundle as `pd.Series` not `dict` (:pull:`363`)
+* remove ``common.pandas_TextParser_hdlr`` (:issue:`8`, :pull:`348`)
+* ``cdm_reader_mapper`` now raises errors instead of logging them (:pull:`348`)
+* ``DataBundle`` now converts all iterables of `pd.DataFrame`/`pd.Series` to `ParquetStreamReader` when initialized (:pull:`348`)
+* all main functions in `common.select` now return a tuple of 4 (selected values, rejected values, original indexes of selected values, original indexes of rejected values) (:pull:`348`)
+* move `ParquetStreamReader` and all corresponding methods to `common.iterables` to handle chunking outside of `mdf_reader`/`cdm_mapper`/`core`/`metmetpy` (:issue:`349`, :pull:`348`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
 * re-work internal structure for more readability and better performance (:pull:`360`)
 * use pre-defined `Literal` constants in `cdm_reader_mapper.properties` (:pull:`363`)
 * `mdf_reader.utils.utilities.read_csv`: parameter `columns` to `column_names` (:pull:`363`)
+* introduce post-processing decorator that handles both `pd.DataFrame` and `ParquetStreamReader` (:pull:`348`)
 
 2.2.1 (2026-01-23)
 ------------------

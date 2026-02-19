@@ -7,6 +7,8 @@ import pytest
 
 from io import StringIO
 
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
+
 from cdm_reader_mapper.metmetpy import properties
 from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
 from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
@@ -645,9 +647,43 @@ def test_correct_datetime_textfilereader():
 
     result = correct_datetime(parser, "icoads_r300_d201").read()
 
-    pd.testing.assert_frame_equal(
-        result.reset_index(drop=True), expected.reset_index(drop=True)
-    )
+    pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
+def test_correct_datetime_invalid_data(data):
+    with pytest.raises(TypeError, match="Unsupported data type"):
+        correct_datetime(data, "icoads_r300_d201")
+
+
+def test_correct_datetime_series():
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        correct_datetime(pd.Series([1, 2, 3]), "icoads_r300_d201")
+
+
+@pytest.mark.parametrize("data", [[1, 2], (1, 2)])
+def test_correct_datetime_invalid_iterable_entries(data):
+    with pytest.raises(
+        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
+    ):
+        correct_datetime(data, "icoads_r300_d201")
+
+
+@pytest.mark.parametrize(
+    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
+)
+def test_correct_datetime_empty_iterable(data):
+    with pytest.raises(ValueError, match="Iterable is empty."):
+        correct_datetime(data, "icoads_r300_d201")
+
+
+def test_correct_datetime_valid_iterable():
+    df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}, index=[0])
+    df2 = pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}, index=[1])
+    result = correct_datetime(ParquetStreamReader(iter([df1, df2])), "icoads_r300_d201")
+
+    exp = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
+    pd.testing.assert_frame_equal(result.read(), exp)
 
 
 @pytest.mark.parametrize(
@@ -716,30 +752,61 @@ def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
         dtype=object,
         skip_blank_lines=False,
     )
-    result = (
-        correct_pt(parser, imodel, log_level="CRITICAL").read().reset_index(drop=True)
-    )
-    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+    result = correct_pt(parser, imodel, log_level="CRITICAL")
+    pd.testing.assert_frame_equal(result.read(), expected, check_dtype=False)
+
+
+@pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
+def test_correct_pt_invalid_data(data):
+    with pytest.raises(TypeError, match="Unsupported data type"):
+        correct_pt(data, "icoads_r300_d993")
+
+
+def test_correct_pt_series():
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        correct_pt(pd.Series([1, 2, 3]), "icoads_r300_d993")
+
+
+@pytest.mark.parametrize("data", [[1, 2], (1, 2)])
+def test_correct_pt_invalid_iterable_entries(data):
+    with pytest.raises(
+        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
+    ):
+        correct_pt(data, "icoads_r300_d993")
+
+
+@pytest.mark.parametrize(
+    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
+)
+def test_correct_pt_empty_iterable(data):
+    with pytest.raises(ValueError, match="Iterable is empty."):
+        correct_pt(data, "icoads_r300_d993")
+
+
+def test_correct_pt_valid_iterable():
+    df1 = pd.DataFrame({PT: [None, "7", None]}, index=[0, 1, 2])
+    df2 = pd.DataFrame({PT: ["6", "7", None]}, index=[3, 4, 5])
+    result = correct_pt(ParquetStreamReader(iter([df1, df2])), "icoads_r300_d993")
+
+    exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
+    pd.testing.assert_frame_equal(result.read(), exp)
 
 
 def test_get_id_col_not_defined():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({"X": [1, 2, 3]})
-    result = _get_id_col(df, "unknown_model", logger)
-    assert result is None
+    with pytest.raises(ValueError, match="ID column not defined in properties file"):
+        _get_id_col(df, "unknown_model")
 
 
 def test_get_id_col_missing_in_data():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({"X": [1, 2, 3]})
-    result = _get_id_col(df, "icoads", logger)
-    assert result is None
+    with pytest.raises(ValueError, match="No ID columns found."):
+        _get_id_col(df, "icoads")
 
 
 def test_get_id_col_single_column_present():
-    logger = logging.getLogger("test_logger")
     df = pd.DataFrame({("core", "ID"): [1, 2, 3], ("other", "ID"): [4, 5, 6]})
-    result = _get_id_col(df, "icoads", logger)
+    result = _get_id_col(df, "icoads")
     assert result == ("core", "ID")
 
 
@@ -831,9 +898,8 @@ def test_validate_id_textfilereader():
     )
     result = validate_id(parser, "icoads_r300_d201", blank=False, log_level="CRITICAL")
     expected = pd.Series([True, False, True], name=ID)
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True), expected, check_dtype=False
-    )
+
+    pd.testing.assert_series_equal(result.read(), expected)
 
 
 @pytest.mark.parametrize(
@@ -857,9 +923,7 @@ def test_validate_id_textfilereader():
 )
 def test_validate_datetime_dataframe(data_input, expected):
     result = validate_datetime(data_input.copy(), "icoads", log_level="CRITICAL")
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True), expected, check_dtype=False
-    )
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -879,6 +943,4 @@ def test_validate_datetime_textfilereader(csv_text, expected):
         skip_blank_lines=False,
     )
     result = validate_datetime(parser, "icoads", log_level="CRITICAL")
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True), expected, check_dtype=False
-    )
+    pd.testing.assert_series_equal(result.read(), expected)
