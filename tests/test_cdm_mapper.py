@@ -102,13 +102,26 @@ def data_header_expected():
 
 def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
     source = test_data[f"test_{data_model}"]["mdf_data"]
-    info = open_json_file(test_data[f"test_{data_model}"]["mdf_info"])
-    df = pd.read_csv(source, dtype=info["dtypes"], encoding=encoding)
+
+    mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
+    if mdf_info is None:
+        dtypes = object
+    else:
+        info = open_json_file(test_data[f"test_{data_model}"]["mdf_info"])
+        dtypes = info["dtypes"]
+
+    delimiter = test_data[f"test_{data_model}"]["delimiter"]
+
+    df = pd.read_csv(source, dtype=dtypes, delimiter=delimiter, encoding=encoding)
+
     if ":" in df.columns[0]:
         df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+
     result = map_model(df, data_model, **kwargs)
+
     if not select:
         select = cdm_tables
+
     for cdm_table in select:
         expected = pd.read_csv(
             test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
@@ -119,6 +132,7 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
         )
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna()
+        result_table = result_table.reset_index(drop=True)
 
         if "record_timestamp" in expected.columns:
             expected = expected.drop("record_timestamp", axis=1)
@@ -359,8 +373,6 @@ def test_extract_input_data(data_header, column, elements, default, use_default,
 
     assert result[1] is use_default
 
-    print(result)
-
     if exp == "idata":
         exp = data_header[elements[0]]
     elif isinstance(exp, list):
@@ -588,6 +600,7 @@ def test_map_model_pub47():
         "icoads_r302_d992",
         "craid",
         "gdac",
+        "marob",
     ],
 )
 def test_map_model_test_data_basic(data_model):
