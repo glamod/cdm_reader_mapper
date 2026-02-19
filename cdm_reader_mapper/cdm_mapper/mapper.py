@@ -399,8 +399,6 @@ def _process_chunk(
             logger=logger,
         )
 
-        table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
-
         if is_reader:
             table_df.to_csv(
                 cdm_tables[table]["buffer"],
@@ -432,6 +430,9 @@ def _finalize_output(cdm_tables, logger):
             meta["buffer"].close()
         else:
             df = meta.get("df", pd.DataFrame())
+
+        df = df.set_index("report_id", drop=False)
+        df.columns = pd.MultiIndex.from_product([[table], df.columns])
 
         final_tables.append(df)
 

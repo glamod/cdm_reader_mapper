@@ -1050,7 +1050,7 @@ class DataBundle(_DataBundle):
         Returns
         -------
         :py:class:`~DataBundle` or None
-            DataBundle without converted ffloat entries or None if ``inplace=True``.
+            DataBundle without converted float entries or None if ``inplace=True``.
         """
         if not isinstance(self._data, pd.DataFrame):
             raise NotImplementedError(
