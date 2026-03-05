@@ -70,7 +70,7 @@ dev = [
   "flake8 >=7.1.1",
   "flake8-rst-docstrings >=0.3.0",
   "flit >=3.9.0",
-  "isort ==8.0.0",
+  "isort ==8.0.1",
   "notebook",
   "pip >=24.2.0",
   "pre-commit >=3.7",
@@ -79,7 +79,7 @@ dev = [
   "pytest-cov>=6.0.0",
   "pytest-env>=1.1.5",
   "ruff >=0.7.0",
-  "vulture ==2.14"
+  "vulture ==2.15"
 ]
 docs = [
   "ipykernel",
