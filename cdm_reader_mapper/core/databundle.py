@@ -17,6 +17,7 @@ from cdm_reader_mapper.common import (
     split_by_boolean_true,
     split_by_index,
     split_by_column_entries,
+    split_by_column_names,
     split_by_boolean_false,
 )
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
@@ -228,6 +229,7 @@ class DataBundle(_DataBundle):
         See Also
         --------
         DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+        DataBundle.select_where_column_isin : Select rows from `data` where column names are in a specific list.
         DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
         DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
 
@@ -267,16 +269,17 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-        >>> db_selected = db.select_where_all_true()
+        >>> db_selected = db.select_where_all_false()
 
         Select valid values only with overwriting the old data.
 
-        >>> db.select_where_all_true(inplace=True)
+        >>> db.select_where_all_false(inplace=True)
         >>> df_selected = db.data
 
         See Also
         --------
         DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_column_isin : Select rows from `data` where column names are in a specific list.
         DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
         DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
 
@@ -288,6 +291,59 @@ class DataBundle(_DataBundle):
         _mask = _copy(db_._mask)
         db_._data, _, selected_idx, _ = split_by_boolean_false(
             db_._data, _mask, **kwargs
+        )
+        if do_mask is True:
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
+        return self._return_db(db_, inplace)
+
+    def select_where_column_isin(
+        self, columns, inplace=False, do_mask=True, **kwargs
+    ) -> DataBundle | None:
+        """Select rows from :py:attr:`data` where column entries are in a specific value list.
+
+        Parameters
+        ----------
+        columns: str, list, pd.Index or pd.MultiIndex
+            Column names to select.
+        inplace: bool
+            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
+            else return a copy of :py:class:`~DataBundle` with selected columns only in :py:attr:`data`.
+            Default: False
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
+
+        Returns
+        -------
+        :py:class:`~DataBundle` or None
+            DataBundle containing rows where column names are in a specific list or None if ``inplace=True``.
+
+        Examples
+        --------
+        Select without overwriting the old data.
+
+        >>> db_selected = db.select_where_column_isin(
+        ...     columns="c1",
+        ... )
+
+        Select with overwriting the old data.
+
+        >>> db.select_where_column_isin(columns="c1", inplace=True)
+        >>> df_selected = db.data
+
+        See Also
+        --------
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+
+        Note
+        ----
+        For more information see :py:func:`split_by_column_entries`
+        """
+        db_ = self._get_db(inplace)
+        db_._data, _, selected_idx, _ = split_by_column_names(
+            db_._data, columns, **kwargs
         )
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
@@ -319,7 +375,7 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-        >>> db_selected = db.select_from_list(
+        >>> db_selected = db.select_where_entry_isin(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
@@ -330,6 +386,7 @@ class DataBundle(_DataBundle):
 
         See Also
         --------
+        DataBundle.select_where_column_isin : Select rows from `data` where column names are in a specific list.
         DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
         DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
         DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
@@ -371,15 +428,16 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-         >>> db_selected = db.select_from_index([0, 2, 4])
+         >>> db_selected = db.select_where_index_isin([0, 2, 4])
 
         Select with overwriting the old data.
 
-        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
+        >>> db.select_where_index_isin(index=[0, 2, 4], inplace=True)
         >>> df_selected = db.data
 
         See Also
         --------
+        DataBundle.select_where_column_isin : Select rows from `data` where column names are in a specific list.
         DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
         DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
         DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
@@ -414,11 +472,12 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_true, db_false = db.split_where_all_true()
+        >>> db_true, db_false = db.split_by_boolean_true()
 
         See Also
         --------
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
+        DataBundle.split_by_column_names : Split `data` by rows where column names are in a specific list.
         DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
         DataBundle.split_by_index : Split `data` by rows within specific index list.
 
@@ -458,11 +517,12 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_false, db_true = db.split_where_all_false()
+        >>> db_false, db_true = db.split_by_boolean_false()
 
         See Also
         --------
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are True.
+        DataBundle.split_by_column_names : Split `data` by rows where column names are in a specific list.
         DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
         DataBundle.split_by_index : Split `data` by rows within specific index list.
 
@@ -475,6 +535,54 @@ class DataBundle(_DataBundle):
         _mask = _copy(db1_._mask)
         db1_._data, db2_._data, selected_idx, _ = split_by_boolean_false(
             db1_._data, _mask, return_rejected=True, **kwargs
+        )
+        if do_mask is True:
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
+            )
+        return db1_, db2_
+
+    def split_by_column_names(
+        self, columns, do_mask=True, **kwargs
+    ) -> tuple[DataBundle, DataBundle]:
+        """Split :py:attr:`data` by rows where column entries are in a specific value list.
+
+        Parameters
+        ----------
+        columns: str, list, pd.Index or pd.MultiIndex
+            Column names to select.
+        do_mask: bool
+            If ``True`` also do selection on :py:attr:`mask`.
+
+        Returns
+        -------
+        tuple
+            First :py:class:`~DataBundle` including rows where column names are in a specific list.
+            Second :py:class:`~DataBundle` including rows where column names are not in a specific list.
+
+        Examples
+        --------
+        Split DataBundle.
+
+        >>> db_isin, db_isnotin = db.split_by_column_names(
+        ...     columns="c1",
+        ... )
+
+        See Also
+        --------
+        DataBundle.split_by_column_entries : Select columns from `data` with specific values.
+        DataBundle.split_by_index : Split `data` by rows within specific index list.
+        DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
+        DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
+
+        Note
+        ----
+        For more information see :py:func:`split_by_column_entries`
+        """
+        db1_ = self.copy()
+        db2_ = self.copy()
+        db1_._data, db2_._data, selected_idx, _ = split_by_column_entries(
+            db1_._data, columns, return_rejected=True, **kwargs
         )
         if do_mask is True:
             db1_._mask, db2_._mask, _, _ = split_by_index(
@@ -505,12 +613,13 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_isin, db_isnotin = db.split_where_entry_isin(
+        >>> db_isin, db_isnotin = db.split_by_column_entries(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
         See Also
         --------
+        DataBundle.split_by_column_names : Split `data` by rows where column names are in a specific list.
         DataBundle.split_by_index : Split `data` by rows within specific index list.
         DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
@@ -554,10 +663,11 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-         >>> db_isin, db_isnotin = db.select_from_index([0, 2, 4])
+         >>> db_isin, db_isnotin = db.split_by_index([0, 2, 4])
 
         See Also
         --------
+        DataBundle.split_by_column_names : Split `data` by rows where column names are in a specific list.
         DataBundle.split_by_column_entries : Select columns from `data` with specific values.
         DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
@@ -803,7 +913,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
-        db_._columns = _tables.columns
+        db_._columns = _tables.attrs["columns"]
         db_._data = _tables
         return self._return_db(db_, inplace)
 
