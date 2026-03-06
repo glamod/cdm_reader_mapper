@@ -1030,34 +1030,3 @@ class DataBundle(_DataBundle):
         header_ = db_.DupDetect.result
         db_._data = db_._data[db_._data.index.isin(header_.index)]
         return self._return_db(db_, inplace)
-
-    def convert_comma_as_decimal_float(
-        self, columns, inplace=False
-    ) -> DataBundle | None:
-        """Replace commas with dots and convert to floats.
-
-        Parameters
-        ----------
-        columns: list, pd.Index or pd.MultiIndex
-            List of commas to convert.
-        inplace: bool
-            If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
-            else return a copy of :py:class:`~DataBundle` with :py:attr:`data` containing no duplicates.
-            Default: False
-
-        Returns
-        -------
-        :py:class:`~DataBundle` or None
-            DataBundle without converted ffloat entries or None if ``inplace=True``.
-        """
-        if not isinstance(self._data, pd.DataFrame):
-            raise NotImplementedError(
-                f"This function is only implemented for pd.DataFrames, not {type(self._data)}."
-            )
-
-        db_ = self._get_db(inplace)
-        for column in columns:
-            db_._data[column] = (
-                db_[column].astype(str).str.replace(",", ".", regex=False).astype(float)
-            )
-        return self._return_db(db_, inplace)

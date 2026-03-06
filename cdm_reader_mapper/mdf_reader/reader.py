@@ -265,6 +265,7 @@ def read_data(
     imodel: str | None = None,
     col_subset: str | list | tuple | None = None,
     encoding: str | None = None,
+    delimiter: str | None = None,
     **kwargs,
 ) -> DataBundle:
     """Read MDF data which is already on a pre-defined data model.
@@ -294,6 +295,8 @@ def read_data(
         Column labels could be both string or tuple.
     encoding : str, optional
         The encoding of the input file. Overrides the value in the imodel schema file.
+    delimiter : str, optional
+        The delimiter used in the input file. Overrides the value in the imodel schema file.
 
     Returns
     -------
@@ -321,13 +324,15 @@ def read_data(
         info_dict = open_json_file(info_file) if info_file else {}
         dtype = info_dict.get("dtypes", "object")
         parse_dates = info_dict.get("parse_dates", False)
-        encoding = encoding or info_dict.get("encoding", None)
+        encoding = encoding or info_dict.get("encoding")
+        delimiter = delimiter or info_dict.get("delimiter")
 
         data_kwargs.setdefault("dtype", dtype)
         data_kwargs.setdefault("parse_dates", parse_dates)
         data_kwargs.setdefault("encoding", encoding)
 
         mask_kwargs.setdefault("dtype", "boolean")
+        mask_kwargs.setdefault("delimiter", delimiter)
 
     data, mask, info = _read_data(
         data_file=data_file,

@@ -6,6 +6,7 @@
   },
   "observation_height_above_station_surface": {
     "elements": "SENSORHOEHE_WAS_TT",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "observed_variable": {
@@ -14,19 +15,20 @@
   "observation_value": {
     "elements": "FEUCHTTEMPERATUR",
     "transform": "temperature_celsius_to_kelvin",
+    "kwargs": {
+      "convert_to_decimal_float": true
+    },
     "decimal_places": 2
   },
   "units": {
     "default": 5
-  },
-  "quality_flag": {
-    "default": 2
   },
   "original_units": {
     "default": 60
   },
   "original_value": {
     "elements": "FEUCHTTEMPERATUR",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "conversion_method": {
