@@ -56,18 +56,7 @@ def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
-def _split_by_cnames_df(
-    df: pd.DataFrame,
-    columns: str,
-    **kwargs,
-):
-    mask_sel = df.columns.isin(columns)
-    mask_sel.name = columns
-
-    return _split_df(df=df, mask=mask_sel, **kwargs)
-
-
-def _split_by_centries_df(
+def _split_by_column_df(
     df: pd.DataFrame,
     col: str,
     values: Iterable,
@@ -283,7 +272,7 @@ def split_by_column_entries(
     def _split_by_column_entries(reset_index=reset_index):
         return ProcessFunction(
             data=data,
-            func=_split_by_centries_df,
+            func=_split_by_column_df,
             func_args=(col, values),
             func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
             **PSR_KWARGS,
@@ -291,57 +280,6 @@ def split_by_column_entries(
 
     col, values = next(iter(selection.items()))
     result = _split_by_column_entries()
-    return tuple(result)
-
-
-def split_by_column_names(
-    data: pd.DataFrame,
-    columns: list | pd.Index | pd.MultiIndex,
-    reset_index: bool = False,
-    inverse: bool = False,
-    return_rejected: bool = False,
-) -> tuple[
-    pd.DataFrame | ParquetStreamReader,
-    pd.DataFrame | ParquetStreamReader,
-    pd.Index | pd.MultiIndex,
-    pd.Index | pd.MultiIndex,
-]:
-    """
-    Split a DataFrame based on matching values in a given column.
-
-    Parameters
-    ----------
-    data : pandas.DataFrame
-        DataFrame to be split.
-    columns : list, pd.Index or pd.MultiIndex
-        Mapping of a column name to an iterable of allowed values.
-        Example: ``{"city": ["London", "Berlin"]}``.
-    reset_index : bool, optional
-        Whether to reset index in returned DataFrames.
-    inverse : bool, optional
-        If ``True``, invert the selection.
-    return_rejected : bool, optional
-        If ``True``, return rejected rows as the second output.
-        If ``False``, the rejected output is empty but dtype-preserving.
-
-    Returns
-    -------
-    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
-        Selected rows (all mask columns True), rejected rows, original indexes of selection and
-        original indexes of rejection.
-    """
-
-    @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
-    def _split_by_column_names(reset_index=reset_index):
-        return ProcessFunction(
-            data=data,
-            func=_split_by_cnames_df,
-            func_args=(columns,),
-            func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
-            **PSR_KWARGS,
-        )
-
-    result = _split_by_column_names()
     return tuple(result)
 
 

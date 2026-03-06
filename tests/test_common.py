@@ -27,13 +27,11 @@ from cdm_reader_mapper.common.select import (
     _split_df,
     _split_by_index_df,
     _split_by_boolean_df,
-    _split_by_centries_df,
-    _split_by_cnames_df,  # noqa
+    _split_by_column_df,
     split_by_boolean,
     split_by_boolean_true,
     split_by_boolean_false,
     split_by_column_entries,
-    split_by_column_names,  # noqa
     split_by_index,
 )
 from cdm_reader_mapper.common.replace import replace_columns
@@ -271,10 +269,10 @@ def test_split_by_boolean_df_empty_mask(sample_df):
         ("B", ["x", "z"], False, [10, 12, 13], []),
     ],
 )
-def test_split_by_centries_df(
+def test_split_by_column_df(
     sample_df, col, values, return_rejected, expected_selected, expected_rejected
 ):
-    selected, rejected, _, _ = _split_by_centries_df(
+    selected, rejected, _, _ = _split_by_column_df(
         sample_df, col, values, return_rejected=return_rejected
     )
     assert list(selected.index) == expected_selected
@@ -1203,12 +1201,12 @@ def test_copy_closed_stream_raises():
 
 def test_empty_returns_true_if_empty():
     reader = ParquetStreamReader(lambda: iter([]))
-    assert reader.empty() is True
+    assert reader.empty is True
 
 
 def test_empty_returns_false_if_not_empty():
     reader = ParquetStreamReader(lambda: iter(make_chunks()))
-    assert reader.empty() is False
+    assert reader.empty is False
 
 
 def test_reset_index_continuous_index():
