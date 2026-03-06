@@ -439,7 +439,7 @@ def map_model(
 
     @process_function()
     def _map_model():
-        result = ProcessFunction(
+        return ProcessFunction(
             data=data,
             func=_map_data_model,
             func_kwargs={
@@ -455,7 +455,6 @@ def map_model(
             },
             makecopy=False,
         )
-        return tuple(result)
 
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
@@ -477,10 +476,9 @@ def map_model(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    # result, columns = _map_model()
     results = _map_model()
 
-    result, columns = results
+    result, columns = tuple(results)
 
     if isinstance(result, (pd.DataFrame, ParquetStreamReader)):
         result = pd.DataFrame(result) if isinstance(result, pd.DataFrame) else result
