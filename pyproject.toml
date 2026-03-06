@@ -62,7 +62,7 @@ dependencies = [
 dev = [
   "black[jupyter] ==26.1.0",
   "blackdoc ==0.4.6",
-  "codespell ==2.4.1",
+  "codespell ==2.4.2",
   "coverage >=7.5.0",
   "coveralls >=4.0.1",
   "deptry ==0.24.0",
