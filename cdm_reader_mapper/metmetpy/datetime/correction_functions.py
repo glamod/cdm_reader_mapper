@@ -44,4 +44,6 @@ def dck_201_icoads(data: pd.DataFrame) -> pd.DataFrame:
         datetime_.loc[loc] = datetime_.loc[loc] - pd.Timedelta(days=1)
         data[datetime_cols] = model_datetimes.from_datetime(datetime_, "icoads")
 
+    data[datetime_cols] = data[datetime_cols].astype("int")
+
     return data

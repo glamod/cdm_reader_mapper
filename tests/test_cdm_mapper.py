@@ -6,7 +6,6 @@ import pytest
 from io import StringIO
 
 from cdm_reader_mapper.cdm_mapper.mapper import (
-    _check_input_data_type,
     _is_empty,
     _drop_duplicated_rows,
     _get_nested_value,
@@ -19,7 +18,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
     _column_mapping,
     _convert_dtype,
     _table_mapping,
-    _map_and_convert,
     _prepare_cdm_tables,
     map_model,
 )
@@ -100,7 +98,9 @@ def data_header_expected():
     )
 
 
-def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
+def _map_model_test_data(
+    data_model, encoding="utf-8", select=None, chunksize=None, **kwargs
+):
     source = test_data[f"test_{data_model}"]["mdf_data"]
 
     mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
@@ -116,11 +116,13 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
 
     if ":" in df.columns[0]:
         df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
-
     result = map_model(df, data_model, **kwargs)
 
     if not select:
         select = cdm_tables
+
+    if chunksize:
+        result = result.read()
 
     for cdm_table in select:
         expected = pd.read_csv(
@@ -142,41 +144,6 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
             result_table = result_table.drop("history", axis=1)
 
         pd.testing.assert_frame_equal(result_table, expected)
-
-
-def test_check_input_data_type_df_non_empty(sample_df):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _check_input_data_type(sample_df, logger)
-
-    assert result == [sample_df]
-
-
-def test_check_input_data_type_df_empty(sample_df_empty):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _check_input_data_type(sample_df_empty, logger)
-
-    assert result is None
-
-
-def test_check_input_data_type_textfilereader_non_empty(sample_tfr):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _check_input_data_type(sample_tfr, logger)
-
-    assert result is sample_tfr
-
-
-def test_check_input_data_type_textfilereader_empty(sample_tfr_empty):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _check_input_data_type(sample_tfr_empty, logger)
-
-    assert result is None
-
-
-def test_check_input_data_type_invalid_type(sample_string):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _check_input_data_type(sample_string, logger)
-
-    assert result is None
 
 
 @pytest.mark.parametrize(
@@ -447,21 +414,6 @@ def test_table_mapping(
     pd.testing.assert_frame_equal(result[expected.columns], expected)
 
 
-def test_map_and_convert(data_header, data_header_expected):
-    logger = logging_hdlr.init_logger(__name__, level="INFO")
-    result = _map_and_convert(
-        "icoads",
-        "r300",
-        "d720",
-        data=data_header,
-        cdm_subset=["header"],
-        logger=logger,
-    )
-    pd.testing.assert_frame_equal(
-        result[data_header_expected.columns], data_header_expected
-    )
-
-
 def test_map_model_icoads(data_header, data_header_expected):
     result = map_model(
         data_header,
@@ -525,6 +477,9 @@ def test_map_model_pub47():
         ("observations-ws", "observation_height_above_station_surface"),
         ("observations-ws", "sensor_id"),
     ]
+    # print(result)
+    # print(type(result))
+    # exit()
     result = result[columns]
 
     exp = np.array(
@@ -616,4 +571,11 @@ def test_map_model_test_data_select():
         "icoads_r300_d714",
         select=["header", "observations-sst"],
         cdm_subset=["header", "observations-sst"],
+    )
+
+
+def test_map_model_test_data_chunksize():
+    _map_model_test_data(
+        "icoads_r300_d714",
+        chunksize=2,
     )
