@@ -5,708 +5,927 @@
   },
   "elements": {
     "iT": {
-      "description": "Format/temperature indicator",
+      "start": 0,
+      "end": 1,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.IT"
+      "description": "Format/temperature indicator",
+      "codetable": "IMMT.iT",
+      "dtype": "key"
     },
     "AAAA": {
-      "description": "Year UTC",
+      "start": 1,
+      "end": 5,
       "field_length": 4,
-      "column_type": "int",
+      "description": "Year UTC",
+      "unit": "Year",
+      "dtype": "int",
       "valid_max": 2100,
-      "valid_min": 1600,
-      "units": "year"
+      "valid_min": 1600
     },
     "MM": {
-      "description": "Month UTC",
+      "start": 5,
+      "end": 7,
       "field_length": 2,
-      "column_type": "int",
+      "description": "Month UTC",
+      "unit": "Month",
+      "dtype": "int",
       "valid_max": 12,
-      "valid_min": 1,
-      "units": "month"
+      "valid_min": 1
     },
     "YY": {
-      "description": "Day UTC",
+      "start": 7,
+      "end": 9,
       "field_length": 2,
-      "column_type": "int",
+      "description": "Day UTC",
+      "unit": "Day",
+      "dtype": "int",
       "valid_max": 31,
-      "valid_min": 1,
-      "units": "day"
+      "valid_min": 1
     },
     "GG": {
-      "description": "Nearest whole hour UTC",
+      "start": 9,
+      "end": 11,
       "field_length": 2,
-      "column_type": "int",
+      "description": "Nearest whole hour UTC",
+      "unit": "Hour",
+      "dtype": "int",
       "valid_max": 23,
-      "valid_min": 0,
-      "units": "hour"
+      "valid_min": 0
     },
     "Qc": {
-      "description": "Quadrant of the globe",
+      "start": 11,
+      "end": 12,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C3333"
+      "description": "Quadrant of the globe",
+      "codetable": "WMO.C3333",
+      "dtype": "key"
     },
     "LaLaLa": {
-      "description": "Latitude",
+      "start": 12,
+      "end": 15,
       "field_length": 3,
-      "column_type": "float",
-      "valid_max": 90.0,
-      "valid_min": 0.0,
+      "description": "Latitude",
+      "unit": "Degrees",
+      "dtype": "float",
+      "transform": "convert_latitude",
       "scale": 0.1,
-      "units": "degrees"
+      "valid_max": 90.0,
+      "valid_min": -90.0
     },
     "LoLoLoLo": {
-      "description": "Longitude",
+      "start": 15,
+      "end": 19,
       "field_length": 4,
-      "column_type": "float",
-      "valid_max": 180.0,
-      "valid_min": 0.0,
+      "description": "Longitude",
+      "unit": "Degrees",
+      "dtype": "float",
+      "transform": "convert_longitude",
       "scale": 0.1,
-      "units": "degrees"
+      "valid_max": 180.0,
+      "valid_min": -180.0
     },
     "hVV": {
-      "description": "Cloud height (h) and visibility (VV) measuring indicator",
+      "start": 19,
+      "end": 20,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.HI"
+      "description": "Cloud height (h) and visibility (VV) measuring indicator",
+      "codetable": "IMMT.hVV",
+      "dtype": "key"
     },
     "h": {
-      "description": "Cloud height",
+      "start": 20,
+      "end": 21,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C1600"
+      "description": "Cloud height",
+      "codetable": "WMO.C1600",
+      "dtype": "key"
     },
     "VV": {
-      "description": "Visibility",
+      "start": 21,
+      "end": 23,
       "field_length": 2,
-      "column_type": "int",
-      "codetable": "WMO.C4377"
+      "description": "Visibility",
+      "codetable": "WMO.C4377",
+      "dtype": "key"
     },
     "N": {
-      "description": "Cloud amount",
+      "start": 23,
+      "end": 24,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C2700"
+      "description": "Cloud amount",
+      "codetable": "WMO.C2700",
+      "dtype": "key"
     },
     "dd": {
-      "description": "True wind direction",
+      "start": 24,
+      "end": 26,
       "field_length": 2,
-      "column_type": "int",
-      "codetable": "WMO.C0877"
+      "description": "True wind direction",
+      "codetable": "WMO.C0877",
+      "dtype": "key"
     },
-    "iW": {
-      "description": "Wind speed indicator",
+    "iff": {
+      "start": 26,
+      "end": 27,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C0.WI"
+      "description": "Wind speed indicator",
+      "codetable": "WMO.C1855",
+      "dtype": "key"
     },
     "ff": {
-      "description": "Wind speed",
+      "start": 27,
+      "end": 29,
       "field_length": 2,
-      "column_type": "float",
-      "valid_max": 99.9,
-      "valid_min": 0.0,
-      "units": "knots or meters per second"
+      "description": "Wind speed",
+      "unit": "Knots or metres per Seconds",
+      "dtype": "int",
+      "valid_max": 99,
+      "valid_min": 0
     },
-    "sgnTTT": {
-      "description": "Sign of air temperature",
+    "snTTT": {
+      "start": 29,
+      "end": 30,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C3845"
+      "description": "Sign of air temperature",
+      "codetable": "WMO.C3845",
+      "dtype": "key"
     },
     "TTT": {
-      "description": "air temperature",
+      "start": 30,
+      "end": 33,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Air temperature",
+      "unit": "Degrees Celsius",
+      "dtype": "float",
+      "transform": [
+        "convert_temperature",
+        "scale_temperature"
+      ],
       "valid_max": 99.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "units": "degree Celsius"
+      "valid_min": -99.9
     },
-    "sgnTdTdTd": {
-      "description": "sign of dew point temperature",
+    "snTdTdTd": {
+      "start": 33,
+      "end": 34,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.DPT"
+      "description": "Sign of dew point temperature",
+      "codetable": "IMMT.sgnTdTdTd",
+      "dtype": "key"
     },
     "TdTdTd": {
-      "description": "dew-point temperature",
+      "start": 34,
+      "end": 37,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Dew-point temperature",
+      "unit": "Degrees Celsius",
+      "dtype": "float",
+      "transform": [
+        "convert_temperature",
+        "scale_temperature"
+      ],
       "valid_max": 99.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "units": "degree Celsius"
+      "valid_min": -99.9
     },
     "PPPP": {
-      "description": "Air pressure",
+      "start": 37,
+      "end": 41,
       "field_length": 4,
-      "column_type": "float",
+      "description": "Air pressure",
+      "unit": "Hectopascal",
+      "dtype": "float",
+      "transform": "convert_pressure",
       "valid_max": 9999.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "units": "hectopascal"
+      "valid_min": 0.0
     },
     "ww": {
-      "description": "present weather",
+      "start": 41,
+      "end": 43,
       "field_length": 2,
-      "column_type": "int",
-      "codetable": "ICOADS.C0.WW"
+      "description": "Present weather",
+      "codetable": "WMO.C4677",
+      "dtype": "key"
     },
     "W1": {
-      "description": "past weather",
+      "start": 43,
+      "end": 44,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C0.W1"
+      "description": "Past weather 1",
+      "codetable": "WMO.C4561",
+      "dtype": "key"
     },
     "W2": {
-      "description": "past weather",
+      "start": 44,
+      "end": 45,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C0.W1"
+      "description": "Past weather 2",
+      "codetable": "WMO.C4561",
+      "dtype": "key"
     },
     "Nh": {
-      "description": "lowest cloud amount",
+      "start": 45,
+      "end": 46,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C2700"
+      "description": "Lowest cloud amount",
+      "codetable": "WMO.C2700",
+      "dtype": "key"
     },
     "CL": {
-      "description": "Genus of CL clouds",
+      "start": 46,
+      "end": 47,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C0513"
+      "description": "Genus of CL clouds",
+      "codetable": "WMO.C0513",
+      "dtype": "key"
     },
     "CM": {
-      "description": "Genus of CM clouds",
+      "start": 47,
+      "end": 48,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C0515"
+      "description": "Genus of CM clouds",
+      "codetable": "WMO.C0515",
+      "dtype": "key"
     },
     "CH": {
+      "start": 48,
+      "end": 49,
+      "field_length": 1,
       "description": "Genus of CH clouds",
-      "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C0509"
+      "codetable": "WMO.C0509",
+      "dtype": "key"
     },
-    "sgnSST": {
+    "snTwTwTw": {
+      "start": 49,
+      "end": 50,
+      "field_length": 1,
       "description": "Sign of sea surface temperature",
-      "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C3845"
+      "codetable": "WMO.C3845",
+      "dtype": "key"
     },
-    "SST": {
-      "description": "Sea surface temperature",
+    "TwTwTw": {
+      "start": 50,
+      "end": 53,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Sea surface temperature",
+      "unit": "Degrees Celsius",
+      "dtype": "float",
+      "transform": [
+        "convert_temperature",
+        "scale_temperature"
+      ],
       "valid_max": 99.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "units": "degree Celsius"
+      "valid_min": -99.9
     },
     "iSST": {
-      "description": "Sea surface temperature indicator",
+      "start": 53,
+      "end": 54,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "IMMT.SSTI"
+      "description": "Sea surface temperature measurement indicator",
+      "codetable": "IMMT.iTwTwTw",
+      "dtype": "key"
     },
     "iWM": {
-      "description": "Wave measurement indicator",
+      "start": 54,
+      "end": 55,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "IMMT.WMI"
+      "description": "Wave measurement indicator",
+      "codetable": "IMMT.iWM",
+      "dtype": "key"
     },
     "PwPw": {
-      "description": "Wave period",
+      "start": 55,
+      "end": 57,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Wave period",
+      "unit": "Seconds",
+      "dtype": "int",
       "valid_max": 99,
-      "valid_min": 0,
-      "units": "second"
+      "valid_min": 0
     },
     "HwHw": {
-      "description": "Wave height",
+      "start": 57,
+      "end": 59,
       "field_length": 2,
-      "column_type": "float",
-      "valid_max": 99.0,
-      "valid_min": 0.0,
+      "description": "Wave height",
+      "unit": "Metres",
+      "dtype": "float",
       "scale": 0.5,
-      "decimal_places": 1,
-      "units": "metre"
+      "valid_max": 99,
+      "valid_min": 0.0
     },
     "dw1dw1": {
-      "description": "Predominant swell direction",
+      "start": 59,
+      "end": 61,
       "field_length": 2,
-      "column_type": "float",
-      "codetable": "WMO.C0877"
+      "description": "Predominant swell direction",
+      "codetable": "WMO.C0877",
+      "dtype": "key"
     },
     "Pw1Pw1": {
-      "description": "Predominant swell period",
+      "start": 61,
+      "end": 63,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Predominant swell period",
+      "unit": "Seconds",
+      "dtype": "int",
       "valid_max": 99,
-      "valid_min": 0,
-      "units": "second"
+      "valid_min": 0
     },
     "Hw1Hw1": {
-      "description": "Swell height",
+      "start": 63,
+      "end": 65,
       "field_length": 2,
-      "column_type": "float",
-      "valid_max": 99.0,
-      "valid_min": 0.0,
+      "description": "Predominant swell height",
+      "unit": "Metres",
+      "dtype": "float",
       "scale": 0.5,
-      "decimal_places": 1,
-      "units": "metre"
+      "valid_max": 99,
+      "valid_min": 0
     },
     "Is": {
-      "description": "Ice accretion on ship",
+      "start": 65,
+      "end": 66,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C1751"
+      "description": "Ice accretion on ship",
+      "codetable": "WMO.C1751",
+      "dtype": "key"
     },
     "EsEs": {
-      "description": "Thickness of ice accretion",
+      "start": 66,
+      "end": 68,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Thickness of ice accretion",
+      "unit": "Centimetres",
+      "dtype": "int",
       "valid_max": 99,
       "valid_min": 0
     },
     "Rs": {
-      "description": "Rate of ice accretion",
+      "start": 68,
+      "end": 69,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C3551"
+      "description": "Rate of ice accretion",
+      "codetable": "WMO.C3551",
+      "dtype": "key"
     },
     "OS": {
-      "description": "Observation source",
+      "start": 69,
+      "end": 70,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.OS"
+      "description": "Observation source",
+      "codetable": "IMMT.OS",
+      "dtype": "key"
     },
     "OP": {
-      "description": "Observation platform",
+      "start": 70,
+      "end": 71,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.OP"
+      "description": "Observation platform",
+      "codetable": "IMMT.OP",
+      "dtype": "key"
     },
     "ID": {
-      "description": "Ship's callsign",
+      "start": 71,
+      "end": 78,
       "field_length": 7,
-      "column_type": "str"
+      "description": "Ship's callsign",
+      "dtype": "str"
     },
     "CC": {
-      "description": "Recruiting country",
+      "start": 78,
+      "end": 80,
       "field_length": 2,
-      "column_type": "key",
-      "codetable": "ICOADS.C0.C1"
+      "description": "Recruiting country",
+      "dtype": "str"
     },
     "NU": {
-      "description": "National use",
+      "start": 80,
+      "end": 81,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C5.NU"
+      "description": "National use",
+      "dtype": "str"
     },
     "iQC": {
-      "description": "Quality control indicator",
+      "start": 81,
+      "end": 82,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.QCI"
+      "description": "Quality control indicator",
+      "codetable": "IMMT.iQC",
+      "dtype": "key"
     },
     "iX": {
-      "description": "Weather data indicator",
+      "start": 82,
+      "end": 83,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.IX"
+      "description": "Weather data indicator",
+      "codetable": "WMO.C1860",
+      "dtype": "key"
     },
     "iR": {
-      "description": "Precipation data indicator",
+      "start": 83,
+      "end": 84,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C5.IR"
+      "description": "Precipation data indicator",
+      "codetable": "WMO.C1819",
+      "dtype": "key"
     },
     "RRR": {
-      "description": "Amount of precipitation",
+      "start": 84,
+      "end": 87,
       "field_length": 3,
-      "column_type": "float",
-      "codetable": "ICOADS.C5.RRR"
+      "description": "Amount of precipitation",
+      "unit": "Millimetres",
+      "codetable": "WMO.C3590",
+      "dtype": "key"
     },
     "tR": {
+      "start": 87,
+      "end": 88,
+      "field_length": 1,
       "description": "Duration of period of reference for amount of precipitation",
-      "field_length": 1,
-      "column_type": "float",
-      "codetable": "IMMT.TR"
+      "codetable": "WMO.C4019",
+      "dtype": "key"
     },
-    "sgnTbTbTb": {
-      "description": "Sign of wet-bulb temperature",
+    "snTbTbTb": {
+      "start": 88,
+      "end": 89,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "IMMT.SW"
+      "description": "Sign of wet-bulb temperature",
+      "codetable": "IMMT.sgnSST",
+      "dtype": "key"
     },
     "TbTbTb": {
-      "description": "Wet-bulb temperature",
+      "start": 89,
+      "end": 92,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Wet-bulb temperature",
+      "unit": "Degrees Celsius",
+      "dtype": "float",
+      "transform": [
+        "convert_temperature",
+        "scale_temperature"
+      ],
       "valid_max": 99.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "units": "degree Celsius"
+      "valid_min": -99.9
     },
     "a": {
-      "description": "Characteristic of pressure tendency",
+      "start": 92,
+      "end": 93,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "ICOADS.C0.A"
+      "description": "Characteristic of pressure tendency",
+      "codetable": "WMO.C0200",
+      "dtype": "key"
     },
     "ppp": {
-      "description": "Amount of pressure tendency",
+      "start": 93,
+      "end": 96,
       "field_length": 3,
-      "column_type": "float",
-      "valid_max": 51.0,
-      "valid_min": 0.0,
+      "description": "Amount of pressure tendency",
+      "unit": "Hectopascal",
+      "dtype": "float",
       "scale": 0.1,
-      "decimal_places": 1,
-      "units": "hectopascal"
+      "valid_max": 99.9,
+      "valid_min": 0.0
     },
     "Ds": {
-      "description": "Ship course",
+      "start": 96,
+      "end": 97,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C0700"
+      "description": "Ship course",
+      "codetable": "WMO.C0700",
+      "dtype": "key"
     },
     "vs": {
-      "description": "Ship speed",
+      "start": 97,
+      "end": 98,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "WMO.C4451"
+      "description": "Ship speed",
+      "codetable": "WMO.C4451",
+      "dtype": "key"
     },
     "dw2dw2": {
-      "description": "Direction of secondary swell",
+      "start": 98,
+      "end": 100,
       "field_length": 2,
-      "column_type": "float",
-      "codetable": "WMO.C0877"
+      "description": "Secondary swell direction",
+      "codetable": "WMO.C0877",
+      "dtype": "key"
     },
     "Pw2Pw2": {
-      "description": "Period of secondary swell",
+      "start": 100,
+      "end": 102,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Secondary swell period",
+      "unit": "Seconds",
+      "dtype": "int",
       "valid_max": 99,
-      "valid_min": 0,
-      "units": "second"
+      "valid_min": 0
     },
     "Hw2Hw2": {
-      "description": "Height of secondary swell",
+      "start": 102,
+      "end": 104,
       "field_length": 2,
-      "column_type": "float",
-      "valid_max": 99.0,
-      "valid_min": 0.0,
+      "description": "Secondary swell height",
+      "unit": "Metres",
+      "dtype": "float",
       "scale": 0.5,
-      "decimal_places": 1,
-      "units": "metre"
+      "valid_max": 99.0,
+      "valid_min": 0.0
     },
     "ci": {
-      "description": "Concentration or arrangement of sea ice",
+      "start": 104,
+      "end": 105,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C0639"
+      "description": "Concentration or arrangement of sea ice",
+      "codetable": "WMO.C0639",
+      "dtype": "key"
     },
     "Si": {
-      "description": "Stage of development",
+      "start": 105,
+      "end": 106,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C3739"
+      "description": "Stage of development",
+      "codetable": "WMO.C3739",
+      "dtype": "key"
     },
     "bi": {
-      "description": "Ice of land origin",
+      "start": 106,
+      "end": 107,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C0439"
+      "description": "Ice of land origin",
+      "codetable": "WMO.C0439",
+      "dtype": "key"
     },
     "Di": {
-      "description": "True bearing of principal ice edge",
+      "start": 107,
+      "end": 108,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C0739"
+      "description": "True bearing of principal ice edge",
+      "codetable": "WMO.C0739",
+      "dtype": "key"
     },
     "zi": {
-      "description": "Present ice situation and trend of conditions over the preceeding three hours",
+      "start": 108,
+      "end": 109,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "WMO.C5239"
+      "description": "Present ice situation and trend of conditions over the preceeding three hours",
+      "codetable": "WMO.C5239",
+      "dtype": "key"
     },
     "FM": {
-      "description": "FM code version",
+      "start": 109,
+      "end": 110,
       "field_length": 1,
-      "column_type": "int",
-      "encoding": "base36",
-      "codetable": "IMMT.FM"
+      "description": "FM code version",
+      "codetable": "IMMT.FM",
+      "dtype": "key"
     },
     "IMMV": {
-      "description": "IMMT version",
+      "start": 110,
+      "end": 111,
       "field_length": 1,
-      "column_type": "int",
-      "encoding": "base36",
-      "codetable": "icoads_3_0.immv"
+      "description": "IMMT version",
+      "codetable": "IMMT.IMMTv",
+      "dtype": "key"
     },
     "Q1": {
-      "description": "QC indicator for cloud height (h)",
+      "start": 111,
+      "end": 112,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for cloud height (h)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q2": {
-      "description": "QC indicator for visibility (VV)",
+      "start": 112,
+      "end": 113,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for visibility (VV)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q3": {
-      "description": "QC indicator for clouds (N, Nh, CL, CM, CH)",
+      "start": 113,
+      "end": 114,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for clouds (N, Nh, CL, CM, CH)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q4": {
-      "description": "QC indicator for wind direction (dd)",
+      "start": 114,
+      "end": 115,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for wind direction (dd)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q5": {
-      "description": "QC indicator for wind speed (ff)",
+      "start": 115,
+      "end": 116,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for wind speed (ff)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q6": {
-      "description": "QC indicator for air temperature (sgnTTT, TTT)",
+      "start": 116,
+      "end": 117,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for air temperature (sgnTTT, TTT)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q7": {
-      "description": "QC indicator for dew-point temperature (sgnTdTdTd, TdTdTd)",
+      "start": 117,
+      "end": 118,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for dew-point temperature (sgnTdTdTd, TdTdTd)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q8": {
-      "description": "QC indicator for air pressure (PPPP)",
+      "start": 118,
+      "end": 119,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for air pressure (PPPP)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q9": {
-      "description": "QC indicator for weather (ww, W1, W2)",
+      "start": 119,
+      "end": 120,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for weather (ww, W1, W2)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q10": {
-      "description": "QC indicator for sea surface temperature (sgnSST, SST)",
+      "start": 120,
+      "end": 121,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for sea surface temperature (sgnSST, SST)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q11": {
-      "description": "QC indicator for period of wind waves of of measured waves (PwPw)",
+      "start": 121,
+      "end": 122,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for period of wind waves of of measured waves (PwPw)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q12": {
-      "description": "QC indicator for height of wind waves of of measured waves (HwHw)",
+      "start": 122,
+      "end": 123,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for height of wind waves of of measured waves (HwHw)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q13": {
-      "description": "QC indicator for swell (dw1dw1, Pw1Pw1, Hw1Hw1, dw2dw2, Pw2Pw2, Hw2Hw2)",
+      "start": 123,
+      "end": 124,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for swell (dw1dw1, Pw1Pw1, Hw1Hw1, dw2dw2, Pw2Pw2, Hw2Hw2)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q14": {
-      "description": "QC indicator for precipitation (iR, RRR, tR)",
+      "start": 124,
+      "end": 125,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for precipitation (iR, RRR, tR)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q15": {
-      "description": "QC indicator for characteristic of pressure tendency (a)",
+      "start": 125,
+      "end": 126,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for characteristic of pressure tendency (a)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q16": {
-      "description": "QC indicator for amount of pressure tendency (ppp)",
+      "start": 126,
+      "end": 127,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for amount of pressure tendency (ppp)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q17": {
-      "description": "QC indicator for true direction of ship (Ds)",
+      "start": 127,
+      "end": 128,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for true direction of ship (Ds)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q18": {
-      "description": "QC indicator for ship's average speed (vs)",
+      "start": 128,
+      "end": 129,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for ship's average speed (vs)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q19": {
-      "description": "QC indicator for wet-bulb temperature (sgnTbTbTb, TbTbTb)",
+      "start": 129,
+      "end": 130,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for wet-bulb temperature (sgnTbTbTb, TbTbTb)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q20": {
-      "description": "QC indicator for ship's position (LaLaLa, LoLoLoLo)",
+      "start": 130,
+      "end": 131,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for ship's position (LaLaLa, LoLoLoLo)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q21": {
-      "description": "MQCS version",
+      "start": 131,
+      "end": 132,
       "field_length": 1,
-      "column_type": "int",
-      "codetable": "icoads_3_0.MQCversion"
+      "description": "MQCS version",
+      "codetable": "IMMT.MQCSv",
+      "dtype": "key"
     },
     "HDG": {
-      "description": "Ships's heading",
+      "start": 132,
+      "end": 135,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Ships's heading",
+      "dtype": "int",
       "valid_max": 360,
       "valid_min": 0
     },
     "COG": {
-      "description": "Ships's ground course",
+      "start": 135,
+      "end": 138,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Ships's ground course",
+      "dtype": "int",
       "valid_max": 360,
       "valid_min": 0
     },
     "SOG": {
-      "description": "Ships's ground speed",
+      "start": 138,
+      "end": 140,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Ships's ground speed",
+      "dtype": "int",
       "valid_max": 99,
       "valid_min": 0
     },
     "SLL": {
-      "description": "Maximum height of cargo above summer load line",
+      "start": 140,
+      "end": 142,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Maximum height of cargo above summer load line",
+      "dtype": "int",
       "valid_max": 99,
       "valid_min": 0
     },
-    "sL": {
-      "description": "Sign of departure of reference level",
+    "snhh": {
+      "start": 142,
+      "end": 143,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "IMMT.SL"
+      "description": "Sign of departure of reference level",
+      "codetable": "IMMT.sgnhh",
+      "dtype": "key"
     },
     "hh": {
-      "description": "Departure of summer max load line from actual sea level",
+      "start": 143,
+      "end": 145,
       "field_length": 2,
-      "column_type": "float",
+      "description": "Departure of summer max load line from actual sea level",
+      "dtype": "int",
       "valid_max": 99,
       "valid_min": 0
     },
     "RWD": {
-      "description": "Relative wind direction",
+      "start": 145,
+      "end": 148,
       "field_length": 3,
-      "column_type": "float",
+      "description": "Relative wind direction",
+      "dtype": "int",
       "valid_max": 360,
-      "valid_min": 1
+      "valid_min": 0
     },
     "RWS": {
-      "description": "Relative wind speed",
+      "start": 148,
+      "end": 151,
       "field_length": 3,
-      "column_type": "float",
-      "valid_max": 99.9,
-      "valid_min": 0.0,
-      "scale": 0.1,
-      "precision": "0.1"
+      "description": "Relative wind speed",
+      "unit": "Knots or metres per second",
+      "dtype": "int",
+      "valid_max": 99,
+      "valid_min": 0
     },
     "Q22": {
-      "description": "QC indicator for ship's heading (HDG)",
+      "start": 151,
+      "end": 152,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for ship's heading (HDG)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q23": {
-      "description": "QC indicator for ship's ground course (COG)",
+      "start": 152,
+      "end": 153,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for ship's ground course (COG)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q24": {
-      "description": "QC indicator for ship's ground speed (SOG)",
+      "start": 153,
+      "end": 154,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for ship's ground speed (SOG)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q25": {
-      "description": "QC indicator for SLL",
+      "start": 154,
+      "end": 155,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for SLL",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q26": {
-      "description": "blank - Formerly (usage now discontinued): QC indicator for (sL); now Q27 serves as the indicator for both sL and hh",
+      "start": 155,
+      "end": 156,
       "field_length": 1,
-      "ignore": "True"
+      "description": "blank - Formerly (usage now discontinued): QC indicator for (sgnhh); now Q27 serves as the indicator for both snhh and hh",
+      "dtype": "str",
+      "ignore": "true"
     },
     "Q27": {
-      "description": "QC indicator for sL and hh",
+      "start": 156,
+      "end": 157,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for snhh and hh",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q28": {
-      "description": "QC indicator for relative wind direction (RWD)",
+      "start": 157,
+      "end": 158,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for relative wind direction (RWD)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "Q29": {
-      "description": "QC indicator for relative wind speed (RWD)",
+      "start": 158,
+      "end": 159,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.MQCIndicator"
+      "description": "QC indicator for relative wind speed (RWD)",
+      "codetable": "IMMT.MQCi",
+      "dtype": "key"
     },
     "RH": {
-      "description": "Relative humidity",
+      "start": 159,
+      "end": 163,
       "field_length": 4,
-      "column_type": "float",
-      "valid_max": 100.0,
-      "valid_min": 0.0,
+      "description": "Relative humidity",
+      "unit": "Percentage",
+      "dtype": "float",
       "scale": 0.1,
-      "precision": "0.1"
+      "valid_max": 100.0,
+      "valid_min": 0.0
     },
     "RHi": {
-      "description": "Relative humidity indicator",
+      "start": 163,
+      "end": 164,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.rhi"
+      "description": "Relative humidity indicator",
+      "codetable": "IMMT.RHi",
+      "dtype": "key"
     },
     "AWSi": {
-      "description": "AWS indicator",
+      "start": 164,
+      "end": 165,
       "field_length": 1,
-      "column_type": "float",
-      "codetable": "icoads_3_0.awsi"
+      "description": "AWS indicator",
+      "codetable": "IMMT.AWSi",
+      "dtype": "key"
     },
     "IMOno": {
-      "description": "IMO number",
+      "start": 165,
+      "end": 172,
       "field_length": 7,
-      "column_type": "float",
+      "description": "IMO number",
+      "dtype": "int",
       "valid_max": 9999999,
-      "valid_min": 0,
-      "scale": 1
+      "valid_min": 0
     }
   }
 }
