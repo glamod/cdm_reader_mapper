@@ -140,6 +140,7 @@ class ParquetStreamReader:
         self._generator, new_gen = itertools.tee(self._generator)
         return ParquetStreamReader(new_gen)
 
+    @property
     def empty(self):
         """Return True if stream is empty."""
         copy_stream = self.copy()
