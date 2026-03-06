@@ -112,17 +112,24 @@ def _map_model_test_data(
 
     delimiter = test_data[f"test_{data_model}"]["delimiter"]
 
-    df = pd.read_csv(source, dtype=dtypes, delimiter=delimiter, encoding=encoding)
+    df = pd.read_csv(
+        source,
+        dtype=dtypes,
+        chunksize=chunksize,
+        delimiter=delimiter,
+        encoding=encoding,
+    )
 
-    if ":" in df.columns[0]:
+    if chunksize is None and ":" in df.columns[0]:
         df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
-    result = map_model(df, data_model, **kwargs)
 
-    if not select:
-        select = cdm_tables
+    result = map_model(df, data_model, **kwargs)
 
     if chunksize:
         result = result.read()
+
+    if not select:
+        select = cdm_tables
 
     for cdm_table in select:
         expected = pd.read_csv(
