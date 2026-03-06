@@ -1201,12 +1201,12 @@ def test_copy_closed_stream_raises():
 
 def test_empty_returns_true_if_empty():
     reader = ParquetStreamReader(lambda: iter([]))
-    assert reader.empty() is True
+    assert reader.empty is True
 
 
 def test_empty_returns_false_if_not_empty():
     reader = ParquetStreamReader(lambda: iter(make_chunks()))
-    assert reader.empty() is False
+    assert reader.empty is False
 
 
 def test_reset_index_continuous_index():

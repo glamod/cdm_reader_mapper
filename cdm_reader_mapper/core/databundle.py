@@ -267,11 +267,11 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-        >>> db_selected = db.select_where_all_true()
+        >>> db_selected = db.select_where_all_false()
 
         Select valid values only with overwriting the old data.
 
-        >>> db.select_where_all_true(inplace=True)
+        >>> db.select_where_all_false(inplace=True)
         >>> df_selected = db.data
 
         See Also
@@ -319,7 +319,7 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-        >>> db_selected = db.select_from_list(
+        >>> db_selected = db.select_where_entry_isin(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
@@ -371,11 +371,11 @@ class DataBundle(_DataBundle):
         --------
         Select without overwriting the old data.
 
-         >>> db_selected = db.select_from_index([0, 2, 4])
+         >>> db_selected = db.select_where_index_isin([0, 2, 4])
 
         Select with overwriting the old data.
 
-        >>> db.select_from_index(index=[0, 2, 4], inplace=True)
+        >>> db.select_where_index_isin(index=[0, 2, 4], inplace=True)
         >>> df_selected = db.data
 
         See Also
@@ -414,7 +414,7 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_true, db_false = db.split_where_all_true()
+        >>> db_true, db_false = db.split_by_boolean_true()
 
         See Also
         --------
@@ -458,7 +458,7 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_false, db_true = db.split_where_all_false()
+        >>> db_false, db_true = db.split_by_boolean_false()
 
         See Also
         --------
@@ -505,7 +505,7 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-        >>> db_isin, db_isnotin = db.split_where_entry_isin(
+        >>> db_isin, db_isnotin = db.split_by_column_entries(
         ...     selection={("c1", "B1"): [26, 41]},
         ... )
 
@@ -554,7 +554,7 @@ class DataBundle(_DataBundle):
         --------
         Split DataBundle.
 
-         >>> db_isin, db_isnotin = db.select_from_index([0, 2, 4])
+         >>> db_isin, db_isnotin = db.split_by_index([0, 2, 4])
 
         See Also
         --------
@@ -803,7 +803,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
-        db_._columns = _tables.columns
+        db_._columns = _tables.attrs["columns"]
         db_._data = _tables
         return self._return_db(db_, inplace)
 
