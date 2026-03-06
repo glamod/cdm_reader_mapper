@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import get_args
+
 import pandas as pd
 import pytest
 
@@ -13,6 +15,9 @@ from cdm_reader_mapper.mdf_reader.utils.convert_and_decode import (
     convert_and_decode,
 )
 from cdm_reader_mapper.mdf_reader import properties
+
+
+numeric_types = get_args(properties.NumericTypes)
 
 
 @pytest.fixture
@@ -89,7 +94,7 @@ def test_base36_preserves_boolean():
 
 
 def test_converter_numeric(numeric_series):
-    conv = Converters(dtype=next(iter(properties.numeric_types)))
+    conv = Converters(dtype=next(iter(numeric_types)))
     func = conv.converter()
 
     result = func(numeric_series)
@@ -111,7 +116,7 @@ def test_numeric_with_scale_offset():
 
 
 def test_preprocessing_function_pppp():
-    conv = Converters(dtype=next(iter(properties.numeric_types)))
+    conv = Converters(dtype=next(iter(numeric_types)))
     series = pd.Series(["0123"], name="PPPP")
 
     result = conv.object_to_numeric(series)

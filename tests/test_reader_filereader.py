@@ -5,9 +5,6 @@ import pytest
 import pandas as pd
 import xarray as xr
 
-from io import StringIO
-
-from pandas.io.parsers import TextFileReader
 from pandas.testing import assert_frame_equal, assert_index_equal
 
 from cdm_reader_mapper import DataBundle
@@ -15,7 +12,6 @@ from cdm_reader_mapper import DataBundle
 from cdm_reader_mapper.mdf_reader.utils.parser import OrderSpec, ParserConfig
 
 from cdm_reader_mapper.mdf_reader.utils.filereader import (
-    _apply_or_chunk,
     _merge_kwargs,
     _apply_multiindex,
     _select_years,
@@ -66,22 +62,6 @@ def test_select_years_handles_non_numeric():
     df = pd.DataFrame({"YR": ["2000", "bad", "2001"]})
     out = _select_years(df, (2000, 2001), "YR")
     assert out["YR"].tolist() == ["2000", "2001"]
-
-
-def test_apply_or_chunk_dataframe():
-    df = pd.DataFrame({"test": [1, 2, 3, 4]})
-    out = _apply_or_chunk(df, f, func_args=[2])
-    assert isinstance(out, pd.DataFrame)
-    assert_frame_equal(out, pd.DataFrame({"test": [3, 4, 5, 6]}))
-
-
-def test_apply_or_chunk_textfilereader():
-    buffer = StringIO("test\n1\n2\n3\n4")
-    read_kwargs = {"chunksize": 2}
-    reader = pd.read_csv(buffer, **read_kwargs)
-    (out,) = _apply_or_chunk(reader, f, func_args=[2], read_kwargs=read_kwargs)
-    assert isinstance(out, TextFileReader)
-    assert_frame_equal(out.read(), pd.DataFrame({"test": [3, 4, 5, 6]}))
 
 
 @pytest.fixture

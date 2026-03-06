@@ -8,20 +8,33 @@ Created on Wed Jul  3 09:48:18 2019
 """
 from __future__ import annotations
 
-from io import StringIO
-from typing import Iterable, Callable
+from typing import Iterable
 
 import pandas as pd
+
+from .iterators import ParquetStreamReader, ProcessFunction, process_function
+
+
+def _concat_indexes(idx_dict):
+    selected_idx = pd.Index([]).append(idx_dict[0])
+    rejected_idx = pd.Index([]).append(idx_dict[1])
+    selected_idx = selected_idx.drop_duplicates()
+    rejected_idx = rejected_idx.drop_duplicates()
+    return selected_idx, rejected_idx
+
+
+def _reset_index(data, reset_index=False):
+    if reset_index is False:
+        return data
+    return data.reset_index(drop=True)
 
 
 def _split_df(
     df: pd.DataFrame,
     mask: pd.DataFrame,
-    reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
 ):
-
     if inverse:
         selected = df[~mask]
         rejected = df[mask] if return_rejected else df.iloc[0:0]
@@ -29,14 +42,9 @@ def _split_df(
         selected = df[mask]
         rejected = df[~mask] if return_rejected else df.iloc[0:0]
 
-    selected.attrs["_prev_index"] = mask.index[mask]
-    rejected.attrs["_prev_index"] = mask.index[~mask]
-
-    if reset_index:
-        selected = selected.reset_index(drop=True)
-        rejected = rejected.reset_index(drop=True)
-
-    return selected, rejected
+    selected_idx = mask.index[mask]
+    rejected_idx = mask.index[~mask]
+    return selected, rejected, selected_idx, rejected_idx
 
 
 def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs):
@@ -55,6 +63,7 @@ def _split_by_column_df(
     **kwargs,
 ):
     mask_sel = df[col].isin(values)
+    mask_sel.name = col
 
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
@@ -66,135 +75,37 @@ def _split_by_index_df(
 ):
     index = pd.Index(index if isinstance(index, Iterable) else [index])
     mask_sel = pd.Series(df.index.isin(index), index=df.index)
-
     return _split_df(df=df, mask=mask_sel, **kwargs)
 
 
-def _split_text_reader(
-    reader,
-    func: Callable,
-    *args,
-    reset_index=False,
-    inverse=False,
-    return_rejected=False,
-):
-    buffer_sel = StringIO()
-    buffer_rej = StringIO()
-
-    read_params = [
-        "chunksize",
-        "names",
-        "dtype",
-        "parse_dates",
-        "date_parser",
-        "infer_datetime_format",
-    ]
-
-    write_dict = {"header": None, "mode": "a", "index": not reset_index}
-    read_dict = {x: reader.orig_options.get(x) for x in read_params}
-
-    new_args = []
-    new_readers = []
-
-    prev_index_sel = None
-    prev_index_rej = None
-
-    for d in args:
-        if isinstance(d, pd.io.parsers.TextFileReader):
-            new_readers.append(d)
-        else:
-            new_args.append(d)
-
-    readers = [reader] + new_readers
-
-    for zipped in zip(*readers):
-
-        if not isinstance(zipped, tuple):
-            zipped = tuple(zipped)
-
-        sel, rej = func(
-            *zipped,
-            *new_args,
-            reset_index=reset_index,
-            inverse=inverse,
-            return_rejected=return_rejected,
-        )
-
-        sel_prev_index = sel.attrs["_prev_index"]
-
-        if prev_index_sel is None:
-            prev_index_sel = sel_prev_index
-        else:
-            prev_index_sel = prev_index_sel.union(sel_prev_index)
-
-        rej_prev_index = rej.attrs["_prev_index"]
-
-        if prev_index_rej is None:
-            prev_index_rej = rej_prev_index
-        else:
-            prev_index_rej = prev_index_rej.union(rej_prev_index)
-
-        sel.to_csv(buffer_sel, **write_dict)
-        if return_rejected:
-            rej.to_csv(buffer_rej, **write_dict)
-
-    dtypes = {}
-    for col, dtype in sel.dtypes.items():
-        if dtype == "object":
-            dtype = "str"
-        dtypes[col] = dtype
-
-    read_dict["dtype"] = dtypes
-
-    buffer_sel.seek(0)
-    buffer_rej.seek(0)
-
-    selected = pd.read_csv(buffer_sel, **read_dict)
-    rejected = pd.read_csv(buffer_rej, **read_dict)
-
-    selected.attrs = {"_prev_index": prev_index_sel}
-    rejected.attrs = {"_prev_index": prev_index_rej}
-
-    return selected, rejected
-
-
-def _split_dispatch(
-    data,
-    func: Callable,
-    *args,
-    **kwargs,
-):
-
-    if isinstance(data, pd.DataFrame):
-        return func(data, *args, **kwargs)
-
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        return _split_text_reader(
-            data,
-            func,
-            *args,
-            **kwargs,
-        )
-
-    raise TypeError("Unsupported input type for split operation.")
+PSR_KWARGS = {
+    "makecopy": False,
+    "non_data_output": "acc",
+    "non_data_proc": _concat_indexes,
+}
 
 
 def split_by_boolean(
-    data: pd.DataFrame,
-    mask: pd.DataFrame,
+    data: pd.DataFrame | Iterable[pd.DataFrame],
+    mask: pd.DataFrame | Iterable[pd.DataFrame],
     boolean: bool,
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split a DataFrame using a boolean mask via ``split_dataframe_by_boolean``.
 
     Parameters
     ----------
-    data : pandas.DataFrame
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         DataFrame to be split.
-    mask : pandas.DataFrame
+    mask : pandas.DataFrame or Iterable[pd.DataFrame]
         Boolean mask with the same length as ``data``.
     boolean : bool
         Determines mask interpretation:
@@ -211,19 +122,23 @@ def split_by_boolean(
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Tuple ``(selected, rejected)`` returned by the underlying
-        ``split_dataframe_by_boolean`` implementation.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
-    return _split_dispatch(
-        data,
-        _split_by_boolean_df,
-        mask,
-        boolean,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+
+    @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
+    def _split_by_boolean(reset_index=reset_index):
+        return ProcessFunction(
+            data=data,
+            func=_split_by_boolean_df,
+            func_args=(mask, boolean),
+            func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
+            **PSR_KWARGS,
+        )
+
+    result = _split_by_boolean()
+    return tuple(result)
 
 
 def split_by_boolean_true(
@@ -232,7 +147,12 @@ def split_by_boolean_true(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split rows where all mask columns are ``True``.
 
@@ -247,12 +167,14 @@ def split_by_boolean_true(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, also return rejected rows.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (all mask columns True) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
     return split_by_boolean(
         data,
@@ -270,7 +192,12 @@ def split_by_boolean_false(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split rows where at least one mask column is ``False``.
 
@@ -285,12 +212,14 @@ def split_by_boolean_false(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as well.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (any mask column False) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
     return split_by_boolean(
         data,
@@ -308,7 +237,12 @@ def split_by_column_entries(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split a DataFrame based on matching values in a given column.
 
@@ -324,23 +258,29 @@ def split_by_column_entries(
     inverse : bool, optional
         If ``True``, invert the selection.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as the second DataFrame.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (column value in provided list) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
+
+    @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
+    def _split_by_column_entries(reset_index=reset_index):
+        return ProcessFunction(
+            data=data,
+            func=_split_by_column_df,
+            func_args=(col, values),
+            func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
+            **PSR_KWARGS,
+        )
+
     col, values = next(iter(selection.items()))
-    return _split_dispatch(
-        data,
-        _split_by_column_df,
-        col,
-        values,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+    result = _split_by_column_entries()
+    return tuple(result)
 
 
 def split_by_index(
@@ -349,7 +289,12 @@ def split_by_index(
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame | ParquetStreamReader,
+    pd.DataFrame | ParquetStreamReader,
+    pd.Index | pd.MultiIndex,
+    pd.Index | pd.MultiIndex,
+]:
     """
     Split a DataFrame by selecting specific index labels.
 
@@ -364,18 +309,25 @@ def split_by_index(
     inverse : bool, optional
         If ``True``, select rows **not** in ``index``.
     return_rejected : bool, optional
-        If ``True``, return rejected rows as well.
+        If ``True``, return rejected rows as the second output.
+        If ``False``, the rejected output is empty but dtype-preserving.
 
     Returns
     -------
-    (pandas.DataFrame, pandas.DataFrame)
-        Selected rows (index in given list) and rejected rows.
+    (pandas.DataFrame or ParquetStreamReader, pandas.DataFrame or ParquetStreamReader, pd.Index or pd.MultiIndex, pd.Index or pd.MultiIndex)
+        Selected rows (all mask columns True), rejected rows, original indexes of selection and
+        original indexes of rejection.
     """
-    return _split_dispatch(
-        data,
-        _split_by_index_df,
-        index,
-        reset_index=reset_index,
-        inverse=inverse,
-        return_rejected=return_rejected,
-    )
+
+    @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
+    def _split_by_index(reset_index=reset_index):
+        return ProcessFunction(
+            data=data,
+            func=_split_by_index_df,
+            func_args=(index,),
+            func_kwargs={"inverse": inverse, "return_rejected": return_rejected},
+            **PSR_KWARGS,
+        )
+
+    result = _split_by_index()
+    return tuple(result)

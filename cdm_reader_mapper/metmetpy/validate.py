@@ -59,9 +59,12 @@ from __future__ import annotations
 import logging
 import re
 
+from typing import Iterable
+
 import pandas as pd
 
-from ..common import logging_hdlr, pandas_TextParser_hdlr
+from ..common import logging_hdlr
+from ..common.iterators import ProcessFunction, process_function
 from ..common.json_dict import collect_json_files, combine_dicts
 
 from . import properties
@@ -71,21 +74,24 @@ _base = f"{properties._base}.station_id"
 
 
 def _get_id_col(
-    data: pd.DataFrame, imodel: str, logger: logging.logger
+    data: pd.DataFrame,
+    imodel: str,
 ) -> int | list[int] | None:
     """Retrieve the ID column(s) for a given data model from the metadata."""
     id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
-        logger.error(f"Data model {imodel} ID column not defined in properties file.")
-        return
+        raise ValueError(
+            f"Data model {imodel} ID column not defined in properties file."
+        )
 
     if not isinstance(id_col, list):
         id_col = [id_col]
 
     id_col = [col for col in id_col if col in data.columns]
     if not id_col:
-        logger.error(f"No ID columns found. Selected columns are {list(data.columns)}")
-        return
+        raise ValueError(
+            f"No ID columns found. Selected columns are {list(data.columns)}"
+        )
 
     if len(id_col) == 1:
         id_col = id_col[0]
@@ -120,8 +126,31 @@ def _get_patterns(
     return patterns
 
 
+def _validate_id(data, mrd, combined_compiled, na_values):
+    """Helper function to validate ID."""
+    id_col = _get_id_col(data, mrd[0])
+    if id_col is None:
+        raise ValueError("No ID conversion columns found.")
+
+    id_series = data[id_col]
+
+    return id_series.str.match(combined_compiled, na=na_values)
+
+
+def _validate_datetime(data: pd.DataFrame | pd.Series, model: str):
+    """Helper function to validate datetime."""
+    data_model_datetime = model_datetimes.to_datetime(data, model)
+
+    if len(data_model_datetime) == 0:
+        raise ValueError(
+            f"No columns found for datetime conversion. Selected columns are {list(data.columns)}."
+        )
+    return data_model_datetime.notna()
+
+
+@process_function(data_only=True)
 def validate_id(
-    data: pd.DataFrame | pd.Series | pd.io.parsers.TextFileReader,
+    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
     imodel: str,
     blank: bool = False,
     log_level: str = "INFO",
@@ -131,7 +160,7 @@ def validate_id(
 
     Parameters
     ----------
-    data : pd.DataFrame, pd.Series, or pd.io.parsers.TextFileReader
+    data : pd.DataFrame, pd.Series, or Iterable[pd.DataFrame, pd.Series]
         Input dataset or series containing ID values.
     imodel : str
         Name of internally available data model, e.g., "icoads_r300_d201".
@@ -149,71 +178,69 @@ def validate_id(
 
     Raises
     ------
-    None explicitly; errors are logged and function returns None on failure.
+    TypeError
+        If `data` is not a pd.DataFrame or a pd.Series or an Iterable[pd.DataFrame | pd.Series].
+    Value Error
+        If dataset `imodel` has no deck information.
+        If no ID conversion columns found.
+        If input deck is not defined in ID library files.
+    FilenotFounderror
+        If dataset `imodel` has no ID deck library.
 
     Notes
     -----
-    - If `data` is a TextFileReader, it is fully read into a DataFrame.
     - Uses `_get_id_col` to determine which column(s) contain IDs.
     - Uses `_get_patterns` to get regex patterns for the deck.
     - Empty values match "^$" pattern if `blank=True`.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, (pd.DataFrame, pd.Series)):
-        logger.error(
-            f"Input data must be a pd.DataFrame or pd.Series.\
-                     Input data type is {type(data)}"
-        )
-        return
-
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.error(f"Dataset {imodel} has no deck information.")
-        return
+        raise ValueError(f"Dataset {imodel} has no deck information.")
 
     dck = mrd[2]
-
-    id_col = _get_id_col(data, mrd[0], logger)
-    if id_col is None:
-        return
-
-    id_series = data[id_col]
 
     data_model_files = collect_json_files(*mrd, base=_base)
 
     if len(data_model_files) == 0:
-        logger.error(f'Input dataset "{imodel}" has no ID deck library')
-        return
+        raise FileNotFoundError(f'Input dataset "{imodel}" has no ID deck library')
 
     id_models = combine_dicts(data_model_files, base=_base)
 
     dck_id_model = id_models.get(dck)
     if not dck_id_model:
-        logger.error(f'Input dck "{dck}" not defined in file {data_model_files}')
-        return
+        raise ValueError(f'Input dck "{dck}" not defined in file {data_model_files}')
 
     patterns = _get_patterns(dck_id_model, blank, dck, data_model_files, logger)
 
     na_values = True if "^$" in patterns else False
     combined_compiled = re.compile("|".join(patterns))
 
-    return id_series.str.match(combined_compiled, na=na_values)
+    return ProcessFunction(
+        data=data,
+        func=_validate_id,
+        func_kwargs={
+            "mrd": mrd,
+            "combined_compiled": combined_compiled,
+            "na_values": na_values,
+        },
+        makecopy=False,
+    )
 
 
+@process_function(data_only=True)
 def validate_datetime(
-    data: pd.DataFrame | pd.Series | pd.io.parsers.TextFileReader,
+    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
     imodel: str,
     blank: bool = False,
     log_level: str = "INFO",
-) -> pd.Series | None:
+) -> pd.Series:
     """Validate datetime columns in a dataset according to the specified model.
 
     Parameters
     ----------
-    data : pd.DataFrame, pd.Series, or pd.io.parsers.TextFileReader
+    data : pd.DataFrame, pd.Series, or Iterable[pd.DataFrame, pd.Series]
         Input dataset or series containing ID values.
     imodel : str
         Name of internally available data model, e.g., "icoads_r300_d201".
@@ -231,34 +258,16 @@ def validate_datetime(
 
     Raises
     ------
-    None explicitly; errors are logged and function returns None on failure.
-
-    Notes
-    -----
-    - If `data` is a TextFileReader, it is fully read into a DataFrame.
+    TypeError
+        If `data` is not a pd.DataFrame or a pd.Series or an Iterable[pd.DataFrame | pd.Series].
+    ValueError
+        If no columns found for datetime conversion.
     """
-    logger = logging_hdlr.init_logger(__name__, level=log_level)
     model = imodel.split("_")[0]
 
-    if isinstance(data, pd.io.parsers.TextFileReader):
-        data = pandas_TextParser_hdlr.make_copy(data).read()
-    elif not isinstance(data, (pd.DataFrame, pd.Series)):
-        logger.error(
-            f"Input data must be a pd.DataFrame or pd.Series.Input data type is {type(data)}."
-        )
-        return
-
-    data_model_datetime = model_datetimes.to_datetime(data, model)
-
-    if not isinstance(data_model_datetime, pd.Series):
-        logger.error(
-            f'Data model "{model}" datetime conversor not defined in model_datetimes module"'
-        )
-        return
-    elif len(data_model_datetime) == 0:
-        data_columns = list(data.columns)
-        logger.info(
-            f"No columns found for datetime conversion. Selected columns are {data_columns}"
-        )
-        return
-    return data_model_datetime.notna()
+    return ProcessFunction(
+        data=data,
+        func=_validate_datetime,
+        func_kwargs={"model": model},
+        makecopy=False,
+    )

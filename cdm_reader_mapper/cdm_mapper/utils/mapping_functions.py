@@ -40,6 +40,7 @@ imodel_lineages = {
     "icoads_r300_d714": icoads_lineage + " with supplemental data recovery",
     "icoads_r302": ". Initial conversion from ICOADS R3.0.2T NRT",
     "craid": ". Initial conversion from C-RAID",
+    "marob": ". Initial conversion from DWD MAROB data base",
 }
 
 c2k_methods = {
@@ -283,8 +284,29 @@ def to_int(value: Any) -> int | pd.NA:
         return pd.NA
 
 
+def series_strptime(series: pd.Series, format: str) -> pd.Series:
+    """
+    Convert series with strings to series with datetime.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Series with strings.
+    format : str
+        String time format.
+
+    Returns
+    -------
+    pd.Series
+        Series with datetime
+    """
+    if series.empty:
+        return pd.Series([])
+    return pd.to_datetime(series, format=format, errors="coerce")
+
+
 class mapping_functions:
-    """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, and IMMT datasets."""
+    """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
 
     def __init__(self, imodel):
         self.imodel = imodel
@@ -497,10 +519,43 @@ class mapping_functions:
         pd.DatetimeIndex
             DatetimeIndex of converted dates.
         """
-        if series.empty:
-            return pd.DatetimeIndex([])
-        data_1d = series.values.ravel()
-        return pd.to_datetime(data_1d, format=format, errors="coerce")
+        return series_strptime(series, format)
+
+    def datetime_marob(
+        self, series: pd.Series, format: str = "%d.%m.%y %H:%M:%S,%f"
+    ) -> pd.Series:
+        """
+        Convert MAROB date strings to pandas datetime.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of date strings.
+        format : str, optional
+            Datetime format string (default: "%d.%m.%y %H:%M:%S,%f").
+
+        Returns
+        -------
+        pd.Series
+            Series of converted dates.
+        """
+        return series_strptime(series, format)
+
+    def convert_to_decimal(self, series):
+        """
+        Convert a string series to a float series with decimals.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of string values.
+
+        Returns
+        -------
+        pd.Series
+            Series of decimal floats.
+        """
+        return series.astype(str).str.replace(",", ".", regex=False).astype(float)
 
     def df_col_join(self, df: pd.DataFrame, sep: str) -> pd.Series:
         """
@@ -523,7 +578,9 @@ class mapping_functions:
 
         return df.astype(str).agg(sep.join, axis=1)
 
-    def float_opposite(self, series: pd.Series) -> pd.Series:
+    def float_opposite(
+        self, series: pd.Series, convert_to_decimal_float=False
+    ) -> pd.Series:
         """
         Return the opposite (negation) of a numeric Series.
 
@@ -537,6 +594,9 @@ class mapping_functions:
         pd.Series
           Series with negated values.
         """
+        if convert_to_decimal_float is True:
+            series = self.convert_to_decimal(series)
+        series = series.astype(float)
         return -series
 
     def select_column(self, df: pd.DataFrame) -> pd.Series:
@@ -580,9 +640,9 @@ class mapping_functions:
         pd.Series
           Scaled Series, or empty float Series if input is non-numeric.
         """
-        if pd.api.types.is_numeric_dtype(series):
-            return series * factor
-        return pd.Series(dtype=float, name=series.name)
+        scaled = pd.to_numeric(series, errors="coerce") * factor
+        scaled.name = series.name
+        return scaled
 
     def integer_to_float(self, s: pd.Series) -> pd.Series:
         """
@@ -816,7 +876,9 @@ class mapping_functions:
         )
         return pd.Series(result, index=df.index, dtype="object")
 
-    def temperature_celsius_to_kelvin(self, df: pd.DataFrame) -> pd.Series:
+    def temperature_celsius_to_kelvin(
+        self, df: pd.DataFrame, convert_to_decimal_float=False
+    ) -> pd.Series:
         """
         Convert temperatures from Celsius to Kelvin using the model-specific method.
 
@@ -830,6 +892,9 @@ class mapping_functions:
         pd.Series
             Series of temperatures in Kelvin.
         """
+        if convert_to_decimal_float is True:
+            df = self.convert_to_decimal(df)
+
         method = find_entry(self.imodel, c2k_methods)
         if not method:
             method = "method_a"
@@ -842,6 +907,66 @@ class mapping_functions:
         if isinstance(result, pd.DataFrame):
             result = result.iloc[:, 0]
         return pd.Series(result, dtype=float)
+
+    def velocity_kmh_in_ms(
+        self, series: pd.Series, convert_to_decimal_float=False
+    ) -> pd.Series:
+        """
+        Convert velocity from kilometers per hour in meters per second.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of velocity in kilometers per hour.
+
+        Returns
+        -------
+        pd.Series
+            Series of velocity in meters per second.
+        """
+        if convert_to_decimal_float is True:
+            series = self.convert_to_decimal(series)
+        return self.float_scale(series, 1 / 3.6)
+
+    def velocity_kn_in_ms(
+        self, series: pd.Series, convert_to_decimal_float=False
+    ) -> pd.Series:
+        """
+        Convert velocity from knots in meters per second.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of velocity in kilometers per hour.
+
+        Returns
+        -------
+        pd.Series
+            Series of velocity in meters per second.
+        """
+        if convert_to_decimal_float is True:
+            series = self.convert_to_decimal(series)
+        return self.float_scale(series, 1852.0 / 3600.0)
+
+    def pressue_hpa_in_pa(
+        self, series: pd.Series, convert_to_decimal_float=False
+    ) -> pd.Series:
+        """
+        Convert pressure from hPa in Pa.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of presuure in hPa.
+
+        Returns
+        -------
+        pd.Series
+            Series of pressure in Pa.
+        """
+        if convert_to_decimal_float is True:
+            series = self.convert_to_decimal(series)
+        return self.float_scale(series, 100)
 
     def time_accuracy(self, series: pd.Series) -> pd.Series:
         """
@@ -969,3 +1094,34 @@ class mapping_functions:
         lon = df["LoLoLoLo"].copy()
         lon[df["Qc"].isin([5, 7])] *= -1
         return lon
+
+    def marob_location_quality(self, df: pd.DataFrame) -> pd.Series:
+        """
+        Get MAROB location quality.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input DataFrame with columns 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG'.
+
+        Returns
+        -------
+        pd.Series
+            Series of location quality flags.
+
+        Raises
+        ------
+        KeyError
+            If required columns are missing.
+        """
+        return np.nan
+        # if (
+        #    "GEOGR_BREITE_FLAG" not in df.columns
+        #    or "GEOGR_LAENGE_FLAG" not in df.columns
+        # ):
+        #    raise KeyError(
+        #        "DataFrame must contain 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG' columns"
+        #    )
+        # lat_flag = df["GEOGR_BREITE_FLAG"]
+        # lon_flag = df["GEOGR_LAENGE_FLAG"]
+        # return pd.Series([None] * len(lat_flag), index=lat_flag.idx)

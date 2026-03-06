@@ -286,7 +286,7 @@ def parse_pandas(
     records = df[col].map(
         lambda line: _parse_line(line, order_specs, sections, excludes)
     )
-    return pd.DataFrame.from_records(records.to_list())
+    return pd.DataFrame.from_records(records.to_list(), index=records.keys())
 
 
 def parse_netcdf(
@@ -407,8 +407,6 @@ def parse_netcdf(
 
     obj_cols = df.select_dtypes(include="object").columns
     for col in obj_cols:
-        print(df[col])
-        print(df[col].str)
         s = df[col].str.decode("utf-8").str.strip()
         df[col] = s.map(lambda x: True if x == "" else x)
 
