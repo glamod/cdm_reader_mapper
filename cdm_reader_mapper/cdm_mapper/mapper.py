@@ -377,7 +377,9 @@ def _map_data_model(
         table_df = table_df.astype(object)
         all_tables.append(table_df)
 
-    return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
+    tables_df = pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
+    columns = tables_df.columns
+    return tables_df, columns
 
 
 def map_model(
@@ -428,9 +430,13 @@ def map_model(
     -------
     cdm_tables: pandas.DataFrame
       DataFrame with MultiIndex columns (cdm_table, column_name).
+
+    Note
+    ----
+    Column names will be written to `cdm_tables.attrs`.
     """
 
-    @process_function(data_only=True)
+    @process_function()
     def _map_model():
         return ProcessFunction(
             data=data,
@@ -469,11 +475,13 @@ def map_model(
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
-    result = _map_model()
+    results = _map_model()
 
-    if isinstance(result, pd.DataFrame):
-        return pd.DataFrame(result)
-    elif isinstance(result, ParquetStreamReader):
+    result, columns = tuple(results)
+
+    if isinstance(result, (pd.DataFrame, ParquetStreamReader)):
+        result = pd.DataFrame(result) if isinstance(result, pd.DataFrame) else result
+        result.attrs["columns"] = columns
         return result
 
     raise ValueError(

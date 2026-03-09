@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import os
-
+from pathlib import Path
 from typing import Sequence
 
 
@@ -64,4 +63,6 @@ def get_filename(
     name = separator.join(filter(bool, pattern))
 
     filename = f"{name}{extension}"
-    return os.path.join(path, filename)
+
+    p = Path(path)
+    return str(p / filename)

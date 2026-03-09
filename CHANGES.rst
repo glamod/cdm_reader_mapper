@@ -23,6 +23,7 @@ New features and enhancements
 * ``cdm_mapper.utils.mapping_functions``: new mapping function `convert_to_decimal` (:pull:`370`)
 * ``test_data``: add MAROB test data (:pull:`370`)
 * ``mdf_reader.read_data``: new parameter "delimiter" (:pull:`370`)
+* ``cdm_mapper.map_model``'s output now has attribute "attrs" where columns are stored (:pull:`379`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -39,6 +40,8 @@ Breaking changes
 * ``DataBundle`` now converts all iterables of `pd.DataFrame`/`pd.Series` to `ParquetStreamReader` when initialized (:pull:`348`)
 * all main functions in `common.select` now return a tuple of 4 (selected values, rejected values, original indexes of selected values, original indexes of rejected values) (:pull:`348`)
 * move `ParquetStreamReader` and all corresponding methods to `common.iterables` to handle chunking outside of `mdf_reader`/`cdm_mapper`/`core`/`metmetpy` (:issue:`349`, :pull:`348`)
+* `cdm_mapper.read_tables`: if "suffix" is None no suffix is selected instead of the wildcard "*" (:pull:`379`)
+* `ParquetStreamReader.empty` now is a property not a class method (:pull:`379`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -46,6 +49,7 @@ Internal changes
 * use pre-defined `Literal` constants in `cdm_reader_mapper.properties` (:pull:`363`)
 * `mdf_reader.utils.utilities.read_csv`: parameter `columns` to `column_names` (:pull:`363`)
 * introduce post-processing decorator that handles both `pd.DataFrame` and `ParquetStreamReader` (:pull:`348`)
+* `cdm_mapper.mapper._map_data_model` now returns a tuple of DataFrame and columns (:pull:`379`)
 
 2.2.1 (2026-01-23)
 ------------------
