@@ -380,7 +380,6 @@ def _map_data_model(
     tables_df = pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
     columns = tables_df.columns
     return tables_df, columns
-    # return pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
 
 
 def map_model(
