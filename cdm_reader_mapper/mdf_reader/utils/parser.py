@@ -407,8 +407,6 @@ def parse_netcdf(
 
     obj_cols = df.select_dtypes(include="object").columns
     for col in obj_cols:
-        print(df[col])
-        print(df[col].str)
         s = df[col].str.decode("utf-8").str.strip()
         df[col] = s.map(lambda x: True if x == "" else x)
 

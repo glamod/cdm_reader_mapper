@@ -20,6 +20,9 @@ New features and enhancements
 * introduce `ParquetStreamReader` to replace `pd.parsers.io.TextfileReader` (:issue:`8`, :pull:`348`)
 * ``cdm_reader.map_model`` now supports both `pd.DataFrame` and `ParquetStreamReader` as output (:pull:`348`)
 * ``common.replace_columns`` now supports both `pd.DataFrame` and `ParquetStreamReader` as output (:pull:`348`)
+* ``cdm_mapper.utils.mapping_functions``: new mapping function `convert_to_decimal` (:pull:`370`)
+* ``test_data``: add MAROB test data (:pull:`370`)
+* ``mdf_reader.read_data``: new parameter "delimiter" (:pull:`370`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^

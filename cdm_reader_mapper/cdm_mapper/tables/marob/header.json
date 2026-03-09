@@ -38,10 +38,12 @@
   },
   "longitude": {
     "elements": "GEOGR_LAENGE",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "latitude": {
     "elements": "GEOGR_BREITE",
+    "transform": "convert_to_decimal",
     "decimal_places": 1
   },
   "location_quality": {
@@ -53,10 +55,14 @@
   "station_speed": {
     "elements": "FAHRTGESCHWINDIGKEIT",
     "transform": "velocity_kn_in_ms",
+    "kwargs": {
+      "convert_to_decimal_float": true
+    },
     "decimal_places": 2
   },
   "station_course": {
     "elements": "FAHRTRICHTUNG",
+    "transform": "convert_to_decimal",
     "decimal_places": 0
   },
   "height_of_station_above_local_ground": {
@@ -65,6 +71,7 @@
   },
   "height_of_station_above_sea_level": {
     "elements": "STATIONSHOEHE_MSL",
+    "transform": "convert_to_decimal",
     "fill_value": 0,
     "decimal_places": 1
   },
@@ -81,9 +88,6 @@
   "report_time_accuracy": {
     "default": 1,
     "decimal_places": 0
-  },
-  "report_time_quality": {
-    "default": 2
   },
   "report_quality": {
     "default": 2
