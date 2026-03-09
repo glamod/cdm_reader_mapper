@@ -795,8 +795,6 @@ class mapping_functions:
         prepend: str = "",
         append: str = "",
         separator: str = "",
-        zfill_col: list = None,
-        zfill: list = None,
     ) -> pd.Series:
         """
         Add strings to Series elements with optional zero-fill.
@@ -811,20 +809,12 @@ class mapping_functions:
           String to append.
         separator : str, default=""
           Separator between series values.
-        zfill_col : list, optional
-          Columns to zero-fill.
-        zfill : list, optional
-          Widths for zero-fill.
 
         Returns
         -------
         pd.Series
           Series with modified string values.
         """
-        if zfill_col and zfill:
-            for col, width in zip(zfill_col, zfill):
-                series.iloc[:, col] = series.iloc[:, col].astype(str).str.zfill(width)
-
         result = np.vectorize(string_add_i, otypes="O")(
             prepend, series, append, separator
         )
@@ -1094,34 +1084,3 @@ class mapping_functions:
         lon = df["LoLoLoLo"].copy()
         lon[df["Qc"].isin([5, 7])] *= -1
         return lon
-
-    def marob_location_quality(self, df: pd.DataFrame) -> pd.Series:
-        """
-        Get MAROB location quality.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Input DataFrame with columns 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG'.
-
-        Returns
-        -------
-        pd.Series
-            Series of location quality flags.
-
-        Raises
-        ------
-        KeyError
-            If required columns are missing.
-        """
-        return np.nan
-        # if (
-        #    "GEOGR_BREITE_FLAG" not in df.columns
-        #    or "GEOGR_LAENGE_FLAG" not in df.columns
-        # ):
-        #    raise KeyError(
-        #        "DataFrame must contain 'GEOGR_BREITE_FLAG' and 'GEOGR_LAENGE_FLAG' columns"
-        #    )
-        # lat_flag = df["GEOGR_BREITE_FLAG"]
-        # lon_flag = df["GEOGR_LAENGE_FLAG"]
-        # return pd.Series([None] * len(lat_flag), index=lat_flag.idx)

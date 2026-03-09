@@ -70,19 +70,23 @@ def _drop_duplicated_rows(df) -> pd.DataFrame:
 def _get_nested_value(ndict, keys) -> Any | None:
     """Traverse nested dictionaries along a sequence of keys."""
     if not isinstance(ndict, dict):
-        return
+        return None
 
     current = ndict
     for key in keys:
         if not isinstance(current, dict):
-            return
-        if key not in current:
-            return
-        value = current[key]
+            return None
+
+        value = current.get(key)
+        if value is None:
+            return None
+
         if isinstance(value, dict):
             current = value
-            continue
-        return value
+        else:
+            return value
+
+    return None
 
 
 def _convert_dtype(series, atts) -> pd.DataFrame:
@@ -146,11 +150,7 @@ def _code_table(
     logger.debug(f"Mapping code table: {code_table}")
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
 
-    try:
-        df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
-    except Exception:
-        logger.warning(f"Could not convert {data} to a DataFrame.")
-        return pd.Series([None] * len(data), index=data.index)
+    df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
 
     df = df.astype(str)
 
