@@ -848,6 +848,7 @@ def test_count_by_cat_i(data, expected):
             {"C": {"a": 2, "b": 1}},
         ),
         (pd.DataFrame(columns=["D"]), ["D"], {"D": {}}),
+        (pd.DataFrame(columns=["D"]), None, {"D": {}}),
     ],
 )
 def test_count_by_cat_dataframe(data, columns, expected):
@@ -912,6 +913,14 @@ def test_get_remote_file_real(tmp_path):
     assert lfile.exists()
     assert lfile.stat().st_size > 0
     assert Path(local_file) == lfile
+
+
+def test_get_remote_file_raises(tmp_path):
+    lfile = tmp_path / "README.md"
+    name = Path("README.md")
+    base_url = "htttps://raw.githubusercontent.com/glamod/cdm-testdata/main"
+    with pytest.raises(ValueError):
+        _get_remote_file(lfile, base_url, name)
 
 
 @pytest.mark.parametrize("content", [b"hello world", b"1234567890"])
@@ -1002,6 +1011,15 @@ def test_get_file_real(tmp_path):
 
     assert list(cache_dir.rglob("*.md5")) == []
 
+    out_file = _get_file(
+        name=name,
+        suffix=".psv",
+        url=base_url,
+        cache_dir=cache_dir,
+        clear_cache=True,
+        within_drs=False,
+    )
+
 
 @pytest.mark.parametrize("within_drs", [True, False])
 @pytest.mark.parametrize("cache", [True, False])
@@ -1009,7 +1027,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
     base_url = "https://github.com/glamod/cdm-testdata"
     drs = "icoads/r302/d792/cdm_tables"
     f = "header-icoads_r302_d792_2022-02-01_subset.psv"
-    cache_dir = tmp_path / "cache"
+    cache_dir = str(tmp_path / "cache")
 
     local_file = load_file(
         name=os.path.join(drs, f),
@@ -1051,16 +1069,26 @@ def test_get_path_existing_file(tmp_path):
     assert result == file_path
 
 
-def test_get_path_missing_file(tmp_path, caplog):
+def test_get_path_missing_file_module_not_found(tmp_path, caplog):
+    """Test get_path when the file is missing and _files raises ModuleNotFoundError."""
     missing_file = tmp_path / "missing.txt"
     caplog.set_level(logging.WARNING)
 
     result = get_path(str(missing_file))
 
     assert result is None
-    assert any(
-        "No module named" in msg or "Cannot treat" in msg for msg in caplog.messages
-    )
+    assert any("No module named" in msg for msg in caplog.messages)
+
+
+def test_get_path_missing_file_attribute_error(tmp_path, caplog):
+    """Test get_path when the file is missing and _files raises AttributeError."""
+    missing_file = tmp_path / "missing.txt"
+    caplog.set_level(logging.WARNING)
+
+    result = get_path(str(missing_file))
+
+    assert result is None
+    assert any("Cannot treat" in msg for msg in caplog.messages)
 
 
 def test_class_process_function_basic():

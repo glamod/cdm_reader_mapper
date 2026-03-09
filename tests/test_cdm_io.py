@@ -25,12 +25,19 @@ def example_data():
 
 
 @pytest.fixture
-def csv_path(tmp_path, example_data):
+def empty_data():
+    return pd.DataFrame({"report_id": []})
+
+
+@pytest.fixture
+def csv_path(tmp_path, example_data, empty_data):
     header_file = tmp_path / "header.csv"
     obssst_file = tmp_path / "observations-sst.csv"
+    empty_file = tmp_path / "observations-at.csv"
 
     example_data["header"].to_csv(header_file, index=False)
     example_data["observations-sst"].to_csv(obssst_file, index=False)
+    empty_data.to_csv(empty_file, index=False)
 
     return tmp_path
 
@@ -64,6 +71,31 @@ def test_read_data_csv(csv_path, example_data):
     pd.testing.assert_frame_equal(bundle.data, example_data.astype(str))
 
 
+def test_read_data_single_csv(csv_path, example_data):
+    bundle = read_tables(csv_path / "observations-sst.csv", delimiter=",")
+    pd.testing.assert_frame_equal(
+        bundle.data, example_data["observations-sst"].astype(str)
+    )
+
+
+def test_read_data_raises_data_format(csv_path, example_data):
+    with pytest.raises(ValueError, match="data_format must be one of"):
+        read_tables(csv_path, delimiter=",", data_format="invalid_format")
+
+
+def test_read_data_raises_filenotfound(csv_path, example_data):
+    with pytest.raises(
+        FileNotFoundError,
+        match="Source is neither a valid file name nor a valid directory path",
+    ):
+        read_tables(csv_path / "header_invalid.csv", delimiter=",")
+
+
+def test_read_data_raises_empty(csv_path, example_data):
+    with pytest.raises(ValueError, match="All tables empty in file system"):
+        read_tables(csv_path / "observations-at.csv", delimiter=",")
+
+
 def test_read_data_parquet(parquet_path, example_data):
     bundle = read_tables(parquet_path, data_format="parquet")
     pd.testing.assert_frame_equal(bundle.data, example_data)
@@ -80,6 +112,15 @@ def test_write_data_csv(tmp_path, example_data):
     data_obssst = pd.read_csv(tmp_path / "observations-sst.csv", delimiter="|")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
     pd.testing.assert_frame_equal(example_data["observations-sst"], data_obssst)
+
+
+def test_write_data_raises(tmp_path, example_data):
+    with pytest.raises(ValueError):
+        write_tables(example_data, out_dir=tmp_path, data_format="invalid_format")
+
+
+def test_write_data_empty(tmp_path, empty_data):
+    write_tables(empty_data, outdir=tmp_path)
 
 
 def test_write_data_parquet(tmp_path, example_data):
