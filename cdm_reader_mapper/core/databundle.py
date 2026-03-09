@@ -33,7 +33,7 @@ class DataBundle(_DataBundle):
 
     Parameters
     ----------
-    data: pandas.DataFrame, optional
+    data: pd.DataFrame or Iterable[pd.DataFrame], optional
         MDF DataFrame.
     columns: pd.Index, pd.MultiIndex or list, optional
         Column labels of ``data``
@@ -140,7 +140,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         Returns
@@ -177,7 +177,7 @@ class DataBundle(_DataBundle):
 
         Note
         ----
-        * This is only working with DataFrames, not with TextFileReaders!
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
         * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
 
         Examples
@@ -237,10 +237,11 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data = split_by_boolean_true(db_._data, _mask, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_boolean_true(
+            db_._data, _mask, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_all_false(
@@ -285,10 +286,11 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data = split_by_boolean_false(db_._data, _mask, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_boolean_false(
+            db_._data, _mask, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
@@ -337,10 +339,11 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`split_by_column_entries`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_column_entries(db_._data, selection, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_column_entries(
+            db_._data, selection, **kwargs
+        )
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def select_where_index_isin(
@@ -386,10 +389,9 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`split_by_index`
         """
         db_ = self._get_db(inplace)
-        db_._data = split_by_index(db_._data, index, **kwargs)[0]
+        db_._data, _, selected_idx, _ = split_by_index(db_._data, index, **kwargs)
         if do_mask is True:
-            _prev_index = db_._data.attrs["_prev_index"]
-            db_._mask = split_by_index(db_._mask, _prev_index, **kwargs)[0]
+            db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
     def split_by_boolean_true(
@@ -427,14 +429,12 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data = split_by_boolean_true(
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_true(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -473,13 +473,12 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data = split_by_boolean_false(
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_false(
             db1_._data, _mask, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -522,13 +521,12 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data = split_by_column_entries(
+        db1_._data, db2_._data, selected_idx, _ = split_by_column_entries(
             db1_._data, selection, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            _prev_index = db1_._data.attrs["_prev_index"]
-            db1_._mask, db2_._mask = split_by_index(
-                db1_._mask, _prev_index, return_rejected=True, **kwargs
+            db1_._mask, db2_._mask, _, _ = split_by_index(
+                db1_._mask, selected_idx, return_rejected=True, **kwargs
             )
         return db1_, db2_
 
@@ -570,11 +568,11 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data = split_by_index(
+        db1_._data, db2_._data, _, _ = split_by_index(
             db1_._data, index, return_rejected=True, **kwargs
         )
         if do_mask is True:
-            db1_._mask, db2_._mask = split_by_index(
+            db1_._mask, db2_._mask, _, _ = split_by_index(
                 db1_._mask, index, return_rejected=True, **kwargs
             )
         return db1_, db2_
@@ -638,11 +636,15 @@ class DataBundle(_DataBundle):
         db_._columns = db_._data.columns
         return self._return_db(db_, inplace)
 
-    def correct_datetime(self, inplace=False) -> DataBundle | None:
+    def correct_datetime(
+        self, imodel=None, inplace=False, **kwargs
+    ) -> DataBundle | None:
         """Correct datetime information in :py:attr:`data`.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with datetime-corrected values in :py:attr:`data`.
@@ -667,12 +669,18 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`correct_datetime`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        db_._data = correct_datetime(db_._data, db_._imodel)
+        db_._data = correct_datetime(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
-    def validate_datetime(self) -> pd.DataFrame:
+    def validate_datetime(self, imodel=None, **kwargs) -> pd.DataFrame:
         """Validate datetime information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
 
         Returns
         -------
@@ -695,13 +703,16 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`validate_datetime`
         """
-        return validate_datetime(self._data, self._imodel)
+        imodel = imodel or self._imodel
+        return validate_datetime(self._data, imodel, **kwargs)
 
-    def correct_pt(self, inplace=False) -> DataBundle | None:
+    def correct_pt(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
         """Correct platform type information in :py:attr:`data`.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with platform-corrected values in :py:attr:`data`.
@@ -726,12 +737,18 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`correct_pt`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        db_._data = correct_pt(db_._data, db_._imodel)
+        db_._data = correct_pt(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
-    def validate_id(self, **kwargs) -> pd.DataFrame:
+    def validate_id(self, imodel=None, **kwargs) -> pd.DataFrame:
         """Validate station id information in :py:attr:`data`.
+
+        Parameters
+        ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
 
         Returns
         -------
@@ -754,13 +771,16 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`validate_id`
         """
-        return validate_id(self._data, self._imodel, **kwargs)
+        imodel = imodel or self._imodel
+        return validate_id(self._data, imodel, **kwargs)
 
-    def map_model(self, inplace=False, **kwargs) -> DataBundle | None:
+    def map_model(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
         """Map :py:attr:`data` to the Common Data Model.
 
         Parameters
         ----------
+        imodel: str, optional
+          Name of the MFD/CDM data model.
         inplace: bool
             If ``True`` overwrite :py:attr:`data` in :py:class:`~DataBundle`
             else return a copy of :py:class:`~DataBundle` with :py:attr:`data` as CDM tables.
@@ -779,15 +799,30 @@ class DataBundle(_DataBundle):
         ----
         For more information see :py:func:`map_model`
         """
+        imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
-        _tables = map_model(db_._data, db_._imodel, **kwargs)
+        _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
         db_._columns = _tables.columns
         db_._data = _tables
         return self._return_db(db_, inplace)
 
-    def write(self, **kwargs) -> None:
+    def write(
+        self, dtypes=None, parse_dates=None, encoding=None, mode=None, **kwargs
+    ) -> None:
         """Write :py:attr:`data` on disk.
+
+        Parameters
+        ----------
+        dtypes: dict, optional
+          Data types of ``data``.
+        parse_dates: list, optional
+          Information how to parse dates on ``data``
+        encoding: str, optional
+          The encoding of the input file. Overrides the value in the imodel schema file.
+        mode: str, optional
+          Data mode ("data" or "tables")
+          Default: "data"
 
         Examples
         --------
@@ -807,13 +842,17 @@ class DataBundle(_DataBundle):
         If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
         If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
         """
+        dtypes = dtypes or self._dtypes
+        parse_dates = parse_dates or self._parse_dates
+        encoding = encoding or self._encoding
+        mode = mode or self._mode
         write(
             data=self._data,
             mask=self._mask,
-            dtypes=self._dtypes,
-            parse_dates=self._parse_dates,
-            encoding=self._encoding,
-            mode=self._mode,
+            dtypes=dtypes,
+            parse_dates=parse_dates,
+            encoding=encoding,
+            mode=mode,
             **kwargs,
         )
 
@@ -959,7 +998,7 @@ class DataBundle(_DataBundle):
         Returns
         -------
         :py:class:`~DataBundle` or None
-            DataBundle without duplictaed rows or None if ``inplace=True``.
+            DataBundle without duplicated rows or None if ``inplace=True``.
 
         Note
         ----

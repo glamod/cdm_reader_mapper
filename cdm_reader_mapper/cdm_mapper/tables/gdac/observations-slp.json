@@ -10,10 +10,7 @@
   },
   "observation_value": {
     "elements": "PPPP",
-    "transform": "float_scale",
-    "kwargs": {
-      "factor": 100
-    },
+    "transform": "pressue_hpa_in_pa",
     "decimal_places": 0
   },
   "units": {

@@ -106,5 +106,4 @@ def test_validate_all_columns(sample_df, attributes):
     assert mask["DATE"].tolist() == expected_date
 
     expected_bool = [True, False, False, False, True]
-    print(mask["BOOL"])
     assert mask["BOOL"].tolist() == expected_bool

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from io import StringIO
 
 from cdm_reader_mapper import DataBundle
 
@@ -14,33 +13,25 @@ def sample_df():
     return DataBundle(data=data)
 
 
-@pytest.fixture
-def sample_text_reader():
-    """Fixture that returns a TextFileReader."""
-    csv_data = "A,B\n1,x\n2,y\n, z"
-    data = pd.read_csv(StringIO(csv_data), chunksize=1)
-    return DataBundle(data=data)
-
-
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_index(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
     assert list(obj.index) == [0, 1, 2]
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_size(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
     assert obj.size == 6
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_shape(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
     assert obj.shape == (3, 2)
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_dropna(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
 
@@ -52,7 +43,7 @@ def test_dropna(request, fixture_name):
     assert dropped["A"].isna().sum() == 0
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_rename(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
 
@@ -64,7 +55,7 @@ def test_rename(request, fixture_name):
     assert "A" not in renamed.columns
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_rename_inplace(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
 
@@ -73,7 +64,7 @@ def test_rename_inplace(request, fixture_name):
     assert "A_new" in obj.columns
 
 
-@pytest.mark.parametrize("fixture_name", ["sample_df", "sample_text_reader"])
+@pytest.mark.parametrize("fixture_name", ["sample_df"])
 def test_iloc(request, fixture_name):
     obj = request.getfixturevalue(fixture_name)
 

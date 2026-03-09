@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 
 from io import StringIO
-from pandas.io.parsers import TextFileReader
 from pathlib import Path
 
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
@@ -21,7 +20,12 @@ from cdm_reader_mapper.mdf_reader.utils.utilities import (
     convert_str_boolean,
     _remove_boolean_values,
     remove_boolean_values,
-    process_textfilereader,
+)
+
+from cdm_reader_mapper.common.iterators import (
+    ParquetStreamReader,
+    process_disk_backed,
+    parquet_stream_from_iterable,
 )
 
 
@@ -34,7 +38,8 @@ def make_parser(text: str, chunksize: int = 1) -> pd.io.parsers.TextFileReader:
 @pytest.fixture
 def sample_reader() -> pd.io.parsers.TextFileReader:
     buffer = StringIO("A,B\n1,2\n3,4\n")
-    return pd.read_csv(buffer, chunksize=1)
+    reader = pd.read_csv(buffer, chunksize=1)
+    return parquet_stream_from_iterable(reader)
 
 
 @pytest.fixture
@@ -246,36 +251,53 @@ def test_remove_boolean_values():
     assert result["B"].dtype.name == "int64"
 
 
-def test_process_textfilereader(sample_reader):
-    reader_out, extra_out = process_textfilereader(
-        sample_reader, sample_func, read_kwargs={"chunksize": 1}
-    )
-    assert isinstance(reader_out, TextFileReader)
-    df_out = reader_out.read()
-    assert df_out.shape == (2, 2)
-    assert df_out["A"].iloc[0] == 2
-    assert df_out["B"].iloc[1] == 8
+def test_process_textfilereader_basic(sample_reader):
+    reader_out, extra_out = process_disk_backed(sample_reader, sample_func)
+    assert isinstance(reader_out, ParquetStreamReader)
+
+    chunk1 = reader_out.get_chunk()
+    assert chunk1.shape == (1, 2)
+    assert chunk1.iloc[0]["A"] == 2
+
+    chunk2 = reader_out.get_chunk()
+    assert chunk2.shape == (1, 2)
+    assert chunk2.iloc[0]["B"] == 8
+
+    assert isinstance(extra_out, dict)
     assert extra_out == {"note": "first_chunk_only"}
+
+    with pytest.raises(StopIteration):
+        reader_out.get_chunk()
 
 
 def test_process_textfilereader_only_df(sample_reader):
-    (reader_out,) = process_textfilereader(
-        sample_reader, sample_func_only_df, read_kwargs={"chunksize": 1}
-    )
-    assert isinstance(reader_out, TextFileReader)
-    df_out = reader_out.read()
-    assert df_out.shape == (2, 2)
-    assert df_out["A"].iloc[0] == 2
-    assert df_out["B"].iloc[1] == 8
+    reader_out, extra_out = process_disk_backed(sample_reader, sample_func_only_df)
+    assert isinstance(reader_out, ParquetStreamReader)
+
+    chunk1 = reader_out.get_chunk()
+    assert chunk1.shape == (1, 2)
+    assert chunk1.iloc[0]["A"] == 2
+
+    chunk2 = reader_out.get_chunk()
+    assert chunk2.shape == (1, 2)
+    assert chunk2.iloc[0]["B"] == 8
+
+    assert extra_out == {}
 
 
 def test_process_textfilereader_makecopy_flag(sample_reader):
-    reader_out, extra_out = process_textfilereader(
-        sample_reader, sample_func, makecopy=True, read_kwargs={"chunksize": 1}
+    reader_out, extra_out = process_disk_backed(
+        sample_reader, sample_func, makecopy=True
     )
-    assert isinstance(reader_out, TextFileReader)
-    df_out = reader_out.read()
-    assert df_out.shape == (2, 2)
-    assert df_out["A"].iloc[0] == 2
-    assert df_out["B"].iloc[1] == 8
+    assert isinstance(reader_out, ParquetStreamReader)
+
+    chunk1 = reader_out.get_chunk()
+    assert chunk1.shape == (1, 2)
+    assert chunk1.iloc[0]["A"] == 2
+
+    chunk2 = reader_out.get_chunk()
+    assert chunk2.shape == (1, 2)
+    assert chunk2.iloc[0]["B"] == 8
+
+    assert isinstance(extra_out, dict)
     assert extra_out == {"note": "first_chunk_only"}
