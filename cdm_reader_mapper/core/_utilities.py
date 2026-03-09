@@ -277,6 +277,10 @@ class _DataBundle:
         for data in datasets:
             _data = f"_{data}"
             _df = getattr(db_, _data) if hasattr(db_, _data) else pd.DataFrame()
+
+            if isinstance(_df, pd.io.parsers.TextFileReader):
+                raise ValueError("Data must be a DataFrame not a TextFileReader.")
+
             to_concat = [
                 getattr(concat, _data) for concat in other if hasattr(concat, _data)
             ]

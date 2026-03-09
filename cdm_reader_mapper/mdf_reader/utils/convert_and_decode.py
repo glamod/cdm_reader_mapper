@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
-from typing import Callable, Any
+from typing import Callable, Any, get_args
 
 import pandas as pd
 
 from .. import properties
 from .utilities import convert_str_boolean
+
+numeric_types = get_args(properties.NumericTypes)
 
 
 def max_decimal_places(*decimals: Decimal) -> int:
@@ -102,7 +104,7 @@ class Decoders:
 
         self._registry = {"key": self.base36}
 
-        for numeric_type in properties.numeric_types:
+        for numeric_type in numeric_types:
             self._registry[numeric_type] = self.base36
 
     def decoder(self) -> Callable[[pd.Series], pd.Series] | None:
@@ -189,7 +191,7 @@ class Converters:
             "key": self.object_to_object,
         }
 
-        for numeric_type in properties.numeric_types:
+        for numeric_type in numeric_types:
             self._registry[numeric_type] = self.object_to_numeric
 
     def converter(self) -> Callable[..., pd.Series]:
