@@ -124,10 +124,14 @@ def _read_multiple_files(
     **kwargs,
 ) -> list[pd.DataFrame]:
     if suffix is None:
-        suffix = ""
+        suffix_pattern = "*"
+    elif suffix == "*":
+        suffix_pattern = "*"
+    else:
+        suffix_pattern = f"*{suffix}"
 
     # See if there's anything at all:
-    pattern = get_filename([prefix, f"*{suffix}"], path=inp_dir, extension=extension)
+    pattern = get_filename([prefix, suffix_pattern], path=inp_dir, extension=extension)
     files = glob.glob(pattern)
 
     if len(files) == 0:
@@ -147,7 +151,7 @@ def _read_multiple_files(
         if prefix:
             _pattern = [prefix] + _pattern
         if suffix:
-            _pattern = _pattern + [f"*{suffix}"]
+            _pattern = _pattern + [suffix_pattern]
         pattern_ = get_filename(_pattern, path=inp_dir, extension=extension)
         paths_ = glob.glob(pattern_)
         if len(paths_) != 1:
