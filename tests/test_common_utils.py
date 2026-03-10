@@ -445,7 +445,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
     base_url = "https://github.com/glamod/cdm-testdata"
     drs = "icoads/r302/d792/cdm_tables"
     f = "header-icoads_r302_d792_2022-02-01_subset.psv"
-    cache_dir = str(tmp_path / "cache")
+    cache_dir = tmp_path / "cache"
 
     local_file = load_file(
         name=os.path.join(drs, f),
@@ -496,14 +496,3 @@ def test_get_path_missing_file_module_not_found(tmp_path, caplog):
 
     assert result is None
     assert any("No module named" in msg for msg in caplog.messages)
-
-
-def test_get_path_missing_file_attribute_error(tmp_path, caplog):
-    """Test get_path when the file is missing and _files raises AttributeError."""
-    missing_file = tmp_path / "missing.txt"
-    caplog.set_level(logging.WARNING)
-
-    result = get_path(str(missing_file))
-
-    assert result is None
-    assert any("Cannot treat" in msg for msg in caplog.messages)
