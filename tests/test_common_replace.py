@@ -6,13 +6,20 @@ import pandas as pd
 
 from io import StringIO
 
-from cdm_reader_mapper.common.replace import replace_columns
+from cdm_reader_mapper.common.replace import _replace_columns, replace_columns
 
 
 def make_parser(text, **kwargs):
     """Helper: create a TextFileReader similar to user code."""
     buffer = StringIO(text)
     return pd.read_csv(buffer, chunksize=2, **kwargs)
+
+
+def test_replace_columns_raises():
+    with pytest.raises(
+        TypeError, match="Input left and right data must be pandas DataFrames."
+    ):
+        _replace_columns([1, 2, 3], [4, 2, 6])
 
 
 def test_basic_replacement_df():
