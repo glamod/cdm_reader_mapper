@@ -117,7 +117,6 @@ def test_method_raises():
 
 
 def test_reader_method_callable(test_db_psr):
-    """Test reader_method with a callable DataFrame attribute (sum)."""
     result = reader_method(
         test_db_psr,
         test_db_psr.data,
@@ -132,7 +131,6 @@ def test_reader_method_callable(test_db_psr):
 
 
 def test_reader_method_subscriptable(test_db_psr):
-    """Test reader_method with a subscriptable DataFrame attribute (column access)."""
     result = reader_method(
         test_db_psr,
         test_db_psr.data,
@@ -146,9 +144,6 @@ def test_reader_method_subscriptable(test_db_psr):
 
 
 def test_reader_method_inplace(test_db_psr):
-    """Test reader_method with inplace=True."""
-    original_data = test_db_psr._data if hasattr(test_db_psr, "_data") else None
-
     result = reader_method(
         test_db_psr,
         test_db_psr.data,
@@ -482,7 +477,7 @@ def test_db_getitem_psr(test_db_psr):
     pd.testing.assert_series_equal(a_col, pd.Series([1, 3], name="a"))
 
     with pytest.raises(TypeError, match="unhashable type: 'list'"):
-        df_slice = db._data[["a", "b"]]
+        db._data[["a", "b"]]
 
 
 def test_db_setitem_pd(test_db_pd):
