@@ -68,7 +68,7 @@ def count_by_cat(
     - Works with large files via ParquetStreamReader by iterating through chunks.
     """
     if columns is None:
-        columns = data.columns
+        columns = list(data.columns)
     if not isinstance(columns, list):
         columns = [columns]
 
