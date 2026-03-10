@@ -179,7 +179,7 @@ def test_stack_v_df(sample_db_df):
 
     db = DataBundle(data=sample_data, mask=sample_mask)
 
-    sample_db_df.stack_v(db)
+    sample_db_df.stack_v(db, inplace=True)
 
     expected_data = pd.concat([sample_data, db.data], ignore_index=True)
     expected_mask = pd.concat([sample_mask, db.mask], ignore_index=True)
@@ -203,7 +203,7 @@ def test_stack_h_df(sample_db_df, sample_data, sample_mask):
     expected_data = pd.concat([sample_db_df.data, db.data], axis=1)
     expected_mask = pd.concat([sample_db_df.mask, db.mask], axis=1)
 
-    sample_db_df.stack_h(db)
+    sample_db_df.stack_h(db, inplace=True)
 
     pd.testing.assert_frame_equal(sample_db_df.data, expected_data)
     pd.testing.assert_frame_equal(sample_db_df.mask, expected_mask)

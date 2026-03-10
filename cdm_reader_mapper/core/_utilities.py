@@ -20,6 +20,17 @@ from cdm_reader_mapper.common.iterators import (
     parquet_stream_from_iterable,
 )
 
+properties = {
+    "data",
+    "columns",
+    "dtypes",
+    "mask",
+    "imodel",
+    "mode",
+    "parse_dates",
+    "encoding",
+}
+
 
 def _copy(value):
     """Make copy of value"""
@@ -36,15 +47,16 @@ def _copy(value):
 
 def method(attr_func, *args, **kwargs):
     """Handles both method calls and subscriptable attributes."""
-    try:
+    if callable(attr_func):
         return attr_func(*args, **kwargs)
-    except TypeError:
+
+    try:
         return attr_func[args]
     except Exception:
         raise ValueError("Attribute is neither callable nor subscriptable.")
 
 
-def reader_method(DataBundle, data, attr, *args, **kwargs):
+def reader_method(DataBundle, data, attr, *args, process_kwargs={}, **kwargs):
     """
     Handles operations on chunked data (ParquetStreamReader).
     Uses process_disk_backed to stream processing without loading into RAM.
@@ -68,7 +80,8 @@ def reader_method(DataBundle, data, attr, *args, **kwargs):
     result_tuple = process_disk_backed(
         data,
         apply_operation,
-        makecopy=True,
+        makecopy=False,
+        **process_kwargs,
     )
 
     # The result is a tuple: (ParquetStreamReader, [extra_outputs])
@@ -121,6 +134,9 @@ def combine_attribute_values(first_value, iterator, attr):
     if isinstance(first_value, (list, np.ndarray)):
         return np.concatenate(combined_values)
 
+    if isinstance(first_value, (pd.DataFrame, pd.Series)):
+        return pd.concat(combined_values)
+
     return combined_values
 
 
@@ -157,21 +173,32 @@ class _DataBundle:
         imodel: str | None = None,
         mode: Literal["data", "tables"] = "data",
     ):
-        if data is None:
-            data = pd.DataFrame(columns=columns, dtype=dtypes)
-        if mask is None:
-            mask = mask or pd.DataFrame(columns=data.columns, dtype=bool)
-
         if mode not in ["data", "tables"]:
             raise ValueError(
                 f"'mode' {mode} is not valid, use one of ['data', 'tables']."
             )
 
+        if data is None:
+            data = pd.DataFrame(columns=columns, dtype=dtypes)
+        if isinstance(data, (list, tuple)):
+            data = iter(data)
         if (
             is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
         ) or isinstance(data, (list, tuple)):
             data = parquet_stream_from_iterable(data)
 
+        if mask is None:
+            if isinstance(data, pd.DataFrame):
+                mask = pd.DataFrame(columns=data.columns, index=data.index, dtype=bool)
+            elif isinstance(data, ParquetStreamReader):
+                data_cp = data.copy()
+                mask = [
+                    pd.DataFrame(columns=df.columns, index=df.index, dtype=bool)
+                    for df in data_cp
+                ]
+
+        if isinstance(mask, (list, tuple)):
+            mask = iter(mask)
         if (
             is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)
         ) or isinstance(mask, (list, tuple)):
@@ -248,11 +275,10 @@ class _DataBundle:
 
     def __setitem__(self, item, value):
         """Make class support item assignment for :py:attr:`data`."""
-        if isinstance(item, str):
-            if hasattr(self, item):
-                setattr(self, item, value)
+        if isinstance(item, str) and item in properties:
+            setattr(self, item, value)
         else:
-            self._data.__setitem__(item, value)
+            self._data[item] = value
 
     def __getitem__(self, item):
         """Make class subscriptable."""
@@ -335,6 +361,25 @@ class _DataBundle:
     def mode(self, value):
         self._mode = value
 
+    def copy(self) -> _DataBundle:
+        """Make deep copy of a :py:class:`~_DataBundle`.
+
+        Returns
+        -------
+        :py:class:`~_DataBundle`
+              Copy of a _DataBundle.
+
+
+        Examples
+        --------
+        >>> db2 = db.copy()
+        """
+        db = _DataBundle()
+        for key, value in self.__dict__.items():
+            value = _copy(value)
+            setattr(db, key, value)
+        return db
+
     def _get_db(self, inplace):
         if inplace is True:
             return self
@@ -346,31 +391,35 @@ class _DataBundle:
         return db
 
     def _stack(self, other, datasets, inplace, **kwargs):
-        db_ = self._get_db(inplace)
+        db_cp = self._get_db(inplace)
+
         if not isinstance(other, list):
             other = [other]
         if not isinstance(datasets, list):
             datasets = [datasets]
 
         for data in datasets:
-            data_ = f"_{data}"
-            df_ = getattr(db_, data_) if hasattr(db_, data_) else pd.DataFrame()
+            data_attr = f"_{data}"
+            df_cp = getattr(db_cp, data_attr, pd.DataFrame())
 
-            if is_valid_iterator(df_):
+            if is_valid_iterator(df_cp):
                 raise ValueError(
                     "Data must be a pd.DataFrame not a iterable of pd.DataFrames."
                 )
 
-            to_concat = [
-                getattr(concat, data_) for concat in other if hasattr(concat, data_)
-            ]
-            if not to_concat:
-                continue
-            if not df_.empty:
-                to_concat = [df_] + to_concat
+            to_concat = [df_cp]
 
-            concatenated = pd.concat(to_concat, **kwargs)
+            for o in other:
+                if hasattr(o, data_attr):
+                    to_concat.append(getattr(o, data_attr))
+
+            if not any(d.empty for d in to_concat):
+                concatenated = pd.concat(to_concat, **kwargs)
+            else:
+                concatenated = pd.DataFrame()
+
             concatenated = concatenated.reset_index(drop=True)
-            setattr(self, data_, concatenated)
 
-        return self._return_db(db_, inplace)
+            setattr(db_cp, data_attr, concatenated)
+
+        return self._return_db(db_cp, inplace)

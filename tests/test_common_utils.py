@@ -429,15 +429,6 @@ def test_get_file_real(tmp_path):
 
     assert list(cache_dir.rglob("*.md5")) == []
 
-    out_file = _get_file(
-        name=name,
-        suffix=".psv",
-        url=base_url,
-        cache_dir=cache_dir,
-        clear_cache=True,
-        within_drs=False,
-    )
-
 
 @pytest.mark.parametrize("within_drs", [True, False])
 @pytest.mark.parametrize("cache", [True, False])
@@ -452,7 +443,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
         github_url=base_url,
         branch="main",
         cache=cache,
-        cache_dir=cache_dir,
+        cache_dir=str(cache_dir),
         clear_cache=True,
         within_drs=within_drs,
     )

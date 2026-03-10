@@ -74,25 +74,6 @@ class DataBundle(_DataBundle):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def copy(self) -> DataBundle:
-        """Make deep copy of a :py:class:`~DataBundle`.
-
-        Returns
-        -------
-        :py:class:`~DataBundle`
-              Copy of a DataBundle.
-
-
-        Examples
-        --------
-        >>> db2 = db.copy()
-        """
-        db = DataBundle()
-        for key, value in self.__dict__.items():
-            value = _copy(value)
-            setattr(db, key, value)
-        return db
-
     def add(self, addition, inplace=False) -> DataBundle | None:
         """Adding information to a :py:class:`~DataBundle`.
 
@@ -120,6 +101,25 @@ class DataBundle(_DataBundle):
             data_cp = _copy(data)
             setattr(db_, f"_{name}", data_cp)
         return self._return_db(db_, inplace)
+
+    def copy(self) -> DataBundle:
+        """Make deep copy of a :py:class:`~DataBundle`.
+
+        Returns
+        -------
+        :py:class:`~DataBundle`
+              Copy of a DataBundle.
+
+
+        Examples
+        --------
+        >>> db2 = db.copy()
+        """
+        db = _DataBundle()
+        for key, value in self.__dict__.items():
+            value = _copy(value)
+            setattr(db, key, value)
+        return db
 
     def stack_v(
         self, other, datasets=["data", "mask"], inplace=False, **kwargs
