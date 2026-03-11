@@ -4,9 +4,7 @@ import pytest
 
 import pandas as pd
 
-from io import StringIO
-
-
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.common.select import (
     _split_df,
     _split_by_index_df,
@@ -18,12 +16,6 @@ from cdm_reader_mapper.common.select import (
     split_by_column_entries,
     split_by_index,
 )
-
-
-def make_parser(text, **kwargs):
-    """Helper: create a TextFileReader similar to user code."""
-    buffer = StringIO(text)
-    return pd.read_csv(buffer, chunksize=2, **kwargs)
 
 
 def dummy_func(x):
@@ -43,29 +35,43 @@ def sample_df():
 
 
 @pytest.fixture
-def sample_reader():
-    text = "10,1,x,True\n11,2,y,False\n12,3,z,True\n13,4,x,False\n14,5,y,True"
-    reader = make_parser(text, names=["A", "B", "C"])
-    return reader
+def sample_psr():
+    df1 = pd.DataFrame(
+        {"A": [1, 2], "B": ["x", "y"], "C": [True, False]}, index=[10, 11]
+    )
+    df2 = pd.DataFrame({"A": [3], "B": ["z"], "C": [True]}, index=[12])
+    df3 = pd.DataFrame(
+        {"A": [4, 5], "B": ["x", "y"], "C": [False, True]}, index=[13, 14]
+    )
+    return ParquetStreamReader([df1, df2, df3])
 
 
 @pytest.fixture
 def sample_df_multi():
     return pd.DataFrame(
         {
-            "A": [1, 2, 3, 4, 5],
-            "B": ["x", "y", "z", "x", "y"],
-            "C": [True, False, True, False, True],
+            ("A", "a"): [1, 2, 3, 4, 5],
+            ("B", "b"): ["x", "y", "z", "x", "y"],
+            ("C", "c"): [True, False, True, False, True],
         },
         index=[10, 11, 12, 13, 14],
     )
 
 
 @pytest.fixture
-def sample_reader_multi():
-    text = "10,1,x,True\n11,2,y,False\n12,3,z,True\n13,4,x,False\n14,5,y,True"
-    reader = make_parser(text, names=[("A", "a"), ("B", "b"), ("C", "c")])
-    return reader
+def sample_psr_multi():
+    df1 = pd.DataFrame(
+        {("A", "a"): [1, 2], ("B", "b"): ["x", "y"], ("C", "c"): [True, False]},
+        index=[10, 11],
+    )
+    df2 = pd.DataFrame(
+        {("A", "a"): [3], ("B", "b"): ["z"], ("C", "c"): [True]}, index=[12]
+    )
+    df3 = pd.DataFrame(
+        {("A", "a"): [4, 5], ("B", "b"): ["x", "y"], ("C", "c"): [False, True]},
+        index=[13, 14],
+    )
+    return ParquetStreamReader([df1, df2, df3])
 
 
 @pytest.fixture
@@ -74,8 +80,8 @@ def empty_df():
 
 
 @pytest.fixture
-def empty_reader():
-    return make_parser("", names=["A", "B", "C"])
+def empty_psr():
+    return ParquetStreamReader([pd.DataFrame(columns=["A", "B", "C"])])
 
 
 @pytest.fixture
@@ -114,19 +120,9 @@ def _test_split_df_false_mask(sample_df):
     assert list(rejected.index) == [11, 12, 14]
 
 
-def test_split_df_multiindex(sample_df):
-    mask = pd.Series([True, False, False, True, False], index=sample_df.index)
-    sample_df.columns = pd.MultiIndex.from_tuples(
-        [
-            ("A", "a"),
-            (
-                "B",
-                "b",
-            ),
-            ("C", "c"),
-        ]
-    )
-    selected, rejected, _, _ = _split_df(sample_df, mask, return_rejected=True)
+def test_split_df_multiindex(sample_df_multi):
+    mask = pd.Series([True, False, False, True, False], index=sample_df_multi.index)
+    selected, rejected, _, _ = _split_df(sample_df_multi, mask, return_rejected=True)
     assert list(selected.index) == [10, 13]
     assert list(rejected.index) == [11, 12, 14]
 
@@ -184,7 +180,7 @@ def test_split_by_column_df(
         ([11, 13], True, True, [10, 12, 14], [11, 13]),
     ],
 )
-def test_split_by_index_df(
+def test_split_by_index_helper(
     sample_df,
     index_list,
     inverse,
@@ -199,25 +195,16 @@ def test_split_by_index_df(
     assert list(rejected.index) == expected_rejected
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_index_basic(sample_df, sample_reader, TextFileReader):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-    selected, rejected, _, _ = split_by_index(data, [11, 13], return_rejected=True)
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
+def test_split_by_index_df(sample_df):
+    selected, rejected, _, _ = split_by_index(sample_df, [11, 13], return_rejected=True)
 
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
 
 
-def test_split_by_index_multiindex(sample_reader_multi):
+def test_split_by_index_prs(sample_psr):
     selected, rejected, _, _ = split_by_index(
-        sample_reader_multi, [11, 13], return_rejected=True
+        sample_psr, [11, 13], return_rejected=True
     )
 
     selected = selected.read()
@@ -227,20 +214,43 @@ def test_split_by_index_multiindex(sample_reader_multi):
     assert list(rejected.index) == [10, 12, 14]
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_column_entries_basic(sample_df, sample_reader, TextFileReader):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
-    selected, rejected, _, _ = split_by_column_entries(
-        data, {"B": ["y"]}, return_rejected=True
+def test_split_by_index_multiindex_df(sample_df_multi):
+    selected, rejected, _, _ = split_by_index(
+        sample_df_multi, [11, 13], return_rejected=True
     )
 
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
+    assert list(selected.index) == [11, 13]
+    assert list(rejected.index) == [10, 12, 14]
+
+
+def test_split_by_index_multiindex_psr(sample_psr_multi):
+    selected, rejected, _, _ = split_by_index(
+        sample_psr_multi, [11, 13], return_rejected=True
+    )
+
+    selected = selected.read()
+    rejected = rejected.read()
+
+    assert list(selected.index) == [11, 13]
+    assert list(rejected.index) == [10, 12, 14]
+
+
+def test_split_by_column_entries_df(sample_df):
+    selected, rejected, _, _ = split_by_column_entries(
+        sample_df, {"B": ["y"]}, return_rejected=True
+    )
+
+    assert list(selected.index) == [11, 14]
+    assert list(rejected.index) == [10, 12, 13]
+
+
+def test_split_by_column_entries_psr(sample_psr):
+    selected, rejected, _, _ = split_by_column_entries(
+        sample_psr, {"B": ["y"]}, return_rejected=True
+    )
+
+    selected = selected.read()
+    rejected = rejected.read()
 
     assert list(selected.index) == [11, 14]
     assert list(rejected.index) == [10, 12, 13]
@@ -255,24 +265,16 @@ def test_split_by_column_entries_basic(sample_df, sample_reader, TextFileReader)
         (True, True, [10, 11, 12, 13, 14], []),
     ],
 )
-@pytest.mark.parametrize("chunked", [False, True])
-def test_split_by_boolean_basic_true(
+def test_split_by_boolean_df_true(
     sample_df,
-    sample_reader,
     boolean_mask,
     inverse,
     reset_index,
     exp_selected_idx,
     exp_rejected_idx,
-    chunked,
 ):
-    if chunked:
-        data = sample_reader
-    else:
-        data = sample_df
-
     selected, rejected, _, _ = split_by_boolean(
-        data,
+        sample_df,
         boolean_mask,
         boolean=True,
         inverse=inverse,
@@ -287,9 +289,46 @@ def test_split_by_boolean_basic_true(
         exp_selected = exp_selected.reset_index(drop=True)
         exp_rejected = exp_rejected.reset_index(drop=True)
 
-    if chunked:
-        selected = selected.read()
-        rejected = rejected.read()
+    pd.testing.assert_frame_equal(selected, exp_selected)
+    pd.testing.assert_frame_equal(rejected, exp_rejected)
+
+
+@pytest.mark.parametrize(
+    "inverse, reset_index, exp_selected_idx, exp_rejected_idx",
+    [
+        (False, False, [], [10, 11, 12, 13, 14]),
+        (False, True, [], [10, 11, 12, 13, 14]),
+        (True, False, [10, 11, 12, 13, 14], []),
+        (True, True, [10, 11, 12, 13, 14], []),
+    ],
+)
+def test_split_by_boolean_psr_true(
+    sample_psr,
+    boolean_mask,
+    inverse,
+    reset_index,
+    exp_selected_idx,
+    exp_rejected_idx,
+):
+    selected, rejected, _, _ = split_by_boolean(
+        sample_psr.copy(),
+        boolean_mask,
+        boolean=True,
+        inverse=inverse,
+        reset_index=reset_index,
+        return_rejected=True,
+    )
+
+    exp = sample_psr.copy().read()
+    exp_selected = exp.loc[exp_selected_idx]
+    exp_rejected = exp.loc[exp_rejected_idx]
+
+    if reset_index is True:
+        exp_selected = exp_selected.reset_index(drop=True)
+        exp_rejected = exp_rejected.reset_index(drop=True)
+
+    selected = selected.read()
+    rejected = rejected.read()
 
     pd.testing.assert_frame_equal(selected, exp_selected)
     pd.testing.assert_frame_equal(rejected, exp_rejected)
@@ -304,24 +343,16 @@ def test_split_by_boolean_basic_true(
         (True, True, [10, 11, 12, 13, 14], []),
     ],
 )
-@pytest.mark.parametrize("chunked", [False, True])
-def test_split_by_boolean_basic_false(
+def test_split_by_boolean_df_false(
     sample_df,
-    sample_reader,
     boolean_mask,
     inverse,
     reset_index,
     exp_selected_idx,
     exp_rejected_idx,
-    chunked,
 ):
-    if chunked:
-        data = sample_reader
-    else:
-        data = sample_df
-
     selected, rejected, _, _ = split_by_boolean(
-        data,
+        sample_df,
         boolean_mask,
         boolean=False,
         inverse=inverse,
@@ -336,107 +367,149 @@ def test_split_by_boolean_basic_false(
         exp_selected = exp_selected.reset_index(drop=True)
         exp_rejected = exp_rejected.reset_index(drop=True)
 
-    if chunked:
-        selected = selected.read()
-        rejected = rejected.read()
+    pd.testing.assert_frame_equal(selected, exp_selected)
+    pd.testing.assert_frame_equal(rejected, exp_rejected)
+
+
+@pytest.mark.parametrize(
+    "inverse, reset_index, exp_selected_idx, exp_rejected_idx",
+    [
+        (False, False, [], [10, 11, 12, 13, 14]),
+        (False, True, [], [10, 11, 12, 13, 14]),
+        (True, False, [10, 11, 12, 13, 14], []),
+        (True, True, [10, 11, 12, 13, 14], []),
+    ],
+)
+def test_split_by_boolean_psr_false(
+    sample_psr,
+    boolean_mask,
+    inverse,
+    reset_index,
+    exp_selected_idx,
+    exp_rejected_idx,
+):
+    selected, rejected, _, _ = split_by_boolean(
+        sample_psr.copy(),
+        boolean_mask,
+        boolean=False,
+        inverse=inverse,
+        reset_index=reset_index,
+        return_rejected=True,
+    )
+
+    exp = sample_psr.copy().read()
+    exp_selected = exp.loc[exp_selected_idx]
+    exp_rejected = exp.loc[exp_rejected_idx]
+
+    if reset_index is True:
+        exp_selected = exp_selected.reset_index(drop=True)
+        exp_rejected = exp_rejected.reset_index(drop=True)
+
+    selected = selected.read()
+    rejected = rejected.read()
 
     pd.testing.assert_frame_equal(selected, exp_selected)
     pd.testing.assert_frame_equal(rejected, exp_rejected)
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_boolean_true_basic(
-    sample_df, sample_reader, boolean_mask_true, TextFileReader
-):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
+def test_split_by_boolean_true_df(sample_df, boolean_mask_true):
     selected, rejected, _, _ = split_by_boolean_true(
-        data, boolean_mask_true, return_rejected=True
+        sample_df, boolean_mask_true, return_rejected=True
     )
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
 
     assert list(selected.index) == [10]
     assert list(rejected.index) == [11, 12, 13, 14]
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_boolean_false_basic(
-    sample_df, sample_reader, boolean_mask, TextFileReader
-):
-    if TextFileReader:
-        data = sample_reader
-    else:
-        data = sample_df
-
-    selected, rejected, _, _ = split_by_boolean_false(
-        data, boolean_mask, return_rejected=True
+def test_split_by_boolean_true_psr(sample_psr, boolean_mask_true):
+    selected, rejected, _, _ = split_by_boolean_true(
+        sample_psr, boolean_mask_true, return_rejected=True
     )
 
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
+    selected = selected.read()
+    rejected = rejected.read()
+
+    assert list(selected.index) == [10]
+    assert list(rejected.index) == [11, 12, 13, 14]
+
+
+def test_split_by_boolean_false_df(sample_df, boolean_mask):
+    selected, rejected, _, _ = split_by_boolean_false(
+        sample_df, boolean_mask, return_rejected=True
+    )
 
     assert list(selected.index) == []
     assert list(rejected.index) == [10, 11, 12, 13, 14]
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_index_empty(empty_df, empty_reader, TextFileReader):
-    if TextFileReader:
-        data = empty_reader
-    else:
-        data = empty_df
+def test_split_by_boolean_false_psr(sample_psr, boolean_mask):
+    selected, rejected, _, _ = split_by_boolean_false(
+        sample_psr, boolean_mask, return_rejected=True
+    )
 
-    selected, rejected, _, _ = split_by_index(data, [0, 1], return_rejected=True)
+    selected = selected.read()
+    rejected = rejected.read()
 
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
+    assert list(selected.index) == []
+    assert list(rejected.index) == [10, 11, 12, 13, 14]
+
+
+def test_split_by_index_empty_df(empty_df):
+    selected, rejected, _, _ = split_by_index(empty_df, [0, 1], return_rejected=True)
 
     assert selected.empty
     assert rejected.empty
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_column_empty(empty_df, empty_reader, TextFileReader):
-    if TextFileReader:
-        data = empty_reader
-    else:
-        data = empty_df
+def test_split_by_index_empty_psr(empty_psr):
+    selected, rejected, _, _ = split_by_index(empty_psr, [0, 1], return_rejected=True)
 
+    selected = selected.read()
+    rejected = rejected.read()
+
+    assert selected.empty
+    assert rejected.empty
+
+
+def test_split_by_column_empty_df(empty_df):
     selected, rejected, _, _ = split_by_column_entries(
-        data, {"A": [1]}, return_rejected=True
+        empty_df, {"A": [1]}, return_rejected=True
     )
-
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
 
     assert selected.empty
     assert rejected.empty
 
 
-@pytest.mark.parametrize("TextFileReader", [False, True])
-def test_split_by_boolean_empty(empty_df, empty_reader, TextFileReader):
-    if TextFileReader:
-        data = empty_reader
-    else:
-        data = empty_df
-
-    mask = empty_df.astype(bool)
-    selected, rejected, _, _ = split_by_boolean(
-        data, mask, boolean=True, return_rejected=True
+def test_split_by_column_empty_psr(empty_psr):
+    selected, rejected, _, _ = split_by_column_entries(
+        empty_psr, {"A": [1]}, return_rejected=True
     )
 
-    if TextFileReader:
-        selected = selected.read()
-        rejected = rejected.read()
+    selected = selected.read()
+    rejected = rejected.read()
+
+    assert selected.empty
+    assert rejected.empty
+
+
+def test_split_by_boolean_empty_df(empty_df):
+    mask = pd.DataFrame(columns=["A", "B", "C"], dtype=bool)
+    selected, rejected, _, _ = split_by_boolean(
+        empty_df, mask, boolean=True, return_rejected=True
+    )
+
+    assert selected.empty
+    assert rejected.empty
+
+
+def test_split_by_boolean_empty_psr(empty_psr):
+    mask = ParquetStreamReader([pd.DataFrame(columns=["A", "B", "C"], dtype=bool)])
+    selected, rejected, _, _ = split_by_boolean(
+        empty_psr, mask, boolean=True, return_rejected=True
+    )
+
+    selected = selected.read()
+    rejected = rejected.read()
 
     assert selected.empty
     assert rejected.empty

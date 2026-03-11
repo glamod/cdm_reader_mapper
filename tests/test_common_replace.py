@@ -4,15 +4,8 @@ import pytest
 
 import pandas as pd
 
-from io import StringIO
-
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.common.replace import _replace_columns, replace_columns
-
-
-def make_parser(text, **kwargs):
-    """Helper: create a TextFileReader similar to user code."""
-    buffer = StringIO(text)
-    return pd.read_csv(buffer, chunksize=2, **kwargs)
 
 
 def test_replace_columns_raises():
@@ -30,11 +23,16 @@ def test_basic_replacement_df():
     assert out["x"].tolist() == [100, 200]
 
 
-def test_basic_replacement_textfilereader():
-    parser_l = make_parser("id,x\n1,10\n2,20")
-    parser_r = make_parser("id,x\n1,100\n2,200")
+def test_basic_replacement_psr():
+    df1 = pd.DataFrame({"id": [1], "x": [10]}, index=[0])
+    df2 = pd.DataFrame({"id": [2], "x": [20]}, index=[1])
+    df3 = pd.DataFrame({"id": [1], "x": [100]}, index=[0])
+    df4 = pd.DataFrame({"id": [2], "x": [200]}, index=[1])
 
-    out = replace_columns(parser_l, parser_r, pivot_c="id", rep_c="x")
+    left = ParquetStreamReader([df1, df2])
+    right = ParquetStreamReader([df3, df4])
+
+    out = replace_columns(left, right, pivot_c="id", rep_c="x")
     out = out.read()
     assert out["x"].tolist() == [100, 200]
 

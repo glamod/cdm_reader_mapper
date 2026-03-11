@@ -5,15 +5,8 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from io import StringIO
-
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.common.inspect import _count_by_cat, get_length, count_by_cat
-
-
-def make_parser(text, **kwargs):
-    """Helper: create a TextFileReader similar to user code."""
-    buffer = StringIO(text)
-    return pd.read_csv(buffer, chunksize=2, **kwargs)
 
 
 @pytest.mark.parametrize(
@@ -49,7 +42,7 @@ def test_count_by_cat_i(data, expected):
         (pd.DataFrame(columns=["D"]), None, {"D": {}}),
     ],
 )
-def test_count_by_cat_dataframe(data, columns, expected):
+def test_count_by_cat_df(data, columns, expected):
     result = count_by_cat(data, columns)
     assert result == expected
 
@@ -60,11 +53,14 @@ def test_count_by_cat_single_column_string():
     assert result == {"A": {1: 1, 2: 2, "nan": 1}}
 
 
-def test_count_by_cat_textfilereader():
-    text = "A,B\n1,x\n2,y\n2,x\nnan,z"
-    parser = make_parser(text)
+def test_count_by_cat_psr():
+    df1 = pd.DataFrame({"A": 1, "B": "x"}, index=[0])
+    df2 = pd.DataFrame({"A": 2, "B": "y"}, index=[1])
+    df3 = pd.DataFrame({"A": 2, "B": "x"}, index=[2])
+    df4 = pd.DataFrame({"A": "nan", "B": "z"}, index=[3])
+    psr = ParquetStreamReader([df1, df2, df3, df4])
 
-    result = count_by_cat(parser, ["A", "B"])
+    result = count_by_cat(psr, ["A", "B"])
     expected = {
         "A": {1: 1, 2: 2, "nan": 1},
         "B": {"x": 2, "y": 1, "z": 1},
@@ -72,12 +68,13 @@ def test_count_by_cat_textfilereader():
     assert result == expected
 
 
-@pytest.mark.parametrize(
-    "data, expected_len",
-    [
-        (pd.DataFrame({"A": [1, 2, 3]}), 3),
-        (make_parser("A,B\n1,x\n2,y\n3,z"), 3),
-    ],
-)
-def test_get_length_inspect(data, expected_len):
-    assert get_length(data) == expected_len
+def test_get_length_df():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    assert get_length(df) == 3
+
+
+def test_get_length_psr():
+    df1 = pd.DataFrame({"A": [1, 2]})
+    df2 = pd.DataFrame({"A": [3]}, index=[2])
+    psr = ParquetStreamReader([df1, df2])
+    assert get_length(psr) == 3
