@@ -133,7 +133,7 @@ def _validate_id(data, mrd, combined_compiled, na_values):
         raise ValueError("No ID conversion columns found.")
 
     id_series = data[id_col]
-
+    id_series = id_series.rename(None)
     return id_series.str.match(combined_compiled, na=na_values)
 
 

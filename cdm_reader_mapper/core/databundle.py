@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from io import StringIO as StringIO
-
 import pandas as pd
 
 from ._utilities import _DataBundle, _copy
@@ -115,7 +113,7 @@ class DataBundle(_DataBundle):
         --------
         >>> db2 = db.copy()
         """
-        db = _DataBundle()
+        db = DataBundle()
         for key, value in self.__dict__.items():
             value = _copy(value)
             setattr(db, key, value)
@@ -619,13 +617,18 @@ class DataBundle(_DataBundle):
         Examples
         --------
         >>> import pandas as pd
-        >>> df_corr = pr.read_csv("correction_file_on_disk")
+        >>> df_corr = pd.read_csv("correction_file_on_disk")
         >>> df_repl = db.replace_columns(df_corr)
 
         Note
         ----
         For more information see :py:func:`replace_columns`
         """
+        if not isinstance(self._data, (pd.DataFrame, pd.Series)):
+            raise TypeError(
+                "Data must be a pd.DataFrame or pd.Series, not a {type(self._data)}."
+            )
+
         db_ = self._get_db(inplace)
         if subset is None:
             db_._data = replace_columns(df_l=db_._data, df_r=df_corr, **kwargs)
@@ -950,20 +953,22 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`DupDetect.flag_duplicates`
         """
         db_ = self._get_db(inplace)
+
         db_.DupDetect.flag_duplicates(**kwargs)
+
         if db_._mode == "tables" and "header" in db_._data:
             db_._data["header"] = db_.DupDetect.result
         else:
             db_._data = db_.DupDetect.result
         return self._return_db(db_, inplace)
 
-    def get_duplicates(self, **kwargs) -> list:
+    def get_duplicates(self, **kwargs) -> pd.DataFrame:
         """Get duplicate matches in :py:attr:`data`.
 
         Returns
         -------
-        list
-            List of tuples containing duplicate matches.
+        pd.DataFrame
+            DataFrame containing duplicate matches.
 
         Note
         ----
@@ -1026,6 +1031,7 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`DupDetect.remove_duplicates`
         """
         db_ = self._get_db(inplace)
+
         db_.DupDetect.remove_duplicates(**kwargs)
         header_ = db_.DupDetect.result
         db_._data = db_._data[db_._data.index.isin(header_.index)]

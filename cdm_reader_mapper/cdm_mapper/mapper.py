@@ -14,7 +14,6 @@ for the input data model.
 from __future__ import annotations
 
 from copy import deepcopy
-from io import StringIO
 from typing import Any, Iterable, get_args
 
 import numpy as np
@@ -331,7 +330,6 @@ def _prepare_cdm_tables(cdm_subset):
         for col, meta in atts.items():
             meta["decimal_places"] = _decimal_places(meta.get("decimal_places"))
         tables[table] = {
-            "buffer": StringIO(),
             "atts": atts,
         }
 

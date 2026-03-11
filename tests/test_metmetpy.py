@@ -5,8 +5,6 @@ import pandas as pd
 import logging
 import pytest
 
-from io import StringIO
-
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 
 from cdm_reader_mapper.metmetpy import properties
@@ -433,7 +431,7 @@ def test_deck_992_icoads_basic():
     pd.testing.assert_frame_equal(result, expected)
 
 
-def test_correct_dt():
+def test_correct_dt_pass():
     data = pd.DataFrame(
         {
             YR: [1899, 1900, 1899],
@@ -462,6 +460,12 @@ def test_correct_dt():
     )
 
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_dt_typeerror():
+    series = pd.Series([1898, 1900, 1899])
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        _correct_dt(series, data_model="icoads", dck="201", correction_method={})
 
 
 def test_correct_pt_fillna():
@@ -617,35 +621,33 @@ def test_correct_pt_missing_function_object():
 
 
 @pytest.mark.parametrize(
-    "data_input,imodel,expected",
+    "data_input,expected",
     [
         (
             pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}),
-            "icoads_r300_d201",
             pd.DataFrame({YR: [1898], MO: [12], DY: [31], HR: [0]}),
         ),
         (
             pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
-            "icoads_r300_d201",
             pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
         ),
     ],
 )
-def test_correct_datetime(data_input, imodel, expected):
-    result = correct_datetime(data_input.copy(), imodel, log_level="CRITICAL")
+def test_correct_datetime(data_input, expected):
+    result = correct_datetime(
+        data_input.copy(), "icoads_r300_d201", log_level="CRITICAL"
+    )
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
-def test_correct_datetime_textfilereader():
-    csv_text = "1899,1,1,0\n1900,1,1,12"
-
+def test_correct_datetime_psr():
     expected = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
 
-    parser = pd.read_csv(
-        StringIO(csv_text), chunksize=2, header=None, names=datetime_cols, dtype=int
-    )
+    df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}, index=[0])
+    df2 = pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}, index=[1])
+    psr = ParquetStreamReader([df1, df2])
 
-    result = correct_datetime(parser, "icoads_r300_d201").read()
+    result = correct_datetime(psr, "icoads_r300_d201").read()
 
     pd.testing.assert_frame_equal(result, expected)
 
@@ -720,17 +722,23 @@ def test_correct_pt_dataframe(data_input, imodel, expected):
 
 
 @pytest.mark.parametrize(
-    "csv_text,names,imodel,expected",
+    "data_input,imodel,expected",
     [
         (
-            "\n7\n\n",
-            [PT],
+            [
+                pd.DataFrame({PT: [None]}, index=[0]),
+                pd.DataFrame({PT: ["7"]}, index=[1]),
+                pd.DataFrame({PT: [None]}, index=[2]),
+            ],
             "icoads_r300_d993",
             pd.DataFrame({PT: ["5", "7", "5"]}),
         ),
         (
-            "5,12345,147\n5,99999,999\n7,123,999",
-            [PT, ID, SID],
+            [
+                pd.DataFrame({PT: ["5"], ID: ["12345"], SID: ["147"]}, index=[0]),
+                pd.DataFrame({PT: ["5"], ID: ["99999"], SID: ["999"]}, index=[1]),
+                pd.DataFrame({PT: ["7"], ID: ["123"], SID: ["999"]}, index=[2]),
+            ],
             "icoads_r300_d700",
             pd.DataFrame(
                 {
@@ -742,17 +750,10 @@ def test_correct_pt_dataframe(data_input, imodel, expected):
         ),
     ],
 )
-def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
+def test_correct_pt_psr(data_input, imodel, expected):
     """Test correct_pt with TextFileReader input."""
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=names,
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = correct_pt(parser, imodel, log_level="CRITICAL")
+    psr = ParquetStreamReader(data_input)
+    result = correct_pt(psr, imodel, log_level="CRITICAL")
     pd.testing.assert_frame_equal(result.read(), expected, check_dtype=False)
 
 
@@ -865,19 +866,19 @@ def test_get_patterns_empty_and_blank_true():
             pd.DataFrame({ID: ["12345", "ABCDE"]}),
             "icoads_r300_d201",
             False,
-            pd.Series([True, False], name=ID),
+            pd.Series([True, False]),
         ),
         (
             pd.DataFrame({ID: ["12345", ""]}),
             "icoads_r300_d201",
             True,
-            pd.Series([True, True], name=ID),
+            pd.Series([True, True]),
         ),
         (
             pd.DataFrame({ID: ["12345", ""]}),
             "icoads_r300_d201",
             False,
-            pd.Series([True, True], name=ID),
+            pd.Series([True, True]),
         ),
     ],
 )
@@ -886,18 +887,13 @@ def test_validate_id_dataframe(data_input, imodel, blank, expected):
     pd.testing.assert_series_equal(result, expected, check_dtype=False)
 
 
-def test_validate_id_textfilereader():
-    csv_text = "12345\nABCDE\n\n"
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=[ID],
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = validate_id(parser, "icoads_r300_d201", blank=False, log_level="CRITICAL")
-    expected = pd.Series([True, False, True], name=ID)
+def test_validate_id_psr():
+    df1 = pd.DataFrame({ID: ["12345"]}, index=[0])
+    df2 = pd.DataFrame({ID: ["ABCDE"]}, index=[1])
+    df3 = pd.DataFrame({ID: [None]}, index=[2])
+    psr = ParquetStreamReader([df1, df2, df3])
+    result = validate_id(psr, "icoads_r300_d201", blank=False, log_level="CRITICAL")
+    expected = pd.Series([True, False, True])
 
     pd.testing.assert_series_equal(result.read(), expected)
 
@@ -927,20 +923,31 @@ def test_validate_datetime_dataframe(data_input, expected):
 
 
 @pytest.mark.parametrize(
-    "csv_text, expected",
+    "data_input, expected",
     [
-        ("2023,1,1,12\n2023,1,2,13\n\n", pd.Series([True, True, False])),
-        ("2023,1,1,12\n2023,1,2,\n\n", pd.Series([True, False, False])),
+        (
+            [
+                pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
+                pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [13]}, index=[1]),
+                pd.DataFrame(
+                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
+                ),
+            ],
+            pd.Series([True, True, False]),
+        ),
+        (
+            [
+                pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
+                pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [None]}, index=[1]),
+                pd.DataFrame(
+                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
+                ),
+            ],
+            pd.Series([True, False, False]),
+        ),
     ],
 )
-def test_validate_datetime_textfilereader(csv_text, expected):
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=datetime_cols,
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = validate_datetime(parser, "icoads", log_level="CRITICAL")
+def test_validate_datetime_psr(data_input, expected):
+    psr = ParquetStreamReader(data_input)
+    result = validate_datetime(psr, "icoads", log_level="CRITICAL")
     pd.testing.assert_series_equal(result.read(), expected)

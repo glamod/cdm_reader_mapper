@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
-from io import StringIO
 
 from cdm_reader_mapper.cdm_mapper.mapper import (
     _is_empty,
@@ -30,33 +29,6 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functio
 from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
 
 from cdm_reader_mapper.data import test_data
-
-
-@pytest.fixture
-def sample_df():
-    return pd.DataFrame({"A": [1, 2]})
-
-
-@pytest.fixture
-def sample_df_empty():
-    return pd.DataFrame()
-
-
-@pytest.fixture
-def sample_tfr():
-    csv_data = "A\n1\n2"
-    return pd.read_csv(StringIO(csv_data), chunksize=1)
-
-
-@pytest.fixture
-def sample_tfr_empty():
-    csv_data = "A\n"
-    return pd.read_csv(StringIO(csv_data), chunksize=1)
-
-
-@pytest.fixture
-def sample_string():
-    return "A"
 
 
 @pytest.fixture
@@ -226,8 +198,6 @@ def test_prepare_cdm_tables(table, is_list):
 
     assert isinstance(result, dict)
     assert list(result.keys()) == [table]
-    assert "buffer" in result[table]
-    assert isinstance(result[table]["buffer"], StringIO)
     assert "atts" in result[table]
 
 

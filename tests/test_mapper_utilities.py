@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 
-
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 
 from cdm_reader_mapper.cdm_mapper.utils.utilities import (
