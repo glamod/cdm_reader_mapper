@@ -143,6 +143,17 @@ def test_reader_method_subscriptable(test_db_psr):
     pd.testing.assert_series_equal(result.read(), expected)
 
 
+def test_reader_method_none(test_db_psr):
+    result = reader_method(
+        test_db_psr,
+        test_db_psr.data,
+        "get",
+        "false_attr",
+    )
+
+    assert result is None
+
+
 def test_reader_method_inplace(test_db_psr):
     result = reader_method(
         test_db_psr,
@@ -244,7 +255,7 @@ def test_subscriptablemethod_call():
     assert result == 5
 
 
-def test_subscriptablemethod_getitem_success():
+def test_subscriptablemethod_getitem_passes():
     data = {"a": 1, "b": 2}
 
     sm = SubscriptableMethod(data)
@@ -255,7 +266,7 @@ def test_subscriptablemethod_getitem_success():
     assert result == 2
 
 
-def test_subscriptablemethod_getitem_typeerror():
+def test_subscriptablemethod_getitem_raises():
     def f(x):
         return x * 2
 
@@ -302,14 +313,14 @@ def test_db_init_psr(test_db_psr):
     )
 
 
-def test_db_raises():
+def test_db_init_raises():
     with pytest.raises(ValueError):
         _DataBundle(
             mode="invalid",
         )
 
 
-def test_db_iterators():
+def test_db_init_iterators():
     data1 = pd.DataFrame([{"a": 1, "b": 2}])
     data2 = pd.DataFrame([{"a": 3, "b": 4}])
 
@@ -333,7 +344,7 @@ def test_db_len(test_db_pd, test_db_psr):
 def test_db_getattr_pd(test_db_pd):
     db = test_db_pd
 
-    sum_method = db.__getattr__("sum")
+    sum_method = getattr(db, "sum")
     assert isinstance(sum_method, SubscriptableMethod)
 
     result = sum_method(axis=1)
@@ -341,7 +352,7 @@ def test_db_getattr_pd(test_db_pd):
 
     pd.testing.assert_series_equal(result, expected)
 
-    columns = db.__getattr__("columns")
+    columns = getattr(db, "columns")
     assert isinstance(columns, pd.Index)
     assert list(columns) == ["a", "b"]
 
@@ -349,7 +360,7 @@ def test_db_getattr_pd(test_db_pd):
 def test_db_getattr_psr(test_db_psr):
     db = test_db_psr
 
-    sum_method = db.__getattr__("sum")
+    sum_method = getattr(db, "sum")
     assert isinstance(sum_method, SubscriptableMethod)
 
     result = sum_method(axis=1, process_kwargs={"non_data_output": "acc"}).read()
@@ -358,9 +369,11 @@ def test_db_getattr_psr(test_db_psr):
 
     pd.testing.assert_series_equal(result, expected)
 
-    columns = db.__getattr__("columns")
+    columns = getattr(db, "columns")
     assert isinstance(columns, pd.Index)
     assert list(columns) == ["a", "b"]
+
+    assert getattr(db, "attrs") == {}
 
 
 def test_db_getattr_raises_underscore(test_db_pd):
@@ -375,6 +388,21 @@ def test_db_getattr_raises_invalid_type():
     db = _DataBundle(data=Dummy())
     with pytest.raises(TypeError, match="expected DataFrame or ParquetStreamReader"):
         getattr(db, "some_attr")
+
+
+def test_db_getattr_raises_empty(test_db_psr):
+    db = test_db_psr.copy()
+    db.read()
+
+    with pytest.raises(
+        ValueError, match="Cannot access attribute on empty data stream."
+    ):
+        getattr(db, "some_attr")
+
+
+def test_db_getattr_raises_invalid_attr(test_db_psr):
+    with pytest.raises(AttributeError, match="DataFrame chunk has no attribute"):
+        getattr(test_db_psr, "invalid_attr")
 
 
 def test_db_repr_pd(test_db_pd):
