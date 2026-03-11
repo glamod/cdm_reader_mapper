@@ -69,12 +69,7 @@ def reader_method(DataBundle, data, attr, *args, process_kwargs={}, **kwargs):
         attr_obj = getattr(df, attr)
 
         # Use the 'method' helper to execute it (call or subscript)
-        result = method(attr_obj, *args, **kwargs)
-
-        # If the operation was inplace on the DataFrame (returns None), yield the modified DataFrame itself.
-        if result is None:
-            return df
-        return result
+        return method(attr_obj, *args, **kwargs)
 
     # Process stream using Disk-Backed Parquet Engine
     result_tuple = process_disk_backed(
@@ -83,6 +78,8 @@ def reader_method(DataBundle, data, attr, *args, process_kwargs={}, **kwargs):
         makecopy=False,
         **process_kwargs,
     )
+    if result_tuple is None:
+        return None
 
     # The result is a tuple: (ParquetStreamReader, [extra_outputs])
     new_reader = result_tuple[0]
@@ -239,7 +236,7 @@ class _DataBundle:
 
             try:
                 first_chunk = data.get_chunk()
-            except ValueError:
+            except (StopIteration, ValueError):
                 raise ValueError("Cannot access attribute on empty data stream.")
 
             if not hasattr(first_chunk, attr):
