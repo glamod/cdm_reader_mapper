@@ -46,6 +46,10 @@ Breaking changes
 * `ParquetStreamReader.empty` now is a property not a class method (:pull:`379`)
 * `cdm_mapper.utils.mapping_functions.string_add` does no longer have parameters `zfill_col` and `zfill` (:oull:`383`)
 
+Bug fixes
+^^^^^^^^^
+* replace "ICOADS-30-" with "ICOADS-300-" in `icoads_r300` mapping tables (:issue:`385`, :pull:`386`)
+
 Internal changes
 ^^^^^^^^^^^^^^^^
 * re-work internal structure for more readability and better performance (:pull:`360`)
