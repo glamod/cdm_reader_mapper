@@ -462,10 +462,71 @@ def test_correct_dt_pass():
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
+def test_correct_dt_no_correction():
+    data = pd.DataFrame(
+        {
+            YR: [1899, 1900, 1899],
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    result = _correct_dt(
+        data.copy(),
+        data_model="icoads",
+        dck="201",
+        correction_method={},
+    )
+
+    pd.testing.assert_frame_equal(data, result)
+
+
 def test_correct_dt_typeerror():
     series = pd.Series([1898, 1900, 1899])
     with pytest.raises(TypeError, match="pd.Series is not supported now."):
         _correct_dt(series, data_model="icoads", dck="201", correction_method={})
+
+
+def test_correct_dt_attributeerror():
+    data = pd.DataFrame(
+        {
+            YR: [1899, 1900, 1899],
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    correction_method = {"201": {"function": "invalid_function"}}
+
+    with pytest.raises(AttributeError, match="not found"):
+        _correct_dt(
+            data.copy(),
+            data_model="icoads",
+            dck="201",
+            correction_method=correction_method,
+        )
+
+
+def test_correct_dt_runtimeerror():
+    invalid_data = pd.DataFrame(
+        {
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    correction_method = {"201": {"function": "dck_201_icoads"}}
+
+    with pytest.raises(RuntimeError, match="could not be executed"):
+        _correct_dt(
+            invalid_data,
+            data_model="icoads",
+            dck="201",
+            correction_method=correction_method,
+        )
 
 
 def test_correct_pt_fillna():
@@ -527,7 +588,7 @@ def test_correct_pt_function():
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
-def test_correct_pt_no_fix_for_deck():
+def test_correct_pt_no_correction():
     pt_col = "PT"
     data = pd.DataFrame({pt_col: ["1", None, "3"]})
 
@@ -560,7 +621,7 @@ def test_correct_pt_missing_platform_column():
     pd.testing.assert_frame_equal(result, data)
 
 
-def test_correct_pt_raises_unknown_method():
+def test_correct_pt_valueerror_not_implemented():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"201": {"method": "not_a_method"}}
@@ -575,7 +636,13 @@ def test_correct_pt_raises_unknown_method():
         )
 
 
-def test_correct_pt_fillna_missing_fillvalue():
+def test_correct_pt_typeerror():
+    series = pd.Series(["1", "2"])
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        _correct_pt(series, imodel="icoads", dck="201", pt_col="PT", fix_methods={})
+
+
+def test_correct_pt_valuerror_fillvalue():
     data = pd.DataFrame({"PT": ["1", None]})
 
     fix_methods = {"201": {"method": "fillna"}}
@@ -590,7 +657,7 @@ def test_correct_pt_fillna_missing_fillvalue():
         )
 
 
-def test_correct_pt_missing_function_name():
+def test_correct_pt_valueerror_no_function_name():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"700": {"method": "function"}}
@@ -605,7 +672,7 @@ def test_correct_pt_missing_function_name():
         )
 
 
-def test_correct_pt_missing_function_object():
+def test_correct_pt_valueerror_no_function_found():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"700": {"method": "function", "function": "NO_SUCH_FUNC"}}
@@ -621,7 +688,7 @@ def test_correct_pt_missing_function_object():
 
 
 @pytest.mark.parametrize(
-    "data_input,expected",
+    "data,expected",
     [
         (
             pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}),
@@ -633,11 +700,9 @@ def test_correct_pt_missing_function_object():
         ),
     ],
 )
-def test_correct_datetime(data_input, expected):
-    result = correct_datetime(
-        data_input.copy(), "icoads_r300_d201", log_level="CRITICAL"
-    )
-    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+def test_correct_datetime_pd(data, expected):
+    result = correct_datetime(data.copy(), "icoads_r300_d201", log_level="CRITICAL")
+    pd.testing.assert_frame_equal(result, expected)
 
 
 def test_correct_datetime_psr():
@@ -652,19 +717,33 @@ def test_correct_datetime_psr():
     pd.testing.assert_frame_equal(result, expected)
 
 
+def test_correct_datetime_pd_no_correction_no_deck():
+    data = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+    result = correct_datetime(data, "icoads_r300")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_datetime_pd_no_correction_false_deck():
+    data = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+    result = correct_datetime(data, "icoads_r302_d992")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
 @pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
-def test_correct_datetime_invalid_data(data):
+def test_correct_datetime_pd_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_datetime(data, "icoads_r300_d201")
 
 
-def test_correct_datetime_series():
+def test_correct_datetime_pd_series():
     with pytest.raises(TypeError, match="pd.Series is not supported now."):
         correct_datetime(pd.Series([1, 2, 3]), "icoads_r300_d201")
 
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2)])
-def test_correct_datetime_invalid_iterable_entries(data):
+def test_correct_datetime_pd_invalid_iterable_entries(data):
     with pytest.raises(
         TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
     ):
@@ -715,8 +794,7 @@ def test_correct_datetime_valid_iterable():
         ),
     ],
 )
-def test_correct_pt_dataframe(data_input, imodel, expected):
-    """Test correct_pt with DataFrame input."""
+def test_correct_pt_pd(data_input, imodel, expected):
     result = correct_pt(data_input.copy(), imodel, log_level="CRITICAL")
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
@@ -758,12 +836,12 @@ def test_correct_pt_psr(data_input, imodel, expected):
 
 
 @pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
-def test_correct_pt_invalid_data(data):
+def test_correct_pt_pd_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_pt(data, "icoads_r300_d993")
 
 
-def test_correct_pt_series():
+def test_correct_pt_pd_series():
     with pytest.raises(TypeError, match="pd.Series is not supported now."):
         correct_pt(pd.Series([1, 2, 3]), "icoads_r300_d993")
 
@@ -791,6 +869,20 @@ def test_correct_pt_valid_iterable():
 
     exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
     pd.testing.assert_frame_equal(result.read(), exp)
+
+
+def test_correct_pt_pd_no_correction_no_deck():
+    data = pd.DataFrame({PT: [None, "7", None]})
+    result = correct_pt(data, "icoads_r300")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_pt_pd_no_correction_false_deck():
+    data = pd.DataFrame({PT: [None, "7", None]})
+    result = correct_pt(data, "icoads_r300_d701")
+
+    pd.testing.assert_frame_equal(result, data)
 
 
 def test_get_id_col_not_defined():
