@@ -1,12 +1,12 @@
 {
   "observation_id": {
     "kwargs": {
-      "prepend": "ICOADS-30"
+      "prepend": "ICOADS-300"
     }
   },
   "report_id": {
     "kwargs": {
-      "prepend": "ICOADS-30"
+      "prepend": "ICOADS-300"
     }
   },
   "source_id": {

@@ -57,10 +57,10 @@ def data_header_expected():
     return pd.DataFrame(
         data={
             ("header", "report_id"): [
-                "ICOADS-30-5012",
-                "ICOADS-30-8960",
-                "ICOADS-30-0037",
-                "ICOADS-30-1000",
+                "ICOADS-300-5012",
+                "ICOADS-300-8960",
+                "ICOADS-300-0037",
+                "ICOADS-300-1000",
             ],
             ("header", "duplicate_status"): ["4", "4", "4", "4"],
             ("header", "platform_type"): ["2", "33", "32", "45"],
@@ -352,7 +352,12 @@ def test_extract_input_data_empty():
         ("platform_type", ["2", "33", "32", "45"]),
         (
             "report_id",
-            ["ICOADS-30-5012", "ICOADS-30-8960", "ICOADS-30-0037", "ICOADS-30-1000"],
+            [
+                "ICOADS-300-5012",
+                "ICOADS-300-8960",
+                "ICOADS-300-0037",
+                "ICOADS-300-1000",
+            ],
         ),
         ("location_quality", ["2", "0", "0", "0"]),
         ("latitude", [None, None, None, None]),
