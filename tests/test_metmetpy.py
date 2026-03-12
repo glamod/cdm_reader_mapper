@@ -79,37 +79,44 @@ def test_icoads_to_datetime_basis():
         }
     )
 
-    dt = icoads(df, "to_datetime")
+    result = icoads(df, "to_datetime")
 
-    assert isinstance(dt, pd.Series)
-    assert dt.dtype == "datetime64[ns]"
-
-    assert dt.iloc[0].year == 2000
-    assert dt.iloc[0].month == 1
-    assert dt.iloc[0].day == 10
-    assert dt.iloc[0].hour == 12
-    assert dt.iloc[0].minute == 30
-
-    assert dt.iloc[1].hour == 6
-    assert dt.iloc[1].minute == 15
+    expected = pd.Series(
+        pd.to_datetime(
+            [
+                "2000-01-10 12:30:00",
+                "2001-02-15 06:15:00",
+            ]
+        )
+    )
+    pd.testing.assert_series_equal(result, expected)
 
 
 def test_icoads_to_datetime_missing_values():
     df = pd.DataFrame(
         {
-            YR: [2000, None, 2002],
-            MO: [1, 2, 3],
-            DY: [10, None, 20],
-            HR: [12.5, None, 18.75],
+            YR: [2000, None, 2001],
+            MO: [1, 2, 2],
+            DY: [10, None, 15],
+            HR: [12.5, None, 6.25],
         }
     )
 
-    dt = icoads(df, "to_datetime")
+    result = icoads(df, "to_datetime")
 
-    assert dt.isna().tolist() == [False, True, False]
+    expected = pd.Series(
+        pd.to_datetime(
+            [
+                "2000-01-10 12:30:00",
+                None,
+                "2001-02-15 06:15:00",
+            ]
+        )
+    )
+    pd.testing.assert_series_equal(result, expected)
 
 
-def test_icoads_from_datetime():
+def test_icoads_from_datetime_basis():
     ds = pd.Series(
         [
             pd.Timestamp("2000-01-10 12:30"),
@@ -118,17 +125,21 @@ def test_icoads_from_datetime():
         ]
     )
 
-    df = icoads(ds, "from_datetime")
+    result = icoads(ds, "from_datetime")
 
-    assert list(df.columns) == [YR, MO, DY, HR]
+    expected = pd.DataFrame(
+        {
+            YR: [2000, 2001, 2002],
+            MO: [1, 2, 3],
+            DY: [10, 15, 20],
+            HR: [12.5, 6.25, 18.75],
+        },
+        dtype=object,
+    )
+    pd.testing.assert_frame_equal(result, expected)
 
-    assert df.loc[0, YR] == 2000
-    assert df.loc[0, MO] == 1
-    assert df.loc[0, DY] == 10
-    assert abs(df.loc[0, HR] - 12.5) < 1e-6
 
-
-def test_icoads_roundtrip():
+def test_icoads_both_datetime():
     df_in = pd.DataFrame(
         {
             YR: [2000, 2001],
@@ -144,7 +155,7 @@ def test_icoads_roundtrip():
     pd.testing.assert_frame_equal(df_in, df_out, check_dtype=False)
 
 
-def test_icoads_invalid_conversion():
+def test_icoads_valueerror():
     df = pd.DataFrame(
         {
             YR: [2000],
@@ -154,29 +165,38 @@ def test_icoads_invalid_conversion():
         }
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="conversion must be one of {'to_datetime','from_datetime'}"
+    ):
         icoads(df, "bad_conversion.")
 
 
-def test_icoads_from_datetime_wrong_input_type():
-    df = pd.DataFrame(
-        {
-            YR: [2000],
-            MO: [1],
-            DY: [10],
-            HR: [12.5],
-        }
-    )
+def test_icoads_from_datetime_typeerror():
+    df = pd.DataFrame([pd.Timestamp(2000)])
 
-    with pytest.raises(ValueError):
-        icoads(df, "from_datetime.")
+    with pytest.raises(TypeError):
+        icoads(df, "from_datetime")
 
 
-def test_icoads_to_datetime_wrong_input_type():
-    s = pd.Series([pd.Timestamp("200-01-01")])
+def test_icoads_to_datetime_typeerror():
+    s = pd.Series([pd.Timestamp("2000-01-01")])
 
     with pytest.raises(TypeError):
         icoads(s, "to_datetime")
+
+
+def test_icoads_to_datetime_false_date_columns():
+    df = pd.DataFrame(
+        {
+            "YR": [2000, 2001],
+            "MO": [1, 2],
+            "DY": [10, 15],
+            "HR": [12.5, 6.25],
+        }
+    )
+    result = icoads(df, "to_datetime")
+
+    pd.testing.assert_series_equal(result, pd.Series(dtype="datetime64[ns]"))
 
 
 def test_icoads_to_datetime_missing_columns():
@@ -184,9 +204,7 @@ def test_icoads_to_datetime_missing_columns():
 
     result = icoads(df, "to_datetime")
 
-    assert isinstance(result, pd.Series)
-    assert result.dtype == "datetime64[ns]"
-    assert result.isna().all()
+    pd.testing.assert_series_equal(result, pd.Series(pd.to_datetime([None])))
 
 
 def test_icoads_from_datetime_empty_series():
@@ -208,23 +226,29 @@ def test_to_datetime_basis():
         }
     )
 
-    dt = to_datetime(df)
+    result = to_datetime(df)
 
-    assert isinstance(dt, pd.Series)
-    assert dt.dtype == "datetime64[ns]"
+    expected = pd.Series(pd.to_datetime(["2000-01-10 12:30:00", "2001-02-15 06:15:00"]))
 
-    assert dt.iloc[0].year == 2000
-    assert dt.iloc[0].month == 1
-    assert dt.iloc[0].day == 10
-    assert dt.iloc[0].hour == 12
-    assert dt.iloc[0].minute == 30
+    pd.testing.assert_series_equal(result, expected)
 
-    assert dt.iloc[1].hour == 6
-    assert dt.iloc[1].minute == 15
+
+def test_to_datetime_no_correction():
+    df = pd.DataFrame(
+        {
+            YR: [2000, 2001],
+            MO: [1, 2],
+            DY: [10, 15],
+            HR: [12.5, 6.25],
+        }
+    )
+
+    result = to_datetime(df, model="no_model")
+    pd.testing.assert_frame_equal(result, df)
 
 
 def test_from_datetime_basis():
-    ds = pd.Series(
+    df = pd.Series(
         [
             pd.Timestamp("2000-01-10 12:30"),
             pd.Timestamp("2001-02-15 06:15"),
@@ -232,14 +256,31 @@ def test_from_datetime_basis():
         ]
     )
 
-    df = from_datetime(ds)
+    result = from_datetime(df)
 
-    assert list(df.columns) == [YR, MO, DY, HR]
+    expected = pd.DataFrame(
+        {
+            YR: [2000, 2001, 2002],
+            MO: [1, 2, 3],
+            DY: [10, 15, 20],
+            HR: [12.5, 6.25, 18.75],
+        },
+        dtype=object,
+    )
+    pd.testing.assert_frame_equal(result, expected)
 
-    assert df.loc[0, YR] == 2000
-    assert df.loc[0, MO] == 1
-    assert df.loc[0, DY] == 10
-    assert abs(df.loc[0, HR] - 12.5) < 1e-6
+
+def test_from_datetime_no_correction():
+    df = pd.Series(
+        [
+            pd.Timestamp("2000-01-10 12:30"),
+            pd.Timestamp("2001-02-15 06:15"),
+            pd.Timestamp("2002-03-20 18:45"),
+        ]
+    )
+
+    result = from_datetime(df, model="no_model")
+    pd.testing.assert_series_equal(result, df)
 
 
 def test_dck_201_icoads():
