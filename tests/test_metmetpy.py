@@ -1015,7 +1015,7 @@ def test_get_patterns_empty_and_blank_true():
         ),
     ],
 )
-def test_validate_id_dataframe(data_input, imodel, blank, expected):
+def test_validate_id_df(data_input, imodel, blank, expected):
     result = validate_id(data_input.copy(), imodel, blank=blank, log_level="CRITICAL")
     pd.testing.assert_series_equal(result, expected, check_dtype=False)
 
@@ -1029,6 +1029,34 @@ def test_validate_id_psr():
     expected = pd.Series([True, False, True])
 
     pd.testing.assert_series_equal(result.read(), expected)
+
+
+def test_validate_id_valueerror_no_deck():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="has no deck information"):
+        validate_id(data, "icoads")
+
+
+def test_validate_id_filenotfounderror():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(FileNotFoundError, match="has no ID deck library"):
+        validate_id(data, "icoads_r302_d992")
+
+
+def test_validate_id_valueerror_invalid_deck():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="not defined in file"):
+        validate_id(data, "icoads_r300_d200")
+
+
+def test_validate_id_valueerror_no_columns():
+    data = pd.DataFrame({"ID": ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="No ID columns found."):
+        validate_id(data, "icoads_r300_d201")
 
 
 @pytest.mark.parametrize(
@@ -1084,3 +1112,11 @@ def test_validate_datetime_psr(data_input, expected):
     psr = ParquetStreamReader(data_input)
     result = validate_datetime(psr, "icoads", log_level="CRITICAL")
     pd.testing.assert_series_equal(result.read(), expected)
+
+
+def test_validate_datetime_valueerror():
+    data = pd.DataFrame(
+        {"YR": [2023, 2023], "MO": [1, 1], "DY": [1, 2], "HR": [12, 13]}
+    )
+    with pytest.raises(ValueError, match="No columns found for datetime conversion"):
+        validate_datetime(data, "icoads")
