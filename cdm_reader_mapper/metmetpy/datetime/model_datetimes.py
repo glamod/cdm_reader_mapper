@@ -76,8 +76,6 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
             return pd.Series(dtype="datetime64[ns]")
 
         dt_data = df[[col for col in datetime_cols if col in df.columns]].copy()
-        if dt_data.empty:
-            return pd.Series(pd.NaT, index=df.index, dtype="datetime64[ns]")
 
         valid = dt_data.notna().all(axis=1)
 

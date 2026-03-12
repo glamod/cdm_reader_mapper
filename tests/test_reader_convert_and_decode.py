@@ -93,6 +93,18 @@ def test_base36_preserves_boolean():
     assert result.tolist() == [True, False, "10"]
 
 
+def test_base36_decoding_raises():
+    decoder = Decoders(dtype="invalid_dtype")
+
+    with pytest.raises(KeyError, match="No converter registered"):
+        decoder.decoder()
+
+
+def test_utf8_decoding_basic(sample_series):
+    dec = Decoders(dtype="key", encoding="utf-8")
+    assert dec.decoder() is None
+
+
 def test_converter_numeric(numeric_series):
     conv = Converters(dtype=next(iter(numeric_types)))
     func = conv.converter()
@@ -133,13 +145,22 @@ def test_object_to_object_strip():
     assert result.tolist() == ["a", None, None, "b"]
 
 
-def test_object_to_object_disable_strip():
+def test_object_to_object_disable_lstrip():
     conv = Converters(dtype="object")
     series = pd.Series([" a ", "b "])
 
     result = conv.object_to_object(series, disable_white_strip="l")
 
     assert result.tolist() == [" a", "b"]
+
+
+def test_object_to_object_disable_rstrip():
+    conv = Converters(dtype="object")
+    series = pd.Series([" a ", "b "])
+
+    result = conv.object_to_object(series, disable_white_strip="r")
+
+    assert result.tolist() == ["a ", "b "]
 
 
 def test_object_to_datetime():

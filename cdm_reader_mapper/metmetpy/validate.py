@@ -129,11 +129,9 @@ def _get_patterns(
 def _validate_id(data, mrd, combined_compiled, na_values):
     """Helper function to validate ID."""
     id_col = _get_id_col(data, mrd[0])
-    if id_col is None:
-        raise ValueError("No ID conversion columns found.")
 
     id_series = data[id_col]
-
+    id_series = id_series.rename(None)
     return id_series.str.match(combined_compiled, na=na_values)
 
 

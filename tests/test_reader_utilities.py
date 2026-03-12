@@ -3,7 +3,6 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from io import StringIO
 from pathlib import Path
 
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
@@ -25,21 +24,14 @@ from cdm_reader_mapper.mdf_reader.utils.utilities import (
 from cdm_reader_mapper.common.iterators import (
     ParquetStreamReader,
     process_disk_backed,
-    parquet_stream_from_iterable,
 )
 
 
-def make_parser(text: str, chunksize: int = 1) -> pd.io.parsers.TextFileReader:
-    """Helper: create a TextFileReader similar to user code."""
-    buffer = StringIO(text)
-    return pd.read_csv(buffer, chunksize=chunksize)
-
-
 @pytest.fixture
-def sample_reader() -> pd.io.parsers.TextFileReader:
-    buffer = StringIO("A,B\n1,2\n3,4\n")
-    reader = pd.read_csv(buffer, chunksize=1)
-    return parquet_stream_from_iterable(reader)
+def sample_psr() -> ParquetStreamReader:
+    df1 = pd.DataFrame({"A": [1], "B": [2]}, index=[0])
+    df2 = pd.DataFrame({"A": [3], "B": [4]}, index=[1])
+    return ParquetStreamReader([df1, df2])
 
 
 @pytest.fixture
@@ -251,8 +243,8 @@ def test_remove_boolean_values():
     assert result["B"].dtype.name == "int64"
 
 
-def test_process_textfilereader_basic(sample_reader):
-    reader_out, extra_out = process_disk_backed(sample_reader, sample_func)
+def test_process_psr_basic(sample_psr):
+    reader_out, extra_out = process_disk_backed(sample_psr, sample_func)
     assert isinstance(reader_out, ParquetStreamReader)
 
     chunk1 = reader_out.get_chunk()
@@ -270,8 +262,8 @@ def test_process_textfilereader_basic(sample_reader):
         reader_out.get_chunk()
 
 
-def test_process_textfilereader_only_df(sample_reader):
-    reader_out, extra_out = process_disk_backed(sample_reader, sample_func_only_df)
+def test_process_psr_only_df(sample_psr):
+    reader_out, extra_out = process_disk_backed(sample_psr, sample_func_only_df)
     assert isinstance(reader_out, ParquetStreamReader)
 
     chunk1 = reader_out.get_chunk()
@@ -285,10 +277,8 @@ def test_process_textfilereader_only_df(sample_reader):
     assert extra_out == {}
 
 
-def test_process_textfilereader_makecopy_flag(sample_reader):
-    reader_out, extra_out = process_disk_backed(
-        sample_reader, sample_func, makecopy=True
-    )
+def test_process_psr_makecopy_flag(sample_psr):
+    reader_out, extra_out = process_disk_backed(sample_psr, sample_func, makecopy=True)
     assert isinstance(reader_out, ParquetStreamReader)
 
     chunk1 = reader_out.get_chunk()

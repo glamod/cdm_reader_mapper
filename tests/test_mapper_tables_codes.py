@@ -144,6 +144,7 @@ def test_get_cdm_atts_invalid():
         ("icoads", []),
         ("icoads", None),
         ("icoads_r302", ["observations-at"]),
+        ("icoads_r302", "observations-at"),
     ],
 )
 def test_get_imodel_maps(dataset, cdm_tables):

@@ -290,6 +290,8 @@ def read_tables(
                 **kwargs,
             )
         ]
+        if df_list[0].empty:
+            df_list = []
     elif os.path.isdir(source):
         df_list = _read_multiple_files(
             source,

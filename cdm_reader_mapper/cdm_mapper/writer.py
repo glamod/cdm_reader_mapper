@@ -39,7 +39,7 @@ from ..properties import SupportedFileTypes
 
 def _table_to_file(
     data: pd.DataFrame,
-    filename=None,
+    filename: str,
     data_format: SupportedFileTypes = "csv",
     delimiter: str = "|",
     encoding: str = "utf-8",
