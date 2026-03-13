@@ -3,9 +3,9 @@
 Changelog
 =========
 
-2.2.2 (unreleased)
+2.3.0 (2026-03-12)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -44,7 +44,7 @@ Breaking changes
 * move `ParquetStreamReader` and all corresponding methods to `common.iterables` to handle chunking outside of `mdf_reader`/`cdm_mapper`/`core`/`metmetpy` (:issue:`349`, :pull:`348`)
 * `cdm_mapper.read_tables`: if "suffix" is None no suffix is selected instead of the wildcard "*" (:pull:`379`)
 * `ParquetStreamReader.empty` now is a property not a class method (:pull:`379`)
-* `cdm_mapper.utils.mapping_functions.string_add` does no longer have parameters `zfill_col` and `zfill` (:oull:`383`)
+* `cdm_mapper.utils.mapping_functions.string_add` does no longer have parameters `zfill_col` and `zfill` (:pull:`383`)
 
 Bug fixes
 ^^^^^^^^^
