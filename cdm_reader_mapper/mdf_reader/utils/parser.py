@@ -490,6 +490,7 @@ def build_parser_config(
             disable_reads.append(order)
 
         element_specs: dict[str, dict[str, Any]] = {}
+        # nn = "AAAA"
         for name, meta in elements.items():
             index = _get_index(name, order, olength)
             ignore = _get_ignore(meta)
@@ -507,6 +508,16 @@ def build_parser_config(
                 continue
 
             ctype = _convert_dtype_to_default(meta.get("column_type"))
+
+            # if name == nn:
+            #    print(meta)
+            #    print(ctype)
+            #    exit()
+            print("-------------------------")
+            print(name)
+            print(meta)
+            print(ctype)
+
             dtype = properties.pandas_dtypes.get(ctype)
             if dtype is not None:
                 dtypes[index] = dtype
