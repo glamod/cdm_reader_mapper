@@ -479,7 +479,7 @@ def map_model(
 
     if isinstance(result, (pd.DataFrame, ParquetStreamReader)):
         result = pd.DataFrame(result) if isinstance(result, pd.DataFrame) else result
-        result.attrs["columns"] = columns
+        result._attrs = {"columns": columns}
         return result
 
     raise ValueError(

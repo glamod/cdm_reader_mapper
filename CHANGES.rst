@@ -3,6 +3,15 @@
 Changelog
 =========
 
+2.3.1 (unpublished)
+-------------------
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+
+* `cdm_mapper.mapper.map_model`: write data columns to `df._attrs` instead of `df.attrs` to avoid crashing class methods (:issue:`390`, :pull:`391`)
+
 2.3.0 (2026-03-12)
 ------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Jan Marius Willruth (:user:`JanWillruth`)
