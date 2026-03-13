@@ -806,7 +806,7 @@ class DataBundle(_DataBundle):
         db_ = self._get_db(inplace)
         _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
-        db_._columns = _tables.attrs["columns"]
+        db_._columns = _tables._attrs["columns"]
         db_._data = _tables
         return self._return_db(db_, inplace)
 
