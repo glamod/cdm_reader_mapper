@@ -490,7 +490,6 @@ def build_parser_config(
             disable_reads.append(order)
 
         element_specs: dict[str, dict[str, Any]] = {}
-        # nn = "AAAA"
         for name, meta in elements.items():
             index = _get_index(name, order, olength)
             ignore = _get_ignore(meta)
