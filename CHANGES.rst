@@ -5,7 +5,12 @@ Changelog
 
 2.3.1 (unpublished)
 -------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Jan Marius Willruth (:user:`JanWillruth`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Update and rename GDAC variable names and code tables to align with current standards. (:issue:`341`, :pull:`350`)
 
 Bug fixes
 ^^^^^^^^^

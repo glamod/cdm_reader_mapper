@@ -10,14 +10,14 @@
   "secondary_variable": {},
   "observation_value": {
     "elements": [
-      "sgnTdTdTd",
+      "snTdTdTd",
       "TdTdTd"
     ],
     "transform": "temperature_celsius_to_kelvin",
     "decimal_places": 2
   },
   "secondary_value": {
-    "elements": "sgnTdTdTd",
+    "elements": "snTdTdTd",
     "code_table": "T_sign"
   },
   "units": {

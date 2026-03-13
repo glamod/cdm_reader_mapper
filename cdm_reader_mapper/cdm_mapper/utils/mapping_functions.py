@@ -891,9 +891,10 @@ class mapping_functions:
         if method == "method_a":
             result = df + 273.15
         if method == "method_b":
-            df.iloc[:, 0] = np.where((df.iloc[:, 0] == 0) | (df.iloc[:, 0] == 5), 1, -1)
-            result = df.iloc[:, 0] * df.iloc[:, 1] + 273.15
-
+            result = (
+                np.where(df.iloc[:, 0].isin(["0", "5"]), df.iloc[:, 1], -df.iloc[:, 1])
+                + 273.15
+            )
         if isinstance(result, pd.DataFrame):
             result = result.iloc[:, 0]
         return pd.Series(result, dtype=float)
