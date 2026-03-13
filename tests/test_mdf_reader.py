@@ -175,6 +175,16 @@ def test_read_mdf_test_data_select(data_model, kwargs, select):
 @pytest.mark.parametrize(
     "data_model, kwargs, drop",
     [
+        ("icoads_r300_d714", {"excludes": ["c98"]}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": "c98"}, ["c98"]),
+        ("icoads_r300_d714", {"excludes": ["c5", "c98"]}, ["c5", "c98"]),
+        ("icoads_r300_mixed", {"excludes": ["c99"], "encoding": "cp1252"}, ["c99"]),
+        ("icoads_r300_mixed", {"excludes": "c99", "encoding": "cp1252"}, ["c99"]),
+        (
+            "craid",
+            {"excludes": ["drifter_measurements", "drifter_history"]},
+            ["drifter_measurements", "drifter_history"],
+        ),
         ("gdac", {"excludes": "AAAA"}, ["AAAA"]),
     ],
 )
