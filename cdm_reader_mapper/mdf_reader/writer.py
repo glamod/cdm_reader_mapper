@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-from io import StringIO as StringIO
 from pathlib import Path
 from typing import Iterable, get_args
 
@@ -125,7 +124,7 @@ def write_data(
             f"data_format must be one of {supported_file_types}, not {data_format}."
         )
 
-    if mask is not None and not isinstance(data, type(mask)):
+    if mask is not None and not isinstance(mask, type(data)):
         raise ValueError("type of 'data' and type of 'mask' do not match.")
 
     extension = extension or data_format

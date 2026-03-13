@@ -233,6 +233,14 @@ def test_process_data_netcdf(reader_xr, fake_xr_dataset, fake_out_dataset):
     assert mask.all().all()
 
 
+def test_process_data_raises(reader_pd):
+    with pytest.raises(ValueError, match="parse_mode must be 'pandas' or 'netcdf'"):
+        reader_pd._process_data(
+            pd.DataFrame(),
+            parse_mode="invalid_mode",
+        )
+
+
 def test_open_data_pandas(reader_pd, fake_pandas_df_file, fake_out_dataset):
     data, mask, config = reader_pd.open_data(
         fake_pandas_df_file,
@@ -267,6 +275,14 @@ def test_open_data_netcdf(reader_xr, fake_xr_dataset_file, fake_out_dataset):
     assert_index_equal(data.columns, config.columns)
 
     assert mask.all().all()
+
+
+def test_open_data_raises(reader_pd, fake_pandas_df_file):
+    with pytest.raises(ValueError, match="open_with must be 'pandas' or 'netcdf'"):
+        reader_pd.open_data(
+            fake_pandas_df_file,
+            open_with="invalid_mode",
+        )
 
 
 def test_read_pandas(reader_pd, fake_pandas_df_file, dtypes, fake_out_dataset):

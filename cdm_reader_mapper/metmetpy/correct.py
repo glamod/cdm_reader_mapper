@@ -294,11 +294,6 @@ def correct_pt(
     fix_methods = combine_dicts(fix_files, base=_base)
     pt_col = properties.metadata_datamodels["platform"].get(mrd[0])
 
-    if not pt_col:
-        raise ValueError(
-            f"Data model {imodel} platform column not defined in properties file."
-        )
-
     return ProcessFunction(
         data=data,
         func=_correct_pt,

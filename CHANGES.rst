@@ -3,9 +3,9 @@
 Changelog
 =========
 
-2.2.2 (unreleased)
+2.3.0 (2026-03-12)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,6 +24,8 @@ New features and enhancements
 * ``test_data``: add MAROB test data (:pull:`370`)
 * ``mdf_reader.read_data``: new parameter "delimiter" (:pull:`370`)
 * ``cdm_mapper.map_model``'s output now has attribute "attrs" where columns are stored (:pull:`379`)
+* `ParquetStreamReader` now support item assignment (:pull:`383`)
+* `ParquetStreamReader` now works with both list and tuple as input data (:pull:`383`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -42,6 +44,11 @@ Breaking changes
 * move `ParquetStreamReader` and all corresponding methods to `common.iterables` to handle chunking outside of `mdf_reader`/`cdm_mapper`/`core`/`metmetpy` (:issue:`349`, :pull:`348`)
 * `cdm_mapper.read_tables`: if "suffix" is None no suffix is selected instead of the wildcard "*" (:pull:`379`)
 * `ParquetStreamReader.empty` now is a property not a class method (:pull:`379`)
+* `cdm_mapper.utils.mapping_functions.string_add` does no longer have parameters `zfill_col` and `zfill` (:pull:`383`)
+
+Bug fixes
+^^^^^^^^^
+* replace "ICOADS-30-" with "ICOADS-300-" in `icoads_r300` mapping tables (:issue:`385`, :pull:`386`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
@@ -50,6 +57,9 @@ Internal changes
 * `mdf_reader.utils.utilities.read_csv`: parameter `columns` to `column_names` (:pull:`363`)
 * introduce post-processing decorator that handles both `pd.DataFrame` and `ParquetStreamReader` (:pull:`348`)
 * `cdm_mapper.mapper._map_data_model` now returns a tuple of DataFrame and columns (:pull:`379`)
+* delete unused function `cdm_mapper.utils.mapping_functions.marob_location_quality` (:pull:`383`)
+* delete unreachable code snippets (:pull:`383`)
+* mainly increase test coverage (:issue:`365`, :pull:`383`)
 
 2.2.1 (2026-01-23)
 ------------------

@@ -3,15 +3,17 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from io import StringIO
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
+from cdm_reader_mapper.duplicates.duplicates import DupDetect
 
-from cdm_reader_mapper import DataBundle, read_data, test_data
+from cdm_reader_mapper import DataBundle
 
-
-def make_parser(text, **kwargs):
-    """Helper: create a TextFileReader similar to user code."""
-    buffer = StringIO(text)
-    return pd.read_csv(buffer, chunksize=2, **kwargs)
+YR = ("core", "YR")
+MO = ("core", "MO")
+DY = ("core", "DY")
+HR = ("core", "HR")
+PT = ("c1", "PT")
+ID = ("core", "ID")
 
 
 @pytest.fixture
@@ -32,25 +34,55 @@ def sample_db_df():
 
 
 @pytest.fixture
-def sample_db_reader():
-    text = "19,0\n26,1\n27,2\n41,3\n91,4"
-    reader_data = make_parser(text, names=["A", "B"])
-
-    text = "True,True\nTrue,True\nTrue,True\nFalse,False\nTrue,False"
-    reader_mask = make_parser(text, names=["A", "B"])
-
-    return DataBundle(data=reader_data, mask=reader_mask)
+def sample_db_df_multi():
+    data = pd.DataFrame(
+        {
+            ("A", "a"): [19, 26, 27, 41, 91],
+            ("B", "b"): [0, 1, 2, 3, 4],
+        }
+    )
+    mask = pd.DataFrame(
+        {
+            ("A", "a"): [True, True, True, False, True],
+            ("B", "b"): [True, True, True, False, False],
+        }
+    )
+    return DataBundle(data=data, mask=mask)
 
 
 @pytest.fixture
-def sample_db_reader_multi():
-    text = "19,0\n26,1\n27,2\n41,3\n91,4"
-    reader_data = make_parser(text, names=[("A", "a"), ("B", "b")])
+def sample_db_psr():
+    data1 = pd.DataFrame({"A": [19, 26], "B": [0, 1]}, index=[0, 1])
+    data2 = pd.DataFrame({"A": [27, 41, 91], "B": [2, 3, 4]}, index=[2, 3, 4])
+    data = ParquetStreamReader([data1, data2])
 
-    text = "True,True\nTrue,True\nTrue,True\nFalse,False\nTrue,False"
-    reader_mask = make_parser(text, names=["A", "B"])
+    mask1 = pd.DataFrame({"A": [True, True], "B": [True, True]}, index=[0, 1])
+    mask2 = pd.DataFrame(
+        {"A": [True, False, True], "B": [True, False, False]}, index=[2, 3, 4]
+    )
+    mask = ParquetStreamReader([mask1, mask2])
 
-    return DataBundle(data=reader_data, mask=reader_mask)
+    return DataBundle(data=data, mask=mask)
+
+
+@pytest.fixture
+def sample_db_psr_multi():
+    data1 = pd.DataFrame({("A", "a"): [19, 26], ("B", "b"): [0, 1]}, index=[0, 1])
+    data2 = pd.DataFrame(
+        {("A", "a"): [27, 41, 91], ("B", "b"): [2, 3, 4]}, index=[2, 3, 4]
+    )
+    data = ParquetStreamReader([data1, data2])
+
+    mask1 = pd.DataFrame(
+        {("A", "a"): [True, True], ("B", "b"): [True, True]}, index=[0, 1]
+    )
+    mask2 = pd.DataFrame(
+        {("A", "a"): [True, False, True], ("B", "b"): [True, False, False]},
+        index=[2, 3, 4],
+    )
+    mask = ParquetStreamReader([mask1, mask2])
+
+    return DataBundle(data=data, mask=mask)
 
 
 @pytest.fixture
@@ -63,32 +95,12 @@ def sample_mask():
     return pd.DataFrame({"C": [True, False, True, False, False]})
 
 
-@pytest.fixture
-def sample_db_df_testdata():
-    data_model = "icoads_r300_d714"
-    data = test_data[f"test_{data_model}"]["mdf_data"]
-    mask = test_data[f"test_{data_model}"]["mdf_mask"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-
-    return read_data(data_file=data, mask_file=mask, info_file=info)
-
-
-@pytest.fixture
-def sample_db_reader_testdata():
-    data_model = "icoads_r300_d714"
-    data = test_data[f"test_{data_model}"]["mdf_data"]
-    mask = test_data[f"test_{data_model}"]["mdf_mask"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-
-    return read_data(data_file=data, mask_file=mask, info_file=info, chunksize=2)
-
-
 def test_len_df(sample_db_df):
     assert len(sample_db_df) == 5
 
 
-def test_len_reader(sample_db_reader):
-    assert len(sample_db_reader) == 5
+def test_len_psr(sample_db_psr):
+    assert len(sample_db_psr) == 5
 
 
 def test_print_df(sample_db_df, capsys):
@@ -102,8 +114,8 @@ def test_print_df(sample_db_df, capsys):
         assert col in captured.out
 
 
-def test_print_reader(sample_db_reader, capsys):
-    print(sample_db_reader)
+def test_print_psr(sample_db_psr, capsys):
+    print(sample_db_psr)
 
     captured = capsys.readouterr()
 
@@ -117,10 +129,10 @@ def test_copy_df(sample_db_df):
     pd.testing.assert_frame_equal(sample_db_df.mask, db_cp.mask)
 
 
-def test_copy_reader(sample_db_reader):
-    db_cp = sample_db_reader.copy()
-    pd.testing.assert_frame_equal(sample_db_reader.data.read(), db_cp.data.read())
-    pd.testing.assert_frame_equal(sample_db_reader.mask.read(), db_cp.mask.read())
+def test_copy_psr(sample_db_psr):
+    db_cp = sample_db_psr.copy()
+    pd.testing.assert_frame_equal(sample_db_psr.data.read(), db_cp.data.read())
+    pd.testing.assert_frame_equal(sample_db_psr.mask.read(), db_cp.mask.read())
 
 
 def test_add_df(sample_db_df):
@@ -144,8 +156,8 @@ def test_add_df(sample_db_df):
     pd.testing.assert_frame_equal(db_add.mask, sample_mask)
 
 
-def test_add_reader_data(sample_db_reader):
-    sample_data = sample_db_reader.data
+def test_add_psr_data(sample_db_psr):
+    sample_data = sample_db_psr.data
 
     db = DataBundle()
     db_add = db.add({"data": sample_data})
@@ -153,8 +165,8 @@ def test_add_reader_data(sample_db_reader):
     pd.testing.assert_frame_equal(db_add.data.read(), sample_data.read())
 
 
-def test_add_reader_mask(sample_db_reader):
-    sample_mask = sample_db_reader.mask
+def test_add_psr_mask(sample_db_psr):
+    sample_mask = sample_db_psr.mask
 
     db = DataBundle()
     db_add = db.add({"mask": sample_mask})
@@ -162,9 +174,9 @@ def test_add_reader_mask(sample_db_reader):
     pd.testing.assert_frame_equal(db_add.mask.read(), sample_mask.read())
 
 
-def test_add_reader_both(sample_db_reader):
-    sample_data = sample_db_reader.data
-    sample_mask = sample_db_reader.mask
+def test_add_psr_both(sample_db_psr):
+    sample_data = sample_db_psr.data
+    sample_mask = sample_db_psr.mask
 
     db = DataBundle()
     db_add = db.add({"data": sample_data, "mask": sample_mask})
@@ -179,7 +191,7 @@ def test_stack_v_df(sample_db_df):
 
     db = DataBundle(data=sample_data, mask=sample_mask)
 
-    sample_db_df.stack_v(db)
+    sample_db_df.stack_v(db, inplace=True)
 
     expected_data = pd.concat([sample_data, db.data], ignore_index=True)
     expected_mask = pd.concat([sample_mask, db.mask], ignore_index=True)
@@ -188,14 +200,14 @@ def test_stack_v_df(sample_db_df):
     pd.testing.assert_frame_equal(sample_db_df.mask, expected_mask)
 
 
-def test_stack_v_reader(sample_db_reader):
-    sample_data = sample_db_reader.data
-    sample_mask = sample_db_reader.mask
+def test_stack_v_psr(sample_db_psr):
+    sample_data = sample_db_psr.data
+    sample_mask = sample_db_psr.mask
 
     db = DataBundle(data=sample_data, mask=sample_mask)
 
     with pytest.raises(ValueError):
-        sample_db_reader.stack_v(db)
+        sample_db_psr.stack_v(db)
 
 
 def test_stack_h_df(sample_db_df, sample_data, sample_mask):
@@ -203,20 +215,20 @@ def test_stack_h_df(sample_db_df, sample_data, sample_mask):
     expected_data = pd.concat([sample_db_df.data, db.data], axis=1)
     expected_mask = pd.concat([sample_db_df.mask, db.mask], axis=1)
 
-    sample_db_df.stack_h(db)
+    sample_db_df.stack_h(db, inplace=True)
 
     pd.testing.assert_frame_equal(sample_db_df.data, expected_data)
     pd.testing.assert_frame_equal(sample_db_df.mask, expected_mask)
 
 
-def test_stack_h_reader(sample_db_reader):
-    sample_data = sample_db_reader.data
-    sample_mask = sample_db_reader.mask
+def test_stack_h_psr(sample_db_psr):
+    sample_data = sample_db_psr.data
+    sample_mask = sample_db_psr.mask
 
     db = DataBundle(data=sample_data, mask=sample_mask)
 
     with pytest.raises(ValueError):
-        sample_db_reader.stack_h(db)
+        sample_db_psr.stack_h(db)
 
 
 @pytest.mark.parametrize(
@@ -276,8 +288,8 @@ def test_select_operators_df(
 )
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def test_select_operators_reader(
-    sample_db_reader,
+def test_select_operators_psr(
+    sample_db_psr,
     func,
     args,
     idx_exp,
@@ -285,12 +297,12 @@ def test_select_operators_reader(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_reader, func)(
+    result = getattr(sample_db_psr, func)(
         *args, reset_index=reset_index, inverse=inverse
     )
 
-    data = sample_db_reader.data.read()
-    mask = sample_db_reader.mask.read()
+    data = sample_db_psr.data.read()
+    mask = sample_db_psr.mask.read()
 
     selected_data = result.data.read()
     selected_mask = result.mask.read()
@@ -308,37 +320,6 @@ def test_select_operators_reader(
         expected_mask = expected_mask.reset_index(drop=True)
 
     pd.testing.assert_frame_equal(expected_data, selected_data)
-    pd.testing.assert_frame_equal(expected_mask, selected_mask)
-
-
-@pytest.mark.parametrize(
-    "func, args, idx_exp",
-    [
-        # ("select_where_all_true", [[0, 1, 2]], [3, 4]),
-        # ("select_where_all_false", [], [3], [0, 1, 2, 4]),
-        ("select_where_index_isin", [[0, 2, 4]], [0, 2, 4]),
-        # ("select_where_entry_isin", [{("core", "ID"): [25629, 26558]}], [1, 3]),
-    ],
-)
-def test_select_operators_testdata_reader(
-    sample_db_reader_testdata,
-    func,
-    args,
-    idx_exp,
-):
-    result = getattr(sample_db_reader_testdata, func)(*args)
-    data = sample_db_reader_testdata.data.read()
-    mask = sample_db_reader_testdata.mask.read()
-
-    selected_data = result.data.read()
-    selected_mask = result.mask.read()
-
-    idx = data.index.isin(idx_exp)
-
-    expected_data = data[idx]
-    expected_mask = mask[idx]
-
-    pd.testing.assert_frame_equal(expected_data, selected_data, check_dtype=False)
     pd.testing.assert_frame_equal(expected_mask, selected_mask)
 
 
@@ -409,8 +390,8 @@ def test_split_operators_df(
 )
 @pytest.mark.parametrize("reset_index", [False, True])
 @pytest.mark.parametrize("inverse", [False, True])
-def test_split_operators_reader(
-    sample_db_reader,
+def test_split_operators_psr(
+    sample_db_psr,
     func,
     args,
     idx_exp,
@@ -418,12 +399,12 @@ def test_split_operators_reader(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_reader, func)(
+    result = getattr(sample_db_psr, func)(
         *args, reset_index=reset_index, inverse=inverse
     )
 
-    data = sample_db_reader.data.read()
-    mask = sample_db_reader.mask.read()
+    data = sample_db_psr.data.read()
+    mask = sample_db_psr.mask.read()
 
     selected_data = result[0].data.read()
     selected_mask = result[0].mask.read()
@@ -454,11 +435,36 @@ def test_split_operators_reader(
     pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
 
 
-def test_split_by_index_multi(sample_db_reader_multi):
-    result = sample_db_reader_multi.split_by_column_entries({("A", "a"): [26, 41]})
+def test_split_by_index_df_multi(sample_db_df_multi):
+    result = sample_db_df_multi.split_by_column_entries({("A", "a"): [26, 41]})
 
-    data = sample_db_reader_multi.data.read()
-    mask = sample_db_reader_multi.mask.read()
+    data = sample_db_df_multi.data
+    mask = sample_db_df_multi.mask
+
+    selected_data = result[0].data
+    selected_mask = result[0].mask
+    rejected_data = result[1].data
+    rejected_mask = result[1].mask
+
+    idx1 = data.index.isin([1, 3])
+    idx2 = data.index.isin([0, 2, 4])
+
+    expected_data1 = data[idx1]
+    expected_data2 = data[idx2]
+    expected_mask1 = mask[idx1]
+    expected_mask2 = mask[idx2]
+
+    pd.testing.assert_frame_equal(expected_data1, selected_data)
+    pd.testing.assert_frame_equal(expected_data2, rejected_data)
+    pd.testing.assert_frame_equal(expected_mask1, selected_mask)
+    pd.testing.assert_frame_equal(expected_mask2, rejected_mask)
+
+
+def test_split_by_index_psr_multi(sample_db_psr_multi):
+    result = sample_db_psr_multi.split_by_column_entries({("A", "a"): [26, 41]})
+
+    data = sample_db_psr_multi.data.read()
+    mask = sample_db_psr_multi.mask.read()
 
     selected_data = result[0].data.read()
     selected_mask = result[0].mask.read()
@@ -484,12 +490,12 @@ def test_unique_df(sample_db_df):
     assert result == {"A": {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
-def test_unique_reader(sample_db_reader):
-    result = sample_db_reader.unique(columns=("A"))
+def test_unique_psr(sample_db_psr):
+    result = sample_db_psr.unique(columns=("A"))
     assert result == {"A": {19: 1, 26: 1, 27: 1, 41: 1, 91: 1}}
 
 
-def test_replace_columns(sample_db_df):
+def test_replace_columns_all_df(sample_db_df):
     df_corr = pd.DataFrame(
         {
             "A_new": [101, 201, 301, 401, 501],
@@ -498,7 +504,6 @@ def test_replace_columns(sample_db_df):
     )
     result = sample_db_df.replace_columns(
         df_corr,
-        subset=["B", "A"],
         rep_map={"A": "A_new"},
         pivot_l="B",
         pivot_r="B",
@@ -511,3 +516,344 @@ def test_replace_columns(sample_db_df):
     )
 
     pd.testing.assert_frame_equal(result.data, expected)
+
+
+def test_replace_columns_subset_df(sample_db_df):
+    df_corr = pd.DataFrame(
+        {
+            "A_new": [101, 201, 301, 401, 501],
+            "B": range(5),
+        }
+    )
+    result = sample_db_df.replace_columns(
+        df_corr,
+        subset=["A", "B"],
+        rep_map={"A": "A_new"},
+        pivot_l="B",
+        pivot_r="B",
+    )
+    expected = pd.DataFrame(
+        {
+            "A": [101, 201, 301, 401, 501],
+            "B": [0, 1, 2, 3, 4],
+        }
+    )
+
+    pd.testing.assert_frame_equal(result.data, expected)
+
+
+def test_replace_columns_all_psr(sample_db_psr):
+    df_corr = pd.DataFrame(
+        {
+            "A_new": [101, 201, 301, 401, 501],
+            "B": range(5),
+        }
+    )
+
+    with pytest.raises(TypeError, match="Data must be a pd.DataFrame or pd.Series"):
+        sample_db_psr.replace_columns(
+            df_corr,
+            rep_map={"A": "A_new"},
+            pivot_l="B",
+            pivot_r="B",
+        )
+
+
+def test_correct_datetime_df():
+    data = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+
+    db = DataBundle(
+        data=data,
+        imodel="icoads_r300_d201",
+    )
+
+    result = db.correct_datetime()
+    expected = pd.DataFrame({YR: [1898], MO: [12], DY: [31], HR: [0]})
+
+    pd.testing.assert_frame_equal(result.data, expected)
+
+
+def test_correct_datetime_psr():
+    df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+
+    db = DataBundle(
+        data=ParquetStreamReader([df1]),
+        imodel="icoads_r300_d201",
+    )
+
+    result = db.correct_datetime()
+
+    expected = pd.DataFrame({YR: [1898], MO: [12], DY: [31], HR: [0]})
+    pd.testing.assert_frame_equal(result.data.read(), expected)
+
+
+def test_validate_datetime_df():
+    data = pd.DataFrame({YR: [2023, 2023], MO: [1, 1], DY: [1, 2], HR: [12, None]})
+
+    db = DataBundle(
+        data=data,
+        imodel="icoads",
+    )
+
+    result = db.validate_datetime()
+
+    pd.testing.assert_series_equal(result, pd.Series([True, False]))
+
+
+def test_validate_datetime_psr():
+    df1 = pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0])
+    df2 = pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [None]}, index=[1])
+
+    db = DataBundle(
+        data=ParquetStreamReader([df1, df2]),
+        imodel="icoads",
+    )
+
+    result = db.validate_datetime()
+
+    pd.testing.assert_series_equal(result.read(), pd.Series([True, False]))
+
+
+def test_correct_pt_df():
+    data = pd.DataFrame({PT: [None, "7", None]})
+
+    db = DataBundle(
+        data=data,
+        imodel="icoads_r300_d993",
+    )
+
+    result = db.correct_pt()
+
+    expected = pd.DataFrame({PT: ["5", "7", "5"]})
+    pd.testing.assert_frame_equal(result.data, expected)
+
+
+def test_correct_pt_psr():
+    df1 = pd.DataFrame({PT: [None, "7", None]})
+
+    db = DataBundle(
+        data=ParquetStreamReader([df1]),
+        imodel="icoads_r300_d993",
+    )
+
+    result = db.correct_pt()
+
+    expected = pd.DataFrame({PT: ["5", "7", "5"]})
+    pd.testing.assert_frame_equal(result.data.read(), expected)
+
+
+def test_validate_id_df():
+    data = pd.DataFrame({ID: ["12345", "ABCDE", None]})
+
+    db = DataBundle(
+        data=data,
+        imodel="icoads_r300_d201",
+    )
+
+    result = db.validate_id()
+
+    pd.testing.assert_series_equal(result, pd.Series([True, False, True]))
+
+
+def test_validate_id_psr():
+    df1 = pd.DataFrame({ID: ["12345"]}, index=[0])
+    df2 = pd.DataFrame({ID: ["ABCDE"]}, index=[1])
+    df3 = pd.DataFrame({ID: [None]}, index=[2])
+
+    db = DataBundle(
+        data=ParquetStreamReader([df1, df2, df3]),
+        imodel="icoads_r300_d201",
+    )
+
+    result = db.validate_id()
+
+    pd.testing.assert_series_equal(result.read(), pd.Series([True, False, True]))
+
+
+def test_map_model_df():
+    data = pd.DataFrame(
+        {
+            ("c1", "PT"): ["2", "4", "9", "21"],
+            ("c98", "UID"): ["5012", "8960", "0037", "1000"],
+            ("c1", "LZ"): ["1", None, None, "3"],
+        }
+    )
+
+    db = DataBundle(
+        data=data,
+        imodel="icoads_r302",
+    )
+
+    result = db.map_model()
+
+    expected = pd.DataFrame(
+        {
+            ("header", "report_id"): [
+                "ICOADS-302-5012",
+                "ICOADS-302-8960",
+                "ICOADS-302-0037",
+                "ICOADS-302-1000",
+            ],
+            ("header", "duplicate_status"): ["4", "4", "4", "4"],
+            ("header", "platform_type"): ["2", "33", "32", "45"],
+            ("header", "location_quality"): ["2", "0", "0", "0"],
+            ("header", "source_id"): ["null", "null", "null", "null"],
+        }
+    )
+
+    pd.testing.assert_frame_equal(result.data[expected.columns], expected)
+
+
+def test_map_model_psr():
+    data = pd.DataFrame(
+        {
+            ("c1", "PT"): ["2", "4", "9", "21"],
+            ("c98", "UID"): ["5012", "8960", "0037", "1000"],
+            ("c1", "LZ"): ["1", None, None, "3"],
+        }
+    )
+
+    db = DataBundle(
+        data=ParquetStreamReader([data]),
+        imodel="icoads_r302",
+    )
+
+    result = db.map_model()
+
+    expected = pd.DataFrame(
+        {
+            ("header", "report_id"): [
+                "ICOADS-302-5012",
+                "ICOADS-302-8960",
+                "ICOADS-302-0037",
+                "ICOADS-302-1000",
+            ],
+            ("header", "duplicate_status"): ["4", "4", "4", "4"],
+            ("header", "platform_type"): ["2", "33", "32", "45"],
+            ("header", "location_quality"): ["2", "0", "0", "0"],
+            ("header", "source_id"): ["null", "null", "null", "null"],
+        }
+    )
+
+    pd.testing.assert_frame_equal(result.data.read()[expected.columns], expected)
+
+
+def test_duplicate_check_single_index():
+    data = pd.DataFrame(
+        {
+            "report_id": ["A", "B", "C", "D", "E", "F"],
+            "primary_station_id": ["S1", "S1", "S2", "S2", "S1", "S1"],
+            "longitude": [0.1, 0.1, 0.2, 0.1, 0.1, 0.1],
+            "latitude": [51.0, 51.2, 52.0, 51.0, 51.0, 51.0],
+            "report_timestamp": pd.to_datetime(
+                [
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                ]
+            ),
+            "station_speed": [10.0, 10.0, 8.0, 10.0, 8.0, 10.0],
+            "station_course": [90, 90, 180, 90, 60, 90],
+            "report_quality": 2,
+            ("header", "duplicates"): "",
+            ("header", "duplicate_status"): 4,
+            ("header", "history"): "",
+        }
+    )
+
+    db = DataBundle(
+        data=data,
+    )
+
+    db_dupdetect = db.duplicate_check()
+
+    assert hasattr(db_dupdetect, "DupDetect")
+    detector = db_dupdetect.DupDetect
+
+    assert isinstance(detector, DupDetect)
+    assert detector.data.shape[0] == data.shape[0]
+
+    duplicates = db_dupdetect.get_duplicates()
+
+    assert isinstance(duplicates, pd.DataFrame)
+
+    pd.testing.assert_index_equal(duplicates.index, pd.MultiIndex.from_tuples([(5, 0)]))
+
+    flagged = db_dupdetect.flag_duplicates()
+
+    pd.testing.assert_series_equal(
+        flagged.data["duplicates"],
+        pd.Series(["{F}", "", "", "", "", "{A}"], name="duplicates"),
+    )
+    pd.testing.assert_series_equal(
+        flagged.data["duplicate_status"],
+        pd.Series([1, 0, 0, 0, 0, 3], name="duplicate_status"),
+    )
+
+    removed = db_dupdetect.remove_duplicates()
+
+    pd.testing.assert_frame_equal(data.iloc[[0, 1, 2, 3, 4]], removed.data)
+
+
+def test_duplicate_check_multi_index():
+    data = pd.DataFrame(
+        {
+            ("header", "report_id"): ["A", "B", "C", "D", "E", "F"],
+            ("header", "primary_station_id"): ["S1", "S1", "S2", "S2", "S1", "S1"],
+            ("header", "longitude"): [0.1, 0.1, 0.2, 0.1, 0.1, 0.1],
+            ("header", "latitude"): [51.0, 51.2, 52.0, 51.0, 51.0, 51.0],
+            ("header", "report_timestamp"): pd.to_datetime(
+                [
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                    "2023-01-01 00:00",
+                ]
+            ),
+            ("header", "station_speed"): [10.0, 10.0, 8.0, 10.0, 8.0, 10.0],
+            ("header", "station_course"): [90, 90, 180, 90, 60, 90],
+            ("header", "report_quality"): 2,
+            ("header", "duplicates"): "",
+            ("header", "duplicate_status"): 4,
+            ("header", "history"): "",
+        }
+    )
+
+    db = DataBundle(
+        data=data,
+        mode="tables",
+    )
+
+    db_dupdetect = db.duplicate_check()
+
+    assert hasattr(db_dupdetect, "DupDetect")
+    detector = db_dupdetect.DupDetect
+
+    assert isinstance(detector, DupDetect)
+    assert detector.data.shape[0] == data.shape[0]
+
+    duplicates = db_dupdetect.get_duplicates()
+
+    assert isinstance(duplicates, pd.DataFrame)
+
+    pd.testing.assert_index_equal(duplicates.index, pd.MultiIndex.from_tuples([(5, 0)]))
+
+    flagged = db_dupdetect.flag_duplicates()
+
+    pd.testing.assert_series_equal(
+        flagged.data[("header", "duplicates")],
+        pd.Series(["{F}", "", "", "", "", "{A}"], name=("header", "duplicates")),
+    )
+    pd.testing.assert_series_equal(
+        flagged.data[("header", "duplicate_status")],
+        pd.Series([1, 0, 0, 0, 0, 3], name=("header", "duplicate_status")),
+    )
+
+    removed = db_dupdetect.remove_duplicates()
+
+    pd.testing.assert_frame_equal(data.iloc[[0, 1, 2, 3, 4]], removed.data)

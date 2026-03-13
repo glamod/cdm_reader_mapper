@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 
-
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 
 from cdm_reader_mapper.cdm_mapper.utils.utilities import (
@@ -99,6 +98,13 @@ def test_get_cdm_subset_invalid(invalid_value):
 )
 def test_get_usecols(tb, col_subset, expected):
     assert get_usecols(tb, col_subset) == expected
+
+
+def test_get_usecols_raises():
+    with pytest.raises(
+        TypeError, match="col_subset must be str, iterable of str, dict, or None"
+    ):
+        get_usecols("table1", 123)
 
 
 @pytest.mark.parametrize(

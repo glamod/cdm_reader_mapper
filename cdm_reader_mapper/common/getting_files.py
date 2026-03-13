@@ -205,5 +205,3 @@ def get_path(path: str | Path) -> Path | None:
         return _files(path)
     except ModuleNotFoundError:
         logging.warning(f"No module named {path}.")
-    except AttributeError:
-        logging.warning(f"Cannot treat {path} as a package.")

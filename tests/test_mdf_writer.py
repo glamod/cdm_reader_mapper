@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 
 import pandas as pd
-import pytest  # noqa
+import pytest
 
 from pandas.testing import assert_frame_equal
 
+from cdm_reader_mapper.common.iterators import ParquetStreamReader
+
 from cdm_reader_mapper.mdf_reader.writer import (
+    _normalize_data_chunks,
     write_data,
 )
 
@@ -30,6 +33,64 @@ def example_mask():
             "B": [False, True, True],
         }
     )
+
+
+def test_normalize_data_chunks_empty():
+    result = _normalize_data_chunks(None)
+
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert isinstance(result[0], pd.DataFrame)
+    assert result[0].empty
+
+
+def test_normalize_data_chunks_df():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    result = _normalize_data_chunks(df)
+
+    assert isinstance(result, list)
+    pd.testing.assert_frame_equal(df, result[0])
+
+
+def test_noramlize_data_chunks_iter():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    result = _normalize_data_chunks(iter([df]))
+
+    assert isinstance(result, ParquetStreamReader)
+
+    pd.testing.assert_frame_equal(df, result.read())
+
+
+def test_noramlize_data_chunks_psr():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    result = _normalize_data_chunks(ParquetStreamReader([df]))
+
+    assert isinstance(result, ParquetStreamReader)
+
+    pd.testing.assert_frame_equal(df, result.read())
+
+
+def test_noramlize_data_chunks_list():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    result = _normalize_data_chunks([df])
+
+    assert isinstance(result, ParquetStreamReader)
+
+    pd.testing.assert_frame_equal(df, result.read())
+
+
+def test_noramlize_data_chunks_tuple():
+    df = pd.DataFrame({"A": [1, 2, 3]})
+    result = _normalize_data_chunks((df,))
+
+    assert isinstance(result, ParquetStreamReader)
+
+    pd.testing.assert_frame_equal(df, result.read())
+
+
+def test_noramlize_data_chunks_raises():
+    with pytest.raises(TypeError, match="Unsupported data type found"):
+        _normalize_data_chunks(42)
 
 
 def test_write_data_csv(tmp_path, example_data, example_mask):
@@ -180,6 +241,13 @@ def test_write_data_feather(tmp_path, example_data, example_mask):
     assert_frame_equal(example_mask, mask_res)
 
 
-def test_write_data_invalid(example_data):
-    with pytest.raises(ValueError):
+def test_write_data_invalid_data_format(example_data):
+    with pytest.raises(ValueError, match="data_format must be one of"):
         write_data(example_data, data_format="invalid")
+
+
+def test_write_data_invalid_mask_type(example_data):
+    with pytest.raises(
+        ValueError, match="type of 'data' and type of 'mask' do not match."
+    ):
+        write_data(example_data, mask=[True, False, True])

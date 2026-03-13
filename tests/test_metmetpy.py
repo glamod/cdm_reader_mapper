@@ -5,8 +5,6 @@ import pandas as pd
 import logging
 import pytest
 
-from io import StringIO
-
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 
 from cdm_reader_mapper.metmetpy import properties
@@ -81,37 +79,44 @@ def test_icoads_to_datetime_basis():
         }
     )
 
-    dt = icoads(df, "to_datetime")
+    result = icoads(df, "to_datetime")
 
-    assert isinstance(dt, pd.Series)
-    assert dt.dtype == "datetime64[ns]"
-
-    assert dt.iloc[0].year == 2000
-    assert dt.iloc[0].month == 1
-    assert dt.iloc[0].day == 10
-    assert dt.iloc[0].hour == 12
-    assert dt.iloc[0].minute == 30
-
-    assert dt.iloc[1].hour == 6
-    assert dt.iloc[1].minute == 15
+    expected = pd.Series(
+        pd.to_datetime(
+            [
+                "2000-01-10 12:30:00",
+                "2001-02-15 06:15:00",
+            ]
+        )
+    )
+    pd.testing.assert_series_equal(result, expected)
 
 
 def test_icoads_to_datetime_missing_values():
     df = pd.DataFrame(
         {
-            YR: [2000, None, 2002],
-            MO: [1, 2, 3],
-            DY: [10, None, 20],
-            HR: [12.5, None, 18.75],
+            YR: [2000, None, 2001],
+            MO: [1, 2, 2],
+            DY: [10, None, 15],
+            HR: [12.5, None, 6.25],
         }
     )
 
-    dt = icoads(df, "to_datetime")
+    result = icoads(df, "to_datetime")
 
-    assert dt.isna().tolist() == [False, True, False]
+    expected = pd.Series(
+        pd.to_datetime(
+            [
+                "2000-01-10 12:30:00",
+                None,
+                "2001-02-15 06:15:00",
+            ]
+        )
+    )
+    pd.testing.assert_series_equal(result, expected)
 
 
-def test_icoads_from_datetime():
+def test_icoads_from_datetime_basis():
     ds = pd.Series(
         [
             pd.Timestamp("2000-01-10 12:30"),
@@ -120,17 +125,21 @@ def test_icoads_from_datetime():
         ]
     )
 
-    df = icoads(ds, "from_datetime")
+    result = icoads(ds, "from_datetime")
 
-    assert list(df.columns) == [YR, MO, DY, HR]
+    expected = pd.DataFrame(
+        {
+            YR: [2000, 2001, 2002],
+            MO: [1, 2, 3],
+            DY: [10, 15, 20],
+            HR: [12.5, 6.25, 18.75],
+        },
+        dtype=object,
+    )
+    pd.testing.assert_frame_equal(result, expected)
 
-    assert df.loc[0, YR] == 2000
-    assert df.loc[0, MO] == 1
-    assert df.loc[0, DY] == 10
-    assert abs(df.loc[0, HR] - 12.5) < 1e-6
 
-
-def test_icoads_roundtrip():
+def test_icoads_both_datetime():
     df_in = pd.DataFrame(
         {
             YR: [2000, 2001],
@@ -146,7 +155,7 @@ def test_icoads_roundtrip():
     pd.testing.assert_frame_equal(df_in, df_out, check_dtype=False)
 
 
-def test_icoads_invalid_conversion():
+def test_icoads_valueerror():
     df = pd.DataFrame(
         {
             YR: [2000],
@@ -156,29 +165,38 @@ def test_icoads_invalid_conversion():
         }
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="conversion must be one of {'to_datetime','from_datetime'}"
+    ):
         icoads(df, "bad_conversion.")
 
 
-def test_icoads_from_datetime_wrong_input_type():
-    df = pd.DataFrame(
-        {
-            YR: [2000],
-            MO: [1],
-            DY: [10],
-            HR: [12.5],
-        }
-    )
+def test_icoads_from_datetime_typeerror():
+    df = pd.DataFrame([pd.Timestamp(2000)])
 
-    with pytest.raises(ValueError):
-        icoads(df, "from_datetime.")
+    with pytest.raises(TypeError):
+        icoads(df, "from_datetime")
 
 
-def test_icoads_to_datetime_wrong_input_type():
-    s = pd.Series([pd.Timestamp("200-01-01")])
+def test_icoads_to_datetime_typeerror():
+    s = pd.Series([pd.Timestamp("2000-01-01")])
 
     with pytest.raises(TypeError):
         icoads(s, "to_datetime")
+
+
+def test_icoads_to_datetime_false_date_columns():
+    df = pd.DataFrame(
+        {
+            "YR": [2000, 2001],
+            "MO": [1, 2],
+            "DY": [10, 15],
+            "HR": [12.5, 6.25],
+        }
+    )
+    result = icoads(df, "to_datetime")
+
+    pd.testing.assert_series_equal(result, pd.Series(dtype="datetime64[ns]"))
 
 
 def test_icoads_to_datetime_missing_columns():
@@ -186,9 +204,7 @@ def test_icoads_to_datetime_missing_columns():
 
     result = icoads(df, "to_datetime")
 
-    assert isinstance(result, pd.Series)
-    assert result.dtype == "datetime64[ns]"
-    assert result.isna().all()
+    pd.testing.assert_series_equal(result, pd.Series(pd.to_datetime([None])))
 
 
 def test_icoads_from_datetime_empty_series():
@@ -210,23 +226,29 @@ def test_to_datetime_basis():
         }
     )
 
-    dt = to_datetime(df)
+    result = to_datetime(df)
 
-    assert isinstance(dt, pd.Series)
-    assert dt.dtype == "datetime64[ns]"
+    expected = pd.Series(pd.to_datetime(["2000-01-10 12:30:00", "2001-02-15 06:15:00"]))
 
-    assert dt.iloc[0].year == 2000
-    assert dt.iloc[0].month == 1
-    assert dt.iloc[0].day == 10
-    assert dt.iloc[0].hour == 12
-    assert dt.iloc[0].minute == 30
+    pd.testing.assert_series_equal(result, expected)
 
-    assert dt.iloc[1].hour == 6
-    assert dt.iloc[1].minute == 15
+
+def test_to_datetime_no_correction():
+    df = pd.DataFrame(
+        {
+            YR: [2000, 2001],
+            MO: [1, 2],
+            DY: [10, 15],
+            HR: [12.5, 6.25],
+        }
+    )
+
+    result = to_datetime(df, model="no_model")
+    pd.testing.assert_frame_equal(result, df)
 
 
 def test_from_datetime_basis():
-    ds = pd.Series(
+    df = pd.Series(
         [
             pd.Timestamp("2000-01-10 12:30"),
             pd.Timestamp("2001-02-15 06:15"),
@@ -234,14 +256,31 @@ def test_from_datetime_basis():
         ]
     )
 
-    df = from_datetime(ds)
+    result = from_datetime(df)
 
-    assert list(df.columns) == [YR, MO, DY, HR]
+    expected = pd.DataFrame(
+        {
+            YR: [2000, 2001, 2002],
+            MO: [1, 2, 3],
+            DY: [10, 15, 20],
+            HR: [12.5, 6.25, 18.75],
+        },
+        dtype=object,
+    )
+    pd.testing.assert_frame_equal(result, expected)
 
-    assert df.loc[0, YR] == 2000
-    assert df.loc[0, MO] == 1
-    assert df.loc[0, DY] == 10
-    assert abs(df.loc[0, HR] - 12.5) < 1e-6
+
+def test_from_datetime_no_correction():
+    df = pd.Series(
+        [
+            pd.Timestamp("2000-01-10 12:30"),
+            pd.Timestamp("2001-02-15 06:15"),
+            pd.Timestamp("2002-03-20 18:45"),
+        ]
+    )
+
+    result = from_datetime(df, model="no_model")
+    pd.testing.assert_series_equal(result, df)
 
 
 def test_dck_201_icoads():
@@ -433,7 +472,7 @@ def test_deck_992_icoads_basic():
     pd.testing.assert_frame_equal(result, expected)
 
 
-def test_correct_dt():
+def test_correct_dt_pass():
     data = pd.DataFrame(
         {
             YR: [1899, 1900, 1899],
@@ -462,6 +501,73 @@ def test_correct_dt():
     )
 
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+
+
+def test_correct_dt_no_correction():
+    data = pd.DataFrame(
+        {
+            YR: [1899, 1900, 1899],
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    result = _correct_dt(
+        data.copy(),
+        data_model="icoads",
+        dck="201",
+        correction_method={},
+    )
+
+    pd.testing.assert_frame_equal(data, result)
+
+
+def test_correct_dt_typeerror():
+    series = pd.Series([1898, 1900, 1899])
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        _correct_dt(series, data_model="icoads", dck="201", correction_method={})
+
+
+def test_correct_dt_attributeerror():
+    data = pd.DataFrame(
+        {
+            YR: [1899, 1900, 1899],
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    correction_method = {"201": {"function": "invalid_function"}}
+
+    with pytest.raises(AttributeError, match="not found"):
+        _correct_dt(
+            data.copy(),
+            data_model="icoads",
+            dck="201",
+            correction_method=correction_method,
+        )
+
+
+def test_correct_dt_runtimeerror():
+    invalid_data = pd.DataFrame(
+        {
+            MO: [1, 2, 3],
+            DY: [1, 15, 1],
+            HR: [0, 12, 0],
+        }
+    )
+
+    correction_method = {"201": {"function": "dck_201_icoads"}}
+
+    with pytest.raises(RuntimeError, match="could not be executed"):
+        _correct_dt(
+            invalid_data,
+            data_model="icoads",
+            dck="201",
+            correction_method=correction_method,
+        )
 
 
 def test_correct_pt_fillna():
@@ -523,7 +629,7 @@ def test_correct_pt_function():
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
-def test_correct_pt_no_fix_for_deck():
+def test_correct_pt_no_correction():
     pt_col = "PT"
     data = pd.DataFrame({pt_col: ["1", None, "3"]})
 
@@ -556,7 +662,7 @@ def test_correct_pt_missing_platform_column():
     pd.testing.assert_frame_equal(result, data)
 
 
-def test_correct_pt_raises_unknown_method():
+def test_correct_pt_valueerror_not_implemented():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"201": {"method": "not_a_method"}}
@@ -571,7 +677,13 @@ def test_correct_pt_raises_unknown_method():
         )
 
 
-def test_correct_pt_fillna_missing_fillvalue():
+def test_correct_pt_typeerror():
+    series = pd.Series(["1", "2"])
+    with pytest.raises(TypeError, match="pd.Series is not supported now."):
+        _correct_pt(series, imodel="icoads", dck="201", pt_col="PT", fix_methods={})
+
+
+def test_correct_pt_valuerror_fillvalue():
     data = pd.DataFrame({"PT": ["1", None]})
 
     fix_methods = {"201": {"method": "fillna"}}
@@ -586,7 +698,7 @@ def test_correct_pt_fillna_missing_fillvalue():
         )
 
 
-def test_correct_pt_missing_function_name():
+def test_correct_pt_valueerror_no_function_name():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"700": {"method": "function"}}
@@ -601,7 +713,7 @@ def test_correct_pt_missing_function_name():
         )
 
 
-def test_correct_pt_missing_function_object():
+def test_correct_pt_valueerror_no_function_found():
     data = pd.DataFrame({"PT": ["1", "2"]})
 
     fix_methods = {"700": {"method": "function", "function": "NO_SUCH_FUNC"}}
@@ -617,52 +729,62 @@ def test_correct_pt_missing_function_object():
 
 
 @pytest.mark.parametrize(
-    "data_input,imodel,expected",
+    "data,expected",
     [
         (
             pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}),
-            "icoads_r300_d201",
             pd.DataFrame({YR: [1898], MO: [12], DY: [31], HR: [0]}),
         ),
         (
             pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
-            "icoads_r300_d201",
             pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}),
         ),
     ],
 )
-def test_correct_datetime(data_input, imodel, expected):
-    result = correct_datetime(data_input.copy(), imodel, log_level="CRITICAL")
-    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+def test_correct_datetime_pd(data, expected):
+    result = correct_datetime(data.copy(), "icoads_r300_d201", log_level="CRITICAL")
+    pd.testing.assert_frame_equal(result, expected)
 
 
-def test_correct_datetime_textfilereader():
-    csv_text = "1899,1,1,0\n1900,1,1,12"
-
+def test_correct_datetime_psr():
     expected = pd.DataFrame({YR: [1898, 1900], MO: [12, 1], DY: [31, 1], HR: [0, 12]})
 
-    parser = pd.read_csv(
-        StringIO(csv_text), chunksize=2, header=None, names=datetime_cols, dtype=int
-    )
+    df1 = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]}, index=[0])
+    df2 = pd.DataFrame({YR: [1900], MO: [1], DY: [1], HR: [12]}, index=[1])
+    psr = ParquetStreamReader([df1, df2])
 
-    result = correct_datetime(parser, "icoads_r300_d201").read()
+    result = correct_datetime(psr, "icoads_r300_d201").read()
 
     pd.testing.assert_frame_equal(result, expected)
 
 
+def test_correct_datetime_pd_no_correction_no_deck():
+    data = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+    result = correct_datetime(data, "icoads_r300")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_datetime_pd_no_correction_false_deck():
+    data = pd.DataFrame({YR: [1899], MO: [1], DY: [1], HR: [0]})
+    result = correct_datetime(data, "icoads_r302_d992")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
 @pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
-def test_correct_datetime_invalid_data(data):
+def test_correct_datetime_pd_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_datetime(data, "icoads_r300_d201")
 
 
-def test_correct_datetime_series():
+def test_correct_datetime_pd_series():
     with pytest.raises(TypeError, match="pd.Series is not supported now."):
         correct_datetime(pd.Series([1, 2, 3]), "icoads_r300_d201")
 
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2)])
-def test_correct_datetime_invalid_iterable_entries(data):
+def test_correct_datetime_pd_invalid_iterable_entries(data):
     with pytest.raises(
         TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
     ):
@@ -713,24 +835,29 @@ def test_correct_datetime_valid_iterable():
         ),
     ],
 )
-def test_correct_pt_dataframe(data_input, imodel, expected):
-    """Test correct_pt with DataFrame input."""
+def test_correct_pt_pd(data_input, imodel, expected):
     result = correct_pt(data_input.copy(), imodel, log_level="CRITICAL")
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
 @pytest.mark.parametrize(
-    "csv_text,names,imodel,expected",
+    "data_input,imodel,expected",
     [
         (
-            "\n7\n\n",
-            [PT],
+            [
+                pd.DataFrame({PT: [None]}, index=[0]),
+                pd.DataFrame({PT: ["7"]}, index=[1]),
+                pd.DataFrame({PT: [None]}, index=[2]),
+            ],
             "icoads_r300_d993",
             pd.DataFrame({PT: ["5", "7", "5"]}),
         ),
         (
-            "5,12345,147\n5,99999,999\n7,123,999",
-            [PT, ID, SID],
+            [
+                pd.DataFrame({PT: ["5"], ID: ["12345"], SID: ["147"]}, index=[0]),
+                pd.DataFrame({PT: ["5"], ID: ["99999"], SID: ["999"]}, index=[1]),
+                pd.DataFrame({PT: ["7"], ID: ["123"], SID: ["999"]}, index=[2]),
+            ],
             "icoads_r300_d700",
             pd.DataFrame(
                 {
@@ -742,27 +869,20 @@ def test_correct_pt_dataframe(data_input, imodel, expected):
         ),
     ],
 )
-def test_correct_pt_textfilereader(csv_text, names, imodel, expected):
+def test_correct_pt_psr(data_input, imodel, expected):
     """Test correct_pt with TextFileReader input."""
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=names,
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = correct_pt(parser, imodel, log_level="CRITICAL")
+    psr = ParquetStreamReader(data_input)
+    result = correct_pt(psr, imodel, log_level="CRITICAL")
     pd.testing.assert_frame_equal(result.read(), expected, check_dtype=False)
 
 
 @pytest.mark.parametrize("data", ["invalid_data", 1, 1.0, True, {"1": 2}, {1, 2}])
-def test_correct_pt_invalid_data(data):
+def test_correct_pt_pd_invalid_data(data):
     with pytest.raises(TypeError, match="Unsupported data type"):
         correct_pt(data, "icoads_r300_d993")
 
 
-def test_correct_pt_series():
+def test_correct_pt_pd_series():
     with pytest.raises(TypeError, match="pd.Series is not supported now."):
         correct_pt(pd.Series([1, 2, 3]), "icoads_r300_d993")
 
@@ -790,6 +910,20 @@ def test_correct_pt_valid_iterable():
 
     exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
     pd.testing.assert_frame_equal(result.read(), exp)
+
+
+def test_correct_pt_pd_no_correction_no_deck():
+    data = pd.DataFrame({PT: [None, "7", None]})
+    result = correct_pt(data, "icoads_r300")
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+def test_correct_pt_pd_no_correction_false_deck():
+    data = pd.DataFrame({PT: [None, "7", None]})
+    result = correct_pt(data, "icoads_r300_d701")
+
+    pd.testing.assert_frame_equal(result, data)
 
 
 def test_get_id_col_not_defined():
@@ -865,41 +999,64 @@ def test_get_patterns_empty_and_blank_true():
             pd.DataFrame({ID: ["12345", "ABCDE"]}),
             "icoads_r300_d201",
             False,
-            pd.Series([True, False], name=ID),
+            pd.Series([True, False]),
         ),
         (
             pd.DataFrame({ID: ["12345", ""]}),
             "icoads_r300_d201",
             True,
-            pd.Series([True, True], name=ID),
+            pd.Series([True, True]),
         ),
         (
             pd.DataFrame({ID: ["12345", ""]}),
             "icoads_r300_d201",
             False,
-            pd.Series([True, True], name=ID),
+            pd.Series([True, True]),
         ),
     ],
 )
-def test_validate_id_dataframe(data_input, imodel, blank, expected):
+def test_validate_id_df(data_input, imodel, blank, expected):
     result = validate_id(data_input.copy(), imodel, blank=blank, log_level="CRITICAL")
     pd.testing.assert_series_equal(result, expected, check_dtype=False)
 
 
-def test_validate_id_textfilereader():
-    csv_text = "12345\nABCDE\n\n"
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=[ID],
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = validate_id(parser, "icoads_r300_d201", blank=False, log_level="CRITICAL")
-    expected = pd.Series([True, False, True], name=ID)
+def test_validate_id_psr():
+    df1 = pd.DataFrame({ID: ["12345"]}, index=[0])
+    df2 = pd.DataFrame({ID: ["ABCDE"]}, index=[1])
+    df3 = pd.DataFrame({ID: [None]}, index=[2])
+    psr = ParquetStreamReader([df1, df2, df3])
+    result = validate_id(psr, "icoads_r300_d201", blank=False, log_level="CRITICAL")
+    expected = pd.Series([True, False, True])
 
     pd.testing.assert_series_equal(result.read(), expected)
+
+
+def test_validate_id_valueerror_no_deck():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="has no deck information"):
+        validate_id(data, "icoads")
+
+
+def test_validate_id_filenotfounderror():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(FileNotFoundError, match="has no ID deck library"):
+        validate_id(data, "icoads_r302_d992")
+
+
+def test_validate_id_valueerror_invalid_deck():
+    data = pd.DataFrame({ID: ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="not defined in file"):
+        validate_id(data, "icoads_r300_d200")
+
+
+def test_validate_id_valueerror_no_columns():
+    data = pd.DataFrame({"ID": ["12345", "ABCDE"]})
+
+    with pytest.raises(ValueError, match="No ID columns found."):
+        validate_id(data, "icoads_r300_d201")
 
 
 @pytest.mark.parametrize(
@@ -927,20 +1084,39 @@ def test_validate_datetime_dataframe(data_input, expected):
 
 
 @pytest.mark.parametrize(
-    "csv_text, expected",
+    "data_input, expected",
     [
-        ("2023,1,1,12\n2023,1,2,13\n\n", pd.Series([True, True, False])),
-        ("2023,1,1,12\n2023,1,2,\n\n", pd.Series([True, False, False])),
+        (
+            [
+                pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
+                pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [13]}, index=[1]),
+                pd.DataFrame(
+                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
+                ),
+            ],
+            pd.Series([True, True, False]),
+        ),
+        (
+            [
+                pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
+                pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [None]}, index=[1]),
+                pd.DataFrame(
+                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
+                ),
+            ],
+            pd.Series([True, False, False]),
+        ),
     ],
 )
-def test_validate_datetime_textfilereader(csv_text, expected):
-    parser = pd.read_csv(
-        StringIO(csv_text),
-        chunksize=2,
-        header=None,
-        names=datetime_cols,
-        dtype=object,
-        skip_blank_lines=False,
-    )
-    result = validate_datetime(parser, "icoads", log_level="CRITICAL")
+def test_validate_datetime_psr(data_input, expected):
+    psr = ParquetStreamReader(data_input)
+    result = validate_datetime(psr, "icoads", log_level="CRITICAL")
     pd.testing.assert_series_equal(result.read(), expected)
+
+
+def test_validate_datetime_valueerror():
+    data = pd.DataFrame(
+        {"YR": [2023, 2023], "MO": [1, 1], "DY": [1, 2], "HR": [12, 13]}
+    )
+    with pytest.raises(ValueError, match="No columns found for datetime conversion"):
+        validate_datetime(data, "icoads")

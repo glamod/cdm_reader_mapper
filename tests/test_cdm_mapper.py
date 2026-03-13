@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
-from io import StringIO
 
 from cdm_reader_mapper.cdm_mapper.mapper import (
     _is_empty,
@@ -33,33 +32,6 @@ from cdm_reader_mapper.data import test_data
 
 
 @pytest.fixture
-def sample_df():
-    return pd.DataFrame({"A": [1, 2]})
-
-
-@pytest.fixture
-def sample_df_empty():
-    return pd.DataFrame()
-
-
-@pytest.fixture
-def sample_tfr():
-    csv_data = "A\n1\n2"
-    return pd.read_csv(StringIO(csv_data), chunksize=1)
-
-
-@pytest.fixture
-def sample_tfr_empty():
-    csv_data = "A\n"
-    return pd.read_csv(StringIO(csv_data), chunksize=1)
-
-
-@pytest.fixture
-def sample_string():
-    return "A"
-
-
-@pytest.fixture
 def imodel_maps():
     return get_imodel_maps("icoads", "r300", "d720", cdm_tables=["header"])
 
@@ -85,10 +57,10 @@ def data_header_expected():
     return pd.DataFrame(
         data={
             ("header", "report_id"): [
-                "ICOADS-30-5012",
-                "ICOADS-30-8960",
-                "ICOADS-30-0037",
-                "ICOADS-30-1000",
+                "ICOADS-300-5012",
+                "ICOADS-300-8960",
+                "ICOADS-300-0037",
+                "ICOADS-300-1000",
             ],
             ("header", "duplicate_status"): ["4", "4", "4", "4"],
             ("header", "platform_type"): ["2", "33", "32", "45"],
@@ -188,6 +160,8 @@ def test_drop_duplicated_rows():
         ("2", 2000),
         ("3", None),
         (["4", "5"], 5000),
+        (["4", "6"], None),
+        ([], None),
     ],
 )
 def test_get_nested_value(value, expected):
@@ -197,6 +171,7 @@ def test_get_nested_value(value, expected):
 
 def test_get_nested_value_none():
     assert _get_nested_value(None, "4") is None
+    assert _get_nested_value({"1", 1000}, ["1", "x"]) is None
 
 
 @pytest.mark.parametrize(
@@ -223,8 +198,6 @@ def test_prepare_cdm_tables(table, is_list):
 
     assert isinstance(result, dict)
     assert list(result.keys()) == [table]
-    assert "buffer" in result[table]
-    assert isinstance(result[table]["buffer"], StringIO)
     assert "atts" in result[table]
 
 
@@ -314,6 +287,7 @@ def test_fill_value(series, fill_value, expected):
         (5, None, np.nan),
         (5, {"data_type": "invalid"}, 5),
         ("5", {"data_type": "int"}, "5"),
+        (5, {}, 5),
     ],
 )
 def test_convert_dtype(value, atts, expected):
@@ -355,6 +329,22 @@ def test_extract_input_data(data_header, column, elements, default, use_default,
     pd.testing.assert_series_equal(result[0], exp)
 
 
+def test_extract_input_data_empty():
+    test_data = pd.DataFrame({"a": []})
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _extract_input_data(
+        test_data,
+        ["a"],
+        "null",
+        logger,
+    )
+    assert isinstance(result, tuple)
+
+    assert result[1] is True
+
+    pd.testing.assert_series_equal(result[0], pd.Series([]))
+
+
 @pytest.mark.parametrize(
     "column, expected",
     [
@@ -362,7 +352,12 @@ def test_extract_input_data(data_header, column, elements, default, use_default,
         ("platform_type", ["2", "33", "32", "45"]),
         (
             "report_id",
-            ["ICOADS-30-5012", "ICOADS-30-8960", "ICOADS-30-0037", "ICOADS-30-1000"],
+            [
+                "ICOADS-300-5012",
+                "ICOADS-300-8960",
+                "ICOADS-300-0037",
+                "ICOADS-300-1000",
+            ],
         ),
         ("location_quality", ["2", "0", "0", "0"]),
         ("latitude", [None, None, None, None]),
@@ -400,6 +395,24 @@ def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
     assert result.str.contains("Initial conversion from ICOADS R3.0.0T").all()
 
 
+def test_column_mapping_subset(imodel_maps, imodel_functions, data_header):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    column = "platform_type"
+    mapping_column = imodel_maps["header"][column]
+    column_atts = get_cdm_atts("header")["header"][column]
+    result = _column_mapping(
+        data_header,
+        mapping_column,
+        imodel_functions,
+        column_atts,
+        ["new_platform_type"],
+        column,
+        logger,
+    )
+    expected = data_header[("c1", "PT")].rename(column)
+    pd.testing.assert_series_equal(result, expected)
+
+
 def test_table_mapping(
     imodel_maps, imodel_functions, data_header, data_header_expected
 ):
@@ -421,6 +434,23 @@ def test_table_mapping(
     pd.testing.assert_frame_equal(result[expected.columns], expected)
 
 
+def test_table_mapping_empty(imodel_maps, imodel_functions, data_header):
+    logger = logging_hdlr.init_logger(__name__, level="INFO")
+    result = _table_mapping(
+        data_header,
+        imodel_maps["header"],
+        {},
+        "null",
+        imodel_functions,
+        None,
+        True,
+        False,
+        False,
+        logger,
+    )
+    pd.testing.assert_frame_equal(result, pd.DataFrame(index=data_header.index))
+
+
 def test_map_model_icoads(data_header, data_header_expected):
     result = map_model(
         data_header,
@@ -430,6 +460,15 @@ def test_map_model_icoads(data_header, data_header_expected):
     pd.testing.assert_frame_equal(
         result[data_header_expected.columns], data_header_expected
     )
+
+
+def test_map_model_raises(data_header):
+    with pytest.raises(ValueError, match="is not defined"):
+        map_model(data_header, None)
+    with pytest.raises(TypeError, match="Input data model type is not supported"):
+        map_model(data_header, ["icoads_r300_d720"])
+    with pytest.raises(ValueError, match="not supported"):
+        map_model(data_header, "icaods_r300_d720")
 
 
 def test_map_model_pub47():
@@ -484,9 +523,6 @@ def test_map_model_pub47():
         ("observations-ws", "observation_height_above_station_surface"),
         ("observations-ws", "sensor_id"),
     ]
-    # print(result)
-    # print(type(result))
-    # exit()
     result = result[columns]
 
     exp = np.array(
