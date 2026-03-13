@@ -507,16 +507,6 @@ def build_parser_config(
                 continue
 
             ctype = _convert_dtype_to_default(meta.get("column_type"))
-
-            # if name == nn:
-            #    print(meta)
-            #    print(ctype)
-            #    exit()
-            print("-------------------------")
-            print(name)
-            print(meta)
-            print(ctype)
-
             dtype = properties.pandas_dtypes.get(ctype)
             if dtype is not None:
                 dtypes[index] = dtype
