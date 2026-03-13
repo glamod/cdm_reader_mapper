@@ -57,10 +57,16 @@ def test_validate_str(numeric_series):
     pd.testing.assert_series_equal(result, expected)
 
 
-def test_validate_codes(code_series):
+def test_validate_codes_pass(code_series):
     codes = ["A", "B", "C"]
     result = validate_codes(code_series, codes, "str")
     expected = pd.Series([True, True, True, True, False])
+    pd.testing.assert_series_equal(result, expected)
+
+
+def test_validate_codes_false(code_series):
+    result = validate_codes(code_series, [], "str")
+    expected = pd.Series([False, False, False, False, False])
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -88,7 +94,7 @@ def attributes():
     }
 
 
-def test_validate_all_columns(sample_df, attributes):
+def test_validate_pass(sample_df, attributes):
     mask = validate(
         sample_df, imodel="icoads", ext_table_path=None, attributes=attributes
     )
@@ -107,3 +113,9 @@ def test_validate_all_columns(sample_df, attributes):
 
     expected_bool = [True, False, False, False, True]
     assert mask["BOOL"].tolist() == expected_bool
+
+
+def test_validate_none():
+    assert (
+        validate([1, 2, 3], imodel="icoads", ext_table_path=None, attributes={}) is None
+    )

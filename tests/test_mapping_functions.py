@@ -592,10 +592,16 @@ def test_integer_to_float(input_obj, expected):
     pd.testing.assert_series_equal(result, expected)
 
 
-def test_integer_to_float_raises():
+def test_integer_to_float_raises_value():
     obj = mapping_functions("dummy_model")
     with pytest.raises(ValueError):
         obj.integer_to_float(pd.Series(["x", "y", "z"], name="S"))
+
+
+def test_integer_to_float_raises_type():
+    obj = mapping_functions("dummy_model")
+    with pytest.raises(TypeError):
+        obj.integer_to_float([1, 2, 3])
 
 
 @pytest.mark.parametrize(

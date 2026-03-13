@@ -75,6 +75,9 @@ class ParquetStreamReader:
         self._closed = False
         self._buffer: list[pd.DataFrame | pd.Series] = []
 
+        if isinstance(source, (tuple, list)):
+            source = iter(source)
+
         if callable(source):
             # factory that produces a fresh iterator
             self._factory = source
@@ -100,6 +103,10 @@ class ParquetStreamReader:
         if self._buffer:
             return self._buffer.pop(0)
         return next(self._generator)
+
+    def __getitem__(self, item):
+        """Make class subscriptable."""
+        return self.attrs[item]
 
     def prepend(self, chunk: pd.DataFrame | pd.Series):
         """
@@ -291,6 +298,7 @@ def _process_chunks(
             )
 
         result = func(*items, *static_args, **static_kwargs)
+
         if not isinstance(result, tuple):
             result = (result,)
 

@@ -14,7 +14,6 @@ for the input data model.
 from __future__ import annotations
 
 from copy import deepcopy
-from io import StringIO
 from typing import Any, Iterable, get_args
 
 import numpy as np
@@ -70,19 +69,23 @@ def _drop_duplicated_rows(df) -> pd.DataFrame:
 def _get_nested_value(ndict, keys) -> Any | None:
     """Traverse nested dictionaries along a sequence of keys."""
     if not isinstance(ndict, dict):
-        return
+        return None
 
     current = ndict
     for key in keys:
         if not isinstance(current, dict):
-            return
-        if key not in current:
-            return
-        value = current[key]
+            return None
+
+        value = current.get(key)
+        if value is None:
+            return None
+
         if isinstance(value, dict):
             current = value
-            continue
-        return value
+        else:
+            return value
+
+    return None
 
 
 def _convert_dtype(series, atts) -> pd.DataFrame:
@@ -146,11 +149,7 @@ def _code_table(
     logger.debug(f"Mapping code table: {code_table}")
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
 
-    try:
-        df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
-    except Exception:
-        logger.warning(f"Could not convert {data} to a DataFrame.")
-        return pd.Series([None] * len(data), index=data.index)
+    df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
 
     df = df.astype(str)
 
@@ -331,7 +330,6 @@ def _prepare_cdm_tables(cdm_subset):
         for col, meta in atts.items():
             meta["decimal_places"] = _decimal_places(meta.get("decimal_places"))
         tables[table] = {
-            "buffer": StringIO(),
             "atts": atts,
         }
 
@@ -481,7 +479,7 @@ def map_model(
 
     if isinstance(result, (pd.DataFrame, ParquetStreamReader)):
         result = pd.DataFrame(result) if isinstance(result, pd.DataFrame) else result
-        result.attrs["columns"] = columns
+        result._attrs = {"columns": columns}
         return result
 
     raise ValueError(
