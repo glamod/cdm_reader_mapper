@@ -90,6 +90,19 @@ class ParquetStreamReader:
 
         self._generator = self._factory()
 
+        try:
+            first = next(self._generator)
+            if isinstance(first, pd.DataFrame):
+                self.columns = first.columns
+                self.dtypes = first.dtypes
+            elif isinstance(first, pd.Series):
+                self.columns = [first.name]
+                self.dtypes = {first.name: first.dtype}
+            self.prepend(first)
+        except StopIteration:
+            self.columns = []
+            self.dtypes = {}
+
         self.attrs = {}
 
     def __iter__(self):
@@ -137,15 +150,26 @@ class ParquetStreamReader:
         if not chunks:
             return pd.DataFrame()
 
-        df = pd.concat(chunks)
-        return df
+        return pd.concat(chunks)
 
     def copy(self):
         """Create an independent copy of the stream."""
         if self._closed:
             raise ValueError("Cannot copy a closed stream.")
         self._generator, new_gen = itertools.tee(self._generator)
-        return ParquetStreamReader(new_gen)
+
+        copy_stream = self.__class__.__new__(self.__class__)
+
+        # Manually copy all internal state
+        copy_stream._closed = self._closed
+        copy_stream._buffer = self._buffer.copy()
+        copy_stream._generator = new_gen
+        copy_stream._factory = self._factory
+        copy_stream.columns = self.columns.copy()
+        copy_stream.dtypes = self.dtypes.copy()
+        copy_stream.attrs = self.attrs.copy()
+
+        return copy_stream
 
     @property
     def empty(self):

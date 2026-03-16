@@ -428,10 +428,6 @@ def map_model(
     -------
     cdm_tables: pandas.DataFrame
       DataFrame with MultiIndex columns (cdm_table, column_name).
-
-    Note
-    ----
-    Column names will be written to `cdm_tables.attrs`.
     """
 
     @process_function()
@@ -477,9 +473,11 @@ def map_model(
 
     result, columns = tuple(results)
 
-    if isinstance(result, (pd.DataFrame, ParquetStreamReader)):
-        result = pd.DataFrame(result) if isinstance(result, pd.DataFrame) else result
-        result._attrs = {"columns": columns}
+    if isinstance(result, pd.DataFrame):
+        return result
+
+    if isinstance(result, ParquetStreamReader):
+        result.columns = columns
         return result
 
     raise ValueError(

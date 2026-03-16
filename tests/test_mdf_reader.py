@@ -384,7 +384,7 @@ def test_read_data_encoding():
     assert db.size == 1705
 
 
-def test_read_data_textfilereader():
+def test_read_data_chunksize():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
