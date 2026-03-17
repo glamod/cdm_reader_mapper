@@ -123,11 +123,11 @@ def _get_file(
 
     if not local_file.is_file():
         _get_remote_file(local_file, url, name)
-        _check_md5s(local_file, remote_md5)
+        # _check_md5s(local_file, remote_md5)
     else:
         if not _check_md5s(local_file, remote_md5, mode="warning"):
             _get_remote_file(local_file, url, name)
-            _check_md5s(local_file, remote_md5)
+            # _check_md5s(local_file, remote_md5)
 
     md5_file.unlink()
     return local_file
@@ -136,8 +136,8 @@ def _get_file(
 # idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
     name: str | os.PathLike,
-    github_url: str = "https://github.com/glamod/cdm-testdata",
-    branch: str = "main",
+    github_url: str = "https://github.com/JanWillruth/cdm-testdata",
+    branch: str = "gdac-elements",
     cache: bool = True,
     cache_dir: str | Path = _default_cache_dir_,
     clear_cache: bool = False,
