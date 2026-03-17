@@ -790,7 +790,7 @@ def test_multiple_readers():
 def make_reader_2(values=None):
     if values is None:
         values = []
-    return ParquetStreamReader(lambda: iter(values))
+    return ParquetStreamReader(values)
 
 
 def make_df_2(val):
