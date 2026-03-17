@@ -180,7 +180,7 @@ class Converters:
 
         self.preprocessing_functions = {
             "PPPP": lambda x: (
-                str(10_000 + int(x)) if isinstance(x, str) and x.startswith("0") else x
+                10_000 + int(x) if isinstance(x, str) and x.startswith("0") else x
             )
         }
 

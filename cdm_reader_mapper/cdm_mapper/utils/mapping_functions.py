@@ -907,7 +907,7 @@ class mapping_functions:
         self, series: pd.Series, convert_to_decimal_float=False
     ) -> pd.Series:
         """
-        Convert velocity from kilometers per hour in meters per second.
+        Convert velocity from kilometers per hour to meters per second.
 
         Parameters
         ----------
@@ -1089,3 +1089,33 @@ class mapping_functions:
         lon = df["LoLoLoLo"].copy()
         lon[df["Qc"].isin([5, 7])] *= -1
         return lon
+
+    def gdac_pressure(self, df: pd.DataFrame) -> pd.Series:
+        """
+        Decode or re-encode the non-standard pressure representation used by IMMT.
+
+        IMMT stores pressure as a scaled integer with an implicit offset: values below
+        1_000 represent readings above 1_000 hPa (e.g. raw 0025 → 1_002.5 hPa after
+        adding 10_000 and multiplying by 0.1).  Values ≥ 1_000 need only the scale
+        factor applied.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input DataFrame with column 'PPPP'.
+
+        Returns
+        -------
+        pd.Series
+            Series of converted pressure values.
+
+        Raises
+        ------
+        KeyError
+            If required columns are missing.
+        """
+        if "PPPP" not in df.columns:
+            raise KeyError("DataFrame must contain 'PPPP' column")
+        pppp = df["PPPP"].copy()
+        pppp = pppp.apply(lambda x: 10_000 + x if x < 1_000 else x) * 0.1
+        return pppp

@@ -17,7 +17,7 @@
       "end": 5,
       "field_length": 4,
       "description": "Year UTC",
-      "unit": "Year",
+      "units": "Year",
       "column_type": "int",
       "valid_max": 2100,
       "valid_min": 1600
@@ -27,7 +27,7 @@
       "end": 7,
       "field_length": 2,
       "description": "Month UTC",
-      "unit": "Month",
+      "units": "Month",
       "column_type": "int",
       "valid_max": 12,
       "valid_min": 1
@@ -37,7 +37,7 @@
       "end": 9,
       "field_length": 2,
       "description": "Day UTC",
-      "unit": "Day",
+      "units": "Day",
       "column_type": "int",
       "valid_max": 31,
       "valid_min": 1
@@ -47,7 +47,7 @@
       "end": 11,
       "field_length": 2,
       "description": "Nearest whole hour UTC",
-      "unit": "Hour",
+      "units": "Hour",
       "column_type": "int",
       "valid_max": 23,
       "valid_min": 0
@@ -65,7 +65,7 @@
       "end": 15,
       "field_length": 3,
       "description": "Latitude",
-      "unit": "Degrees",
+      "units": "Degrees",
       "column_type": "float",
       "transform": "convert_latitude",
       "scale": 0.1,
@@ -77,7 +77,7 @@
       "end": 19,
       "field_length": 4,
       "description": "Longitude",
-      "unit": "Degrees",
+      "units": "Degrees",
       "column_type": "float",
       "transform": "convert_longitude",
       "scale": 0.1,
@@ -137,7 +137,7 @@
       "end": 29,
       "field_length": 2,
       "description": "Wind speed",
-      "unit": "Knots or Metres per Second",
+      "units": "Knots or Metres per Second",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -155,12 +155,9 @@
       "end": 33,
       "field_length": 3,
       "description": "Air temperature",
-      "unit": "Degrees Celsius",
+      "units": "Degrees Celsius",
       "column_type": "float",
-      "transform": [
-        "convert_temperature",
-        "scale_temperature"
-      ],
+      "scale": 0.1,
       "valid_max": 99.9,
       "valid_min": -99.9
     },
@@ -177,12 +174,9 @@
       "end": 37,
       "field_length": 3,
       "description": "Dew-point temperature",
-      "unit": "Degrees Celsius",
+      "units": "Degrees Celsius",
       "column_type": "float",
-      "transform": [
-        "convert_temperature",
-        "scale_temperature"
-      ],
+      "scale": 0.1,
       "valid_max": 99.9,
       "valid_min": -99.9
     },
@@ -191,9 +185,9 @@
       "end": 41,
       "field_length": 4,
       "description": "Air pressure",
-      "unit": "Hectopascal",
+      "units": "Hectopascal",
       "column_type": "float",
-      "transform": "convert_pressure",
+      "scale": 0.1,
       "valid_max": 9999.9,
       "valid_min": 0.0
     },
@@ -266,12 +260,9 @@
       "end": 53,
       "field_length": 3,
       "description": "Sea surface temperature",
-      "unit": "Degrees Celsius",
+      "units": "Degrees Celsius",
       "column_type": "float",
-      "transform": [
-        "convert_temperature",
-        "scale_temperature"
-      ],
+      "scale": 0.1,
       "valid_max": 99.9,
       "valid_min": -99.9
     },
@@ -296,7 +287,7 @@
       "end": 57,
       "field_length": 2,
       "description": "Wave period",
-      "unit": "Seconds",
+      "units": "Seconds",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -306,7 +297,7 @@
       "end": 59,
       "field_length": 2,
       "description": "Wave height",
-      "unit": "Metres",
+      "units": "Metres",
       "column_type": "float",
       "scale": 0.5,
       "valid_max": 99,
@@ -325,7 +316,7 @@
       "end": 63,
       "field_length": 2,
       "description": "Predominant swell period",
-      "unit": "Seconds",
+      "units": "Seconds",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -335,7 +326,7 @@
       "end": 65,
       "field_length": 2,
       "description": "Predominant swell height",
-      "unit": "Metres",
+      "units": "Metres",
       "column_type": "float",
       "scale": 0.5,
       "valid_max": 99,
@@ -354,7 +345,7 @@
       "end": 68,
       "field_length": 2,
       "description": "Thickness of ice accretion",
-      "unit": "Centimetres",
+      "units": "Centimetres",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -433,7 +424,7 @@
       "end": 87,
       "field_length": 3,
       "description": "Amount of precipitation",
-      "unit": "Millimetres",
+      "units": "Millimetres",
       "codetable": "WMO.C3590",
       "column_type": "key"
     },
@@ -458,12 +449,9 @@
       "end": 92,
       "field_length": 3,
       "description": "Wet-bulb temperature",
-      "unit": "Degrees Celsius",
+      "units": "Degrees Celsius",
       "column_type": "float",
-      "transform": [
-        "convert_temperature",
-        "scale_temperature"
-      ],
+      "scale": 0.1,
       "valid_max": 99.9,
       "valid_min": -99.9
     },
@@ -480,7 +468,7 @@
       "end": 96,
       "field_length": 3,
       "description": "Amount of pressure tendency",
-      "unit": "Hectopascal",
+      "units": "Hectopascal",
       "column_type": "float",
       "scale": 0.1,
       "valid_max": 99.9,
@@ -515,7 +503,7 @@
       "end": 102,
       "field_length": 2,
       "description": "Secondary swell period",
-      "unit": "Seconds",
+      "units": "Seconds",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -525,7 +513,7 @@
       "end": 104,
       "field_length": 2,
       "description": "Secondary swell height",
-      "unit": "Metres",
+      "units": "Metres",
       "column_type": "float",
       "scale": 0.5,
       "valid_max": 99.0,
@@ -822,7 +810,7 @@
       "end": 151,
       "field_length": 3,
       "description": "Relative wind speed",
-      "unit": "Knots or metres per second",
+      "units": "Knots or metres per second",
       "column_type": "int",
       "valid_max": 99,
       "valid_min": 0
@@ -895,7 +883,7 @@
       "end": 163,
       "field_length": 4,
       "description": "Relative humidity",
-      "unit": "Percentage",
+      "units": "Percentage",
       "column_type": "float",
       "scale": 0.1,
       "valid_max": 100.0,
