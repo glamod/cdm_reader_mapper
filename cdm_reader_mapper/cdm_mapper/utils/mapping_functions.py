@@ -522,7 +522,9 @@ class mapping_functions:
         return series_strptime(series, format)
 
     def datetime_marob(
-        self, series: pd.Series, format: str = "%Y-%m-%dT%H:%M:%S"#"%d.%m.%y %H:%M:%S,%f"
+        self,
+        series: pd.Series,
+        format: str = "%Y-%m-%dT%H:%M:%S",  # "%d.%m.%y %H:%M:%S,%f"
     ) -> pd.Series:
         """
         Convert MAROB date strings to pandas datetime.
