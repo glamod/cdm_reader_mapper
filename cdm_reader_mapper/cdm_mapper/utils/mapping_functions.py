@@ -892,7 +892,11 @@ class mapping_functions:
             result = df + 273.15
         if method == "method_b":
             result = (
-                np.where(df.iloc[:, 0].isin(["0", "5"]), df.iloc[:, 1], -df.iloc[:, 1])
+                np.where(
+                    df.iloc[:, 0].astype(str).isin(["0", "5"]),
+                    df.iloc[:, 1],
+                    -df.iloc[:, 1],
+                )
                 + 273.15
             )
         if isinstance(result, pd.DataFrame):
