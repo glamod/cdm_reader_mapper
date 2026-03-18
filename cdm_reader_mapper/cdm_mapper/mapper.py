@@ -428,10 +428,6 @@ def map_model(
     -------
     cdm_tables: pandas.DataFrame
       DataFrame with MultiIndex columns (cdm_table, column_name).
-
-    Note
-    ----
-    Column names will be written to `cdm_tables.attrs`.
     """
 
     @process_function()
