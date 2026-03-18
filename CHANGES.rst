@@ -5,12 +5,28 @@ Changelog
 
 2.3.1 (unpublished)
 -------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Jan Marius Willruth (:user:`JanWillruth`)
+
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* `cdm_mapper.utils.mapping_functions`: Add function `gdac_pressure` in anticipation of moving conversion steps to the mapper in the future. (:pull:`350`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+
+* `mdf_reader`: Update and rename GDAC variable names (`schemas/gdac`) and code tables (`codes/gdac`) to align with current standards. (:issue:`341`, :pull:`350`)
+* `cdm_mapper`: (:pull:`350`)
+
+    * Update and rename GDAC variable names in `tables/gdac`.
+    * Fix `gdac_latitude` and `gdac_longitude` (`utils/mapping_functions.py`) not being used in observations.json
 
 Bug fixes
 ^^^^^^^^^
 
 * `cdm_mapper.mapper.map_model`: write data columns to `df._attrs` instead of `df.attrs` to avoid crashing class methods (:issue:`390`, :pull:`391`)
+* `cdm_mapper.utils.mapping_functions`: Change `method_b` in `mapping_function.py` to work with both str and int. (:pull:`350`)
+* `cdm_mapper.map_models`: write columns directly as an attribute to result to avoid crashing further DataFrame methods (:issue:`394`, :pull:`397`)
 
 2.3.0 (2026-03-12)
 ------------------

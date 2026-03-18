@@ -1,0 +1,12 @@
+{
+  "0": "No QC has been performed on this element",
+  "1": "QC performed; element appears correct",
+  "2": "QC performed; element appears inconsistent with other elements",
+  "3": "QC performed; element appears doubtful",
+  "4": "QC performed; element appears erroneous",
+  "5": "QC performed; element changed (possibly to missing) as a result",
+  "6": "QC flag amended: element flagged by CM as correct (1), but according to MQCS still appears suspect (2-4) or missing (9)",
+  "7": "QC flag amended: element flagged by CM as changed (5), but according to MQCS still appears suspect (2-4)",
+  "8": "Reserved",
+  "9": "Element is missing"
+}
