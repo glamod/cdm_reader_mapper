@@ -8,7 +8,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
     _is_empty,
     _drop_duplicated_rows,
     _get_nested_value,
-    _decimal_places,
     _transform,
     _code_table,
     _default,
@@ -54,18 +53,27 @@ def data_header():
 
 @pytest.fixture
 def data_header_expected():
-    return pd.DataFrame(
-        data={
+    data = pd.DataFrame(
+        {
             ("header", "report_id"): [
                 "ICOADS-300-5012",
                 "ICOADS-300-8960",
                 "ICOADS-300-0037",
                 "ICOADS-300-1000",
             ],
-            ("header", "duplicate_status"): ["4", "4", "4", "4"],
-            ("header", "platform_type"): ["2", "33", "32", "45"],
-            ("header", "location_quality"): ["2", "0", "0", "0"],
-            ("header", "source_id"): ["null", "null", "null", "null"],
+            ("header", "duplicate_status"): [4, 4, 4, 4],
+            ("header", "platform_type"): [2, 33, 32, 45],
+            ("header", "location_quality"): [2, 0, 0, 0],
+            ("header", "source_id"): [pd.NA, pd.NA, pd.NA, pd.NA],
+        }
+    )
+    return data.astype(
+        {
+            ("header", "report_id"): str,
+            ("header", "duplicate_status"): "Int64",
+            ("header", "platform_type"): "Int64",
+            ("header", "location_quality"): "Int64",
+            ("header", "source_id"): str,
         }
     )
 
@@ -111,8 +119,9 @@ def _map_model_test_data(
             na_values=None,
             keep_default_na=False,
         )
+
         result_table = result[cdm_table].copy()
-        result_table = result_table.dropna()
+        result_table = result_table.dropna(how="all")
         result_table = result_table.reset_index(drop=True)
 
         if "record_timestamp" in expected.columns:
@@ -121,6 +130,12 @@ def _map_model_test_data(
         if "history" in expected.columns:
             expected = expected.drop("history", axis=1)
             result_table = result_table.drop("history", axis=1)
+
+        # expected = expected.replace("null", pd.NA)
+        # expected = expected.astype(result_table.dtypes)
+
+        # print(result_table)  # .dtypes)
+        # print(expected)  # .dtypes)
 
         pd.testing.assert_frame_equal(result_table, expected)
 
@@ -206,14 +221,6 @@ def test_prepare_cdm_tables_invalid():
     assert result == {}
 
 
-@pytest.mark.parametrize(
-    "decimal_places,expected",
-    [(None, 5), (4, 4), ("4", 5)],
-)
-def test_decimal_places(decimal_places, expected):
-    assert _decimal_places(decimal_places) == expected
-
-
 def test_transform(imodel_functions):
     series = pd.Series(data={"a": 1, "b": 2, "c": np.nan}, index=["a", "b", "c"])
     logger = logging_hdlr.init_logger(__name__, level="INFO")
@@ -283,20 +290,17 @@ def test_fill_value(series, fill_value, expected):
 @pytest.mark.parametrize(
     "value,atts,expected",
     [
-        (5, {"data_type": "numeric", "decimal_places": 2}, "5.00"),
-        (5, None, np.nan),
+        (5, {"data_type": "numeric"}, 5.0),
+        (5, None, pd.NA),
         (5, {"data_type": "invalid"}, 5),
-        ("5", {"data_type": "int"}, "5"),
+        ("5", {"data_type": "int"}, 5),
         (5, {}, 5),
     ],
 )
 def test_convert_dtype(value, atts, expected):
     idata = pd.Series(value)
     result = _convert_dtype(idata, atts)
-    if isinstance(result, pd.Series):
-        pd.testing.assert_series_equal(result, pd.Series(expected))
-    else:
-        assert result, expected
+    pd.testing.assert_series_equal(result, pd.Series(expected), check_dtype=False)
 
 
 @pytest.mark.parametrize(
@@ -346,12 +350,13 @@ def test_extract_input_data_empty():
 
 
 @pytest.mark.parametrize(
-    "column, expected",
+    "column, dtype, expected",
     [
-        ("duplicate_status", ["4", "4", "4", "4"]),
-        ("platform_type", ["2", "33", "32", "45"]),
+        ("duplicate_status", "Int64", [4, 4, 4, 4]),
+        ("platform_type", "Int64", [2, 33, 32, 45]),
         (
             "report_id",
+            str,
             [
                 "ICOADS-300-5012",
                 "ICOADS-300-8960",
@@ -359,11 +364,13 @@ def test_extract_input_data_empty():
                 "ICOADS-300-1000",
             ],
         ),
-        ("location_quality", ["2", "0", "0", "0"]),
-        ("latitude", [None, None, None, None]),
+        ("location_quality", "Int64", [2, 0, 0, 0]),
+        ("latitude", "Float64", [pd.NA, pd.NA, pd.NA, pd.NA]),
     ],
 )
-def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expected):
+def test_column_mapping(
+    imodel_maps, imodel_functions, data_header, column, dtype, expected
+):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     mapping_column = imodel_maps["header"][column]
     column_atts = get_cdm_atts("header")["header"][column]
@@ -376,7 +383,9 @@ def test_column_mapping(imodel_maps, imodel_functions, data_header, column, expe
         column,
         logger,
     )
-    pd.testing.assert_series_equal(result, pd.Series(expected, name=column))
+    pd.testing.assert_series_equal(
+        result, pd.Series(expected, name=column, dtype=dtype)
+    )
 
 
 def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
@@ -409,7 +418,7 @@ def test_column_mapping_subset(imodel_maps, imodel_functions, data_header):
         column,
         logger,
     )
-    expected = data_header[("c1", "PT")].rename(column)
+    expected = data_header[("c1", "PT")].rename(column).astype("Int64")
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -422,7 +431,6 @@ def test_table_mapping(
         data_header,
         imodel_maps["header"],
         table_atts,
-        "null",
         imodel_functions,
         None,
         True,
@@ -440,7 +448,6 @@ def test_table_mapping_empty(imodel_maps, imodel_functions, data_header):
         data_header,
         imodel_maps["header"],
         {},
-        "null",
         imodel_functions,
         None,
         True,
@@ -457,6 +464,9 @@ def test_map_model_icoads(data_header, data_header_expected):
         "icoads_r300_d720",
         cdm_subset=["header"],
     )
+    c = ("header", "duplicate_status")
+    print(result[c])
+    print(data_header_expected[c])
     pd.testing.assert_frame_equal(
         result[data_header_expected.columns], data_header_expected
     )
@@ -523,6 +533,43 @@ def test_map_model_pub47():
         ("observations-ws", "observation_height_above_station_surface"),
         ("observations-ws", "sensor_id"),
     ]
+
+    dtypes = {
+        ("header", "station_name"): str,
+        ("header", "platform_sub_type"): "Int64",
+        ("header", "primary_station_id"): str,
+        ("header", "station_record_number"): "Int64",
+        ("header", "report_duration"): "Int64",
+        ("observations-at", "sensor_automation_status"): "Int64",
+        ("observations-at", "z_coordinate"): "Float64",
+        ("observations-at", "observation_height_above_station_surface"): "Float64",
+        ("observations-at", "sensor_id"): str,
+        ("observations-dpt", "sensor_automation_status"): "Int64",
+        ("observations-dpt", "z_coordinate"): "Float64",
+        ("observations-dpt", "observation_height_above_station_surface"): "Float64",
+        ("observations-dpt", "sensor_id"): str,
+        ("observations-slp", "sensor_automation_status"): "Int64",
+        ("observations-slp", "z_coordinate"): "Float64",
+        ("observations-slp", "observation_height_above_station_surface"): "Float64",
+        ("observations-slp", "sensor_id"): str,
+        ("observations-sst", "sensor_automation_status"): "Int64",
+        ("observations-sst", "z_coordinate"): "Float64",
+        ("observations-sst", "observation_height_above_station_surface"): "Float64",
+        ("observations-sst", "sensor_id"): str,
+        ("observations-wbt", "sensor_automation_status"): "Int64",
+        ("observations-wbt", "z_coordinate"): "Float64",
+        ("observations-wbt", "observation_height_above_station_surface"): "Float64",
+        ("observations-wbt", "sensor_id"): str,
+        ("observations-wd", "sensor_automation_status"): "Int64",
+        ("observations-wd", "z_coordinate"): "Float64",
+        ("observations-wd", "observation_height_above_station_surface"): "Float64",
+        ("observations-wd", "sensor_id"): str,
+        ("observations-ws", "sensor_automation_status"): "Int64",
+        ("observations-ws", "z_coordinate"): "Float64",
+        ("observations-ws", "observation_height_above_station_surface"): "Float64",
+        ("observations-ws", "sensor_id"): str,
+    }
+
     result = result[columns]
 
     exp = np.array(
@@ -534,37 +581,37 @@ def test_map_model_pub47():
                 "ZENITH LEADER",
                 "MAERSK KENSINGTON",
             ],
-            ["null", "27", "null", "30", "4"],
+            [pd.NA, 27, pd.NA, 30, 4],
             ["03380", "2AAY7", "2ABB2", "2ACU6", "2AEC7"],
-            ["0", "6", "2", "3", "4"],
-            ["9", "11", "null", "15", "11"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
+            [0, 6, 2, 3, 4],
+            [9, 11, pd.NA, 15, 11],
+            [1, 5, 5, 5, 2],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
             ["AT", "AT", "AT", "AT", "AT"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
             ["HUM", "HUM", "HUM", "HUM", "HUM"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
             ["SLP", "SLP", "SLP", "SLP", "SLP"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "null", "null", "-5.5", "-7.0"],
-            ["null", "null", "null", "-5.5", "-7.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, np.nan, np.nan, -5.5, -7.0],
+            [np.nan, np.nan, np.nan, -5.5, -7.0],
             ["SST", "SST", "SST", "SST", "SST"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
-            ["null", "17.5", "30.0", "27.0", "32.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
+            [np.nan, 17.5, 30.0, 27.0, 32.0],
             ["HUM", "HUM", "HUM", "HUM", "HUM"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "21.0", "30.0", "3.5", "9.0"],
-            ["null", "21.0", "30.0", "3.5", "9.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, 21.0, 30.0, 3.5, 9.0],
+            [np.nan, 21.0, 30.0, 3.5, 9.0],
             ["WSPD", "WSPD", "WSPD", "WSPD", "WSPD"],
-            ["1", "5", "5", "5", "2"],
-            ["null", "21.0", "30.0", "3.5", "9.0"],
-            ["null", "21.0", "30.0", "3.5", "9.0"],
+            [1, 5, 5, 5, 2],
+            [np.nan, 21.0, 30.0, 3.5, 9.0],
+            [np.nan, 21.0, 30.0, 3.5, 9.0],
             ["WSPD", "WSPD", "WSPD", "WSPD", "WSPD"],
         ]
     )
@@ -572,6 +619,7 @@ def test_map_model_pub47():
         data=exp.T,
         columns=pd.MultiIndex.from_tuples(columns),
     )
+    expected = expected.astype(dtypes)
 
     pd.testing.assert_frame_equal(result, expected)
 
