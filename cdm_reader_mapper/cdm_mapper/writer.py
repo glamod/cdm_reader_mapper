@@ -31,6 +31,7 @@ from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
+from .conversion import convert_to_str
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
@@ -80,6 +81,10 @@ def write_tables(
     col_subset: str | list | dict | None = None,
     delimiter: str = "|",
     encoding: str = "utf-8",
+    imodel: str | None = None,
+    from_str: bool | None = None,
+    to_str: bool | None = None,
+    null_label: str = "null",
     **kwargs,
 ) -> None:
     """Write pandas.DataFrame to CDM-table file on file system.
@@ -169,12 +174,18 @@ def write_tables(
 
     extension = extension or data_format
 
+    if to_str is True:
+        data = convert_to_str(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
+
     for table in cdm_subset:
-        if table not in data:
-            cdm_atts = get_cdm_atts(table)
-            cdm_table = pd.DataFrame(columns=cdm_atts.keys())
-        else:
+        cdm_atts = get_cdm_atts(table)[table]
+        table_columns = pd.Index(cdm_atts.keys())
+        if table in data:
             cdm_table = data[table]
+        elif data.columns.equals(table_columns):
+            cdm_table = data
+        else:
+            cdm_table = pd.DataFrame(columns=table_columns)
 
         filename_ = filename.get(table)
         if not filename_:

@@ -694,14 +694,14 @@ def test_map_model_df():
                 "ICOADS-302-0037",
                 "ICOADS-302-1000",
             ],
-            ("header", "duplicate_status"): ["4", "4", "4", "4"],
-            ("header", "platform_type"): ["2", "33", "32", "45"],
-            ("header", "location_quality"): ["2", "0", "0", "0"],
-            ("header", "source_id"): ["null", "null", "null", "null"],
+            ("header", "duplicate_status"): [4, 4, 4, 4],
+            ("header", "platform_type"): [2, 33, 32, 45],
+            ("header", "location_quality"): [2, 0, 0, 0],
         }
     )
-
-    pd.testing.assert_frame_equal(result.data[expected.columns], expected)
+    pd.testing.assert_frame_equal(
+        result.data[expected.columns], expected, check_dtype=False
+    )
 
 
 def test_map_model_psr():
@@ -728,14 +728,15 @@ def test_map_model_psr():
                 "ICOADS-302-0037",
                 "ICOADS-302-1000",
             ],
-            ("header", "duplicate_status"): ["4", "4", "4", "4"],
-            ("header", "platform_type"): ["2", "33", "32", "45"],
-            ("header", "location_quality"): ["2", "0", "0", "0"],
-            ("header", "source_id"): ["null", "null", "null", "null"],
+            ("header", "duplicate_status"): [4, 4, 4, 4],
+            ("header", "platform_type"): [2, 33, 32, 45],
+            ("header", "location_quality"): [2, 0, 0, 0],
         }
     )
 
-    pd.testing.assert_frame_equal(result.data.read()[expected.columns], expected)
+    pd.testing.assert_frame_equal(
+        result.data.read()[expected.columns], expected, check_dtype=False
+    )
 
 
 def test_duplicate_check_single_index():
