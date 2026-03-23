@@ -124,6 +124,7 @@ def _convert_array_general(data: pd.Series, dtype: type) -> pd.Series:
 
     return data.apply(_convert_value)
 
+
 def _transform(
     data,
     imodel_functions,
@@ -310,7 +311,7 @@ def _table_mapping(
 
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
-        
+
     return table_df
 
 
@@ -326,7 +327,7 @@ def _prepare_cdm_tables(cdm_subset):
     tables = {}
     for table, atts in cdm_atts.items():
         tables[table] = atts
-        
+
     return tables
 
 
@@ -354,7 +355,7 @@ def _map_data_model(
         table_df = _table_mapping(
             idata=idata,
             mapping=table_maps,
-            atts=table_atts, 
+            atts=table_atts,
             imodel_functions=imodel_functions,
             codes_subset=codes_subset,
             cdm_complete=cdm_complete,

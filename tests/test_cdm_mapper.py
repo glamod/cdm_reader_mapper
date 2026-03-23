@@ -114,7 +114,7 @@ def _map_model_test_data(
 
     if not select:
         select = cdm_tables
-    
+        
     for cdm_table in select:
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna(how="all")
@@ -140,10 +140,6 @@ def _map_model_test_data(
         if "history" in expected_table.columns:
             expected_table = expected_table.drop("history", axis=1)
             result_table = result_table.drop("history", axis=1)
-            
-        def get_decimals(x):
-            s = str(x)
-            return len(s.split(".")[1] if "." in s else 0)
 
         pd.testing.assert_frame_equal(result_table, expected_table)
 
@@ -431,7 +427,7 @@ def test_table_mapping_basic(
     )
     expected = data_header_expected["header"]
     result = results[expected.columns]
-    
+
     pd.testing.assert_frame_equal(result, expected)
 
 
