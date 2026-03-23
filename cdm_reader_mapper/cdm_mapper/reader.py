@@ -57,7 +57,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 from ..properties import SupportedFileTypes
 from .properties import cdm_tables
 
-from .conversion import convert_to_str, convert_from_str
+from .conversion import convert_to_str_df, convert_from_str_df
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
@@ -104,6 +104,7 @@ def _read_single_file(
         col_subset=col_subset,
         **kwargs,
     )
+
     if df.empty:
         return pd.DataFrame()
 
@@ -324,8 +325,8 @@ def read_tables(
     merged = merged.reset_index(drop=True)
 
     if from_str is True:
-        merged = convert_from_str(merged, imodel, cdm_subset=cdm_subset)
+        merged = convert_from_str_df(merged, imodel, cdm_subset=cdm_subset)
     elif to_str is True:
-        merged = convert_to_str(merged, imodel, cdm_subset=cdm_subset)
+        merged = convert_to_str_df(merged, imodel, cdm_subset=cdm_subset)
 
     return DataBundle(data=merged, columns=merged.columns, mode="tables")

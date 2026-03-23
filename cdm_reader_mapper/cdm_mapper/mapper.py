@@ -30,18 +30,9 @@ from cdm_reader_mapper.common.iterators import (
 
 from . import properties
 from .codes.codes import get_code_table
+from .conversion import convert_from_str_series
 from .tables.tables import get_cdm_atts, get_imodel_maps
 from .utils.mapping_functions import mapping_functions
-
-dtypes = {
-    "int": "Int64",
-    "int[]": {list: "Int64"},
-    "numeric": "Float64",
-    "numeric[]": {list: "Float64"},
-    "timestamp with timezone": pd.to_datetime,
-    "varchar": str,
-    "varchar[]": {list: str},
-}
 
 
 def _is_empty(value):
@@ -132,36 +123,6 @@ def _convert_array_general(data: pd.Series, dtype: type) -> pd.Series:
         return v_list
 
     return data.apply(_convert_value)
-
-
-def _convert_dtype(series, atts) -> pd.Series:
-    """Convert data to the type specified in `atts`."""
-    if atts is None:
-        return pd.Series(pd.NA)
-
-    dtype = atts.get("data_type")
-    if not dtype:
-        return series
-
-    dtype = dtypes.get(dtype)
-    if not dtype:
-        return series
-
-    # series = series.fillna(pd.NA)
-    # series = series.replace(null_label, pd.NA)
-
-    if isinstance(dtype, type):
-        series = series.astype(dtype)
-    elif dtype in ("Int64", "Float64"):
-        series = pd.to_numeric(series, errors="coerce").astype(dtype)
-    elif isinstance(dtype, dict):
-        dtype_entry = list(dtype.values())[0]
-        series = _convert_array_general(series, dtype_entry)
-    elif isinstance(dtype, Callable):
-        series = dtype(series)
-
-    return series
-
 
 def _transform(
     data,
@@ -305,10 +266,11 @@ def _column_mapping(
     if fill_value is not None:
         data = _fill_value(data, fill_value)
 
-    if atts:
-        data = _convert_dtype(data, atts)
-
-    return data
+    atts_combined = {**atts, **imapping}
+    return convert_from_str_series(
+        data,
+        atts,
+    )
 
 
 def _table_mapping(
@@ -326,17 +288,11 @@ def _table_mapping(
     out = {}
 
     for column in columns:
-        if column not in mapping.keys():
-            out[column] = pd.Series(
-                [pd.NA] * len(idata), index=idata.index, name=column
-            )
-            continue
-
         logger.debug(f"\tElement: {column}")
 
         out[column] = _column_mapping(
             idata,
-            mapping[column],
+            mapping.get(column, {}),
             imodel_functions,
             atts[column],
             codes_subset,
@@ -354,7 +310,7 @@ def _table_mapping(
 
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
-
+        
     return table_df
 
 
@@ -369,10 +325,8 @@ def _prepare_cdm_tables(cdm_subset):
 
     tables = {}
     for table, atts in cdm_atts.items():
-        tables[table] = {
-            "atts": atts,
-        }
-
+        tables[table] = atts
+        
     return tables
 
 
@@ -394,13 +348,13 @@ def _map_data_model(
         )
 
     all_tables = []
-    for table, mapping in imodel_maps.items():
+    for table, table_atts in cdm_tables.items():
         logger.debug(f"Table: {table}")
-
+        table_maps = imodel_maps[table]
         table_df = _table_mapping(
             idata=idata,
-            mapping=mapping,
-            atts=deepcopy(cdm_tables[table]["atts"]),
+            mapping=table_maps,
+            atts=table_atts, 
             imodel_functions=imodel_functions,
             codes_subset=codes_subset,
             cdm_complete=cdm_complete,

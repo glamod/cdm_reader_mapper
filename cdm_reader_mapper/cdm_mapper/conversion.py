@@ -80,11 +80,18 @@ def _convert_array_general_from_str(data: pd.Series, dtype: type) -> pd.Series:
     """
 
     def _convert_value(x):
-        if pd.isna(x):
+        if isinstance(x, list):
+            x_list = x
+        elif pd.isna(x):
             x_list = []
         else:
-            x_list = x.strip("{}").split(",")
-        return list(pd.array(x_list, dtype=dtype))
+            x_list = str(x).strip("{}").split(",")
+
+        value_list = list(pd.array(x_list, dtype=dtype))
+        if not value_list:
+            value_list = pd.NA
+
+        return value_list
 
     return data.apply(_convert_value)
 
@@ -334,14 +341,43 @@ def _convert_datetime_to_str(data: pd.Series, null_label: str) -> pd.Series:
 def _convert_datetime_from_str(data: pd.Series) -> pd.Series:
     return pd.to_datetime(data)
 
+def _convert_column(
+    series: pd.Series,
+    column_atts: dict,
+    converters: ConvertFromStr | ConvertToStr,
+    **kwargs,
+    
+) -> pd.Series:
+            if not isinstance(series, pd.Series):
+                raise TypeError("series must be a pd.Series.")
+                       
+            data_type = column_atts.get("data_type")
+            if data_type is None:
+                return series
 
-def _convert(
+            converter = converters[data_type]
+
+            if converter is None:
+                return series
+
+            converter_args = converters.get_args(data_type)
+            
+            column_kwargs = {**kwargs}
+            if converter_args == "decimal_places":
+                column_kwargs["decimal_places"] = column_atts.get(
+                    "decimal_places", 
+                    properties.default_decimal_places,
+                )
+
+            return converter(series, **column_kwargs)
+
+def _convert_columns(
     data: pd.DataFrame,
     imodel: str,
     cdm_subset: str | list | None,
     null_label: str | None,
     mode: str,
-):
+) -> pd.DataFrame:
     if not isinstance(data, pd.DataFrame):
         raise TypeError("data must be a pd.DataFrame.")
 
@@ -377,63 +413,71 @@ def _convert(
     for table, table_atts in cdm_atts.items():
         table_maps = imodel_maps.get(table, {})
         for column, column_atts in table_atts.items():
-            data_type = column_atts.get("data_type")
-            if data_type is None:
-                continue
-
-            converter = converters[data_type]
-
-            if converter is None:
-                continue
-
+        
             if column in data.columns:
                 data_column = column
             elif (table, column) in data.columns:
                 data_column = (table, column)
             else:
-                continue
-
-            converter_args = converters.get_args(data_type)
-
-            column_kwargs = {**kwargs}
-
-            if table_maps and converter_args == "decimal_places":
-                column_maps = table_maps.get(column, {})
-                decimal_places = column_maps.get("decimal_places")
-                if decimal_places is None or not isinstance(decimal_places, int):
-                    decimal_places = properties.default_decimal_places
-                column_kwargs["decimal_places"] = decimal_places
-
-            data[data_column] = converter(data[data_column], **column_kwargs)
-
+                continue  
+                
+            column_maps = table_maps.get(column, {})
+            column_atts = {**column_atts, **column_maps}                     
+        
+            data[data_column] = _convert_column(
+                data[data_column],
+                column_atts,
+                converters,
+                **kwargs,
+            )
     return data
 
 
-def convert_from_str(
+def convert_from_str_df(
     data: pd.DataFrame,
     imodel: str,
     cdm_subset: str | list | None = None,
     null_label: str | None = "null",
-):
-    return _convert(
+) -> pd.DataFrame:
+    return _convert_columns(
         data,
         imodel,
         cdm_subset,
         null_label,
         "from_str",
+      )
+      
+def convert_from_str_series(
+  series: pd.Series,
+  column_atts: dict,
+) -> pd.Series:
+    series = series.fillna(pd.NA)
+    return _convert_column(
+        series,
+        column_atts,
+        ConvertFromStr(),
     )
 
-
-def convert_to_str(
+def convert_to_str_df(
     data: pd.DataFrame,
     imodel: str,
     cdm_subset: str | list | None = None,
     null_label: str | None = "null",
 ):
-    return _convert(
+    return _convert_columns(
         data,
         imodel,
         cdm_subset,
         null_label,
         "to_str",
+    )
+    
+def convert_to_str_series(
+    series: pd.Series,
+    column_atts: dict,
+) -> pd.Series:    
+    return _soncert_column(
+        series,
+        column_atts,
+        ConvertToStr(),
     )

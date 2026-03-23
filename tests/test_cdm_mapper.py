@@ -14,7 +14,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
     _fill_value,
     _extract_input_data,
     _column_mapping,
-    _convert_dtype,
     _table_mapping,
     _prepare_cdm_tables,
     map_model,
@@ -24,8 +23,9 @@ from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.common.json_dict import open_json_file
 
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
-from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functions
+from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
+from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functions
 
 from cdm_reader_mapper.data import test_data
 
@@ -69,11 +69,11 @@ def data_header_expected():
     )
     return data.astype(
         {
-            ("header", "report_id"): str,
+            ("header", "report_id"): object,
             ("header", "duplicate_status"): "Int64",
             ("header", "platform_type"): "Int64",
             ("header", "location_quality"): "Int64",
-            ("header", "source_id"): str,
+            ("header", "source_id"): object,
         }
     )
 
@@ -110,34 +110,46 @@ def _map_model_test_data(
 
     if not select:
         select = cdm_tables
+    
+    expected = read_tables(
+        test_data[f"test_{data_model}"][f"cdm_header"].parent,
+        imodel=data_model,
+        from_str=True,
+        extension="psv",
+        suffix="*",
+    )
 
     for cdm_table in select:
-        expected = pd.read_csv(
-            test_data[f"test_{data_model}"][f"cdm_{cdm_table}"],
-            delimiter="|",
-            dtype="object",
-            na_values=None,
-            keep_default_na=False,
-        )
-
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna(how="all")
         result_table = result_table.reset_index(drop=True)
 
-        if "record_timestamp" in expected.columns:
-            expected = expected.drop("record_timestamp", axis=1)
+        if result_table.empty and cdm_table not in expected.data.columns.get_level_values(0):
+            continue
+            
+        expected_table = expected.data[cdm_table]
+        expected_table = expected_table.dropna(how="all")
+        expected_table = expected_table.reset_index(drop=True)             
+
+        if "record_timestamp" in expected_table.columns:
+            expected_table = expected_table.drop("record_timestamp", axis=1)
             result_table = result_table.drop("record_timestamp", axis=1)
-        if "history" in expected.columns:
-            expected = expected.drop("history", axis=1)
+        if "history" in expected_table.columns:
+            expected_table = expected_table.drop("history", axis=1)
             result_table = result_table.drop("history", axis=1)
+            
+        #def get_decimals(x):
+        #    s = str(x)
+        #    return len(s.split(".")[1] if "." in s else 0)
+        
+        #for c in expected_table.columns:
+        #    if expected_table[c].dtype == "Float64":
+        #        decimal_list = [get_decimals(v) for v in expected_table[c].dropna()]
+        #        if decimal_list:
+        #            decimals = max(decimal_list)
+        #            result_table[c] = result_table[c].round(decimals)
 
-        # expected = expected.replace("null", pd.NA)
-        # expected = expected.astype(result_table.dtypes)
-
-        # print(result_table)  # .dtypes)
-        # print(expected)  # .dtypes)
-
-        pd.testing.assert_frame_equal(result_table, expected)
+        pd.testing.assert_frame_equal(result_table, expected_table)
 
 
 @pytest.mark.parametrize(
@@ -213,7 +225,6 @@ def test_prepare_cdm_tables(table, is_list):
 
     assert isinstance(result, dict)
     assert list(result.keys()) == [table]
-    assert "atts" in result[table]
 
 
 def test_prepare_cdm_tables_invalid():
@@ -285,22 +296,6 @@ def test_fill_value(series, fill_value, expected):
         pd.testing.assert_series_equal(result, expected)
     else:
         assert result == expected
-
-
-@pytest.mark.parametrize(
-    "value,atts,expected",
-    [
-        (5, {"data_type": "numeric"}, 5.0),
-        (5, None, pd.NA),
-        (5, {"data_type": "invalid"}, 5),
-        ("5", {"data_type": "int"}, 5),
-        (5, {}, 5),
-    ],
-)
-def test_convert_dtype(value, atts, expected):
-    idata = pd.Series(value)
-    result = _convert_dtype(idata, atts)
-    pd.testing.assert_series_equal(result, pd.Series(expected), check_dtype=False)
 
 
 @pytest.mark.parametrize(
@@ -422,12 +417,12 @@ def test_column_mapping_subset(imodel_maps, imodel_functions, data_header):
     pd.testing.assert_series_equal(result, expected)
 
 
-def test_table_mapping(
+def test_table_mapping_basic(
     imodel_maps, imodel_functions, data_header, data_header_expected
 ):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     table_atts = get_cdm_atts("header")["header"]
-    result = _table_mapping(
+    results = _table_mapping(
         data_header,
         imodel_maps["header"],
         table_atts,
@@ -439,7 +434,9 @@ def test_table_mapping(
         logger,
     )
     expected = data_header_expected["header"]
-    pd.testing.assert_frame_equal(result[expected.columns], expected)
+    result = results[expected.columns]
+    
+    pd.testing.assert_frame_equal(result, expected)
 
 
 def test_table_mapping_empty(imodel_maps, imodel_functions, data_header):
@@ -465,8 +462,6 @@ def test_map_model_icoads(data_header, data_header_expected):
         cdm_subset=["header"],
     )
     c = ("header", "duplicate_status")
-    print(result[c])
-    print(data_header_expected[c])
     pd.testing.assert_frame_equal(
         result[data_header_expected.columns], data_header_expected
     )

@@ -31,7 +31,7 @@ from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from .conversion import convert_to_str
+from .conversion import convert_to_str_df
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
@@ -175,7 +175,7 @@ def write_tables(
     extension = extension or data_format
 
     if to_str is True:
-        data = convert_to_str(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
+        data = convert_to_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
 
     for table in cdm_subset:
         cdm_atts = get_cdm_atts(table)[table]
