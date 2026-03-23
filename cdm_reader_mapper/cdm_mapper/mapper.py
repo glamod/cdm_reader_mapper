@@ -460,7 +460,7 @@ def map_model(
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
     results = _map_model()
-
+    
     result, columns = tuple(results)
 
     if isinstance(result, pd.DataFrame):

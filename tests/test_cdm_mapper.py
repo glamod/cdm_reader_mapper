@@ -30,6 +30,10 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functio
 from cdm_reader_mapper.data import test_data
 
 
+from cdm_reader_mapper.cdm_mapper.writer import write_tables
+
+from cdm_reader_mapper.cdm_mapper.writer import write_tables
+
 @pytest.fixture
 def imodel_maps():
     return get_imodel_maps("icoads", "r300", "d720", cdm_tables=["header"])
@@ -82,7 +86,7 @@ def _map_model_test_data(
     data_model, encoding="utf-8", select=None, chunksize=None, **kwargs
 ):
     source = test_data[f"test_{data_model}"]["mdf_data"]
-
+    
     mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
     if mdf_info is None:
         dtypes = object
@@ -111,25 +115,24 @@ def _map_model_test_data(
     if not select:
         select = cdm_tables
     
-    expected = read_tables(
-        test_data[f"test_{data_model}"][f"cdm_header"].parent,
-        imodel=data_model,
-        from_str=True,
-        extension="psv",
-        suffix="*",
-    )
-
     for cdm_table in select:
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna(how="all")
         result_table = result_table.reset_index(drop=True)
+        
+        try:
+          expected_table = read_tables(
+            test_data[f"test_{data_model}"][f"cdm_{cdm_table}"].parent,
+            data_format="parquet",
+            extension="pq",
+            suffix="*",
+            cdm_subset=cdm_table,
+          )[cdm_table]
+        except ValueError:
+            expected_table =pd.DataFrame()
 
-        if result_table.empty and cdm_table not in expected.data.columns.get_level_values(0):
-            continue
-            
-        expected_table = expected.data[cdm_table]
-        expected_table = expected_table.dropna(how="all")
-        expected_table = expected_table.reset_index(drop=True)             
+        if result_table.empty and expected_table.empty:
+            continue          
 
         if "record_timestamp" in expected_table.columns:
             expected_table = expected_table.drop("record_timestamp", axis=1)
@@ -138,16 +141,9 @@ def _map_model_test_data(
             expected_table = expected_table.drop("history", axis=1)
             result_table = result_table.drop("history", axis=1)
             
-        #def get_decimals(x):
-        #    s = str(x)
-        #    return len(s.split(".")[1] if "." in s else 0)
-        
-        #for c in expected_table.columns:
-        #    if expected_table[c].dtype == "Float64":
-        #        decimal_list = [get_decimals(v) for v in expected_table[c].dropna()]
-        #        if decimal_list:
-        #            decimals = max(decimal_list)
-        #            result_table[c] = result_table[c].round(decimals)
+        def get_decimals(x):
+            s = str(x)
+            return len(s.split(".")[1] if "." in s else 0)
 
         pd.testing.assert_frame_equal(result_table, expected_table)
 

@@ -254,7 +254,7 @@ class TestData:
         }
         for cdm_table in cdm_tables:
             cdm_table_file = (
-                f"{drs}/cdm_tables/{cdm_table}-{data_model}_{data_file}.psv"
+                f"{drs}/cdm_tables/{cdm_table}-{data_model}_{data_file}.pq"
             )
             data_dict[f"cdm_{cdm_table}"] = cdm_table_file
 

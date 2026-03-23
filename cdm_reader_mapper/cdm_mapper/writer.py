@@ -60,7 +60,7 @@ def _table_to_file(
             **kwargs,
         )
     elif data_format == "parquet":
-        data.to_parquet(filename, **kwargs)
+        data.to_parquet(filename, engine="pyarrow", compression="snappy", **kwargs)
     elif data_format == "feather":
         data.to_feather(filename, **kwargs)
     else:

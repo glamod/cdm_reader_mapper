@@ -308,14 +308,14 @@ def test_read_tables_testdata_str_conversion(tmp_path):
     imodel = "icoads_r302_d992"
     source = test_data[f"test_{imodel}"]["cdm_header"]
 
-    db_type = read_tables(source, from_str=True, imodel=imodel)
+    db_type = read_tables(source, data_format="parquet", extension="pq")
     write_tables(
         db_type.data, out_dir=tmp_path, to_str=True, imodel=imodel, suffix="str"
     )
 
     db_tmp = read_tables(tmp_path, suffix="str")
 
-    expected = read_tables(source)
+    expected = read_tables(source, data_format="parquet", extension="pq", to_str=True, imodel=imodel)
     pd.testing.assert_frame_equal(db_tmp.data["header"], expected.data)
 
 
@@ -324,7 +324,7 @@ def test_read_tables_testdata_binary(tmp_path, data_format):
     imodel = "icoads_r302_d992"
     source = test_data[f"test_{imodel}"]["cdm_header"]
 
-    db_type = read_tables(source, from_str=True, imodel=imodel)
+    db_type = read_tables(source, data_format="parquet", extension="parquet")
     write_tables(db_type.data, out_dir=tmp_path, data_format=data_format)
 
     db_tmp = read_tables(tmp_path, data_format=data_format)

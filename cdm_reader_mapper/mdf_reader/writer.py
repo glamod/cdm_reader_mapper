@@ -188,6 +188,11 @@ def write_data(
                 encoding=encoding,
                 **kwargs,
             )
+        if data_format == "parquet":
+            write_kwargs = dict(
+                engine="pyarrow",
+                compression="snappy",
+            )
 
         writer = WRITERS[data_format]
         getattr(data_df, writer)(filename_data, **write_kwargs)

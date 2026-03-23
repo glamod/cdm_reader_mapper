@@ -6,6 +6,7 @@ import ast
 
 from typing import get_args
 
+import numpy as np
 import pandas as pd
 
 from . import properties
@@ -120,7 +121,15 @@ def _convert_array_general_to_str(
             except (SyntaxError, ValueError):
                 x = [x]
 
-        x_list = x if isinstance(x, list) else [x]
+        if x is None:
+            return null_label
+
+        if isinstance(x, np.ndarray):
+            x_list = x.tolist()
+        elif isinstance(x, list):
+            x_list = x
+        else:
+            x_list = [x]
 
         str_list = [str(dtype(x_)) for x_ in x_list]
 
