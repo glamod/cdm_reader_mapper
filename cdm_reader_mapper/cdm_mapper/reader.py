@@ -174,7 +174,7 @@ def _read_multiple_files(
             null_label=null_label,
             **kwargs,
         )
-        
+
         if dfi.empty:
             logger.warning(
                 f"Table {table} empty in file system, not added to the final DF"
