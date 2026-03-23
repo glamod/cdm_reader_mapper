@@ -341,35 +341,36 @@ def _convert_datetime_to_str(data: pd.Series, null_label: str) -> pd.Series:
 def _convert_datetime_from_str(data: pd.Series) -> pd.Series:
     return pd.to_datetime(data)
 
+
 def _convert_column(
     series: pd.Series,
     column_atts: dict,
     converters: ConvertFromStr | ConvertToStr,
     **kwargs,
-    
 ) -> pd.Series:
-            if not isinstance(series, pd.Series):
-                raise TypeError("series must be a pd.Series.")
-                       
-            data_type = column_atts.get("data_type")
-            if data_type is None:
-                return series
+    if not isinstance(series, pd.Series):
+        raise TypeError("series must be a pd.Series.")
 
-            converter = converters[data_type]
+    data_type = column_atts.get("data_type")
+    if data_type is None:
+        return series
 
-            if converter is None:
-                return series
+    converter = converters[data_type]
 
-            converter_args = converters.get_args(data_type)
-            
-            column_kwargs = {**kwargs}
-            if converter_args == "decimal_places":
-                column_kwargs["decimal_places"] = column_atts.get(
-                    "decimal_places", 
-                    properties.default_decimal_places,
-                )
+    if converter is None:
+        return series
 
-            return converter(series, **column_kwargs)
+    converter_args = converters.get_args(data_type)
+
+    column_kwargs = {**kwargs}
+    if converter_args == "decimal_places":
+        column_kwargs["decimal_places"] = column_atts.get(
+            "decimal_places",
+            properties.default_decimal_places,
+        )
+
+    return converter(series, **column_kwargs)
+
 
 def _convert_columns(
     data: pd.DataFrame,
@@ -413,17 +414,17 @@ def _convert_columns(
     for table, table_atts in cdm_atts.items():
         table_maps = imodel_maps.get(table, {})
         for column, column_atts in table_atts.items():
-        
+
             if column in data.columns:
                 data_column = column
             elif (table, column) in data.columns:
                 data_column = (table, column)
             else:
-                continue  
-                
+                continue
+
             column_maps = table_maps.get(column, {})
-            column_atts = {**column_atts, **column_maps}                     
-        
+            column_atts = {**column_atts, **column_maps}
+
             data[data_column] = _convert_column(
                 data[data_column],
                 column_atts,
@@ -445,11 +446,12 @@ def convert_from_str_df(
         cdm_subset,
         null_label,
         "from_str",
-      )
-      
+    )
+
+
 def convert_from_str_series(
-  series: pd.Series,
-  column_atts: dict,
+    series: pd.Series,
+    column_atts: dict,
 ) -> pd.Series:
     series = series.fillna(pd.NA)
     return _convert_column(
@@ -457,6 +459,7 @@ def convert_from_str_series(
         column_atts,
         ConvertFromStr(),
     )
+
 
 def convert_to_str_df(
     data: pd.DataFrame,
@@ -471,11 +474,12 @@ def convert_to_str_df(
         null_label,
         "to_str",
     )
-    
+
+
 def convert_to_str_series(
     series: pd.Series,
     column_atts: dict,
-) -> pd.Series:    
+) -> pd.Series:
     return _soncert_column(
         series,
         column_atts,

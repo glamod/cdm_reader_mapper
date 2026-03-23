@@ -110,7 +110,7 @@ def _map_model_test_data(
 
     if not select:
         select = cdm_tables
-    
+
     expected = read_tables(
         test_data[f"test_{data_model}"][f"cdm_header"].parent,
         imodel=data_model,
@@ -124,12 +124,15 @@ def _map_model_test_data(
         result_table = result_table.dropna(how="all")
         result_table = result_table.reset_index(drop=True)
 
-        if result_table.empty and cdm_table not in expected.data.columns.get_level_values(0):
+        if (
+            result_table.empty
+            and cdm_table not in expected.data.columns.get_level_values(0)
+        ):
             continue
-            
+
         expected_table = expected.data[cdm_table]
         expected_table = expected_table.dropna(how="all")
-        expected_table = expected_table.reset_index(drop=True)             
+        expected_table = expected_table.reset_index(drop=True)
 
         if "record_timestamp" in expected_table.columns:
             expected_table = expected_table.drop("record_timestamp", axis=1)
@@ -137,12 +140,12 @@ def _map_model_test_data(
         if "history" in expected_table.columns:
             expected_table = expected_table.drop("history", axis=1)
             result_table = result_table.drop("history", axis=1)
-            
-        #def get_decimals(x):
+
+        # def get_decimals(x):
         #    s = str(x)
         #    return len(s.split(".")[1] if "." in s else 0)
-        
-        #for c in expected_table.columns:
+
+        # for c in expected_table.columns:
         #    if expected_table[c].dtype == "Float64":
         #        decimal_list = [get_decimals(v) for v in expected_table[c].dropna()]
         #        if decimal_list:
@@ -435,7 +438,7 @@ def test_table_mapping_basic(
     )
     expected = data_header_expected["header"]
     result = results[expected.columns]
-    
+
     pd.testing.assert_frame_equal(result, expected)
 
 
