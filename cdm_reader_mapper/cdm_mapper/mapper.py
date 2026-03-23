@@ -15,8 +15,7 @@ from __future__ import annotations
 
 import ast
 
-from copy import deepcopy
-from typing import Any, Iterable, get_args, Callable
+from typing import Any, Iterable, get_args
 
 import pandas as pd
 
@@ -270,7 +269,7 @@ def _column_mapping(
     atts_combined = {**atts, **imapping}
     return convert_from_str_series(
         data,
-        atts,
+        atts_combined,
     )
 
 
@@ -461,7 +460,7 @@ def map_model(
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 
     results = _map_model()
-    
+
     result, columns = tuple(results)
 
     if isinstance(result, pd.DataFrame):

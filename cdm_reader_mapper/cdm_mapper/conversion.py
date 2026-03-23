@@ -489,7 +489,7 @@ def convert_to_str_series(
     series: pd.Series,
     column_atts: dict,
 ) -> pd.Series:
-    return _soncert_column(
+    return _convert_column(
         series,
         column_atts,
         ConvertToStr(),

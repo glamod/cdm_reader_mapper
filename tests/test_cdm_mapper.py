@@ -30,10 +30,6 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functio
 from cdm_reader_mapper.data import test_data
 
 
-from cdm_reader_mapper.cdm_mapper.writer import write_tables
-
-from cdm_reader_mapper.cdm_mapper.writer import write_tables
-
 @pytest.fixture
 def imodel_maps():
     return get_imodel_maps("icoads", "r300", "d720", cdm_tables=["header"])
@@ -86,7 +82,7 @@ def _map_model_test_data(
     data_model, encoding="utf-8", select=None, chunksize=None, **kwargs
 ):
     source = test_data[f"test_{data_model}"]["mdf_data"]
-    
+
     mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
     if mdf_info is None:
         dtypes = object
@@ -114,25 +110,25 @@ def _map_model_test_data(
 
     if not select:
         select = cdm_tables
-        
+
     for cdm_table in select:
         result_table = result[cdm_table].copy()
         result_table = result_table.dropna(how="all")
         result_table = result_table.reset_index(drop=True)
-        
+
         try:
-          expected_table = read_tables(
-            test_data[f"test_{data_model}"][f"cdm_{cdm_table}"].parent,
-            data_format="parquet",
-            extension="pq",
-            suffix="*",
-            cdm_subset=cdm_table,
-          )[cdm_table]
+            expected_table = read_tables(
+                test_data[f"test_{data_model}"][f"cdm_{cdm_table}"].parent,
+                data_format="parquet",
+                extension="pq",
+                suffix="*",
+                cdm_subset=cdm_table,
+            )[cdm_table]
         except ValueError:
-            expected_table =pd.DataFrame()
+            expected_table = pd.DataFrame()
 
         if result_table.empty and expected_table.empty:
-            continue          
+            continue
 
         if "record_timestamp" in expected_table.columns:
             expected_table = expected_table.drop("record_timestamp", axis=1)
@@ -453,7 +449,6 @@ def test_map_model_icoads(data_header, data_header_expected):
         "icoads_r300_d720",
         cdm_subset=["header"],
     )
-    c = ("header", "duplicate_status")
     pd.testing.assert_frame_equal(
         result[data_header_expected.columns], data_header_expected
     )

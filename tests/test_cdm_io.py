@@ -315,7 +315,9 @@ def test_read_tables_testdata_str_conversion(tmp_path):
 
     db_tmp = read_tables(tmp_path, suffix="str")
 
-    expected = read_tables(source, data_format="parquet", extension="pq", to_str=True, imodel=imodel)
+    expected = read_tables(
+        source, data_format="parquet", extension="pq", to_str=True, imodel=imodel
+    )
     pd.testing.assert_frame_equal(db_tmp.data["header"], expected.data)
 
 
