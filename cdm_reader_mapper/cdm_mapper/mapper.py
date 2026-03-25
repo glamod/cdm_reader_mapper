@@ -29,7 +29,7 @@ from cdm_reader_mapper.common.iterators import (
 
 from . import properties
 from .codes.codes import get_code_table
-from .conversion import convert_from_str_series
+from .utils.conversion import convert_from_str_series
 from .tables.tables import get_cdm_atts, get_imodel_maps
 from .utils.mapping_functions import mapping_functions
 
