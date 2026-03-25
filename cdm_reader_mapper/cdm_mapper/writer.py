@@ -41,7 +41,7 @@ from ..properties import SupportedFileTypes
 def _table_to_file(
     data: pd.DataFrame,
     filename: str,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     delimiter: str = "|",
     encoding: str = "utf-8",
     **kwargs,
@@ -71,7 +71,7 @@ def _table_to_file(
 
 def write_tables(
     data: pd.DataFrame,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     out_dir: str | None = None,
     prefix: str | None = None,
     suffix: str | None = None,
@@ -93,7 +93,7 @@ def write_tables(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parqeut"
         Format of input data file(s).
     out_dir: str, optional
         Path to the output directory.

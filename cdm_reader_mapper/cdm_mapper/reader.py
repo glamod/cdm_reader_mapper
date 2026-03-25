@@ -189,7 +189,7 @@ def _read_multiple_files(
 
 def read_tables(
     source: str,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
@@ -210,7 +210,7 @@ def read_tables(
     ----------
     source: str
         The file (including path) or the path to the file(s) to be read.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parquet"
         Format of input data file(s).
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.

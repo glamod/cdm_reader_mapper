@@ -119,7 +119,6 @@ def _map_model_test_data(
         try:
             expected_table = read_tables(
                 test_data[f"test_{data_model}"][f"cdm_{cdm_table}"].parent,
-                data_format="parquet",
                 extension="pq",
                 suffix="*",
                 cdm_subset=cdm_table,
