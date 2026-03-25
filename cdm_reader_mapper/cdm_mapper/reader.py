@@ -57,7 +57,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 from ..properties import SupportedFileTypes
 from .properties import cdm_tables
 
-from .utils.conversion import convert_to_str_df, convert_from_str_df
+from .utils.conversions import convert_to_str_df, convert_from_str_df
 from .utils.utilities import get_cdm_subset, get_usecols
 
 

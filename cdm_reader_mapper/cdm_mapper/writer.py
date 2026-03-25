@@ -31,7 +31,7 @@ from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from .utils.conversion import convert_to_str_df
+from .utils.conversions import convert_to_str_df
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
