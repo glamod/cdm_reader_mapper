@@ -16,7 +16,13 @@ def db_tables():
     for table in cdm_tables:
         cdm_path = test_data[pattern][f"cdm_{table}"].parent
 
-    db = read(cdm_path, suffix=f"{imodel}*", extension="psv", mode="tables")
+    db = read(
+        cdm_path,
+        suffix=f"{imodel}*",
+        data_format="parquet",
+        extension="pq",
+        mode="tables",
+    )
     db.imodel = imodel
     return db
 
@@ -46,8 +52,12 @@ def test_write_data_csv(tmp_path, db_data):
 
 
 def test_write_tables_csv(tmp_path, db_tables):
-    db_tables.write(out_dir=tmp_path, suffix=f"{db_tables.imodel}_all")
-    db_res = read(tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables")
+    db_tables.write(
+        out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="parquet"
+    )
+    db_res = read(
+        tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="parquet"
+    )
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)
 
 
@@ -56,14 +66,16 @@ def test_write_header(tmp_path, db_tables):
     db_tables.write(
         out_dir=tmp_path,
         suffix=f"{db_tables.imodel}_{table}_all",
-        extension="psv",
+        data_format="parquet",
+        extension="pq",
         cdm_subset=table,
     )
     db_res = read(
         tmp_path,
         suffix=f"{db_tables.imodel}_{table}_all",
         cdm_subset=table,
-        extension="psv",
+        data_format="parquet",
+        extension="pq",
         mode="tables",
     )
 
@@ -74,13 +86,17 @@ def test_write_header(tmp_path, db_tables):
 def test_write_observations(tmp_path, db_tables):
     table = "observations-sst"
     db_tables.write(
-        out_dir=tmp_path, suffix=f"{db_tables.imodel}_{table}_all", cdm_subset=table
+        out_dir=tmp_path,
+        suffix=f"{db_tables.imodel}_{table}_all",
+        cdm_subset=table,
+        data_format="parquet",
     )
     db_res = read(
         tmp_path,
         suffix=f"{db_tables.imodel}_{table}_all",
         cdm_subset=table,
         mode="tables",
+        data_format="parquet",
     )
     table_exp = db_tables[table].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res[table])
@@ -91,23 +107,30 @@ def test_write_fns(tmp_path, db_tables):
         out_dir=tmp_path,
         prefix="prefix",
         suffix=f"{db_tables.imodel}_all",
-        extension="csv",
-        delimiter=",",
+        data_format="parquet",
     )
     db_res = read(
         tmp_path,
         prefix="prefix",
         suffix=f"{db_tables.imodel}_all",
-        extension="csv",
-        delimiter=",",
+        data_format="parquet",
         mode="tables",
     )
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)
 
 
 def test_write_filename(tmp_path, db_tables):
-    db_tables.write(out_dir=tmp_path, filename=f"{db_tables.imodel}_filename_all")
-    db_res = read(tmp_path, suffix=f"{db_tables.imodel}_filename_all", mode="tables")
+    db_tables.write(
+        out_dir=tmp_path,
+        filename=f"{db_tables.imodel}_filename_all",
+        data_format="parquet",
+    )
+    db_res = read(
+        tmp_path,
+        suffix=f"{db_tables.imodel}_filename_all",
+        mode="tables",
+        data_format="parquet",
+    )
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)
 
 
@@ -115,9 +138,12 @@ def test_write_filename_dict_header(tmp_path, db_tables):
     filename_dict = {
         "header": f"{db_tables.imodel}_filename_dict_all",
     }
-    db_tables.write(out_dir=tmp_path, filename=filename_dict)
+    db_tables.write(out_dir=tmp_path, filename=filename_dict, data_format="parquet")
     db_res = read(
-        tmp_path, suffix=f"{db_tables.imodel}_filename_dict_all", mode="tables"
+        tmp_path,
+        suffix=f"{db_tables.imodel}_filename_dict_all",
+        mode="tables",
+        data_format="parquet",
     )
     table_exp = db_tables["header"].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res.data["header"])
@@ -125,14 +151,15 @@ def test_write_filename_dict_header(tmp_path, db_tables):
 
 def test_write_filename_dict_observations(tmp_path, db_tables):
     filename_dict = {
-        "observations-sst": f"observations-sst-{db_tables.imodel}_filename_dict_all.psv",
+        "observations-sst": f"observations-sst-{db_tables.imodel}_filename_dict_all.pq",
     }
-    db_tables.write(out_dir=tmp_path, filename=filename_dict, extension="psv")
+    db_tables.write(out_dir=tmp_path, filename=filename_dict, data_format="parquet")
     db_res = read(
         tmp_path,
         suffix=f"{db_tables.imodel}_filename_dict_all",
         mode="tables",
-        extension="psv",
+        data_format="parquet",
+        extension="pq",
     )
     table_exp = db_tables["observations-sst"].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res.data["observations-sst"])
@@ -146,8 +173,14 @@ def test_write_col_subset(tmp_path, db_tables):
         suffix=f"{db_tables.imodel}_{table}_all",
         cdm_subset=table,
         col_subset={table: columns},
+        data_format="parquet",
     )
-    db_res = read(tmp_path, suffix=f"{db_tables.imodel}_{table}_all", mode="tables")
+    db_res = read(
+        tmp_path,
+        suffix=f"{db_tables.imodel}_{table}_all",
+        mode="tables",
+        data_format="parquet",
+    )
     table_exp = db_tables[table][columns].dropna(how="all").reset_index(drop=True)
     pd.testing.assert_frame_equal(table_exp, db_res[table])
 
