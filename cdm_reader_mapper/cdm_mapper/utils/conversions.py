@@ -25,6 +25,7 @@ class BaseConverter:
     _args : dict
         Optional mapping of type names to argument names for converters.
     """
+
     def __init__(self, converters: dict, args: dict | None = None):
         """
         Initialize the BaseConverter with converters and optional arguments.
@@ -35,7 +36,7 @@ class BaseConverter:
             Mapping of type names to conversion functions.
         args : dict, optional
             Mapping of type names to argument names for converters.
-        """    
+        """
         self._converters = converters or {}
         self._args = args or {}
 
@@ -52,7 +53,7 @@ class BaseConverter:
         -------
         callable or None
             The conversion function if found, else None.
-        """    
+        """
         return self._converters.get(key)
 
     def get_args(self, key: str):
@@ -68,7 +69,7 @@ class BaseConverter:
         -------
         str or None
             The argument name if found, else None.
-        """    
+        """
         return self._args.get(key)
 
     def __contains__(self, key: str):
@@ -84,7 +85,7 @@ class BaseConverter:
         -------
         bool
             True if the converter exists, False otherwise.
-        """    
+        """
         return key in self._converters
 
 
@@ -97,9 +98,7 @@ class ConvertFromStr(BaseConverter):
     """
 
     def __init__(self):
-        """
-        Initialize ConvertFromStr with default string-to-type converters.
-        """    
+        """Initialize ConvertFromStr with default string-to-type converters."""
         super().__init__(
             converters={
                 "int": _convert_integer_from_str,
@@ -123,9 +122,7 @@ class ConvertToStr(BaseConverter):
     """
 
     def __init__(self):
-        """
-        Initialize ConvertToStr with default type-to-string converters and optional arguments.
-        """    
+        """Initialize ConvertToStr with default type-to-string converters and optional arguments."""
         super().__init__(
             converters={
                 "int": _convert_integer_to_str,
