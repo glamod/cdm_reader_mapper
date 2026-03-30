@@ -13,10 +13,8 @@ for the input data model.
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Any, Iterable, get_args
 
-import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
@@ -29,8 +27,8 @@ from cdm_reader_mapper.common.iterators import (
 
 from . import properties
 from .codes.codes import get_code_table
+from .utils.conversions import convert_from_str_series
 from .tables.tables import get_cdm_atts, get_imodel_maps
-from .utils.conversions import converters, iconverters_kwargs
 from .utils.mapping_functions import mapping_functions
 
 
@@ -86,36 +84,6 @@ def _get_nested_value(ndict, keys) -> Any | None:
             return value
 
     return None
-
-
-def _convert_dtype(series, atts) -> pd.DataFrame:
-    """Convert data to the type specified in `atts`."""
-    if atts is None:
-        return np.nan
-
-    dtype = atts.get("data_type")
-    if not dtype:
-        return series
-
-    converter = converters.get(dtype)
-    if not converter:
-        return series
-
-    converter_keys = iconverters_kwargs.get(dtype)
-    if converter_keys:
-        kwargs = {key: atts.get(key) for key in converter_keys}
-    else:
-        kwargs = {}
-
-    return converter(series, np.nan, **kwargs)
-
-
-def _decimal_places(decimal_places) -> int:
-    """Set the 'decimal_places' in the entry dictionary."""
-    if decimal_places is None or not isinstance(decimal_places, int):
-        return properties.default_decimal_places
-
-    return decimal_places
 
 
 def _transform(
@@ -224,7 +192,6 @@ def _column_mapping(
     code_table = imapping.get("code_table")
     default = imapping.get("default")
     fill_value = imapping.get("fill_value")
-    decimal_places = imapping.get("decimal_places")
 
     if codes_subset and code_table not in codes_subset:
         code_table = None
@@ -261,18 +228,17 @@ def _column_mapping(
     if fill_value is not None:
         data = _fill_value(data, fill_value)
 
-    if atts:
-        atts["decimal_places"] = _decimal_places(decimal_places)
-        data = _convert_dtype(data, atts)
-
-    return data
+    atts_combined = {**atts, **imapping}
+    return convert_from_str_series(
+        data,
+        atts_combined,
+    )
 
 
 def _table_mapping(
     idata,
     mapping,
     atts,
-    null_label,
     imodel_functions,
     codes_subset,
     cdm_complete,
@@ -284,17 +250,11 @@ def _table_mapping(
     out = {}
 
     for column in columns:
-        if column not in mapping.keys():
-            out[column] = pd.Series(
-                [null_label] * len(idata), index=idata.index, name=column
-            )
-            continue
-
         logger.debug(f"\tElement: {column}")
 
         out[column] = _column_mapping(
             idata,
-            mapping[column],
+            mapping.get(column, {}),
             imodel_functions,
             atts[column],
             codes_subset,
@@ -313,7 +273,7 @@ def _table_mapping(
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
 
-    return table_df.fillna(null_label)
+    return table_df
 
 
 def _prepare_cdm_tables(cdm_subset):
@@ -327,11 +287,7 @@ def _prepare_cdm_tables(cdm_subset):
 
     tables = {}
     for table, atts in cdm_atts.items():
-        for col, meta in atts.items():
-            meta["decimal_places"] = _decimal_places(meta.get("decimal_places"))
-        tables[table] = {
-            "atts": atts,
-        }
+        tables[table] = atts
 
     return tables
 
@@ -341,7 +297,6 @@ def _map_data_model(
     imodel_maps,
     imodel_functions,
     cdm_tables,
-    null_label,
     codes_subset,
     cdm_complete,
     drop_missing_obs,
@@ -355,14 +310,13 @@ def _map_data_model(
         )
 
     all_tables = []
-    for table, mapping in imodel_maps.items():
+    for table, table_atts in cdm_tables.items():
         logger.debug(f"Table: {table}")
-
+        table_maps = imodel_maps[table]
         table_df = _table_mapping(
             idata=idata,
-            mapping=mapping,
-            atts=deepcopy(cdm_tables[table]["atts"]),
-            null_label=null_label,
+            mapping=table_maps,
+            atts=table_atts,
             imodel_functions=imodel_functions,
             codes_subset=codes_subset,
             cdm_complete=cdm_complete,
@@ -372,7 +326,6 @@ def _map_data_model(
         )
 
         table_df.columns = pd.MultiIndex.from_product([[table], table_df.columns])
-        table_df = table_df.astype(object)
         all_tables.append(table_df)
 
     tables_df = pd.concat(all_tables, axis=1, join="outer").reset_index(drop=True)
@@ -385,7 +338,6 @@ def map_model(
     imodel: str,
     cdm_subset: str | list[str] | None = None,
     codes_subset: str | list[str] | None = None,
-    null_label: str = "null",
     cdm_complete: bool = True,
     drop_missing_obs: bool = True,
     drop_duplicates: bool = True,
@@ -407,9 +359,6 @@ def map_model(
     codes_subset: str or list, optional
         subset of code mapping tables to map.
         Default to the full set of code mapping tables defined for the imodel.
-    null_label: str
-        String how to label non valid values in `data`.
-        Default: null
     cdm_complete: bool
         If True map entire CDM tables list.
         Default: True
@@ -443,7 +392,6 @@ def map_model(
                 "imodel_maps": imodel_maps,
                 "imodel_functions": imodel_functions,
                 "cdm_tables": cdm_tables,
-                "null_label": null_label,
                 "codes_subset": codes_subset,
                 "cdm_complete": cdm_complete,
                 "drop_missing_obs": drop_missing_obs,

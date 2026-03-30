@@ -106,6 +106,7 @@ def test_write_data_csv(tmp_path, example_data, example_mask):
         out_dir=tmp_path,
         prefix="test_write",
         suffix="basic",
+        data_format="csv",
         **info,
     )
 
@@ -143,6 +144,7 @@ def test_write_data_col_subset(tmp_path, example_data, example_mask):
         out_dir=tmp_path,
         prefix="test_write",
         suffix="subset",
+        data_format="csv",
         col_subset=subset,
         **info,
     )

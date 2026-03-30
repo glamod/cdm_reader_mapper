@@ -5,6 +5,7 @@ import pytest
 
 from cdm_reader_mapper import DataBundle
 from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.data import test_data
 
 from cdm_reader_mapper.cdm_mapper.reader import (
     _read_single_file,
@@ -97,7 +98,6 @@ def test_read_single_file_null(csv_path, example_data):
     df = _read_single_file(
         csv_path / "header.csv", "csv", ["header"], None, null_label=3
     )
-
     assert isinstance(df, pd.DataFrame)
 
     exp = example_data["header"].set_index("report_id", drop=False).drop(3)
@@ -199,7 +199,7 @@ def test_read_multiple_files_raises(csv_path, example_data):
 
 
 def test_read_data_csv(csv_path, example_data):
-    bundle = read_tables(csv_path, delimiter=",")
+    bundle = read_tables(csv_path, data_format="csv", delimiter=",")
 
     assert isinstance(bundle, DataBundle)
     assert hasattr(bundle, "data")
@@ -211,7 +211,9 @@ def test_read_data_csv(csv_path, example_data):
 
 
 def test_read_data_single_csv(csv_path, example_data):
-    bundle = read_tables(csv_path / "observations-sst.csv", delimiter=",")
+    bundle = read_tables(
+        csv_path / "observations-sst.csv", data_format="csv", delimiter=","
+    )
 
     assert isinstance(bundle, DataBundle)
     assert hasattr(bundle, "data")
@@ -239,11 +241,11 @@ def test_read_data_raises_filenotfound(csv_path):
 
 def test_read_data_raises_empty(csv_path):
     with pytest.raises(ValueError, match="All tables empty in file system"):
-        read_tables(csv_path / "observations-at.csv", delimiter=",")
+        read_tables(csv_path / "observations-at.csv", data_format="csv", delimiter=",")
 
 
 def test_read_data_parquet(parquet_path, example_data):
-    bundle = read_tables(parquet_path, data_format="parquet")
+    bundle = read_tables(parquet_path)
 
     assert isinstance(bundle, DataBundle)
     assert hasattr(bundle, "data")
@@ -272,7 +274,7 @@ def test_table_to_file_raises(csv_path, example_data):
 
 
 def test_write_data_csv(tmp_path, example_data):
-    write_tables(example_data, out_dir=tmp_path)
+    write_tables(example_data, data_format="csv", out_dir=tmp_path)
     data_header = pd.read_csv(tmp_path / "header.csv", delimiter="|")
     data_obssst = pd.read_csv(tmp_path / "observations-sst.csv", delimiter="|")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
@@ -289,7 +291,7 @@ def test_write_data_empty(tmp_path, empty_data):
 
 
 def test_write_data_parquet(tmp_path, example_data):
-    write_tables(example_data, out_dir=tmp_path, data_format="parquet")
+    write_tables(example_data, out_dir=tmp_path)
     data_header = pd.read_parquet(tmp_path / "header.parquet")
     data_obssst = pd.read_parquet(tmp_path / "observations-sst.parquet")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
@@ -302,3 +304,31 @@ def test_write_data_feather(tmp_path, example_data):
     data_obssst = pd.read_feather(tmp_path / "observations-sst.feather")
     pd.testing.assert_frame_equal(example_data["header"], data_header)
     pd.testing.assert_frame_equal(example_data["observations-sst"], data_obssst)
+
+
+def test_read_tables_testdata_str_conversion(tmp_path):
+    imodel = "icoads_r302_d992"
+    source = test_data[f"test_{imodel}"]["cdm_header"]
+
+    db_type = read_tables(source, extension="pq")
+    write_tables(
+        db_type.data, out_dir=tmp_path, to_str=True, imodel=imodel, suffix="str"
+    )
+
+    db_tmp = read_tables(tmp_path, suffix="str")
+
+    expected = read_tables(source, extension="pq", to_str=True, imodel=imodel)
+    pd.testing.assert_frame_equal(db_tmp.data["header"], expected.data)
+
+
+@pytest.mark.parametrize("data_format", ["parquet", "feather"])
+def test_read_tables_testdata_binary(tmp_path, data_format):
+    imodel = "icoads_r302_d992"
+    source = test_data[f"test_{imodel}"]["cdm_header"]
+
+    db_type = read_tables(source)
+    write_tables(db_type.data, out_dir=tmp_path, data_format=data_format)
+
+    db_tmp = read_tables(tmp_path, data_format=data_format)
+
+    pd.testing.assert_frame_equal(db_tmp.data["header"], db_type.data)
