@@ -13,8 +13,6 @@ for the input data model.
 
 from __future__ import annotations
 
-import ast
-
 from typing import Any, Iterable, get_args
 
 import pandas as pd
@@ -86,42 +84,6 @@ def _get_nested_value(ndict, keys) -> Any | None:
             return value
 
     return None
-
-
-def _convert_array_general(data: pd.Series, dtype: type) -> pd.Series:
-    """
-    Convert a series of values (single or list) into an array.
-
-    Parameters
-    ----------
-    data : pd.Series
-        Series containing values or lists of values.
-
-    Returns
-    -------
-    pd.Series
-        Series of arrays.
-    """
-
-    def _convert_value(x):
-        if isinstance(x, str):
-            try:
-                x = ast.literal_eval(x)
-            except (SyntaxError, ValueError):
-                x = [x]
-
-        x_list = x if isinstance(x, list) else [x]
-
-        v_list = []
-        for v in x_list:
-            if pd.isna(v):
-                continue
-            v = pd.array([v], dtype=dtype)[0]
-            v_list.append(v)
-
-        return v_list
-
-    return data.apply(_convert_value)
 
 
 def _transform(

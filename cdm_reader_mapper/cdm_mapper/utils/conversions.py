@@ -1,4 +1,4 @@
-﻿"""Convert Common Datamodel (CDM) mapping table elements from/to string types"""
+"""Convert Common Datamodel (CDM) mapping table elements from/to string types"""
 
 from __future__ import annotations
 
@@ -140,7 +140,9 @@ class ConvertToStr(BaseConverter):
         )
 
 
-def _convert_array_general_from_str(data: pd.Series, dtype: type) -> pd.Series:
+def _convert_array_general_from_str(
+    data: pd.Series, null_label: str, dtype: type
+) -> pd.Series:
     """
     Convert a series of string values (single or list) into an array.
 
@@ -159,15 +161,30 @@ def _convert_array_general_from_str(data: pd.Series, dtype: type) -> pd.Series:
         if isinstance(x, list):
             x_list = x
         elif pd.isna(x):
-            x_list = []
+            return pd.NA
+        elif x == null_label:
+            return pd.NA
         else:
             x_list = str(x).strip("{}").split(",")
 
-        value_list = list(pd.array(x_list, dtype=dtype))
-        if not value_list:
-            value_list = pd.NA
+        v_list = []
+        for x_ in x_list:
+            if pd.isna(x_):
+                v_list.append(pd.NA)
+            elif x_ == null_label:
+                v_list.append(pd.NA)
+            elif not x_:
+                v_list.append(pd.NA)
+            else:
+                v_list.append(x_)
 
-        return value_list
+        if len(v_list) == 0:
+            return pd.NA
+
+        if len(v_list) == 1 and pd.isna(v_list[0]):
+            return pd.NA
+
+        return list(pd.array(v_list, dtype=dtype))
 
     return data.apply(_convert_value)
 
@@ -206,9 +223,23 @@ def _convert_array_general_to_str(
         else:
             x_list = [x]
 
-        str_list = [str(dtype(x_)) for x_ in x_list]
+        str_list = []
+        for x_ in x_list:
+            if pd.isna(x_):
+                str_list.append(null_label)
+            elif not x_ and pd.to_numeric(x_, errors="coerce"):
+                str_list.append(null_label)
+            else:
+                t = pd.array([x_], dtype=dtype)[0]
+                str_list.append(str(t))
 
-        return "{" + ",".join(str_list) + "}" if x_list else null_label
+        if len(str_list) == 0:
+            return null_label
+
+        if len(str_list) == 1 and str_list[0] == null_label:
+            return null_label
+
+        return "{" + ",".join(str_list) + "}"
 
     return data.apply(_convert_value).astype(object)
 
@@ -240,7 +271,7 @@ def _convert_str_to_str(data: pd.Series, null_label: str) -> pd.Series:
     return data.apply(lambda x: _return_str(x, null_label))
 
 
-def _convert_str_from_str(data: pd.Series) -> pd.Series:
+def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert elements from string representation.
 
@@ -254,7 +285,7 @@ def _convert_str_from_str(data: pd.Series) -> pd.Series:
     pd.Series
         Series with data type representtions of elements.
     """
-    return data.astype(object)
+    return data.astype(object).replace(null_label, pd.NA)
 
 
 def _convert_str_array_to_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -276,7 +307,7 @@ def _convert_str_array_to_str(data: pd.Series, null_label: str) -> pd.Series:
     return _convert_array_general_to_str(data, null_label, dtype=str)
 
 
-def _convert_str_array_from_str(data: pd.Series) -> pd.Series:
+def _convert_str_array_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string arrays in "{...}" format to Python lists of strings.
 
@@ -290,7 +321,7 @@ def _convert_str_array_from_str(data: pd.Series) -> pd.Series:
     pd.Series
         Series with Python lists of strings.
     """
-    return _convert_array_general_from_str(data, object)
+    return _convert_array_general_from_str(data, null_label, object)
 
 
 def _convert_integer_to_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -321,7 +352,7 @@ def _convert_integer_to_str(data: pd.Series, null_label: str) -> pd.Series:
     return data.apply(lambda x: _return_str(x, null_label)).astype(object)
 
 
-def _convert_integer_from_str(data: pd.Series) -> pd.Series:
+def _convert_integer_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string values to nullable integer type.
 
@@ -355,10 +386,10 @@ def _convert_integer_array_to_str(data: pd.Series, null_label: str) -> pd.Series
     pd.Series
         Series with integer arrays in "{...}" format.
     """
-    return _convert_array_general_to_str(data, null_label, dtype=int)
+    return _convert_array_general_to_str(data, null_label, dtype="Int64")
 
 
-def _convert_integer_array_from_str(data: pd.Series) -> pd.Series:
+def _convert_integer_array_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string arrays in "{...}" format to lists of integers.
 
@@ -373,7 +404,7 @@ def _convert_integer_array_from_str(data: pd.Series) -> pd.Series:
         Series with values converted to lists of integers using pandas nullable
         integer dtype ("Int64"). Invalid or non-convertible elements are set to NaN.
     """
-    return _convert_array_general_from_str(data, "Int64")
+    return _convert_array_general_from_str(data, null_label, "Int64")
 
 
 def _convert_float_to_str(
@@ -409,7 +440,7 @@ def _convert_float_to_str(
     return data.apply(lambda x: _return_str(x, null_label, format_float)).astype(object)
 
 
-def _convert_float_from_str(data: pd.Series) -> pd.Series:
+def _convert_float_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string values to nullable float type.
 
@@ -446,7 +477,7 @@ def _convert_float_array_to_str(data: pd.Series, null_label: str) -> pd.Series:
     return _convert_array_general_to_str(data, null_label, dtype=float)
 
 
-def _convert_float_array_from_str(data: pd.Series) -> pd.Series:
+def _convert_float_array_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string arrays in "{...}" format to lists of floats.
 
@@ -461,7 +492,7 @@ def _convert_float_array_from_str(data: pd.Series) -> pd.Series:
         Series with values converted to lists of floats using pandas nullable
         float dtype ("Float64"). Invalid or non-convertible elements are set to NaN.
     """
-    return _convert_array_general_from_str(data, "Float64")
+    return _convert_array_general_from_str(data, null_label, "Float64")
 
 
 def _convert_datetime_to_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -491,7 +522,7 @@ def _convert_datetime_to_str(data: pd.Series, null_label: str) -> pd.Series:
     return data.apply(lambda x: _return_str(x, null_label)).astype(object)
 
 
-def _convert_datetime_from_str(data: pd.Series) -> pd.Series:
+def _convert_datetime_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
     Convert a series of string values to datetime objects.
 
@@ -506,14 +537,14 @@ def _convert_datetime_from_str(data: pd.Series) -> pd.Series:
         Series with values converted to pandas datetime dtype (datetime64[ns]).
         Invalid or non-convertible values are set to NaT.
     """
-    return pd.to_datetime(data)
+    return pd.to_datetime(data, errors="coerce")
 
 
 def _convert_column(
     series: pd.Series,
     column_atts: dict,
+    null_label: str,
     converters: ConvertFromStr | ConvertToStr,
-    **kwargs,
 ) -> pd.Series:
     """
     Apply a type-specific converter to a pandas Series based on column attributes.
@@ -526,12 +557,12 @@ def _convert_column(
         Dictionary containing metadata about the column. Must include the key
         "data_type" to determine which converter to apply. May also include
         additional parameters such as "decimal_places".
+    null_label : str or None
+        Label used to represent null values when converting to string format.
+        Ignored when ``mode="from_str"``.
     converters : ConvertFromStr or ConvertToStr
         Converter registry that maps data types to conversion functions and
         optional argument requirements.
-    **kwargs
-        Additional keyword arguments passed to the converter function
-        (e.g., ``null_label``).
 
     Returns
     -------
@@ -565,14 +596,14 @@ def _convert_column(
 
     converter_args = converters.get_args(data_type)
 
-    column_kwargs = {**kwargs}
+    kwargs = {}
     if converter_args == "decimal_places":
-        column_kwargs["decimal_places"] = column_atts.get(
+        kwargs["decimal_places"] = column_atts.get(
             "decimal_places",
             properties.default_decimal_places,
         )
 
-    return converter(series, **column_kwargs)
+    return converter(series, null_label, **kwargs)
 
 
 def _convert_columns(
@@ -645,11 +676,9 @@ def _convert_columns(
         data = data.replace(null_label, pd.NA)
         data = data.fillna(pd.NA)
         converters = ConvertFromStr()
-        kwargs = {}
         imodel_maps = {}
     else:
         converters = ConvertToStr()
-        kwargs = {"null_label": null_label}
         imodel_maps = get_imodel_maps(*data_model, cdm_tables=cdm_subset)
 
     if not cdm_subset:
@@ -674,8 +703,8 @@ def _convert_columns(
             data[data_column] = _convert_column(
                 data[data_column],
                 column_atts,
+                null_label,
                 converters,
-                **kwargs,
             )
     return data
 
@@ -718,6 +747,7 @@ def convert_from_str_df(
 def convert_from_str_series(
     series: pd.Series,
     column_atts: dict,
+    null_label: str | None = "null",
 ) -> pd.Series:
     """
     Convert a Series of string values to a native pandas dtype.
@@ -729,6 +759,8 @@ def convert_from_str_series(
     column_atts : dict
         Dictionary defining column metadata, including the "data_type"
         used to select the appropriate converter.
+    null_label : str or None, default "null"
+        Label representing null values in the input data.
 
     Returns
     -------
@@ -739,6 +771,7 @@ def convert_from_str_series(
     return _convert_column(
         series,
         column_atts,
+        null_label,
         ConvertFromStr(),
     )
 
@@ -780,6 +813,7 @@ def convert_to_str_df(
 def convert_to_str_series(
     series: pd.Series,
     column_atts: dict,
+    null_label: str | None = "null",
 ) -> pd.Series:
     """
     Convert a Series to string representations based on column metadata.
@@ -791,6 +825,8 @@ def convert_to_str_series(
     column_atts : dict
         Dictionary defining column metadata, including the "data_type"
         used to select the appropriate converter.
+    null_label : str or None, default "null"
+        Label representing null values in the input data.
 
     Returns
     -------
@@ -800,5 +836,6 @@ def convert_to_str_series(
     return _convert_column(
         series,
         column_atts,
+        null_label,
         ConvertToStr(),
     )
