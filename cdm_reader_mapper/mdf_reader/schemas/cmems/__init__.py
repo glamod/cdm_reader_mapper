@@ -1,3 +1,3 @@
-"""Common Data Model (CDM) C-RAID schema tables."""
+"""Common Data Model (CDM) CMEMS schema tables."""
 
 from __future__ import annotations
