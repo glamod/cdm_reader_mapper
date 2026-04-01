@@ -628,6 +628,7 @@ def test_map_model_pub47():
         "craid",
         "gdac",
         "marob",
+        "cmems",
     ],
 )
 def test_map_model_test_data_basic(data_model):

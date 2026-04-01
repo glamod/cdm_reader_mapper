@@ -3,8 +3,8 @@
 Changelog
 =========
 
-2.3.1 (unpublished)
--------------------
+2.4.0 (2026-04-01)
+------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
