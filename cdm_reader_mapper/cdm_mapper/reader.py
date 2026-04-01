@@ -56,6 +56,8 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from ..properties import SupportedFileTypes
 from .properties import cdm_tables
+
+from .utils.conversions import convert_to_str_df, convert_from_str_df
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
@@ -95,20 +97,23 @@ def _read_single_file(
 ) -> pd.DataFrame:
     if not isinstance(cdm_subset, list):
         cdm_subset = [cdm_subset]
-    dfi_ = _read_file(
+    df = _read_file(
         ifile,
         table=cdm_subset[0],
         data_format=data_format,
         col_subset=col_subset,
         **kwargs,
     )
-    if dfi_.empty:
+
+    if df.empty:
         return pd.DataFrame()
 
-    dfi_ = dfi_.set_index("report_id", drop=False)
-    if null_label in dfi_.index:
-        return dfi_.drop(index=null_label)
-    return dfi_
+    df = df.set_index("report_id", drop=False)
+
+    if null_label in df.index:
+        return df.drop(index=null_label)
+
+    return df
 
 
 def _read_multiple_files(
@@ -184,7 +189,7 @@ def _read_multiple_files(
 
 def read_tables(
     source: str,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
@@ -193,6 +198,9 @@ def read_tables(
     delimiter: str = "|",
     na_values: str | None = None,
     null_label: str = "null",
+    imodel: str | None = None,
+    from_str: bool | None = None,
+    to_str: bool | None = None,
     **kwargs,
 ) -> DataBundle:
     """
@@ -202,7 +210,7 @@ def read_tables(
     ----------
     source: str
         The file (including path) or the path to the file(s) to be read.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parquet"
         Format of input data file(s).
     prefix: str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
@@ -315,4 +323,10 @@ def read_tables(
 
     merged = pd.concat(df_list, axis=1, join="outer")
     merged = merged.reset_index(drop=True)
+
+    if from_str is True:
+        merged = convert_from_str_df(merged, imodel, cdm_subset=cdm_subset)
+    elif to_str is True:
+        merged = convert_to_str_df(merged, imodel, cdm_subset=cdm_subset)
+
     return DataBundle(data=merged, columns=merged.columns, mode="tables")

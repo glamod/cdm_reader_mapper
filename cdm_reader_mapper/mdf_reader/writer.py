@@ -47,7 +47,7 @@ def _normalize_data_chunks(
 def write_data(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     dtypes: pd.Series | dict | None = None,
     parse_dates: list | bool = False,
     encoding: str = "utf-8",
@@ -68,7 +68,7 @@ def write_data(
         Data to export.
     mask: pandas.DataFrame or Iterable[pd.DataFrame], optional
         Validation mask to export.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parquet"
         Format of output data file(s).
     dtypes: dict, optional
         Dictionary of data types on ``data``.
@@ -187,6 +187,11 @@ def write_data(
                 sep=delimiter,
                 encoding=encoding,
                 **kwargs,
+            )
+        if data_format == "parquet":
+            write_kwargs = dict(
+                engine="pyarrow",
+                compression="snappy",
             )
 
         writer = WRITERS[data_format]

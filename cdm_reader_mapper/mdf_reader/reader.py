@@ -261,7 +261,7 @@ def read_data(
     data_file: str,
     mask_file: str | None = None,
     info_file: str | None = None,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     imodel: str | None = None,
     col_subset: str | list | tuple | None = None,
     encoding: str | None = None,
@@ -278,7 +278,7 @@ def read_data(
         The validation file (including path) to be read.
     info_file: str, optional
         The information file (including path) to be read.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parquet"
         Format of input data file(s).
     imodel: str, optional
         Name of internally available input data model.

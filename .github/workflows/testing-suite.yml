@@ -39,7 +39,7 @@ jobs:
           echo "UV_CACHE_DIR=/tmp/.uv-cache" >> $GITHUB_ENV
 
       - name: Install uv
-        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload code coverage to Codecov
         if: github.ref == 'refs/heads/main'
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN}}
           files: ./coverage.xml

@@ -2,264 +2,357 @@ from __future__ import annotations
 
 import pytest
 
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper.utils.conversions import (
-    convert_integer,
-    convert_float,
-    convert_datetime,
-    convert_str,
-    convert_integer_array,
-    convert_str_array,
+    _convert_array_general_from_str,
+    _convert_array_general_to_str,
+    _convert_datetime_from_str,
+    _convert_datetime_to_str,
+    _convert_float_array_from_str,
+    _convert_float_array_to_str,
+    _convert_float_from_str,
+    _convert_float_to_str,
+    _convert_integer_array_from_str,
+    _convert_integer_array_to_str,
+    _convert_integer_from_str,
+    _convert_integer_to_str,
+    _convert_str_array_from_str,
+    _convert_str_array_to_str,
+    _convert_str_from_str,
+    _convert_str_to_str,
+    # _convert_column,
+    # _convert_columns,
+    # convert_from_str_df,
+    # convert_from_str_series,
+    # convert_to_str_df,
+    # convert_to_str_series,
 )
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, expected_series",
+    "data, dtype, exp",
     [
-        # All integers
-        (pd.Series([1, 2, 3]), "NA", pd.Series(["1", "2", "3"], dtype=object)),
-        # Floats that are whole numbers
-        (pd.Series([1.0, 2.0, 3.0]), "NA", pd.Series(["1", "2", "3"], dtype=object)),
-        # Floats with decimals
-        (
-            pd.Series([1.1, 2.5, 3.9]),
-            "NA",
-            pd.Series(["1", "2", "3"], dtype=object),
-        ),  # truncated
-        # Strings that are numbers
-        (
-            pd.Series(["4", "5.0", "6.7"]),
-            "NA",
-            pd.Series(["4", "5", "6"], dtype=object),
-        ),
-        # NaN values
-        (
-            pd.Series([np.nan, 2, "3"]),
-            "NULL",
-            pd.Series(["NULL", "2", "3"], dtype=object),
-        ),
-        # Invalid strings
-        (
-            pd.Series(["abc", "123", "4.5"]),
-            "NA",
-            pd.Series(["NA", "123", "4"], dtype=object),
-        ),
-        # Empty Series
-        (pd.Series([], dtype=object), "NA", pd.Series([], dtype=object)),
+        (["1,2,3"], int, [[1, 2, 3]]),
+        (["{1,2,3}"], int, [[1, 2, 3]]),
+        ([[1, 2, 3]], int, [[1, 2, 3]]),
+        ([["1", "2", "3"]], int, [[1, 2, 3]]),
+        (["1, 2, 3"], int, [[1, 2, 3]]),
+        (["{1}"], int, [[1]]),
+        (["1"], int, [[1]]),
+        ([""], str, [pd.NA]),
+        (["{abc}"], str, [["abc"]]),
+        ([None], int, [pd.NA]),
+        ([pd.NA], int, [pd.NA]),
+        (["null"], "Int64", [pd.NA]),
+        (["1,null,3"], "Int64", [[1, pd.NA, 3]]),
+        ([[]], int, [pd.NA]),
+        ([np.nan], int, [pd.NA]),
+        (["1,2", [3, 4], None], int, [[1, 2], [3, 4], pd.NA]),
     ],
 )
-def test_convert_integer(input_series, null_label, expected_series):
-    result = convert_integer(input_series, null_label)
+def test_convert_array_general_from_str(data, dtype, exp):
+    series = pd.Series(data)
+    result = _convert_array_general_from_str(series, "null", dtype)
+    expected = pd.Series(exp)
 
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-        check_dtype=True,  # ensure all output elements are strings
-    )
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, decimal_places, expected_series",
+    "data, dtype, exp",
     [
-        (
-            pd.Series([1.0, 2.5, 3.14159]),
-            "NA",
-            2,
-            pd.Series(["1.00", "2.50", "3.14"], dtype=object),
-        ),
-        (
-            pd.Series([0.1234, 5.6789]),
-            "NA",
-            3,
-            pd.Series(["0.123", "5.679"], dtype=object),
-        ),
-        (pd.Series([1, 2, 3]), "NA", 1, pd.Series(["1.0", "2.0", "3.0"], dtype=object)),
-        (
-            pd.Series([np.nan, 2.5, 3]),
-            "NULL",
-            2,
-            pd.Series(["NULL", "2.50", "3.00"], dtype=object),
-        ),
-        (pd.Series(["abc", 1.23]), "NA", 1, pd.Series(["NA", "1.2"], dtype=object)),
-        (pd.Series([], dtype=float), "NA", 2, pd.Series([], dtype=object)),
+        ([[1, 2, 3]], int, ["{1,2,3}"]),
+        (["[1,2,3]"], int, ["{1,2,3}"]),
+        ([1], int, ["{1}"]),
+        (["1"], int, ["{1}"]),
+        ([[]], int, ["null"]),
+        ([None], int, ["null"]),
+        ([pd.NA], int, ["null"]),
+        ([np.nan], int, ["null"]),
+        ([""], str, ["null"]),
+        (["abc"], str, ["{abc}"]),
+        ([[1.1, 2.2]], float, ["{1.1,2.2}"]),
+        ([[1, 0]], bool, ["{True,False}"]),
+        ([[1, pd.NA, 3]], "Int64", ["{1,null,3}"]),
+        ([["", "", ""]], str, ["{null,null,null}"]),
+        ([[1, 2], np.array([3, 4]), None], int, ["{1,2}", "{3,4}", "null"]),
     ],
 )
-def test_convert_float(input_series, null_label, decimal_places, expected_series):
-    result = convert_float(input_series, null_label, decimal_places)
-
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-        check_dtype=True,
-    )
+def test_convert_array_general_to_str(exp, dtype, data):
+    series = pd.Series(data)
+    result = _convert_array_general_to_str(series, "null", dtype)
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, expected_series",
+    "data, exp",
     [
-        # Datetime objects
-        (
-            pd.Series(
-                [
-                    pd.Timestamp("2024-01-01 12:30:00"),
-                    pd.Timestamp("2023-12-31 23:59:59"),
-                ]
-            ),
-            "NA",
-            pd.Series(["2024-01-01 12:30:00", "2023-12-31 23:59:59"], dtype=object),
-        ),
-        # String dates (should be returned as-is)
-        (
-            pd.Series(["2024-01-01 12:30:00", "2023-12-31 23:59:59"]),
-            "NA",
-            pd.Series(["2024-01-01 12:30:00", "2023-12-31 23:59:59"], dtype=object),
-        ),
-        # Mixed datetime, string, and NaN
-        (
-            pd.Series(
-                [pd.Timestamp("2024-01-01 12:30:00"), "2023-12-31 23:59:59", np.nan]
-            ),
-            "NULL",
-            pd.Series(
-                ["2024-01-01 12:30:00", "2023-12-31 23:59:59", "NULL"], dtype=object
-            ),
-        ),
-        # Empty series
-        (
-            pd.Series([], dtype="datetime64[ns]"),
-            "NA",
-            pd.Series([], dtype=object),
-        ),
+        ([1, None, [1, 2], "abc"], ["1", "null", "[1, 2]", "abc"]),
+        ([[], "", np.nan], ["[]", "", "null"]),
     ],
 )
-def test_convert_datetime(input_series, null_label, expected_series):
-    result = convert_datetime(input_series, null_label)
-
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-        check_dtype=True,
-    )
+def test_convert_str_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_str_to_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, expected_series",
+    "data, exp",
     [
-        # Regular strings
-        (pd.Series(["a", "b", "c"]), "NA", pd.Series(["a", "b", "c"], dtype=object)),
-        # Integers (should be converted to strings)
-        (pd.Series([1, 2, 3]), "NA", pd.Series(["1", "2", "3"], dtype=object)),
-        # Floats (converted to strings)
-        (
-            pd.Series([1.1, 2.5, 3.0]),
-            "NA",
-            pd.Series(["1.1", "2.5", "3.0"], dtype=object),
-        ),
-        # Lists (should be converted to string representation)
-        (
-            pd.Series([[1, 2], ["a", "b"]]),
-            "NA",
-            pd.Series(["[1, 2]", "['a', 'b']"], dtype=object),
-        ),
-        # NaNs replaced by null_label
-        (
-            pd.Series([np.nan, "hello", None]),
-            "NULL",
-            pd.Series(["NULL", "hello", "NULL"], dtype=object),
-        ),
-        # Empty series
-        (pd.Series([], dtype=object), "NA", pd.Series([], dtype=object)),
+        (["1", "null", "[1, 2]", "abc"], ["1", pd.NA, "[1, 2]", "abc"]),
+        (["[]", "", "NA"], ["[]", "", "NA"]),
     ],
 )
-def test_convert_str(input_series, null_label, expected_series):
-    result = convert_str(input_series, null_label)
-
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-        check_dtype=True,
-    )
+def test_convert_str_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_str_from_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, expected_series",
+    "data, exp",
     [
-        # Single integers
-        (pd.Series([1, 2, 3]), None, pd.Series(["{1}", "{2}", "{3}"], dtype=object)),
-        # Single floats that are whole numbers
-        (
-            pd.Series([1.0, 2.0, 3.0]),
-            None,
-            pd.Series(["{1}", "{2}", "{3}"], dtype=object),
-        ),
-        # Single floats with decimals (truncated)
-        (
-            pd.Series([1.9, 2.5, 3.7]),
-            None,
-            pd.Series(["{1}", "{2}", "{3}"], dtype=object),
-        ),
-        # Lists of integers
-        (
-            pd.Series([[1, 2], [3, 4], [5]]),
-            None,
-            pd.Series(["{1,2}", "{3,4}", "{5}"], dtype=object),
-        ),
-        # Lists of floats (whole numbers)
-        (
-            pd.Series([[1.0, 2.0], [3.0, 4.0]]),
-            None,
-            pd.Series(["{1,2}", "{3,4}"], dtype=object),
-        ),
-        # Lists with invalid entries
-        (
-            pd.Series([[1, "a", 3], None, [np.nan]]),
-            "NA",
-            pd.Series(["{1,3}", "NA", "NA"], dtype=object),
-        ),
-        # Strings representing lists
-        (
-            pd.Series(["[1,2,3]", "[4,5]"]),
-            None,
-            pd.Series(["{1,2,3}", "{4,5}"], dtype=object),
-        ),
-        # Single None and NaN values
-        (pd.Series([None, np.nan]), "NULL", pd.Series(["NULL", "NULL"], dtype=object)),
-        # Empty Series
-        (pd.Series([], dtype=float), None, pd.Series([], dtype=object)),
+        (["a"], ["{a}"]),
+        ([["a", "b"]], ["{a,b}"]),
+        ([[]], ["null"]),
+        ([None, np.nan], ["null", "null"]),
+        ([["a", "", "c"]], ["{a,null,c}"]),
+        ([""], ["null"]),
     ],
 )
-def test_convert_integer_array(input_series, null_label, expected_series):
-    result = convert_integer_array(input_series, null_label)
-
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-    )
+def test_convert_str_array_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_str_array_to_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "input_series, null_label, expected_series",
+    "data, exp",
     [
-        # String arrays
-        (pd.Series([["a", "b", "c"]]), "NA", pd.Series(["{a,b,c}"])),
-        (pd.Series(["x"]), "NA", pd.Series(["{x}"])),
-        (pd.Series([None]), "NULL", pd.Series(["NULL"])),
-        (pd.Series(['["p","q","r"]']), "NA", pd.Series(["{p,q,r}"])),
-        (pd.Series([[], None]), "NA", pd.Series(["NA", "NA"])),
-        (pd.Series([], dtype=object), "NA", pd.Series([], dtype=object)),
+        (["{a,b,c}"], [["a", "b", "c"]]),
+        (["{}"], pd.NA),
+        (["null"], pd.NA),
+        (["{a,,c}"], [["a", pd.NA, "c"]]),
+        (["{x}"], [["x"]]),
+        (["not an array"], [["not an array"]]),
     ],
 )
-def test_convert_str_array(input_series, null_label, expected_series):
-    result = convert_str_array(input_series, null_label=null_label)
-    pd.testing.assert_series_equal(
-        result.reset_index(drop=True),
-        expected_series.reset_index(drop=True),
-        check_names=False,
-    )
+def test_convert_str_array_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_str_array_from_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        ([1, 2, 3], ["1", "2", "3"]),
+        ([1.0, 2.5, 3.9], ["1", "2", "3"]),
+        ([np.nan, None, pd.NA], ["null", "null", "null"]),
+        ([1, 2.2, None, 4], ["1", "2", "null", "4"]),
+        ([1, "abc", 3], ["1", "null", "3"]),
+    ],
+)
+def test_convert_integer_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_integer_to_str(series, "null")
+    expected_series = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected_series)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (
+            ["1", "2", "3"],
+            [1, 2, 3],
+        ),
+        ([1.0, np.nan, 3.0], [1, pd.NA, 3]),
+        (["1", "abc", "3"], [1, pd.NA, 3]),
+        (["1", "null", "3"], [1, pd.NA, 3]),
+        (["", "2"], [pd.NA, 2]),
+    ],
+)
+def test_convert_integer_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_integer_from_str(series, "null")
+    expected = pd.Series(exp, dtype="Int64")
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        ([1, 2, 3], ["{1}", "{2}", "{3}"]),
+        ([[1, 2], [3, 4]], ["{1,2}", "{3,4}"]),
+        ([[]], ["null"]),
+        ([None, np.nan, pd.NA], ["null", "null", "null"]),
+        ([[1, None, 3], [4, 5]], ["{1,null,3}", "{4,5}"]),
+        ([0], ["{0}"]),
+    ],
+)
+def test_convert_integer_array_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_integer_array_to_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (["{1,2,3}", "{4,5}"], [[1, 2, 3], [4, 5]]),
+        (["{}"], pd.NA),
+        (["null"], pd.NA),
+        (["{1,null,3}"], [[1, pd.NA, 3]]),
+        (["{0}"], [[0]]),
+    ],
+)
+def test_convert_integer_array_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_integer_array_from_str(series, "null")
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, decimal_places, exp",
+    [
+        ([1.234, 5.678, 9.0], 2, ["1.23", "5.68", "9.00"]),
+        ([1, 2, 3], 1, ["1.0", "2.0", "3.0"]),
+        ([np.nan, None, pd.NA], 2, ["null", "null", "null"]),
+        ([1.2, None, 3.4], 1, ["1.2", "null", "3.4"]),
+        ([1.9, 2.1], 0, ["2", "2"]),
+        ([-1.234, -5.678], 2, ["-1.23", "-5.68"]),
+        ([], 2, []),
+    ],
+)
+def test_convert_float_to_str(data, decimal_places, exp):
+    series = pd.Series(data)
+    result = _convert_float_to_str(series, "null", decimal_places)
+    expected = pd.Series(exp)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (["1.23", "5.68", "9.00"], [1.23, 5.68, 9.0]),
+        (["1", "2", "3"], [1.0, 2.0, 3.0]),
+        (["null", "1.5"], [pd.NA, 1.5]),
+        (["abc", "2.5"], [pd.NA, 2.5]),
+        (["", "3.1"], [pd.NA, 3.1]),
+        (["1.1", "", "abc", "5.5"], [1.1, pd.NA, pd.NA, 5.5]),
+        ([], []),
+    ],
+)
+def test_convert_float_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_float_from_str(series, "null")
+    expected = pd.Series(exp, dtype="Float64")
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        ([1.2, 3.4], ["{1.2}", "{3.4}"]),
+        ([[1.2, 3.4]], ["{1.2,3.4}"]),
+        ([1.2], ["{1.2}"]),
+        ([np.nan], ["null"]),
+        ([None], ["null"]),
+        ([[]], ["null"]),
+        (["[1.2,3.4]"], ["{1.2,3.4}"]),
+        (["[1.2]"], ["{1.2}"]),
+        ([""], ["null"]),
+    ],
+)
+def test_convert_float_array_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_float_array_to_str(series, "null")
+    expected = pd.Series(exp, dtype=object)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (["{1.2,3.4}"], [[1.2, 3.4]]),
+        (["{1.2}"], [[1.2]]),
+        (["{}"], pd.NA),
+        ([np.nan], pd.NA),
+        ([None], pd.NA),
+        ([[]], pd.NA),
+    ],
+)
+def test_convert_float_array_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_float_array_from_str(series, "null")
+    expected = pd.Series(exp, dtype=object)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (
+            [datetime(2023, 1, 1, 12, 0, 0), "2022-01-01 00:00:00", np.nan],
+            ["2023-01-01 12:00:00", "2022-01-01 00:00:00", "null"],
+        ),
+        (
+            [np.nan, None, pd.NA],
+            ["null", "null", "null"],
+        ),
+        (
+            [datetime(2021, 7, 4, 9, 30), datetime(2020, 12, 31, 23, 59, 59)],
+            ["2021-07-04 09:30:00", "2020-12-31 23:59:59"],
+        ),
+        (
+            [],
+            [],
+        ),
+    ],
+)
+def test_convert_datetime_to_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_datetime_to_str(series, "null")
+    expected = pd.Series(exp, dtype=object)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, exp",
+    [
+        (
+            ["2023-01-01 12:00:00", "2022-01-01 00:00:00"],
+            [pd.Timestamp("2023-01-01 12:00:00"), pd.Timestamp("2022-01-01 00:00:00")],
+        ),
+        (
+            ["not-a-date", "2022-01-01 00:00:00"],
+            [pd.NaT, pd.Timestamp("2022-01-01 00:00:00")],
+        ),
+        (
+            [datetime(2021, 7, 4, 9, 30), np.nan],
+            [pd.Timestamp("2021-07-04 09:30:00"), pd.NaT],
+        ),
+        (
+            [],
+            [],
+        ),
+    ],
+)
+def test_convert_datetime_from_str(data, exp):
+    series = pd.Series(data)
+    result = _convert_datetime_from_str(series, "null")
+    expected = pd.Series(exp, dtype="datetime64[ns]")
+    pd.testing.assert_series_equal(result, expected)

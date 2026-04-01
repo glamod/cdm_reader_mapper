@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest  # noqa
 
+import pandas as pd
+
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
@@ -39,7 +41,7 @@ from ._duplicates import (
             None,
             None,
             None,
-            {"station_speed": "null", "station_course": "null"},
+            {"station_speed": pd.NA, "station_course": pd.NA},
             None,
             exp7,
         ),
@@ -50,8 +52,8 @@ from ._duplicates import (
             None,
             {
                 "primary_station_id": ["SHIP", "MASKSTID"],
-                "station_speed": "null",
-                "station_course": "null",
+                "station_speed": pd.NA,
+                "station_course": pd.NA,
             },
             None,
             exp8,
@@ -102,11 +104,12 @@ def test_duplicates_remove():
     cdm_icoads.duplicate_check(
         ignore_entries={
             "primary_station_id": ["SHIP", "MASKSTID"],
-            "station_speed": "null",
-            "station_course": "null",
+            "station_speed": pd.NA,
+            "station_course": pd.NA,
         },
         inplace=True,
     )
+
     tables_dups_removed = cdm_icoads.remove_duplicates().data
     expected = cdm_icoads.iloc[[0, 1, 2, 4, 6, 8, 10, 12, 15, 17, 18]]
     assert_frame_equal(expected, tables_dups_removed)
@@ -117,4 +120,4 @@ def test_duplicates_craid():
     cdm_craid.flag_duplicates(inplace=True)
     assert_array_equal(cdm_craid[("header", "duplicate_status")], [0] * 10)
     assert_array_equal(cdm_craid[("header", "report_quality")], [2] * 10)
-    assert_array_equal(cdm_craid[("header", "duplicates")], ["null"] * 10)
+    assert_array_equal(cdm_craid[("header", "duplicates")], [None] * 10)

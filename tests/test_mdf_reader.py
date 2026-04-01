@@ -46,7 +46,9 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    expected = read_data(data_file=data, mask_file=mask, info_file=info)
+    expected = read_data(
+        data_file=data, mask_file=mask, info_file=info, data_format="csv"
+    )
 
     if not isinstance(result.data, pd.DataFrame):
         result.data = result.data.read()
@@ -215,7 +217,7 @@ def test_read_data_basic():
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, mask, info)
+    db = read_data(data, mask, info, data_format="csv")
 
     assert isinstance(db, DataBundle)
 
@@ -250,7 +252,7 @@ def test_read_data_no_mask():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data_file=data, info_file=info)
+    db = read_data(data_file=data, info_file=info, data_format="csv")
 
     assert isinstance(db, DataBundle)
 
@@ -285,7 +287,7 @@ def test_read_data_no_info():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
 
-    db = read_data(data_file=data)
+    db = read_data(data_file=data, data_format="csv")
 
     assert isinstance(db, DataBundle)
 
@@ -319,7 +321,7 @@ def test_read_data_col_subset():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data_file=data, info_file=info, col_subset="core")
+    db = read_data(data_file=data, info_file=info, data_format="csv", col_subset="core")
 
     assert isinstance(db, DataBundle)
 
@@ -353,7 +355,7 @@ def test_read_data_col_subset():
 def test_read_data_encoding():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    db = read_data(data_file=data, encoding="cp1252")
+    db = read_data(data_file=data, data_format="csv", encoding="cp1252")
 
     assert isinstance(db, DataBundle)
 
@@ -389,7 +391,9 @@ def test_read_data_chunksize():
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
     info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data_file=data, mask_file=mask, info_file=info, chunksize=3)
+    db = read_data(
+        data_file=data, mask_file=mask, info_file=info, data_format="csv", chunksize=3
+    )
 
     assert isinstance(db, DataBundle)
 
@@ -689,7 +693,6 @@ def test_read_data_parquet(parquet_files, example_data, example_mask):
     bundle = read_data(
         data_file=data_file,
         mask_file=mask_file,
-        data_format="parquet",
     )
 
     assert isinstance(bundle, DataBundle)

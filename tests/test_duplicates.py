@@ -36,7 +36,7 @@ def test_convert_series_basic():
 
 
 def test_convert_series_null_replacement():
-    df = pd.DataFrame({"a": ["1", "null", "3"], "b": ["null", "2.5", "null"]})
+    df = pd.DataFrame({"a": ["1", None, "3"], "b": [None, "2.5", None]})
     conversion = {"a": "float", "b": "float"}
 
     expected = pd.DataFrame({"a": [1.0, 9999.0, 3.0], "b": [9999.0, 2.5, 9999.0]})
@@ -58,9 +58,9 @@ def test_convert_series_date_to_float():
 def test_convert_series_mixed():
     df = pd.DataFrame(
         {
-            "num": ["1", "null", "3"],
-            "val": ["10.5", "20.5", "null"],
-            "date": ["2023-01-01", "null", "2023-01-03"],
+            "num": ["1", None, "3"],
+            "val": ["10.5", "20.5", None],
+            "date": ["2023-01-01", None, "2023-01-03"],
         }
     )
     conversion = {"num": "Int64", "val": "float", "date": "convert_date_to_float"}
@@ -175,7 +175,7 @@ def test_change_offsets():
 
 def test_reindex_nulls_orders_by_null_count():
     df = pd.DataFrame({"a": ["null", 1, "null", 2], "b": ["null", 2, 3, "null"]})
-    result = reindex_nulls(df)
+    result = reindex_nulls(df, null_label="null")
 
     expected_order = [1, 2, 3, 0]
     assert list(result.index) == expected_order
@@ -183,7 +183,7 @@ def test_reindex_nulls_orders_by_null_count():
 
 def test_reindex_nulls_empty_df():
     df = pd.DataFrame()
-    result = reindex_nulls(df)
+    result = reindex_nulls(df, null_label="null")
     assert result.equals(df)
 
 

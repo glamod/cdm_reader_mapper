@@ -62,7 +62,7 @@
     "sections": "drifter_measurements",
     "elements": "POSITION_ACCURACY",
     "code_table": "location_accuracy",
-    "decimal_places": 0
+    "decimal_places": 1
   },
   "location_method": {
     "sections": "drifter_measurements",
@@ -97,8 +97,8 @@
     "default": 0
   },
   "report_time_accuracy": {
-    "default": 1,
-    "decimal_places": 0
+    "default": 1.0,
+    "decimal_places": 1
   },
   "report_time_quality": {
     "sections": "drifter_measurements",

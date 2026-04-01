@@ -35,7 +35,6 @@ def convert_series(df: pd.DataFrame, conversion: dict) -> pd.DataFrame:
         return (date - date.min()) / np.timedelta64(1, "s")
 
     df = df.copy()
-    df = df.mask(df == "null", np.nan)
     for column, method in conversion.items():
         try:
             df[column] = df[column].astype(method)
@@ -523,7 +522,7 @@ def change_offsets(dic: dict, dic_o: dict) -> dict:
     return dic
 
 
-def reindex_nulls(df: pd.DataFrame) -> pd.DataFrame:
+def reindex_nulls(df: pd.DataFrame, null_label) -> pd.DataFrame:
     """
     Reindex a DataFrame in ascending order based on the number of 'null' strings in each row.
 
@@ -539,14 +538,28 @@ def reindex_nulls(df: pd.DataFrame) -> pd.DataFrame:
         Original row order is preserved for rows with the same null count.
     """
 
-    def _count_nulls(row):
-        return (row == "null").sum()
+    def is_missing(x):
+        if isinstance(x, (list, tuple, np.ndarray)):
+            return any(is_missing(x_) for x_ in x)
 
-    nulls = df.apply(lambda x: _count_nulls(x), axis=1)
-    if nulls.empty:
+        if pd.isna(x):
+            return True
+
+        if x == null_label:
+            return True
+
+        return False
+
+    def count_nulls(row):
+        return sum(is_missing(x) for x in row)
+
+    null_counts = df.apply(count_nulls, axis=1)
+
+    if null_counts.empty:
         return df
-    indexes_ = list(zip(*sorted(zip(nulls.values, nulls.index))))
-    return df.reindex(indexes_[1])
+
+    sorted_index = null_counts.sort_values(kind="stable").index
+    return df.loc[sorted_index]
 
 
 class Comparer:
@@ -584,14 +597,15 @@ class Comparer:
         indexer = getattr(rl.index, method)(**method_kwargs)
         comparer = set_comparer(compare_kwargs)
         if convert_data is True:
-            data_ = convert_series(data, comparer.conversion)
+            data_cp = convert_series(data, comparer.conversion)
         else:
-            data_ = data.copy()
+            data_cp = data.copy()
+
         if pairs_df is None:
-            pairs_df = [data_]
+            pairs_df = [data_cp]
         pairs = indexer.index(*pairs_df)
-        self.compared = comparer.compute(pairs, data_)
-        self.data = data_
+        self.compared = comparer.compute(pairs, data_cp)
+        self.data = data_cp
 
 
 def duplicate_check(
@@ -604,6 +618,7 @@ def duplicate_check(
     ignore_entries=None,
     offsets=None,
     reindex_by_null=True,
+    null_label="null",
 ) -> DupDetect:
     """
     Run a duplicate check on a dataset using recordlinkage.
@@ -638,13 +653,15 @@ def duplicate_check(
         E.g. offsets={"latitude": 0.1}
     reindex_by_null: bool, optional
         If True data is re-indexed in ascending order according to the number of nulls in each row.
+    null_label: str, optional
+        Null label which is used if `reindex_by_null` is True.
 
     Returns
     -------
         cdm_reader_mapper.DupDetect
     """
     if reindex_by_null is True:
-        data = reindex_nulls(data)
+        data = reindex_nulls(data, null_label=null_label)
 
     index = data.index
     data.reset_index(drop=True)
@@ -677,13 +694,12 @@ def duplicate_check(
     compared = [compared]
 
     for column_, entry_ in ignore_entries.items():
-        if isinstance(entry_, str):
+        if not isinstance(entry_, list):
             entry_ = [entry_]
         entries = data[column_].isin(entry_)
 
-        d1 = data.mask(entries).dropna()
-        d2 = data.where(entries).dropna()
-
+        d1 = data.mask(entries).dropna(how="all")
+        d2 = data.where(entries).dropna(how="all")
         if d1.empty:
             continue
         if d2.empty:

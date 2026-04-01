@@ -31,6 +31,7 @@ from typing import get_args
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
+from .utils.conversions import convert_to_str_df
 from .tables.tables import get_cdm_atts
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
@@ -40,7 +41,7 @@ from ..properties import SupportedFileTypes
 def _table_to_file(
     data: pd.DataFrame,
     filename: str,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     delimiter: str = "|",
     encoding: str = "utf-8",
     **kwargs,
@@ -59,7 +60,7 @@ def _table_to_file(
             **kwargs,
         )
     elif data_format == "parquet":
-        data.to_parquet(filename, **kwargs)
+        data.to_parquet(filename, engine="pyarrow", compression="snappy", **kwargs)
     elif data_format == "feather":
         data.to_feather(filename, **kwargs)
     else:
@@ -70,7 +71,7 @@ def _table_to_file(
 
 def write_tables(
     data: pd.DataFrame,
-    data_format: SupportedFileTypes = "csv",
+    data_format: SupportedFileTypes = "parquet",
     out_dir: str | None = None,
     prefix: str | None = None,
     suffix: str | None = None,
@@ -80,6 +81,10 @@ def write_tables(
     col_subset: str | list | dict | None = None,
     delimiter: str = "|",
     encoding: str = "utf-8",
+    imodel: str | None = None,
+    from_str: bool | None = None,
+    to_str: bool | None = None,
+    null_label: str = "null",
     **kwargs,
 ) -> None:
     """Write pandas.DataFrame to CDM-table file on file system.
@@ -88,7 +93,7 @@ def write_tables(
     ----------
     data: pandas.DataFrame
         pandas.DataFrame to export.
-    data_format: {"csv", "parquet", "feather"}, default: "csv"
+    data_format: {"csv", "parquet", "feather"}, default: "parqeut"
         Format of input data file(s).
     out_dir: str, optional
         Path to the output directory.
@@ -169,12 +174,18 @@ def write_tables(
 
     extension = extension or data_format
 
+    if to_str is True:
+        data = convert_to_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
+
     for table in cdm_subset:
-        if table not in data:
-            cdm_atts = get_cdm_atts(table)
-            cdm_table = pd.DataFrame(columns=cdm_atts.keys())
-        else:
+        cdm_atts = get_cdm_atts(table)[table]
+        table_columns = pd.Index(cdm_atts.keys())
+        if table in data:
             cdm_table = data[table]
+        elif data.columns.equals(table_columns):
+            cdm_table = data
+        else:
+            cdm_table = pd.DataFrame(columns=table_columns)
 
         filename_ = filename.get(table)
         if not filename_:

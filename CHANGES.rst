@@ -3,14 +3,16 @@
 Changelog
 =========
 
-2.3.1 (unpublished)
--------------------
+2.4.0 (2026-04-01)
+------------------
 Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * `cdm_mapper.utils.mapping_functions`: Add function `gdac_pressure` in anticipation of moving conversion steps to the mapper in the future. (:pull:`350`)
+* `mdf_reader`/`cdm_mapper`: optionally, convert data types to strings when reading and writing data from/to disk (:pull:`401`)
+* `mdf_reader`/`cdm_mapper`: optionally, convert data types from strings when reading and writing data from/to disk (:pull:`401`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
@@ -20,6 +22,10 @@ Breaking changes
 
     * Update and rename GDAC variable names in `tables/gdac`.
     * Fix `gdac_latitude` and `gdac_longitude` (`utils/mapping_functions.py`) not being used in observations.json
+
+* `mdf_reader`/`cdm_mapper`: use parquet as default instead of csv when reading and writing data from/to disk (:pul:`401`)
+* `cdm_mapper`: do not convert data types to strings while mapping to the CDM (:issue:`398`, :pull:`401`)
+* `cdm_mapper`: set default decimal_places from `0` to `1` for `location_accuracy`, `report_time_accuracy`, `station_speed` and ``station_course` (:pull:`401`)
 
 Bug fixes
 ^^^^^^^^^

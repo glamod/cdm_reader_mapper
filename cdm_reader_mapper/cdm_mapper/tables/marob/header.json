@@ -63,7 +63,7 @@
   "station_course": {
     "elements": "FAHRTRICHTUNG",
     "transform": "convert_to_decimal",
-    "decimal_places": 0
+    "decimal_places": 1
   },
   "height_of_station_above_local_ground": {
     "default": 0,
@@ -86,8 +86,8 @@
     "default": 15
   },
   "report_time_accuracy": {
-    "default": 1,
-    "decimal_places": 0
+    "default": 1.0,
+    "decimal_places": 1
   },
   "report_quality": {
     "default": 2

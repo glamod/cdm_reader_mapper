@@ -67,7 +67,7 @@
       "LAT"
     ],
     "transform": "location_accuracy",
-    "decimal_places": 0
+    "decimal_places": 1
   },
   "location_quality": {
     "sections": "c1",
@@ -91,7 +91,7 @@
     "sections": "core",
     "elements": "DS",
     "code_table": "station_course",
-    "decimal_places": 0
+    "decimal_places": 1
   },
   "height_of_station_above_local_ground": {
     "default": 0,
@@ -121,7 +121,7 @@
     "sections": "core",
     "elements": "TI",
     "transform": "time_accuracy",
-    "decimal_places": 0
+    "decimal_places": 1
   },
   "report_time_quality": {
     "default": 2

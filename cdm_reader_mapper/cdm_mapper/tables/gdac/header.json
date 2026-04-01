@@ -130,9 +130,6 @@
   "processing_codes": {},
   "source_id": {},
   "source_record_id": {
-    "default": [
-      0,
-      5
-    ]
+    "default": "[0, 5]"
   }
 }
