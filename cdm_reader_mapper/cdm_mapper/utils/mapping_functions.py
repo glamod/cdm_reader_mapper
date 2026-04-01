@@ -41,6 +41,7 @@ imodel_lineages = {
     "icoads_r302": ". Initial conversion from ICOADS R3.0.2T NRT",
     "craid": ". Initial conversion from C-RAID",
     "marob": ". Initial conversion from DWD MAROB data base",
+    "cmems": ". Initial conversion from CMEMS",
 }
 
 c2k_methods = {
@@ -513,6 +514,26 @@ class mapping_functions:
             Series of date strings.
         format : str, optional
             Datetime format string (default: "%Y-%m-%d %H:%M:%S.%f").
+
+        Returns
+        -------
+        pd.DatetimeIndex
+            DatetimeIndex of converted dates.
+        """
+        return series_strptime(series, format)
+
+    def datetime_cmems(
+        self, series: pd.Series, format: str = "%Y-%m-%d %H:%M:%S"
+    ) -> pd.DatetimeIndex:
+        """
+        Convert CMEMS date strings to pandas datetime.
+
+        Parameters
+        ----------
+        series : pd.Series
+            Series of date strings.
+        format : str, optional
+            Datetime format string (default: "%Y-%m-%d %H:%M:%S").
 
         Returns
         -------
