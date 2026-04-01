@@ -374,9 +374,7 @@ def parse_netcdf(
     ds_attrs = ds.attrs
 
     for order, ospec in order_specs.items():
-        if sections is not None and order not in sections:
-            continue
-        if order in excludes:
+        if order in excludes or (sections is not None and order not in sections):
             continue
 
         header = ospec.get("header", {})
@@ -409,9 +407,8 @@ def parse_netcdf(
         s = df[col].str.decode("utf-8").str.strip()
         df[col] = s.map(lambda x: True if x == "" else x)
 
-    if attrs:
-        for k, v in attrs.items():
-            df[k] = v.replace("\n", "; ")
+    for k, v in attrs.items():
+        df[k] = v.replace("\n", "; ")
 
     if missing_values:
         df[missing_values] = False
