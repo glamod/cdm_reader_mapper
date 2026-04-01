@@ -370,6 +370,7 @@ def parse_netcdf(
 
     data_vars = ds.data_vars
     dims = ds.dims
+    coords = ds.coords
     ds_attrs = ds.attrs
 
     for order, ospec in order_specs.items():
@@ -384,12 +385,13 @@ def parse_netcdf(
             continue
 
         for element, espec in ospec.get("elements", {}).items():
+
             if espec.get("ignore"):
                 continue
 
             index = espec["index"]
 
-            if element in data_vars or element in dims:
+            if element in data_vars or element in dims or element in coords:
                 renames[element] = index
             elif element in ds_attrs:
                 attrs[index] = ds_attrs[element]
@@ -399,9 +401,6 @@ def parse_netcdf(
     df = ds[list(renames)].to_dataframe().reset_index()
     df = df[list(renames)].rename(columns=renames)
 
-    if attrs:
-        df = df.assign(**{k: v.replace("\n", "; ") for k, v in attrs.items()})
-
     if disables:
         df[disables] = np.nan
 
@@ -409,6 +408,10 @@ def parse_netcdf(
     for col in obj_cols:
         s = df[col].str.decode("utf-8").str.strip()
         df[col] = s.map(lambda x: True if x == "" else x)
+
+    if attrs:
+        for k, v in attrs.items():
+            df[k] = v.replace("\n", "; ")
 
     if missing_values:
         df[missing_values] = False
@@ -591,6 +594,7 @@ def update_xr_config(ds: xr.Dataset, config: ParserConfig) -> ParserConfig:
                 element not in ds.data_vars
                 and element not in ds.attrs
                 and element not in ds.dims
+                and element not in ds.coords
             ):
                 especs["ignore"] = True
                 continue
