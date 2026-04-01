@@ -1,0 +1,114 @@
+{
+  "observation_id": {
+    "sections": [
+      "global_attributes",
+      "global_attributes",
+      "dimensions"
+    ],
+    "elements": [
+      "format_version",
+      "platform_code",
+      "NTIME"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "CMEMS",
+      "separator": "-"
+    }
+  },
+  "report_id": {
+    "sections": [
+      "global_attributes",
+      "global_attributes",
+      "dimensions"
+    ],
+    "elements": [
+      "format_version",
+      "platform_code",
+      "NTIME"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "CMEMS",
+      "separator": "-"
+    }
+  },
+  "data_policy_licence": {
+    "default": 5
+  },
+  "date_time": {
+    "sections": "coordinates",
+    "elements": "TIME",
+    "transform": "datetime_cmems"
+  },
+  "date_time_meaning": {
+    "default": 5
+  },
+  "observation_duration": {
+    "default": 8
+  },
+  "longitude": {
+    "sections": "coordinates",
+    "elements": "LONGITUDE",
+    "decimal_places": "default_decimal_places"
+  },
+  "latitude": {
+    "sections": "coordinates",
+    "elements": "LATITUDE",
+    "decimal_places": "default_decimal_places"
+  },
+  "crs": {
+    "default": 0
+  },
+  "z_coordinate_type": {
+    "default": 0
+  },
+  "observation_height_above_station_surface": {
+    "sections": "coordinates",
+    "elements": "DEPH"
+  },
+  "value_significance": {
+    "default": 2
+  },
+  "conversion_flag": {
+    "default": 0
+  },
+  "location_precision": {
+    "default": 5
+  },
+  "spatial_representativeness": {
+    "default": 3
+  },
+  "numerical_precision": {},
+  "sensor_automation_status": {
+    "default": 5
+  },
+  "exposure_of_sensor": {
+    "default": 3
+  },
+  "original_precision": {},
+  "processing_level": {
+    "default": 3
+  },
+  "traceability": {
+    "default": 2
+  },
+  "advanced_qc": {
+    "default": 0
+  },
+  "advanced_uncertainty": {
+    "default": 0
+  },
+  "advanced_homogenisation": {
+    "default": 0
+  },
+  "source_id": {
+    "sections": "global_attributes",
+    "elements": "format_version",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "CMEMS",
+      "separator": "-"
+    }
+  }
+}

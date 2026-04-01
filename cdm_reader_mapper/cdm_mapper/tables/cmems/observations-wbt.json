@@ -1,0 +1,20 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WBT"
+    }
+  },
+  "observed_variable": {
+    "default": 41
+  },
+  "observation_value": {},
+  "units": {
+    "default": 5
+  },
+  "quality_flag": {},
+  "original_units": {},
+  "original_value": {},
+  "conversion_method": {
+    "default": 1
+  }
+}

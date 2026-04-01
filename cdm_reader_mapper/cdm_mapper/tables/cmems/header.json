@@ -1,0 +1,123 @@
+{
+  "report_id": {
+    "sections": [
+      "global_attributes",
+      "global_attributes",
+      "dimensions"
+    ],
+    "elements": [
+      "format_version",
+      "platform_code",
+      "NTIME"
+    ],
+    "transform": "string_join_add",
+    "kwargs": {
+      "prepend": "CMEMS",
+      "separator": "-"
+    }
+  },
+  "application_area": {
+    "default": [
+      1,
+      7,
+      10,
+      11
+    ]
+  },
+  "report_type": {
+    "default": 0
+  },
+  "station_type": {
+    "default": 2
+  },
+  "platform_type": {
+    "default": 5
+  },
+  "platform_sub_type": {
+    "default": 69
+  },
+  "primary_station_id": {
+    "sections": "global_attributes",
+    "elements": "wmo_platform_code",
+    "fill_value": "UNKNOWN"
+  },
+  "station_record_number": {
+    "default": 1
+  },
+  "primary_station_id_scheme": {
+    "fill_value": "4"
+  },
+  "longitude": {
+    "sections": "coordinates",
+    "elements": "LONGITUDE",
+    "decimal_places": "default_decimal_places"
+  },
+  "latitude": {
+    "sections": "coordinates",
+    "elements": "LATITUDE",
+    "decimal_places": "default_decimal_places"
+  },
+  "location_accuracy": {
+    "default": 5
+  },
+  "location_method": {
+    "default": 10
+  },
+  "location_quality": {
+    "sections": "data_variables",
+    "elements": "POSITION_QC",
+    "code_table": "location_quality"
+  },
+  "crs": {
+    "default": 0
+  },
+  "height_of_station_above_local_ground": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "height_of_station_above_sea_level": {
+    "default": 0,
+    "decimal_places": 1
+  },
+  "report_meaning_of_timestamp": {
+    "default": 2
+  },
+  "report_timestamp": {
+    "sections": "coordinates",
+    "elements": "TIME",
+    "transform": "datetime_cmems"
+  },
+  "report_duration": {
+    "default": 0
+  },
+  "report_time_accuracy": {
+    "default": 1.0,
+    "decimal_places": 1
+  },
+  "report_time_quality": {
+    "sections": "data_variables",
+    "elements": "TIME_QC",
+    "code_table": "time_quality"
+  },
+  "report_quality": {
+    "default": 2
+  },
+  "duplicate_status": {
+    "default": 4
+  },
+  "record_timestamp": {
+    "transform": "datetime_utcnow"
+  },
+  "history": {
+    "transform": "lineage"
+  },
+  "source_id": {
+    "sections": "global_attributes",
+    "elements": "format_version",
+    "transform": "string_add",
+    "kwargs": {
+      "prepend": "CMEMS",
+      "separator": "-"
+    }
+  }
+}

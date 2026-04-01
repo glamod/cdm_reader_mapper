@@ -8,26 +8,15 @@
       },
       {
         "o": [
-          "dimensions",
-          "general",
-          "drifter_institution",
-          "drifter_characteristics",
-          "drifter_deployment",
-          "drifter_configuration",
-          "drifter_sensor",
-          "drifter_calibration",
-          "drifter_measurements",
-          "drifter_greylist",
-          "drifter_history"
+          "coordinates",
+          "data_variables"
         ]
       }
     ]
   },
   "sections": {
     "global_attributes": {
-      "header": {
-        "disable_read": true
-      },
+      "header": {},
       "elements": {
         "platform_code": {
           "description": "The unique platform code within Copernicus In Situ TAC. This attribute is used in the naming of the platform and the respective files naming.",
@@ -230,15 +219,15 @@
           "column_type": "str"
         },
         "publisher_name": {
-          "desciption": "Name of the person responsible for metadata and formatting of the data file (ACDD)",
+          "description": "Name of the person responsible for metadata and formatting of the data file (ACDD)",
           "column_type": "str"
         },
         "publisher_url": {
-          "desciption": "Web address of the institution or of the data publisher (ACDD)",
+          "description": "Web address of the institution or of the data publisher (ACDD)",
           "column_type": "str"
         },
         "publisher_institution": {
-          "desciption": "Name of the institution or of the data publisher (ACDD)",
+          "description": "Name of the institution or of the data publisher (ACDD)",
           "column_type": "str"
         }
       }
