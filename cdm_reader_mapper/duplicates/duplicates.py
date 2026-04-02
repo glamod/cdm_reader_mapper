@@ -131,7 +131,10 @@ def add_duplicates(df: pd.DataFrame, dups: pd.DataFrame) -> pd.DataFrame:
         df["duplicates"] = ""
 
     report_ids = df["report_id"]
-    return df.apply(lambda x: _add_dups(x), axis=1)
+
+    dtypes = df.dtypes
+    result = df.apply(lambda x: _add_dups(x), axis=1)
+    return result.astype(dtypes)
 
 
 def add_report_quality(df: pd.DataFrame, indexes_bad: Iterable[int]) -> pd.DataFrame:
