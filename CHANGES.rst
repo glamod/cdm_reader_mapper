@@ -3,9 +3,19 @@
 Changelog
 =========
 
+2.4.1 (2026-04-07)
+------------------
+Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
+
+Bug fixes
+^^^^^^^^^
+
+* `duplicates`: do not change data types when updating quality flags and history description (:pull:`408`)
+
+
 2.4.0 (2026-04-01)
 ------------------
-Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`), Jan Marius Willruth (:user:`JanWillruth`)
+Contributors to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`) and Jan Marius Willruth (:user:`JanWillruth`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -25,7 +35,7 @@ Breaking changes
 
 * `mdf_reader`/`cdm_mapper`: use parquet as default instead of csv when reading and writing data from/to disk (:pul:`401`)
 * `cdm_mapper`: do not convert data types to strings while mapping to the CDM (:issue:`398`, :pull:`401`)
-* `cdm_mapper`: set default decimal_places from `0` to `1` for `location_accuracy`, `report_time_accuracy`, `station_speed` and ``station_course` (:pull:`401`)
+* `cdm_mapper`: set default decimal_places from `0` to `1` for `location_accuracy`, `report_time_accuracy`, `station_speed` and `station_course` (:pull:`401`)
 
 Bug fixes
 ^^^^^^^^^
@@ -66,7 +76,7 @@ Breaking changes
   * `cdm_mapper.read_tables`
   * `cdm_mapper.write_tables`
 
-* set default for `extension` from ``csv`  to specified `data_format` in `mdf_reader.write_data` (:pull:`363`)
+* set default for `extension` from `csv`  to specified `data_format` in `mdf_reader.write_data` (:pull:`363`)
 * `mdf_reader.read_data`: save `dtypes` in return DataBundle as `pd.Series` not `dict` (:pull:`363`)
 * remove ``common.pandas_TextParser_hdlr`` (:issue:`8`, :pull:`348`)
 * ``cdm_reader_mapper`` now raises errors instead of logging them (:pull:`348`)
@@ -126,7 +136,7 @@ Internal changes
 ^^^^^^^^^^^^^^^^
 * implement map_model test for Pub47 data (:issue:`310`, :pull:`327`)
 * rename test data class from test_data to TestData (:pull:`327`)
-* update .gitignore (:pull:``324`)
+* update .gitignore (:pull:`324`)
 * update and add docstrings for multiple functions (:pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: update mapping functions for more readability (:pull:`324`)
 * ``cdm_reader_mapper.cdm_mapper``: introduce some helper functions (:pull:`324`)
@@ -345,7 +355,7 @@ Internal changes
 * ``cdm_mapper.codes.common``: convert range-key properties to list (:pull:`221`)
 * ``testing_suite``: new chunksize test with icoads_r300_d721 (:pull:`222`)
 * ``mdf_reader``, ``cdm_nmapper``: use model-depending encoding while writing data on disk (:pull:`222`)
-* code restructuring (:pull:``224`)
+* code restructuring (:pull:`224`)
 * remove unused functions and methods (:pull:`224`)
 
 
