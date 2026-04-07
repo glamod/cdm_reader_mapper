@@ -359,6 +359,9 @@ class DupDetect:
 
         self.get_duplicates(keep=keep, limit=limit, equal_musts=equal_musts)
         result = self.data.copy()
+
+        dtypes = result.dtypes
+
         result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
             self.get_matches(limit="default", equal_musts=equal_musts)
@@ -388,7 +391,9 @@ class DupDetect:
         result = add_report_quality(result, indexes_bad=indexes_bad)
         result = add_history(result, indexes)
         result = result.sort_index(ascending=True)
-        self.result = add_duplicates(result, duplicates)
+        result = add_duplicates(result, duplicates)
+
+        self.result = result.astype(dtypes)
         self.data = self.data.sort_index(ascending=True)
 
         return self.result
@@ -681,6 +686,8 @@ def duplicate_check(
     if offsets:
         compare_kwargs = change_offsets(compare_kwargs, offsets)
 
+    dtypes = data.dtypes
+
     Compared_ = Comparer(
         data=data,
         method=method,
@@ -723,4 +730,5 @@ def duplicate_check(
 
     compared = pd.concat(compared)
     data.set_index(index, inplace=True)
+    data = data.astype(dtypes)
     return DupDetect(data, compared, method, method_kwargs, compare_kwargs)
