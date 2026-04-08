@@ -99,6 +99,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
         "icoads_r302_d992",
         "craid",
         "gdac",
+        "cmems",
     ],
 )
 def test_read_mdf_test_data_basic(data_model):

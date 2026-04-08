@@ -211,10 +211,12 @@ class TestData:
     @property
     def test_marob(self):
         """MAROB (DWD database) test data."""
-        return self._get_data_dict(
-            "2026-04-07_subset",
-            "marob",
-        )
+        return self._get_data_dict("2026-04-07_subset", "marob")
+
+    @property
+    def test_cmems(self):
+        """CMEMS (copernicusmarine) test data."""
+        return self._get_data_dict("2017-05-02_subset", "cmems", "nc")
 
     @property
     def test_pub47(self):
