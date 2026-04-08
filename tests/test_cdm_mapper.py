@@ -127,6 +127,9 @@ def _map_model_test_data(
         if result_table.empty and expected_table.empty:
             continue
 
+        object_columns = result_table.select_dtypes(include="object").columns
+        expected_table[object_columns] = expected_table[object_columns].astype("object")
+
         if "record_timestamp" in expected_table.columns:
             expected_table = expected_table.drop("record_timestamp", axis=1)
             result_table = result_table.drop("record_timestamp", axis=1)
@@ -626,6 +629,7 @@ def test_map_model_pub47():
         "craid",
         "gdac",
         "marob",
+        "cmems",
     ],
 )
 def test_map_model_test_data_basic(data_model):

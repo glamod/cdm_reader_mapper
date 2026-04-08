@@ -7,6 +7,11 @@ Changelog
 ------------------
 Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+New features and enhancements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* `mdf_mapper` / `cdm_mapper`: add new project CMEMS for drifting iridium buoy data (:pull:`405`)
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 

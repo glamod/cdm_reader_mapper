@@ -1,0 +1,20 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "WD"
+    }
+  },
+  "observed_variable": {
+    "default": 106
+  },
+  "observation_value": {},
+  "units": {
+    "default": 320
+  },
+  "quality_flag": {},
+  "original_units": {},
+  "original_value": {},
+  "conversion_method": {
+    "default": 1
+  }
+}

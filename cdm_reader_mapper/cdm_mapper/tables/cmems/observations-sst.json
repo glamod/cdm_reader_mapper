@@ -1,0 +1,20 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "SST"
+    }
+  },
+  "observed_variable": {
+    "default": 95
+  },
+  "observation_value": {},
+  "units": {
+    "default": 5
+  },
+  "quality_flag": {},
+  "original_units": {},
+  "original_value": {},
+  "conversion_method": {
+    "default": 1
+  }
+}

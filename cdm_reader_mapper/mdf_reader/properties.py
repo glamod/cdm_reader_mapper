@@ -10,12 +10,21 @@ _base = "cdm_reader_mapper.mdf_reader"
 
 open_file = {
     "craid": "netcdf",
+    "cmems": "netcdf",
 }
 
 year_column = {
     "gdac": "AAAA",
     "icoads": ("core", "YR"),
     "craid": ("drifter_measurements", "JULD"),
+    "cmems": ("coordinates", "TIME"),
+}
+
+factorize = {
+    "cmems": {
+        "source": ("coordinates", "TIME"),
+        "target": ("dimensions", "NTIME"),
+    }
 }
 
 pandas_dtypes = {}

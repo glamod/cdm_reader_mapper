@@ -1,0 +1,35 @@
+{
+  "observation_id": {
+    "kwargs": {
+      "append": "SLP"
+    }
+  },
+  "observed_variable": {
+    "default": 58
+  },
+  "observation_value": {
+    "sections": "data_variables",
+    "elements": "ATMS",
+    "transform": "pressue_hpa_in_pa",
+    "decimal_places": 0
+  },
+  "units": {
+    "default": 32
+  },
+  "quality_flag": {
+    "sections": "data_variables",
+    "elements": "ATMS_QC",
+    "code_table": "quality_flag"
+  },
+  "original_units": {
+    "default": 530
+  },
+  "original_value": {
+    "sections": "data_variables",
+    "elements": "ATMS",
+    "decimal_places": 1
+  },
+  "conversion_method": {
+    "default": 7
+  }
+}

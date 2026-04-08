@@ -492,6 +492,29 @@ def test_datetime_marob(df, expected):
 
 
 @pytest.mark.parametrize(
+    "df, expected",
+    [
+        (
+            pd.Series(["2025-11-02 10:30:00"]),
+            pd.Series([pd.Timestamp("2025-11-02 10:30:00")]),
+        ),
+        (
+            pd.Series(["2025-11-02 10:30:00,000", "2025-12-03 15:45:00,123"]),
+            pd.Series([pd.NaT, pd.NaT]),
+        ),
+        (pd.Series(["invalid"]), pd.Series([pd.NaT])),
+        (pd.Series([]), pd.Series([])),
+    ],
+)
+def test_datetime_cmems(df, expected):
+    obj = mapping_functions("dummy_model")
+    result = obj.datetime_cmems(df)
+    print(result)
+    print(expected)
+    pd.testing.assert_series_equal(result, expected)
+
+
+@pytest.mark.parametrize(
     "df, sep, expected",
     [
         (pd.DataFrame({"A": [1, 2], "B": [3, 4]}), "-", pd.Series(["1-3", "2-4"])),

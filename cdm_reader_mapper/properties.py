@@ -8,7 +8,7 @@ NumericTypes = Literal["Int64", "int", "float"]
 
 ObjectTypes = Literal["str", "object", "key", "datetime"]
 
-SupportedDataModels = Literal["craid", "gdac", "icoads", "pub47", "marob"]
+SupportedDataModels = Literal["craid", "gdac", "icoads", "pub47", "marob", "cmems"]
 
 SupportedFileTypes = Literal["csv", "parquet", "feather"]
 

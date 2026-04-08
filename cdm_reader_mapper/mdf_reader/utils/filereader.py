@@ -177,7 +177,15 @@ class FileReader:
         data = _apply_multiindex(data)
 
         data_model = self.imodel.split("_")[0]
-        year_col = properties.year_column[data_model]
+
+        factorize = properties.factorize.get(data_model)
+        if factorize:
+            source_column = factorize["source"]
+            target_column = factorize["target"]
+            codes, _ = pd.factorize(data[source_column])
+            data[target_column] = pd.Series(codes)
+
+        year_col = properties.year_column.get(data_model)
 
         data = _select_years(data, (year_init, year_end), year_col)
 

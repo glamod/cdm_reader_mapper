@@ -1,0 +1,299 @@
+{
+  "header": {
+    "parsing_order": [
+      {
+        "s": [
+          "global_attributes"
+        ]
+      },
+      {
+        "o": [
+          "coordinates",
+          "data_variables"
+        ]
+      }
+    ]
+  },
+  "sections": {
+    "global_attributes": {
+      "header": {},
+      "elements": {
+        "platform_code": {
+          "description": "The unique platform code within Copernicus In Situ TAC. This attribute is used in the naming of the platform and the respective files naming.",
+          "column_type": "int"
+        },
+        "platform_name": {
+          "description": "The human readable name of the platform. This attribute may have an empty fill value.",
+          "column_type": "str"
+        },
+        "wmo_platform_code": {
+          "description": "WMO (World Meteorological Organization) identifier for the platform. The WMO identifier is the WMO call sign (from World Meteorological Organisation). This code is highly recommended, it appears in the wmo_platform_code global attribute of the NetCDF data files. More information on WMO call signs: http://www.wmo.int/pages/prog/amp/mmop/wmo-number-rules.html When WMO code is not available, the platform code is a unique code assigned by a Production Unit (or agreed between PUs).",
+          "column_type": "int"
+        },
+        "ices_platform_code": {
+          "description": "It contains the platform code assigned by ICES (International Council for the Exploration of the Sea). If it does not exist (example: drifting buoys do not have ICES codes), the attribute has an empty fill value.",
+          "column_type": "int"
+        },
+        "coriolis_platform": {
+          "description": "The human readable name of the CORIOLIS platform. This attribute may have an empty fill value.",
+          "column_type": "int"
+        },
+        "transmitter_system": {
+          "description": "The name of the transmitter system (e.g. ARGOS or IRIDIUM)",
+          "column_type": "str"
+        },
+        "start_mission_date": {
+          "description": "Mission start date of the data in UTC. See note on time format below.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "end_mission_date": {
+          "description": "Mission end date of the data in UTC. See note on time format below.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "estimated_drogue_off_date": {
+          "description": "Date (UTC) of the loss of the drogue.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "source": {
+          "description": "The method of production of the original data. If it was model-generated, source should name the model and its version, as specifically as could be useful. If it is observational, source should characterize it (e.g., 'surface observation' or 'radiosonde').",
+          "column_type": "str"
+        },
+        "source_platform_category_code": {
+          "description": "Reports platform categories as a code (related with source attribute). SeaVoX-SeaDataNet platform categories L06 code: http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=L06",
+          "column_type": "int"
+        },
+        "institution": {
+          "description": "Specifies where the original data was produced.",
+          "column_type": "str"
+        },
+        "institution_edmo_code": {
+          "description": "Reports platform categories as a code (related with source attribute). SeaVoX-SeaDataNet platform categories L06 code: http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=L06",
+          "column_type": "int"
+        },
+        "institution_country": {
+          "description": "Country of the platform's institution (semicolon separated list)",
+          "column_type": "str"
+        },
+        "institution_references": {
+          "description": "The references of the platform's institution (blank separated list)",
+          "column_type": "str"
+        },
+        "naming_authority": {
+          "description": "The organization that manages data set names.",
+          "column_type": "str"
+        },
+        "title": {
+          "description": "A succinct description of what is in the dataset.",
+          "column_type": "str"
+        },
+        "summary": {
+          "description": "Longer free-format text describing the dataset. This attribute  should allow data discovery for a human reader. A paragraph of up to 100 words is recommended.",
+          "column_type": "str"
+        },
+        "data_mode": {
+          "description": "Indicates if the file contains real-time, delayed mode or mixed data.",
+          "column_type": "str",
+          "codetable": "CRAID.MODES"
+        },
+        "wmo_instrument_type": {
+          "description": "If available, the WMO instrument type is recorded in the global attribute section of the NetCDF file. The WMO code is available only for vertical profiles. To be renamed in 2023 by wmo_instrument_type",
+          "column_type": "int"
+        },
+        "area": {
+          "description": "Geographical coverage. Try to compose of the following: North/Tropical/South Atlantic/Pacific/Indian Ocean, Southern Ocean, Arctic Ocean.",
+          "column_type": "str"
+        },
+        "geospatial_lat_min": {
+          "description": "Southernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float"
+        },
+        "geospatial_lat_max": {
+          "description": "Northernmost valid latitude, a value between -90 and 90 decimal degrees. This is calculated from the valid latitudes in the file.",
+          "column_type": "float"
+        },
+        "geospatial_lon_min": {
+          "description": "Westernmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float"
+        },
+        "geospatial_lon_max": {
+          "description": "Easternmost valid longitude, a value between -180 and 180 decimal degrees. This is calculated from the valid longitudes in the file.",
+          "column_type": "float"
+        },
+        "geospatial_vertical_min": {
+          "description": "Minimum depth or height of measurements.",
+          "column_type": "float"
+        },
+        "geospatial_vertical_max": {
+          "description": "Maximum depth or height of measurements.",
+          "column_type": "float"
+        },
+        "time_coverage_start": {
+          "description": "Start date of the data in UTC. See note on time format below.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "time_coverage_end": {
+          "description": "Final date of the data in UTC. See note on time format below.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "cdm_data_type": {
+          "description": "The Unidata CDM (common data model) data type used by THREDDS. More on https://www.unidata.ucar.edu/software/netcdf-java/v4.6/CDM/index.html https://www.unidata.ucar.edu/software/netcdf-java/v4.6/reference/FeatureDatasets/CFpointImplement.html https://www.unidata.ucar.edu/software/netcdf-java/v4.6/tutorial/GridDatatype.html http://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf-conventions.html#_features_and_feature_types Accepted values: timeSeries - a series of data points at the same spatial location with monotonically increasing times; trajectory - a series of data points along a path through space with monotonically increasing times; profile - an ordered set of data points along a vertical line at a fixed horizontal position and fixed time; trajectoryProfile - a series of profile features located at points ordered along a trajectory; grid - a set of data points in a multidimensional grid, where each coordinate is ordered and separable",
+          "column_type": "str"
+        },
+        "featureType": {
+          "description": "The Unidata CDM (common data model) feature type used by THREDDS. See 'cdm_data_type'.",
+          "column_type": "str"
+        },
+        "bottom_depth": {
+          "description": "This global attribute may have an empty fill value. It's an optional int value expressed in meters. On moorings or fixed buoys, this information is provided by the platform operator. If that information is not available the attribute should be omitted.",
+          "column_type": "int"
+        },
+        "last_date_observation": {
+          "description": "The last valid observation date and position. excepting HF radar data",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "last_latitude_observation": {
+          "description": "The last valid observation date and position. excepting HF radar data",
+          "column_type": "float"
+        },
+        "last_longitude_observation": {
+          "description": "The last valid observation date and position. excepting HF radar data",
+          "column_type": "float"
+        },
+        "references": {
+          "description": "Published or web-based references that describe the data or methods used to produce it.",
+          "column_type": "str"
+        },
+        "license": {
+          "description": "The license is a legal arrangement between the depositor of the dataset (the licensee) and the data repository (Copernicus Marine service), signifying what a user is allowed to do with the dataset",
+          "column_type": "str"
+        },
+        "update_interval": {
+          "description": "Update interval for the file. Use ISO 8601 Interval format: PnYnMnDTnHnM where elements that are 0 may be omitted. Examples: Hourly: 'PT1H'; Daily: 'P1D'; Monthly: 'P1M'. Use 'void' for data that are not updated on a schedule.",
+          "column_type": "str"
+        },
+        "citation": {
+          "description": "The citation to be used in publications using the data file.",
+          "column_type": "str"
+        },
+        "doi": {
+          "description": "List of Data Object Identifiers (DOI) related to this data file (blank separated).",
+          "column_type": "str"
+        },
+        "creator_name": {
+          "description": "The first name and the last name of the data creator,",
+          "column_type": "str"
+        },
+        "id": {
+          "description": "The 'id' and 'naming_authority' attributes are intended to provide a globally unique identification for each dataset. The id may be the file name without the .nc suffix, which is designed to be unique.",
+          "column_type": "str"
+        },
+        "netcdf_version": {
+          "description": "Netcdf version used for the data file.",
+          "column_type": "str"
+        },
+        "format_version": {
+          "description": "Copernicus In Situ NetCDF format version.",
+          "column_type": "float"
+        },
+        "Conventions": {
+          "description": "The conventions supported by this file, blank separated",
+          "column_type": "str"
+        },
+        "date_modified": {
+          "description": "The date on which this file was last updated. To be changed in 2023 by date_modified: The date on which this file was last modified. (ACDD)",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "history": {
+          "description": "Provides an audit trail for modifications to the original data. Well-behaved generic NetCDF filters will automatically append their name and the parameters with which they were invoked to the global history attribute of an input NetCDF file. We recommend that each line begin with a timestamp indicating the date and time of day that the program was executed.",
+          "column_type": "str"
+        },
+        "publisher_email": {
+          "description": "Email address of person responsible for metadata and formatting of the data file (ACDD)",
+          "column_type": "str"
+        },
+        "publisher_name": {
+          "description": "Name of the person responsible for metadata and formatting of the data file (ACDD)",
+          "column_type": "str"
+        },
+        "publisher_url": {
+          "description": "Web address of the institution or of the data publisher (ACDD)",
+          "column_type": "str"
+        },
+        "publisher_institution": {
+          "description": "Name of the institution or of the data publisher (ACDD)",
+          "column_type": "str"
+        }
+      }
+    },
+    "coordinates": {
+      "header": {},
+      "elements": {
+        "TIME": {
+          "description": "Time of the measurement in days since noon.",
+          "column_type": "datetime",
+          "datetime_format": "%Y-%m-%dT%H:%M:%S.f"
+        },
+        "LATITUDE": {
+          "description": "Latitude of each location.",
+          "column_type": "float"
+        },
+        "LONGITUDE": {
+          "description": "Longitude of each location.",
+          "column_type": "float"
+        },
+        "TRAJECTORY": {
+          "description": "Trajectory id. This variable contains the mandatory attribute cf_role. This variable is included because of compatibility reasons with CF Conventions.",
+          "column_type": "str"
+        },
+        "DEPH": {
+          "description": "Depth of the measurements. ",
+          "column_type": "float"
+        }
+      }
+    },
+    "data_variables": {
+      "header": {},
+      "elements": {
+        "TIME_QC": {
+          "description": "Time quality flag. [0 1 2 3 4 5 6 7 8 9], [no_qc_performed, good_data, probably_good_data, bad_data_that_are_potentially_correctable, bad_data value_changed, value_below_detection, nominal_value, interpolated_value, missing_value]",
+          "column_type": "int",
+          "codetable": "CMEMS.QC"
+        },
+        "POSITION_QC": {
+          "description": "Position quality flag. [0 1 2 3 4 5 6 7 8 9], [no_qc_performed, good_data, probably_good_data, bad_data_that_are_potentially_correctable, bad_data value_changed, value_below_detection, nominal_value, interpolated_value, missing_value]",
+          "column_type": "int",
+          "codetable": "CMEMS.QC"
+        },
+        "DC_REFERENCE": {
+          "description": "Station/Location unique identifier in data centre.",
+          "column_type": "str"
+        },
+        "TEMP": {
+          "description": "Sea temperature.",
+          "column_type": "float"
+        },
+        "TEMP_QC": {
+          "description": "Sea temperature quality flag. [0 1 2 3 4 5 6 7 8 9], [no_qc_performed, good_data, probably_good_data, bad_data_that_are_potentially_correctable, bad_data value_changed, value_below_detection, nominal_value, interpolated_value, missing_value]",
+          "column_type": "int",
+          "codetable": "CMEMS.QC"
+        },
+        "ATMS": {
+          "description": "Atmospheric pressure at sea level.",
+          "column_type": "float"
+        },
+        "ATMS_QC": {
+          "description": "Atmospheric pressure at sea level quality flag. [0 1 2 3 4 5 6 7 8 9], [no_qc_performed, good_data, probably_good_data, bad_data_that_are_potentially_correctable, bad_data value_changed, value_below_detection, nominal_value, interpolated_value, missing_value]",
+          "column_type": "int",
+          "codetable": "CMEMS.QC"
+        }
+      }
+    }
+  }
+}
