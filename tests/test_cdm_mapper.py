@@ -84,19 +84,17 @@ def _map_model_test_data(
     source = test_data[f"test_{data_model}"]["mdf_data"]
 
     mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
+
     if mdf_info is None:
         dtypes = object
     else:
-        info = open_json_file(test_data[f"test_{data_model}"]["mdf_info"])
+        info = open_json_file(mdf_info)
         dtypes = info["dtypes"]
-
-    delimiter = test_data[f"test_{data_model}"]["delimiter"]
 
     df = pd.read_csv(
         source,
         dtype=dtypes,
         chunksize=chunksize,
-        delimiter=delimiter,
         encoding=encoding,
     )
 
