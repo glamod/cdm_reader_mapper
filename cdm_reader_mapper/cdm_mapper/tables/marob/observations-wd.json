@@ -5,16 +5,14 @@
     }
   },
   "observation_height_above_station_surface": {
-    "elements": "SENSORHOEHE_WAS_FF",
-    "transform": "convert_to_decimal",
+    "elements": "sensorhoehe_was_ff",
     "decimal_places": 1
   },
   "observed_variable": {
     "default": 106
   },
   "observation_value": {
-    "elements": "WINDRICHTUNG",
-    "transform": "convert_to_decimal",
+    "elements": "windrichtung",
     "decimal_places": 0
   },
   "units": {
@@ -24,8 +22,7 @@
     "default": 320
   },
   "original_value": {
-    "elements": "WINDRICHTUNG",
-    "transform": "convert_to_decimal",
+    "elements": "windrichtung",
     "decimal_places": 0
   },
   "conversion_flag": {

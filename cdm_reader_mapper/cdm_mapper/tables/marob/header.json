@@ -1,6 +1,6 @@
 {
   "report_id": {
-    "elements": "ID",
+    "elements": "marob_id",
     "transform": "string_add",
     "kwargs": {
       "separator": "-",
@@ -28,7 +28,7 @@
     "default": 2
   },
   "primary_station_id": {
-    "elements": "KENNUNG"
+    "elements": "kennung"
   },
   "station_record_number": {
     "default": 1
@@ -37,13 +37,11 @@
     "fill_value": 5
   },
   "longitude": {
-    "elements": "GEOGR_LAENGE",
-    "transform": "convert_to_decimal",
+    "elements": "geogr_laenge",
     "decimal_places": 1
   },
   "latitude": {
-    "elements": "GEOGR_BREITE",
-    "transform": "convert_to_decimal",
+    "elements": "geogr_breite",
     "decimal_places": 1
   },
   "location_quality": {
@@ -53,16 +51,12 @@
     "default": 0
   },
   "station_speed": {
-    "elements": "FAHRTGESCHWINDIGKEIT",
+    "elements": "fahrtgeschwindigkeit",
     "transform": "velocity_kn_in_ms",
-    "kwargs": {
-      "convert_to_decimal_float": true
-    },
     "decimal_places": 2
   },
   "station_course": {
-    "elements": "FAHRTRICHTUNG",
-    "transform": "convert_to_decimal",
+    "elements": "fahrtrichtung",
     "decimal_places": 1
   },
   "height_of_station_above_local_ground": {
@@ -70,8 +64,7 @@
     "decimal_places": 1
   },
   "height_of_station_above_sea_level": {
-    "elements": "STATIONSHOEHE_MSL",
-    "transform": "convert_to_decimal",
+    "elements": "stationshoehe_msl",
     "fill_value": 0,
     "decimal_places": 1
   },
@@ -79,7 +72,7 @@
     "default": 2
   },
   "report_timestamp": {
-    "elements": "MESSZEIT",
+    "elements": "messzeit",
     "transform": "datetime_marob"
   },
   "report_duration": {
@@ -102,9 +95,9 @@
     "transform": "lineage"
   },
   "source_id": {
-    "elements": "DATENQUELLE_ID"
+    "elements": "IID"
   },
   "source_record_id": {
-    "elements": "ID"
+    "elements": "marob_id"
   }
 }
