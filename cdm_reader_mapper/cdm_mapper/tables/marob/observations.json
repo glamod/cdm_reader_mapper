@@ -1,6 +1,6 @@
 {
   "observation_id": {
-    "elements": "ID",
+    "elements": "marob_id",
     "transform": "string_add",
     "kwargs": {
       "separator": "-",
@@ -8,7 +8,7 @@
     }
   },
   "report_id": {
-    "elements": "ID",
+    "elements": "marob_id",
     "transform": "string_add",
     "kwargs": {
       "separator": "-",
@@ -19,7 +19,7 @@
     "default": 1
   },
   "date_time": {
-    "elements": "MESSZEIT",
+    "elements": "messzeit",
     "transform": "datetime_marob"
   },
   "date_time_meaning": {
@@ -29,13 +29,11 @@
     "default": 8
   },
   "longitude": {
-    "elements": "GEOGR_LAENGE",
-    "transform": "convert_to_decimal",
+    "elements": "geogr_laenge",
     "decimal_places": 1
   },
   "latitude": {
-    "elements": "GEOGR_BREITE",
-    "transform": "convert_to_decimal",
+    "elements": "geogr_breite",
     "decimal_places": 1
   },
   "crs": {
@@ -58,7 +56,7 @@
   },
   "numerical_precision": {},
   "sensor_automation_status": {
-    "elements": "DATENQUELLE_ID",
+    "elements": "IID",
     "code_table": "sensor_automation_status"
   },
   "exposure_of_sensor": {
@@ -81,6 +79,6 @@
     "default": 0
   },
   "source_id": {
-    "elements": "DATENQUELLE_ID"
+    "elements": "IID"
   }
 }

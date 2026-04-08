@@ -7,10 +7,22 @@ Changelog
 ------------------
 Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
+Breaking changes
+^^^^^^^^^^^^^^^^
+
+* `cdm_mapper`: update element names in MAROB CDM mapping tables (:pull:`393`)
+* `cdm_mapper.util.mapping_functions`: change default MAROB datetime string format to "%Y-%m-%dT%H:%M:%S" (:pull:`393`)
+
+
 Bug fixes
 ^^^^^^^^^
 
 * `duplicates`: do not change data types when updating quality flags and history description (:pull:`408`)
+
+Internal changes
+^^^^^^^^^^^^^^^^
+
+* `cdm_mapper.util.mapping_functions`: delete function `convert_to_decimal` (:pull:`393`)
 
 
 2.4.0 (2026-04-01)

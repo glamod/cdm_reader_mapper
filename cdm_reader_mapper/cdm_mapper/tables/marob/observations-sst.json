@@ -5,22 +5,16 @@
     }
   },
   "observation_height_above_station_surface": {
-    "elements": "MESSTIEFE",
+    "elements": "messtiefe",
     "transform": "float_opposite",
-    "kwargs": {
-      "convert_to_decimal_float": true
-    },
     "decimal_places": 1
   },
   "observed_variable": {
     "default": 95
   },
   "observation_value": {
-    "elements": "WASSERTEMPERATUR",
+    "elements": "wassertemperatur",
     "transform": "temperature_celsius_to_kelvin",
-    "kwargs": {
-      "convert_to_decimal_float": true
-    },
     "decimal_places": 2
   },
   "units": {
@@ -30,8 +24,7 @@
     "default": 60
   },
   "original_value": {
-    "elements": "WASSERTEMPERATUR",
-    "transform": "convert_to_decimal",
+    "elements": "wassertemperatur",
     "decimal_places": 1
   },
   "conversion_method": {
