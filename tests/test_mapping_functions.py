@@ -469,15 +469,15 @@ def test_datetime_craid(df, expected):
     "df, expected",
     [
         (
-            pd.Series(["02.11.25 10:30:00,000"]),
+            pd.Series(["2025-11-02T10:30:00"]),
             pd.Series([pd.Timestamp("2025-11-02 10:30:00")]),
         ),
         (
-            pd.Series(["02.11.25 10:30:00,000", "03.12.25 15:45:00,123"]),
+            pd.Series(["2025-11-02T10:30:00", "2025-12-03T15:45:00"]),
             pd.Series(
                 [
                     pd.Timestamp("2025-11-02 10:30:00"),
-                    pd.Timestamp("2025-12-03 15:45:00.123"),
+                    pd.Timestamp("2025-12-03 15:45:00"),
                 ]
             ),
         ),

@@ -522,7 +522,7 @@ class mapping_functions:
         return series_strptime(series, format)
 
     def datetime_marob(
-        self, series: pd.Series, format: str = "%d.%m.%y %H:%M:%S,%f"
+        self, series: pd.Series, format: str = "%Y-%m-%dT%H:%M:%S"
     ) -> pd.Series:
         """
         Convert MAROB date strings to pandas datetime.
@@ -532,7 +532,7 @@ class mapping_functions:
         series : pd.Series
             Series of date strings.
         format : str, optional
-            Datetime format string (default: "%d.%m.%y %H:%M:%S,%f").
+            Datetime format string (default: "%d.%m.%y %H:%M:%S).
 
         Returns
         -------
@@ -540,22 +540,6 @@ class mapping_functions:
             Series of converted dates.
         """
         return series_strptime(series, format)
-
-    def convert_to_decimal(self, series):
-        """
-        Convert a string series to a float series with decimals.
-
-        Parameters
-        ----------
-        series : pd.Series
-            Series of string values.
-
-        Returns
-        -------
-        pd.Series
-            Series of decimal floats.
-        """
-        return series.astype(str).str.replace(",", ".", regex=False).astype(float)
 
     def df_col_join(self, df: pd.DataFrame, sep: str) -> pd.Series:
         """
@@ -578,9 +562,7 @@ class mapping_functions:
 
         return df.astype(str).agg(sep.join, axis=1)
 
-    def float_opposite(
-        self, series: pd.Series, convert_to_decimal_float=False
-    ) -> pd.Series:
+    def float_opposite(self, series: pd.Series) -> pd.Series:
         """
         Return the opposite (negation) of a numeric Series.
 
@@ -594,8 +576,6 @@ class mapping_functions:
         pd.Series
           Series with negated values.
         """
-        if convert_to_decimal_float is True:
-            series = self.convert_to_decimal(series)
         series = series.astype(float)
         return -series
 
@@ -866,9 +846,7 @@ class mapping_functions:
         )
         return pd.Series(result, index=df.index, dtype="object")
 
-    def temperature_celsius_to_kelvin(
-        self, df: pd.DataFrame, convert_to_decimal_float=False
-    ) -> pd.Series:
+    def temperature_celsius_to_kelvin(self, df: pd.DataFrame) -> pd.Series:
         """
         Convert temperatures from Celsius to Kelvin using the model-specific method.
 
@@ -882,9 +860,6 @@ class mapping_functions:
         pd.Series
             Series of temperatures in Kelvin.
         """
-        if convert_to_decimal_float is True:
-            df = self.convert_to_decimal(df)
-
         method = find_entry(self.imodel, c2k_methods)
         if not method:
             method = "method_a"
@@ -903,9 +878,7 @@ class mapping_functions:
             result = result.iloc[:, 0]
         return pd.Series(result, dtype=float)
 
-    def velocity_kmh_in_ms(
-        self, series: pd.Series, convert_to_decimal_float=False
-    ) -> pd.Series:
+    def velocity_kmh_in_ms(self, series: pd.Series) -> pd.Series:
         """
         Convert velocity from kilometers per hour to meters per second.
 
@@ -919,13 +892,9 @@ class mapping_functions:
         pd.Series
             Series of velocity in meters per second.
         """
-        if convert_to_decimal_float is True:
-            series = self.convert_to_decimal(series)
         return self.float_scale(series, 1 / 3.6)
 
-    def velocity_kn_in_ms(
-        self, series: pd.Series, convert_to_decimal_float=False
-    ) -> pd.Series:
+    def velocity_kn_in_ms(self, series: pd.Series) -> pd.Series:
         """
         Convert velocity from knots in meters per second.
 
@@ -939,13 +908,9 @@ class mapping_functions:
         pd.Series
             Series of velocity in meters per second.
         """
-        if convert_to_decimal_float is True:
-            series = self.convert_to_decimal(series)
         return self.float_scale(series, 1852.0 / 3600.0)
 
-    def pressue_hpa_in_pa(
-        self, series: pd.Series, convert_to_decimal_float=False
-    ) -> pd.Series:
+    def pressue_hpa_in_pa(self, series: pd.Series) -> pd.Series:
         """
         Convert pressure from hPa in Pa.
 
@@ -959,8 +924,6 @@ class mapping_functions:
         pd.Series
             Series of pressure in Pa.
         """
-        if convert_to_decimal_float is True:
-            series = self.convert_to_decimal(series)
         return self.float_scale(series, 100)
 
     def time_accuracy(self, series: pd.Series) -> pd.Series:

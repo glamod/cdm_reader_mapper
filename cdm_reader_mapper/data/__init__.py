@@ -17,12 +17,9 @@ class LazyDataDict(dict):
         super().__init__()
         self._loader = loader
         self._items = items
-        self._attrs = attrs or {}
 
     def __getitem__(self, key):
         """Make class subscriptable."""
-        if key in self._attrs:
-            return self._attrs[key]
         if key not in self:
             path = self._items[key]
             self[key] = self._loader(path)
@@ -215,10 +212,8 @@ class TestData:
     def test_marob(self):
         """MAROB (DWD database) test data."""
         return self._get_data_dict(
-            "2026-02-12_subset",
+            "2026-04-07_subset",
             "marob",
-            "csv",
-            ";",
         )
 
     @property
@@ -242,7 +237,7 @@ class TestData:
         except OSError as err:
             raise err
 
-    def _get_data_dict(self, data_file, data_model, source_ext, delimiter=","):
+    def _get_data_dict(self, data_file, data_model, source_ext="csv"):
         drs = "/".join(data_model.split("_"))
         data_dict = {
             "source": f"{drs}/input/{data_model}_{data_file}.{source_ext}",
@@ -256,7 +251,7 @@ class TestData:
             cdm_table_file = f"{drs}/cdm_tables/{cdm_table}-{data_model}_{data_file}.pq"
             data_dict[f"cdm_{cdm_table}"] = cdm_table_file
 
-        return LazyDataDict(self._load_file, data_dict, attrs={"delimiter": delimiter})
+        return LazyDataDict(self._load_file, data_dict)
 
 
 test_data = TestData()

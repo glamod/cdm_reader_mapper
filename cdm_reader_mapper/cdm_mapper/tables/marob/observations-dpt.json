@@ -5,19 +5,15 @@
     }
   },
   "observation_height_above_station_surface": {
-    "elements": "SENSORHOEHE_WAS_TT",
-    "transform": "convert_to_decimal",
+    "elements": "sensorhoehe_was_tt",
     "decimal_places": 1
   },
   "observed_variable": {
     "default": 36
   },
   "observation_value": {
-    "elements": "TAUPUNKTTEMPERATUR",
+    "elements": "taupunkttemperatur",
     "transform": "temperature_celsius_to_kelvin",
-    "kwargs": {
-      "convert_to_decimal_float": true
-    },
     "decimal_places": 2
   },
   "units": {
@@ -27,8 +23,7 @@
     "default": 60
   },
   "original_value": {
-    "elements": "TAUPUNKTTEMPERATUR",
-    "transform": "convert_to_decimal",
+    "elements": "taupunkttemperatur",
     "decimal_places": 1
   },
   "conversion_method": {
