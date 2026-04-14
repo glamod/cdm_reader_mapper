@@ -243,9 +243,8 @@ class TestData:
         drs = "/".join(data_model.split("_"))
         data_dict = {
             "source": f"{drs}/input/{data_model}_{data_file}.{source_ext}",
-            "mdf_data": f"{drs}/output/data_{data_model}_{data_file}.csv",
-            "mdf_mask": f"{drs}/output/mask_{data_model}_{data_file}.csv",
-            "mdf_info": f"{drs}/output/info_{data_model}_{data_file}.json",
+            "mdf_data": f"{drs}/output/data_{data_model}_{data_file}.pq",
+            "mdf_mask": f"{drs}/output/mask_{data_model}_{data_file}.pq",
             "vadt": f"{drs}/validation/vadt_{data_model}_{data_file}.csv",
             "vaid": f"{drs}/validation/vaid_{data_model}_{data_file}.csv",
         }

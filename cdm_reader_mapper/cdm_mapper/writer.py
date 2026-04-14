@@ -77,6 +77,7 @@ def write_tables(
     suffix: str | None = None,
     extension: str | None = None,
     filename: str | dict | None = None,
+    separator: str | None = "-",
     cdm_subset: str | list | None = None,
     col_subset: str | list | dict | None = None,
     delimiter: str = "|",
@@ -104,6 +105,8 @@ def write_tables(
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
     extension: str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+    separator : str, optional
+        Separator to join the file name pattern components (default "-").
     filename: str or dict, optional
         Name of the output file name(s).
         List one filename for each table name in ``data`` ({<table>:<filename>}).
@@ -190,7 +193,10 @@ def write_tables(
         filename_ = filename.get(table)
         if not filename_:
             filename_ = get_filename(
-                [prefix, table, suffix], path=out_dir, extension=extension
+                [prefix, table, suffix],
+                path=out_dir,
+                extension=extension,
+                separator=separator,
             )
         filename_ = adjust_filename(filename_, table=table, extension=extension)
         if len(Path(filename_).parts) == 1:

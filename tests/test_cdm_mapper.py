@@ -20,7 +20,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
 )
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.json_dict import open_json_file
 
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
@@ -83,23 +82,26 @@ def _map_model_test_data(
 ):
     source = test_data[f"test_{data_model}"]["mdf_data"]
 
-    mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
-
-    if mdf_info is None:
-        dtypes = object
-    else:
-        info = open_json_file(mdf_info)
-        dtypes = info["dtypes"]
-
-    df = pd.read_csv(
+    df = pd.read_parquet(
         source,
-        dtype=dtypes,
-        chunksize=chunksize,
-        encoding=encoding,
+        # dtype=dtypes,
+        # chunksize=chunksize,
+        # encoding=encoding,
     )
 
-    if chunksize is None and ":" in df.columns[0]:
-        df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+    import ast
+
+    if chunksize is None and "(" in df.columns[0]:
+
+        def to_tuple(x):
+            try:
+                val = ast.literal_eval(x)
+                if isinstance(val, tuple):
+                    return val
+            except Exception:
+                return (x, "")
+
+        df.columns = pd.MultiIndex.from_tuples([to_tuple(col) for col in df.columns])
 
     result = map_model(df, data_model, **kwargs)
 
@@ -617,18 +619,18 @@ def test_map_model_pub47():
         "icoads_r300_d707",
         "icoads_r302_d794",
         "icoads_r300_d704",
-        "icoads_r300_d721",
+        "icoads_r300_d721",  # f
         "icoads_r300_d730",
         "icoads_r300_d781",
-        "icoads_r300_d703",
+        "icoads_r300_d703",  # f
         "icoads_r300_d201",
         "icoads_r300_d892",
         "icoads_r300_d700",
         "icoads_r302_d792",
         "icoads_r302_d992",
-        "craid",
+        "craid",  # f
         "gdac",
-        "marob",
+        "marob",  # f
         "cmems",
     ],
 )

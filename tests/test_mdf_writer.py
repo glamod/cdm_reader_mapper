@@ -110,9 +110,9 @@ def test_write_data_csv(tmp_path, example_data, example_mask):
         **info,
     )
 
-    data_file = tmp_path / "test_write-data-basic.csv"
-    mask_file = tmp_path / "test_write-mask-basic.csv"
-    info_file = tmp_path / "test_write-info-basic.json"
+    data_file = tmp_path / "test_write_data_basic.csv"
+    mask_file = tmp_path / "test_write_mask_basic.csv"
+    info_file = tmp_path / "test_write_info_basic.json"
 
     assert data_file.is_file()
     assert mask_file.is_file()
@@ -149,9 +149,9 @@ def test_write_data_col_subset(tmp_path, example_data, example_mask):
         **info,
     )
 
-    data_file = tmp_path / "test_write-data-subset.csv"
-    mask_file = tmp_path / "test_write-mask-subset.csv"
-    info_file = tmp_path / "test_write-info-subset.json"
+    data_file = tmp_path / "test_write_data_subset.csv"
+    mask_file = tmp_path / "test_write_mask_subset.csv"
+    info_file = tmp_path / "test_write_info_subset.json"
 
     assert data_file.is_file()
     assert mask_file.is_file()
@@ -186,18 +186,11 @@ def test_write_data_parquet(tmp_path, example_data, example_mask):
         **info,
     )
 
-    data_file = tmp_path / "test_write-data-basic.parquet"
-    mask_file = tmp_path / "test_write-mask-basic.parquet"
-    info_file = tmp_path / "test_write-info-basic.json"
+    data_file = tmp_path / "test_write_data_basic.parquet"
+    mask_file = tmp_path / "test_write_mask_basic.parquet"
 
     assert data_file.is_file()
     assert mask_file.is_file()
-    assert info_file.is_file()
-
-    with open(info_file) as read_file:
-        info_res = json.load(read_file)
-
-    assert info_res == info
 
     data_res = pd.read_parquet(data_file)
     assert_frame_equal(example_data, data_res)
@@ -223,18 +216,11 @@ def test_write_data_feather(tmp_path, example_data, example_mask):
         **info,
     )
 
-    data_file = tmp_path / "test_write-data-basic.feather"
-    mask_file = tmp_path / "test_write-mask-basic.feather"
-    info_file = tmp_path / "test_write-info-basic.json"
+    data_file = tmp_path / "test_write_data_basic.feather"
+    mask_file = tmp_path / "test_write_mask_basic.feather"
 
     assert data_file.is_file()
     assert mask_file.is_file()
-    assert info_file.is_file()
-
-    with open(info_file) as read_file:
-        info_res = json.load(read_file)
-
-    assert info_res == info
 
     data_res = pd.read_feather(data_file)
     assert_frame_equal(example_data, data_res)

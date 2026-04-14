@@ -250,8 +250,8 @@ def test_combine_dicts(tmp_path):
 @pytest.mark.parametrize(
     "pattern, extension, expected_filename",
     [
-        (["a", "b"], "txt", "a-b.txt"),
-        (["a", "", "c"], "psv", "a-c.psv"),
+        (["a", "b"], "txt", "a_b.txt"),
+        (["a", "", "c"], "psv", "a_c.psv"),
         (["x"], ".csv", "x.csv"),
         ([], "log", ""),
     ],
@@ -293,9 +293,9 @@ def test_get_filename_extension_normalization(tmp_path, extension, normalized):
 @pytest.mark.parametrize(
     "pattern, expected_name",
     [
-        (["data", "2024"], "data-2024.psv"),
-        (["", "A", "B"], "A-B.psv"),
-        (["only"], "only.psv"),
+        (["data", "2024"], "data_2024.pq"),
+        (["", "A", "B"], "A_B.pq"),
+        (["only"], "only.pq"),
     ],
 )
 def test_get_filename_name_part(pattern, expected_name):
