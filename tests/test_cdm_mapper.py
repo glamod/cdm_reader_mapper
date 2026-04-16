@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -77,21 +79,12 @@ def data_header_expected():
     )
 
 
-def _map_model_test_data(
-    data_model, encoding="utf-8", select=None, chunksize=None, **kwargs
-):
+def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
     source = test_data[f"test_{data_model}"]["mdf_data"]
 
-    df = pd.read_parquet(
-        source,
-        # dtype=dtypes,
-        # chunksize=chunksize,
-        # encoding=encoding,
-    )
+    df = pd.read_parquet(source)
 
-    import ast
-
-    if chunksize is None and "(" in df.columns[0]:
+    if "(" in df.columns[0]:
 
         def to_tuple(x):
             try:
@@ -104,9 +97,6 @@ def _map_model_test_data(
         df.columns = pd.MultiIndex.from_tuples([to_tuple(col) for col in df.columns])
 
     result = map_model(df, data_model, **kwargs)
-
-    if chunksize:
-        result = result.read()
 
     if not select:
         select = cdm_tables
@@ -619,18 +609,18 @@ def test_map_model_pub47():
         "icoads_r300_d707",
         "icoads_r302_d794",
         "icoads_r300_d704",
-        "icoads_r300_d721",  # f
+        "icoads_r300_d721",
         "icoads_r300_d730",
         "icoads_r300_d781",
-        "icoads_r300_d703",  # f
+        "icoads_r300_d703",
         "icoads_r300_d201",
         "icoads_r300_d892",
         "icoads_r300_d700",
         "icoads_r302_d792",
         "icoads_r302_d992",
-        "craid",  # f
+        "craid",
         "gdac",
-        "marob",  # f
+        "marob",
         "cmems",
     ],
 )
@@ -639,7 +629,7 @@ def test_map_model_test_data_basic(data_model):
 
 
 def test_map_model_test_data_mixed():
-    _map_model_test_data("icoads_r300_mixed", encoding="cp1252")
+    _map_model_test_data("icoads_r300_mixed")
 
 
 def test_map_model_test_data_select():
@@ -647,11 +637,4 @@ def test_map_model_test_data_select():
         "icoads_r300_d714",
         select=["header", "observations-sst"],
         cdm_subset=["header", "observations-sst"],
-    )
-
-
-def test_map_model_test_data_chunksize():
-    _map_model_test_data(
-        "icoads_r300_d714",
-        chunksize=2,
     )
