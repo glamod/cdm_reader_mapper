@@ -160,8 +160,6 @@ def write_data(
         [prefix, "info", suffix], path=out_dir, extension="json", separator=separator
     )
 
-    print(filename_data)
-
     for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
         if col_subset is not None:
             data_df = data_df[col_subset]
