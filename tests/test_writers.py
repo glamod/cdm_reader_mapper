@@ -32,9 +32,8 @@ def db_data():
     pattern = f"test_{imodel}"
 
     data_file = test_data[pattern]["mdf_data"]
-    info_file = test_data[pattern]["mdf_info"]
 
-    db = read(data_file, info_file=info_file, mode="data", data_format="csv")
+    db = read(data_file, mode="data")
     db.imodel = imodel
     return db
 

@@ -122,6 +122,7 @@ def _read_multiple_files(
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
+    separator: str | None = "-",
     cdm_subset: str | list | None = None,
     col_subset: str | list | None = None,
     null_label: str = "null",
@@ -136,7 +137,9 @@ def _read_multiple_files(
         suffix_pattern = f"*{suffix}"
 
     # See if there's anything at all:
-    pattern = get_filename([prefix, suffix_pattern], path=inp_dir, extension=extension)
+    pattern = get_filename(
+        [prefix, suffix_pattern], path=inp_dir, extension=extension, separator=separator
+    )
     files = glob.glob(pattern)
 
     if len(files) == 0:
@@ -157,7 +160,9 @@ def _read_multiple_files(
             _pattern = [prefix] + _pattern
         if suffix:
             _pattern = _pattern + [suffix_pattern]
-        pattern_ = get_filename(_pattern, path=inp_dir, extension=extension)
+        pattern_ = get_filename(
+            _pattern, path=inp_dir, extension=extension, separator=separator
+        )
         paths_ = glob.glob(pattern_)
         if len(paths_) != 1:
             logger.warning(
@@ -193,6 +198,7 @@ def read_tables(
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
+    separator: str | None = "-",
     cdm_subset: str | list | None = None,
     col_subset: str | list | dict | None = None,
     delimiter: str = "|",
@@ -221,7 +227,10 @@ def read_tables(
     extension: str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
-        Default: psv
+        Default: "psv"
+    separator : str, optional
+        Separator to join the file name pattern components.
+        Default: "-"
     cdm_subset: str or list, optional
         Specifies a subset of tables or a single table.
 
@@ -307,6 +316,7 @@ def read_tables(
             prefix=prefix,
             suffix=suffix,
             extension=extension,
+            separator=separator,
             cdm_subset=cdm_subset,
             col_subset=col_subset,
             null_label=null_label,

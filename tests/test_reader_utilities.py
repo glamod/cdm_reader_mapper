@@ -193,7 +193,7 @@ def test_read_csv_with_col_subset(tmp_csv_file):
 def test_convert_dtypes_basic():
     dtypes = {"A": "int", "B": "datetime", "C": "float"}
     updated, dates = convert_dtypes(dtypes)
-    assert updated["B"] == "object"
+    assert updated["B"] == "datetime64[ns]"
     assert dates == ["B"]
 
 

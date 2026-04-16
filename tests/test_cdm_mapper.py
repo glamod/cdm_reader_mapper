@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -20,7 +22,6 @@ from cdm_reader_mapper.cdm_mapper.mapper import (
 )
 
 from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.json_dict import open_json_file
 
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
@@ -78,33 +79,24 @@ def data_header_expected():
     )
 
 
-def _map_model_test_data(
-    data_model, encoding="utf-8", select=None, chunksize=None, **kwargs
-):
+def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
     source = test_data[f"test_{data_model}"]["mdf_data"]
 
-    mdf_info = test_data[f"test_{data_model}"]["mdf_info"]
+    df = pd.read_parquet(source)
 
-    if mdf_info is None:
-        dtypes = object
-    else:
-        info = open_json_file(mdf_info)
-        dtypes = info["dtypes"]
+    if "(" in df.columns[0]:
 
-    df = pd.read_csv(
-        source,
-        dtype=dtypes,
-        chunksize=chunksize,
-        encoding=encoding,
-    )
+        def to_tuple(x):
+            try:
+                val = ast.literal_eval(x)
+                if isinstance(val, tuple):
+                    return val
+            except Exception:
+                return (x, "")
 
-    if chunksize is None and ":" in df.columns[0]:
-        df.columns = pd.MultiIndex.from_tuples(col.split(":") for col in df.columns)
+        df.columns = pd.MultiIndex.from_tuples([to_tuple(col) for col in df.columns])
 
     result = map_model(df, data_model, **kwargs)
-
-    if chunksize:
-        result = result.read()
 
     if not select:
         select = cdm_tables
@@ -637,7 +629,7 @@ def test_map_model_test_data_basic(data_model):
 
 
 def test_map_model_test_data_mixed():
-    _map_model_test_data("icoads_r300_mixed", encoding="cp1252")
+    _map_model_test_data("icoads_r300_mixed")
 
 
 def test_map_model_test_data_select():
@@ -645,11 +637,4 @@ def test_map_model_test_data_select():
         "icoads_r300_d714",
         select=["header", "observations-sst"],
         cdm_subset=["header", "observations-sst"],
-    )
-
-
-def test_map_model_test_data_chunksize():
-    _map_model_test_data(
-        "icoads_r300_d714",
-        chunksize=2,
     )

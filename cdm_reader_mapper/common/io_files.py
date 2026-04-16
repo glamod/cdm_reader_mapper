@@ -9,8 +9,8 @@ from typing import Sequence
 def get_filename(
     pattern: Sequence[str],
     path: str = ".",
-    extension: str = "psv",
-    separator: str = "-",
+    extension: str = "pq",
+    separator: str = "_",
 ) -> str:
     """
     Construct a filename from a sequence of string components.
@@ -26,9 +26,9 @@ def get_filename(
         Default is current directory `"."`.
     extension : str, optional
         File extension, with or without a leading dot
-        (e.g., `"psv"` or `".psv"`). Default is `"psv"`.
+        (e.g., `"pq"` or `".pq"`). Default is `"pq"`.
     separator : str, optional
-        Separator to join the pattern components (default "-").
+        Separator to join the pattern components (default "_").
 
     Returns
     -------

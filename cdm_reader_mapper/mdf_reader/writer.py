@@ -56,6 +56,7 @@ def write_data(
     suffix: str | None = None,
     extension: str = None,
     filename: str | dict | None = None,
+    separator: str | None = "_",
     col_subset: str | list[str] | tuple[str] | None = None,
     delimiter: str = ",",
     **kwargs,
@@ -88,6 +89,8 @@ def write_data(
     extension: str, optional
         Extension of file name structure: ``<prefix>-data-*<suffix>.<extension>``.
         By default, extension depends on `data_format`.
+    separator : str, optional
+        Separator to join the file name pattern components (default "_").
     filename: str or dict, optional
         Name of the output file name(s).
         List one filename for both ``data`` and ``mask`` ({"data":<filenameD>, "mask":<filenameM>}).
@@ -148,13 +151,13 @@ def write_data(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     filename_data = get_filename(
-        [prefix, "data", suffix], path=out_dir, extension=extension
+        [prefix, "data", suffix], path=out_dir, extension=extension, separator=separator
     )
     filename_mask = get_filename(
-        [prefix, "mask", suffix], path=out_dir, extension=extension
+        [prefix, "mask", suffix], path=out_dir, extension=extension, separator=separator
     )
     filename_info = get_filename(
-        [prefix, "info", suffix], path=out_dir, extension="json"
+        [prefix, "info", suffix], path=out_dir, extension="json", separator=separator
     )
 
     for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
@@ -199,5 +202,6 @@ def write_data(
         if not mask_df.empty:
             getattr(mask_df, writer)(filename_mask, **write_kwargs)
 
-    with open(filename_info, "w") as fileObj:
-        json.dump(info, fileObj, indent=4)
+    if data_format == "csv":
+        with open(filename_info, "w") as fileObj:
+            json.dump(info, fileObj, indent=4)

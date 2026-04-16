@@ -357,7 +357,7 @@ def convert_dtypes(dtypes) -> tuple[str]:
     for key, value in dtypes.items():
         if value == "datetime":
             parse_dates.append(key)
-            dtypes[key] = "object"
+            dtypes[key] = "datetime64[ns]"
     return dtypes, parse_dates
 
 

@@ -216,6 +216,13 @@ class FileReader:
         data = remove_boolean_values(data, config.dtypes)
         config = replace(config, columns=data.columns)
 
+        if config.encoding not in [None, "utf-8"]:
+            object_columns = data.select_dtypes(include=["object", "string"]).columns
+            for object_column in object_columns:
+                data[object_column] = (
+                    data[object_column].str.encode(config.encoding).str.decode("utf-8")
+                )
+
         return data, mask, config
 
     @process_function()
@@ -370,7 +377,7 @@ class FileReader:
             columns=config.columns,
             dtypes=config.dtypes,
             parse_dates=config.parse_dates,
-            encoding=config.encoding,
+            encoding="utf-8",
             mask=mask,
             imodel=self.imodel,
         )

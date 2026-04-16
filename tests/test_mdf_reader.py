@@ -15,7 +15,7 @@ from cdm_reader_mapper.mdf_reader.reader import (
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
-from cdm_reader_mapper.common.iterators import ParquetStreamReader
+
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
     read_csv,
     read_parquet,
@@ -44,11 +44,8 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
 
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
 
-    expected = read_data(
-        data_file=data, mask_file=mask, info_file=info, data_format="csv"
-    )
+    expected = read_data(data_file=data, mask_file=mask)
 
     if not isinstance(result.data, pd.DataFrame):
         result.data = result.data.read()
@@ -217,8 +214,7 @@ def test_read_data_basic():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data, mask, info, data_format="csv")
+    db = read_data(data, mask)
 
     assert isinstance(db, DataBundle)
 
@@ -238,9 +234,8 @@ def test_read_data_basic():
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
     assert isinstance(db.dtypes, pd.Series)
-    assert isinstance(db.parse_dates, list)
-    assert isinstance(db.encoding, str)
-    assert db.encoding == "cp1252"
+    assert db.parse_dates is False
+    assert db.encoding is None
     assert db.imodel is None
     assert isinstance(db.mode, str)
     assert db.mode == "data"
@@ -252,8 +247,7 @@ def test_read_data_basic():
 def test_read_data_no_mask():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data_file=data, info_file=info, data_format="csv")
+    db = read_data(data_file=data)
 
     assert isinstance(db, DataBundle)
 
@@ -273,9 +267,8 @@ def test_read_data_no_mask():
     assert isinstance(db.mask, pd.DataFrame)
     assert isinstance(db.columns, pd.MultiIndex)
     assert isinstance(db.dtypes, pd.Series)
-    assert isinstance(db.parse_dates, list)
-    assert isinstance(db.encoding, str)
-    assert db.encoding == "cp1252"
+    assert db.parse_dates is False
+    assert db.encoding is None
     assert db.imodel is None
     assert isinstance(db.mode, str)
     assert db.mode == "data"
@@ -288,7 +281,7 @@ def test_read_data_no_info():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
 
-    db = read_data(data_file=data, data_format="csv")
+    db = read_data(data_file=data)
 
     assert isinstance(db, DataBundle)
 
@@ -321,42 +314,7 @@ def test_read_data_no_info():
 def test_read_data_col_subset():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(data_file=data, info_file=info, data_format="csv", col_subset="core")
-
-    assert isinstance(db, DataBundle)
-
-    for attr in [
-        "data",
-        "mask",
-        "columns",
-        "dtypes",
-        "parse_dates",
-        "encoding",
-        "imodel",
-        "mode",
-    ]:
-        assert hasattr(db, attr)
-
-    assert isinstance(db.data, pd.DataFrame)
-    assert isinstance(db.mask, pd.DataFrame)
-    assert isinstance(db.columns, pd.Index)
-    assert isinstance(db.dtypes, pd.Series)
-    assert isinstance(db.parse_dates, list)
-    assert isinstance(db.encoding, str)
-    assert db.encoding == "cp1252"
-    assert db.imodel is None
-    assert isinstance(db.mode, str)
-    assert db.mode == "data"
-    assert len(db) == 5
-    assert db.shape == (5, 48)
-    assert db.size == 240
-
-
-def test_read_data_encoding():
-    data_model = "icoads_r300_d721"
-    data = test_data[f"test_{data_model}"]["mdf_data"]
-    db = read_data(data_file=data, data_format="csv", encoding="cp1252")
+    db = read_data(data_file=data, col_subset="core")
 
     assert isinstance(db, DataBundle)
 
@@ -377,24 +335,19 @@ def test_read_data_encoding():
     assert isinstance(db.columns, pd.Index)
     assert isinstance(db.dtypes, pd.Series)
     assert db.parse_dates is False
-    assert isinstance(db.encoding, str)
-    assert db.encoding == "cp1252"
+    assert db.encoding is None
     assert db.imodel is None
     assert isinstance(db.mode, str)
     assert db.mode == "data"
     assert len(db) == 5
-    assert db.shape == (5, 341)
-    assert db.size == 1705
+    assert db.shape == (5, 48)
+    assert db.size == 240
 
 
-def test_read_data_chunksize():
+def test_read_data_encoded():
     data_model = "icoads_r300_d721"
     data = test_data[f"test_{data_model}"]["mdf_data"]
-    mask = test_data[f"test_{data_model}"]["mdf_mask"]
-    info = test_data[f"test_{data_model}"]["mdf_info"]
-    db = read_data(
-        data_file=data, mask_file=mask, info_file=info, data_format="csv", chunksize=3
-    )
+    db = read_data(data_file=data)
 
     assert isinstance(db, DataBundle)
 
@@ -410,13 +363,12 @@ def test_read_data_chunksize():
     ]:
         assert hasattr(db, attr)
 
-    assert isinstance(db.data, ParquetStreamReader)
-    assert isinstance(db.mask, ParquetStreamReader)
-    assert isinstance(db.columns, pd.MultiIndex)
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.Index)
     assert isinstance(db.dtypes, pd.Series)
-    assert db.parse_dates == []
-    assert isinstance(db.encoding, str)
-    assert db.encoding == "cp1252"
+    assert db.parse_dates is False
+    assert db.encoding is None
     assert db.imodel is None
     assert isinstance(db.mode, str)
     assert db.mode == "data"

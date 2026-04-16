@@ -285,7 +285,15 @@ def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
     pd.Series
         Series with data type representtions of elements.
     """
-    return data.astype(object).replace(null_label, pd.NA)
+
+    def _return_str(x, null_label):
+        if pd.isna(x):
+            return pd.NA
+        if x == null_label:
+            return pd.NA
+        return str(x)
+
+    return data.apply(lambda x: _return_str(x, null_label))
 
 
 def _convert_str_array_to_str(data: pd.Series, null_label: str) -> pd.Series:
