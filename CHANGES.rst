@@ -3,7 +3,7 @@
 Changelog
 =========
 
-2.4.1 (unpublished)
+2.4.1 (2016-04-16)
 ------------------
 Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
