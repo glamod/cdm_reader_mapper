@@ -16,7 +16,6 @@ from cdm_reader_mapper.mdf_reader.reader import (
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
 
-# from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
     read_csv,
     read_parquet,
@@ -78,26 +77,26 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
 @pytest.mark.parametrize(
     "data_model",
     [
-        # "icoads_r300_d714",
-        # "icoads_r300_d701",
-        # "icoads_r300_d706",
-        # "icoads_r300_d705",
-        # "icoads_r300_d702",
-        # "icoads_r300_d707",
-        # "icoads_r302_d794",
-        # "icoads_r300_d704",
+        "icoads_r300_d714",
+        "icoads_r300_d701",
+        "icoads_r300_d706",
+        "icoads_r300_d705",
+        "icoads_r300_d702",
+        "icoads_r300_d707",
+        "icoads_r302_d794",
+        "icoads_r300_d704",
         "icoads_r300_d721",
-        # "icoads_r300_d730",
-        # "icoads_r300_d781",
-        # "icoads_r300_d703",
-        # "icoads_r300_d201",
-        # "icoads_r300_d892",
-        # "icoads_r300_d700",
-        # "icoads_r302_d792",
-        # "icoads_r302_d992",
-        # "craid",
-        # "gdac",
-        # "cmems",
+        "icoads_r300_d730",
+        "icoads_r300_d781",
+        "icoads_r300_d703",
+        "icoads_r300_d201",
+        "icoads_r300_d892",
+        "icoads_r300_d700",
+        "icoads_r302_d792",
+        "icoads_r302_d992",
+        "craid",
+        "gdac",
+        "cmems",
     ],
 )
 def test_read_mdf_test_data_basic(data_model):
@@ -179,8 +178,8 @@ def test_read_mdf_test_data_select(data_model, kwargs, select):
         ("icoads_r300_d714", {"excludes": ["c98"]}, ["c98"]),
         ("icoads_r300_d714", {"excludes": "c98"}, ["c98"]),
         ("icoads_r300_d714", {"excludes": ["c5", "c98"]}, ["c5", "c98"]),
-        # ("icoads_r300_mixed", {"excludes": ["c99"], "encoding": "cp1252"}, ["c99"]),
-        # ("icoads_r300_mixed", {"excludes": "c99", "encoding": "cp1252"}, ["c99"]),
+        ("icoads_r300_mixed", {"excludes": ["c99"], "encoding": "cp1252"}, ["c99"]),
+        ("icoads_r300_mixed", {"excludes": "c99", "encoding": "cp1252"}, ["c99"]),
         (
             "craid",
             {"excludes": ["drifter_measurements", "drifter_history"]},
@@ -345,76 +344,37 @@ def test_read_data_col_subset():
     assert db.size == 240
 
 
-# def test_read_data_encoding():
-#    data_model = "icoads_r300_d721"
-#    data = test_data[f"test_{data_model}"]["mdf_data"]
-#    db = read_data(data_file=data, data_format="csv", encoding="cp1252")
+def test_read_data_encoded():
+    data_model = "icoads_r300_d721"
+    data = test_data[f"test_{data_model}"]["mdf_data"]
+    db = read_data(data_file=data)
 
-#    assert isinstance(db, DataBundle)
+    assert isinstance(db, DataBundle)
 
-#    for attr in [
-#        "data",
-#        "mask",
-#        "columns",
-#        "dtypes",
-#        "parse_dates",
-#        "encoding",
-#        "imodel",
-#        "mode",
-#    ]:
-#        assert hasattr(db, attr)
+    for attr in [
+        "data",
+        "mask",
+        "columns",
+        "dtypes",
+        "parse_dates",
+        "encoding",
+        "imodel",
+        "mode",
+    ]:
+        assert hasattr(db, attr)
 
-#    assert isinstance(db.data, pd.DataFrame)
-#    assert isinstance(db.mask, pd.DataFrame)
-#    assert isinstance(db.columns, pd.Index)
-#    assert isinstance(db.dtypes, pd.Series)
-#    assert db.parse_dates is False
-#    assert isinstance(db.encoding, str)
-#    assert db.encoding == "cp1252"
-#    assert db.imodel is None
-#    assert isinstance(db.mode, str)
-#    assert db.mode == "data"
-#    assert len(db) == 5
-#    assert db.shape == (5, 341)
-#    assert db.size == 1705
-
-
-# def test_read_data_chunksize():
-#    data_model = "icoads_r300_d721"
-#    data = test_data[f"test_{data_model}"]["mdf_data"]
-#    mask = test_data[f"test_{data_model}"]["mdf_mask"]
-#    info = test_data[f"test_{data_model}"]["mdf_info"]
-#    db = read_data(
-#        data_file=data, mask_file=mask, info_file=info, data_format="csv", chunksize=3
-#    )
-
-#    assert isinstance(db, DataBundle)
-
-#    for attr in [
-#        "data",
-#        "mask",
-#        "columns",
-#        "dtypes",
-#        "parse_dates",
-#        "encoding",
-#        "imodel",
-#        "mode",
-#    ]:
-#        assert hasattr(db, attr)
-
-#    assert isinstance(db.data, ParquetStreamReader)
-#    assert isinstance(db.mask, ParquetStreamReader)
-#    assert isinstance(db.columns, pd.MultiIndex)
-#    assert isinstance(db.dtypes, pd.Series)
-#    assert db.parse_dates == []
-#    assert isinstance(db.encoding, str)
-#    assert db.encoding == "cp1252"
-#    assert db.imodel is None
-#    assert isinstance(db.mode, str)
-#    assert db.mode == "data"
-#    assert len(db) == 5
-#    assert db.shape == (5, 341)
-#    assert db.size == 1705
+    assert isinstance(db.data, pd.DataFrame)
+    assert isinstance(db.mask, pd.DataFrame)
+    assert isinstance(db.columns, pd.Index)
+    assert isinstance(db.dtypes, pd.Series)
+    assert db.parse_dates is False
+    assert db.encoding is None
+    assert db.imodel is None
+    assert isinstance(db.mode, str)
+    assert db.mode == "data"
+    assert len(db) == 5
+    assert db.shape == (5, 341)
+    assert db.size == 1705
 
 
 def test_validate_read_mdf_args_pass(tmp_path):
