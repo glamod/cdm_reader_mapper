@@ -365,6 +365,21 @@ class FileReader:
 
         data, mask, config = result
 
+        if config.encoding not in [None, "utf-8"]:
+            object_columns = data.select_dtypes(include=["object", "string"]).columns
+            for object_column in object_columns:
+                # print(data[object_column])
+                # print(config.encoding)
+                data[object_column] = (
+                    data[object_column].str.encode(config.encoding).str.decode("utf-8")
+                )
+                # print(data[object_column])
+                # print('---------------------------------------------')
+                # if object_column == ("c99_header","ship_name"):
+                #  exit()
+
+        # exit()
+
         return DataBundle(
             data=data,
             columns=config.columns,
