@@ -3,7 +3,7 @@
 Changelog
 =========
 
-2.4.1 (2026-04-07)
+2.4.1 (unpublished)
 ------------------
 Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 
@@ -11,18 +11,23 @@ New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * `mdf_mapper` / `cdm_mapper`: add new project CMEMS for drifting iridium buoy data (:pull:`405`)
+* `mdf_mapper` / `cdm_mapper`: new parameter "separator" to define filename separator while reading and writing files (:pull:`414`)
 
 Breaking changes
 ^^^^^^^^^^^^^^^^
 
 * `cdm_mapper`: update element names in MAROB CDM mapping tables (:pull:`393`)
 * `cdm_mapper.util.mapping_functions`: change default MAROB datetime string format to "%Y-%m-%dT%H:%M:%S" (:pull:`393`)
+* `cdm_mapper`: keep pd.NA value and do not convert them to strings (:pull:`414`)
+* `test_data`: load parquet files instead of csv files (:issue:`410`, :pull:`414`)
+* `mdf_mapper` / `cdm_mapper`: default file name extension is "pq" while reading and writing files (:pull:`414`)
 
 
 Bug fixes
 ^^^^^^^^^
 
 * `duplicates`: do not change data types when updating quality flags and history description (:pull:`408`)
+* `mdf_reader`: decode data to "utf-8" to avoid misleading file encoding (:pull:`414`)
 
 Internal changes
 ^^^^^^^^^^^^^^^^
