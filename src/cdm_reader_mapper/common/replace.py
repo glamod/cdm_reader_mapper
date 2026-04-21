@@ -18,8 +18,7 @@ Replacement arguments:
 """
 
 from __future__ import annotations
-
-from typing import Iterable
+from collections.abc import Iterable
 
 import pandas as pd
 
@@ -44,15 +43,11 @@ def _replace_columns(
         pivot_l = pivot_r = pivot_c
 
     if pivot_l is None or pivot_r is None:
-        raise ValueError(
-            "Pivot columns must be declared using `pivot_c` or both `pivot_l` and `pivot_r`."
-        )
+        raise ValueError("Pivot columns must be declared using `pivot_c` or both `pivot_l` and `pivot_r`.")
 
     if rep_map is None:
         if rep_c is None:
-            raise ValueError(
-                "Replacement columns must be declared using `rep_c` or `rep_map`."
-            )
+            raise ValueError("Replacement columns must be declared using `rep_c` or `rep_map`.")
 
         if isinstance(rep_c, str):
             rep_c = [rep_c]
@@ -60,16 +55,10 @@ def _replace_columns(
 
     missing_cols = [src for src in rep_map.values() if src not in df_r.columns]
     if missing_cols:
-        raise ValueError(
-            f"Replacement source columns not found in right DataFrame: {missing_cols}."
-        )
+        raise ValueError(f"Replacement source columns not found in right DataFrame: {missing_cols}.")
 
     out = df_l.copy()
-    right_lookup = (
-        df_r[[pivot_r, *rep_map.values()]]
-        .set_index(pivot_r)
-        .rename(columns={v: k for k, v in rep_map.items()})
-    )
+    right_lookup = df_r[[pivot_r, *rep_map.values()]].set_index(pivot_r).rename(columns={v: k for k, v in rep_map.items()})
 
     # Align once using reindex (vectorized, C-level)
     aligned = right_lookup.reindex(out[pivot_l].values)
@@ -145,6 +134,4 @@ def replace_columns(
     elif isinstance(result, ParquetStreamReader):
         return result
 
-    raise ValueError(
-        f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}."
-    )
+    raise ValueError(f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}.")

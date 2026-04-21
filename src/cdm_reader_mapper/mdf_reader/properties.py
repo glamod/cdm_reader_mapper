@@ -1,10 +1,10 @@
 """Common Data Model (CDM) reader properties."""
 
 from __future__ import annotations
-
 from typing import get_args
 
 from ..properties import NumericTypes, ObjectTypes, SupportedDataModels  # noqa
+
 
 _base = "cdm_reader_mapper.mdf_reader"
 

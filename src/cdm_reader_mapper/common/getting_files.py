@@ -1,16 +1,16 @@
 """pandas local file operator."""
 
 from __future__ import annotations
-
 import hashlib
 import logging
 import os
-import requests
 import warnings
 from pathlib import Path
 from urllib.parse import urlparse
 
+import requests
 from platformdirs import user_cache_dir
+
 
 try:
     from importlib.resources import files as _files
@@ -25,16 +25,14 @@ def _file_md5_checksum(f_name: str | Path) -> str:
     hash_md5 = hashlib.md5()  # noqa: S324
     chunk_size = 8192
 
-    with open(f_name, "rb") as f:
+    with Path(f_name).open("rb") as f:
         for chunk in iter(lambda: f.read(chunk_size), b""):
             hash_md5.update(chunk)
 
     return hash_md5.hexdigest()
 
 
-def _get_remote_file(
-    lfile: str | Path, url: str, name: str | Path
-) -> tuple[str, object]:
+def _get_remote_file(lfile: str | Path, url: str, name: str | Path) -> tuple[str, object]:
     """Download a remote file to a local path.."""
     lfile = Path(lfile)
     name = Path(name)
@@ -118,7 +116,7 @@ def _get_file(
 
     _get_remote_file(md5_file, url, md5_name)
 
-    with open(md5_file) as f:
+    with Path(md5_file).open() as f:
         remote_md5 = f.read()
 
     if not local_file.is_file():
@@ -143,7 +141,8 @@ def load_file(
     clear_cache: bool = False,
     within_drs: bool = True,
 ) -> Path:
-    """Load file from the online Github-like repository.
+    """
+    Load file from the online Github-like repository.
 
     Parameters
     ----------
@@ -204,4 +203,4 @@ def get_path(path: str | Path) -> Path | None:
     try:
         return _files(path)
     except ModuleNotFoundError:
-        logging.warning(f"No module named {path}.")
+        logging.warning("No module named %s.", path)

@@ -1,10 +1,10 @@
 """Utility function for reading and writing CDM tables."""
 
 from __future__ import annotations
+from collections.abc import Iterable
+from typing import Any
 
 from .. import properties
-
-from typing import Iterable, Any
 
 
 def dict_to_tuple_list(dic: dict[Any, Any]) -> list[tuple[Any, Any]]:
@@ -80,16 +80,12 @@ def get_cdm_subset(cdm_subset: Iterable[str] | None) -> list[str]:
 
     for item in cdm_subset:
         if item not in properties.cdm_tables:
-            raise ValueError(
-                f"Invalid CDM subset '{item}'. must be one of {properties.cdm_tables}."
-            )
+            raise ValueError(f"Invalid CDM subset '{item}'. must be one of {properties.cdm_tables}.")
 
     return cdm_subset
 
 
-def get_usecols(
-    tb: str, col_subset: str | Iterable[str] | dict | None
-) -> list[str] | None:
+def get_usecols(tb: str, col_subset: str | Iterable[str] | dict | None) -> list[str] | None:
     """
     Normalize a column subset specification for use with pandas.read_csv.
 
@@ -143,9 +139,7 @@ def get_usecols(
     try:
         return list(col_subset)
     except TypeError:
-        raise TypeError(
-            f"col_subset must be str, iterable of str, dict, or None, got {type(col_subset)}"
-        )
+        raise TypeError(f"col_subset must be str, iterable of str, dict, or None, got {type(col_subset)}")
 
 
 def adjust_filename(filename: str, table: str = "", extension: str = "psv") -> str:

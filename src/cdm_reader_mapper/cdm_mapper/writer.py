@@ -21,21 +21,18 @@ of the imodel, the number of decimal places used comes from a default tool defin
 """
 
 from __future__ import annotations
-
 import os
-
-import pandas as pd
-
 from pathlib import Path
 from typing import get_args
 
+import pandas as pd
+
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from .utils.conversions import convert_to_str_df
-from .tables.tables import get_cdm_atts
-from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
-
 from ..properties import SupportedFileTypes
+from .tables.tables import get_cdm_atts
+from .utils.conversions import convert_to_str_df
+from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
 
 def _table_to_file(
@@ -64,9 +61,7 @@ def _table_to_file(
     elif data_format == "feather":
         data.to_feather(filename, **kwargs)
     else:
-        raise ValueError(
-            f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}."
-        )
+        raise ValueError(f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}.")
 
 
 def write_tables(
@@ -88,7 +83,8 @@ def write_tables(
     null_label: str = "null",
     **kwargs,
 ) -> None:
-    """Write pandas.DataFrame to CDM-table file on file system.
+    """
+    Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
@@ -151,9 +147,7 @@ def write_tables(
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     supported_file_types = get_args(SupportedFileTypes)
     if data_format not in supported_file_types:
-        raise ValueError(
-            f"data_format must be one of {supported_file_types}, not {data_format}."
-        )
+        raise ValueError(f"data_format must be one of {supported_file_types}, not {data_format}.")
 
     cdm_subset = get_cdm_subset(cdm_subset)
 
@@ -202,7 +196,7 @@ def write_tables(
         if len(Path(filename_).parts) == 1:
             filename_ = os.path.join(out_dir, filename_)
 
-        logger.info(f"Writing table {table}: {filename_}")
+        logger.info("Writing table %s: %s", table, filename_)
         _table_to_file(
             cdm_table,
             delimiter=delimiter,

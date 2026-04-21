@@ -1,12 +1,10 @@
 """json dictionary manipulator."""
 
 from __future__ import annotations
-
 import json
+from pathlib import Path
 
 from .getting_files import get_path
-
-from pathlib import Path
 
 
 def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict:
@@ -25,13 +23,11 @@ def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict:
     dict
         Contents of the JSON file.
     """
-    with open(ifile, encoding=encoding) as f:
+    with Path(ifile).open(encoding=encoding) as f:
         return json.load(f)
 
 
-def collect_json_files(
-    idir: str, *args: str, base: str | None = None, name: str | None = None
-) -> list[Path]:
+def collect_json_files(idir: str, *args: str, base: str | None = None, name: str | None = None) -> list[Path]:
     """
     Collect JSON files recursively based on directory and optional subdirectories.
 
@@ -67,9 +63,7 @@ def collect_json_files(
     return list_of_files
 
 
-def combine_dicts(
-    list_of_files: str | Path | list[str | Path | dict], base: str | None = None
-) -> dict:
+def combine_dicts(list_of_files: str | Path | list[str | Path | dict], base: str | None = None) -> dict:
     """
     Combine multiple JSON files or dictionaries into a single dictionary.
 

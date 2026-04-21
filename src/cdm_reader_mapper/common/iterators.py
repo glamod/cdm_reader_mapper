@@ -1,31 +1,21 @@
 """Utilities for handling pandas TextParser objects safely."""
 
 from __future__ import annotations
-
-import tempfile
-
 import inspect
 import itertools
-
-import pandas as pd
-import xarray as xr
-
-import pyarrow as pa
-import pyarrow.parquet as pq
-
+import tempfile
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import wraps
-
 from pathlib import Path
-
 from typing import (
     Any,
-    Callable,
-    Generator,
-    Iterable,
-    Iterator,
     Literal,
-    Sequence,
 )
+
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+import xarray as xr
 
 
 class ProcessFunction:
@@ -67,10 +57,7 @@ class ParquetStreamReader:
 
     def __init__(
         self,
-        source: (
-            Iterator[pd.DataFrame | pd.Series]
-            | Callable[[], Iterator[pd.DataFrame | pd.Series]]
-        ),
+        source: (Iterator[pd.DataFrame | pd.Series] | Callable[[], Iterator[pd.DataFrame | pd.Series]]),
     ):
         self._closed = False
         self._buffer: list[pd.DataFrame | pd.Series] = []
@@ -84,9 +71,7 @@ class ParquetStreamReader:
         elif isinstance(source, Iterator):
             self._factory = lambda: source
         else:
-            raise TypeError(
-                "ParquetStreamReader expects an iterator or a factory callable."
-            )
+            raise TypeError("ParquetStreamReader expects an iterator or a factory callable.")
 
         self._generator = self._factory()
 
@@ -218,9 +203,7 @@ class ParquetStreamReader:
         self.close()
 
 
-def _sort_chunk_outputs(
-    outputs: tuple, capture_meta: bool, requested_types: tuple[type, ...]
-) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
+def _sort_chunk_outputs(outputs: tuple, capture_meta: bool, requested_types: tuple[type, ...]) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
     """Separates DataFrames from metadata in the function output."""
     data, meta = [], []
     for out in outputs:
@@ -248,10 +231,7 @@ def _initialize_storage(
         elif isinstance(obj, pd.Series):
             schemas.append((pd.Series, obj.name))
         else:
-            raise TypeError(
-                f"Unsupported data type: {type(obj)}."
-                "Use one of [pd.DataFrame, pd.Series]."
-            )
+            raise TypeError(f"Unsupported data type: {type(obj)}.Use one of [pd.DataFrame, pd.Series].")
 
         temp_dirs.append(tempfile.TemporaryDirectory())
 
@@ -274,9 +254,7 @@ def _write_chunks_to_disk(
         pq.write_table(table, file_path, compression="snappy")
 
 
-def _parquet_generator(
-    temp_dir, data_type, schema
-) -> Generator[pd.DataFrame | pd.Series]:
+def _parquet_generator(temp_dir, data_type, schema) -> Generator[pd.DataFrame | pd.Series]:
     """Yields DataFrames from a temp directory, restoring schema."""
     try:
         files = sorted(Path(temp_dir.name).glob("*.parquet"))
@@ -314,12 +292,8 @@ def _process_chunks(
     chunk_counter: int = 0
 
     for items in zip(*readers):
-
         if not isinstance(items[0], requested_types):
-            raise TypeError(
-                f"Unsupported data type in Iterable {items[0]}: {type(items[0])}"
-                f"Requested types are: {requested_types} "
-            )
+            raise TypeError(f"Unsupported data type in Iterable {items[0]}: {type(items[0])}Requested types are: {requested_types} ")
 
         result = func(*items, *static_args, **static_kwargs)
 
@@ -351,9 +325,7 @@ def _process_chunks(
         output_non_data = output_non_data[keys[0]]
 
     if isinstance(non_data_proc, Callable):
-        output_non_data = non_data_proc(
-            output_non_data, *non_data_proc_args, **non_data_proc_kwargs
-        )
+        output_non_data = non_data_proc(output_non_data, *non_data_proc_args, **non_data_proc_kwargs)
 
     if isinstance(output_non_data, list) and len(output_non_data) == 1:
         output_non_data = output_non_data[0]
@@ -362,10 +334,7 @@ def _process_chunks(
     if temp_dirs is None:
         return output_non_data
 
-    final_iterators = [
-        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s))
-        for d, (t, s) in zip(temp_dirs, schemas)
-    ]
+    final_iterators = [ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas)]
 
     if isinstance(output_non_data, tuple):
         output_non_data = list(output_non_data)
@@ -488,9 +457,7 @@ def process_disk_backed(
     if not isinstance(requested_types, (list, tuple)):
         requested_types = (requested_types,)
 
-    readers, static_args, static_kwargs = _prepare_readers(
-        reader, func_args, func_kwargs, makecopy
-    )
+    readers, static_args, static_kwargs = _prepare_readers(reader, func_args, func_kwargs, makecopy)
 
     if non_data_proc is not None:
         if not isinstance(non_data_proc, Callable):

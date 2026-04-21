@@ -1,8 +1,8 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-
-from typing import Iterable, get_args
+from collections.abc import Iterable
+from typing import get_args
 
 import pandas as pd
 
@@ -10,6 +10,7 @@ from cdm_reader_mapper.cdm_mapper.writer import write_tables
 from cdm_reader_mapper.mdf_reader.writer import write_data
 
 from ..properties import SupportedWriteModes
+
 
 supported_write_modes = get_args(SupportedWriteModes)
 
@@ -24,7 +25,8 @@ def write(
     mode: SupportedWriteModes = "data",
     **kwargs,
 ) -> None:
-    """Write either MDF data or CDM tables on disk.
+    """
+    Write either MDF data or CDM tables on disk.
 
     Parameters
     ----------
@@ -54,8 +56,6 @@ def write(
     `kwargs` are the keyword arguments for the specific `mode` reader.
     """
     if mode not in supported_write_modes:
-        raise ValueError(
-            f"No valid mode: {mode}. Choose one of {supported_write_modes}."
-        )
+        raise ValueError(f"No valid mode: {mode}. Choose one of {supported_write_modes}.")
 
     return WRITERS[mode](data, **kwargs)

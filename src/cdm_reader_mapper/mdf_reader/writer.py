@@ -1,15 +1,13 @@
 """Common Data Model (CDM) MDF writer."""
 
 from __future__ import annotations
-
 import json
 import logging
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, get_args
+from typing import get_args
 
 import pandas as pd
-
-from .utils.utilities import join, update_column_names, update_dtypes
 
 from ..common import get_filename
 from ..common.iterators import (
@@ -17,8 +15,9 @@ from ..common.iterators import (
     is_valid_iterator,
     parquet_stream_from_iterable,
 )
-
 from ..properties import SupportedFileTypes
+from .utils.utilities import join, update_column_names, update_dtypes
+
 
 WRITERS = {
     "csv": "to_csv",
@@ -61,7 +60,8 @@ def write_data(
     delimiter: str = ",",
     **kwargs,
 ) -> None:
-    """Write pandas.DataFrame to MDF file on file system.
+    """
+    Write pandas.DataFrame to MDF file on file system.
 
     Parameters
     ----------
@@ -123,9 +123,7 @@ def write_data(
     """
     supported_file_types = get_args(SupportedFileTypes)
     if data_format not in supported_file_types:
-        raise ValueError(
-            f"data_format must be one of {supported_file_types}, not {data_format}."
-        )
+        raise ValueError(f"data_format must be one of {supported_file_types}, not {data_format}.")
 
     if mask is not None and not isinstance(mask, type(data)):
         raise ValueError("type of 'data' and type of 'mask' do not match.")
@@ -146,19 +144,13 @@ def write_data(
         "parse_dates": [join(p) for p in parse_dates],
     }
 
-    logging.info(f"WRITING DATA TO FILES IN: {out_dir}")
+    logging.info("WRITING DATA TO FILES IN: %s", out_dir)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    filename_data = get_filename(
-        [prefix, "data", suffix], path=out_dir, extension=extension, separator=separator
-    )
-    filename_mask = get_filename(
-        [prefix, "mask", suffix], path=out_dir, extension=extension, separator=separator
-    )
-    filename_info = get_filename(
-        [prefix, "info", suffix], path=out_dir, extension="json", separator=separator
-    )
+    filename_data = get_filename([prefix, "data", suffix], path=out_dir, extension=extension, separator=separator)
+    filename_mask = get_filename([prefix, "mask", suffix], path=out_dir, extension=extension, separator=separator)
+    filename_info = get_filename([prefix, "info", suffix], path=out_dir, extension="json", separator=separator)
 
     for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
         if col_subset is not None:
@@ -203,5 +195,5 @@ def write_data(
             getattr(mask_df, writer)(filename_mask, **write_kwargs)
 
     if data_format == "csv":
-        with open(filename_info, "w") as fileObj:
+        with Path(filename_info).open("w") as fileObj:
             json.dump(info, fileObj, indent=4)

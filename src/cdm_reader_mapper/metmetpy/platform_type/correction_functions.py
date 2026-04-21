@@ -7,12 +7,10 @@ Created on Tue Jun 25 09:07:05 2019
 """
 
 from __future__ import annotations
-
 import re
+from typing import Any
 
 import pandas as pd
-
-from typing import Any
 
 from .. import properties
 
@@ -127,20 +125,14 @@ def fill_value(
 
     msk_na = fill_serie.isna() if fillna else pd.Series(False, index=fill_serie.index)
 
-    msk_self = (
-        fill_serie == self_condition_value
-        if self_condition_value is not None
-        else pd.Series(True, index=fill_serie.index)
-    )
+    msk_self = fill_serie == self_condition_value if self_condition_value is not None else pd.Series(True, index=fill_serie.index)
 
     if len(out_condition) > 0 and out_condition_values:
         if isinstance(out_condition, pd.Series):
             _, value = list(out_condition_values.items())[0]
             msk_out = out_condition == value
         else:
-            msk_out = pd.concat(
-                (out_condition[k] == v for k, v in out_condition_values.items()), axis=1
-            ).all(axis=1)
+            msk_out = pd.concat((out_condition[k] == v for k, v in out_condition_values.items()), axis=1).all(axis=1)
     else:
         msk_out = pd.Series(True, index=fill_serie.index)
         self_out_conditions = "intersect"
@@ -187,7 +179,8 @@ def deck_717_gdac(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def deck_700_icoads(data) -> pd.DataFrame:
-    """Adjust ICOADS platform codes for dataset 700.
+    """
+    Adjust ICOADS platform codes for dataset 700.
 
     - Fill missing platform values with '7' (drifters)
     - Change platform from '5' to '6' (buoys) for records with:
@@ -214,9 +207,7 @@ def deck_700_icoads(data) -> pd.DataFrame:
     pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
     data[pt_col] = data[pt_col].fillna(drifters)
-    loc = (
-        (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
-    )
+    loc = (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
 
     data[pt_col] = data[pt_col].where(~loc, buoys)
     return data
@@ -260,9 +251,7 @@ def deck_892_icoads(data: pd.DataFrame) -> pd.DataFrame:
     sid_col = properties.metadata_datamodels.get("source").get("icoads")
     pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
-    loc = (
-        (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
-    )
+    loc = (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
     data[pt_col] = data[pt_col].where(~loc, buoys)
     return data
 
@@ -347,12 +336,7 @@ def deck_992_icoads(data: pd.DataFrame) -> pd.DataFrame:
     sid_col = properties.metadata_datamodels.get("source").get("icoads")
     pt_col = properties.metadata_datamodels.get("platform").get("icoads")
 
-    loc = (
-        data[id_col].str.match(regex)
-        & (data[id_col].str.len() == 7)
-        & (data[sid_col] == sid)
-        & (data[pt_col] == pt)
-    )
+    loc = data[id_col].str.match(regex) & (data[id_col].str.len() == 7) & (data[sid_col] == sid) & (data[pt_col] == pt)
     data = overwrite_data(data, loc, pt_col, lv)
 
     regex_numeric = re.compile("^[0-9]+$")

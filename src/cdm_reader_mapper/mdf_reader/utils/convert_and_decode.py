@@ -1,14 +1,15 @@
 """pandas converting operators."""
 
 from __future__ import annotations
-
+from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
-from typing import Callable, Any, get_args
+from typing import Any, get_args
 
 import pandas as pd
 
 from .. import properties
 from .utilities import convert_str_boolean
+
 
 numeric_types = get_args(properties.NumericTypes)
 
@@ -27,9 +28,7 @@ def max_decimal_places(*decimals: Decimal) -> int:
     int
         Maximum number of decimal places.
     """
-    return max(
-        (-d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0) for d in decimals
-    )
+    return max((-d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0) for d in decimals)
 
 
 def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
@@ -178,11 +177,7 @@ class Converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
-        self.preprocessing_functions = {
-            "PPPP": lambda x: (
-                10_000 + int(x) if isinstance(x, str) and x.startswith("0") else x
-            )
-        }
+        self.preprocessing_functions = {"PPPP": lambda x: 10_000 + int(x) if isinstance(x, str) and x.startswith("0") else x}
 
         self._registry = {
             "datetime": self.object_to_datetime,
@@ -286,9 +281,7 @@ class Converters:
         elif disable_white_strip == "r":
             data = data.str.lstrip()
 
-        return data.apply(
-            lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x
-        )
+        return data.apply(lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x)
 
     def object_to_datetime(
         self,
@@ -326,7 +319,8 @@ def convert_and_decode(
     converter_kwargs: dict[str, dict] | None = None,
     decoder_dict: dict[str, Callable[[pd.Series], pd.Series]] | None = None,
 ) -> pd.DataFrame:
-    """Convert and decode data entries by using a pre-defined data model.
+    """
+    Convert and decode data entries by using a pre-defined data model.
 
     Overwrite attribute `data` with converted and/or decoded data.
 

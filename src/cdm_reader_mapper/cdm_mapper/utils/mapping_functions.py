@@ -23,7 +23,6 @@ Auxiliary functions can be used and defined in or outside class mapping_function
 """
 
 from __future__ import annotations
-
 import datetime
 import math
 import uuid
@@ -33,6 +32,7 @@ import numpy as np
 import pandas as pd
 import swifter  # noqa
 from timezonefinder import TimezoneFinder
+
 
 icoads_lineage = ". Initial conversion from ICOADS R3.0.0T"
 imodel_lineages = {
@@ -208,9 +208,7 @@ def location_accuracy_i(li: int | float, lat: float) -> float:
     degrees = {0: 0.1, 1: 1, 4: 1 / 60, 5: 1 / 3600}
     deg_km = 111
     try:
-        accuracy = degrees.get(int(li), np.nan) * math.sqrt(
-            (deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2)
-        )
+        accuracy = degrees.get(int(li), np.nan) * math.sqrt((deg_km**2) * (1 + math.cos(math.radians(lat)) ** 2))
     except (TypeError, ValueError):
         return np.nan
     if np.isnan(accuracy):
@@ -311,7 +309,7 @@ class mapping_functions:
 
     def __init__(self, imodel):
         self.imodel = imodel
-        self.utc = datetime.timezone.utc
+        self.utc = datetime.UTC
 
     def datetime_decimalhour_to_hm(self, row: pd.Series) -> pd.Series:
         """
@@ -421,9 +419,7 @@ class mapping_functions:
         data = pd.to_datetime(strings, format=date_format, errors="coerce")
         df_time = pd.DataFrame(data={"Dates": data, "Time_zone": time_zone.values})
 
-        results = df_time.swifter.apply(
-            lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1
-        )
+        results = df_time.swifter.apply(lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1)
         results.index = df.index
         return pd.DatetimeIndex(results.dt.tz_convert(None))
 
@@ -502,9 +498,7 @@ class mapping_functions:
         """
         return datetime.datetime.now(self.utc)
 
-    def datetime_craid(
-        self, series: pd.Series, format: str = "%Y-%m-%d %H:%M:%S.%f"
-    ) -> pd.DatetimeIndex:
+    def datetime_craid(self, series: pd.Series, format: str = "%Y-%m-%d %H:%M:%S.%f") -> pd.DatetimeIndex:
         """
         Convert C-RAID date strings to pandas datetime.
 
@@ -522,9 +516,7 @@ class mapping_functions:
         """
         return series_strptime(series, format)
 
-    def datetime_cmems(
-        self, series: pd.Series, format: str = "%Y-%m-%d %H:%M:%S"
-    ) -> pd.DatetimeIndex:
+    def datetime_cmems(self, series: pd.Series, format: str = "%Y-%m-%d %H:%M:%S") -> pd.DatetimeIndex:
         """
         Convert CMEMS date strings to pandas datetime.
 
@@ -542,9 +534,7 @@ class mapping_functions:
         """
         return series_strptime(series, format)
 
-    def datetime_marob(
-        self, series: pd.Series, format: str = "%Y-%m-%dT%H:%M:%S"
-    ) -> pd.Series:
+    def datetime_marob(self, series: pd.Series, format: str = "%Y-%m-%dT%H:%M:%S") -> pd.Series:
         """
         Convert MAROB date strings to pandas datetime.
 
@@ -743,9 +733,7 @@ class mapping_functions:
           Converted longitude Series.
         """
         result = np.vectorize(longitude_360to180_i, otypes="f")(series)
-        return pd.Series(
-            result, name=series.name, index=series.index, dtype=series.dtypes
-        )
+        return pd.Series(result, name=series.name, index=series.index, dtype=series.dtypes)
 
     def location_accuracy(self, df: pd.DataFrame) -> pd.Series:
         """
@@ -767,9 +755,7 @@ class mapping_functions:
         li_array = df.iloc[:, 0]
         lat_array = df.iloc[:, 1]
 
-        result = np.vectorize(location_accuracy_i, otypes="f")(
-            li_array, lat_array
-        )  # last minute tweak so that is does no fail on nans!
+        result = np.vectorize(location_accuracy_i, otypes="f")(li_array, lat_array)  # last minute tweak so that is does no fail on nans!
         return pd.Series(result, dtype=float, index=df.index)
 
     def observing_programme(self, series: pd.Series) -> pd.Series:
@@ -816,9 +802,7 @@ class mapping_functions:
         pd.Series
           Series with modified string values.
         """
-        result = np.vectorize(string_add_i, otypes="O")(
-            prepend, series, append, separator
-        )
+        result = np.vectorize(string_add_i, otypes="O")(prepend, series, append, separator)
 
         return pd.Series(result, index=series.index, dtype="object")
 
@@ -862,9 +846,7 @@ class mapping_functions:
                 df[column_name] = df[column_name].astype(str).str.zfill(width)
 
         joint = self.df_col_join(df, separator)
-        result = np.vectorize(string_add_i, otypes="O")(
-            prepend, joint, append, sep=separator
-        )
+        result = np.vectorize(string_add_i, otypes="O")(prepend, joint, append, sep=separator)
         return pd.Series(result, index=df.index, dtype="object")
 
     def temperature_celsius_to_kelvin(self, df: pd.DataFrame) -> pd.Series:
@@ -987,9 +969,7 @@ class mapping_functions:
         series = series.astype(float)
         return np.round(series / 3.2808, 2)
 
-    def gdac_uid(
-        self, df: pd.DataFrame, prepend: str = "", append: str = ""
-    ) -> pd.Series:
+    def gdac_uid(self, df: pd.DataFrame, prepend: str = "", append: str = "") -> pd.Series:
         """
         Generate a unique UID based on timestamp and ship's callsign (ID).
 
@@ -1018,9 +998,7 @@ class mapping_functions:
         name = df.apply(lambda x: "".join(x), axis=1)
         uid = np.empty(np.shape(df["AAAA"]), dtype="U126")
         for i, n in enumerate(name):
-            uid[i] = (
-                str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)
-            )
+            uid[i] = str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)
         df["UUID"] = uid
         return df["UUID"]
 

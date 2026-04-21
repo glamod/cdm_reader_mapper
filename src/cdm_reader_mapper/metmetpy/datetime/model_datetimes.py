@@ -13,7 +13,6 @@ registered in ../properties.py in metadata_datamodels.
 """
 
 from __future__ import annotations
-
 import math
 
 import numpy as np
@@ -92,9 +91,7 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
 
         strings = dt_data.loc[valid].astype(int).astype(str).apply("-".join, axis=1)
 
-        out.loc[valid] = pd.to_datetime(
-            strings, format="%Y-%m-%d-%H-%M", errors="coerce"
-        )
+        out.loc[valid] = pd.to_datetime(strings, format="%Y-%m-%d-%H-%M", errors="coerce")
         return out
 
     def from_datetime(ds: pd.Series) -> pd.DataFrame:

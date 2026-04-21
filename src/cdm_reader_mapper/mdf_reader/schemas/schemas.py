@@ -8,7 +8,6 @@ requirements of the data reader tool
 """
 
 from __future__ import annotations
-
 from pathlib import Path
 from typing import TypedDict, get_args
 
@@ -114,9 +113,7 @@ def _resolve_schema_files(
 
         return collect_json_files(*parts, base=f"{properties._base}.schemas")
 
-    raise ValueError(
-        "One of 'imodel', 'ext_schema_path', or 'ext_schema_file' must be set"
-    )
+    raise ValueError("One of 'imodel', 'ext_schema_path', or 'ext_schema_file' must be set")
 
 
 def _normalize_schema(schema: SchemaDict) -> SchemaDict:
@@ -129,9 +126,7 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
         if not elements:
             raise KeyError("Schema has no sections and no elements")
         level = properties.dummy_level
-        dummy_header = {
-            k: header[k] for k in ("delimiter", "field_layout", "format") if k in header
-        }
+        dummy_header = {k: header[k] for k in ("delimiter", "field_layout", "format") if k in header}
         sections = {level: {"header": dummy_header, "elements": elements}}
         schema = {k: v for k, v in schema.items() if k != "elements"}
 

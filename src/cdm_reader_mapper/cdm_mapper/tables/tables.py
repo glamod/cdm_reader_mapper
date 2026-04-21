@@ -10,9 +10,7 @@ the cdm tool.
 """
 
 from __future__ import annotations
-
 from copy import deepcopy
-
 from typing import Any
 
 from cdm_reader_mapper.common.json_dict import (
@@ -27,7 +25,8 @@ from .. import properties
 def get_cdm_atts(
     cdm_tables: str | list[str] | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """Get CDM attribute tables.
+    """
+    Get CDM attribute tables.
 
     Parameters
     ----------
@@ -44,14 +43,10 @@ def get_cdm_atts(
         Keys are table names like `header` or `observations-*`.
         Values are dictionaries loaded from JSON files.
     """
-    header_file = collect_json_files(
-        "common", base=f"{properties._base}.tables", name="header"
-    )[0]
+    header_file = collect_json_files("common", base=f"{properties._base}.tables", name="header")[0]
     header_dict = open_json_file(header_file)
 
-    observations_file = collect_json_files(
-        "common", base=f"{properties._base}.tables", name="observations"
-    )[0]
+    observations_file = collect_json_files("common", base=f"{properties._base}.tables", name="observations")[0]
     observations_dict = open_json_file(observations_file)
 
     if cdm_tables is None:
@@ -111,9 +106,7 @@ def get_imodel_maps(
     observations_files = []
 
     for cdm_table in cdm_table_list:
-        cdm_files = collect_json_files(
-            data_model, *sub_models, base=f"{properties._base}.tables", name=cdm_table
-        )
+        cdm_files = collect_json_files(data_model, *sub_models, base=f"{properties._base}.tables", name=cdm_table)
 
         if not observations_files:
             observations_files = collect_json_files(

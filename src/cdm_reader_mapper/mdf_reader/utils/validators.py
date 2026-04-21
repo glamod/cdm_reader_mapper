@@ -1,12 +1,12 @@
 """Data validation module."""
 
 from __future__ import annotations
-
 import logging
+from collections.abc import Iterable
+from typing import Any, get_args
+
 import numpy as np
 import pandas as pd
-
-from typing import Any, Iterable, get_args
 
 from .. import properties
 from ..codes import codes
@@ -46,9 +46,7 @@ def validate_datetime(series: pd.Series) -> pd.Series:
     return dates.notna() | series.isna()
 
 
-def validate_numeric(
-    series: pd.Series, valid_min: float, valid_max: float
-) -> pd.Series:
+def validate_numeric(series: pd.Series, valid_min: float, valid_max: float) -> pd.Series:
     """
     Validate that entries in a pandas Series are numeric and within a range.
 
@@ -94,9 +92,7 @@ def validate_str(series: pd.Series) -> pd.Series:
     return pd.Series(True, index=series.index, dtype="boolean")
 
 
-def validate_codes(
-    series: pd.Series, code_table: Iterable[Any], column_type: str
-) -> pd.Series:
+def validate_codes(series: pd.Series, code_table: Iterable[Any], column_type: str) -> pd.Series:
     """
     Validate that entries in a pandas Series exist in a provided code table.
 
@@ -171,9 +167,7 @@ def validate(
 
     disables = disables or []
     elements = [col for col in data.columns if col not in disables]
-    element_atts = {
-        element: attributes[element] for element in elements if element in attributes
-    }
+    element_atts = {element: attributes[element] for element in elements if element in attributes}
 
     validated_columns = []
     validated_dtypes = set(numeric_types) | {"datetime", "key"}
@@ -197,16 +191,12 @@ def validate(
             column_mask = validate_numeric(series, valid_min, valid_max)
         elif column_type == "key":
             code_table_name = column_atts.get("codetable")
-            code_table = codes.read_table(
-                code_table_name, imodel=imodel, ext_table_path=ext_table_path
-            )
+            code_table = codes.read_table(code_table_name, imodel=imodel, ext_table_path=ext_table_path)
             column_mask = validate_codes(series, code_table, column_type)
         elif column_type in basic_functions:
             column_mask = basic_functions[column_type](series)
         else:
-            logging.warning(
-                f"Unknown column_type '{column_type}' for column '{column}'"
-            )
+            logging.warning("Unknown column_type '%s' for column '%s'", column_type, column)
             continue
 
         mask[column] = column_mask
