@@ -1,22 +1,19 @@
 """Common Data Model (CDM) MDF reader."""
 
 from __future__ import annotations
-
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Any, get_args
+from typing import Any, get_args
 
 import pandas as pd
 
 from cdm_reader_mapper import DataBundle
 
 from ..common.json_dict import open_json_file
-
-from .utils.filereader import FileReader
-from .utils.utilities import validate_arg
-
-from .utils.utilities import as_list, as_path, read_csv, read_parquet, read_feather
-
 from ..properties import SupportedFileTypes
+from .utils.filereader import FileReader
+from .utils.utilities import as_list, as_path, read_csv, read_feather, read_parquet, validate_arg
+
 
 READERS = {
     "csv": read_csv,
@@ -55,9 +52,7 @@ def validate_read_mdf_args(
         raise FileNotFoundError(f"Source file not found: {source}")
 
     if not imodel and not (ext_schema_path or ext_schema_file):
-        raise ValueError(
-            "One of imodel or ext_schema_path/ext_schema_file must be provided"
-        )
+        raise ValueError("One of imodel or ext_schema_path/ext_schema_file must be provided")
 
     validate_arg("chunksize", chunksize, int)
     if chunksize is not None and chunksize <= 0:
@@ -94,7 +89,8 @@ def read_mdf(
     pd_kwargs: dict | None = None,
     xr_kwargs: dict | None = None,
 ) -> DataBundle:
-    """Read data files compliant with a user specific data model.
+    """
+    Read data files compliant with a user specific data model.
 
     Reads a data file to a pandas DataFrame using a pre-defined data model.
     Read data is validates against its data model producing a boolean mask
@@ -268,7 +264,8 @@ def read_data(
     delimiter: str | None = None,
     **kwargs,
 ) -> DataBundle:
-    """Read MDF data which is already on a pre-defined data model.
+    """
+    Read MDF data which is already on a pre-defined data model.
 
     Parameters
     ----------
@@ -313,9 +310,7 @@ def read_data(
     """
     supported_file_types = get_args(SupportedFileTypes)
     if data_format not in supported_file_types:
-        raise ValueError(
-            f"data_format must be one of {supported_file_types}, not {data_format}."
-        )
+        raise ValueError(f"data_format must be one of {supported_file_types}, not {data_format}.")
 
     data_kwargs = kwargs.copy()
     mask_kwargs = kwargs.copy()

@@ -1,24 +1,22 @@
 """Auxiliary functions and class for reading, converting, decoding and validating MDF files."""
 
 from __future__ import annotations
-
 import csv
 import logging
-
-from dataclasses import dataclass, replace
+from collections.abc import Iterable
 from copy import deepcopy
+from dataclasses import dataclass, replace
 from itertools import zip_longest
-from typing import TypedDict, Any, Iterable
+from typing import Any, TypedDict
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 from .. import properties
-from ..schemas.schemas import read_schema, SchemaDict
-from .utilities import convert_dtypes
-
+from ..schemas.schemas import SchemaDict, read_schema
 from .convert_and_decode import Converters, Decoders
+from .utilities import convert_dtypes
 
 
 class OrderSpec(TypedDict):
@@ -91,10 +89,10 @@ def _convert_dtype_to_default(dtype: str | None) -> str | None:
     elif dtype == "int":
         return properties.pandas_int
     elif "float" in dtype.lower():
-        logging.warning(f"Set column type from deprecated {dtype} to float.")
+        logging.warning("Set column type from deprecated %s to float.", dtype)
         return "float"
     elif "int" in dtype.lower():
-        logging.warning(f"Set column type from deprecated {dtype} to int.")
+        logging.warning("Set column type from deprecated %s to int.", dtype)
         return properties.pandas_int
     return dtype
 
@@ -142,11 +140,7 @@ def _parse_fixed_width(
 
                 out[index] = value
 
-        if (
-            delimiter
-            and j + delim_len <= line_len
-            and line[j : j + delim_len] == delimiter
-        ):
+        if delimiter and j + delim_len <= line_len and line[j : j + delim_len] == delimiter:
             j += delim_len
 
         i = j
@@ -283,9 +277,7 @@ def parse_pandas(
     sections = set(sections) if sections is not None else None
     excludes = set(excludes) if excludes else set()
 
-    records = df[col].map(
-        lambda line: _parse_line(line, order_specs, sections, excludes)
-    )
+    records = df[col].map(lambda line: _parse_line(line, order_specs, sections, excludes))
     return pd.DataFrame.from_records(records.to_list(), index=records.keys())
 
 
@@ -383,7 +375,6 @@ def parse_netcdf(
             continue
 
         for element, espec in ospec.get("elements", {}).items():
-
             if espec.get("ignore"):
                 continue
 
@@ -465,12 +456,7 @@ def build_parser_config(
         ext_schema_file=ext_schema_file,
     )
 
-    orders = [
-        order
-        for group in schema["header"]["parsing_order"]
-        for section_list in group.values()
-        for order in section_list
-    ]
+    orders = [order for group in schema["header"]["parsing_order"] for section_list in group.values() for order in section_list]
     olength = len(orders)
 
     dtypes: dict[Any, Any] = {}
@@ -498,9 +484,7 @@ def build_parser_config(
                 "index": index,
                 "ignore": ignore,
                 "missing_value": meta.get("missing_value"),
-                "field_length": meta.get(
-                    "field_length", properties.MAX_FULL_REPORT_WIDTH
-                ),
+                "field_length": meta.get("field_length", properties.MAX_FULL_REPORT_WIDTH),
             }
 
             if ignore or meta.get("disable_read", False):
@@ -515,10 +499,7 @@ def build_parser_config(
             if conv_func:
                 converters[index] = conv_func
 
-            conv_args = {
-                k: meta.get(k)
-                for k in properties.data_type_conversion_args.get(ctype, [])
-            }
+            conv_args = {k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])}
             if conv_args:
                 converter_kwargs[index] = conv_args
 
@@ -587,12 +568,7 @@ def update_xr_config(ds: xr.Dataset, config: ParserConfig) -> ParserConfig:
         elements = ospecs["elements"]
 
         for element, especs in elements.items():
-            if (
-                element not in ds.data_vars
-                and element not in ds.attrs
-                and element not in ds.dims
-                and element not in ds.coords
-            ):
+            if element not in ds.data_vars and element not in ds.attrs and element not in ds.dims and element not in ds.coords:
                 especs["ignore"] = True
                 continue
 

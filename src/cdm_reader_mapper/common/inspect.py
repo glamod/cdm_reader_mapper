@@ -7,8 +7,8 @@ Created on Wed Jul  3 09:48:18 2019
 """
 
 from __future__ import annotations
-
-from typing import Any, Iterable, Mapping
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 import pandas as pd
 

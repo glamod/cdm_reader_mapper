@@ -4,18 +4,14 @@ from __future__ import annotations
 
 import pandas as pd
 
-from ._utilities import _DataBundle, _copy
-
-from .writer import write
-
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.common import (
     count_by_cat,
     replace_columns,
-    split_by_boolean_true,
-    split_by_index,
-    split_by_column_entries,
     split_by_boolean_false,
+    split_by_boolean_true,
+    split_by_column_entries,
+    split_by_index,
 )
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.metmetpy import (
@@ -25,9 +21,13 @@ from cdm_reader_mapper.metmetpy import (
     validate_id,
 )
 
+from ._utilities import _DataBundle, _copy
+from .writer import write
+
 
 class DataBundle(_DataBundle):
-    """Class for manipulating the MDF data and mapping it to the CDM.
+    """
+    Class for manipulating the MDF data and mapping it to the CDM.
 
     Parameters
     ----------
@@ -73,7 +73,8 @@ class DataBundle(_DataBundle):
         super().__init__(*args, **kwargs)
 
     def add(self, addition, inplace=False) -> DataBundle | None:
-        """Adding information to a :py:class:`~DataBundle`.
+        """
+        Adding information to a :py:class:`~DataBundle`.
 
         Parameters
         ----------
@@ -101,7 +102,8 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def copy(self) -> DataBundle:
-        """Make deep copy of a :py:class:`~DataBundle`.
+        """
+        Make deep copy of a :py:class:`~DataBundle`.
 
         Returns
         -------
@@ -119,10 +121,9 @@ class DataBundle(_DataBundle):
             setattr(db, key, value)
         return db
 
-    def stack_v(
-        self, other, datasets=["data", "mask"], inplace=False, **kwargs
-    ) -> DataBundle | None:
-        """Stack multiple :py:class:`~DataBundle`'s vertically.
+    def stack_v(self, other, datasets=["data", "mask"], inplace=False, **kwargs) -> DataBundle | None:
+        """
+        Stack multiple :py:class:`~DataBundle`'s vertically.
 
         Parameters
         ----------
@@ -156,10 +157,9 @@ class DataBundle(_DataBundle):
         """
         return self._stack(other, datasets, inplace, **kwargs)
 
-    def stack_h(
-        self, other, datasets=["data", "mask"], inplace=False, **kwargs
-    ) -> DataBundle | None:
-        """Stack multiple :py:class:`~DataBundle`'s horizontally.
+    def stack_h(self, other, datasets=["data", "mask"], inplace=False, **kwargs) -> DataBundle | None:
+        """
+        Stack multiple :py:class:`~DataBundle`'s horizontally.
 
         Parameters
         ----------
@@ -193,10 +193,9 @@ class DataBundle(_DataBundle):
         """
         return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
-    def select_where_all_true(
-        self, inplace=False, do_mask=True, **kwargs
-    ) -> DataBundle | None:
-        """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are True.
+    def select_where_all_true(self, inplace=False, do_mask=True, **kwargs) -> DataBundle | None:
+        """
+        Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are True.
 
         Parameters
         ----------
@@ -235,17 +234,14 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data, _, selected_idx, _ = split_by_boolean_true(
-            db_._data, _mask, **kwargs
-        )
+        db_._data, _, selected_idx, _ = split_by_boolean_true(db_._data, _mask, **kwargs)
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
-    def select_where_all_false(
-        self, inplace=False, do_mask=True, **kwargs
-    ) -> DataBundle | None:
-        """Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are False.
+    def select_where_all_false(self, inplace=False, do_mask=True, **kwargs) -> DataBundle | None:
+        """
+        Select rows from :py:attr:`data` where all column entries in :py:attr:`mask` are False.
 
         Parameters
         ----------
@@ -284,17 +280,14 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
-        db_._data, _, selected_idx, _ = split_by_boolean_false(
-            db_._data, _mask, **kwargs
-        )
+        db_._data, _, selected_idx, _ = split_by_boolean_false(db_._data, _mask, **kwargs)
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
-    def select_where_entry_isin(
-        self, selection, inplace=False, do_mask=True, **kwargs
-    ) -> DataBundle | None:
-        """Select rows from :py:attr:`data` where column entries are in a specific value list.
+    def select_where_entry_isin(self, selection, inplace=False, do_mask=True, **kwargs) -> DataBundle | None:
+        """
+        Select rows from :py:attr:`data` where column entries are in a specific value list.
 
         Parameters
         ----------
@@ -337,17 +330,14 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`split_by_column_entries`
         """
         db_ = self._get_db(inplace)
-        db_._data, _, selected_idx, _ = split_by_column_entries(
-            db_._data, selection, **kwargs
-        )
+        db_._data, _, selected_idx, _ = split_by_column_entries(db_._data, selection, **kwargs)
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
-    def select_where_index_isin(
-        self, index, inplace=False, do_mask=True, **kwargs
-    ) -> DataBundle | None:
-        """Select rows from :py:attr:`data` where indexes within a specific index list.
+    def select_where_index_isin(self, index, inplace=False, do_mask=True, **kwargs) -> DataBundle | None:
+        """
+        Select rows from :py:attr:`data` where indexes within a specific index list.
 
         Parameters
         ----------
@@ -392,10 +382,9 @@ class DataBundle(_DataBundle):
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
         return self._return_db(db_, inplace)
 
-    def split_by_boolean_true(
-        self, do_mask=True, **kwargs
-    ) -> tuple[DataBundle, DataBundle]:
-        """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are True.
+    def split_by_boolean_true(self, do_mask=True, **kwargs) -> tuple[DataBundle, DataBundle]:
+        """
+        Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are True.
 
         Parameteers
         -----------
@@ -427,19 +416,14 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_true(
-            db1_._data, _mask, return_rejected=True, **kwargs
-        )
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_true(db1_._data, _mask, return_rejected=True, **kwargs)
         if do_mask is True:
-            db1_._mask, db2_._mask, _, _ = split_by_index(
-                db1_._mask, selected_idx, return_rejected=True, **kwargs
-            )
+            db1_._mask, db2_._mask, _, _ = split_by_index(db1_._mask, selected_idx, return_rejected=True, **kwargs)
         return db1_, db2_
 
-    def split_by_boolean_false(
-        self, do_mask=True, **kwargs
-    ) -> tuple[DataBundle, DataBundle]:
-        """Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
+    def split_by_boolean_false(self, do_mask=True, **kwargs) -> tuple[DataBundle, DataBundle]:
+        """
+        Split :py:attr:`data` by rows where all column entries in :py:attr:`mask` are False.
 
         Parameteers
         -----------
@@ -471,19 +455,14 @@ class DataBundle(_DataBundle):
         db1_ = self.copy()
         db2_ = self.copy()
         _mask = _copy(db1_._mask)
-        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_false(
-            db1_._data, _mask, return_rejected=True, **kwargs
-        )
+        db1_._data, db2_._data, selected_idx, _ = split_by_boolean_false(db1_._data, _mask, return_rejected=True, **kwargs)
         if do_mask is True:
-            db1_._mask, db2_._mask, _, _ = split_by_index(
-                db1_._mask, selected_idx, return_rejected=True, **kwargs
-            )
+            db1_._mask, db2_._mask, _, _ = split_by_index(db1_._mask, selected_idx, return_rejected=True, **kwargs)
         return db1_, db2_
 
-    def split_by_column_entries(
-        self, selection, do_mask=True, **kwargs
-    ) -> tuple[DataBundle, DataBundle]:
-        """Split :py:attr:`data` by rows where column entries are in a specific value list.
+    def split_by_column_entries(self, selection, do_mask=True, **kwargs) -> tuple[DataBundle, DataBundle]:
+        """
+        Split :py:attr:`data` by rows where column entries are in a specific value list.
 
         Parameters
         ----------
@@ -519,19 +498,14 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data, selected_idx, _ = split_by_column_entries(
-            db1_._data, selection, return_rejected=True, **kwargs
-        )
+        db1_._data, db2_._data, selected_idx, _ = split_by_column_entries(db1_._data, selection, return_rejected=True, **kwargs)
         if do_mask is True:
-            db1_._mask, db2_._mask, _, _ = split_by_index(
-                db1_._mask, selected_idx, return_rejected=True, **kwargs
-            )
+            db1_._mask, db2_._mask, _, _ = split_by_index(db1_._mask, selected_idx, return_rejected=True, **kwargs)
         return db1_, db2_
 
-    def split_by_index(
-        self, index, do_mask=True, **kwargs
-    ) -> tuple[DataBundle, DataBundle]:
-        """Split :py:attr:`data` by rows within specific index list.
+    def split_by_index(self, index, do_mask=True, **kwargs) -> tuple[DataBundle, DataBundle]:
+        """
+        Split :py:attr:`data` by rows within specific index list.
 
         Parameters
         ----------
@@ -566,17 +540,14 @@ class DataBundle(_DataBundle):
         """
         db1_ = self.copy()
         db2_ = self.copy()
-        db1_._data, db2_._data, _, _ = split_by_index(
-            db1_._data, index, return_rejected=True, **kwargs
-        )
+        db1_._data, db2_._data, _, _ = split_by_index(db1_._data, index, return_rejected=True, **kwargs)
         if do_mask is True:
-            db1_._mask, db2_._mask, _, _ = split_by_index(
-                db1_._mask, index, return_rejected=True, **kwargs
-            )
+            db1_._mask, db2_._mask, _, _ = split_by_index(db1_._mask, index, return_rejected=True, **kwargs)
         return db1_, db2_
 
     def unique(self, **kwargs) -> dict:
-        """Get unique values of :py:attr:`data`.
+        """
+        Get unique values of :py:attr:`data`.
 
         Returns
         -------
@@ -593,10 +564,9 @@ class DataBundle(_DataBundle):
         """
         return count_by_cat(self._data, **kwargs)
 
-    def replace_columns(
-        self, df_corr, subset=None, inplace=False, **kwargs
-    ) -> DataBundle | None:
-        """Replace columns in :py:attr:`data`.
+    def replace_columns(self, df_corr, subset=None, inplace=False, **kwargs) -> DataBundle | None:
+        """
+        Replace columns in :py:attr:`data`.
 
         Parameters
         ----------
@@ -625,24 +595,19 @@ class DataBundle(_DataBundle):
         For more information see :py:func:`replace_columns`
         """
         if not isinstance(self._data, (pd.DataFrame, pd.Series)):
-            raise TypeError(
-                "Data must be a pd.DataFrame or pd.Series, not a {type(self._data)}."
-            )
+            raise TypeError("Data must be a pd.DataFrame or pd.Series, not a {type(self._data)}.")
 
         db_ = self._get_db(inplace)
         if subset is None:
             db_._data = replace_columns(df_l=db_._data, df_r=df_corr, **kwargs)
         else:
-            db_._data[subset] = replace_columns(
-                df_l=db_._data[subset], df_r=df_corr, **kwargs
-            )
+            db_._data[subset] = replace_columns(df_l=db_._data[subset], df_r=df_corr, **kwargs)
         db_._columns = db_._data.columns
         return self._return_db(db_, inplace)
 
-    def correct_datetime(
-        self, imodel=None, inplace=False, **kwargs
-    ) -> DataBundle | None:
-        """Correct datetime information in :py:attr:`data`.
+    def correct_datetime(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
+        """
+        Correct datetime information in :py:attr:`data`.
 
         Parameters
         ----------
@@ -678,7 +643,8 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def validate_datetime(self, imodel=None, **kwargs) -> pd.DataFrame:
-        """Validate datetime information in :py:attr:`data`.
+        """
+        Validate datetime information in :py:attr:`data`.
 
         Parameters
         ----------
@@ -710,7 +676,8 @@ class DataBundle(_DataBundle):
         return validate_datetime(self._data, imodel, **kwargs)
 
     def correct_pt(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
-        """Correct platform type information in :py:attr:`data`.
+        """
+        Correct platform type information in :py:attr:`data`.
 
         Parameters
         ----------
@@ -746,7 +713,8 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def validate_id(self, imodel=None, **kwargs) -> pd.DataFrame:
-        """Validate station id information in :py:attr:`data`.
+        """
+        Validate station id information in :py:attr:`data`.
 
         Parameters
         ----------
@@ -778,7 +746,8 @@ class DataBundle(_DataBundle):
         return validate_id(self._data, imodel, **kwargs)
 
     def map_model(self, imodel=None, inplace=False, **kwargs) -> DataBundle | None:
-        """Map :py:attr:`data` to the Common Data Model.
+        """
+        Map :py:attr:`data` to the Common Data Model.
 
         Parameters
         ----------
@@ -810,10 +779,9 @@ class DataBundle(_DataBundle):
         db_._data = _tables
         return self._return_db(db_, inplace)
 
-    def write(
-        self, dtypes=None, parse_dates=None, encoding=None, mode=None, **kwargs
-    ) -> None:
-        """Write :py:attr:`data` on disk.
+    def write(self, dtypes=None, parse_dates=None, encoding=None, mode=None, **kwargs) -> None:
+        """
+        Write :py:attr:`data` on disk.
 
         Parameters
         ----------
@@ -860,7 +828,8 @@ class DataBundle(_DataBundle):
         )
 
     def duplicate_check(self, inplace=False, **kwargs) -> DataBundle | None:
-        """Duplicate check in :py:attr:`data`.
+        """
+        Duplicate check in :py:attr:`data`.
 
         Parameters
         ----------
@@ -913,7 +882,8 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def flag_duplicates(self, inplace=False, **kwargs) -> DataBundle | None:
-        """Flag detected duplicates in :py:attr:`data`.
+        """
+        Flag detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------
@@ -963,7 +933,8 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def get_duplicates(self, **kwargs) -> pd.DataFrame:
-        """Get duplicate matches in :py:attr:`data`.
+        """
+        Get duplicate matches in :py:attr:`data`.
 
         Returns
         -------
@@ -991,7 +962,8 @@ class DataBundle(_DataBundle):
         return self.DupDetect.get_duplicates(**kwargs)
 
     def remove_duplicates(self, inplace=False, **kwargs) -> DataBundle | None:
-        """Remove detected duplicates in :py:attr:`data`.
+        """
+        Remove detected duplicates in :py:attr:`data`.
 
         Parameters
         ----------

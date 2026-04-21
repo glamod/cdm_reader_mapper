@@ -5,6 +5,7 @@ from __future__ import annotations
 from recordlinkage import Compare
 from recordlinkage.compare import Numeric
 
+
 _method_kwargs = {
     "left_on": "report_timestamp",
     "window": 5,

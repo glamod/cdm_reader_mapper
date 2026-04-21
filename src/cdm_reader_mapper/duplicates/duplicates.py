@@ -1,11 +1,9 @@
 """Common Data Model (CDM) pandas duplicate check."""
 
 from __future__ import annotations
-
 import datetime
+from collections.abc import Iterable
 from copy import deepcopy
-
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -15,7 +13,8 @@ from ._duplicate_settings import Compare, _compare_kwargs, _histories, _method_k
 
 
 def convert_series(df: pd.DataFrame, conversion: dict) -> pd.DataFrame:
-    """Convert data types in Dataframe.
+    """
+    Convert data types in Dataframe.
 
     Parameters
     ----------
@@ -294,7 +293,8 @@ class DupDetect:
         limit: str | float | None = "default",
         equal_musts: str | list[str] | None = None,
     ) -> pd.DataFrame:
-        r"""Get result dataset with flagged duplicates.
+        r"""
+        Get result dataset with flagged duplicates.
 
         Parameters
         ----------
@@ -446,14 +446,12 @@ def set_comparer(compare_dict) -> Compare:
         Compare object with added comparison methods and a 'conversion' attribute.
     """
     comparer = Compare()
-    setattr(comparer, "conversion", {})
+    comparer.conversion = {}
     for column, c_dict in compare_dict.items():
         try:
             method = c_dict["method"]
         except KeyError:
-            raise KeyError(
-                "compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found"
-            )
+            raise KeyError("compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found")
         try:
             kwargs = c_dict["kwargs"]
         except KeyError:

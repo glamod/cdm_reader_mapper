@@ -1,17 +1,14 @@
 """Convert Common Datamodel (CDM) mapping table elements from/to string types"""
 
 from __future__ import annotations
-
 import ast
-
 from typing import get_args
 
 import numpy as np
 import pandas as pd
 
 from .. import properties
-
-from ..tables.tables import get_imodel_maps, get_cdm_atts
+from ..tables.tables import get_cdm_atts, get_imodel_maps
 
 
 class BaseConverter:
@@ -140,9 +137,7 @@ class ConvertToStr(BaseConverter):
         )
 
 
-def _convert_array_general_from_str(
-    data: pd.Series, null_label: str, dtype: type
-) -> pd.Series:
+def _convert_array_general_from_str(data: pd.Series, null_label: str, dtype: type) -> pd.Series:
     """
     Convert a series of string values (single or list) into an array.
 
@@ -189,9 +184,7 @@ def _convert_array_general_from_str(
     return data.apply(_convert_value)
 
 
-def _convert_array_general_to_str(
-    data: pd.Series, null_label: str, dtype: type
-) -> pd.Series:
+def _convert_array_general_to_str(data: pd.Series, null_label: str, dtype: type) -> pd.Series:
     """
     Convert a series of values (single or list) into an string array.
 
@@ -415,9 +408,7 @@ def _convert_integer_array_from_str(data: pd.Series, null_label: str) -> pd.Seri
     return _convert_array_general_from_str(data, null_label, "Int64")
 
 
-def _convert_float_to_str(
-    data: pd.Series, null_label: str, decimal_places: int
-) -> pd.Series:
+def _convert_float_to_str(data: pd.Series, null_label: str, decimal_places: int) -> pd.Series:
     """
     Convert numeric elements to float strings with specified decimals.
 
@@ -675,7 +666,7 @@ def _convert_columns(
 
     data_model = imodel.split("_")
     if data_model[0] not in get_args(properties.SupportedDataModels):
-        raise ValueError("Input data model " f"{data_model[0]}" " not supported")
+        raise ValueError(f"Input data model {data_model[0]} not supported")
 
     if mode not in ("from_str", "to_str"):
         raise ValueError("mode must be one of {'from_str', 'to_str'}")
@@ -697,7 +688,6 @@ def _convert_columns(
     for table, table_atts in cdm_atts.items():
         table_maps = imodel_maps.get(table, {})
         for column, column_atts in table_atts.items():
-
             if column in data.columns:
                 data_column = column
             elif (table, column) in data.columns:

@@ -1,32 +1,29 @@
 """Auxiliary functions and class for reading, converting, decoding and validating MDF files."""
 
 from __future__ import annotations
-
 import logging
-
-from typing import Any, Mapping, Sequence, Iterable
+from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import replace
+from typing import Any
 
 import pandas as pd
 import xarray as xr
 
-from dataclasses import replace
+from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from cdm_reader_mapper.core.databundle import DataBundle
 
 from .. import properties
-from .utilities import remove_boolean_values
-
 from .convert_and_decode import convert_and_decode
-from .validators import validate
 from .parser import (
-    update_xr_config,
-    update_pd_config,
-    parse_pandas,
-    parse_netcdf,
-    build_parser_config,
     ParserConfig,
+    build_parser_config,
+    parse_netcdf,
+    parse_pandas,
+    update_pd_config,
+    update_xr_config,
 )
-
-from cdm_reader_mapper.core.databundle import DataBundle
-from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from .utilities import remove_boolean_values
+from .validators import validate
 
 
 def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
@@ -219,9 +216,7 @@ class FileReader:
         if config.encoding not in [None, "utf-8"]:
             object_columns = data.select_dtypes(include=["object", "string"]).columns
             for object_column in object_columns:
-                data[object_column] = (
-                    data[object_column].str.encode(config.encoding).str.decode("utf-8")
-                )
+                data[object_column] = data[object_column].str.encode(config.encoding).str.decode("utf-8")
 
         return data, mask, config
 
@@ -236,10 +231,7 @@ class FileReader:
         decode_kwargs: dict | None = None,
         validate_kwargs: dict | None = None,
         select_kwargs: dict | None = None,
-    ) -> (
-        tuple[pd.DataFrame, pd.DataFrame, ParserConfig]
-        | tuple[Iterable[pd.DataFrame], Iterable[pd.DataFrame], ParserConfig]
-    ):
+    ) -> tuple[pd.DataFrame, pd.DataFrame, ParserConfig] | tuple[Iterable[pd.DataFrame], Iterable[pd.DataFrame], ParserConfig]:
         """
         Open and parse source data according to parser configuration.
 

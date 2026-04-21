@@ -1,13 +1,13 @@
 """Auxiliary functions and class for reading, converting, decoding and validating MDF files."""
 
 from __future__ import annotations
-
 import ast
-
 import os
-import pandas as pd
+from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any
+
+import pandas as pd
 
 from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
 
@@ -105,9 +105,7 @@ def update_dtypes(dtypes: dict[str, Any], columns: Iterable[str]) -> dict[str, A
     return dtypes
 
 
-def update_column_names(
-    dtypes: dict[str, Any] | str, col_o: str, col_n: str
-) -> dict[str, Any] | str:
+def update_column_names(dtypes: dict[str, Any] | str, col_o: str, col_n: str) -> dict[str, Any] | str:
     """
     Rename a column in a dtypes dictionary if it exists.
 
@@ -385,9 +383,7 @@ def validate_arg(arg_name, arg_value, arg_type) -> bool:
         If `arg_value` is not of type `arg_type` and not None.
     """
     if arg_value and not isinstance(arg_value, arg_type):
-        raise ValueError(
-            f"Argument {arg_name} must be {arg_type} or None, not {type(arg_value)}"
-        )
+        raise ValueError(f"Argument {arg_name} must be {arg_type} or None, not {type(arg_value)}")
 
     return True
 

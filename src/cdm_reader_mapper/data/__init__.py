@@ -1,13 +1,12 @@
 """Common Data Model (CDM) reader and mapper test data."""
 
 from __future__ import annotations
-
 import logging
 
 from requests.exceptions import HTTPError
 
-from cdm_reader_mapper.common import load_file
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
+from cdm_reader_mapper.common import load_file
 
 
 class LazyDataDict(dict):

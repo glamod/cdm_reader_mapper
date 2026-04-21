@@ -7,9 +7,9 @@ Created on Wed Apr  3 08:45:03 2019
 """
 
 from __future__ import annotations
-
 import logging
 import os
+
 
 LOG_FN = os.getenv("CDM_LOG_FILE", None)
 

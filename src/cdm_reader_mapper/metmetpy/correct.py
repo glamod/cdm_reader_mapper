@@ -58,18 +58,18 @@ invocation) logging an error.
 """
 
 from __future__ import annotations
-
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 import pandas as pd
 
 from ..common import logging_hdlr
 from ..common.iterators import ProcessFunction, process_function
 from ..common.json_dict import collect_json_files, combine_dicts
-
 from . import properties
 from .datetime import correction_functions as corr_f_dt
 from .platform_type import correction_functions as corr_f_pt
+
 
 _base = f"{properties._base}"
 
@@ -90,13 +90,10 @@ def _correct_dt(
     # 1. Optional deck specific corrections
     datetime_correction = correction_method.get(dck, {}).get("function")
     if not datetime_correction:
-        logger.info(
-            f"No datetime correction to apply to deck {dck} data "
-            f"from data model {data_model}."
-        )
+        logger.info("No datetime correction to apply to deck %s data from data model %s.", dck, data_model)
         return data
 
-    logger.info(f'Applying "{datetime_correction}" datetime correction')
+    logger.info('Applying "%s" datetime correction', datetime_correction)
     try:
         trans = getattr(corr_f_dt, datetime_correction)
     except AttributeError:
@@ -124,9 +121,7 @@ def _correct_pt(
 
     deck_fix = fix_methods.get(dck)
     if not deck_fix:
-        logger.info(
-            f"No platform type fixes to apply to deck {dck} data from dataset {imodel}"
-        )
+        logger.info("No platform type fixes to apply to deck %s data from dataset %s", dck, imodel)
         return data
 
     if not isinstance(pt_col, list):
@@ -145,28 +140,22 @@ def _correct_pt(
     if method == "fillna":
         fillvalue = deck_fix.get("fill_value")
         if fillvalue is None:
-            raise ValueError(
-                f'Platform fix "fillna" for deck {dck} requires "fill_value".'
-            )
-        logger.info(f"Filling na values with {fillvalue}")
+            raise ValueError(f'Platform fix "fillna" for deck {dck} requires "fill_value".')
+        logger.info("Filling na values with %s", fillvalue)
         data[pt_col] = corr_f_pt.fill_value(data[pt_col], fillvalue)
         return data
 
     if method == "function":
         transform = deck_fix.get("function")
         if transform is None:
-            raise ValueError(
-                f'Platform fix "function" for deck {dck} requires "function" name.'
-            )
-        logger.info(f"Applying fix function {transform}")
+            raise ValueError(f'Platform fix "function" for deck {dck} requires "function" name.')
+        logger.info("Applying fix function %s", transform)
         if not hasattr(corr_f_pt, transform):
             raise ValueError(f'Platform fix function "{transform}" not found.')
         trans = getattr(corr_f_pt, transform)
         return trans(data)
 
-    raise ValueError(
-        f'Platform type fix method "{method}" not implemented for deck {dck}.'
-    )
+    raise ValueError(f'Platform type fix method "{method}" not implemented for deck {dck}.')
 
 
 @process_function(data_only=True)
@@ -176,7 +165,8 @@ def correct_datetime(
     log_level: str = "INFO",
     _base=_base,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
-    """Apply ICOADS deck specific datetime corrections.
+    """
+    Apply ICOADS deck specific datetime corrections.
 
     Parameters
     ----------
@@ -209,14 +199,14 @@ def correct_datetime(
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {imodel} has no deck information.")
+        logger.warning("Dataset %s has no deck information.", imodel)
         return data
 
     dck = mrd[2]
 
     replacements_method_files = collect_json_files(*mrd, base=_base)
     if len(replacements_method_files) == 0:
-        logger.warning(f"Data model {imodel} has no replacements in library")
+        logger.warning("Data model %s has no replacements in library", imodel)
         logger.warning("Module will proceed with no attempt to apply id replacements")
         return data
 
@@ -245,7 +235,8 @@ def correct_pt(
     log_level="INFO",
     _base=_base,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
-    """Apply ICOADS deck specific platform ID corrections.
+    """
+    Apply ICOADS deck specific platform ID corrections.
 
     Parameters
     ----------
@@ -277,7 +268,7 @@ def correct_pt(
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
-        logger.warning(f"Dataset {imodel} has no deck information.")
+        logger.warning("Dataset %s has no deck information.", imodel)
         return data
 
     dck = mrd[2]
@@ -285,7 +276,7 @@ def correct_pt(
     fix_files = collect_json_files(*mrd, base=_base)
 
     if len(fix_files) == 0:
-        logger.warning(f"Dataset {imodel} not included in platform library")
+        logger.warning("Dataset %s not included in platform library", imodel)
         return data
 
     if isinstance(data, pd.Series):

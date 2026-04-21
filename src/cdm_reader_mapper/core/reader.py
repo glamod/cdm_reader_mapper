@@ -1,15 +1,14 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-
 from typing import get_args
 
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
-from cdm_reader_mapper.mdf_reader.reader import read_mdf, read_data
-
-from .databundle import DataBundle
+from cdm_reader_mapper.mdf_reader.reader import read_data, read_mdf
 
 from ..properties import SupportedReadModes
+from .databundle import DataBundle
+
 
 supported_read_modes = get_args(SupportedReadModes)
 
@@ -25,7 +24,8 @@ def read(
     mode: SupportedReadModes = "mdf",
     **kwargs,
 ) -> DataBundle:
-    """Read either original marine-meteorological data or MDF data or CDM tables from disk.
+    """
+    Read either original marine-meteorological data or MDF data or CDM tables from disk.
 
     Parameters
     ----------
@@ -57,8 +57,6 @@ def read(
 
     """
     if mode not in supported_read_modes:
-        raise ValueError(
-            f"No valid mode: {mode}. Choose one of {supported_read_modes}."
-        )
+        raise ValueError(f"No valid mode: {mode}. Choose one of {supported_read_modes}.")
 
     return READERS[mode](source, **kwargs)

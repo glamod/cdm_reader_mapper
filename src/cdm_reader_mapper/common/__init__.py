@@ -10,7 +10,7 @@ from .replace import replace_columns
 from .select import (
     split_by_boolean,
     split_by_boolean_false,
-    split_by_index,
-    split_by_column_entries,
     split_by_boolean_true,
+    split_by_column_entries,
+    split_by_index,
 )

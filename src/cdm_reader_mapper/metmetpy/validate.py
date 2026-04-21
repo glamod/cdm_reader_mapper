@@ -55,20 +55,18 @@ will warn and validate all to True, with NaN to False
 """
 
 from __future__ import annotations
-
 import logging
 import re
-
-from typing import Iterable
+from collections.abc import Iterable
 
 import pandas as pd
 
 from ..common import logging_hdlr
 from ..common.iterators import ProcessFunction, process_function
 from ..common.json_dict import collect_json_files, combine_dicts
-
 from . import properties
 from .datetime import model_datetimes
+
 
 _base = f"{properties._base}.station_id"
 
@@ -80,18 +78,14 @@ def _get_id_col(
     """Retrieve the ID column(s) for a given data model from the metadata."""
     id_col = properties.metadata_datamodels["id"].get(imodel)
     if not id_col:
-        raise ValueError(
-            f"Data model {imodel} ID column not defined in properties file."
-        )
+        raise ValueError(f"Data model {imodel} ID column not defined in properties file.")
 
     if not isinstance(id_col, list):
         id_col = [id_col]
 
     id_col = [col for col in id_col if col in data.columns]
     if not id_col:
-        raise ValueError(
-            f"No ID columns found. Selected columns are {list(data.columns)}"
-        )
+        raise ValueError(f"No ID columns found. Selected columns are {list(data.columns)}")
 
     if len(id_col) == 1:
         id_col = id_col[0]
@@ -110,9 +104,7 @@ def _get_patterns(
     pattern_dict = dck_id_model.get("valid_patterns")
 
     if not pattern_dict:
-        logger.warning(
-            f'Input dck "{dck}" validation patterns are empty in file {data_model_files}'
-        )
+        logger.warning('Input dck "%s" validation patterns are empty in file %s', dck, data_model_files)
         logger.warning("Adding match-all regex to validation patterns")
         patterns = [".*?"]
     else:
@@ -140,9 +132,7 @@ def _validate_datetime(data: pd.DataFrame | pd.Series, model: str):
     data_model_datetime = model_datetimes.to_datetime(data, model)
 
     if len(data_model_datetime) == 0:
-        raise ValueError(
-            f"No columns found for datetime conversion. Selected columns are {list(data.columns)}."
-        )
+        raise ValueError(f"No columns found for datetime conversion. Selected columns are {list(data.columns)}.")
     return data_model_datetime.notna()
 
 
@@ -234,7 +224,8 @@ def validate_datetime(
     blank: bool = False,
     log_level: str = "INFO",
 ) -> pd.Series:
-    """Validate datetime columns in a dataset according to the specified model.
+    """
+    Validate datetime columns in a dataset according to the specified model.
 
     Parameters
     ----------

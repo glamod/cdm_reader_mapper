@@ -1,10 +1,9 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-
-from typing import Iterable, Literal
-
+from collections.abc import Iterable
 from copy import deepcopy
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -12,13 +11,13 @@ import pandas as pd
 from cdm_reader_mapper.common import (
     get_length,
 )
-
 from cdm_reader_mapper.common.iterators import (
     ParquetStreamReader,
-    process_disk_backed,
     is_valid_iterator,
     parquet_stream_from_iterable,
+    process_disk_backed,
 )
+
 
 properties = {
     "data",
@@ -148,9 +147,7 @@ class SubscriptableMethod:
         try:
             return self.func[item]
         except TypeError:
-            raise NotImplementedError(
-                "Calling subscriptable methods have not been implemented for chunked data yet."
-            )
+            raise NotImplementedError("Calling subscriptable methods have not been implemented for chunked data yet.")
 
     def __call__(self, *args, **kwargs):
         """Ensure function calls work properly."""
@@ -158,7 +155,6 @@ class SubscriptableMethod:
 
 
 class _DataBundle:
-
     def __init__(
         self,
         data: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
@@ -171,17 +167,13 @@ class _DataBundle:
         mode: Literal["data", "tables"] = "data",
     ):
         if mode not in ["data", "tables"]:
-            raise ValueError(
-                f"'mode' {mode} is not valid, use one of ['data', 'tables']."
-            )
+            raise ValueError(f"'mode' {mode} is not valid, use one of ['data', 'tables'].")
 
         if data is None:
             data = pd.DataFrame(columns=columns, dtype=dtypes)
         if isinstance(data, (list, tuple)):
             data = iter(data)
-        if (
-            is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)
-        ) or isinstance(data, (list, tuple)):
+        if (is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)) or isinstance(data, (list, tuple)):
             data = parquet_stream_from_iterable(data)
 
         if mask is None:
@@ -189,16 +181,11 @@ class _DataBundle:
                 mask = pd.DataFrame(columns=data.columns, index=data.index, dtype=bool)
             elif isinstance(data, ParquetStreamReader):
                 data_cp = data.copy()
-                mask = [
-                    pd.DataFrame(columns=df.columns, index=df.index, dtype=bool)
-                    for df in data_cp
-                ]
+                mask = [pd.DataFrame(columns=df.columns, index=df.index, dtype=bool) for df in data_cp]
 
         if isinstance(mask, (list, tuple)):
             mask = iter(mask)
-        if (
-            is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)
-        ) or isinstance(mask, (list, tuple)):
+        if (is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)) or isinstance(mask, (list, tuple)):
             mask = parquet_stream_from_iterable(mask)
 
         self._data = data
@@ -262,9 +249,7 @@ class _DataBundle:
                 # The combiner will consume the rest.
                 return combine_attribute_values(attr_value, data, attr)
 
-        raise TypeError(
-            f"'data' is {type(data)}, expected DataFrame or ParquetStreamReader."
-        )
+        raise TypeError(f"'data' is {type(data)}, expected DataFrame or ParquetStreamReader.")
 
     def __repr__(self) -> str:
         """Return a string representation for :py:attr:`data`."""
@@ -313,7 +298,8 @@ class _DataBundle:
 
     @property
     def parse_dates(self):
-        """Information of how to parse dates in :py:attr:`data`.
+        """
+        Information of how to parse dates in :py:attr:`data`.
 
         See Also
         --------
@@ -323,7 +309,8 @@ class _DataBundle:
 
     @property
     def encoding(self):
-        """A string representing the encoding to use in the :py:attr:`data`.
+        """
+        A string representing the encoding to use in the :py:attr:`data`.
 
         See Also
         --------
@@ -359,7 +346,8 @@ class _DataBundle:
         self._mode = value
 
     def copy(self) -> _DataBundle:
-        """Make deep copy of a :py:class:`~_DataBundle`.
+        """
+        Make deep copy of a :py:class:`~_DataBundle`.
 
         Returns
         -------
@@ -400,9 +388,7 @@ class _DataBundle:
             df_cp = getattr(db_cp, data_attr, pd.DataFrame())
 
             if is_valid_iterator(df_cp):
-                raise ValueError(
-                    "Data must be a pd.DataFrame not a iterable of pd.DataFrames."
-                )
+                raise ValueError("Data must be a pd.DataFrame not a iterable of pd.DataFrames.")
 
             to_concat = [df_cp]
 

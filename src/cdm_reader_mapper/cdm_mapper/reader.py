@@ -43,10 +43,8 @@ When specifying a subset of tables, valid names are those in properties.cdm_tabl
 """
 
 from __future__ import annotations
-
 import glob
-import os
-
+import pathlib
 from typing import get_args
 
 import pandas as pd
@@ -56,8 +54,7 @@ from cdm_reader_mapper.core.databundle import DataBundle
 
 from ..properties import SupportedFileTypes
 from .properties import cdm_tables
-
-from .utils.conversions import convert_to_str_df, convert_from_str_df
+from .utils.conversions import convert_from_str_df, convert_to_str_df
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
@@ -137,9 +134,7 @@ def _read_multiple_files(
         suffix_pattern = f"*{suffix}"
 
     # See if there's anything at all:
-    pattern = get_filename(
-        [prefix, suffix_pattern], path=inp_dir, extension=extension, separator=separator
-    )
+    pattern = get_filename([prefix, suffix_pattern], path=inp_dir, extension=extension, separator=separator)
     files = glob.glob(pattern)
 
     if len(files) == 0:
@@ -151,24 +146,19 @@ def _read_multiple_files(
 
     for table in cdm_subset:
         if table not in cdm_tables:
-            logger.warning(f"Requested table {table} not defined in CDM")
+            logger.warning("Requested table %s not defined in CDM", table)
             continue
 
-        logger.info(f"Getting file path for pattern {table}")
+        logger.info("Getting file path for pattern %s", table)
         _pattern = [table]
         if prefix:
             _pattern = [prefix] + _pattern
         if suffix:
             _pattern = _pattern + [suffix_pattern]
-        pattern_ = get_filename(
-            _pattern, path=inp_dir, extension=extension, separator=separator
-        )
+        pattern_ = get_filename(_pattern, path=inp_dir, extension=extension, separator=separator)
         paths_ = glob.glob(pattern_)
         if len(paths_) != 1:
-            logger.warning(
-                f"Pattern {pattern_} resulted in multiple files for table {table}: {paths_} "
-                "Cannot securely retrieve cdm table(s)"
-            )
+            logger.warning("Pattern %s resulted in multiple files for table %s: %s Cannot securely retrieve cdm table(s)", pattern_, table, paths_)
             continue
 
         dfi = _read_single_file(
@@ -181,9 +171,7 @@ def _read_multiple_files(
         )
 
         if dfi.empty:
-            logger.warning(
-                f"Table {table} empty in file system, not added to the final DF"
-            )
+            logger.warning("Table %s empty in file system, not added to the final DF", table)
             continue
 
         dfi.columns = pd.MultiIndex.from_product([[table], dfi.columns])
@@ -277,9 +265,7 @@ def read_tables(
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     supported_file_types = get_args(SupportedFileTypes)
     if data_format not in supported_file_types:
-        raise ValueError(
-            f"data_format must be one of {supported_file_types}, not {data_format}."
-        )
+        raise ValueError(f"data_format must be one of {supported_file_types}, not {data_format}.")
 
     # Because how the printers are written, they modify the original data frame!,
     # also removing rows with empty observation_value in observation_tables
@@ -296,7 +282,7 @@ def read_tables(
 
     extension = extension or data_format
 
-    if os.path.isfile(source):
+    if pathlib.Path(source).is_file():
         df_list = [
             _read_single_file(
                 source,
@@ -309,7 +295,7 @@ def read_tables(
         ]
         if df_list[0].empty:
             df_list = []
-    elif os.path.isdir(source):
+    elif pathlib.Path(source).is_dir():
         df_list = _read_multiple_files(
             source,
             data_format=data_format,
@@ -324,9 +310,7 @@ def read_tables(
             **kwargs,
         )
     else:
-        raise FileNotFoundError(
-            f"Source is neither a valid file name nor a valid directory path: {source}."
-        )
+        raise FileNotFoundError(f"Source is neither a valid file name nor a valid directory path: {source}.")
 
     if len(df_list) == 0:
         raise ValueError("All tables empty in file system.")

@@ -6,9 +6,9 @@ Created on Wed Jul  3 09:48:18 2019
 
 @author: iregon
 """
-from __future__ import annotations
 
-from typing import Iterable
+from __future__ import annotations
+from collections.abc import Iterable
 
 import pandas as pd
 

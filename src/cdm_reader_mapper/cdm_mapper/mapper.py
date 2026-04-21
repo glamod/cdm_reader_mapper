@@ -1,4 +1,4 @@
-﻿"""
+"""
 Map Common Data Model (CDM).
 
 Created on Thu Apr 11 13:45:38 2019
@@ -12,13 +12,12 @@ for the input data model.
 """
 
 from __future__ import annotations
-
-from typing import Any, Iterable, get_args
+from collections.abc import Iterable
+from typing import Any, get_args
 
 import pandas as pd
 
 from cdm_reader_mapper.common import logging_hdlr
-
 from cdm_reader_mapper.common.iterators import (
     ParquetStreamReader,
     ProcessFunction,
@@ -27,8 +26,8 @@ from cdm_reader_mapper.common.iterators import (
 
 from . import properties
 from .codes.codes import get_code_table
-from .utils.conversions import convert_from_str_series
 from .tables.tables import get_cdm_atts, get_imodel_maps
+from .utils.conversions import convert_from_str_series
 from .utils.mapping_functions import mapping_functions
 
 
@@ -48,9 +47,7 @@ def _is_empty(value):
 
 def _drop_duplicated_rows(df) -> pd.DataFrame:
     """Drop duplicates from list."""
-    list_cols = [
-        col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()
-    ]
+    list_cols = [col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()]
 
     for col in list_cols:
         df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
@@ -94,14 +91,14 @@ def _transform(
     logger,
 ) -> pd.Series:
     """Apply a transformation function from imodel_functions to a pandas Series."""
-    logger.debug(f"Applying transform: {transform}")
+    logger.debug("Applying transform: %s", transform)
 
     if kwargs:
         logger.debug(f"With kwargs: {', '.join(kwargs.keys())}")
     try:
         trans_func = getattr(imodel_functions, transform)
     except AttributeError:
-        logger.error(f"Transform '{transform}' not found in imodel_functions")
+        logger.error("Transform '%s' not found in imodel_functions", transform)
         return data
 
     return trans_func(data, **kwargs)
@@ -114,16 +111,14 @@ def _code_table(
     logger,
 ) -> pd.Series:
     """Map values in a Series or DataFrame using a (possibly nested) code table."""
-    logger.debug(f"Mapping code table: {code_table}")
+    logger.debug("Mapping code table: %s", code_table)
     table_map = get_code_table(*data_model.split("_"), code_table=code_table)
 
     df = data.to_frame() if isinstance(data, pd.Series) else data.copy()
 
     df = df.astype(str)
 
-    df.columns = [
-        "_".join(col) if isinstance(col, tuple) else str(col) for col in df.columns
-    ]
+    df.columns = ["_".join(col) if isinstance(col, tuple) else str(col) for col in df.columns]
 
     def _map_col(col):
         return _get_nested_value(table_map, col.tolist())
@@ -165,7 +160,7 @@ def _extract_input_data(idata, elements, default, logger):
 
     for e in elements:
         if e not in cols:
-            logger.warning(f"Missing element from input data: {e}")
+            logger.warning("Missing element from input data: %s", e)
             return _return_default(True)
 
     data = idata[elements[0]] if len(elements) == 1 else idata[elements]
@@ -250,7 +245,7 @@ def _table_mapping(
     out = {}
 
     for column in columns:
-        logger.debug(f"\tElement: {column}")
+        logger.debug("	Element: %s", column)
 
         out[column] = _column_mapping(
             idata,
@@ -305,13 +300,11 @@ def _map_data_model(
 ):
     """Process one chunk of input data."""
     if ":" in idata.columns[0]:
-        idata.columns = pd.MultiIndex.from_tuples(
-            col.split(":") for col in idata.columns
-        )
+        idata.columns = pd.MultiIndex.from_tuples(col.split(":") for col in idata.columns)
 
     all_tables = []
     for table, table_atts in cdm_tables.items():
-        logger.debug(f"Table: {table}")
+        logger.debug("Table: %s", table)
         table_maps = imodel_maps[table]
         table_df = _table_mapping(
             idata=idata,
@@ -343,7 +336,8 @@ def map_model(
     drop_duplicates: bool = True,
     log_level: str = "INFO",
 ) -> pd.DataFrame | ParquetStreamReader:
-    """Map a pandas DataFrame to the CDM header and observational tables.
+    """
+    Map a pandas DataFrame to the CDM header and observational tables.
 
     Parameters
     ----------
@@ -407,7 +401,7 @@ def map_model(
 
     data_model = imodel.split("_")
     if data_model[0] not in get_args(properties.SupportedDataModels):
-        raise ValueError("Input data model " f"{data_model[0]}" " not supported")
+        raise ValueError(f"Input data model {data_model[0]} not supported")
 
     if not cdm_subset:
         cdm_subset = properties.cdm_tables
@@ -428,6 +422,4 @@ def map_model(
         result.columns = columns
         return result
 
-    raise ValueError(
-        f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}."
-    )
+    raise ValueError(f"result mus be a pd.DataFrame or ParquetStreamReader, not {type(result)}.")
