@@ -5,13 +5,13 @@ import pandas as pd
 import pytest
 
 from cdm_reader_mapper.mdf_reader.utils.validators import (
-    _is_true,
     _is_false,
+    _is_true,
+    validate,
+    validate_codes,
     validate_datetime,
     validate_numeric,
     validate_str,
-    validate_codes,
-    validate,
 )
 
 
@@ -95,9 +95,7 @@ def attributes():
 
 
 def test_validate_pass(sample_df, attributes):
-    mask = validate(
-        sample_df, imodel="icoads", ext_table_path=None, attributes=attributes
-    )
+    mask = validate(sample_df, imodel="icoads", ext_table_path=None, attributes=attributes)
 
     expected_num = [True, True, False, True, True]
     assert mask["NUM"].tolist() == expected_num
@@ -116,6 +114,4 @@ def test_validate_pass(sample_df, attributes):
 
 
 def test_validate_none():
-    assert (
-        validate([1, 2, 3], imodel="icoads", ext_table_path=None, attributes={}) is None
-    )
+    assert validate([1, 2, 3], imodel="icoads", ext_table_path=None, attributes={}) is None

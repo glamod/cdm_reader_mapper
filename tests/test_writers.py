@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import os
 
 import pandas as pd
@@ -175,9 +174,7 @@ def test_write_data_parquet(tmp_path, db_data):
 
 def test_write_data_feather(tmp_path, db_data):
     db_data.write(out_dir=tmp_path, data_format="feather")
-    db_res = read(
-        os.path.join(tmp_path, "data.feather"), data_format="feather", mode="data"
-    )
+    db_res = read(os.path.join(tmp_path, "data.feather"), data_format="feather", mode="data")
     pd.testing.assert_frame_equal(db_data.data, db_res.data)
 
 
@@ -195,10 +192,6 @@ def test_write_tables_parquet(tmp_path, db_tables):
 
 
 def test_write_tables_feather(tmp_path, db_tables):
-    db_tables.write(
-        out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="feather"
-    )
-    db_res = read(
-        tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="feather"
-    )
+    db_tables.write(out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="feather")
+    db_res = read(tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="feather")
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)

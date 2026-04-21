@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import pytest
-
 import numpy as np
 import pandas as pd
+import pytest
 
+from cdm_reader_mapper.common.inspect import _count_by_cat, count_by_cat, get_length
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
-from cdm_reader_mapper.common.inspect import _count_by_cat, get_length, count_by_cat
 
 
 @pytest.mark.parametrize(

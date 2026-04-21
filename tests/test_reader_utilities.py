@@ -1,29 +1,27 @@
 from __future__ import annotations
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from pathlib import Path
-
-from cdm_reader_mapper.mdf_reader.utils.utilities import (
-    as_list,
-    as_path,
-    join,
-    update_dtypes,
-    update_column_names,
-    update_column_labels,
-    read_csv,
-    convert_dtypes,
-    validate_arg,
-    _adjust_dtype,
-    convert_str_boolean,
-    _remove_boolean_values,
-    remove_boolean_values,
-)
-
 from cdm_reader_mapper.common.iterators import (
     ParquetStreamReader,
     process_disk_backed,
+)
+from cdm_reader_mapper.mdf_reader.utils.utilities import (
+    _adjust_dtype,
+    _remove_boolean_values,
+    as_list,
+    as_path,
+    convert_dtypes,
+    convert_str_boolean,
+    join,
+    read_csv,
+    remove_boolean_values,
+    update_column_labels,
+    update_column_names,
+    update_dtypes,
+    validate_arg,
 )
 
 

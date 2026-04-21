@@ -1,27 +1,25 @@
 from __future__ import annotations
-
-import pytest
-
 import datetime
 import math
 import re
 
 import numpy as np
 import pandas as pd
+import pytest
 from pandas import Timestamp
 
 from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import (
-    find_entry,
+    convert_to_str,
+    convert_to_utc_i,
     coord_360_to_180i,
     coord_dmh_to_90i,
-    convert_to_utc_i,
-    time_zone_i,
-    longitude_360to180_i,
+    find_entry,
     location_accuracy_i,
-    convert_to_str,
-    string_add_i,
-    to_int,
+    longitude_360to180_i,
     mapping_functions,
+    string_add_i,
+    time_zone_i,
+    to_int,
 )
 
 
@@ -188,17 +186,13 @@ def test_location_accuracy_i_invalid_li(li, lat):
 
 def test_location_accuracy_i_lat_edge_cases_positiv():
     result_90 = location_accuracy_i(1, 90)
-    expected_90 = int(
-        round(1 * math.sqrt(111**2 * (1 + math.cos(math.radians(90)) ** 2)))
-    )
+    expected_90 = int(round(1 * math.sqrt(111**2 * (1 + math.cos(math.radians(90)) ** 2))))
     assert result_90 == expected_90
 
 
 def test_location_accuracy_i_lat_edge_cases_negativ():
     result_neg90 = location_accuracy_i(1, -90)
-    expected_neg90 = int(
-        round(1 * math.sqrt(111**2 * (1 + math.cos(math.radians(-90)) ** 2)))
-    )
+    expected_neg90 = int(round(1 * math.sqrt(111**2 * (1 + math.cos(math.radians(-90)) ** 2))))
     assert result_neg90 == expected_neg90
 
 
@@ -416,9 +410,7 @@ def test_datetime_imma1_701(df, expected):
         ),
         (
             pd.DataFrame([[2025, 11, 2, 10], [2025, 12, 3, 15]]),
-            pd.DatetimeIndex(
-                [pd.Timestamp("2025-11-02 10:00"), pd.Timestamp("2025-12-03 15:00")]
-            ),
+            pd.DatetimeIndex([pd.Timestamp("2025-11-02 10:00"), pd.Timestamp("2025-12-03 15:00")]),
         ),
         (pd.DataFrame([]), pd.DatetimeIndex([])),
     ],
@@ -687,9 +679,7 @@ def test_lineage(imodel, expected_suffix):
     result = obj.lineage(df=None)
 
     timestamp_pattern = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-    assert re.match(
-        timestamp_pattern, result
-    ), f"Timestamp missing or invalid: {result}"
+    assert re.match(timestamp_pattern, result), f"Timestamp missing or invalid: {result}"
 
     assert result.endswith(expected_suffix), f"Lineage suffix mismatch: {result}"
 
@@ -781,9 +771,7 @@ def test_observing_programme(input_series, expected):
 )
 def test_string_add(input_series, prepend, append, separator, expected):
     obj = mapping_functions("dummy_model")
-    result = obj.string_add(
-        input_series, prepend=prepend, append=append, separator=separator
-    )
+    result = obj.string_add(input_series, prepend=prepend, append=append, separator=separator)
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -971,9 +959,7 @@ def test_feet_to_m(input_series, expected):
             pd.Series(["a57ea24d0eb65ca390a63bd175c906db"], dtype="object"),
         ),
         (
-            pd.DataFrame(
-                {"AAAA": [1, 2024], "MM": [1, 12], "YY": [1, 99], "GG": [1, 23]}
-            ),
+            pd.DataFrame({"AAAA": [1, 2024], "MM": [1, 12], "YY": [1, 99], "GG": [1, 23]}),
             "",
             "",
             pd.Series(

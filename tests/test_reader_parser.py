@@ -1,29 +1,25 @@
 from __future__ import annotations
-
-import pytest  # noqa
-
 import logging
-
-import pandas as pd
-import xarray as xr  # noqa
-
-from pandas.testing import assert_frame_equal
-
 from types import MethodType
 
+import pandas as pd
+import pytest  # noqa
+import xarray as xr  # noqa
+from pandas.testing import assert_frame_equal
+
 from cdm_reader_mapper.mdf_reader.utils.parser import (
-    _get_index,
-    _get_ignore,
+    ParserConfig,
     _convert_dtype_to_default,
-    _parse_fixed_width,
+    _get_ignore,
+    _get_index,
     _parse_delimited,
+    _parse_fixed_width,
     _parse_line,
-    parse_pandas,
+    build_parser_config,
     parse_netcdf,  # noqa
+    parse_pandas,
     update_pd_config,
     update_xr_config,
-    ParserConfig,
-    build_parser_config,
 )
 
 

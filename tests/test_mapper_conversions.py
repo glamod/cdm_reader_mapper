@@ -1,11 +1,9 @@
 from __future__ import annotations
-
-import pytest
-
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from cdm_reader_mapper.cdm_mapper.utils.conversions import (
     _convert_array_general_from_str,

@@ -1,14 +1,12 @@
 from __future__ import annotations
-
 import json
+import pathlib
 
 import pandas as pd
 import pytest
-
 from pandas.testing import assert_frame_equal
 
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
-
 from cdm_reader_mapper.mdf_reader.writer import (
     _normalize_data_chunks,
     write_data,
@@ -118,7 +116,7 @@ def test_write_data_csv(tmp_path, example_data, example_mask):
     assert mask_file.is_file()
     assert info_file.is_file()
 
-    with open(info_file) as read_file:
+    with pathlib.Path(info_file).open() as read_file:
         info_res = json.load(read_file)
 
     assert info_res == info
@@ -157,7 +155,7 @@ def test_write_data_col_subset(tmp_path, example_data, example_mask):
     assert mask_file.is_file()
     assert info_file.is_file()
 
-    with open(info_file) as read_file:
+    with pathlib.Path(info_file).open() as read_file:
         info_res = json.load(read_file)
 
     assert info_res == info
@@ -235,7 +233,5 @@ def test_write_data_invalid_data_format(example_data):
 
 
 def test_write_data_invalid_mask_type(example_data):
-    with pytest.raises(
-        ValueError, match="type of 'data' and type of 'mask' do not match."
-    ):
+    with pytest.raises(ValueError, match="type of 'data' and type of 'mask' do not match."):
         write_data(example_data, mask=[True, False, True])

@@ -1,8 +1,8 @@
 from __future__ import annotations
+import json
+from pathlib import Path
 
 import pytest
-from pathlib import Path
-import json
 
 from cdm_reader_mapper.mdf_reader.codes.codes import read_table
 

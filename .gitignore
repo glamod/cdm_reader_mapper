@@ -35,7 +35,6 @@ cdm_reader_mapper/_version.py
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-uv.lock
 
 # Unit test / coverage reports
 htmlcov/
@@ -44,12 +43,11 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
+coverage.lcov
 coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-*.psv
-*.csv
 
 # Translations
 *.mo
@@ -68,7 +66,9 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/generated
+docs/api/generated/
+docs/generated/
+docs/apidoc
 
 # PyBuilder
 target/
@@ -109,3 +109,6 @@ ENV/
 # IDE settings
 .vscode/
 .idea/
+
+# Code coverage
+coverage.lcov

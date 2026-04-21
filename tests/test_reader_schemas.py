@@ -1,11 +1,11 @@
 from __future__ import annotations
-
-import pytest
 import json
 
+import pytest
+
 from cdm_reader_mapper.mdf_reader.schemas.schemas import (
-    _resolve_schema_files,
     _normalize_schema,
+    _resolve_schema_files,
     read_schema,
 )
 

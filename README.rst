@@ -3,24 +3,24 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions|                                              |
+| Versions                   | |pypi|                                                         |
 +----------------------------+----------------------------------------------------------------+
-| Documentation and Support  | |docs|                                                         |
+| Documentation and Support  | |docs| |versions|                                              |
 +----------------------------+----------------------------------------------------------------+
 | Open Source                | |license| |zenodo|                                             |
-+----------------------------+----------------------------------------------------------------+
 |                            | |fair-software| |ossf|                                         |
 +----------------------------+----------------------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |codefactor|                       |
-+----------------------------+----------------------------------------------------------------+
-|                            | |security| |fossa|                                             |
+| Coding Standards           | |ruff| |prek| |pre-commit-ci|                                  |
+|                            | |codefactor| |security| |fossa|                                |
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
 | Funding                    | |c3s|                                                          |
-+----------------------------+----------------------------------------------------------------+
 |                            | |noc| |ukmcas|                                                 |
 +----------------------------+----------------------------------------------------------------+
+
+Introduction
+============
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for:
 
@@ -169,7 +169,7 @@ Credits
 
 Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
-This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-pypackage`_ project template.
+This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pypackage`_ project template.
 
 .. hyperlinks
 
