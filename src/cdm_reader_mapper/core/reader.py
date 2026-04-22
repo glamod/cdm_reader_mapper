@@ -1,7 +1,8 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-from typing import get_args
+from collections.abc import Callable
+from typing import Any, get_args
 
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.mdf_reader.reader import read_data, read_mdf
@@ -12,7 +13,7 @@ from .databundle import DataBundle
 
 supported_read_modes = get_args(SupportedReadModes)
 
-READERS = {
+READERS: dict[str, Callable[..., DataBundle]] = {
     "mdf": read_mdf,
     "data": read_data,
     "tables": read_tables,
@@ -22,7 +23,7 @@ READERS = {
 def read(
     source: str,
     mode: SupportedReadModes = "mdf",
-    **kwargs,
+    **kwargs: Any,
 ) -> DataBundle:
     """
     Read either original marine-meteorological data or MDF data or CDM tables from disk.

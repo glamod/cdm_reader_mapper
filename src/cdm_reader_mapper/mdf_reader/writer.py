@@ -53,7 +53,7 @@ def write_data(
     out_dir: str = ".",
     prefix: str | None = None,
     suffix: str | None = None,
-    extension: str = None,
+    extension: str | None = None,
     filename: str | dict | None = None,
     separator: str | None = "_",
     col_subset: str | list[str] | tuple[str] | None = None,
@@ -152,7 +152,7 @@ def write_data(
     filename_mask = get_filename([prefix, "mask", suffix], path=out_dir, extension=extension, separator=separator)
     filename_info = get_filename([prefix, "info", suffix], path=out_dir, extension="json", separator=separator)
 
-    for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list)):
+    for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list, strict=True)):
         if col_subset is not None:
             data_df = data_df[col_subset]
             mask_df = mask_df[col_subset]
@@ -195,5 +195,5 @@ def write_data(
             getattr(mask_df, writer)(filename_mask, **write_kwargs)
 
     if data_format == "csv":
-        with Path(filename_info).open("w") as fileObj:
-            json.dump(info, fileObj, indent=4)
+        with Path(filename_info).open("w") as f:
+            json.dump(info, f, indent=4)

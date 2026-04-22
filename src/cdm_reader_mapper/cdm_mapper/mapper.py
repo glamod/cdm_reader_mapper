@@ -28,7 +28,7 @@ from . import properties
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps
 from .utils.conversions import convert_from_str_series
-from .utils.mapping_functions import mapping_functions
+from .utils.mapping_functions import MappingFunctions
 
 
 def _is_empty(value):
@@ -94,7 +94,7 @@ def _transform(
     logger.debug("Applying transform: %s", transform)
 
     if kwargs:
-        logger.debug(f"With kwargs: {', '.join(kwargs.keys())}")
+        logger.debug("With kwargs: %s", ", ".join(kwargs.keys()))
     try:
         trans_func = getattr(imodel_functions, transform)
     except AttributeError:
@@ -154,7 +154,7 @@ def _extract_input_data(idata, elements, default, logger):
             bool = True
         return _return_default(bool)
 
-    logger.debug(f"\telements: {' '.join(map(str, elements))}")
+    logger.debug("\telements: %s", " ".join(map(str, elements)))
 
     cols = idata.columns
 
@@ -280,9 +280,7 @@ def _prepare_cdm_tables(cdm_subset):
     if not cdm_atts:
         return {}
 
-    tables = {}
-    for table, atts in cdm_atts.items():
-        tables[table] = atts
+    tables = {table: atts for table, atts in cdm_atts.items()}
 
     return tables
 
@@ -407,7 +405,7 @@ def map_model(
         cdm_subset = properties.cdm_tables
 
     imodel_maps = get_imodel_maps(*data_model, cdm_tables=cdm_subset)
-    imodel_functions = mapping_functions(imodel)
+    imodel_functions = MappingFunctions(imodel)
 
     cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
 

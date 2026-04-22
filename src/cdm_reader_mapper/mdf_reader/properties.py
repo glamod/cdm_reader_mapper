@@ -23,21 +23,21 @@ __all__ = [
 ]
 
 
-_base = "cdm_reader_mapper.mdf_reader"
+_base: str = "cdm_reader_mapper.mdf_reader"
 
-open_file = {
+open_file: dict[str, str] = {
     "craid": "netcdf",
     "cmems": "netcdf",
 }
 
-year_column = {
+year_column: dict[str, str | tuple[str, str]] = {
     "gdac": "AAAA",
     "icoads": ("core", "YR"),
     "craid": ("drifter_measurements", "JULD"),
     "cmems": ("coordinates", "TIME"),
 }
 
-factorize = {
+factorize: dict[str, dict[str, tuple[str, str]]] = {
     "cmems": {
         "source": ("coordinates", "TIME"),
         "target": ("dimensions", "NTIME"),

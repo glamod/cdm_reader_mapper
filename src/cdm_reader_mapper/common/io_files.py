@@ -6,10 +6,10 @@ from pathlib import Path
 
 
 def get_filename(
-    pattern: Sequence[str],
+    pattern: Sequence[str | None],
     path: str = ".",
-    extension: str = "pq",
-    separator: str = "_",
+    extension: str | None = "pq",
+    separator: str | None = "_",
 ) -> str:
     """
     Construct a filename from a sequence of string components.
@@ -18,7 +18,7 @@ def get_filename(
     ----------
     pattern : Sequence[str]
         Iterable of string components to be joined with hyphens
-        (e.g., ["sales", "2024", "Q1"] ? "sales-2024-Q1").
+        (e.g., ["sales", "2024", "Q1"]).
         Empty or falsy items are ignored.
     path : str, optional
         Directory in which the file should be placed.
@@ -35,6 +35,11 @@ def get_filename(
         Full file path including directory, filename, and extension.
         Returns an empty string if pattern is empty or contains no truthy elements.
 
+    Notes
+    -----
+    - Any empty or falsy parts of `pattern` will be removed.
+    - The extension is normalized to always begin with a leading dot.
+
     Examples
     --------
     >>> get_filename(["data", "2025"])
@@ -45,11 +50,6 @@ def get_filename(
 
     >>> get_filename(["part1", "part2"], separator="_")
     './part1_part2.psv'
-
-    Notes
-    -----
-    - Any empty or falsy parts of `pattern` will be removed.
-    - The extension is normalized to always begin with a leading dot.
     """
     if not pattern or not any(pattern):
         return ""
@@ -59,7 +59,15 @@ def get_filename(
     elif not extension.startswith("."):
         extension = f".{extension}"
 
-    name = separator.join(filter(bool, pattern))
+    if not pattern:
+        raise ValueError("pattern is empty.")
+
+    if len(pattern) == 1:
+        name = pattern[0]
+    else:
+        if not separator:
+            raise ValueError("Length of pattern is greater than 1. A separator must be set.")
+        name = separator.join(filter(bool, pattern))
 
     filename = f"{name}{extension}"
 

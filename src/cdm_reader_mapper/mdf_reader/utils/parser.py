@@ -57,7 +57,7 @@ class ParserConfig:
         Explicit column index to apply. If None, inferred from input.
     """
 
-    order_specs: OrderSpec
+    order_specs: dict[str, OrderSpec]
     disable_reads: list[str]
     dtypes: dict
     parse_dates: list[str]
@@ -233,6 +233,15 @@ def parse_pandas(
         DataFrame constructed from parsed records. Columns are derived
         from element indices and may be strings or tuples.
 
+    Notes
+    -----
+    - Ignored elements (``ignore=True``) are skipped.
+    - Disabled sections (``disable_read=True``) are included as raw strings in the output.
+    - Missing elements are filled with ``False``.
+    - Object-type columns are stripped, decoded from UTF-8 if necessary, and empty
+      strings are replaced with ``True``.
+    - No type conversion is performed at this stage.
+
     Examples
     --------
     Example ``order_specs`` structure::
@@ -262,15 +271,6 @@ def parse_pandas(
                 "is_delimited": False,
             }
         }
-
-    Notes
-    -----
-    - Ignored elements (``ignore=True``) are skipped.
-    - Disabled sections (``disable_read=True``) are included as raw strings in the output.
-    - Missing elements are filled with ``False``.
-    - Object-type columns are stripped, decoded from UTF-8 if necessary, and empty
-      strings are replaced with ``True``.
-    - No type conversion is performed at this stage.
     """
     col = df.columns[0]
 
@@ -315,6 +315,16 @@ def parse_netcdf(
         Columns are derived from element indices. Missing fields are filled with
         False, disabled sections with NaN, and empty strings are converted to True.
 
+    Notes
+    -----
+    - Variables, dimensions, and global attributes in `ds` are mapped to columns
+      according to the element `index`.
+    - Ignored elements (`ignore=True`) are skipped.
+    - Disabled sections (`disable_read=True`) are added as columns filled with NaN.
+    - Missing elements are added as columns filled with False.
+    - Object-type columns are decoded from UTF-8, stripped, and empty strings
+      replaced with True.
+
     Examples
     --------
     Example ``order_specs`` structure::
@@ -341,16 +351,6 @@ def parse_netcdf(
                 "is_delimited": False,
             }
         }
-
-    Notes
-    -----
-    - Variables, dimensions, and global attributes in `ds` are mapped to columns
-      according to the element `index`.
-    - Ignored elements (`ignore=True`) are skipped.
-    - Disabled sections (`disable_read=True`) are added as columns filled with NaN.
-    - Missing elements are added as columns filled with False.
-    - Object-type columns are decoded from UTF-8, stripped, and empty strings
-      replaced with True.
     """
     sections = set(sections) if sections is not None else None
     excludes = set(excludes) if excludes else set()
@@ -564,7 +564,7 @@ def update_xr_config(ds: xr.Dataset, config: ParserConfig) -> ParserConfig:
     new_order_specs = deepcopy(config.order_specs)
     new_validation = deepcopy(config.validation)
 
-    for order, ospecs in new_order_specs.items():
+    for ospecs in new_order_specs.values():
         elements = ospecs["elements"]
 
         for element, especs in elements.items():

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from collections.abc import Iterable
 from copy import deepcopy
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -31,7 +31,7 @@ properties = {
 }
 
 
-def _copy(value):
+def _copy(value: Any) -> Any:
     """Make copy of value"""
     if isinstance(value, dict):
         return deepcopy(value)
@@ -51,11 +51,13 @@ def method(attr_func, *args, **kwargs):
 
     try:
         return attr_func[args]
-    except Exception:
-        raise ValueError("Attribute is neither callable nor subscriptable.")
+    except (ValueError, AttributeError) as err:
+        raise ValueError("Attribute is neither callable nor subscriptable.") from err
 
 
-def reader_method(DataBundle, data, attr, *args, process_kwargs={}, **kwargs):
+def reader_method(
+    db: _DataBundle, data: pd.DataFrame | ParquetStreamReader, attr: str, *args: Any, process_kwargs: Dict[str, Any] = {}, **kwargs: Any
+):
     """
     Handles operations on chunked data (ParquetStreamReader).
     Uses process_disk_backed to stream processing without loading into RAM.
@@ -85,7 +87,7 @@ def reader_method(DataBundle, data, attr, *args, process_kwargs={}, **kwargs):
 
     # Handle inplace logic
     if inplace:
-        DataBundle._data = new_reader
+        db._data = new_reader
         return None
 
     return new_reader
@@ -158,14 +160,14 @@ class _DataBundle:
     def __init__(
         self,
         data: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
-        columns: pd.Index | pd.MultiIndex | list | None = None,
-        dtypes: pd.Series | dict | None = None,
-        parse_dates: list | bool | None = None,
+        columns: pd.Index | pd.MultiIndex | list[str] | None = None,
+        dtypes: pd.Series | dict[str, Any] | None = None,
+        parse_dates: list[str] | bool | None = None,
         encoding: str | None = None,
         mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
         imodel: str | None = None,
         mode: Literal["data", "tables"] = "data",
-    ):
+    ) -> None:
         if mode not in ["data", "tables"]:
             raise ValueError(f"'mode' {mode} is not valid, use one of ['data', 'tables'].")
 
@@ -201,7 +203,7 @@ class _DataBundle:
         """Length of :py:attr:`data`."""
         return get_length(self._data)
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
         if attr.startswith("__") and attr.endswith("__"):
             raise AttributeError(f"DataBundle object has no attribute {attr}.")
@@ -255,21 +257,21 @@ class _DataBundle:
         """Return a string representation for :py:attr:`data`."""
         return self._data.__repr__()
 
-    def __setitem__(self, item, value):
+    def __setitem__(self, item, value) -> None:
         """Make class support item assignment for :py:attr:`data`."""
         if isinstance(item, str) and item in properties:
             setattr(self, item, value)
         else:
             self._data[item] = value
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> Any:
         """Make class subscriptable."""
         if isinstance(item, str):
             if hasattr(self, item):
                 return getattr(self, item)
         return self._data.__getitem__(item)
 
-    def _return_property(self, property):
+    def _return_property(self, property: str) -> Any:
         if hasattr(self, property):
             return getattr(self, property)
 
@@ -365,17 +367,17 @@ class _DataBundle:
             setattr(db, key, value)
         return db
 
-    def _get_db(self, inplace):
+    def _get_db(self, inplace: bool) -> _DataBundle:
         if inplace is True:
             return self
         return self.copy()
 
-    def _return_db(self, db, inplace):
+    def _return_db(self, db: _DataBundle, inplace: bool) -> _DataBundle:
         if inplace is True:
             return
         return db
 
-    def _stack(self, other, datasets, inplace, **kwargs):
+    def _stack(self, other: str | list[str], datasets: pd.DataFrame | list[pd.DataFrame], inplace: bool, **kwargs: Any) -> _DataBundle:
         db_cp = self._get_db(inplace)
 
         if not isinstance(other, list):

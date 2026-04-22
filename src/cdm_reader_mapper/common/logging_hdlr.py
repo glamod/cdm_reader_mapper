@@ -14,7 +14,7 @@ import os
 LOG_FN = os.getenv("CDM_LOG_FILE", None)
 
 
-def init_logger(module, level="INFO", fn=LOG_FN):
+def init_logger(module: str, level: str = "INFO", fn: str | None = LOG_FN) -> logging.Logger:
     """
     Initialize and configure a logger for a given module.
 

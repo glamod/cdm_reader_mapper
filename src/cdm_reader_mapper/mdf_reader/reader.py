@@ -1,7 +1,7 @@
 """Common Data Model (CDM) MDF reader."""
 
 from __future__ import annotations
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any, get_args
 
@@ -15,7 +15,7 @@ from .utils.filereader import FileReader
 from .utils.utilities import as_list, as_path, read_csv, read_feather, read_parquet, validate_arg
 
 
-READERS = {
+READERS: dict[str, Callable[..., tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]]] = {
     "csv": read_csv,
     "parquet": read_parquet,
     "feather": read_feather,
@@ -32,7 +32,7 @@ def validate_read_mdf_args(
     year_end: int | None = None,
     chunksize: int | None = None,
     skiprows: int | None = None,
-):
+) -> None:
     """
     Validate arguments for reading an MDF file.
 
@@ -68,8 +68,8 @@ def validate_read_mdf_args(
 
 
 def read_mdf(
-    source,
-    imodel: str | None = None,
+    source: str,
+    imodel: str,
     ext_schema_path: str | None = None,
     ext_schema_file: str | None = None,
     ext_table_path: str | None = None,
@@ -77,17 +77,17 @@ def read_mdf(
     year_end: int | None = None,
     encoding: str | None = None,
     chunksize: int | None = None,
-    skiprows: int = None,
+    skiprows: int | None = None,
     convert_flag: bool = True,
-    converter_dict: dict | None = None,
-    converter_kwargs: dict | None = None,
+    converter_dict: dict[str, Any] | None = None,
+    converter_kwargs: dict[str, Any] | None = None,
     decode_flag: bool = True,
-    decoder_dict: dict | None = None,
+    decoder_dict: dict[str, Any] | None = None,
     validate_flag: bool = True,
-    sections: str | list | None = None,
-    excludes: str | list | None = None,
-    pd_kwargs: dict | None = None,
-    xr_kwargs: dict | None = None,
+    sections: str | list[str] | None = None,
+    excludes: str | list[str] | None = None,
+    pd_kwargs: dict[str, Any] | None = None,
+    xr_kwargs: dict[str, Any] | None = None,
 ) -> DataBundle:
     """
     Read data files compliant with a user specific data model.
@@ -103,7 +103,7 @@ def read_mdf(
     ----------
     source: str
         The file (including path) to be read.
-    imodel: str, optional
+    imodel: str
         Name of internally available input data model.
         e.g. icoads_r300_d704
     ext_schema_path: str, optional
@@ -229,10 +229,10 @@ def _read_data(
     data_file: str,
     mask_file: str | None,
     reader: Callable[..., Any],
-    col_subset: str | list | tuple | None,
-    data_kwargs: dict,
-    mask_kwargs: dict,
-):
+    col_subset: str | list[str] | tuple[str] | None,
+    data_kwargs: dict[str, Any],
+    mask_kwargs: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """Helper function for reading data files from disk."""
     data, info = reader(
         data_file,
@@ -259,10 +259,10 @@ def read_data(
     info_file: str | None = None,
     data_format: SupportedFileTypes = "parquet",
     imodel: str | None = None,
-    col_subset: str | list | tuple | None = None,
+    col_subset: str | list[str] | tuple[str] | None = None,
     encoding: str | None = None,
     delimiter: str | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> DataBundle:
     """
     Read MDF data which is already on a pre-defined data model.

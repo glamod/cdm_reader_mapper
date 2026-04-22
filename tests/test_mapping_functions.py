@@ -9,6 +9,7 @@ import pytest
 from pandas import Timestamp
 
 from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import (
+    MappingFunctions,
     convert_to_str,
     convert_to_utc_i,
     coord_360_to_180i,
@@ -16,7 +17,6 @@ from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import (
     find_entry,
     location_accuracy_i,
     longitude_360to180_i,
-    mapping_functions,
     string_add_i,
     time_zone_i,
     to_int,
@@ -290,7 +290,7 @@ def test_to_int(input_val, expected):
     ],
 )
 def test_datetime_decimalhour_to_hm(row, expected_hr, expected_m):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_decimalhour_to_hm(row)
     assert result["HR"] == expected_hr
     assert result["M"] == expected_m
@@ -312,7 +312,7 @@ def test_datetime_decimalhour_to_hm(row, expected_hr, expected_m):
     ],
 )
 def test_datetime_imma1(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_imma1(df)
     pd.testing.assert_index_equal(result, expected)
 
@@ -355,7 +355,7 @@ def test_datetime_imma1(df, expected):
     ],
 )
 def test_datetime_imma1_to_utc(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_imma1_to_utc(df)
 
     expected_naive = expected.tz_localize(None) if expected.tz else expected
@@ -392,7 +392,7 @@ def test_datetime_imma1_to_utc(df, expected):
     ],
 )
 def test_datetime_imma1_701(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_imma1_701(df)
     pd.testing.assert_index_equal(result, expected)
 
@@ -416,13 +416,13 @@ def test_datetime_imma1_701(df, expected):
     ],
 )
 def test_datetime_immt(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_immt(df)
     pd.testing.assert_index_equal(result, expected)
 
 
 def test_datetime_utcnow():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_utcnow(pd.DataFrame())
 
     assert isinstance(result, datetime.datetime)
@@ -452,7 +452,7 @@ def test_datetime_utcnow():
     ],
 )
 def test_datetime_craid(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_craid(df)
     pd.testing.assert_series_equal(result, expected)
 
@@ -478,7 +478,7 @@ def test_datetime_craid(df, expected):
     ],
 )
 def test_datetime_marob(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_marob(df)
     pd.testing.assert_series_equal(result, expected)
 
@@ -499,10 +499,8 @@ def test_datetime_marob(df, expected):
     ],
 )
 def test_datetime_cmems(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.datetime_cmems(df)
-    print(result)
-    print(expected)
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -520,7 +518,7 @@ def test_datetime_cmems(df, expected):
     ],
 )
 def test_df_col_join_series(df, sep, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.df_col_join(df, sep)
     pd.testing.assert_series_equal(result, expected)
 
@@ -536,7 +534,7 @@ def test_df_col_join_series(df, sep, expected):
     ],
 )
 def test_float_opposite(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.float_opposite(df)
     if isinstance(result, pd.Series):
         pd.testing.assert_series_equal(result, expected)
@@ -560,7 +558,7 @@ def test_float_opposite(df, expected):
     ],
 )
 def test_select_column(df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.select_column(df)
     pd.testing.assert_series_equal(result, expected)
 
@@ -584,7 +582,7 @@ def test_select_column(df, expected):
     ],
 )
 def test_float_scale(input_s, factor, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.float_scale(input_s, factor=factor)
     pd.testing.assert_series_equal(result, expected)
 
@@ -601,20 +599,20 @@ def test_float_scale(input_s, factor, expected):
     ],
 )
 def test_integer_to_float(input_obj, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.integer_to_float(input_obj)
 
     pd.testing.assert_series_equal(result, expected)
 
 
 def test_integer_to_float_raises_value():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     with pytest.raises(ValueError):
         obj.integer_to_float(pd.Series(["x", "y", "z"], name="S"))
 
 
 def test_integer_to_float_raises_type():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     with pytest.raises(TypeError):
         obj.integer_to_float([1, 2, 3])
 
@@ -630,7 +628,7 @@ def test_integer_to_float_raises_type():
     ],
 )
 def test_icoads_wd_conversion(input_s, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.icoads_wd_conversion(input_s)
     pd.testing.assert_series_equal(result, expected)
 
@@ -649,13 +647,13 @@ def test_icoads_wd_conversion(input_s, expected):
     ],
 )
 def test_icoads_wd_integer_to_float(input_s, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.icoads_wd_integer_to_float(input_s)
     pd.testing.assert_series_equal(result, expected)
 
 
 def test_icoads_wd_integer_to_float_raises():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     with pytest.raises(ValueError):
         obj.icoads_wd_integer_to_float(pd.Series(["x", "y", "z"], name="F"))
 
@@ -674,7 +672,7 @@ def test_icoads_wd_integer_to_float_raises():
     ],
 )
 def test_lineage(imodel, expected_suffix):
-    obj = mapping_functions(imodel)
+    obj = MappingFunctions(imodel)
 
     result = obj.lineage(df=None)
 
@@ -702,7 +700,7 @@ def test_lineage(imodel, expected_suffix):
     ],
 )
 def test_longitude_360to180(input_s, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.longitude_360to180(input_s)
     pd.testing.assert_series_equal(result, expected)
 
@@ -727,7 +725,7 @@ def test_longitude_360to180(input_s, expected):
     ],
 )
 def test_location_accuracy(input_df, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.location_accuracy(input_df)
     result = result.astype("float64")
     pd.testing.assert_series_equal(result, expected)
@@ -750,7 +748,7 @@ def test_location_accuracy(input_df, expected):
     ],
 )
 def test_observing_programme(input_series, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.observing_programme(input_series)
     pd.testing.assert_series_equal(result, expected)
 
@@ -770,7 +768,7 @@ def test_observing_programme(input_series, expected):
     ],
 )
 def test_string_add(input_series, prepend, append, separator, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.string_add(input_series, prepend=prepend, append=append, separator=separator)
     pd.testing.assert_series_equal(result, expected)
 
@@ -826,7 +824,7 @@ def test_string_add(input_series, prepend, append, separator, expected):
     ],
 )
 def test_string_join_add(df, prepend, append, separator, zfill_col, zfill, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.string_join_add(
         df,
         prepend=prepend,
@@ -865,7 +863,7 @@ def test_string_join_add(df, prepend, append, separator, zfill_col, zfill, expec
     ],
 )
 def test_temperature_celsius_to_kelvin(input_df, imodel, expected):
-    obj = mapping_functions(imodel)
+    obj = MappingFunctions(imodel)
     result = obj.temperature_celsius_to_kelvin(input_df)
     pd.testing.assert_series_equal(result, expected)
 
@@ -879,7 +877,7 @@ def test_temperature_celsius_to_kelvin(input_df, imodel, expected):
     ],
 )
 def test_velocity_kmh_in_ms(input_values, expected_values):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     series = pd.Series(input_values)
     expected = pd.Series(expected_values)
     result = obj.velocity_kmh_in_ms(series)
@@ -894,7 +892,7 @@ def test_velocity_kmh_in_ms(input_values, expected_values):
     ],
 )
 def test_velocity_kn_in_ms(input_values, expected_values):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     series = pd.Series(input_values)
     expected = pd.Series(expected_values)
     result = obj.velocity_kn_in_ms(series)
@@ -909,7 +907,7 @@ def test_velocity_kn_in_ms(input_values, expected_values):
     ],
 )
 def test_pressure_hpa_in_pa(input_values, expected_values):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     series = pd.Series(input_values)
     expected = pd.Series(expected_values)
     result = obj.pressue_hpa_in_pa(series)
@@ -926,7 +924,7 @@ def test_pressure_hpa_in_pa(input_values, expected_values):
     ],
 )
 def test_time_accuracy(input_series, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.time_accuracy(input_series)
     pd.testing.assert_series_equal(result, expected)
 
@@ -941,7 +939,7 @@ def test_time_accuracy(input_series, expected):
     ],
 )
 def test_feet_to_m(input_series, expected):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
     result = obj.feet_to_m(input_series)
 
     expected = expected.astype(float)
@@ -985,7 +983,7 @@ def test_feet_to_m(input_series, expected):
     ],
 )
 def test_gdac_uid(input_df, prepend, append, expected_uuids):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
 
     result = obj.gdac_uid(input_df, prepend=prepend, append=append)
 
@@ -1012,7 +1010,7 @@ def test_gdac_uid(input_df, prepend, append, expected_uuids):
     ],
 )
 def test_gdac_latitude(input_df, expected_latitudes):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
 
     result = obj.gdac_latitude(input_df)
 
@@ -1024,7 +1022,7 @@ def test_gdac_latitude(input_df, expected_latitudes):
 
 
 def test_gdac_latitude_missing_columns():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
 
     df_missing_qc = pd.DataFrame({"LaLaLa": [10.0, 20.0]})
     with pytest.raises(KeyError):
@@ -1054,7 +1052,7 @@ def test_gdac_latitude_missing_columns():
     ],
 )
 def test_gdac_longitude(input_df, expected_longitudes):
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
 
     result = obj.gdac_longitude(input_df)
 
@@ -1066,7 +1064,7 @@ def test_gdac_longitude(input_df, expected_longitudes):
 
 
 def test_gdac_longitude_missing_columns():
-    obj = mapping_functions("dummy_model")
+    obj = MappingFunctions("dummy_model")
 
     df_missing_qc = pd.DataFrame({"LoLoLoLo": [10.0, 20.0]})
     with pytest.raises(KeyError):

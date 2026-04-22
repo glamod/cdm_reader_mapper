@@ -113,7 +113,7 @@ def validate_codes(series: pd.Series, code_table: Iterable[Any], column_type: st
         Boolean Series indicating valid entries
     """
     if not code_table:
-        logging.error(f"Code table not found for element {series.name}")
+        logging.error("Code table not found for element %s", series.name)
         return pd.Series(False, index=series.index)
 
     keys = set(code_table)
@@ -126,7 +126,7 @@ def validate_codes(series: pd.Series, code_table: Iterable[Any], column_type: st
 def validate(
     data: pd.DataFrame,
     imodel: str,
-    ext_table_path: str,
+    ext_table_path: str | None,
     attributes: dict[str, dict[str, Any]],
     disables: list[str] | None = None,
 ) -> pd.DataFrame:
@@ -145,7 +145,7 @@ def validate(
         Input data to validate.
     imodel : str
         Name of the internal data model, e.g., 'icoads_r300_d704'.
-    ext_table_path : str
+    ext_table_path : str, optional
         Path to external code tables for validation.
     attributes : dict[str, dict]
         Dictionary of column attributes (e.g., type, valid ranges, codetable).

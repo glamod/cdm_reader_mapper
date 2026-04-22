@@ -303,7 +303,7 @@ def series_strptime(series: pd.Series, format: str) -> pd.Series:
     return pd.to_datetime(series, format=format, errors="coerce")
 
 
-class mapping_functions:
+class MappingFunctions:
     """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
 
     def __init__(self, imodel):
@@ -811,8 +811,8 @@ class mapping_functions:
         prepend=None,
         append=None,
         separator: str = "",
-        zfill_col: list = None,
-        zfill: list = None,
+        zfill_col: list | None = None,
+        zfill: list | None = None,
     ) -> pd.Series:
         """
         Join DataFrame columns into a single string and optionally prepend/append strings.
@@ -839,7 +839,7 @@ class mapping_functions:
         """
         df = df.copy()
         if zfill_col and zfill:
-            for col, width in zip(zfill_col, zfill):
+            for col, width in zip(zfill_col, zfill, strict=True):
                 column_name = df.columns[col]
                 df[column_name] = df[column_name].astype("object")
                 df[column_name] = df[column_name].astype(str).str.zfill(width)

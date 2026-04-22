@@ -43,9 +43,11 @@ When specifying a subset of tables, valid names are those in properties.cdm_tabl
 """
 
 from __future__ import annotations
-import glob
+import logging
 import pathlib
-from typing import get_args
+from collections.abc import Callable
+from pathlib import Path
+from typing import Any, get_args
 
 import pandas as pd
 
@@ -58,7 +60,7 @@ from .utils.conversions import convert_from_str_df, convert_to_str_df
 from .utils.utilities import get_cdm_subset, get_usecols
 
 
-READERS = {
+READERS: dict[str, Callable[..., pd.DataFrame | pd.Series]] = {
     "csv": pd.read_csv,
     "parquet": pd.read_parquet,
     "feather": pd.read_feather,
@@ -74,9 +76,9 @@ READER_KWARGS = {
 def _read_file(
     ifile: str,
     table: str,
-    col_subset: str | list | None,
+    col_subset: str | list[str] | dict[str, Any] | None,
     data_format: SupportedFileTypes,
-    **kwargs,
+    **kwargs: Any,
 ) -> pd.DataFrame:
     usecols = get_usecols(table, col_subset)
     reader = READERS[data_format]
@@ -87,13 +89,16 @@ def _read_file(
 def _read_single_file(
     ifile: str,
     data_format: SupportedFileTypes,
-    cdm_subset: str | list | None = None,
-    col_subset: str | list | None = None,
+    cdm_subset: str | list[str],
+    col_subset: str | list[str] | dict[str, Any] | None,
     null_label: str = "null",
-    **kwargs,
+    **kwargs: Any,
 ) -> pd.DataFrame:
-    if not isinstance(cdm_subset, list):
+    if isinstance(cdm_subset, str):
         cdm_subset = [cdm_subset]
+    else:
+        cdm_subset = list(cdm_subset)
+
     df = _read_file(
         ifile,
         table=cdm_subset[0],
@@ -120,12 +125,17 @@ def _read_multiple_files(
     suffix: str | None = None,
     extension: str | None = None,
     separator: str | None = "-",
-    cdm_subset: str | list | None = None,
-    col_subset: str | list | None = None,
+    cdm_subset: str | list[str] | None = None,
+    col_subset: str | list[str] | dict[str, Any] | None = None,
     null_label: str = "null",
-    logger=None,
-    **kwargs,
+    logger: logging.Logger | None = None,
+    **kwargs: Any,
 ) -> list[pd.DataFrame]:
+    if cdm_subset is None:
+        raise ValueError("cdm_subset must be a string or a list of strings, not None.")
+    if logger is None:
+        raise ValueError("logger must be a logging.logger, not None.")
+
     if suffix is None:
         suffix_pattern = "*"
     elif suffix == "*":
@@ -135,7 +145,7 @@ def _read_multiple_files(
 
     # See if there's anything at all:
     pattern = get_filename([prefix, suffix_pattern], path=inp_dir, extension=extension, separator=separator)
-    files = glob.glob(pattern)
+    files = [p.as_posix() for p in Path(inp_dir).glob(pattern)]
 
     if len(files) == 0:
         raise FileNotFoundError(f"No files found matching pattern {pattern}")
@@ -156,7 +166,7 @@ def _read_multiple_files(
         if suffix:
             _pattern = _pattern + [suffix_pattern]
         pattern_ = get_filename(_pattern, path=inp_dir, extension=extension, separator=separator)
-        paths_ = glob.glob(pattern_)
+        paths_ = [p.as_posix() for p in Path(inp_dir).glob(pattern_)]
         if len(paths_) != 1:
             logger.warning("Pattern %s resulted in multiple files for table %s: %s Cannot securely retrieve cdm table(s)", pattern_, table, paths_)
             continue
@@ -187,15 +197,15 @@ def read_tables(
     suffix: str | None = None,
     extension: str | None = None,
     separator: str | None = "-",
-    cdm_subset: str | list | None = None,
-    col_subset: str | list | dict | None = None,
+    cdm_subset: str | list[str] | None = None,
+    col_subset: str | list[str] | dict[str, Any] | None = None,
     delimiter: str = "|",
     na_values: str | None = None,
     null_label: str = "null",
     imodel: str | None = None,
     from_str: bool | None = None,
     to_str: bool | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> DataBundle:
     """
     Read CDM-table-like files from file system to a pandas.DataFrame.

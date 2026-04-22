@@ -51,11 +51,13 @@ def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
 def _select_years(
     df: pd.DataFrame,
     selection: tuple[int | None, int | None],
-    year_col,
+    year_col: str | tuple[str, str] | None,
 ) -> pd.DataFrame:
     """Filter rows of a DataFrame by a year range."""
     year_init, year_end = selection
     if year_init is None and year_end is None:
+        return df
+    if year_col is None:
         return df
 
     years = pd.to_numeric(df[year_col], errors="coerce")
@@ -83,7 +85,7 @@ class FileReader:
 
     def __init__(
         self,
-        imodel: str | None = None,
+        imodel: str,
         ext_schema_path: str | None = None,
         ext_schema_file: str | None = None,
     ):
@@ -109,9 +111,9 @@ class FileReader:
         data: pd.DataFrame | Iterable[pd.DataFrame],
         convert_flag: bool = False,
         decode_flag: bool = False,
-        converter_dict: dict | None = None,
-        converter_kwargs: dict | None = None,
-        decoder_dict: dict | None = None,
+        converter_dict: dict[str, Any] | None = None,
+        converter_kwargs: dict[str, Any] | None = None,
+        decoder_dict: dict[str, Any] | None = None,
         validate_flag: bool = False,
         ext_table_path: str | None = None,
         sections: Sequence[str] | None = None,
@@ -225,12 +227,12 @@ class FileReader:
         self,
         source: str,
         open_with: str = "pandas",
-        pd_kwargs: dict | None = None,
-        xr_kwargs: dict | None = None,
-        convert_kwargs: dict | None = None,
-        decode_kwargs: dict | None = None,
-        validate_kwargs: dict | None = None,
-        select_kwargs: dict | None = None,
+        pd_kwargs: dict[str, Any] | None = None,
+        xr_kwargs: dict[str, Any] | None = None,
+        convert_kwargs: dict[str, Any] | None = None,
+        decode_kwargs: dict[str, Any] | None = None,
+        validate_kwargs: dict[str, Any] | None = None,
+        select_kwargs: dict[str, Any] | None = None,
     ) -> tuple[pd.DataFrame, pd.DataFrame, ParserConfig] | tuple[Iterable[pd.DataFrame], Iterable[pd.DataFrame], ParserConfig]:
         """
         Open and parse source data according to parser configuration.
@@ -261,7 +263,7 @@ class FileReader:
         """
 
         @process_function()
-        def _open_data():
+        def _open_data() -> ProcessFunction:
             return ProcessFunction(
                 data=to_parse,
                 func=self._process_data,
@@ -308,12 +310,12 @@ class FileReader:
     def read(
         self,
         source: str,
-        pd_kwargs: dict | None = None,
-        xr_kwargs: dict | None = None,
-        convert_kwargs: dict | None = None,
-        decode_kwargs: dict | None = None,
-        validate_kwargs: dict | None = None,
-        select_kwargs: dict | None = None,
+        pd_kwargs: dict[str, Any] | None = None,
+        xr_kwargs: dict[str, Any] | None = None,
+        convert_kwargs: dict[str, Any] | None = None,
+        decode_kwargs: dict[str, Any] | None = None,
+        validate_kwargs: dict[str, Any] | None = None,
+        select_kwargs: dict[str, Any] | None = None,
     ) -> DataBundle:
         """
         Read and process data from the given source.

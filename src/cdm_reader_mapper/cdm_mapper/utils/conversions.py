@@ -709,7 +709,7 @@ def _convert_columns(
 
 def convert_from_str_df(
     data: pd.DataFrame,
-    imodel: str,
+    imodel: str | None,
     cdm_subset: str | list | None = None,
     null_label: str | None = "null",
 ) -> pd.DataFrame:
@@ -733,6 +733,8 @@ def convert_from_str_df(
         DataFrame with values converted from string representations to
         appropriate pandas dtypes.
     """
+    if imodel is None:
+        raise ValueError("imodel must be a string, not None.")
     return _convert_columns(
         data,
         imodel,
@@ -776,7 +778,7 @@ def convert_from_str_series(
 
 def convert_to_str_df(
     data: pd.DataFrame,
-    imodel: str,
+    imodel: str | None,
     cdm_subset: str | list | None = None,
     null_label: str | None = "null",
 ):
@@ -799,6 +801,8 @@ def convert_to_str_df(
     pd.DataFrame
         DataFrame with values converted to string representations.
     """
+    if imodel is None:
+        raise ValueError("imodel must be a string, not None.")
     return _convert_columns(
         data,
         imodel,
