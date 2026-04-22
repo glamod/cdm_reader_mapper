@@ -30,7 +30,7 @@ def dict_to_tuple_list(dic: dict[Any, Any]) -> list[tuple[Any, Any]]:
     >>> dict_to_tuple_list({"A": [1, 2], "B": 3})
     [('A', 1), ('A', 2), ('B', 3)]
     """
-    tuple_list = []
+    tuple_list: list[tuple[Any]] = []
     for key, value in dic.items():
         if isinstance(value, list):
             tuple_list.extend((key, item) for item in value)
@@ -73,10 +73,12 @@ def get_cdm_subset(cdm_subset: Iterable[str] | None) -> list[str]:
         If any provided table name is not in ``properties.cdm_tables``.
     """
     if cdm_subset is None:
-        return properties.cdm_tables
+        return list(properties.cdm_tables)
 
-    if not isinstance(cdm_subset, list):
+    if isinstance(cdm_subset, str):
         cdm_subset = [cdm_subset]
+    else:
+        cdm_subset = list(cdm_subset)
 
     for item in cdm_subset:
         if item not in properties.cdm_tables:

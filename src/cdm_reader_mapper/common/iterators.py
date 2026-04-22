@@ -3,10 +3,11 @@
 from __future__ import annotations
 import inspect
 import itertools
-import tempfile
 from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import wraps
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from types import TracebackType
 from typing import (
     Any,
     Literal,
@@ -27,11 +28,11 @@ class ProcessFunction:
         func: Callable[..., Any],
         func_args: Any | list[Any] | tuple[Any] | None = None,
         func_kwargs: dict[str, Any] | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         self.data = data
 
-        if not isinstance(func, Callable):
+        if not callable(func):
             raise ValueError(f"Function {func} is not callable.")
 
         self.func = func
@@ -57,7 +58,12 @@ class ParquetStreamReader:
 
     def __init__(
         self,
-        source: (Iterator[pd.DataFrame | pd.Series] | Callable[[], Iterator[pd.DataFrame | pd.Series]]),
+        source: (
+            list[pd.DataFrame | pd.Series]
+            | tuple[pd.DataFrame | pd.Series]
+            | Iterator[pd.DataFrame | pd.Series]
+            | Callable[[], Iterator[pd.DataFrame | pd.Series]]
+        ),
     ):
         self._closed = False
         self._buffer: list[pd.DataFrame | pd.Series] = []
@@ -88,13 +94,13 @@ class ParquetStreamReader:
             self.columns = []
             self.dtypes = {}
 
-        self.attrs = {}
+        self.attrs: dict[str, Any] = {}
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[pd.DataFrame | pd.Series]:
         """Allows: for df in reader: ..."""
         return self
 
-    def __next__(self):
+    def __next__(self) -> pd.DataFrame | pd.Series:
         """Allows: next(reader)"""
         if self._closed:
             raise ValueError("I/O operation on closed stream.")
@@ -102,11 +108,11 @@ class ParquetStreamReader:
             return self._buffer.pop(0)
         return next(self._generator)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         """Make class subscriptable."""
         return self.attrs[item]
 
-    def prepend(self, chunk: pd.DataFrame | pd.Series):
+    def prepend(self, chunk: pd.DataFrame | pd.Series) -> None:
         """
         Push a chunk back onto the front of the stream.
         Useful for peeking at the first chunk without losing it.
@@ -114,7 +120,7 @@ class ParquetStreamReader:
         # Insert at 0 ensures FIFO order (peeking logic)
         self._buffer.insert(0, chunk)
 
-    def get_chunk(self):
+    def get_chunk(self) -> pd.DataFrame | pd.Series:
         """
         Safe for Large Files.
         Returns the next single chunk from disk.
@@ -122,9 +128,7 @@ class ParquetStreamReader:
         """
         return next(self)
 
-    def read(
-        self,
-    ):
+    def read(self) -> pd.DataFrame:
         """
         WARNING: unsafe for Files > RAM.
         Reads ALL remaining data into memory at once.
@@ -137,7 +141,7 @@ class ParquetStreamReader:
 
         return pd.concat(chunks)
 
-    def copy(self):
+    def copy(self) -> ParquetStreamReader:
         """Create an independent copy of the stream."""
         if self._closed:
             raise ValueError("Cannot copy a closed stream.")
@@ -157,7 +161,7 @@ class ParquetStreamReader:
         return copy_stream
 
     @property
-    def empty(self):
+    def empty(self) -> bool:
         """Return True if stream is empty."""
         copy_stream = self.copy()
 
@@ -167,13 +171,13 @@ class ParquetStreamReader:
         except StopIteration:
             return True
 
-    def reset_index(self, drop=False):
+    def reset_index(self, drop: bool = False) -> ParquetStreamReader:
         """Reset indexes continuously."""
         if self._closed:
             raise ValueError("Cannot copy a closed stream.")
 
         offset = 0
-        chunks = []
+        chunks: list[pd.DataFrame] = []
 
         for df in self:
             df = df.copy()
@@ -190,20 +194,22 @@ class ParquetStreamReader:
 
         return ParquetStreamReader(lambda: iter(chunks))
 
-    def close(self):
+    def close(self) -> None:
         """Close the stream and release resources."""
         self._closed = True
 
-    def __enter__(self):
+    def __enter__(self) -> ParquetStreamReader:
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         return self
 
-    def __exit__(self, *_):
+    def __exit__(self, exc_type: type | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         self.close()
 
 
-def _sort_chunk_outputs(outputs: tuple, capture_meta: bool, requested_types: tuple[type, ...]) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
+def _sort_chunk_outputs(
+    outputs: tuple[Any, ...], capture_meta: bool, requested_types: tuple[type, ...]
+) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
     """Separates DataFrames from metadata in the function output."""
     data, meta = [], []
     for out in outputs:
@@ -220,10 +226,10 @@ def _sort_chunk_outputs(outputs: tuple, capture_meta: bool, requested_types: tup
 
 def _initialize_storage(
     first_batch: list[pd.DataFrame | pd.Series],
-) -> tuple[list, list]:
+) -> tuple[list[TemporaryDirectory], list[tuple[type, Any]]]:
     """Creates temp directories and captures schemas from the first chunk."""
-    temp_dirs = []
-    schemas = []
+    temp_dirs: list[TemporaryDirectory] = []
+    schemas: list[tuple[type, Any]] = []
 
     for obj in first_batch:
         if isinstance(obj, pd.DataFrame):
@@ -233,14 +239,14 @@ def _initialize_storage(
         else:
             raise TypeError(f"Unsupported data type: {type(obj)}.Use one of [pd.DataFrame, pd.Series].")
 
-        temp_dirs.append(tempfile.TemporaryDirectory())
+        temp_dirs.append(TemporaryDirectory())
 
     return temp_dirs, schemas
 
 
 def _write_chunks_to_disk(
     batch: list[pd.DataFrame | pd.Series],
-    temp_dirs: list[tempfile.TemporaryDirectory],
+    temp_dirs: list[TemporaryDirectory],
     chunk_counter: int,
 ) -> None:
     """Writes the current batch of DataFrames to their respective temp directories."""
@@ -254,7 +260,7 @@ def _write_chunks_to_disk(
         pq.write_table(table, file_path, compression="snappy")
 
 
-def _parquet_generator(temp_dir, data_type, schema) -> Generator[pd.DataFrame | pd.Series]:
+def _parquet_generator(temp_dir: TemporaryDirectory, data_type: type, schema: str | None) -> Generator[pd.DataFrame | pd.Series]:
     """Yields DataFrames from a temp directory, restoring schema."""
     try:
         files = sorted(Path(temp_dir.name).glob("*.parquet"))
@@ -276,19 +282,23 @@ def _parquet_generator(temp_dir, data_type, schema) -> Generator[pd.DataFrame | 
 def _process_chunks(
     readers: list[ParquetStreamReader],
     func: Callable[..., Any],
-    requested_types: tuple[str],
+    requested_types: tuple[type, ...],
     static_args: list[Any],
     static_kwargs: dict[str, Any],
     non_data_output: str,
     non_data_proc: Callable[..., Any] | None,
     non_data_proc_args: tuple[Any] | None,
     non_data_proc_kwargs: dict[str, Any] | None,
+) -> (
+    tuple[ParquetStreamReader, ...]  # when data is produced
+    | tuple[Any, ...]  # non-data outputs that are a tuple
+    | Any  # single value or list (no data produced)
 ):
     """Process chunks."""
     # State variables
-    temp_dirs = None
-    schemas = None
-    output_non_data: dict[int, list[Any]] = {}
+    temp_dirs: list[TemporaryDirectory] | None = None
+    schemas: list[tuple[type, Any]] | None = None
+    output_non_data_dict: dict[int, list[Any]] = {}
     chunk_counter: int = 0
 
     for items in zip(*readers):
@@ -306,7 +316,7 @@ def _process_chunks(
         data, meta = _sort_chunk_outputs(result, capture_meta, requested_types)
 
         for i, meta in enumerate(meta):
-            output_non_data.setdefault(i, []).append(meta)
+            output_non_data_dict.setdefault(i, []).append(meta)
 
         # Write DataFrames
         if data:
@@ -320,12 +330,18 @@ def _process_chunks(
     if chunk_counter == 0:
         raise ValueError("Iterable is empty.")
 
-    keys = list(output_non_data.keys())
-    if len(keys) == 1:
-        output_non_data = output_non_data[keys[0]]
+    if len(output_non_data_dict) == 1:
+        first_key = list(output_non_data_dict.keys())[0]
+        output_non_data: Any = output_non_data_dict[first_key]
+    else:
+        output_non_data = output_non_data_dict
 
-    if isinstance(non_data_proc, Callable):
-        output_non_data = non_data_proc(output_non_data, *non_data_proc_args, **non_data_proc_kwargs)
+    if callable(non_data_proc):
+        output_non_data = non_data_proc(
+            output_non_data,
+            *(non_data_proc_args or ()),
+            **(non_data_proc_kwargs or {}),
+        )
 
     if isinstance(output_non_data, list) and len(output_non_data) == 1:
         output_non_data = output_non_data[0]
@@ -334,7 +350,11 @@ def _process_chunks(
     if temp_dirs is None:
         return output_non_data
 
-    final_iterators = [ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas)]
+    assert temp_dirs is not None and schemas is not None
+
+    final_iterators: list[ParquetStreamReader] = [
+        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas)
+    ]
 
     if isinstance(output_non_data, tuple):
         output_non_data = list(output_non_data)
@@ -352,9 +372,11 @@ def _prepare_readers(
 ) -> tuple[list[ParquetStreamReader], list[Any], dict[str, Any]]:
     """Prepare readers for chunking."""
     reader = ensure_parquet_reader(reader)
+    if not isinstance(reader, ParquetStreamReader):
+        raise TypeError(f"reader is not a ParquetStreamReader: {type(reader)}")
 
-    args_reader = []
-    args = []
+    args_reader: list[ParquetStreamReader] = []
+    args: list[Any] = []
     for arg in func_args:
         converted = ensure_parquet_reader(arg)
         if isinstance(converted, ParquetStreamReader):
@@ -397,7 +419,7 @@ def parquet_stream_from_iterable(
     if not isinstance(first, (pd.DataFrame, pd.Series)):
         raise TypeError("Iterable must contain pd.DataFrame or pd.Series objects.")
 
-    temp_dir = tempfile.TemporaryDirectory()
+    temp_dir = TemporaryDirectory()
     temp_dirs = [temp_dir]
 
     if isinstance(first, pd.DataFrame):
@@ -436,12 +458,12 @@ def ensure_parquet_reader(obj: Any) -> Any:
 def process_disk_backed(
     reader: Iterator[pd.DataFrame | pd.Series],
     func: Callable[..., Any],
-    func_args: Sequence[Any] | None = None,
+    func_args: tuple[Any, ...] | None = None,
     func_kwargs: dict[str, Any] | None = None,
     requested_types: type | tuple[type, ...] = (pd.DataFrame, pd.Series),
     non_data_output: Literal["first", "acc"] = "first",
     non_data_proc: Callable[..., Any] | None = None,
-    non_data_proc_args: tuple[Any] | None = None,
+    non_data_proc_args: tuple[Any, ...] | None = None,
     non_data_proc_kwargs: dict[str, Any] | None = None,
     makecopy: bool = True,
 ) -> tuple[Any, ...]:
@@ -460,7 +482,7 @@ def process_disk_backed(
     readers, static_args, static_kwargs = _prepare_readers(reader, func_args, func_kwargs, makecopy)
 
     if non_data_proc is not None:
-        if not isinstance(non_data_proc, Callable):
+        if not callable(non_data_proc):
             raise ValueError(f"Function {non_data_proc} is not callable.")
 
         if non_data_proc_args is None:
@@ -481,7 +503,7 @@ def process_disk_backed(
     )
 
 
-def _process_function(results, data_only=False):
+def _process_function(results: Any, data_only: bool = False) -> Any:
     if not isinstance(results, ProcessFunction):
         return results
 
@@ -502,10 +524,12 @@ def _process_function(results, data_only=False):
     if not isinstance(data, ParquetStreamReader):
         raise TypeError(f"Unsupported data type: {type(data)}")
 
+    args_for_call: tuple[Any, ...] | None = tuple(args)
+
     result = process_disk_backed(
         data,
         func,
-        func_args=args,
+        func_args=args_for_call,
         func_kwargs=kwargs,
         **results.kwargs,
     )
@@ -516,14 +540,17 @@ def _process_function(results, data_only=False):
     return result
 
 
-def process_function(data_only=False, postprocessing=None):
+def process_function(
+    data_only: bool = False,
+    postprocessing: dict[str, Any] | None = None,
+) -> Callable[..., Any]:
     """Decorator to apply function to both pd.DataFrame and Iterable[pd.DataFrame]."""
 
-    def decorator(func):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         sig = inspect.signature(func)
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
             original_call = bound_args.arguments.copy()
@@ -538,7 +565,7 @@ def process_function(data_only=False, postprocessing=None):
                 return results
 
             postproc_func = postprocessing.get("func")
-            if not isinstance(postproc_func, Callable):
+            if not callable(postproc_func):
                 raise ValueError(f"Function {postproc_func} is not callable.")
             postproc_list = postprocessing.get("kwargs", {})
             if isinstance(postproc_list, str):

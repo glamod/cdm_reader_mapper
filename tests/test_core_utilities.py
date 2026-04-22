@@ -366,7 +366,7 @@ def test_db_getattr_psr(test_db_psr):
 
 def test_db_getattr_raises_underscore(test_db_pd):
     with pytest.raises(AttributeError, match="DataBundle object has no attribute"):
-        test_db_pd.__magic__
+        _ = test_db_pd.__magic__
 
 
 def test_db_getattr_raises_invalid_type():
@@ -375,7 +375,7 @@ def test_db_getattr_raises_invalid_type():
 
     db = _DataBundle(data=Dummy())
     with pytest.raises(TypeError, match="expected DataFrame or ParquetStreamReader"):
-        db.some_attr
+        _ = db.some_attr
 
 
 def test_db_getattr_raises_empty(test_db_psr):
@@ -383,12 +383,12 @@ def test_db_getattr_raises_empty(test_db_psr):
     db.read()
 
     with pytest.raises(ValueError, match="Cannot access attribute on empty data stream."):
-        db.some_attr
+        _ = db.some_attr
 
 
 def test_db_getattr_raises_invalid_attr(test_db_psr):
     with pytest.raises(AttributeError, match="DataFrame chunk has no attribute"):
-        test_db_psr.invalid_attr
+        _ = test_db_psr.invalid_attr
 
 
 def test_db_repr_pd(test_db_pd):

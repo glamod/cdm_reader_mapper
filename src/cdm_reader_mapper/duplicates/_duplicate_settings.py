@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from recordlinkage import Compare
-from recordlinkage.compare import Numeric
+from recordlinkage.compare import Numeric  # type: ignore[attr-defined]
 
 
 _method_kwargs = {
@@ -48,7 +48,7 @@ class Date2(Numeric):
     pass
 
 
-def date2(self, *args, **kwargs):
+def date2(self: Compare, *args: Any, **kwargs: Any) -> Compare:
     """New method for ``rl.Compare`` object using ``Date2`` object."""
     compare = Date2(*args, **kwargs)
     self.add(compare)

@@ -3,7 +3,6 @@ import hashlib
 import importlib
 import json
 import logging
-import os
 import sys
 import tempfile
 from pathlib import Path
@@ -268,7 +267,7 @@ def test_get_filename_basic(tmp_path, pattern, extension, expected_filename):
 )
 def test_get_filename_separator(pattern, separator, expected):
     result = get_filename(pattern, extension="", separator=separator)
-    assert os.path.basename(result) == expected
+    assert Path(result).name == expected
 
 
 @pytest.mark.parametrize(
@@ -434,7 +433,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
     cache_dir = tmp_path / "cache"
 
     local_file = load_file(
-        name=os.path.join(drs, f),
+        name=str(Path(drs) / f),
         github_url=base_url,
         branch="main",
         cache=cache,

@@ -9,7 +9,7 @@ requirements of the data reader tool
 
 from __future__ import annotations
 from pathlib import Path
-from typing import TypedDict, get_args
+from typing import Any, TypedDict, get_args
 
 from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
 
@@ -28,8 +28,8 @@ class SectionDict(TypedDict, total=False):
         Dictionary of elements/fields contained within the section.
     """
 
-    header: dict
-    elements: dict
+    header: dict[str, Any]
+    elements: dict[str, Any]
 
 
 class SchemaHeaderDict(TypedDict, total=False):
@@ -52,7 +52,7 @@ class SchemaHeaderDict(TypedDict, total=False):
         Whether multiple reports may appear on a single line.
     """
 
-    parsing_order: list[dict]
+    parsing_order: list[dict[str, Any]]
     delimiter: str
     field_layout: str
     format: str
@@ -80,7 +80,7 @@ class SchemaDict(TypedDict, total=False):
 
     header: SchemaHeaderDict
     sections: dict[str, SectionDict]
-    elements: dict
+    elements: dict[str, Any]
     name: list[Path]
     imodel: str | None
 
@@ -117,7 +117,20 @@ def _resolve_schema_files(
 
 
 def _normalize_schema(schema: SchemaDict) -> SchemaDict:
-    """Normalize a schema dictionary by ensuring it has sections and a parsing order."""
+    """
+    Normalise a schema dictionary by ensuring it has sections and a parsing order.
+
+    Parameters
+    ----------
+    schema : SchemaDict
+        Raw schema coming from the file parser.
+
+    Returns
+    -------
+    SchemaDict
+        Normalised schema - a plain dictionary that still fulfils the
+        expected schema structure.
+    """
     header = schema.get("header", {})
     sections = schema.get("sections")
     elements = schema.get("elements")
@@ -126,16 +139,33 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
         if not elements:
             raise KeyError("Schema has no sections and no elements")
         level = properties.dummy_level
-        dummy_header = {k: header[k] for k in ("delimiter", "field_layout", "format") if k in header}
+
+        dummy_header: dict[str, Any] = {}
+        if "delimiter" in header:
+            dummy_header["delimiter"] = header["delimiter"]
+        if "field_layout" in header:
+            dummy_header["field_layout"] = header["field_layout"]
+        if "format" in header:
+            dummy_header["format"] = header["format"]
+
         sections = {level: {"header": dummy_header, "elements": elements}}
-        schema = {k: v for k, v in schema.items() if k != "elements"}
+
+        new_schema: SchemaDict = {}
+        if "header" in schema:
+            new_schema["header"] = schema["header"]
+        if "sections" in schema:
+            new_schema["sections"] = schema["sections"]
+        if "name" in schema:
+            new_schema["name"] = schema["name"]
+        if "imodel" in schema:
+            new_schema["imodel"] = schema["imodel"]
 
     header = {
         **header,
         "parsing_order": header.get("parsing_order") or [{"s": list(sections.keys())}],
     }
 
-    return {**schema, "header": header, "sections": sections}
+    return {**new_schema, "header": header, "sections": sections}
 
 
 def read_schema(
@@ -168,7 +198,7 @@ def read_schema(
     SchemaDict
         Data model schema
     """
-    schema_files = _resolve_schema_files(
+    schema_files: list[Any] = _resolve_schema_files(
         imodel=imodel,
         ext_schema_path=ext_schema_path,
         ext_schema_file=ext_schema_file,
@@ -176,9 +206,15 @@ def read_schema(
 
     raw_schema = combine_dicts(schema_files, base=f"{properties._base}.schemas")
 
-    enriched = {
-        **raw_schema,
-        "name": schema_files,
-    }
+    enriched: SchemaDict = {}
+    if "header" in raw_schema:
+        enriched["header"] = raw_schema["header"]
+    if "sections" in raw_schema:
+        enriched["sections"] = raw_schema["sections"]
+    if "elements" in raw_schema:
+        enriched["elements"] = raw_schema["elements"]
+    if "imodel" in raw_schema:
+        enriched["imodel"] = raw_schema["imodel"]
+    enriched["name"] = schema_files
 
     return _normalize_schema(enriched)

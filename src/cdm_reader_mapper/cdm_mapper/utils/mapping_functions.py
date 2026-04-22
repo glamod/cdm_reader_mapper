@@ -30,7 +30,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import swifter  # noqa
 from timezonefinder import TimezoneFinder
 
 

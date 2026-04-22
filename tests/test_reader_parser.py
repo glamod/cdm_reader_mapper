@@ -3,8 +3,8 @@ import logging
 from types import MethodType
 
 import pandas as pd
-import pytest  # noqa
-import xarray as xr  # noqa
+import pytest
+import xarray as xr
 from pandas.testing import assert_frame_equal
 
 from cdm_reader_mapper.mdf_reader.utils.parser import (
@@ -16,7 +16,7 @@ from cdm_reader_mapper.mdf_reader.utils.parser import (
     _parse_fixed_width,
     _parse_line,
     build_parser_config,
-    parse_netcdf,  # noqa
+    parse_netcdf,
     parse_pandas,
     update_pd_config,
     update_xr_config,

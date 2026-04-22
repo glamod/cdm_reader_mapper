@@ -284,7 +284,7 @@ def test_initialize_storage_valid(inputs, expected_schema_types):
         # Check schemas
         assert len(schemas) == len(expected_schema_types)
 
-        for (actual_type, actual_meta), (exp_type, exp_meta) in zip(schemas, expected_schema_types):
+        for (actual_type, actual_meta), (exp_type, exp_meta) in zip(schemas, expected_schema_types, strict=True):
             assert actual_type is exp_type
 
             if exp_type is pd.DataFrame:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
-import pytest  # noqa
+import pytest
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 

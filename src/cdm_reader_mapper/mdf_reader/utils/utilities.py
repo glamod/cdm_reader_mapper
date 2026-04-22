@@ -39,7 +39,7 @@ def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
     return list(x)
 
 
-def as_path(value: str | os.PathLike, name: str) -> Path:
+def as_path(value: str | os.PathLike[str], name: str) -> Path:
     """
     Ensure the input is a Path-like object.
 
@@ -131,7 +131,7 @@ def update_column_names(dtypes: dict[str, Any] | str, col_o: str, col_n: str) ->
     return dtypes
 
 
-def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiIndex:
+def update_column_labels(columns: Iterable[str | tuple[str, ...]]) -> pd.Index | pd.MultiIndex:
     """
     Convert string column labels to tuples if needed, producing a pandas Index or MultiIndex.
 
@@ -153,17 +153,21 @@ def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiI
     pd.Index or pd.MultiIndex
         Converted column labels as a pandas Index or MultiIndex.
     """
-    new_cols = []
+    new_cols: list[str | tuple[str, ...]] = []
     all_tuples = True
 
     for col in columns:
-        try:
-            col_ = ast.literal_eval(col)
-        except Exception:
-            if isinstance(col, str) and ":" in col:
-                col_ = tuple(col.split(":"))
-            else:
-                col_ = col
+        if isinstance(col, str):
+            try:
+                col_ = ast.literal_eval(col)
+            except Exception:
+                if isinstance(col, str) and ":" in col:
+                    col_ = tuple(col.split(":"))
+                else:
+                    col_ = col
+        else:
+            col_ = col
+
         all_tuples &= isinstance(col_, tuple)
         new_cols.append(col_)
 
@@ -174,7 +178,7 @@ def update_column_labels(columns: Iterable[str | tuple]) -> pd.Index | pd.MultiI
 
 def update_and_select(
     df: pd.DataFrame,
-    subset: str | list | None = None,
+    subset: str | list[str] | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     """
@@ -207,10 +211,10 @@ def update_and_select(
 def _read_data_from_file(
     filepath: Path,
     reader: Callable[..., Any],
-    col_subset: str | list | None = None,
+    col_subset: str | list[str] | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
-    reader_kwargs: dict | None = None,
-) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
+    reader_kwargs: dict[str, Any] | None = None,
+) -> ProcessFunction:
     """Helper file reader."""
     if filepath is None or not Path(filepath).is_file():
         raise FileNotFoundError(f"File not found: {filepath}")
@@ -230,9 +234,9 @@ def _read_data_from_file(
 def read_csv(
     filepath: Path,
     delimiter: str = ",",
-    col_subset: str | list | None = None,
+    col_subset: str | list[str] | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """
     Safe CSV reader that handles missing files and column subsets.
@@ -266,9 +270,9 @@ def read_csv(
 
 def read_parquet(
     filepath: Path,
-    col_subset: str | list | None = None,
+    col_subset: str | list[str] | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """
     Safe CSV reader that handles missing files and column subsets.
@@ -302,9 +306,9 @@ def read_parquet(
 
 def read_feather(
     filepath: Path,
-    col_subset: str | list | None = None,
+    col_subset: str | list[str] | None = None,
     column_names: pd.Index | pd.MultiIndex | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
     """
     Safe CSV reader that handles missing files and column subsets.
@@ -336,7 +340,7 @@ def read_feather(
     return tuple(result)
 
 
-def convert_dtypes(dtypes) -> tuple[str]:
+def convert_dtypes(dtypes: dict[str, str]) -> tuple[dict[str, str], list[str]]:
     """
     Convert datetime columns to object dtype and return columns to parse as dates.
 
@@ -359,7 +363,7 @@ def convert_dtypes(dtypes) -> tuple[str]:
     return dtypes, parse_dates
 
 
-def validate_arg(arg_name, arg_value, arg_type) -> bool:
+def validate_arg(arg_name: str, arg_value: Any, arg_type: type) -> bool:
     """
     Validate that the input argument is of the expected type.
 
@@ -388,14 +392,14 @@ def validate_arg(arg_name, arg_value, arg_type) -> bool:
     return True
 
 
-def _adjust_dtype(dtype, df) -> dict:
+def _adjust_dtype(dtype: Any, df: pd.DataFrame) -> Any:
     """Filter dtype dictionary to only include columns present in the DataFrame."""
     if not isinstance(dtype, dict):
         return dtype
     return {k: v for k, v in dtype.items() if k in df.columns}
 
 
-def convert_str_boolean(x) -> str | bool:
+def convert_str_boolean(x: Any) -> Any:
     """
     Convert string boolean values 'True'/'False' to Python booleans.
 
@@ -416,7 +420,7 @@ def convert_str_boolean(x) -> str | bool:
     return x
 
 
-def _remove_boolean_values(x) -> str | None:
+def _remove_boolean_values(x: Any) -> Any:
     """Remove boolean values or string representations of boolean."""
     x = convert_str_boolean(x)
     if x is True or x is False:
@@ -424,7 +428,7 @@ def _remove_boolean_values(x) -> str | None:
     return x
 
 
-def remove_boolean_values(data, dtypes) -> pd.DataFrame:
+def remove_boolean_values(data: pd.DataFrame, dtypes: dict[str, str]) -> pd.DataFrame:
     """
     Remove boolean values from a DataFrame and adjust dtypes.
 

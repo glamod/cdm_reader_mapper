@@ -87,7 +87,7 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
                 val = ast.literal_eval(x)
                 if isinstance(val, tuple):
                     return val
-            except Exception:
+            except (TypeError, AttributeError):
                 return (x, "")
 
         df.columns = pd.MultiIndex.from_tuples([to_tuple(col) for col in df.columns])

@@ -8,7 +8,7 @@ Created on Wed Jul 10 09:18:41 2019
 
 _base = "cdm_reader_mapper.metmetpy"
 
-metadata_datamodels = {}
+metadata_datamodels: dict[str, Any] = {}
 
 metadata_datamodels["deck"] = {}
 metadata_datamodels["deck"]["icoads"] = ("c1", "DCK")

@@ -28,7 +28,7 @@ def max_decimal_places(*decimals: Decimal) -> int:
     int
         Maximum number of decimal places.
     """
-    return max((-d.as_tuple().exponent if d.as_tuple().exponent < 0 else 0) for d in decimals)
+    return max(-int(d.as_tuple().exponent) if int(d.as_tuple().exponent) < 0 else 0 for d in decimals)
 
 
 def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
@@ -147,7 +147,7 @@ class Decoders:
             Decoded Series with stringified integers or booleans
         """
 
-        def _base36(x):
+        def _base36(x: Any) -> Any:
             x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
@@ -177,9 +177,11 @@ class Converters:
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
         self.numeric_offset = 0.0 if self.dtype == "float" else 0
 
-        self.preprocessing_functions = {"PPPP": lambda x: 10_000 + int(x) if isinstance(x, str) and x.startswith("0") else x}
+        self.preprocessing_functions: dict[str, Callable[[Any], Any]] = {
+            "PPPP": lambda x: 10_000 + int(x) if isinstance(x, str) and x.startswith("0") else x
+        }
 
-        self._registry = {
+        self._registry: dict[str, Callable[..., Any]] = {
             "datetime": self.object_to_datetime,
             "str": self.object_to_object,
             "object": self.object_to_object,
@@ -239,17 +241,17 @@ class Converters:
         if data.dtype != "object":
             return data
 
-        scale = scale if scale else self.numeric_scale
-        offset = offset if offset else self.numeric_offset
+        scale_val = scale if scale else self.numeric_scale
+        offset_val = offset if offset else self.numeric_offset
 
-        scale = Decimal(str(scale))
-        offset = Decimal(str(offset))
+        scale_dec = Decimal(str(scale_val))
+        offset_dec = Decimal(str(offset_val))
 
         column_name = data.name
         if column_name in self.preprocessing_functions:
             data = data.apply(self.preprocessing_functions[column_name])
 
-        return data.apply(lambda x: to_numeric(x, scale, offset))
+        return data.apply(lambda x: to_numeric(x, scale_dec, offset_dec))
 
     def object_to_object(
         self,
@@ -316,7 +318,7 @@ def convert_and_decode(
     convert_flag: bool = True,
     decode_flag: bool = True,
     converter_dict: dict[str, Callable[[pd.Series], pd.Series]] | None = None,
-    converter_kwargs: dict[str, dict] | None = None,
+    converter_kwargs: dict[str, dict[str, Any]] | None = None,
     decoder_dict: dict[str, Callable[[pd.Series], pd.Series]] | None = None,
 ) -> pd.DataFrame:
     """

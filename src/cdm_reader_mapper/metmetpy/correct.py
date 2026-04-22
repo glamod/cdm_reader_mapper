@@ -96,13 +96,13 @@ def _correct_dt(
     logger.info('Applying "%s" datetime correction', datetime_correction)
     try:
         trans = getattr(corr_f_dt, datetime_correction)
-    except AttributeError:
-        raise AttributeError(f"Correction function '{datetime_correction}' not found.")
+    except AttributeError as err:
+        raise AttributeError(f"Correction function '{datetime_correction}' not found.") from err
 
     try:
         return trans(data)
-    except Exception as e:
-        raise RuntimeError("func '{trans.__name__}' could not be executed") from e
+    except Exception as err:
+        raise RuntimeError("func '{trans.__name__}' could not be executed") from err
 
 
 def _correct_pt(
@@ -129,7 +129,7 @@ def _correct_pt(
 
     pt_col = [col for col in pt_col if col in data.columns]
     if not pt_col:
-        logger.info(f"No platform type found. Selected columns are {data.columns}")
+        logger.info("No platform type found. Selected columns are %s", data.columns)
         return data
 
     if len(pt_col) == 1:

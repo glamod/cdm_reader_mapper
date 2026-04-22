@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json
-import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -108,31 +108,22 @@ def test_read_mdf_test_data_basic(data_model):
         ("icoads_r300_d721", {"chunksize": 3}),
         (
             "icoads_r300_d703",
-            {"ext_schema_path": os.path.join(".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads")},
+            {"ext_schema_path": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads"},
         ),
         (
             "icoads_r300_d703",
-            {"ext_table_path": os.path.join(".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads")},
-        ),
-        (
-            "icoads_r300_d703",
-            {
-                "ext_table_path": os.path.join(".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"),
-                "ext_schema_path": os.path.join(".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"),
-            },
+            {"ext_table_path": Path("cdm_reader_mapper") / "mdf_reader" / "codes" / "icoads"},
         ),
         (
             "icoads_r300_d703",
             {
-                "ext_schema_file": os.path.join(
-                    ".",
-                    "cdm_reader_mapper",
-                    "mdf_reader",
-                    "schemas",
-                    "icoads",
-                    "icoads.json",
-                )
+                "ext_table_path": Path("cdm_reader_mapper") / "mdf_reader" / "codes" / "icoads",
+                "ext_schema_path": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads",
             },
+        ),
+        (
+            "icoads_r300_d703",
+            {"ext_schema_file": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads" / "icoads.json"},
         ),
     ],
 )
