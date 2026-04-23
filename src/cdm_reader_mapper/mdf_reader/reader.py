@@ -69,7 +69,7 @@ def validate_read_mdf_args(
 
 def read_mdf(
     source: str,
-    imodel: str,
+    imodel: str | None = None,
     ext_schema_path: str | None = None,
     ext_schema_file: str | None = None,
     ext_table_path: str | None = None,

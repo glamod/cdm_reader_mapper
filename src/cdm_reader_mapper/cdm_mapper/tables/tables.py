@@ -121,7 +121,7 @@ def get_imodel_maps(
 
         table_dict = combine_dicts(cdm_files)
 
-        for k, v in table_dict.items():
+        for v in table_dict.values():
             elements = v.get("elements")
             if elements and not isinstance(elements, list):
                 v["elements"] = [elements]
@@ -129,7 +129,7 @@ def get_imodel_maps(
             if section:
                 if not isinstance(section, list):
                     section = [section] * len(v.get("elements"))
-                v["elements"] = [(s, e) for s, e in zip(section, v["elements"])]
+                v["elements"] = [(s, e) for s, e in zip(section, v["elements"], strict=True)]
                 v.pop("sections", None)
 
         imodel_maps[cdm_table] = table_dict

@@ -140,8 +140,8 @@ def get_usecols(tb: str, col_subset: str | Iterable[str] | dict | None) -> list[
     # Any other iterable ? convert to list
     try:
         return list(col_subset)
-    except TypeError:
-        raise TypeError(f"col_subset must be str, iterable of str, dict, or None, got {type(col_subset)}")
+    except TypeError as err:
+        raise TypeError(f"col_subset must be str, iterable of str, dict, or None, got {type(col_subset)}") from err
 
 
 def adjust_filename(filename: str, table: str = "", extension: str = "psv") -> str:

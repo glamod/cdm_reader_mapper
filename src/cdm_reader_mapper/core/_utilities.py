@@ -56,7 +56,7 @@ def method(attr_func, *args, **kwargs):
 
 
 def reader_method(
-    db: _DataBundle, data: pd.DataFrame | ParquetStreamReader, attr: str, *args: Any, process_kwargs: Dict[str, Any] = {}, **kwargs: Any
+    db: _DataBundle, data: pd.DataFrame | ParquetStreamReader, attr: str, *args: Any, process_kwargs: dict[str, Any] | None = None, **kwargs: Any
 ):
     """
     Handles operations on chunked data (ParquetStreamReader).
@@ -71,6 +71,9 @@ def reader_method(
 
         # Use the 'method' helper to execute it (call or subscript)
         return method(attr_obj, *args, **kwargs)
+
+    if process_kwargs is None:
+        process_kwargs = {}
 
     # Process stream using Disk-Backed Parquet Engine
     result_tuple = process_disk_backed(
@@ -107,10 +110,8 @@ def combine_attribute_values(first_value, iterator, attr):
         The attribute name to fetch from remaining chunks.
     """
     combined_values = [first_value]
-
     # Iterate through the rest of the stream
-    for chunk in iterator:
-        combined_values.append(getattr(chunk, attr))
+    combined_values.extend(getattr(chunk, attr) for chunk in iterator)
 
     # Logic to merge results based on type
     if isinstance(first_value, pd.Index):
@@ -148,8 +149,8 @@ class SubscriptableMethod:
         """Ensure subscript access is handled properly."""
         try:
             return self.func[item]
-        except TypeError:
-            raise NotImplementedError("Calling subscriptable methods have not been implemented for chunked data yet.")
+        except TypeError as err:
+            raise NotImplementedError("Calling subscriptable methods have not been implemented for chunked data yet.") from err
 
     def __call__(self, *args, **kwargs):
         """Ensure function calls work properly."""
@@ -225,8 +226,8 @@ class _DataBundle:
 
             try:
                 first_chunk = data.get_chunk()
-            except (StopIteration, ValueError):
-                raise ValueError("Cannot access attribute on empty data stream.")
+            except (StopIteration, ValueError) as err:
+                raise ValueError("Cannot access attribute on empty data stream.") from err
 
             if not hasattr(first_chunk, attr):
                 # Restore state before raising error
@@ -393,10 +394,7 @@ class _DataBundle:
                 raise ValueError("Data must be a pd.DataFrame not a iterable of pd.DataFrames.")
 
             to_concat = [df_cp]
-
-            for o in other:
-                if hasattr(o, data_attr):
-                    to_concat.append(getattr(o, data_attr))
+            to_concat.extend(getattr(o, data_attr) for o in other if hasattr(o, data_attr))
 
             if not any(d.empty for d in to_concat):
                 concatenated = pd.concat(to_concat, **kwargs)

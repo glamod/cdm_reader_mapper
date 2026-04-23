@@ -21,7 +21,6 @@ of the imodel, the number of decimal places used comes from a default tool defin
 """
 
 from __future__ import annotations
-import os
 from pathlib import Path
 from typing import get_args
 
@@ -168,6 +167,7 @@ def write_tables(
         filename = {}
 
     out_dir = out_dir or "."
+    out_dir = Path(out_dir)
 
     extension = extension or data_format
 
@@ -194,7 +194,7 @@ def write_tables(
             )
         filename_ = adjust_filename(filename_, table=table, extension=extension)
         if len(Path(filename_).parts) == 1:
-            filename_ = os.path.join(out_dir, filename_)
+            filename_ = out_dir / filename_
 
         logger.info("Writing table %s: %s", table, filename_)
         _table_to_file(

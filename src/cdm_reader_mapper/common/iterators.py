@@ -301,7 +301,7 @@ def _process_chunks(
     output_non_data_dict: dict[int, list[Any]] = {}
     chunk_counter: int = 0
 
-    for items in zip(*readers):
+    for items in zip(*readers, strict=True):
         if not isinstance(items[0], requested_types):
             raise TypeError(f"Unsupported data type in Iterable {items[0]}: {type(items[0])}Requested types are: {requested_types} ")
 
@@ -315,8 +315,8 @@ def _process_chunks(
 
         data, meta = _sort_chunk_outputs(result, capture_meta, requested_types)
 
-        for i, meta in enumerate(meta):
-            output_non_data_dict.setdefault(i, []).append(meta)
+        for i, m in enumerate(meta):
+            output_non_data_dict.setdefault(i, []).append(m)
 
         # Write DataFrames
         if data:
@@ -350,10 +350,11 @@ def _process_chunks(
     if temp_dirs is None:
         return output_non_data
 
-    assert temp_dirs is not None and schemas is not None
+    if schemas is None:
+        raise ValueError("Could not set schemas.")
 
     final_iterators: list[ParquetStreamReader] = [
-        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas)
+        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas, strict=True)
     ]
 
     if isinstance(output_non_data, tuple):
@@ -413,8 +414,8 @@ def parquet_stream_from_iterable(
 
     try:
         first = next(iterator)
-    except StopIteration:
-        raise ValueError("Iterable is empty.")
+    except StopIteration as err:
+        raise ValueError("Iterable is empty.") from err
 
     if not isinstance(first, (pd.DataFrame, pd.Series)):
         raise TypeError("Iterable must contain pd.DataFrame or pd.Series objects.")

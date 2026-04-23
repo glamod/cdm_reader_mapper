@@ -224,9 +224,7 @@ class DupDetect:
         for value in self.compare_kwargs.keys():
             if not isinstance(value, list):
                 value = [value]
-            for v in value:
-                if v in self.data.columns:
-                    equal_musts.append(v)
+            equal_musts.extend(v for v in value if v in self.data.columns)
         return equal_musts
 
     def _total_score(self) -> None:
@@ -343,10 +341,10 @@ class DupDetect:
             return dictionary_, drops_
 
         def replace_keeps_and_drops(df, keep_):
+            keeps = df[keep_].values
             while True:
                 df = df.sort_index()
-                keeps = df[keep_].values
-                replaces = df.apply(lambda x: _get_similars(x, keeps), axis=1)
+                replaces = df.apply(lambda row, keeps=keeps: _get_similars(row, keeps), axis=1)
                 replaces = dict(replaces.dropna().values)
                 replaces, drops_ = _delete_values_equal_keys(replaces)
                 keys = replaces.keys()
@@ -450,8 +448,10 @@ def set_comparer(compare_dict) -> Compare:
     for column, c_dict in compare_dict.items():
         try:
             method = c_dict["method"]
-        except KeyError:
-            raise KeyError("compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found")
+        except KeyError as err:
+            raise KeyError(
+                "compare_kwargs must be hierarchically ordered: {<column_name>: {'method': <compare_method>}}. 'method' not found"
+            ) from err
         try:
             kwargs = c_dict["kwargs"]
         except KeyError:
@@ -686,15 +686,15 @@ def duplicate_check(
 
     dtypes = data.dtypes
 
-    Compared_ = Comparer(
+    comparer = Comparer(
         data=data,
         method=method,
         method_kwargs=method_kwargs,
         compare_kwargs=compare_kwargs,
         convert_data=True,
     )
-    compared = Compared_.compared
-    data_ = Compared_.data
+    compared = comparer.compared
+    data_ = comparer.data
 
     if ignore_entries is None:
         return DupDetect(data, compared, method, method_kwargs, compare_kwargs)

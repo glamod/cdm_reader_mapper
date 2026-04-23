@@ -1,7 +1,7 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-from typing import Any
+from typing import Any, Literal
 
 import pandas as pd
 
@@ -123,7 +123,7 @@ class DataBundle(_DataBundle):
         return db
 
     def stack_v(
-        self, other: str | list[str], datasets: str | list[str] = ["data", "mask"], inplace: bool = False, **kwargs: Any
+        self, other: str | list[str], datasets: str | list[str] = Literal["data", "mask"], inplace: bool = False, **kwargs: Any
     ) -> DataBundle | None:
         """
         Stack multiple :py:class:`~DataBundle`'s vertically.
@@ -140,28 +140,28 @@ class DataBundle(_DataBundle):
             else return a copy of :py:class:`~DataBundle` with stacked datasets.
             Default: False
 
-        Note
-        ----
-        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
-        * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
-
         Returns
         -------
         :py:class:`~DataBundle` or None
             Vertically stacked DataBundle or None if ``inplace=True``.
 
-        Examples
-        --------
-        >>> db = db1.stack_v(db2, datasets=["data", "mask"])
+        Note
+        ----
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
+        * The DataFrames in the :py:class:`~DataBundle` have to have the same data columns!
 
         See Also
         --------
         DataBundle.stack_h : Stack multiple DataBundle's horizontally.
+
+        Examples
+        --------
+        >>> db = db1.stack_v(db2, datasets=["data", "mask"])
         """
         return self._stack(other, datasets, inplace, **kwargs)
 
     def stack_h(
-        self, other: str | list[str], datasets: str | list[str] = ["data", "mask"], inplace: bool = False, **kwargs: Any
+        self, other: str | list[str], datasets: str | list[str] = Literal["data", "mask"], inplace: bool = False, **kwargs: Any
     ) -> DataBundle | None:
         """
         Stack multiple :py:class:`~DataBundle`'s horizontally.
@@ -178,23 +178,23 @@ class DataBundle(_DataBundle):
             else return a copy of :py:class:`~DataBundle` with stacked datasets.
             Default: False
 
-        Note
-        ----
-        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
-        * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
-
-        Examples
-        --------
-        >>> db = db1.stack_h(db2, datasets=["data", "mask"])
-
         Returns
         -------
         :py:class:`~DataBundle` or None
             Horizontally stacked DataBundle or None if ``inplace=True``.
 
+        Note
+        ----
+        * This is only working with pd.DataFrames, not with iterables of pd.DataFrames!
+        * The DataFrames in the :py:class:`~DataBundle` may have different data columns!
+
         See Also
         --------
         DataBundle.stack_v : Stack multiple DataBundle's vertically.
+
+        Examples
+        --------
+        >>> db = db1.stack_h(db2, datasets=["data", "mask"])
         """
         return self._stack(other, datasets, inplace, axis=1, join="outer", **kwargs)
 
@@ -216,6 +216,16 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing rows where all column entries in :py:attr:`mask` are True or None if ``inplace=True``.
 
+        Note
+        ----
+        For more information see :py:func:`split_by_boolean_true`
+
+        See Also
+        --------
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
+
         Examples
         --------
         Select without overwriting the old data.
@@ -226,16 +236,6 @@ class DataBundle(_DataBundle):
 
         >>> db.select_where_all_true(inplace=True)
         >>> df_selected = db.data
-
-        See Also
-        --------
-        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
-        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
-        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
-
-        Note
-        ----
-        For more information see :py:func:`split_by_boolean_true`
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
@@ -262,6 +262,16 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing rows where all column entries in :py:attr:`mask` are False or None if ``inplace=True``.
 
+        Note
+        ----
+        For more information see :py:func:`split_by_boolean_false`
+
+        See Also
+        --------
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
+
         Examples
         --------
         Select without overwriting the old data.
@@ -272,16 +282,6 @@ class DataBundle(_DataBundle):
 
         >>> db.select_where_all_false(inplace=True)
         >>> df_selected = db.data
-
-        See Also
-        --------
-        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
-        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
-        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
-
-        Note
-        ----
-        For more information see :py:func:`split_by_boolean_false`
         """
         db_ = self._get_db(inplace)
         _mask = _copy(db_._mask)
@@ -313,6 +313,16 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing rows where column entries are in a specific value list or None if ``inplace=True``.
 
+        Note
+        ----
+        For more information see :py:func:`split_by_column_entries`
+
+        See Also
+        --------
+        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+
         Examples
         --------
         Select without overwriting the old data.
@@ -325,16 +335,6 @@ class DataBundle(_DataBundle):
 
         >>> db.select_where_entry_isin(selection={("c1", "B1"): [26, 41]}, inplace=True)
         >>> df_selected = db.data
-
-        See Also
-        --------
-        DataBundle.select_where_index_isin : Select rows from `data` within specific index list.
-        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
-        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
-
-        Note
-        ----
-        For more information see :py:func:`split_by_column_entries`
         """
         db_ = self._get_db(inplace)
         db_._data, _, selected_idx, _ = split_by_column_entries(db_._data, selection, **kwargs)
@@ -362,6 +362,16 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing rows where indexes are within a specific index list or None if ``inplace=True``.
 
+        Note
+        ----
+        For more information see :py:func:`split_by_index`
+
+        See Also
+        --------
+        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
+        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
+        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
+
         Examples
         --------
         Select without overwriting the old data.
@@ -372,16 +382,6 @@ class DataBundle(_DataBundle):
 
         >>> db.select_where_index_isin(index=[0, 2, 4], inplace=True)
         >>> df_selected = db.data
-
-        See Also
-        --------
-        DataBundle.select_where_entry_isin : Select rows from `data` where column entries are in a specific value list.
-        DataBundle.select_where_all_true : Select rows from `data` where all entries in `mask` are True.
-        DataBundle.select_where_all_false : Select rows from `data` where all entries in `mask` are False.
-
-        Note
-        ----
-        For more information see :py:func:`split_by_index`
         """
         db_ = self._get_db(inplace)
         db_._data, _, selected_idx, _ = split_by_index(db_._data, index, **kwargs)
@@ -404,11 +404,9 @@ class DataBundle(_DataBundle):
             First :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are True.
             Second :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are False.
 
-        Examples
-        --------
-        Split DataBundle.
-
-        >>> db_true, db_false = db.split_by_boolean_true()
+        Note
+        ----
+        For more information see :py:func:`split_by_boolean_true`
 
         See Also
         --------
@@ -416,9 +414,11 @@ class DataBundle(_DataBundle):
         DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
         DataBundle.split_by_index : Split `data` by rows within specific index list.
 
-        Note
-        ----
-        For more information see :py:func:`split_by_boolean_true`
+        Examples
+        --------
+        Split DataBundle.
+
+        >>> db_true, db_false = db.split_by_boolean_true()
         """
         db1_ = self.copy()
         db2_ = self.copy()
@@ -443,11 +443,9 @@ class DataBundle(_DataBundle):
             First :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are False.
             Second :py:class:`~DataBundle` including rows where all column entries in :py:attr:`mask` are True.
 
-        Examples
-        --------
-        Split DataBundle.
-
-        >>> db_false, db_true = db.split_by_boolean_false()
+        Note
+        ----
+        For more information see :py:func:`split_by_boolean_false`
 
         See Also
         --------
@@ -455,9 +453,11 @@ class DataBundle(_DataBundle):
         DataBundle.split_by_column_entries : Split `data` by rows where column entries are in a specific value list.
         DataBundle.split_by_index : Split `data` by rows within specific index list.
 
-        Note
-        ----
-        For more information see :py:func:`split_by_boolean_false`
+        Examples
+        --------
+        Split DataBundle.
+
+        >>> db_false, db_true = db.split_by_boolean_false()
         """
         db1_ = self.copy()
         db2_ = self.copy()
@@ -487,13 +487,9 @@ class DataBundle(_DataBundle):
             First :py:class:`~DataBundle` including rows where column entries are in a specific value list.
             Second :py:class:`~DataBundle` including rows where column entries are not in a specific value list.
 
-        Examples
-        --------
-        Split DataBundle.
-
-        >>> db_isin, db_isnotin = db.split_by_column_entries(
-        ...     selection={("c1", "B1"): [26, 41]},
-        ... )
+        Note
+        ----
+        For more information see :py:func:`split_by_column_entries`
 
         See Also
         --------
@@ -501,9 +497,13 @@ class DataBundle(_DataBundle):
         DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
 
-        Note
-        ----
-        For more information see :py:func:`split_by_column_entries`
+        Examples
+        --------
+        Split DataBundle.
+
+        >>> db_isin, db_isnotin = db.split_by_column_entries(
+        ...     selection={("c1", "B1"): [26, 41]},
+        ... )
         """
         db1_ = self.copy()
         db2_ = self.copy()
@@ -530,12 +530,9 @@ class DataBundle(_DataBundle):
             First :py:class:`~DataBundle` including rows within specific index list.
             Second :py:class:`~DataBundle` including rows outside specific index list.
 
-
-        Examples
-        --------
-        Split DataBundle.
-
-         >>> db_isin, db_isnotin = db.split_by_index([0, 2, 4])
+        Note
+        ----
+        For more information see :py:func:`split_by_index`
 
         See Also
         --------
@@ -543,9 +540,11 @@ class DataBundle(_DataBundle):
         DataBundle.split_by_boolean_true : Split `data` by rows where all entries in `mask` are True.
         DataBundle.split_by_boolean_false : Split `data` by rows where all entries in `mask` are False.
 
-        Note
-        ----
-        For more information see :py:func:`split_by_index`
+        Examples
+        --------
+        Split DataBundle.
+
+         >>> db_isin, db_isnotin = db.split_by_index([0, 2, 4])
         """
         db1_ = self.copy()
         db2_ = self.copy()
@@ -563,13 +562,13 @@ class DataBundle(_DataBundle):
         dict
             Dictionary with unique values.
 
-        Examples
-        --------
-        >>> db.unique(columns=("c1", "B1"))
-
         Note
         ----
         For more information see :py:func:`unique`
+
+        Examples
+        --------
+        >>> db.unique(columns=("c1", "B1"))
         """
         return count_by_cat(self._data, **kwargs)
 
@@ -593,15 +592,15 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle with replaced column names or None if ``inplace=True``.
 
+        Note
+        ----
+        For more information see :py:func:`replace_columns`
+
         Examples
         --------
         >>> import pandas as pd
         >>> df_corr = pd.read_csv("correction_file_on_disk")
         >>> df_repl = db.replace_columns(df_corr)
-
-        Note
-        ----
-        For more information see :py:func:`replace_columns`
         """
         if not isinstance(self._data, (pd.DataFrame, pd.Series)):
             raise TypeError("Data must be a pd.DataFrame or pd.Series, not a {type(self._data)}.")
@@ -632,9 +631,9 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle with corrected datetime information or None if ``inplace=True``.
 
-        Examples
-        --------
-        >>> df_dt = db.correct_datetime()
+        Note
+        ----
+        For more information see :py:func:`correct_datetime`
 
         See Also
         --------
@@ -642,9 +641,9 @@ class DataBundle(_DataBundle):
         DataBundle.validate_datetime: Validate datetime information in `data`.
         DataBundle.validate_id : Validate station id information in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`correct_datetime`
+        Examples
+        --------
+        >>> df_dt = db.correct_datetime()
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
@@ -667,9 +666,9 @@ class DataBundle(_DataBundle):
             True: All datetime information in :py:attr:`data` row are valid.
             False: At least one datetime information in :py:attr:`data` row is invalid.
 
-        Examples
-        --------
-        >>> val_dt = db.validate_datetime()
+        Note
+        ----
+        For more information see :py:func:`validate_datetime`
 
         See Also
         --------
@@ -677,9 +676,9 @@ class DataBundle(_DataBundle):
         DataBundle.correct_datetime : Correct datetime information in `data`.
         DataBundle.correct_pt : Correct platform type information in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`validate_datetime`
+        Examples
+        --------
+        >>> val_dt = db.validate_datetime()
         """
         imodel = imodel or self._imodel
         return validate_datetime(self._data, imodel, **kwargs)
@@ -702,9 +701,9 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle with corrected platform type information or None if ``inplace=True``.
 
-        Examples
-        --------
-        >>> df_pt = db.correct_pt()
+        Note
+        ----
+        For more information see :py:func:`correct_pt`
 
         See Also
         --------
@@ -712,9 +711,9 @@ class DataBundle(_DataBundle):
         DataBundle.validate_id : Validate station id information in `data`.
         DataBundle.validate_datetime : Validate datetime information in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`correct_pt`
+        Examples
+        --------
+        >>> df_pt = db.correct_pt()
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
@@ -737,9 +736,9 @@ class DataBundle(_DataBundle):
             True: All station ID information in :py:attr:`data` row are valid.
             False: At least one station ID information in :py:attr:`data` row is invalid.
 
-        Examples
-        --------
-        >>> val_dt = db.validate_id()
+        Note
+        ----
+        For more information see :py:func:`validate_id`
 
         See Also
         --------
@@ -747,9 +746,9 @@ class DataBundle(_DataBundle):
         DataBundle.correct_pt : Correct platform type information in `data`.
         DataBundle.correct_datetime : Correct datetime information in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`validate_id`
+        Examples
+        --------
+        >>> val_dt = db.validate_id()
         """
         imodel = imodel or self._imodel
         return validate_id(self._data, imodel, **kwargs)
@@ -772,13 +771,13 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing :py:attr:`data` mapped to the CDM or None if ``inplace=True``.
 
-        Examples
-        --------
-        >>> cdm_tables = db.map_model()
-
         Note
         ----
         For more information see :py:func:`map_model`
+
+        Examples
+        --------
+        >>> cdm_tables = db.map_model()
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
@@ -811,9 +810,10 @@ class DataBundle(_DataBundle):
           Data mode ("data" or "tables")
           Default: "data"
 
-        Examples
-        --------
-        >>> db.write()
+        Note
+        ----
+        If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
+        If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
 
         See Also
         --------
@@ -822,12 +822,11 @@ class DataBundle(_DataBundle):
         read: Read original marine-meteorological data as well as MDF data or CDM tables from disk.
         read_data: Read MDF data and validation mask from disk.
         read_mdf : Read original marine-meteorological data from disk.
-        read_tables : Read CDM tables from disk.
 
-        Note
-        ----
-        If :py:attr:`mode` is "data" write data using :py:func:`write_data`.
-        If :py:attr:`mode` is "tables" write data using :py:func:`write_tables`.
+        Examples
+        --------
+        >>> db.write()
+        read_tables : Read CDM tables from disk.
         """
         dtypes = dtypes or self._dtypes
         parse_dates = parse_dates or self._parse_dates
@@ -875,9 +874,9 @@ class DataBundle(_DataBundle):
         This adds a new class :py:class:`~DupDetect` to :py:class:`~DataBundle`.
         This class is necessary for further duplicate check methods.
 
-        Examples
-        --------
-        >>> db.duplicate_check()
+        Note
+        ----
+        For more information see :py:func:`duplicate_check`
 
         See Also
         --------
@@ -885,9 +884,9 @@ class DataBundle(_DataBundle):
         DataBundle.flag_duplicates : Flag detected duplicates in `data`.
         DataBundle.remove_duplicates : Remove detected duplicates in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`duplicate_check`
+        Examples
+        --------
+        >>> db.duplicate_check()
         """
         db_ = self._get_db(inplace)
         if db_._mode == "tables" and "header" in db_._data:
@@ -917,6 +916,16 @@ class DataBundle(_DataBundle):
         ----
         Before flagging duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
+        Note
+        ----
+        For more information see :py:func:`DupDetect.flag_duplicates`
+
+        See Also
+        --------
+        DataBundle.remove_duplicates : Remove detected duplicates in `data`.
+        DataBundle.get_duplicates : Get duplicate matches in `data`.
+        DataBundle.duplicate_check : Duplicate check in `data`.
+
         Examples
         --------
         Flag duplicates without overwriting :py:attr:`data`.
@@ -927,16 +936,6 @@ class DataBundle(_DataBundle):
 
         >>> db.flag_duplicates(inplace=True)
         >>> flagged_tables = db.data
-
-        See Also
-        --------
-        DataBundle.remove_duplicates : Remove detected duplicates in `data`.
-        DataBundle.get_duplicates : Get duplicate matches in `data`.
-        DataBundle.duplicate_check : Duplicate check in `data`.
-
-        Note
-        ----
-        For more information see :py:func:`DupDetect.flag_duplicates`
         """
         db_ = self._get_db(inplace)
 
@@ -961,9 +960,9 @@ class DataBundle(_DataBundle):
         ----
         Before getting duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
-        Examples
-        --------
-        >>> matches = db.get_duplicates()
+        Note
+        ----
+        For more information see :py:func:`DupDetect.get_duplicates`
 
         See Also
         --------
@@ -971,9 +970,9 @@ class DataBundle(_DataBundle):
         DataBundle.flag_duplicates : Flag detected duplicates in `data`.
         DataBundle.duplicate_check : Duplicate check in `data`.
 
-        Note
-        ----
-        For more information see :py:func:`DupDetect.get_duplicates`
+        Examples
+        --------
+        >>> matches = db.get_duplicates()
         """
         return self.DupDetect.get_duplicates(**kwargs)
 
@@ -997,6 +996,16 @@ class DataBundle(_DataBundle):
         ----
         Before removing duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
+        Note
+        ----
+        For more information see :py:func:`DupDetect.remove_duplicates`
+
+        See Also
+        --------
+        DataBundle.flag_duplicates : Flag detected duplicates in `data`.
+        DataBundle.get_duplicates : Get duplicate matches in `data`.
+        DataBundle.duplicate_check : Duplicate check in `data`.
+
         Examples
         --------
         Remove duplicates without overwriting :py:attr:`data`.
@@ -1007,16 +1016,6 @@ class DataBundle(_DataBundle):
 
         >>> db.remove_duplicates(inplace=True)
         >>> removed_tables = db.data
-
-        See Also
-        --------
-        DataBundle.flag_duplicates : Flag detected duplicates in `data`.
-        DataBundle.get_duplicates : Get duplicate matches in `data`.
-        DataBundle.duplicate_check : Duplicate check in `data`.
-
-        Note
-        ----
-        For more information see :py:func:`DupDetect.remove_duplicates`
         """
         db_ = self._get_db(inplace)
 

@@ -1,6 +1,7 @@
 """Settings for duplicate check."""
 
 from __future__ import annotations
+from typing import Any
 
 from recordlinkage import Compare
 from recordlinkage.compare import Numeric  # type: ignore[attr-defined]

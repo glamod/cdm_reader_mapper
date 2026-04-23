@@ -34,7 +34,7 @@ def _to_int(x: Any) -> int | None:
     try:
         return int(x)
     except (TypeError, ValueError):
-        None
+        return None
 
 
 def _expand_integer_range_key(d: Any) -> Any:

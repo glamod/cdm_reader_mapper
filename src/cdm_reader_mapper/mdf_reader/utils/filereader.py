@@ -175,7 +175,10 @@ class FileReader:
 
         data = _apply_multiindex(data)
 
-        data_model = self.imodel.split("_")[0]
+        if self.imodel:
+            data_model = self.imodel.split("_")[0]
+        else:
+            data_model = None
 
         factorize = properties.factorize.get(data_model)
         if factorize:
@@ -337,17 +340,17 @@ class FileReader:
         select_kwargs : dict, optional
             Additional key-word arguments for selecting/filtering data.
 
-        Notes
-        -----
-        All kwargs are forwarded to ``open_data`` to customize the
-        parsing, conversion, decoding, validation, and selection steps.
-
         Returns
         -------
         DataBundle
             Container with processed data, mask, columns, dtypes, and metadata.
+
+        Notes
+        -----
+        All kwargs are forwarded to ``open_data`` to customize the
+        parsing, conversion, decoding, validation, and selection steps.
         """
-        logging.info(f"EXTRACTING DATA FROM MODEL: {self.imodel}")
+        logging.info("EXTRACTING DATA FROM MODEL: %s", self.imodel)
         logging.info("Reading and parsing source data...")
 
         result = self.open_data(

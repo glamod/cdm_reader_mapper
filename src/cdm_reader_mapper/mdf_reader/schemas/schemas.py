@@ -131,6 +131,8 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
         Normalised schema - a plain dictionary that still fulfils the
         expected schema structure.
     """
+    new_schema: SchemaDict = dict(schema)
+
     header = schema.get("header", {})
     sections = schema.get("sections")
     elements = schema.get("elements")
@@ -150,15 +152,16 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
 
         sections = {level: {"header": dummy_header, "elements": elements}}
 
-        new_schema: SchemaDict = {}
-        if "header" in schema:
-            new_schema["header"] = schema["header"]
-        if "sections" in schema:
-            new_schema["sections"] = schema["sections"]
-        if "name" in schema:
-            new_schema["name"] = schema["name"]
-        if "imodel" in schema:
-            new_schema["imodel"] = schema["imodel"]
+        # new_schema: SchemaDict = {}
+        # if "header" in schema:
+        #    new_schema["header"] = schema["header"]
+        # if "sections" in schema:
+        #    new_schema["sections"] = schema["sections"]
+        # if "name" in schema:
+        #    new_schema["name"] = schema["name"]
+        # if "imodel" in schema:
+        #    new_schema["imodel"] = schema["imodel"]
+        new_schema.pop("elements", None)
 
     header = {
         **header,

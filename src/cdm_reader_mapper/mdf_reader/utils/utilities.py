@@ -160,7 +160,7 @@ def update_column_labels(columns: Iterable[str | tuple[str, ...]]) -> pd.Index |
         if isinstance(col, str):
             try:
                 col_ = ast.literal_eval(col)
-            except Exception:
+            except (ValueError, AttributeError):
                 if isinstance(col, str) and ":" in col:
                     col_ = tuple(col.split(":"))
                 else:
