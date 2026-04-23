@@ -202,7 +202,7 @@ class ParquetStreamReader:
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         return self
 
-    def __exit__(self, exc_type: type | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
+    def __exit__(self, _exc_type: type | None, _exc_val: BaseException | None, _exc_tb: TracebackType | None) -> None:
         """Allows: with ParquetStreamReader(...) as reader: ..."""
         self.close()
 
