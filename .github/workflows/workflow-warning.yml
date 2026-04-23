@@ -1,10 +1,92 @@
-bump-my-version==1.3.0
-deptry==0.25.1
-exceptiongroup==1.3.1
-flit==3.12.0
-pip==26.0.1
-pydantic==2.13.0
-pylint==4.0.5
-tomli==2.4.1
-tox-gh==1.7.1
-tox==4.53.0
+name: Workflow Changes Warnings
+
+on:
+  # Note: potential security risk from this action using pull_request_target.
+  # Do not add actions in here which need a checkout of the repo, and do not use any caching in here.
+  # See: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - .github/workflows/*.yml
+
+permissions:
+  contents: read
+
+jobs:
+  comment-concerning-workflow-changes:
+    name: Comment Concerning Workflow Changes
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name)
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+
+      - name: Manage Warning / Note Comments
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'approved') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          WARNING_TEXT="This Pull Request modifies GitHub workflows and is coming from a fork."
+          NOTE_TEXT="Workflow changes in this Pull Request have been approved!"
+
+          # Fetch existing comments
+          COMMENTS=$(gh api repos/$REPO/issues/$PR_NUMBER/comments)
+
+          # Find warning comment ID
+          WARNING_COMMENT_ID=$(echo "$COMMENTS" | jq -r \
+            '.[] | select(.user.login=="github-actions[bot]") | select(.body | contains("'"$WARNING_TEXT"'")) | .id' | head -n 1)
+
+          # Find note comment ID
+          NOTE_COMMENT_ID=$(echo "$COMMENTS" | jq -r \
+            '.[] | select(.user.login=="github-actions[bot]") | select(.body | contains("'"$NOTE_TEXT"'")) | .id' | head -n 1)
+
+          if [ "$APPROVED" = "true" ]; then
+            BODY="> [!NOTE]
+          > Workflow changes in this Pull Request have been approved!"
+
+            if [ -n "$NOTE_COMMENT_ID" ] && [ "$NOTE_COMMENT_ID" != "null" ]; then
+              # Append to existing note comment
+              EXISTING=$(gh api repos/$REPO/issues/comments/$NOTE_COMMENT_ID --jq .body)
+              gh api \
+                --method PATCH \
+                repos/$REPO/issues/comments/$NOTE_COMMENT_ID \
+                -f body="$EXISTING
+
+          $BODY"
+            else
+              # Create new note comment
+              gh pr comment "$PR_NUMBER" --body "$BODY"
+            fi
+
+            # Add reaction (hooray)
+            if [ -n "$NOTE_COMMENT_ID" ] && [ "$NOTE_COMMENT_ID" != "null" ]; then
+              gh api \
+                --method POST \
+                repos/$REPO/issues/comments/$NOTE_COMMENT_ID/reactions \
+                -f content='hooray' \
+                -H "Accept: application/vnd.github+json"
+            fi
+
+          else
+            BODY="> [!WARNING]
+          > This Pull Request modifies GitHub Workflows and is coming from a fork.
+          **It is very important for the reviewer to ensure that the workflow changes are appropriate.**"
+
+            if [ -z "$WARNING_COMMENT_ID" ] || [ "$WARNING_COMMENT_ID" = "null" ]; then
+              gh pr comment "$PR_NUMBER" --body "$BODY"
+            fi
+          fi
