@@ -30,7 +30,7 @@ def dict_to_tuple_list(dic: dict[Any, Any]) -> list[tuple[Any, Any]]:
     >>> dict_to_tuple_list({"A": [1, 2], "B": 3})
     [('A', 1), ('A', 2), ('B', 3)]
     """
-    tuple_list: list[tuple[Any]] = []
+    tuple_list: list[tuple[Any, Any]] = []
     for key, value in dic.items():
         if isinstance(value, list):
             tuple_list.extend((key, item) for item in value)
@@ -87,7 +87,7 @@ def get_cdm_subset(cdm_subset: Iterable[str] | None) -> list[str]:
     return cdm_subset
 
 
-def get_usecols(tb: str, col_subset: str | Iterable[str] | dict | None) -> list[str] | None:
+def get_usecols(tb: str, col_subset: str | Iterable[str] | dict[str, Any] | None) -> list[str] | None:
     """
     Normalize a column subset specification for use with pandas.read_csv.
 

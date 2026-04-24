@@ -57,9 +57,11 @@ will warn and validate all to True, with NaN to False
 from __future__ import annotations
 import logging
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 import pandas as pd
+from pathlin import Path
 
 from ..common import logging_hdlr
 from ..common.iterators import ProcessFunction, process_function
@@ -74,31 +76,33 @@ _base = f"{properties._base}.station_id"
 def _get_id_col(
     data: pd.DataFrame,
     imodel: str,
-) -> int | list[int] | None:
+) -> str | list[str]:
     """Retrieve the ID column(s) for a given data model from the metadata."""
-    id_col = properties.metadata_datamodels["id"].get(imodel)
-    if not id_col:
+    id_col: str | tuple[str, str] | None = properties.metadata_datamodels["id"].get(imodel)
+    if id_col is None:
         raise ValueError(f"Data model {imodel} ID column not defined in properties file.")
 
-    if not isinstance(id_col, list):
-        id_col = [id_col]
+    if isinstance(id_col, str):
+        id_col_lst = [id_col]
+    else:
+        id_col_lst = list(id_col)
 
-    id_col = [col for col in id_col if col in data.columns]
-    if not id_col:
+    id_col_lst = [col for col in id_col_lst if col in data.columns]
+    if not id_col_lst:
         raise ValueError(f"No ID columns found. Selected columns are {list(data.columns)}")
 
-    if len(id_col) == 1:
-        id_col = id_col[0]
+    if len(id_col_lst) == 1:
+        return id_col_lst[0]
 
-    return id_col
+    return id_col_lst
 
 
 def _get_patterns(
-    dck_id_model: dict,
+    dck_id_model: dict[str, dict[str, str]],
     blank: bool,
     dck: str,
-    data_model_files: list[str],
-    logger: logging.logger,
+    data_model_files: Sequence[str | Path],
+    logger: logging.Logger,
 ) -> list[str]:
     """Generate a list of validation patterns for a given deck.."""
     pattern_dict = dck_id_model.get("valid_patterns")
@@ -118,7 +122,7 @@ def _get_patterns(
     return patterns
 
 
-def _validate_id(data, mrd, combined_compiled, na_values):
+def _validate_id(data: pd.DataFrame, mrd: list[str], combined_compiled: str, na_values: Any) -> pd.Series:
     """Helper function to validate ID."""
     id_col = _get_id_col(data, mrd[0])
 
@@ -127,7 +131,7 @@ def _validate_id(data, mrd, combined_compiled, na_values):
     return id_series.str.match(combined_compiled, na=na_values)
 
 
-def _validate_datetime(data: pd.DataFrame | pd.Series, model: str):
+def _validate_datetime(data: pd.DataFrame | pd.Series, model: str) -> pd.DataFrame | pd.Series:
     """Helper function to validate datetime."""
     data_model_datetime = model_datetimes.to_datetime(data, model)
 
@@ -138,7 +142,7 @@ def _validate_datetime(data: pd.DataFrame | pd.Series, model: str):
 
 @process_function(data_only=True)
 def validate_id(
-    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
+    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame | pd.Series],
     imodel: str,
     blank: bool = False,
     log_level: str = "INFO",
@@ -219,7 +223,7 @@ def validate_id(
 
 @process_function(data_only=True)
 def validate_datetime(
-    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame, pd.Series],
+    data: pd.DataFrame | pd.Series | Iterable[pd.DataFrame | pd.Series],
     imodel: str,
     blank: bool = False,
     log_level: str = "INFO",

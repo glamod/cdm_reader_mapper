@@ -11,6 +11,7 @@ the cdm tool.
 
 from __future__ import annotations
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 from cdm_reader_mapper.common.json_dict import (
@@ -103,7 +104,7 @@ def get_imodel_maps(
         cdm_table_list = cdm_tables
 
     imodel_maps = {}
-    observations_files = []
+    observations_files: list[Path] = []
 
     for cdm_table in cdm_table_list:
         cdm_files = collect_json_files(data_model, *sub_models, base=f"{properties._base}.tables", name=cdm_table)

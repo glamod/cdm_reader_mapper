@@ -7,7 +7,7 @@ from pathlib import Path
 
 def get_filename(
     pattern: Sequence[str | None],
-    path: str = ".",
+    path: str | Path = ".",
     extension: str | None = "pq",
     separator: str | None = "_",
 ) -> str:
@@ -20,7 +20,7 @@ def get_filename(
         Iterable of string components to be joined with hyphens
         (e.g., ["sales", "2024", "Q1"]).
         Empty or falsy items are ignored.
-    path : str, optional
+    path : str or Path-like, optional
         Directory in which the file should be placed.
         Default is current directory `"."`.
     extension : str, optional
@@ -67,7 +67,7 @@ def get_filename(
     else:
         if not separator:
             raise ValueError("Length of pattern is greater than 1. A separator must be set.")
-        name = separator.join(filter(bool, pattern))
+        name = separator.join(filter(None, pattern))
 
     filename = f"{name}{extension}"
 

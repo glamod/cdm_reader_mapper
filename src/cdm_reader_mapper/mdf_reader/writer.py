@@ -5,7 +5,7 @@ import json
 import logging
 from collections.abc import Iterable
 from pathlib import Path
-from typing import get_args
+from typing import Any, get_args
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ WRITERS = {
 
 def _normalize_data_chunks(
     data: pd.DataFrame | Iterable[pd.DataFrame] | None,
-) -> list | ParquetStreamReader:
+) -> list[pd.DataFrame] | ParquetStreamReader:
     """Helper function to normalize data chunks."""
     if data is None:
         data = pd.DataFrame()
@@ -47,18 +47,18 @@ def write_data(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
     data_format: SupportedFileTypes = "parquet",
-    dtypes: pd.Series | dict | None = None,
-    parse_dates: list | bool = False,
+    dtypes: pd.Series | dict[Any, Any] | None = None,
+    parse_dates: list[Any] | bool = False,
     encoding: str = "utf-8",
     out_dir: str = ".",
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
-    filename: str | dict | None = None,
+    filename: str | dict[str, str] | None = None,
     separator: str | None = "_",
     col_subset: str | list[str] | tuple[str] | None = None,
     delimiter: str = ",",
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """
     Write pandas.DataFrame to MDF file on file system.
@@ -145,12 +145,12 @@ def write_data(
     }
 
     logging.info("WRITING DATA TO FILES IN: %s", out_dir)
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    out_dir_path = Path(out_dir)
+    out_dir_path.mkdir(parents=True, exist_ok=True)
 
-    filename_data = get_filename([prefix, "data", suffix], path=out_dir, extension=extension, separator=separator)
-    filename_mask = get_filename([prefix, "mask", suffix], path=out_dir, extension=extension, separator=separator)
-    filename_info = get_filename([prefix, "info", suffix], path=out_dir, extension="json", separator=separator)
+    filename_data = get_filename([prefix, "data", suffix], path=out_dir_path, extension=extension, separator=separator)
+    filename_mask = get_filename([prefix, "mask", suffix], path=out_dir_path, extension=extension, separator=separator)
+    filename_info = get_filename([prefix, "info", suffix], path=out_dir_path, extension="json", separator=separator)
 
     for i, (data_df, mask_df) in enumerate(zip(data_list, mask_list, strict=True)):
         if col_subset is not None:
@@ -167,10 +167,11 @@ def write_data(
 
         if i == 0:
             info["dtypes"] = update_dtypes(info["dtypes"], data_df.columns)
-            for col in data_df.columns:
-                info["dtypes"] = update_column_names(info["dtypes"], col, join(col))
+            if isinstance(info["dtypes"], dict):
+                for col in data_df.columns:
+                    info["dtypes"] = update_column_names(info["dtypes"], col, join(col))
 
-            info["parse_dates"] = [p for p in info["parse_dates"] if p in header]
+            info["parse_dates"] = [p for p in info["parse_dates"] if isinstance(header, list) and p in header]
             info["encoding"] = encoding
 
         write_kwargs = {}

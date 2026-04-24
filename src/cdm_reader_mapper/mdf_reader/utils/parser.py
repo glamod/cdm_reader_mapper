@@ -59,10 +59,10 @@ class ParserConfig:
 
     order_specs: dict[str, OrderSpec]
     disable_reads: list[str]
-    dtypes: dict
+    dtypes: dict[Any, Any]
     parse_dates: list[str]
-    convert_decode: dict
-    validation: dict
+    convert_decode: dict[Any, Any]
+    validation: dict[Any, Any]
     encoding: str
     columns: pd.Index | pd.MultiIndex | None = None
 
@@ -102,8 +102,8 @@ def _parse_fixed_width(
     i: int,
     header: dict[str, Any],
     elements: dict[str, dict[str, Any]],
-    sections: set | None,
-    excludes: set,
+    sections: set[str] | None,
+    excludes: set[str],
     out: dict[Any, Any],
 ) -> int:
     """Parse a fixed-width section of a line into an output dictionary."""
@@ -131,6 +131,7 @@ def _parse_fixed_width(
         if not ignore:
             key = index[0] if isinstance(index, tuple) else index
             if (sections is None or key in sections) and key not in excludes:
+                value: str | bool
                 if i < j:
                     value = line[i:j]
                     if not value.strip() or value == missing_value:
@@ -153,8 +154,8 @@ def _parse_delimited(
     i: int,
     header: dict[str, Any],
     elements: dict[str, dict[str, Any]],
-    sections: set | None,
-    excludes: set,
+    sections: set[str] | None,
+    excludes: set[str],
     out: dict[Any, Any],
 ) -> int:
     """Parse a delimiter-separated section of a line into an output dictionary."""
@@ -174,9 +175,9 @@ def _parse_delimited(
 def _parse_line(
     line: str,
     order_specs: dict[str, OrderSpec],
-    sections: set | None,
-    excludes: set,
-) -> dict[str, dict[Any, Any]]:
+    sections: set[str] | None,
+    excludes: set[str],
+) -> dict[str, str]:
     """Parse a line using the provided parser configuration."""
     i = 0
     out = {}
@@ -491,13 +492,14 @@ def build_parser_config(
                 continue
 
             ctype = _convert_dtype_to_default(meta.get("column_type"))
+            if ctype is None:
+                continue
+
             dtype = properties.pandas_dtypes.get(ctype)
             if dtype is not None:
                 dtypes[index] = dtype
 
-            conv_func = Converters(ctype).converter()
-            if conv_func:
-                converters[index] = conv_func
+            converters[index] = Converters(ctype).converter()
 
             conv_args = {k: meta.get(k) for k in properties.data_type_conversion_args.get(ctype, [])}
             if conv_args:

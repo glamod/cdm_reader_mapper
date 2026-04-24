@@ -15,7 +15,7 @@ import pandas as pd
 from .iterators import ProcessFunction, process_function
 
 
-def merge_sum_dicts(dicts):
+def merge_sum_dicts(dicts: list[Mapping[str, Any]]) -> dict[str, Any]:
     """Recursively merge dictionaries, summing numeric values at the leaves."""
     result = {}
 
@@ -32,7 +32,7 @@ def merge_sum_dicts(dicts):
     return result
 
 
-def _count_by_cat(df, columns) -> dict:
+def _count_by_cat(df: pd.DataFrame, columns: list[Any]) -> dict[Any, Any]:
     """Count unique values in a pandas Series, including NaNs."""
     count_dict = {}
     for column in columns:
@@ -45,8 +45,8 @@ def _count_by_cat(df, columns) -> dict:
 @process_function()
 def count_by_cat(
     data: pd.DataFrame | Iterable[pd.DataFrame],
-    columns: str | list[str] | tuple | None = None,
-) -> dict[str, dict[Any, int]]:
+    columns: str | list[str] | tuple[str] | None = None,
+) -> ProcessFunction:
     """
     Count unique values per column in a DataFrame or a Iterable of DataFrame.
 
@@ -68,9 +68,14 @@ def count_by_cat(
     - Works with large files via ParquetStreamReader by iterating through chunks.
     """
     if columns is None:
+        if not isinstance(data, pd.DataFrame):
+            raise TypeError(f"data must be a pandas DataFrame, not {type(data)}.")
         columns = list(data.columns)
-    if not isinstance(columns, list):
+
+    if isinstance(columns, str):
         columns = [columns]
+    else:
+        columns = list(columns)
 
     return ProcessFunction(
         data=data,
@@ -82,13 +87,13 @@ def count_by_cat(
     )
 
 
-def _get_length(data: pd.DataFrame):
+def _get_length(data: pd.DataFrame) -> int:
     """Get length pd.DataFrame."""
     return len(data)
 
 
 @process_function()
-def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
+def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> ProcessFunction | int:
     """
     Get the total number of rows in a pandas object.
 
@@ -108,7 +113,7 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> int:
       to count rows without loading the entire file into memory.
     """
     if hasattr(data, "_row_count"):
-        return data._row_count
+        return int(data._row_count)
 
     return ProcessFunction(
         data=data,

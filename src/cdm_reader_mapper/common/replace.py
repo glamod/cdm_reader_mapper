@@ -33,7 +33,7 @@ def _replace_columns(
     pivot_r: str | None = None,
     rep_c: str | list[str] | None = None,
     rep_map: dict[str, str] | None = None,
-):
+) -> pd.DataFrame:
     """Helper function to replace columns in DataFrame."""
     # Check inargs
     if not isinstance(df_l, pd.DataFrame) or not isinstance(df_r, pd.DataFrame):
@@ -112,7 +112,7 @@ def replace_columns(
     """
 
     @process_function(data_only=True)
-    def _replace_columns_hlp():
+    def _replace_columns_hlp() -> ProcessFunction:
         return ProcessFunction(
             data=df_l,
             func=_replace_columns,

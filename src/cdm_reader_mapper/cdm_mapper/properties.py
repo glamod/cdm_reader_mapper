@@ -17,7 +17,7 @@ cdm_tables = [
 ]
 
 # ...from CDM table definitions psuedo-sql(...) --------------------------------
-pandas_dtypes = {}
+pandas_dtypes: dict[str, dict[str, str]] = {}
 pandas_dtypes["from_sql"] = {}
 pandas_dtypes["from_sql"]["timestamp with timezone"] = "object"
 pandas_dtypes["from_sql"]["numeric"] = "float"

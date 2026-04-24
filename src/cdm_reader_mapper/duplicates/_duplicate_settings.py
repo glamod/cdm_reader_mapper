@@ -4,8 +4,10 @@ from __future__ import annotations
 from typing import Any
 
 from recordlinkage import Compare
-from recordlinkage.compare import Numeric  # type: ignore[attr-defined]
+from recordlinkage.compare import Numeric
 
+
+__all__ = ["Compare"]
 
 _method_kwargs = {
     "left_on": "report_timestamp",
@@ -43,7 +45,7 @@ _histories = {
 }
 
 
-class Date2(Numeric):
+class Date2(Numeric):  # type: ignore[misc]
     """Copy of ``rl.compare.Numeric`` class."""
 
     pass

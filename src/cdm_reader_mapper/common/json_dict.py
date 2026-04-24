@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 import json
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from .getting_files import get_path
 
 
-def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict:
+def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict[Any, Any]:
     """
     Open a JSON file and return its contents as a dictionary.
 
@@ -24,7 +26,12 @@ def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict:
         Contents of the JSON file.
     """
     with Path(ifile).open(encoding=encoding) as f:
-        return json.load(f)
+        data = json.load(f)
+
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected a JSON object, got {type(data)}.")
+
+    return data
 
 
 def collect_json_files(idir: str, *args: str, base: str | None = None, name: str | None = None) -> list[Path]:
@@ -63,7 +70,7 @@ def collect_json_files(idir: str, *args: str, base: str | None = None, name: str
     return list_of_files
 
 
-def combine_dicts(list_of_files: str | Path | list[str | Path | dict], base: str | None = None) -> dict:
+def combine_dicts(list_of_files: str | Path | Sequence[str | Path | dict[str, Any]], base: str | None = None) -> dict[str, Any]:
     """
     Combine multiple JSON files or dictionaries into a single dictionary.
 
@@ -82,7 +89,7 @@ def combine_dicts(list_of_files: str | Path | list[str | Path | dict], base: str
         Combined dictionary from all input files/dictionaries.
     """
 
-    def update_dict(old: dict, new: dict) -> dict:
+    def update_dict(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         keys = set(old.keys()) | set(new.keys())
         for key in keys:
             if key not in new:
@@ -97,7 +104,7 @@ def combine_dicts(list_of_files: str | Path | list[str | Path | dict], base: str
                 old[key] = new[key]
         return old
 
-    combined_dict: dict = {}
+    combined_dict: dict[str, Any] = {}
     if isinstance(list_of_files, (str, Path)):
         list_of_files = [list_of_files]
 

@@ -10,6 +10,7 @@ Common Data Model (CMD) tables within the cdm tool.
 from __future__ import annotations
 import ast
 import datetime
+from pathlib import Path
 from typing import Any
 
 from cdm_reader_mapper.common.json_dict import (
@@ -42,7 +43,7 @@ def _expand_integer_range_key(d: Any) -> Any:
     if not isinstance(d, dict):
         return d
 
-    expanded = {}
+    expanded: dict[str, Any] = {}
 
     for k, v in d.items():
         v = _expand_integer_range_key(v)
@@ -54,7 +55,7 @@ def _expand_integer_range_key(d: Any) -> Any:
             upper = _to_int(k_eval[1] if k_eval[1] != "yyyy" else datetime.date.today().year)
             step = _to_int(k_eval[2] if len(k_eval) > 2 else 1)
 
-            if None in (lower, upper, step):
+            if lower is None or upper is None or step is None:
                 continue
 
             for i in range(lower, upper + 1, step):
@@ -65,7 +66,7 @@ def _expand_integer_range_key(d: Any) -> Any:
     return expanded
 
 
-def open_code_table(ifile) -> dict:
+def open_code_table(ifile: str | Path) -> Any:
     """Open code table from json file on disk."""
     json_dict = open_json_file(ifile)
     return _expand_integer_range_key(json_dict)

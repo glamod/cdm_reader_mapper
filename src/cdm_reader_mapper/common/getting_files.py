@@ -5,17 +5,13 @@ import hashlib
 import logging
 import os
 import warnings
+from importlib.resources import files as _files
 from pathlib import Path
 from urllib.parse import urlparse
 
-import requests
+import requests  # type: ignore[import-untyped]
 from platformdirs import user_cache_dir
 
-
-try:
-    from importlib.resources import files as _files
-except ImportError:
-    from importlib_resources import files as _files
 
 _default_cache_dir_ = Path(user_cache_dir("cdm-testdata", ".cache"))
 
@@ -32,7 +28,7 @@ def _file_md5_checksum(f_name: str | Path) -> str:
     return hash_md5.hexdigest()
 
 
-def _get_remote_file(lfile: str | Path, url: str, name: str | Path) -> tuple[str, object]:
+def _get_remote_file(lfile: str | Path, url: str, name: str | Path) -> tuple[Path, object]:
     """Download a remote file to a local path.."""
     lfile = Path(lfile)
     name = Path(name)
@@ -133,7 +129,7 @@ def _get_file(
 
 # idea copied from xclim that borrowed it from raven that borrowed it from xclim that borrowed it from xarray that was borrowed from Seaborn
 def load_file(
-    name: str | os.PathLike,
+    name: str | os.PathLike[str],
     github_url: str = "https://github.com/glamod/cdm-testdata",
     branch: str = "main",
     cache: bool = True,
@@ -165,8 +161,7 @@ def load_file(
     -------
     Path
     """
-    if isinstance(name, str):
-        name = Path(name)
+    name = Path(name)
 
     if isinstance(cache_dir, str):
         cache_dir = Path(cache_dir)
@@ -194,13 +189,28 @@ def load_file(
 
 
 def get_path(path: str | Path) -> Path | None:
-    """Get path either from _files(path) or directly from file system."""
-    p = Path(path)
+    """
+    Get path either from _files(path) or directly from file system.
 
+    Parameters
+    ----------
+    path : str | Path
+        If it points to an existing file on disk, that file is returned.
+        Otherwise the value is interpreted as a module name or as
+        ``<module>:<subpath>`` (e.g. ``"mypkg:templates/index.html"``).
+
+    Returns
+    -------
+    Path | None
+        The resolved path or ``None`` if the resource cannot be found.
+    """
+    p = Path(path)
     if p.exists():
         return p
 
     try:
-        return _files(path)
+        return Path(str(_files(str(p))))
     except ModuleNotFoundError:
         logging.warning("No module named %s.", path)
+
+    return None

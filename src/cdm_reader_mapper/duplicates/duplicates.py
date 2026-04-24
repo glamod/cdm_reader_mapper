@@ -4,6 +4,7 @@ from __future__ import annotations
 import datetime
 from collections.abc import Iterable
 from copy import deepcopy
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ import recordlinkage as rl
 from ._duplicate_settings import Compare, _compare_kwargs, _histories, _method_kwargs
 
 
-def convert_series(df: pd.DataFrame, conversion: dict) -> pd.DataFrame:
+def convert_series(df: pd.DataFrame, conversion: dict[Any, Any]) -> pd.DataFrame:
     """
     Convert data types in Dataframe.
 
@@ -28,10 +29,9 @@ def convert_series(df: pd.DataFrame, conversion: dict) -> pd.DataFrame:
     -------
     pandas.DataFrame
     """
-
-    def convert_date_to_float(date):
-        date = date.astype("datetime64[ns]")
-        return (date - date.min()) / np.timedelta64(1, "s")
+    # def convert_date_to_float(date):
+    #    date = date.astype("datetime64[ns]")
+    #    return (date - date.min()) / np.timedelta64(1, "s")
 
     df = df.copy()
     for column, method in conversion.items():
@@ -66,7 +66,7 @@ def add_history(df: pd.DataFrame, indexes: Iterable[int]) -> pd.DataFrame:
     - Each message is prefixed with a UTC timestamp in "YYYY-MM-DD HH:MM:SS" format.
     """
 
-    def _datetime_now():
+    def _datetime_now() -> str:
 
         try:
             now = datetime.datetime.now(datetime.UTC)
@@ -110,7 +110,7 @@ def add_duplicates(df: pd.DataFrame, dups: pd.DataFrame) -> pd.DataFrame:
     - Supports duplicates represented either by IDs (str) or by indices (int) of `report_id`.
     """
 
-    def _add_dups(row):
+    def _add_dups(row: pd.Series) -> pd.Series:
         idx = row.name
         if idx not in dups.index:
             return row
@@ -182,9 +182,9 @@ class DupDetect:
         data: pd.DataFrame,
         compared: pd.DataFrame,
         method: str,
-        method_kwargs: dict,
-        compare_kwargs: dict,
-    ):
+        method_kwargs: dict[Any, Any],
+        compare_kwargs: dict[Any, Any],
+    ) -> None:
         self.data = data.copy()
         self.compared = compared
         self.method = method
@@ -206,7 +206,7 @@ class DupDetect:
             Threshold for total score to consider duplicates.
         """
         default_limit = 0.991
-        if limit in ("default", None):
+        if limit is None or limit == "default":
             return default_limit
 
         return float(limit)
@@ -220,11 +220,13 @@ class DupDetect:
         list[str]
             Columns that must match exactly to consider duplicates.
         """
-        equal_musts = []
+        equal_musts: list[str] = []
         for value in self.compare_kwargs.keys():
-            if not isinstance(value, list):
-                value = [value]
-            equal_musts.extend(v for v in value if v in self.data.columns)
+            if isinstance(value, str):
+                value_lst = [value]
+            else:
+                value_lst = list(value)
+            equal_musts.extend(v for v in value_lst if v in self.data.columns)
         return equal_musts
 
     def _total_score(self) -> None:
@@ -317,7 +319,7 @@ class DupDetect:
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
 
-        def _get_similars(drop, keeps):
+        def _get_similars(drop: dict[str, Any], keeps: Any) -> tuple[Any, Any]:
             if drop[drop_] in keeps:
                 drops = drop[drop_]
                 keeps = drop[keep_]
@@ -326,11 +328,13 @@ class DupDetect:
                 except ValueError:
                     return drops, keeps
 
-        def _get_duplicates(x, last):
+            return None, None
+
+        def _get_duplicates(x: pd.DataFrame, last: Any) -> pd.Series:
             b = list(set(x[last].values))
             return pd.Series({"dups": b})
 
-        def _delete_values_equal_keys(dictionary):
+        def _delete_values_equal_keys(dictionary: dict[Any, Any]) -> tuple[dict[Any, Any], list[Any]]:
             dictionary_ = {}
             drops_ = []
             for k, v in dictionary.items():
@@ -340,7 +344,7 @@ class DupDetect:
                 dictionary_[k] = v
             return dictionary_, drops_
 
-        def replace_keeps_and_drops(df, keep_):
+        def replace_keeps_and_drops(df: pd.DataFrame, keep_: Any) -> pd.DataFrame:
             keeps = df[keep_].values
             while True:
                 df = df.sort_index()
@@ -362,7 +366,7 @@ class DupDetect:
 
         result["duplicate_status"] = 0
         if not hasattr(self, "matches"):
-            self.get_matches(limit="default", equal_musts=equal_musts)
+            self.get_duplicates(limit="default", equal_musts=equal_musts)
 
         indexes = self.matches.index
         indexes_df = indexes.to_frame()
@@ -428,7 +432,7 @@ class DupDetect:
         return self.result
 
 
-def set_comparer(compare_dict) -> Compare:
+def set_comparer(compare_dict: dict[Any, Any]) -> Compare:
     """
     Build a recordlinkage Compare object with optional conversion dictionary.
 
@@ -472,7 +476,7 @@ def set_comparer(compare_dict) -> Compare:
     return comparer
 
 
-def remove_ignores(dic: dict, columns: str | list[str]) -> dict:
+def remove_ignores(dic: dict[Any, Any], columns: str | list[str]) -> dict[Any, Any]:
     """
     Remove dictionary entries where keys or values match ignored columns.
 
@@ -505,7 +509,7 @@ def remove_ignores(dic: dict, columns: str | list[str]) -> dict:
     return new_dict
 
 
-def change_offsets(dic: dict, dic_o: dict) -> dict:
+def change_offsets(dic: dict[Any, Any], dic_o: dict[Any, Any]) -> dict[Any, Any]:
     """
     Update the 'offset' value in compare dictionary kwargs.
 
@@ -528,7 +532,7 @@ def change_offsets(dic: dict, dic_o: dict) -> dict:
     return dic
 
 
-def reindex_nulls(df: pd.DataFrame, null_label) -> pd.DataFrame:
+def reindex_nulls(df: pd.DataFrame, null_label: Any) -> pd.DataFrame:
     """
     Reindex a DataFrame in ascending order based on the number of 'null' strings in each row.
 
@@ -544,7 +548,7 @@ def reindex_nulls(df: pd.DataFrame, null_label) -> pd.DataFrame:
         Original row order is preserved for rows with the same null count.
     """
 
-    def is_missing(x):
+    def is_missing(x: Any) -> bool:
         if isinstance(x, (list, tuple, np.ndarray)):
             return any(is_missing(x_) for x_ in x)
 
@@ -556,7 +560,7 @@ def reindex_nulls(df: pd.DataFrame, null_label) -> pd.DataFrame:
 
         return False
 
-    def count_nulls(row):
+    def count_nulls(row: pd.Series) -> int:
         return sum(is_missing(x) for x in row)
 
     null_counts = df.apply(count_nulls, axis=1)
@@ -593,12 +597,12 @@ class Comparer:
 
     def __init__(
         self,
-        data,
-        method,
-        method_kwargs,
-        compare_kwargs,
-        pairs_df=None,
-        convert_data=False,
+        data: pd.DataFrame,
+        method: str,
+        method_kwargs: dict[Any, Any],
+        compare_kwargs: dict[Any, Any],
+        pairs_df: list[pd.DataFrame] | None = None,
+        convert_data: bool = False,
     ):
         indexer = getattr(rl.index, method)(**method_kwargs)
         comparer = set_comparer(compare_kwargs)
@@ -615,16 +619,16 @@ class Comparer:
 
 
 def duplicate_check(
-    data,
-    method="SortedNeighbourhood",
-    method_kwargs=None,
-    compare_kwargs=None,
-    table_name=None,
-    ignore_columns=None,
-    ignore_entries=None,
-    offsets=None,
-    reindex_by_null=True,
-    null_label="null",
+    data: pd.DataFrame,
+    method: str = "SortedNeighbourhood",
+    method_kwargs: dict[Any, Any] | None = None,
+    compare_kwargs: dict[Any, Any] | None = None,
+    table_name: str | None = None,
+    ignore_columns: str | None = None,
+    ignore_entries: dict[str, Any] | None = None,
+    offsets: dict[str, Any] | None = None,
+    reindex_by_null: bool = True,
+    null_label: Any = "null",
 ) -> DupDetect:
     """
     Run a duplicate check on a dataset using recordlinkage.

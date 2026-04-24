@@ -163,7 +163,7 @@ def correct_datetime(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
     log_level: str = "INFO",
-    _base=_base,
+    _base: str = _base,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """
     Apply ICOADS deck specific datetime corrections.
@@ -232,8 +232,8 @@ def correct_datetime(
 def correct_pt(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
-    log_level="INFO",
-    _base=_base,
+    log_level: str = "INFO",
+    _base: str = _base,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """
     Apply ICOADS deck specific platform ID corrections.

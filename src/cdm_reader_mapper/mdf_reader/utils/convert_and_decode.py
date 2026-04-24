@@ -205,10 +205,10 @@ class Converters:
         KeyError
             If no converter is registered for the dtype
         """
-        try:
+        if self.dtype in self._registry:
             return self._registry[self.dtype]
-        except KeyError as exc:
-            raise KeyError(f"No converter registered for '{self.dtype}'") from exc
+
+        raise KeyError(f"No converter registered for '{self.dtype}'")
 
     def object_to_numeric(
         self,

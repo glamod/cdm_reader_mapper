@@ -226,9 +226,9 @@ def _sort_chunk_outputs(
 
 def _initialize_storage(
     first_batch: list[pd.DataFrame | pd.Series],
-) -> tuple[list[TemporaryDirectory], list[tuple[type, Any]]]:
+) -> tuple[list[TemporaryDirectory[str]], list[tuple[type, Any]]]:
     """Creates temp directories and captures schemas from the first chunk."""
-    temp_dirs: list[TemporaryDirectory] = []
+    temp_dirs: list[TemporaryDirectory[str]] = []
     schemas: list[tuple[type, Any]] = []
 
     for obj in first_batch:
@@ -246,7 +246,7 @@ def _initialize_storage(
 
 def _write_chunks_to_disk(
     batch: list[pd.DataFrame | pd.Series],
-    temp_dirs: list[TemporaryDirectory],
+    temp_dirs: list[TemporaryDirectory[str]],
     chunk_counter: int,
 ) -> None:
     """Writes the current batch of DataFrames to their respective temp directories."""
@@ -260,7 +260,7 @@ def _write_chunks_to_disk(
         pq.write_table(table, file_path, compression="snappy")
 
 
-def _parquet_generator(temp_dir: TemporaryDirectory, data_type: type, schema: str | None) -> Generator[pd.DataFrame | pd.Series]:
+def _parquet_generator(temp_dir: TemporaryDirectory[str], data_type: type, schema: str | None) -> Generator[pd.DataFrame | pd.Series]:
     """Yields DataFrames from a temp directory, restoring schema."""
     try:
         files = sorted(Path(temp_dir.name).glob("*.parquet"))
@@ -296,7 +296,7 @@ def _process_chunks(
 ):
     """Process chunks."""
     # State variables
-    temp_dirs: list[TemporaryDirectory] | None = None
+    temp_dirs: list[TemporaryDirectory[str]] | None = None
     schemas: list[tuple[type, Any]] | None = None
     output_non_data_dict: dict[int, list[Any]] = {}
     chunk_counter: int = 0
@@ -354,7 +354,12 @@ def _process_chunks(
         raise ValueError("Could not set schemas.")
 
     final_iterators: list[ParquetStreamReader] = [
-        ParquetStreamReader(lambda d=d, t=t, s=s: _parquet_generator(d, t, s)) for d, (t, s) in zip(temp_dirs, schemas, strict=True)
+        ParquetStreamReader(
+            (
+                lambda d=d, t=t, s=s: _parquet_generator(d, t, s)  # type: ignore[misc]
+            )
+        )
+        for d, (t, s) in zip(temp_dirs, schemas, strict=True)
     ]
 
     if isinstance(output_non_data, tuple):

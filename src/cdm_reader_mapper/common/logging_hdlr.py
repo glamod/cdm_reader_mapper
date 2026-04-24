@@ -42,15 +42,7 @@ def init_logger(module: str, level: str = "INFO", fn: str | None = LOG_FN) -> lo
     reload(logging)
 
     level = logging.getLevelName(level.upper())
-    logging_params = {
-        "level": level,
-        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    }
-
-    if fn is not None:
-        logging_params["filename"] = fn
-
-    logging.basicConfig(**logging_params)
+    logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", filename=fn)
     logging.info("Initialized basic logging configuration successfully")
 
     return logging.getLogger(module)

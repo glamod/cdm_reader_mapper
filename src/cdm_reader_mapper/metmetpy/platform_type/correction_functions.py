@@ -37,9 +37,9 @@ def is_num(x: Any) -> bool:
 
 def overwrite_data(
     data: pd.DataFrame,
-    loc: pd.Series | pd.Index | list | pd.Series,
+    loc: pd.Series | pd.Index | list[int] | pd.Series,
     pt_col: str,
-    value,
+    value: Any,
 ) -> pd.DataFrame:
     """
     Overwrite values in a DataFrame column based on a boolean location mask.
@@ -52,7 +52,7 @@ def overwrite_data(
         Boolean mask indicating which rows to overwrite.
     pt_col : str
         Name of the column to overwrite.
-    value : any
+    value : Any
         Value to assign to the specified rows and column.
 
     Returns
@@ -72,11 +72,11 @@ def overwrite_data(
 
 def fill_value(
     fill_serie: pd.Series,
-    fill_value,
-    self_condition_value=None,
+    fill_value: Any,
+    self_condition_value: Any | None = None,
     fillna: bool = False,
     out_condition: pd.DataFrame | None = None,
-    out_condition_values: dict | None = None,
+    out_condition_values: dict[Any, Any] | None = None,
     self_out_conditions: str = "intersect",
 ) -> pd.Series:
     """
@@ -95,9 +95,9 @@ def fill_value(
     ----------
     fill_serie : pd.Series
         Series to fill.
-    fill_value : any
+    fill_value : Any
         Value used to fill.
-    self_condition_value : optional
+    self_condition_value : Any, optional
         Value in `fill_serie` that triggers filling.
     fillna : bool, default False
         Whether to fill NA values in addition to conditions.
@@ -178,7 +178,7 @@ def deck_717_gdac(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def deck_700_icoads(data) -> pd.DataFrame:
+def deck_700_icoads(data: pd.DataFrame) -> pd.DataFrame:
     """
     Adjust ICOADS platform codes for dataset 700.
 
@@ -202,9 +202,9 @@ def deck_700_icoads(data) -> pd.DataFrame:
     pt = "5"
     buoys = "6"
     regex = re.compile(r"^\d{5,5}$")
-    id_col = properties.metadata_datamodels.get("id").get("icoads")
-    sid_col = properties.metadata_datamodels.get("source").get("icoads")
-    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
+    id_col = properties.metadata_datamodels.get("id", {}).get("icoads")
+    sid_col = properties.metadata_datamodels.get("source", {}).get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform", {}).get("icoads")
 
     data[pt_col] = data[pt_col].fillna(drifters)
     loc = (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
@@ -247,9 +247,9 @@ def deck_892_icoads(data: pd.DataFrame) -> pd.DataFrame:
     pt = "5"
     buoys = "6"
     regex = re.compile(r"^\d{5,5}$")
-    id_col = properties.metadata_datamodels.get("id").get("icoads")
-    sid_col = properties.metadata_datamodels.get("source").get("icoads")
-    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
+    id_col = properties.metadata_datamodels.get("id", {}).get("icoads")
+    sid_col = properties.metadata_datamodels.get("source", {}).get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform", {}).get("icoads")
 
     loc = (data[id_col].str.match(regex)) & (data[sid_col] == sid) & (data[pt_col] == pt)
     data[pt_col] = data[pt_col].where(~loc, buoys)
@@ -291,9 +291,9 @@ def deck_792_icoads(data: pd.DataFrame) -> pd.DataFrame:
     pt = "5"
     buoys = "6"
     regex = re.compile("^[0-9]+$")
-    id_col = properties.metadata_datamodels.get("id").get("icoads")
-    sid_col = properties.metadata_datamodels.get("source").get("icoads")
-    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
+    id_col = properties.metadata_datamodels.get("id", {}).get("icoads")
+    sid_col = properties.metadata_datamodels.get("source", {}).get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform", {}).get("icoads")
 
     loc = (
         (data[id_col].str.match(regex))
@@ -332,9 +332,9 @@ def deck_992_icoads(data: pd.DataFrame) -> pd.DataFrame:
     buoys = "6"
     regex = re.compile("^6202+$")
 
-    id_col = properties.metadata_datamodels.get("id").get("icoads")
-    sid_col = properties.metadata_datamodels.get("source").get("icoads")
-    pt_col = properties.metadata_datamodels.get("platform").get("icoads")
+    id_col = properties.metadata_datamodels.get("id", {}).get("icoads")
+    sid_col = properties.metadata_datamodels.get("source", {}).get("icoads")
+    pt_col = properties.metadata_datamodels.get("platform", {}).get("icoads")
 
     loc = data[id_col].str.match(regex) & (data[id_col].str.len() == 7) & (data[sid_col] == sid) & (data[pt_col] == pt)
     data = overwrite_data(data, loc, pt_col, lv)

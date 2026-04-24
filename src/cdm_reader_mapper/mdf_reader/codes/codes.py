@@ -9,6 +9,7 @@ requirements of the data reader tool
 
 from __future__ import annotations
 from pathlib import Path
+from typing import Any
 
 from cdm_reader_mapper.common.json_dict import (
     collect_json_files,
@@ -23,7 +24,7 @@ def read_table(
     code_table_name: str,
     imodel: str | None = None,
     ext_table_path: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """
     Load a data model code table into a Python dictionary.
 
@@ -60,7 +61,7 @@ def read_table(
         table_file = table_path / f"{code_table_name}.json"
         if not table_file.is_file():
             raise FileNotFoundError(f"Can't find input code table file {table_file}")
-        table_files = [table_file]
+        table_files: list[Path] = [table_file]
     elif imodel:
         parts = imodel.split("_")
         table_files = collect_json_files(
@@ -68,12 +69,9 @@ def read_table(
             base=f"{properties._base}.codes",
             name=code_table_name,
         )
-
-        if isinstance(table_files, Path):
-            table_files = [table_files]
     else:
         raise ValueError("One of 'imodel' or 'ext_table_path' must be set")
 
-    tables = [open_json_file(ifile) for ifile in table_files]
+    tables: list[dict[str, Any]] = [open_json_file(ifile) for ifile in table_files]
 
     return combine_dicts(tables)

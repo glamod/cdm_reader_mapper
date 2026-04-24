@@ -129,7 +129,7 @@ def validate(
     ext_table_path: str | None,
     attributes: dict[str, dict[str, Any]],
     disables: list[str] | None = None,
-) -> pd.DataFrame:
+) -> pd.DataFrame | None:
     """
     Validate a pandas DataFrame according to a data model and code tables.
 
@@ -191,6 +191,9 @@ def validate(
             column_mask = validate_numeric(series, valid_min, valid_max)
         elif column_type == "key":
             code_table_name = column_atts.get("codetable")
+            if not isinstance(code_table_name, str):
+                logging.warning("codetable must be a str for column '{column}', got %s", type(code_table_name))
+                continue
             code_table = codes.read_table(code_table_name, imodel=imodel, ext_table_path=ext_table_path)
             column_mask = validate_codes(series, code_table, column_type)
         elif column_type in basic_functions:

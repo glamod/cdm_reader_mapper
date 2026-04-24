@@ -9,13 +9,14 @@ Created on Wed Jul  3 09:48:18 2019
 
 from __future__ import annotations
 from collections.abc import Iterable
+from typing import Any
 
 import pandas as pd
 
 from .iterators import ParquetStreamReader, ProcessFunction, process_function
 
 
-def _concat_indexes(idx_dict):
+def _concat_indexes(idx_dict: dict[int, Any]) -> tuple[pd.Index, pd.Index]:
     selected_idx = pd.Index([]).append(idx_dict[0])
     rejected_idx = pd.Index([]).append(idx_dict[1])
     selected_idx = selected_idx.drop_duplicates()
@@ -23,7 +24,7 @@ def _concat_indexes(idx_dict):
     return selected_idx, rejected_idx
 
 
-def _reset_index(data, reset_index=False):
+def _reset_index(data: pd.DataFrame | pd.Series, reset_index: bool = False) -> pd.DataFrame | pd.Series:
     if reset_index is False:
         return data
     return data.reset_index(drop=True)
@@ -34,7 +35,7 @@ def _split_df(
     mask: pd.DataFrame,
     inverse: bool = False,
     return_rejected: bool = False,
-):
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if inverse:
         selected = df[~mask]
         rejected = df[mask] if return_rejected else df.iloc[0:0]
@@ -47,7 +48,9 @@ def _split_df(
     return selected, rejected, selected_idx, rejected_idx
 
 
-def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs):
+def _split_by_boolean_df(
+    df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **kwargs: Any
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if mask.empty:
         mask_sel = pd.Series(boolean, index=df.index)
     else:
@@ -59,9 +62,9 @@ def _split_by_boolean_df(df: pd.DataFrame, mask: pd.DataFrame, boolean: bool, **
 def _split_by_column_df(
     df: pd.DataFrame,
     col: str,
-    values: Iterable,
-    **kwargs,
-):
+    values: Iterable[Any],
+    **kwargs: Any,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     mask_sel = df[col].isin(values)
     mask_sel.name = col
 
@@ -70,9 +73,9 @@ def _split_by_column_df(
 
 def _split_by_index_df(
     df: pd.DataFrame,
-    index,
-    **kwargs,
-):
+    index: int | Iterable[int],
+    **kwargs: Any,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     index = pd.Index(index if isinstance(index, Iterable) else [index])
     mask_sel = pd.Series(df.index.isin(index), index=df.index)
     return _split_df(df=df, mask=mask_sel, **kwargs)
@@ -128,7 +131,7 @@ def split_by_boolean(
     """
 
     @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
-    def _split_by_boolean(reset_index=reset_index):
+    def _split_by_boolean(reset_index: bool = reset_index) -> ProcessFunction:
         return ProcessFunction(
             data=data,
             func=_split_by_boolean_df,
@@ -233,7 +236,7 @@ def split_by_boolean_false(
 
 def split_by_column_entries(
     data: pd.DataFrame,
-    selection: dict[str, Iterable],
+    selection: dict[str, Iterable[Any]],
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
@@ -269,7 +272,7 @@ def split_by_column_entries(
     """
 
     @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
-    def _split_by_column_entries(reset_index=reset_index):
+    def _split_by_column_entries(reset_index: bool = reset_index) -> ProcessFunction:
         return ProcessFunction(
             data=data,
             func=_split_by_column_df,
@@ -285,7 +288,7 @@ def split_by_column_entries(
 
 def split_by_index(
     data: pd.DataFrame,
-    index,
+    index: int | Iterable[int],
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,
@@ -320,7 +323,7 @@ def split_by_index(
     """
 
     @process_function(postprocessing={"func": _reset_index, "kwargs": "reset_index"})
-    def _split_by_index(reset_index=reset_index):
+    def _split_by_index(reset_index: bool = reset_index) -> ProcessFunction:
         return ProcessFunction(
             data=data,
             func=_split_by_index_df,

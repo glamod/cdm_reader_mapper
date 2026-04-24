@@ -84,13 +84,13 @@ def join(col: Any | Iterable[Any]) -> str:
     return str(col)
 
 
-def update_dtypes(dtypes: dict[str, Any], columns: Iterable[str]) -> dict[str, Any]:
+def update_dtypes(dtypes: dict[str, Any] | pd.Series, columns: Iterable[str]) -> dict[str, Any] | pd.Series:
     """
     Filter dtypes dictionary to only include columns present in 'columns'.
 
     Parameters
     ----------
-    dtypes : dict
+    dtypes : dict or pd.Series
         Dictionary mapping column names to their data types.
     columns : iterable of str
         List of columns to keep.
