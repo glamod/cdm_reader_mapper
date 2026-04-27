@@ -85,7 +85,7 @@ class FileReader:
 
     def __init__(
         self,
-        imodel: str,
+        imodel: str | None,
         ext_schema_path: str | None = None,
         ext_schema_file: str | None = None,
     ):
@@ -99,7 +99,7 @@ class FileReader:
         args, kwargs
             Arguments passed to ``build_parser_config``.
         """
-        self.imodel: str = imodel
+        self.imodel = imodel
         self.config: ParserConfig = build_parser_config(
             imodel=imodel,
             ext_schema_path=ext_schema_path,
@@ -177,17 +177,18 @@ class FileReader:
 
         if self.imodel:
             data_model = self.imodel.split("_")[0]
+            factorize = properties.factorize.get(data_model)
+            year_col = properties.year_column.get(data_model)
         else:
             data_model = None
+            factorize = None
+            year_col = None
 
-        factorize = properties.factorize.get(data_model)
         if factorize:
             source_column = factorize["source"]
             target_column = factorize["target"]
             codes, _ = pd.factorize(data[source_column])
             data[target_column] = pd.Series(codes)
-
-        year_col = properties.year_column.get(data_model)
 
         data = _select_years(data, (year_init, year_end), year_col)
 
@@ -353,9 +354,14 @@ class FileReader:
         logging.info("EXTRACTING DATA FROM MODEL: %s", self.imodel)
         logging.info("Reading and parsing source data...")
 
+        if self.imodel is None:
+            open_with = "pandas"
+        else:
+            open_with = properties.open_file.get(self.imodel, "pandas")
+
         result = self.open_data(
             source,
-            open_with=properties.open_file.get(self.imodel, "pandas"),
+            open_with=open_with,
             pd_kwargs=pd_kwargs,
             xr_kwargs=xr_kwargs,
             convert_kwargs=convert_kwargs,

@@ -125,7 +125,7 @@ def validate_codes(series: pd.Series, code_table: Iterable[Any], column_type: st
 
 def validate(
     data: pd.DataFrame,
-    imodel: str,
+    imodel: str | None,
     ext_table_path: str | None,
     attributes: dict[str, dict[str, Any]],
     disables: list[str] | None = None,
@@ -157,6 +157,10 @@ def validate(
     pd.DataFrame
         Boolean mask of the same shape as `data`. True indicates a valid entry.
     """
+    if imodel is None:
+        logging.error("imodel is not defined.")
+        return None
+
     if not isinstance(data, pd.DataFrame):
         logging.error("input data must be a pandas DataFrame.")
         return None

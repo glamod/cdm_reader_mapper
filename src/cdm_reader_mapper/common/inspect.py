@@ -12,7 +12,7 @@ from typing import Any
 
 import pandas as pd
 
-from .iterators import ProcessFunction, process_function
+from .iterators import ParquetStreamReader, ProcessFunction, process_function
 
 
 def merge_sum_dicts(dicts: list[Mapping[str, Any]]) -> dict[str, Any]:
@@ -32,9 +32,14 @@ def merge_sum_dicts(dicts: list[Mapping[str, Any]]) -> dict[str, Any]:
     return result
 
 
-def _count_by_cat(df: pd.DataFrame, columns: list[Any]) -> dict[Any, Any]:
+# def _is_counts_dict(value: Any) -> TypeGuard[dict[str | tuple[str, str], int]]:
+#    """Return True if *value* is a dict with the expected key/value types."""
+#    return isinstance(value, dict)
+
+
+def _count_by_cat(df: pd.DataFrame, columns: list[Any]) -> dict[Any, int]:
     """Count unique values in a pandas Series, including NaNs."""
-    count_dict = {}
+    count_dict: dict[Any, int] = {}
     for column in columns:
         counts = df[column].value_counts(dropna=False)
         counts.index = counts.index.where(~counts.index.isna(), "nan")
@@ -45,8 +50,8 @@ def _count_by_cat(df: pd.DataFrame, columns: list[Any]) -> dict[Any, Any]:
 @process_function()
 def count_by_cat(
     data: pd.DataFrame | Iterable[pd.DataFrame],
-    columns: str | list[str] | tuple[str] | None = None,
-) -> ProcessFunction:
+    columns: str | tuple[str, str] | list[str | tuple[str, str]] | None = None,
+) -> dict[str | tuple[str, str], dict[Any, int]]:
     """
     Count unique values per column in a DataFrame or a Iterable of DataFrame.
 
@@ -59,7 +64,7 @@ def count_by_cat(
 
     Returns
     -------
-    Dict[str, Dict[Any, int]]
+    Dict[str | tuple[str, str], int]
         Dictionary where each key is a column name, and each value is a dictionary
         mapping unique values (including NaN as 'nan') to their counts.
 
@@ -77,7 +82,7 @@ def count_by_cat(
     else:
         columns = list(columns)
 
-    return ProcessFunction(
+    result = ProcessFunction(
         data=data,
         func=_count_by_cat,
         func_kwargs={"columns": columns},
@@ -86,6 +91,11 @@ def count_by_cat(
         non_data_proc=merge_sum_dicts,
     )
 
+    if isinstance(result, dict):
+        return result
+
+    raise TypeError(f"result is not a dictionary, {type(result)}.")
+
 
 def _get_length(data: pd.DataFrame) -> int:
     """Get length pd.DataFrame."""
@@ -93,7 +103,7 @@ def _get_length(data: pd.DataFrame) -> int:
 
 
 @process_function()
-def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> ProcessFunction | int:
+def get_length(data: pd.DataFrame | Iterable[pd.DataFrame] | ParquetStreamReader) -> int:
     """
     Get the total number of rows in a pandas object.
 
@@ -115,10 +125,15 @@ def get_length(data: pd.DataFrame | Iterable[pd.DataFrame]) -> ProcessFunction |
     if hasattr(data, "_row_count"):
         return int(data._row_count)
 
-    return ProcessFunction(
+    result = ProcessFunction(
         data=data,
         func=_get_length,
         non_data_output="acc",
         makecopy=True,
         non_data_proc=sum,
     )
+
+    if isinstance(result, int):
+        return result
+
+    raise TypeError(f"result is not a integer, {type(result)}.")

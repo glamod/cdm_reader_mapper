@@ -58,10 +58,10 @@ from __future__ import annotations
 import logging
 import re
 from collections.abc import Iterable, Sequence
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from pathlin import Path
 
 from ..common import logging_hdlr
 from ..common.iterators import ProcessFunction, process_function

@@ -10,6 +10,7 @@ the cdm tool.
 """
 
 from __future__ import annotations
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -24,8 +25,8 @@ from .. import properties
 
 
 def get_cdm_atts(
-    cdm_tables: str | list[str] | None = None,
-) -> dict[str, dict[str, Any]]:
+    cdm_tables: str | tuple[str, str] | Sequence[str | tuple[str, str]] | None = None,
+) -> dict[Any, dict[Any, Any]]:
     """
     Get CDM attribute tables.
 
@@ -51,7 +52,7 @@ def get_cdm_atts(
     observations_dict = open_json_file(observations_file)
 
     if cdm_tables is None:
-        cdm_table_list = properties.cdm_tables
+        cdm_table_list: Sequence[str | tuple[str, str]] = properties.cdm_tables
     elif isinstance(cdm_tables, str):
         cdm_table_list = [cdm_tables]
     else:

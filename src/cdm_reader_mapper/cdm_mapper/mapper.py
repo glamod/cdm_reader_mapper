@@ -12,7 +12,8 @@ for the input data model.
 """
 
 from __future__ import annotations
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from logging import Logger
 from typing import Any, get_args
 
 import pandas as pd
@@ -31,7 +32,7 @@ from .utils.conversions import convert_from_str_series
 from .utils.mapping_functions import MappingFunctions
 
 
-def _is_empty(value):
+def _is_empty(value: Any) -> bool:
     """Check whether a value is considered empty."""
     if value is None:
         return True
@@ -45,7 +46,7 @@ def _is_empty(value):
     return False
 
 
-def _drop_duplicated_rows(df) -> pd.DataFrame:
+def _drop_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Drop duplicates from list."""
     list_cols = [col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()]
 
@@ -61,22 +62,18 @@ def _drop_duplicated_rows(df) -> pd.DataFrame:
     return df
 
 
-def _get_nested_value(ndict, keys) -> Any | None:
+def _get_nested_value(ndict: dict[Any, Any] | None, keys: list[Any]) -> Any | None:
     """Traverse nested dictionaries along a sequence of keys."""
     if not isinstance(ndict, dict):
         return None
 
-    current = ndict
     for key in keys:
-        if not isinstance(current, dict):
-            return None
-
-        value = current.get(key)
+        value = ndict.get(key)
         if value is None:
             return None
 
         if isinstance(value, dict):
-            current = value
+            ndict = value
         else:
             return value
 
@@ -84,11 +81,11 @@ def _get_nested_value(ndict, keys) -> Any | None:
 
 
 def _transform(
-    data,
-    imodel_functions,
-    transform,
-    kwargs,
-    logger,
+    data: pd.DataFrame | pd.Series,
+    imodel_functions: MappingFunctions,
+    transform: str,
+    kwargs: dict[str, Any],
+    logger: Logger,
 ) -> pd.Series:
     """Apply a transformation function from imodel_functions to a pandas Series."""
     logger.debug("Applying transform: %s", transform)
@@ -105,10 +102,10 @@ def _transform(
 
 
 def _code_table(
-    data,
-    data_model,
-    code_table,
-    logger,
+    data: pd.DataFrame | pd.Series,
+    data_model: str,
+    code_table: str,
+    logger: Logger,
 ) -> pd.Series:
     """Map values in a Series or DataFrame using a (possibly nested) code table."""
     logger.debug("Mapping code table: %s", code_table)
@@ -120,31 +117,33 @@ def _code_table(
 
     df.columns = ["_".join(col) if isinstance(col, tuple) else str(col) for col in df.columns]
 
-    def _map_col(col):
+    def _map_col(col: Any) -> Any:
         return _get_nested_value(table_map, col.tolist())
 
     return df.apply(_map_col, axis=1)
 
 
 def _default(
-    default,
-    length,
-) -> list:
+    default: Any,
+    length: int,
+) -> list[Any]:
     """Return a list of a given length filled with the default value."""
     return [default] * length
 
 
-def _fill_value(series, fill_value) -> pd.Series:
+def _fill_value(series: pd.DataFrame | pd.Series, fill_value: Any | None) -> pd.Series:
     """Fill missing values in series."""
     if fill_value is None:
         return series
     return series.fillna(value=fill_value).infer_objects(copy=False)
 
 
-def _extract_input_data(idata, elements, default, logger):
+def _extract_input_data(
+    idata: pd.DataFrame | pd.Series, elements: list[str | tuple[str, str]], default: Any, logger: Logger
+) -> tuple[pd.DataFrame | pd.Series, bool]:
     """Extract the relevant input data based on `elements`."""
 
-    def _return_default(bool):
+    def _return_default(bool: bool) -> tuple[pd.Series, bool]:
         return pd.Series(_default(default, len(idata)), index=idata.index), bool
 
     if not elements:
@@ -172,21 +171,21 @@ def _extract_input_data(idata, elements, default, logger):
 
 
 def _column_mapping(
-    idata,
-    imapping,
-    imodel_functions,
-    atts,
-    codes_subset,
-    column,
-    logger,
-):
+    idata: pd.DataFrame | pd.Series,
+    imapping: dict[str, Any],
+    imodel_functions: MappingFunctions,
+    atts: dict[str, Any],
+    codes_subset: str | tuple[str, str] | list[str | tuple[str, str]],
+    column: str | tuple[str, str],
+    logger: Logger,
+) -> pd.DataFrame | pd.Series:
     """Map a column (or multiple elements) in input data according to mapping rules."""
-    elements = imapping.get("elements")
-    transform = imapping.get("transform")
-    kwargs = imapping.get("kwargs", {})
-    code_table = imapping.get("code_table")
-    default = imapping.get("default")
-    fill_value = imapping.get("fill_value")
+    elements: list[str | tuple[str, str]] = imapping.get("elements", [])
+    transform: str | None = imapping.get("transform")
+    kwargs: dict[str, Any] = imapping.get("kwargs", {})
+    code_table: str | None = imapping.get("code_table")
+    default: Any = imapping.get("default")
+    fill_value: Any = imapping.get("fill_value")
 
     if codes_subset and code_table not in codes_subset:
         code_table = None
@@ -231,15 +230,15 @@ def _column_mapping(
 
 
 def _table_mapping(
-    idata,
-    mapping,
-    atts,
-    imodel_functions,
-    codes_subset,
-    cdm_complete,
-    drop_missing_obs,
-    drop_duplicates,
-    logger,
+    idata: pd.DataFrame | pd.Series,
+    mapping: dict[str, Any],
+    atts: dict[str, Any],
+    imodel_functions: MappingFunctions,
+    codes_subset: str | tuple[str, str] | list[str | tuple[str, str]],
+    cdm_complete: bool,
+    drop_missing_obs: bool,
+    drop_duplicates: bool,
+    logger: Logger,
 ) -> pd.DataFrame:
     columns = list(atts) if cdm_complete else [c for c in atts if c in idata.columns]
     out = {}
@@ -271,7 +270,7 @@ def _table_mapping(
     return table_df
 
 
-def _prepare_cdm_tables(cdm_subset):
+def _prepare_cdm_tables(cdm_subset: str | tuple[str, str] | Sequence[str | tuple[str, str]]) -> dict[str, Any]:
     """Prepare table buffers and attributes for CDM tables."""
     if isinstance(cdm_subset, str):
         cdm_subset = [cdm_subset]
@@ -286,16 +285,16 @@ def _prepare_cdm_tables(cdm_subset):
 
 
 def _map_data_model(
-    idata,
-    imodel_maps,
-    imodel_functions,
-    cdm_tables,
-    codes_subset,
-    cdm_complete,
-    drop_missing_obs,
-    drop_duplicates,
-    logger,
-):
+    idata: pd.DataFrame,
+    imodel_maps: dict[str, Any],
+    imodel_functions: MappingFunctions,
+    cdm_tables: dict[str, Any],
+    codes_subset: str | tuple[str, str] | list[str | tuple[str, str]],
+    cdm_complete: bool,
+    drop_missing_obs: bool,
+    drop_duplicates: bool,
+    logger: Logger,
+) -> tuple[pd.DataFrame, pd.Index | pd.MultiIndex]:
     """Process one chunk of input data."""
     if ":" in idata.columns[0]:
         idata.columns = pd.MultiIndex.from_tuples(col.split(":") for col in idata.columns)
@@ -326,7 +325,7 @@ def _map_data_model(
 
 def map_model(
     data: pd.DataFrame | Iterable[pd.DataFrame],
-    imodel: str,
+    imodel: str | None,
     cdm_subset: str | list[str] | None = None,
     codes_subset: str | list[str] | None = None,
     cdm_complete: bool = True,
@@ -372,7 +371,7 @@ def map_model(
     """
 
     @process_function()
-    def _map_model():
+    def _map_model() -> ProcessFunction:
         return ProcessFunction(
             data=data,
             func=_map_data_model,
@@ -407,9 +406,13 @@ def map_model(
     imodel_maps = get_imodel_maps(*data_model, cdm_tables=cdm_subset)
     imodel_functions = MappingFunctions(imodel)
 
-    cdm_tables = _prepare_cdm_tables(imodel_maps.keys())
+    cdms = list(imodel_maps.keys())
+    cdm_tables = _prepare_cdm_tables(cdms)
 
     results = _map_model()
+
+    if not isinstance(results, tuple):
+        raise TypeError(f"result is not a tuple, {type(results)}.")
 
     result, columns = tuple(results)
 

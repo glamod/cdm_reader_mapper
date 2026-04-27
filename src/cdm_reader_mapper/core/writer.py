@@ -1,8 +1,8 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-from collections.abc import Iterable
-from typing import get_args
+from collections.abc import Callable, Iterable
+from typing import Any, get_args
 
 import pandas as pd
 
@@ -14,7 +14,7 @@ from ..properties import SupportedWriteModes
 
 supported_write_modes = get_args(SupportedWriteModes)
 
-WRITERS = {
+WRITERS: dict[str, Callable[..., pd.DataFrame | Iterable[pd.DataFrame]]] = {
     "data": write_data,
     "tables": write_tables,
 }
@@ -23,7 +23,7 @@ WRITERS = {
 def write(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     mode: SupportedWriteModes = "data",
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """
     Write either MDF data or CDM tables on disk.
@@ -58,4 +58,4 @@ def write(
     if mode not in supported_write_modes:
         raise ValueError(f"No valid mode: {mode}. Choose one of {supported_write_modes}.")
 
-    return WRITERS[mode](data, **kwargs)
+    WRITERS[mode](data, **kwargs)

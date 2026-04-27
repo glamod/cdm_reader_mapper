@@ -1,6 +1,7 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
+from collections.abc import Sequence
 from typing import Any, Literal
 
 import pandas as pd
@@ -14,6 +15,7 @@ from cdm_reader_mapper.common import (
     split_by_column_entries,
     split_by_index,
 )
+from cdm_reader_mapper.common.iterators import is_valid_iterator
 from cdm_reader_mapper.duplicates.duplicates import duplicate_check
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
@@ -73,6 +75,45 @@ class DataBundle(_DataBundle):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
+    def _return_db(self, db: DataBundle, inplace: bool) -> DataBundle | None:
+        if inplace is True:
+            return None
+        return db
+
+    def _get_db(self, inplace: bool) -> DataBundle:
+        if inplace is True:
+            return self
+        return self.copy()
+
+    def _stack(self, other: str | list[str], datasets: pd.DataFrame | list[pd.DataFrame], inplace: bool, **kwargs: Any) -> DataBundle | None:
+        db_cp = self._get_db(inplace)
+
+        if not isinstance(other, list):
+            other = [other]
+        if not isinstance(datasets, list):
+            datasets = [datasets]
+
+        for data in datasets:
+            data_attr = f"_{data}"
+            df_cp = getattr(db_cp, data_attr, pd.DataFrame())
+
+            if is_valid_iterator(df_cp):
+                raise ValueError("Data must be a pd.DataFrame not a iterable of pd.DataFrames.")
+
+            to_concat = [df_cp]
+            to_concat.extend(getattr(o, data_attr) for o in other if hasattr(o, data_attr))
+
+            if not any(d.empty for d in to_concat):
+                concatenated = pd.concat(to_concat, **kwargs)
+            else:
+                concatenated = pd.DataFrame()
+
+            concatenated = concatenated.reset_index(drop=True)
+
+            setattr(db_cp, data_attr, concatenated)
+
+        return self._return_db(db_cp, inplace)
+
     def add(self, addition: dict[str, pd.DataFrame | pd.Series], inplace: bool = False) -> DataBundle | None:
         """
         Adding information to a :py:class:`~DataBundle`.
@@ -123,7 +164,7 @@ class DataBundle(_DataBundle):
         return db
 
     def stack_v(
-        self, other: str | list[str], datasets: str | list[str] = Literal["data", "mask"], inplace: bool = False, **kwargs: Any
+        self, other: str | list[str], datasets: str | Sequence[str] | Literal["data", "mask"] = ("data", "mask"), inplace: bool = False, **kwargs: Any
     ) -> DataBundle | None:
         """
         Stack multiple :py:class:`~DataBundle`'s vertically.
@@ -161,7 +202,7 @@ class DataBundle(_DataBundle):
         return self._stack(other, datasets, inplace, **kwargs)
 
     def stack_h(
-        self, other: str | list[str], datasets: str | list[str] = Literal["data", "mask"], inplace: bool = False, **kwargs: Any
+        self, other: str | list[str], datasets: str | Sequence[str] | Literal["data", "mask"] = ("data", "mask"), inplace: bool = False, **kwargs: Any
     ) -> DataBundle | None:
         """
         Stack multiple :py:class:`~DataBundle`'s horizontally.
@@ -291,7 +332,7 @@ class DataBundle(_DataBundle):
         return self._return_db(db_, inplace)
 
     def select_where_entry_isin(
-        self, selection: dict[str | tuple[str, str], list[Any]], inplace: bool = False, do_mask: bool = True, **kwargs: Any
+        self, selection: dict[str | tuple[str, str], Sequence[Any]], inplace: bool = False, do_mask: bool = True, **kwargs: Any
     ) -> DataBundle | None:
         """
         Select rows from :py:attr:`data` where column entries are in a specific value list.
@@ -468,7 +509,7 @@ class DataBundle(_DataBundle):
         return db1_, db2_
 
     def split_by_column_entries(
-        self, selection: dict[str | tuple[str, str], list[Any]], do_mask: bool = True, **kwargs: Any
+        self, selection: dict[str | tuple[str, str], Sequence[Any]], do_mask: bool = True, **kwargs: Any
     ) -> tuple[DataBundle, DataBundle]:
         """
         Split :py:attr:`data` by rows where column entries are in a specific value list.
@@ -553,7 +594,7 @@ class DataBundle(_DataBundle):
             db1_._mask, db2_._mask, _, _ = split_by_index(db1_._mask, index, return_rejected=True, **kwargs)
         return db1_, db2_
 
-    def unique(self, **kwargs: Any) -> dict[str | tuple[str, str], int]:
+    def unique(self, **kwargs: Any) -> dict[str | tuple[str, str], dict[Any, int]]:
         """
         Get unique values of :py:attr:`data`.
 
@@ -570,7 +611,7 @@ class DataBundle(_DataBundle):
         --------
         >>> db.unique(columns=("c1", "B1"))
         """
-        return count_by_cat(self._data, **kwargs)
+        return count_by_cat(self._data, **kwargs)  # type: ignore[no-any-return]
 
     def replace_columns(self, df_corr: pd.DataFrame, subset: str | None = None, inplace: bool = False, **kwargs: Any) -> DataBundle | None:
         """
@@ -790,9 +831,9 @@ class DataBundle(_DataBundle):
     def write(
         self,
         dtypes: dict[str | tuple[str, str], str | type] | None = None,
-        parse_dates: list[str | tuple[str, str]] | None = None,
+        parse_dates: list[str | tuple[str, str]] | bool | None = None,
         encoding: str | None = None,
-        mode: str | None = None,
+        mode: Literal["data", "tables"] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -912,9 +953,11 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle containing duplicate flags in :py:attr:`data` or None if ``inplace=True``.
 
-        Note
-        ----
-        Before flagging duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
+        Raises
+        ------
+        RuntimeError
+            Before flagging duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
+
 
         Note
         ----
@@ -939,6 +982,9 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
 
+        if db_.DupDetect is None:
+            raise RuntimeError("Before flagging duplicates, a duplictate check has to be done: 'db.duplicate_check()'")
+
         db_.DupDetect.flag_duplicates(**kwargs)
 
         if db_._mode == "tables" and "header" in db_._data:
@@ -956,9 +1002,10 @@ class DataBundle(_DataBundle):
         pd.DataFrame
             DataFrame containing duplicate matches.
 
-        Note
-        ----
-        Before getting duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
+        Raises
+        ------
+        RuntimeError
+            Before getting duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
         Note
         ----
@@ -974,6 +1021,8 @@ class DataBundle(_DataBundle):
         --------
         >>> matches = db.get_duplicates()
         """
+        if self.DupDetect is None:
+            raise RuntimeError("Before getting duplicates, a duplictate check has to be done: 'db.duplicate_check()'")
         return self.DupDetect.get_duplicates(**kwargs)
 
     def remove_duplicates(self, inplace: bool = False, **kwargs: Any) -> DataBundle | None:
@@ -992,9 +1041,10 @@ class DataBundle(_DataBundle):
         :py:class:`~DataBundle` or None
             DataBundle without duplicated rows or None if ``inplace=True``.
 
-        Note
-        ----
-        Before removing duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
+        Raises
+        ------
+        RuntimeError
+            Before removing duplicates, a duplictate check has to be done, :py:func:`DataBundle.duplicate_check`.
 
         Note
         ----
@@ -1019,7 +1069,12 @@ class DataBundle(_DataBundle):
         """
         db_ = self._get_db(inplace)
 
+        if db_.DupDetect is None:
+            raise RuntimeError("Before removing duplicates, a duplictate check has to be done: 'db.duplicate_check()'")
+
         db_.DupDetect.remove_duplicates(**kwargs)
         header_ = db_.DupDetect.result
+        if not isinstance(db_._data, pd.DataFrame):
+            raise TypeError("data has unsupported type: {type(db_._data)}.")
         db_._data = db_._data[db_._data.index.isin(header_.index)]
         return self._return_db(db_, inplace)

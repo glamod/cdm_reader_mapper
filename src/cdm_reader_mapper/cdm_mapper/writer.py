@@ -22,7 +22,7 @@ of the imodel, the number of decimal places used comes from a default tool defin
 
 from __future__ import annotations
 from pathlib import Path
-from typing import get_args
+from typing import Any, get_args
 
 import pandas as pd
 
@@ -36,11 +36,11 @@ from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
 def _table_to_file(
     data: pd.DataFrame,
-    filename: str,
+    filename: str | Path,
     data_format: SupportedFileTypes = "parquet",
     delimiter: str = "|",
     encoding: str = "utf-8",
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     data = data.dropna(how="all")
     if data_format == "csv":
@@ -66,21 +66,21 @@ def _table_to_file(
 def write_tables(
     data: pd.DataFrame,
     data_format: SupportedFileTypes = "parquet",
-    out_dir: str | None = None,
+    out_dir: str | Path | None = None,
     prefix: str | None = None,
     suffix: str | None = None,
     extension: str | None = None,
-    filename: str | dict | None = None,
+    filename: str | Path | dict[str, str | Path] | None = None,
     separator: str | None = "-",
-    cdm_subset: str | list | None = None,
-    col_subset: str | list | dict | None = None,
+    cdm_subset: str | list[str] | None = None,
+    col_subset: str | list[str] | dict[str, str] | None = None,
     delimiter: str = "|",
     encoding: str = "utf-8",
     imodel: str | None = None,
     from_str: bool | None = None,
     to_str: bool | None = None,
     null_label: str = "null",
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """
     Write pandas.DataFrame to CDM-table file on file system.
@@ -151,9 +151,12 @@ def write_tables(
     cdm_subset = get_cdm_subset(cdm_subset)
 
     if col_subset:
+        to_select: str | list[str] | list[tuple[str, str]]
         if isinstance(col_subset, dict):
-            col_subset = dict_to_tuple_list(col_subset)
-        data = data[col_subset]
+            to_select = dict_to_tuple_list(col_subset)
+        else:
+            to_select = cdm_subset
+        data = data[to_select]
 
     if data.empty:
         logger.warning("All CDM tables are empty")
@@ -192,7 +195,7 @@ def write_tables(
                 extension=extension,
                 separator=separator,
             )
-        filename_ = adjust_filename(filename_, table=table, extension=extension)
+        filename_ = adjust_filename(str(filename_), table=table, extension=extension)
         if len(Path(filename_).parts) == 1:
             filename_ = out_dir / filename_
 

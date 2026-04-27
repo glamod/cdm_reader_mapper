@@ -8,7 +8,7 @@ Created on Wed Jul  3 09:48:18 2019
 """
 
 from __future__ import annotations
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 import pandas as pd
@@ -236,7 +236,7 @@ def split_by_boolean_false(
 
 def split_by_column_entries(
     data: pd.DataFrame,
-    selection: dict[str, Iterable[Any]],
+    selection: dict[str | tuple[str, str], Sequence[Any]],
     reset_index: bool = False,
     inverse: bool = False,
     return_rejected: bool = False,

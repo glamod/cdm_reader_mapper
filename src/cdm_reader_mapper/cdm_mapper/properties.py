@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+from ..properties import SupportedDataModels, SupportedFileTypes
+
+
+__all__ = [
+    "SupportedDataModels",
+    "SupportedFileTypes",
+    "_base",
+    "cdm_tables",
+    "default_decimal_places",
+    "pandas_dtypes",
+]
 
 _base = "cdm_reader_mapper.cdm_mapper"
 

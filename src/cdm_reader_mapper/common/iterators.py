@@ -112,6 +112,10 @@ class ParquetStreamReader:
         """Make class subscriptable."""
         return self.attrs[item]
 
+    def __setitem__(self, item: str, value: Any) -> None:
+        """Make class support item assignment."""
+        setattr(self, item, value)
+
     def prepend(self, chunk: pd.DataFrame | pd.Series) -> None:
         """
         Push a chunk back onto the front of the stream.

@@ -54,7 +54,7 @@ k_elements = {
 tf = TimezoneFinder()
 
 
-def find_entry(imodel: str | None, d: dict) -> str | None:
+def find_entry(imodel: str | None, d: dict[str, str]) -> str | None:
     """
     Find entry in a dictionary, handling imodel suffix stripping.
 
@@ -71,7 +71,7 @@ def find_entry(imodel: str | None, d: dict) -> str | None:
         Corresponding value if found, otherwise None.
     """
     if not imodel:
-        return
+        return None
     if imodel in d.keys():
         return d[imodel]
     imodel = "_".join(imodel.split("_")[:-1])
@@ -125,7 +125,7 @@ def coord_dmh_to_90i(deg: float, min: float, hemis: str) -> float:
 
     if hemis == "S":
         decimal *= -1
-    return np.round(decimal, 2)
+    return float(np.round(decimal, 2))
 
 
 def convert_to_utc_i(date: pd.Series, zone: str) -> pd.DatetimeIndex:
@@ -165,8 +165,8 @@ def time_zone_i(lat: float, lon: float) -> str | None:
         Timezone name if available, otherwise None.
     """
     if not (-90 <= lat <= 90 and -180 <= lon <= 180):
-        return
-    return tf.timezone_at(lng=lon, lat=lat)
+        return None
+    return str(tf.timezone_at(lng=lon, lat=lat))
 
 
 def longitude_360to180_i(lon: float) -> float:
@@ -215,13 +215,13 @@ def location_accuracy_i(li: int | float, lat: float) -> float:
     return max(1, int(round(accuracy)))
 
 
-def convert_to_str(a: Any) -> str | None:
+def convert_to_str(a: str | None) -> str | None:
     """
     Convert a value to string.
 
     Parameters
     ----------
-    a : any
+    a : str or None
         Input value.
 
     Returns
@@ -255,6 +255,7 @@ def string_add_i(a: Any, b: Any, c: Any, sep: str) -> str | None:
     c = convert_to_str(c)
     if b:
         return sep.join(filter(None, [a, b, c]))
+    return None
 
 
 def to_int(value: Any) -> int | pd.NA:
@@ -306,7 +307,7 @@ def series_strptime(series: pd.Series, format: str) -> pd.Series:
 class MappingFunctions:
     """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
 
-    def __init__(self, imodel):
+    def __init__(self, imodel: str) -> None:
         self.imodel = imodel
         self.utc = datetime.UTC
 
@@ -481,7 +482,7 @@ class MappingFunctions:
         )
         return pd.DatetimeIndex(result)
 
-    def datetime_utcnow(self, df) -> datetime.datetime:
+    def datetime_utcnow(self, df: pd.DataFrame) -> datetime.datetime:
         """
         Return the current UTC datetime.
 
@@ -808,11 +809,11 @@ class MappingFunctions:
     def string_join_add(
         self,
         df: pd.DataFrame,
-        prepend=None,
-        append=None,
+        prepend: str | None = None,
+        append: str | None = None,
         separator: str = "",
-        zfill_col: list | None = None,
-        zfill: list | None = None,
+        zfill_col: list[str] | None = None,
+        zfill: list[str] | None = None,
     ) -> pd.Series:
         """
         Join DataFrame columns into a single string and optionally prepend/append strings.

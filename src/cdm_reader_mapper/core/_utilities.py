@@ -1,7 +1,7 @@
 """Common Data Model (CDM) DataBundle class."""
 
 from __future__ import annotations
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from copy import deepcopy
 from typing import Any, Literal
 
@@ -17,6 +17,7 @@ from cdm_reader_mapper.common.iterators import (
     parquet_stream_from_iterable,
     process_disk_backed,
 )
+from cdm_reader_mapper.duplicates.duplicates import DupDetect
 
 
 properties = {
@@ -44,7 +45,7 @@ def _copy(value: Any) -> Any:
     return value
 
 
-def method(attr_func, *args, **kwargs):
+def method(attr_func: Any, *args: Any, **kwargs: Any) -> Any:
     """Handles both method calls and subscriptable attributes."""
     if callable(attr_func):
         return attr_func(*args, **kwargs)
@@ -57,7 +58,7 @@ def method(attr_func, *args, **kwargs):
 
 def reader_method(
     db: _DataBundle, data: pd.DataFrame | ParquetStreamReader, attr: str, *args: Any, process_kwargs: dict[str, Any] | None = None, **kwargs: Any
-):
+) -> ParquetStreamReader | None:
     """
     Handles operations on chunked data (ParquetStreamReader).
     Uses process_disk_backed to stream processing without loading into RAM.
@@ -65,7 +66,7 @@ def reader_method(
     inplace = kwargs.pop("inplace", False)
 
     # Define the transformation function to apply per chunk
-    def apply_operation(df):
+    def apply_operation(df: pd.DataFrame) -> pd.DataFrame:
         # Fetch the attribute (method or property) from the chunk
         attr_obj = getattr(df, attr)
 
@@ -82,11 +83,9 @@ def reader_method(
         makecopy=False,
         **process_kwargs,
     )
-    if result_tuple is None:
-        return None
 
     # The result is a tuple: (ParquetStreamReader, [extra_outputs])
-    new_reader = result_tuple[0]
+    new_reader: ParquetStreamReader = result_tuple[0]
 
     # Handle inplace logic
     if inplace:
@@ -96,7 +95,7 @@ def reader_method(
     return new_reader
 
 
-def combine_attribute_values(first_value, iterator, attr):
+def combine_attribute_values(first_value: Any, iterator: Iterator[Any] | ParquetStreamReader, attr: str) -> Any:
     """
     Collect values of an attribute across all chunks and combine them.
 
@@ -142,17 +141,17 @@ def combine_attribute_values(first_value, iterator, attr):
 class SubscriptableMethod:
     """Allows both method calls and subscript access."""
 
-    def __init__(self, func):
+    def __init__(self, func: Any) -> None:
         self.func = func
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: Any) -> Any:
         """Ensure subscript access is handled properly."""
         try:
             return self.func[item]
         except TypeError as err:
             raise NotImplementedError("Calling subscriptable methods have not been implemented for chunked data yet.") from err
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Ensure function calls work properly."""
         return self.func(*args, **kwargs)
 
@@ -161,9 +160,9 @@ class _DataBundle:
     def __init__(
         self,
         data: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
-        columns: pd.Index | pd.MultiIndex | list[str] | None = None,
-        dtypes: pd.Series | dict[str, Any] | None = None,
-        parse_dates: list[str] | bool | None = None,
+        columns: pd.Index | pd.MultiIndex | list[Any] | None = None,
+        dtypes: pd.Series | dict[str | tuple[str, str], Any] | None = None,
+        parse_dates: list[Any] | bool | None = None,
         encoding: str | None = None,
         mask: pd.DataFrame | Iterable[pd.DataFrame] | None = None,
         imodel: str | None = None,
@@ -174,10 +173,18 @@ class _DataBundle:
 
         if data is None:
             data = pd.DataFrame(columns=columns, dtype=dtypes)
+
         if isinstance(data, (list, tuple)):
             data = iter(data)
+
+        if data is None:
+            raise AssertionError("data should never be None here")
+
         if (is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)) or isinstance(data, (list, tuple)):
             data = parquet_stream_from_iterable(data)
+
+        if not isinstance(data, (pd.DataFrame, ParquetStreamReader)):
+            raise TypeError(f"data has unsupported type {type(data)}")
 
         if mask is None:
             if isinstance(data, pd.DataFrame):
@@ -188,21 +195,32 @@ class _DataBundle:
 
         if isinstance(mask, (list, tuple)):
             mask = iter(mask)
+
+        if mask is None:
+            raise AssertionError("mask should never be None here")
+
         if (is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)) or isinstance(mask, (list, tuple)):
             mask = parquet_stream_from_iterable(mask)
 
-        self._data = data
+        if not isinstance(mask, (pd.DataFrame, ParquetStreamReader)):
+            raise TypeError(f"mask has unsupported type {type(data)}")
+
+        self._data: pd.DataFrame | ParquetStreamReader = data
         self._columns = columns
         self._dtypes = dtypes
         self._parse_dates = parse_dates
         self._encoding = encoding
-        self._mask = mask
+        self._mask: pd.DataFrame | ParquetStreamReader = mask
         self._imodel = imodel
         self._mode = mode
+        self.DupDetect: DupDetect | None = None
 
     def __len__(self) -> int:
         """Length of :py:attr:`data`."""
-        return get_length(self._data)
+        length = get_length(self._data)
+        if isinstance(length, int):
+            return length
+        raise TypeError(f"Length is not an integer: {length}, {type(length)}")
 
     def __getattr__(self, attr: str) -> Any:
         """Apply attribute to :py:attr:`data` if attribute is not defined for :py:class:`~DataBundle` ."""
@@ -241,7 +259,7 @@ class _DataBundle:
                 # Put the chunk BACK so the reader_method sees the full stream.
                 data.prepend(first_chunk)
 
-                def wrapped_reader_method(*args, **kwargs):
+                def wrapped_reader_method(*args: Any, **kwargs: Any) -> ParquetStreamReader | None:
                     return reader_method(self, data, attr, *args, **kwargs)
 
                 return SubscriptableMethod(wrapped_reader_method)
@@ -258,14 +276,14 @@ class _DataBundle:
         """Return a string representation for :py:attr:`data`."""
         return self._data.__repr__()
 
-    def __setitem__(self, item, value) -> None:
+    def __setitem__(self, item: Any, value: Any) -> None:
         """Make class support item assignment for :py:attr:`data`."""
         if isinstance(item, str) and item in properties:
             setattr(self, item, value)
         else:
             self._data[item] = value
 
-    def __getitem__(self, item) -> Any:
+    def __getitem__(self, item: Any) -> Any:
         """Make class subscriptable."""
         if isinstance(item, str):
             if hasattr(self, item):
@@ -277,30 +295,30 @@ class _DataBundle:
             return getattr(self, property)
 
     @property
-    def data(self):
+    def data(self) -> pd.DataFrame | ParquetStreamReader:
         """MDF pandas.DataFrame data."""
         return self._return_property("_data")
 
     @data.setter
-    def data(self, value):
+    def data(self, value: pd.DataFrame | ParquetStreamReader) -> None:
         self._data = value
 
     @property
-    def columns(self):
+    def columns(self) -> pd.Index | pd.MultiIndex:
         """Column labels of :py:attr:`data`."""
         return self._data.columns
 
     @columns.setter
-    def columns(self, value):
+    def columns(self, value: pd.Index | pd.MultiIndex | list[Any]) -> None:
         self._columns = value
 
     @property
-    def dtypes(self):
+    def dtypes(self) -> pd.Series | dict[str, Any] | None:
         """Dictionary of data types on :py:attr:`data`."""
         return self._return_property("_dtypes")
 
     @property
-    def parse_dates(self):
+    def parse_dates(self) -> list[Any] | bool | None:
         """
         Information of how to parse dates in :py:attr:`data`.
 
@@ -308,10 +326,15 @@ class _DataBundle:
         --------
         :py:func:pandas.`read_csv`
         """
-        return self._return_property("_parse_dates")
+        parse_dates_ = self._return_property("_parse_dates")
+        if parse_dates_ is None:
+            return None
+        if isinstance(parse_dates_, (list, bool)):
+            return parse_dates_
+        raise TypeError(f"parse_dates has type {type(parse_dates_)}; expected list[Any], bool, or None.")
 
     @property
-    def encoding(self):
+    def encoding(self) -> str | None:
         """
         A string representing the encoding to use in the :py:attr:`data`.
 
@@ -319,33 +342,48 @@ class _DataBundle:
         --------
         :py:func:pandas.`to_csv`
         """
-        return self._return_property("_encoding")
+        encoding_ = self._return_property("_encoding")
+        if encoding_ is None:
+            return None
+        if isinstance(encoding_, str):
+            return encoding_
+        raise TypeError(f"encoding has type {type(encoding_)}; expected str or None.")
 
     @property
-    def mask(self):
+    def mask(self) -> pd.DataFrame | ParquetStreamReader:
         """MDF pandas.DataFrame validation mask."""
         return self._return_property("_mask")
 
     @mask.setter
-    def mask(self, value):
+    def mask(self, value: pd.DataFrame | ParquetStreamReader) -> None:
         self._mask = value
 
     @property
-    def imodel(self):
+    def imodel(self) -> str | None:
         """Name of the MDF/CDM input model."""
-        return self._return_property("_imodel")
+        imodel_ = self._return_property("_imodel")
+        if imodel_ is None:
+            return None
+        if isinstance(imodel_, str):
+            return imodel_
+        raise TypeError(f"imodel has type {type(imodel_)}; expected str or None.")
 
     @imodel.setter
-    def imodel(self, value):
+    def imodel(self, value: str) -> None:
         self._imodel = value
 
     @property
-    def mode(self):
+    def mode(self) -> str:
         """Data mode."""
-        return self._return_property("_mode")
+        mode_ = self._return_property("_mode")
+        if isinstance(mode_, str):
+            return mode_
+        raise TypeError(f"mode_ has type {type(mode_)}; expected str.")
 
     @mode.setter
-    def mode(self, value):
+    def mode(self, value: Literal["data", "tables"]) -> None:
+        if value not in ("data", "tables"):
+            raise ValueError("value must be one of 'data' or 'tables'.")
         self._mode = value
 
     def copy(self) -> _DataBundle:
@@ -367,42 +405,3 @@ class _DataBundle:
             value = _copy(value)
             setattr(db, key, value)
         return db
-
-    def _get_db(self, inplace: bool) -> _DataBundle:
-        if inplace is True:
-            return self
-        return self.copy()
-
-    def _return_db(self, db: _DataBundle, inplace: bool) -> _DataBundle:
-        if inplace is True:
-            return
-        return db
-
-    def _stack(self, other: str | list[str], datasets: pd.DataFrame | list[pd.DataFrame], inplace: bool, **kwargs: Any) -> _DataBundle:
-        db_cp = self._get_db(inplace)
-
-        if not isinstance(other, list):
-            other = [other]
-        if not isinstance(datasets, list):
-            datasets = [datasets]
-
-        for data in datasets:
-            data_attr = f"_{data}"
-            df_cp = getattr(db_cp, data_attr, pd.DataFrame())
-
-            if is_valid_iterator(df_cp):
-                raise ValueError("Data must be a pd.DataFrame not a iterable of pd.DataFrames.")
-
-            to_concat = [df_cp]
-            to_concat.extend(getattr(o, data_attr) for o in other if hasattr(o, data_attr))
-
-            if not any(d.empty for d in to_concat):
-                concatenated = pd.concat(to_concat, **kwargs)
-            else:
-                concatenated = pd.DataFrame()
-
-            concatenated = concatenated.reset_index(drop=True)
-
-            setattr(db_cp, data_attr, concatenated)
-
-        return self._return_db(db_cp, inplace)
