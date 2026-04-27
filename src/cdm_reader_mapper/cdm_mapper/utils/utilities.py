@@ -95,17 +95,6 @@ def get_usecols(tb: str, col_subset: str | Iterable[str] | dict[str, Any] | None
     standardized list of column names suitable for the `usecols` argument
     in `pandas.read_csv`.
 
-    Rules for conversion:
-    ---------------------
-    1. If `col_subset` is a string, it is returned as a single-element list.
-    2. If `col_subset` is an iterable of strings (e.g., list, tuple, set),
-       it is converted to a list.
-    3. If `col_subset` is a dictionary, it is interpreted as a mapping
-       {table_name: list_of_columns} and returns the entry corresponding
-       to the given table `tb` (or None if missing).
-    4. If `col_subset` is None, the function returns None, meaning all columns
-       should be read.
-
     Parameters
     ----------
     tb : str
@@ -127,6 +116,17 @@ def get_usecols(tb: str, col_subset: str | Iterable[str] | dict[str, Any] | None
     ------
     TypeError
         If `col_subset` is not a string, iterable, dict, or None.
+
+    Notes
+    -----
+    1. If `col_subset` is a string, it is returned as a single-element list.
+    2. If `col_subset` is an iterable of strings (e.g., list, tuple, set),
+       it is converted to a list.
+    3. If `col_subset` is a dictionary, it is interpreted as a mapping
+       {table_name: list_of_columns} and returns the entry corresponding
+       to the given table `tb` (or None if missing).
+    4. If `col_subset` is None, the function returns None, meaning all columns
+       should be read.
     """
     if isinstance(col_subset, str):
         return [col_subset]
@@ -148,12 +148,6 @@ def adjust_filename(filename: str, table: str = "", extension: str = "psv") -> s
     """
     Adjust a filename by optionally prepending a table name and appending an extension.
 
-    Rules:
-    ------
-    1. If `table` is not already part of the filename, it will be prepended with a dash.
-    2. If the filename does not contain an extension (no '.'), the specified `extension` is appended.
-       Default extension is 'psv'.
-
     Parameters
     ----------
     filename : str
@@ -167,6 +161,12 @@ def adjust_filename(filename: str, table: str = "", extension: str = "psv") -> s
     -------
     str
         Adjusted filename with optional table prefix and file extension.
+
+    Notes
+    -----
+    1. If `table` is not already part of the filename, it will be prepended with a dash.
+    2. If the filename does not contain an extension (no '.'), the specified `extension` is appended.
+       Default extension is 'psv'.
 
     Examples
     --------

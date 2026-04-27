@@ -33,7 +33,19 @@ from .utils.mapping_functions import MappingFunctions
 
 
 def _is_empty(value: Any) -> bool:
-    """Check whether a value is considered empty."""
+    """
+    Check whether a value is considered empty.
+
+    Parameters
+    ----------
+    value : Any
+        Value to be checked.
+
+    Returns
+    -------
+    bool
+        True if value is not empty else False.
+    """
     if value is None:
         return True
 

@@ -1,5 +1,5 @@
 """
-metmetpy correction functions.
+Internal metmetpy correction functions.
 
 Created on Tue Jun 25 09:07:05 2019
 
@@ -16,8 +16,9 @@ from . import model_datetimes
 
 def dck_201_icoads(data: pd.DataFrame) -> pd.DataFrame:
     """
-    Adjust ICOADS date/time fields for dataset DCK 201:
-    - If year <= 1899 and hour == 0, shift the datetime back by one day.
+    Adjust ICOADS date/time fields for dataset DCK 201.
+
+    If year <= 1899 and hour == 0, shift the datetime back by one day.
 
     Parameters
     ----------

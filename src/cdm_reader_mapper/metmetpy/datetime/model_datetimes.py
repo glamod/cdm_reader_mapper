@@ -1,5 +1,5 @@
 """
-metmetpy modelo datetime package.
+Internal metmetpy modelo datetime package.
 
 Created on Wed Jul 10 09:18:41 2019
 
@@ -43,8 +43,7 @@ def datetime_decimalhour_to_hm(decimal_hours: float) -> tuple[int, int]:
 
 def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd.Series:
     """
-    Convert ICOADS date/time fields between DataFrame representation
-    and pandas datetime Series.
+    Convert ICOADS date/time fields between DataFrame representation and pandas datetime Series.
 
     Parameters
     ----------
@@ -71,6 +70,19 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
         datetime_cols = [c for c in datetime_cols if c in data.columns]
 
     def to_datetime(df: pd.DataFrame) -> pd.Series:
+        """
+        Convert datetime information to datetime object.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input data to be converted.
+
+        Returns
+        -------
+        pd.Series
+            Series as datetime object.
+        """
         if not datetime_cols:
             return pd.Series(dtype="datetime64[ns]")
 
@@ -95,6 +107,19 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
         return out
 
     def from_datetime(ds: pd.Series) -> pd.DataFrame:
+        """
+        Convert datetime object to str.
+
+        Parameters
+        ----------
+        ds : pd.Series
+            Input series to be converted.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with year, month, day and hour columns.
+        """
         df = pd.DataFrame(index=ds.index, columns=datetime_cols)
         df.columns = pd.MultiIndex.from_tuples(datetime_cols)
         valid = ds.notna()
@@ -120,14 +145,44 @@ def icoads(data: pd.DataFrame | pd.Series, conversion: str) -> pd.DataFrame | pd
 
 
 def to_datetime(data: pd.DataFrame, model: str = "icoads") -> pd.Series:
-    """Dispatch conversion to datetime according to model."""
+    """
+    Dispatch conversion to datetime according to model.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to be converted.
+    model : str, default: icoads
+        If 'icoads' convert data in ICOADS-style.
+        Else skip conversion.
+
+    Returns
+    -------
+    pd.Series
+        Converted series as datetime object.
+    """
     if model == "icoads":
         return icoads(data, "to_datetime")
     return data
 
 
 def from_datetime(data: pd.Series, model: str = "icoads") -> pd.DataFrame:
-    """Dispatch conversion from datetime according to model."""
+    """
+    Dispatch conversion from datetime according to model.
+
+    Parameters
+    ----------
+    data : pd.Series
+        Series to split into multiple datetime columns.
+    model : str, default: icoads
+        If 'icoads' convert data in ICOADS-style.
+        Else skip conversion.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with multiple datetime columns: year, month, day and hour.
+    """
     if model == "icoads":
         return icoads(data, "from_datetime")
     return data

@@ -26,8 +26,20 @@ from .utilities import remove_boolean_values
 from .validators import validate
 
 
-def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
-    """Merge multiple keyword-argument dictionaries."""
+def _merge_kwargs(*dicts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    r"""
+    Merge multiple keyword-argument dictionarie.
+
+    Parameters
+    ----------
+    \*dicts : Sequence[Mapping[str, Any]]
+        Sequence of dictionaries to be merged together.
+
+    Returns
+    -------
+    dict
+        A combined dictionary.
+    """
     merged = {}
     for d in dicts:
         for k in d:
@@ -38,7 +50,19 @@ def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _apply_multiindex(df: pd.DataFrame) -> pd.DataFrame:
-    """Convert tuple-based columns to a pandas MultiIndex."""
+    """
+    Convert tuple-based columns to a pandas MultiIndex.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data for which tuple-based columns should be converted to a pandas MultiIndex.
+
+    Returns
+    -------
+    pd.DataFrame
+        Data with converted column type.
+    """
     if not df.columns.map(lambda x: isinstance(x, tuple)).all():
         return df
 
@@ -53,7 +77,23 @@ def _select_years(
     selection: tuple[int | None, int | None],
     year_col: str | tuple[str, str] | None,
 ) -> pd.DataFrame:
-    """Filter rows of a DataFrame by a year range."""
+    """
+    Filter rows of a DataFrame by a year range.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data for which rows should be selected.
+    selection : tuple of int or None
+        Left and right borders of range.
+    year_col : str or tuple of str
+        Column that contins year information.
+
+    Returns
+    -------
+    pd.DataFrame
+        Data with selected rows only.
+    """
     year_init, year_end = selection
     if year_init is None and year_end is None:
         return df
@@ -94,10 +134,12 @@ class FileReader:
 
         Parameters
         ----------
-        imodel : str
+        imodel : str, optional
             Name of the data model (e.g., 'ICOADS').
-        args, kwargs
-            Arguments passed to ``build_parser_config``.
+        ext_schema_path : str, optional
+            Directory of external MDF schema file.
+        ext_schema file :  str, optional
+            Path to external MDF schema file
         """
         self.imodel = imodel
         self.config: ParserConfig = build_parser_config(

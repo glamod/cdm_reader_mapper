@@ -34,7 +34,42 @@ def _replace_columns(
     rep_c: str | list[str] | None = None,
     rep_map: dict[str, str] | None = None,
 ) -> pd.DataFrame:
-    """Helper function to replace columns in DataFrame."""
+    """
+    Helper function to replace columns in DataFrame.
+
+    Parameters
+    ----------
+    df_l : pandas.DataFrame or Iterable[pd.dataFrame]
+        The left DataFrame whose columns will be replaced.
+    df_r : pandas.DataFrame or Iterable[pd.dataFrame]
+        The right DataFrame providing replacement values.
+    pivot_c : str, optional
+        A single pivot column present in both DataFrames.
+        Overrides `pivot_l` and `pivot_r`.
+    pivot_l : str, optional
+        Pivot column in `df_l`. Used only when `pivot_c` is not supplied.
+    pivot_r : str, optional
+        Pivot column in `df_r`. Used only when `pivot_c` is not supplied.
+    rep_c : str or list of str, optional
+        One or more column names to replace in `df_l`.
+        Ignored if `rep_map` is supplied.
+    rep_map : dict, optional
+        Mapping between left and right column names as `{left_col: right_col}`.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Updated DataFrame with replacements applied.
+
+    Raises
+    ------
+    TypeError
+        If `df_l` or `df_r` is not a pandas DataFrame.
+    ValueError
+        - If one of `pivot_l` and `pivot_r` is not defined.
+        - If `rep_map` and `rep_c` is not defined.
+        - If replacement source columns not found in `df_r`.
+    """
     # Check inargs
     if not isinstance(df_l, pd.DataFrame) or not isinstance(df_r, pd.DataFrame):
         raise TypeError("Input left and right data must be pandas DataFrames.")
@@ -105,6 +140,15 @@ def replace_columns(
     -------
     pandas.DataFrame
         Updated DataFrame with replacements applied.
+
+    Raises
+    ------
+    TypeError
+        If `df_l` or `df_r` is not a pandas DataFrame.
+    ValueError
+        - If one of `pivot_l` and `pivot_r` is not defined.
+        - If `rep_map` and `rep_c` is not defined.
+        - If replacement source columns not found in `df_r`.
 
     Notes
     -----

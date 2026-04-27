@@ -1,4 +1,4 @@
-"""Convert Common Datamodel (CDM) mapping table elements from/to string types"""
+"""Convert Common Datamodel (CDM) mapping table elements from/to string types."""
 
 from __future__ import annotations
 import ast
@@ -18,9 +18,9 @@ class BaseConverter:
 
     Attributes
     ----------
-    _converters : dict
+    converters : dict
         Mapping of type names to conversion functions.
-    _args : dict
+    args : dict
         Optional mapping of type names to argument names for converters.
     """
 
@@ -146,6 +146,10 @@ def _convert_array_general_from_str(data: pd.Series, null_label: str, dtype: typ
     ----------
     data : pd.Series
         Series containing string values or lists of values.
+    null_label : str
+        Label to replace missing value with.
+    dtype : type or str
+        Result data type.
 
     Returns
     -------
@@ -154,6 +158,19 @@ def _convert_array_general_from_str(data: pd.Series, null_label: str, dtype: typ
     """
 
     def _convert_value(x: Any) -> Any:
+        """
+        Convert value to `dtype`.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+
+        Returns
+        -------
+        Any
+            Converted value.
+        """
         if isinstance(x, list):
             x_list = x
         elif pd.isna(x):
@@ -193,6 +210,10 @@ def _convert_array_general_to_str(data: pd.Series, null_label: str, dtype: type 
     ----------
     data : pd.Series
         Series containing values or lists of values.
+    null_label : str
+        Label to replace missing value with.
+    dtype : type or str
+        Result data type.
 
     Returns
     -------
@@ -200,7 +221,20 @@ def _convert_array_general_to_str(data: pd.Series, null_label: str, dtype: type 
         Series of string arrays.
     """
 
-    def _convert_value(x: Any) -> Any:
+    def _convert_value(x: Any) -> str:
+        """
+        Convert value to str.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+
+        Returns
+        -------
+        str
+            Converted value.
+        """
         if isinstance(x, str):
             try:
                 x = ast.literal_eval(x)
@@ -256,6 +290,21 @@ def _convert_str_to_str(data: pd.Series, null_label: str) -> pd.Series:
     """
 
     def _return_str(x: Any, null_label: str) -> str:
+        """
+        Convert value to string.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+        null_label: str
+            Label to replace missing value with.
+
+        Returns
+        -------
+        str
+            Converted value.
+        """
         if isinstance(x, list):
             return str(x)
         if pd.isna(x):
@@ -273,6 +322,8 @@ def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
     ----------
     data : pd.Series
         Series containing string elements to convert.
+    null_label : str
+        Label to use for NaN or invalid values.
 
     Returns
     -------
@@ -281,6 +332,21 @@ def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
     """
 
     def _return_str(x: Any, null_label: str) -> str | pd.NA:
+        """
+        Convert value to object.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+        null_label: str
+            Label to replace missing value with.
+
+        Returns
+        -------
+        str | pd.NA
+            Converted value.
+        """
         if pd.isna(x):
             return pd.NA
         if x == null_label:
@@ -317,6 +383,8 @@ def _convert_str_array_from_str(data: pd.Series, null_label: str) -> pd.Series:
     ----------
     data : pd.Series
         Series containing string arrays in "{...}" format.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
@@ -362,12 +430,14 @@ def _convert_integer_from_str(data: pd.Series, null_label: str) -> pd.Series:
     ----------
     data : pd.Series
         Series containing string representations of numeric values.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
     pd.Series
         Series with values converted to pandas nullable integer dtype ("Int64").
-        Invalid or non-convertible values are set to NaN.
+        Invalid or non-convertible values are set to pd.NA.
     """
     return pd.to_numeric(data, errors="coerce").astype("Int64")
 
@@ -399,6 +469,8 @@ def _convert_integer_array_from_str(data: pd.Series, null_label: str) -> pd.Seri
     ----------
     data : pd.Series
         Series containing string arrays in "{...}" format.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
@@ -448,6 +520,8 @@ def _convert_float_from_str(data: pd.Series, null_label: str) -> pd.Series:
     ----------
     data : pd.Series
         Series containing string representations of numeric values.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
@@ -485,6 +559,8 @@ def _convert_float_array_from_str(data: pd.Series, null_label: str) -> pd.Series
     ----------
     data : pd.Series
         Series containing string arrays in "{...}" format.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------
@@ -530,6 +606,8 @@ def _convert_datetime_from_str(data: pd.Series, null_label: str) -> pd.Series:
     ----------
     data : pd.Series
         Series containing string representations of datetime values.
+    null_label : str
+        Label to use for NaN, empty, or invalid values.
 
     Returns
     -------

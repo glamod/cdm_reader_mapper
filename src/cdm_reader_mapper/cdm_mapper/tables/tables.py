@@ -75,14 +75,14 @@ def get_imodel_maps(
     *sub_models: str,
     cdm_tables: str | list[str] | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """
+    r"""
     Retrieve CDM attribute maps for a data model and optional submodels.
 
     Parameters
     ----------
     data_model : str
         The main data model name, e.g., `icoads`.
-    sub_models : str
+    \*sub_models : str
         Optional submodel names, e.g. `r300`, `d721`.
     cdm_tables : str or list of str, optional
         List of CDM tables to retrieve.

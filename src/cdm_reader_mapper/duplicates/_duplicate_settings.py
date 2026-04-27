@@ -51,11 +51,27 @@ class Date2(Numeric):  # type: ignore[misc]
     pass
 
 
-def date2(self: Compare, *args: Any, **kwargs: Any) -> Compare:
-    """New method for ``rl.Compare`` object using ``Date2`` object."""
+def date2(object: Compare, *args: Any, **kwargs: Any) -> Compare:
+    r"""
+    New method for ``rl.Compare`` object using ``Date2`` object.
+
+    Parameters
+    ----------
+    object : Compare
+        Object to with the new method should be added.
+    \*args : Any
+        Positional argument for `Date2`.
+    *kwargs : Any
+        Keyword-arguments for `Date2`.
+
+    Returns
+    -------
+    Compare
+        Compare object with new method.
+    """
     compare = Date2(*args, **kwargs)
-    self.add(compare)
-    return self
+    object.add(compare)
+    return object
 
 
 Compare.date2 = date2
