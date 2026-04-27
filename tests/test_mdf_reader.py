@@ -1,25 +1,23 @@
 from __future__ import annotations
-
 import json
-import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from cdm_reader_mapper import test_data, DataBundle
+from cdm_reader_mapper import DataBundle, test_data
 from cdm_reader_mapper.mdf_reader.reader import (
     _read_data,
-    read_mdf,
     read_data,
+    read_mdf,
     validate_read_mdf_args,
 )
 from cdm_reader_mapper.mdf_reader.utils.filereader import _apply_multiindex
-
 from cdm_reader_mapper.mdf_reader.utils.utilities import (
     read_csv,
-    read_parquet,
     read_feather,
+    read_parquet,
 )
 
 
@@ -110,43 +108,22 @@ def test_read_mdf_test_data_basic(data_model):
         ("icoads_r300_d721", {"chunksize": 3}),
         (
             "icoads_r300_d703",
-            {
-                "ext_schema_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
-                )
-            },
+            {"ext_schema_path": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads"},
+        ),
+        (
+            "icoads_r300_d703",
+            {"ext_table_path": Path("cdm_reader_mapper") / "mdf_reader" / "codes" / "icoads"},
         ),
         (
             "icoads_r300_d703",
             {
-                "ext_table_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"
-                )
+                "ext_table_path": Path("cdm_reader_mapper") / "mdf_reader" / "codes" / "icoads",
+                "ext_schema_path": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads",
             },
         ),
         (
             "icoads_r300_d703",
-            {
-                "ext_table_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "codes", "icoads"
-                ),
-                "ext_schema_path": os.path.join(
-                    ".", "cdm_reader_mapper", "mdf_reader", "schemas", "icoads"
-                ),
-            },
-        ),
-        (
-            "icoads_r300_d703",
-            {
-                "ext_schema_file": os.path.join(
-                    ".",
-                    "cdm_reader_mapper",
-                    "mdf_reader",
-                    "schemas",
-                    "icoads",
-                    "icoads.json",
-                )
-            },
+            {"ext_schema_file": Path("cdm_reader_mapper") / "mdf_reader" / "schemas" / "icoads" / "icoads.json"},
         ),
     ],
 )
@@ -568,9 +545,7 @@ def test_read_data_with_mask_csv(csv_files, example_data, example_mask, example_
     pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
 
 
-def test_read_data_with_mask_parquet(
-    parquet_files, example_data, example_mask, example_info
-):
+def test_read_data_with_mask_parquet(parquet_files, example_data, example_mask, example_info):
     data_file, mask_file = parquet_files
     data, mask, info = _read_data(
         data_file=data_file,
@@ -586,9 +561,7 @@ def test_read_data_with_mask_parquet(
     pd.testing.assert_series_equal(info["dtypes"], example_info["dtypes"])
 
 
-def test_read_data_with_mask_feather(
-    feather_files, example_data, example_mask, example_info
-):
+def test_read_data_with_mask_feather(feather_files, example_data, example_mask, example_info):
     data_file, mask_file = feather_files
     data, mask, info = _read_data(
         data_file=data_file,

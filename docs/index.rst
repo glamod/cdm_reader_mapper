@@ -1,4 +1,4 @@
-﻿.. module:: cdm_reader_mapper
+.. module:: cdm_reader_mapper
 
 .. mdf_reader documentation master file, created by
    sphinx-quickstart on Fri Apr 16 14:18:24 2021.

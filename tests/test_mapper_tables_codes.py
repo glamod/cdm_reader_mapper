@@ -1,17 +1,16 @@
 from __future__ import annotations
+import datetime
 
 import pytest
 
-import datetime
-
 from cdm_reader_mapper.cdm_mapper import properties
-from cdm_reader_mapper.cdm_mapper.tables.tables import get_cdm_atts, get_imodel_maps
 from cdm_reader_mapper.cdm_mapper.codes.codes import (
     _eval,
-    _to_int,
     _expand_integer_range_key,
+    _to_int,
     get_code_table,
 )
+from cdm_reader_mapper.cdm_mapper.tables.tables import get_cdm_atts, get_imodel_maps
 
 
 def _assert_dict_keys(d: dict, expected_keys: str | list | set):
@@ -25,10 +24,7 @@ def _assert_dict_keys(d: dict, expected_keys: str | list | set):
     else:
         expected_keys_set = set(expected_keys)
 
-    assert actual_keys == expected_keys_set, (
-        f"Unexpected keys: {actual_keys - expected_keys_set}, "
-        f"Missing keys: {expected_keys_set - actual_keys}"
-    )
+    assert actual_keys == expected_keys_set, f"Unexpected keys: {actual_keys - expected_keys_set}, Missing keys: {expected_keys_set - actual_keys}"
 
 
 @pytest.mark.parametrize(

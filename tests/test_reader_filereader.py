@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 import xarray as xr
-
 from pandas.testing import assert_frame_equal, assert_index_equal
 
 from cdm_reader_mapper import DataBundle
-
-from cdm_reader_mapper.mdf_reader.utils.parser import OrderSpec, ParserConfig
-
 from cdm_reader_mapper.mdf_reader.utils.filereader import (
-    _merge_kwargs,
-    _apply_multiindex,
-    _select_years,
     FileReader,
+    _apply_multiindex,
+    _merge_kwargs,
+    _select_years,
 )
+from cdm_reader_mapper.mdf_reader.utils.parser import OrderSpec, ParserConfig
 
 
 def f(x, y):

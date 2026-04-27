@@ -1,42 +1,42 @@
 from __future__ import annotations
+import logging
 
 import numpy as np
 import pandas as pd
-import logging
 import pytest
 
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
-
 from cdm_reader_mapper.metmetpy import properties
-from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
-from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
-    datetime_decimalhour_to_hm,
-    to_datetime,
-    from_datetime,
-    icoads,
-)
-from cdm_reader_mapper.metmetpy.platform_type.correction_functions import (
-    is_num,
-    overwrite_data,
-    fill_value,
-    deck_717_gdac,
-    deck_700_icoads,
-    deck_892_icoads,
-    deck_792_icoads,
-    deck_992_icoads,
-)
 from cdm_reader_mapper.metmetpy.correct import (
     _correct_dt,
     _correct_pt,
     correct_datetime,
     correct_pt,
 )
+from cdm_reader_mapper.metmetpy.datetime.correction_functions import dck_201_icoads
+from cdm_reader_mapper.metmetpy.datetime.model_datetimes import (
+    datetime_decimalhour_to_hm,
+    from_datetime,
+    icoads,
+    to_datetime,
+)
+from cdm_reader_mapper.metmetpy.platform_type.correction_functions import (
+    deck_700_icoads,
+    deck_717_gdac,
+    deck_792_icoads,
+    deck_892_icoads,
+    deck_992_icoads,
+    fill_value,
+    is_num,
+    overwrite_data,
+)
 from cdm_reader_mapper.metmetpy.validate import (
     _get_id_col,
     _get_patterns,
-    validate_id,
     validate_datetime,
+    validate_id,
 )
+
 
 YR = properties.metadata_datamodels["year"]["icoads"]
 MO = properties.metadata_datamodels["month"]["icoads"]
@@ -165,9 +165,7 @@ def test_icoads_valueerror():
         }
     )
 
-    with pytest.raises(
-        ValueError, match="conversion must be one of {'to_datetime','from_datetime'}"
-    ):
+    with pytest.raises(ValueError, match="conversion must be one of {'to_datetime','from_datetime'}"):
         icoads(df, "bad_conversion.")
 
 
@@ -284,9 +282,7 @@ def test_from_datetime_no_correction():
 
 
 def test_dck_201_icoads():
-    data = pd.DataFrame(
-        {YR: [1899, 1900, 1899], MO: [1, 2, 3], DY: [1, 15, 1], HR: [0, 12, 0]}
-    )
+    data = pd.DataFrame({YR: [1899, 1900, 1899], MO: [1, 2, 3], DY: [1, 15, 1], HR: [0, 12, 0]})
 
     expected = pd.DataFrame(
         {
@@ -347,9 +343,7 @@ def test_fill_value():
     pd.testing.assert_series_equal(result2, expected2)
 
     df = pd.DataFrame({"mask": [True, False, True, False, True]})
-    result3 = fill_value(
-        s, fill_value=-1, out_condition=df, out_condition_values={"mask": True}
-    )
+    result3 = fill_value(s, fill_value=-1, out_condition=df, out_condition_values={"mask": True})
     expected3 = pd.Series([-1, 2, -1, None, -1])
     pd.testing.assert_series_equal(result3, expected3)
 
@@ -785,15 +779,11 @@ def test_correct_datetime_pd_series():
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2)])
 def test_correct_datetime_pd_invalid_iterable_entries(data):
-    with pytest.raises(
-        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
-    ):
+    with pytest.raises(TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."):
         correct_datetime(data, "icoads_r300_d201")
 
 
-@pytest.mark.parametrize(
-    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
-)
+@pytest.mark.parametrize("data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))])
 def test_correct_datetime_empty_iterable(data):
     with pytest.raises(ValueError, match="Iterable is empty."):
         correct_datetime(data, "icoads_r300_d201")
@@ -889,15 +879,11 @@ def test_correct_pt_pd_series():
 
 @pytest.mark.parametrize("data", [[1, 2], (1, 2)])
 def test_correct_pt_invalid_iterable_entries(data):
-    with pytest.raises(
-        TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."
-    ):
+    with pytest.raises(TypeError, match="Iterable must contain pd.DataFrame or pd.Series objects."):
         correct_pt(data, "icoads_r300_d993")
 
 
-@pytest.mark.parametrize(
-    "data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))]
-)
+@pytest.mark.parametrize("data", [ParquetStreamReader(iter([])), ParquetStreamReader(iter(()))])
 def test_correct_pt_empty_iterable(data):
     with pytest.raises(ValueError, match="Iterable is empty."):
         correct_pt(data, "icoads_r300_d993")
@@ -1071,9 +1057,7 @@ def test_validate_id_valueerror_no_columns():
             pd.Series([True, False]),
         ),
         (
-            pd.DataFrame(
-                {YR: [2023, None], MO: [1, None], DY: [1, None], HR: [12, None]}
-            ),
+            pd.DataFrame({YR: [2023, None], MO: [1, None], DY: [1, None], HR: [12, None]}),
             pd.Series([True, False]),
         ),
     ],
@@ -1090,9 +1074,7 @@ def test_validate_datetime_dataframe(data_input, expected):
             [
                 pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
                 pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [13]}, index=[1]),
-                pd.DataFrame(
-                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
-                ),
+                pd.DataFrame({YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]),
             ],
             pd.Series([True, True, False]),
         ),
@@ -1100,9 +1082,7 @@ def test_validate_datetime_dataframe(data_input, expected):
             [
                 pd.DataFrame({YR: [2023], MO: [1], DY: [1], HR: [12]}, index=[0]),
                 pd.DataFrame({YR: [2023], MO: [1], DY: [2], HR: [None]}, index=[1]),
-                pd.DataFrame(
-                    {YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]
-                ),
+                pd.DataFrame({YR: [None], MO: [None], DY: [None], HR: [None]}, index=[2]),
             ],
             pd.Series([True, False, False]),
         ),
@@ -1115,8 +1095,6 @@ def test_validate_datetime_psr(data_input, expected):
 
 
 def test_validate_datetime_valueerror():
-    data = pd.DataFrame(
-        {"YR": [2023, 2023], "MO": [1, 1], "DY": [1, 2], "HR": [12, 13]}
-    )
+    data = pd.DataFrame({"YR": [2023, 2023], "MO": [1, 1], "DY": [1, 2], "HR": [12, 13]})
     with pytest.raises(ValueError, match="No columns found for datetime conversion"):
         validate_datetime(data, "icoads")

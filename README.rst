@@ -3,24 +3,24 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
 +----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi| |versions|                                              |
+| Versions                   | |pypi|                                                         |
 +----------------------------+----------------------------------------------------------------+
-| Documentation and Support  | |docs|                                                         |
+| Documentation and Support  | |docs| |versions|                                              |
 +----------------------------+----------------------------------------------------------------+
 | Open Source                | |license| |zenodo|                                             |
-+----------------------------+----------------------------------------------------------------+
 |                            | |fair-software| |ossf|                                         |
 +----------------------------+----------------------------------------------------------------+
-| Coding Standards           | |black| |ruff| |pre-commit| |codefactor|                       |
-+----------------------------+----------------------------------------------------------------+
-|                            | |security| |fossa|                                             |
+| Coding Standards           | |ruff| |prek| |pre-commit-ci|                                  |
+|                            | |codefactor| |security| |fossa|                                |
 +----------------------------+----------------------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                                   |
 +----------------------------+----------------------------------------------------------------+
 | Funding                    | |c3s|                                                          |
-+----------------------------+----------------------------------------------------------------+
 |                            | |noc| |ukmcas|                                                 |
 +----------------------------+----------------------------------------------------------------+
+
+Introduction
+============
 
 The ``cdm_reader_mapper`` toolbox is a python_ tool designed for:
 
@@ -169,7 +169,7 @@ Credits
 
 Furthermore, acknowledgments go to National Oceanography Centre (NOC_) and UK Marine and Climate Advisory Service (UKMCAS_).
 
-This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-pypackage`_ project template.
+This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pypackage`_ project template.
 
 .. hyperlinks
 
@@ -217,10 +217,6 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
         :target: https://github.com/glamod/cdm_reader_mapper/actions/workflows/testing-suite.yml
         :alt: Build Status
 
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-        :target: https://github.com/psf/black
-        :alt: Python Black
-
 .. |c3s| image:: https://img.shields.io/badge/Powered%20by-Copernicus%20Climate%20Change%20Service-blue.svg
         :target: https://climate.copernicus.eu/
         :alt: Funding
@@ -253,9 +249,13 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
         :target: https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper
         :alt: OpenSSF Scorecard
 
-.. |pre-commit| image:: https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg
+.. |pre-commit-ci| image:: https://results.pre-commit.ci/badge/github/glamod/cdm_reader_mapper/main.svg
         :target: https://results.pre-commit.ci/latest/github/glamod/cdm_reader_mapper/main
         :alt: pre-commit.ci status
+
+.. |prek| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json
+        :target: https://github.com/j178/prek
+        :alt: prek
 
 .. |pypi| image:: https://img.shields.io/pypi/v/cdm_reader_mapper.svg
         :target: https://pypi.python.org/pypi/cdm_reader_mapper

@@ -1,9 +1,8 @@
 from __future__ import annotations
-
-import os
+from pathlib import Path
 
 import pandas as pd
-import pytest  # noqa
+import pytest
 
 from cdm_reader_mapper import read, test_data
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
@@ -40,9 +39,10 @@ def db_data():
 
 def test_write_data_csv(tmp_path, db_data):
     db_data.write(out_dir=tmp_path, data_format="csv")
+    tmppath = Path(tmp_path)
     db_res = read(
-        os.path.join(tmp_path, "data.csv"),
-        info_file=os.path.join(tmp_path, "info.json"),
+        tmppath / "data.csv",
+        info_file=tmppath / "info.json",
         data_format="csv",
         mode="data",
     )
@@ -168,16 +168,16 @@ def test_write_col_subset(tmp_path, db_tables):
 
 
 def test_write_data_parquet(tmp_path, db_data):
+    tmppath = Path(tmp_path)
     db_data.write(out_dir=tmp_path)
-    db_res = read(os.path.join(tmp_path, "data.parquet"), mode="data")
+    db_res = read(tmppath / "data.parquet", mode="data")
     pd.testing.assert_frame_equal(db_data.data, db_res.data)
 
 
 def test_write_data_feather(tmp_path, db_data):
+    tmppath = Path(tmp_path)
     db_data.write(out_dir=tmp_path, data_format="feather")
-    db_res = read(
-        os.path.join(tmp_path, "data.feather"), data_format="feather", mode="data"
-    )
+    db_res = read(tmppath / "data.feather", data_format="feather", mode="data")
     pd.testing.assert_frame_equal(db_data.data, db_res.data)
 
 
@@ -195,10 +195,6 @@ def test_write_tables_parquet(tmp_path, db_tables):
 
 
 def test_write_tables_feather(tmp_path, db_tables):
-    db_tables.write(
-        out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="feather"
-    )
-    db_res = read(
-        tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="feather"
-    )
+    db_tables.write(out_dir=tmp_path, suffix=f"{db_tables.imodel}_all", data_format="feather")
+    db_res = read(tmp_path, suffix=f"{db_tables.imodel}_all", mode="tables", data_format="feather")
     pd.testing.assert_frame_equal(db_tables.data, db_res.data)

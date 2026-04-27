@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import ast
 
 import numpy as np
@@ -7,27 +6,24 @@ import pandas as pd
 import pytest
 
 from cdm_reader_mapper.cdm_mapper.mapper import (
-    _is_empty,
-    _drop_duplicated_rows,
-    _get_nested_value,
-    _transform,
     _code_table,
-    _default,
-    _fill_value,
-    _extract_input_data,
     _column_mapping,
-    _table_mapping,
+    _default,
+    _drop_duplicated_rows,
+    _extract_input_data,
+    _fill_value,
+    _get_nested_value,
+    _is_empty,
     _prepare_cdm_tables,
+    _table_mapping,
+    _transform,
     map_model,
 )
-
-from cdm_reader_mapper.common import logging_hdlr
-
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
-from cdm_reader_mapper.cdm_mapper.tables.tables import get_imodel_maps, get_cdm_atts
+from cdm_reader_mapper.cdm_mapper.tables.tables import get_cdm_atts, get_imodel_maps
 from cdm_reader_mapper.cdm_mapper.utils.mapping_functions import mapping_functions
-
+from cdm_reader_mapper.common import logging_hdlr
 from cdm_reader_mapper.data import test_data
 
 
@@ -91,7 +87,7 @@ def _map_model_test_data(data_model, encoding="utf-8", select=None, **kwargs):
                 val = ast.literal_eval(x)
                 if isinstance(val, tuple):
                     return val
-            except Exception:
+            except (TypeError, AttributeError):
                 return (x, "")
 
         df.columns = pd.MultiIndex.from_tuples([to_tuple(col) for col in df.columns])
@@ -150,13 +146,9 @@ def test_is_empty(value, expected):
 
 
 def test_drop_duplicated_rows():
-    data = pd.DataFrame(
-        data={"col1": [1, 2, 3, 4, 3], "col2": [[5, 9], [6, 9], [7, 9], [8, 9], [7, 9]]}
-    )
+    data = pd.DataFrame(data={"col1": [1, 2, 3, 4, 3], "col2": [[5, 9], [6, 9], [7, 9], [8, 9], [7, 9]]})
     result = _drop_duplicated_rows(data)
-    expected = pd.DataFrame(
-        data={"col1": [1, 2, 3, 4], "col2": [[5, 9], [6, 9], [7, 9], [8, 9]]}
-    )
+    expected = pd.DataFrame(data={"col1": [1, 2, 3, 4], "col2": [[5, 9], [6, 9], [7, 9], [8, 9]]})
     pd.testing.assert_frame_equal(result, expected)
 
 
@@ -343,9 +335,7 @@ def test_extract_input_data_empty():
         ("latitude", "Float64", [pd.NA, pd.NA, pd.NA, pd.NA]),
     ],
 )
-def test_column_mapping(
-    imodel_maps, imodel_functions, data_header, column, dtype, expected
-):
+def test_column_mapping(imodel_maps, imodel_functions, data_header, column, dtype, expected):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     mapping_column = imodel_maps["header"][column]
     column_atts = get_cdm_atts("header")["header"][column]
@@ -358,9 +348,7 @@ def test_column_mapping(
         column,
         logger,
     )
-    pd.testing.assert_series_equal(
-        result, pd.Series(expected, name=column, dtype=dtype)
-    )
+    pd.testing.assert_series_equal(result, pd.Series(expected, name=column, dtype=dtype))
 
 
 def test_history_column_mapping(imodel_maps, imodel_functions, data_header):
@@ -397,9 +385,7 @@ def test_column_mapping_subset(imodel_maps, imodel_functions, data_header):
     pd.testing.assert_series_equal(result, expected)
 
 
-def test_table_mapping_basic(
-    imodel_maps, imodel_functions, data_header, data_header_expected
-):
+def test_table_mapping_basic(imodel_maps, imodel_functions, data_header, data_header_expected):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
     table_atts = get_cdm_atts("header")["header"]
     results = _table_mapping(
@@ -441,9 +427,7 @@ def test_map_model_icoads(data_header, data_header_expected):
         "icoads_r300_d720",
         cdm_subset=["header"],
     )
-    pd.testing.assert_frame_equal(
-        result[data_header_expected.columns], data_header_expected
-    )
+    pd.testing.assert_frame_equal(result[data_header_expected.columns], data_header_expected)
 
 
 def test_map_model_raises(data_header):

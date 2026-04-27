@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.common.replace import _replace_columns, replace_columns
 
 
 def test_replace_columns_raises():
-    with pytest.raises(
-        TypeError, match="Input left and right data must be pandas DataFrames."
-    ):
+    with pytest.raises(TypeError, match="Input left and right data must be pandas DataFrames."):
         _replace_columns([1, 2, 3], [4, 2, 6])
 
 

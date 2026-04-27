@@ -1,39 +1,33 @@
 from __future__ import annotations
-
-import pytest
-
 import hashlib
 import importlib
 import json
 import logging
-import os
 import sys
 import tempfile
-
 from pathlib import Path
-
 from urllib.parse import urlparse
 
+import pytest
 import requests
 
-
-from cdm_reader_mapper.common.logging_hdlr import init_logger
-from cdm_reader_mapper.common.json_dict import (
-    open_json_file,
-    collect_json_files,
-    combine_dicts,
+from cdm_reader_mapper.common.getting_files import (
+    _check_md5s,
+    _file_md5_checksum,
+    _get_file,
+    _get_remote_file,
+    _rm_tree,
+    _with_md5_suffix,
+    get_path,
+    load_file,
 )
 from cdm_reader_mapper.common.io_files import get_filename
-from cdm_reader_mapper.common.getting_files import (
-    _file_md5_checksum,
-    _get_remote_file,
-    _check_md5s,
-    _with_md5_suffix,
-    _rm_tree,
-    _get_file,
-    load_file,
-    get_path,
+from cdm_reader_mapper.common.json_dict import (
+    collect_json_files,
+    combine_dicts,
+    open_json_file,
 )
+from cdm_reader_mapper.common.logging_hdlr import init_logger
 
 
 def compute_md5(content: bytes) -> str:
@@ -126,7 +120,7 @@ def test_init_logger_file(tmp_path):
     logger.info("File log message")
 
     assert log_file.exists()
-    with open(log_file, encoding="utf-8") as f:
+    with Path(log_file).open(encoding="utf-8") as f:
         content = f.read()
     assert "File log message" in content
 
@@ -273,7 +267,7 @@ def test_get_filename_basic(tmp_path, pattern, extension, expected_filename):
 )
 def test_get_filename_separator(pattern, separator, expected):
     result = get_filename(pattern, extension="", separator=separator)
-    assert os.path.basename(result) == expected
+    assert Path(result).name == expected
 
 
 @pytest.mark.parametrize(
@@ -439,7 +433,7 @@ def test_load_file_real(tmp_path, within_drs, cache):
     cache_dir = tmp_path / "cache"
 
     local_file = load_file(
-        name=os.path.join(drs, f),
+        name=str(Path(drs) / f),
         github_url=base_url,
         branch="main",
         cache=cache,

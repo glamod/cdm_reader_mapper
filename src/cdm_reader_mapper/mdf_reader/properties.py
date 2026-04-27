@@ -1,0 +1,73 @@
+"""Common Data Model (CDM) reader properties."""
+
+from __future__ import annotations
+from typing import get_args
+
+from ..properties import NumericTypes, ObjectTypes, SupportedDataModels
+
+
+__all__ = [
+    "MAX_FULL_REPORT_WIDTH",
+    "NumericTypes",
+    "ObjectTypes",
+    "SupportedDataModels",
+    "_base",
+    "data_type_conversion_args",
+    "dummy_level",
+    "factorize",
+    "internal_delimiter",
+    "open_file",
+    "pandas_dtypes",
+    "pandas_int",
+    "year_column",
+]
+
+
+_base: str = "cdm_reader_mapper.mdf_reader"
+
+open_file: dict[str, str] = {
+    "craid": "netcdf",
+    "cmems": "netcdf",
+}
+
+year_column: dict[str, str | tuple[str, str]] = {
+    "gdac": "AAAA",
+    "icoads": ("core", "YR"),
+    "craid": ("drifter_measurements", "JULD"),
+    "cmems": ("coordinates", "TIME"),
+}
+
+factorize: dict[str, dict[str, tuple[str, str]]] = {
+    "cmems": {
+        "source": ("coordinates", "TIME"),
+        "target": ("dimensions", "NTIME"),
+    }
+}
+
+pandas_dtypes = {}
+for dtype in get_args(ObjectTypes):
+    pandas_dtypes[dtype] = "object"
+pandas_dtypes.update({x: x for x in get_args(NumericTypes)})
+pandas_dtypes["datetime"] = "datetime"
+
+pandas_int = "Int64"
+
+# ....and how they are managed
+data_type_conversion_args = {}
+for dtype in get_args(NumericTypes):
+    data_type_conversion_args[dtype] = ["scale", "offset"]
+data_type_conversion_args["str"] = ["disable_white_strip"]
+data_type_conversion_args["object"] = ["disable_white_strip"]
+data_type_conversion_args["key"] = ["disable_white_strip"]
+data_type_conversion_args["datetime"] = ["datetime_format"]
+
+# Misc ------------------------------------------------------------------------
+dummy_level = "_SECTION_"
+# Length of reports in initial read
+MAX_FULL_REPORT_WIDTH = 100000
+# This is a delimiter internally used when writing to buffers
+# It is the Unicode Character 'END OF TEXT'
+# It is supposed to be safe because we don;t expect it in a string
+# It's UTF-8 encoding length is not > 1, so it is supported by pandas 'c'
+# engine, which is faster than the python engine.
+internal_delimiter = "\u0003"

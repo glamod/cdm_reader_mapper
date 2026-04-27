@@ -1,4 +1,4 @@
-name: cdm_reader_mapper Testing Suite
+name: CDM reader and mapper Testing Suite
 on:
   push:
     branches:
@@ -16,27 +16,64 @@ permissions:
   pull-requests: read
 
 jobs:
-  test:
-    name: py${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -l {0}
+  lint:
+    name: Lint (Python${{ matrix.python-version }})
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
-        # Bookend python versions
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: [ "3.14" ]
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - name: Checkout Repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Python${{ matrix.python-version }}
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install CI libraries
+        run: |
+          python -m pip install --require-hashes -r CI/requirements_ci.txt
+      - name: Environment Caching
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            .tox
+          key: ${{ hashFiles('pyproject.toml', 'tox.ini') }}-lint
+      - name: Run linting suite
+        run: |
+          python -m tox -e lint
+
+  test-pypi:
+    name: Test with Python${{ matrix.python-version }}
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ 'ubuntu-latest' ]
+        python-version: [ "3.11", "3.12", "3.13", "3.14" ] # "3.10" disabled due to project's Python requirement
+    env:
+      # UV_ENV_FILE: pyproject.toml ; disabled since UV_ENV_FILE requires a .env and in addition it is not needed so far
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      UV_CACHE_DIR: /tmp/.uv-cache
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags.
-      - name: Set environment variables
-        run: |
-          echo "UV_ENV_FILE=pyproject.toml" >> $GITHUB_ENV
-          echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
-          echo "UV_CACHE_DIR=/tmp/.uv-cache" >> $GITHUB_ENV
+          persist-credentials: false
 
       - name: Install uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
@@ -46,7 +83,7 @@ jobs:
           cache-local-path: ${{ env.UV_CACHE_DIR }}
 
       - name: Restore uv cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ env.UV_CACHE_DIR }}
           key: uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}-${{ hashFiles(env.UV_ENV_FILE) }}
@@ -54,16 +91,15 @@ jobs:
             uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}-${{ hashFiles(env.UV_ENV_FILE) }}
             uv-${{ runner.os }}-${{runner.arch}}-py${{matrix.python-version}}
 
-      - name: Install cdm reader mapper toolbox
+      - name: Install CDM reader and mapper toolbox
         run: |
-          uv sync --extra dev
+          uv sync --group dev
 
       - name: Version info
         run: |
-          uv version
           uv pip list
 
-      - name: Import cdm_reader_mapper toolbox
+      - name: Import CDM reader and mapper toolbox
         run: |
           uv run python -c "import cdm_reader_mapper"
 
@@ -75,7 +111,6 @@ jobs:
           --junitxml=test-results/${{ runner.os }}-${{ matrix.python-version }}.xml
 
       - name: Upload code coverage to Codecov
-        if: github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN}}

@@ -4,15 +4,14 @@ import pandas as pd
 import pytest
 
 from cdm_reader_mapper import DataBundle
-from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.data import test_data
-
 from cdm_reader_mapper.cdm_mapper.reader import (
-    _read_single_file,
     _read_multiple_files,
+    _read_single_file,
     read_tables,
 )
 from cdm_reader_mapper.cdm_mapper.writer import _table_to_file, write_tables
+from cdm_reader_mapper.common import logging_hdlr
+from cdm_reader_mapper.data import test_data
 
 
 @pytest.fixture
@@ -95,9 +94,7 @@ def test_read_single_file_subset(csv_path, example_data):
 
 
 def test_read_single_file_null(csv_path, example_data):
-    df = _read_single_file(
-        csv_path / "header.csv", "csv", ["header"], None, null_label=3
-    )
+    df = _read_single_file(csv_path / "header.csv", "csv", ["header"], None, null_label=3)
     assert isinstance(df, pd.DataFrame)
 
     exp = example_data["header"].set_index("report_id", drop=False).drop(3)
@@ -106,9 +103,7 @@ def test_read_single_file_null(csv_path, example_data):
 
 def test_read_multiple_files_subset(csv_path, example_data):
     logger = logging_hdlr.init_logger(__name__, level="INFO")
-    df_list = _read_multiple_files(
-        csv_path, "csv", extension="csv", cdm_subset="header", logger=logger
-    )
+    df_list = _read_multiple_files(csv_path, "csv", extension="csv", cdm_subset="header", logger=logger)
 
     assert isinstance(df_list, list)
     assert len(df_list) == 1
@@ -211,9 +206,7 @@ def test_read_data_csv(csv_path, example_data):
 
 
 def test_read_data_single_csv(csv_path, example_data):
-    bundle = read_tables(
-        csv_path / "observations-sst.csv", data_format="csv", delimiter=","
-    )
+    bundle = read_tables(csv_path / "observations-sst.csv", data_format="csv", delimiter=",")
 
     assert isinstance(bundle, DataBundle)
     assert hasattr(bundle, "data")
@@ -221,9 +214,7 @@ def test_read_data_single_csv(csv_path, example_data):
     data = bundle.data
     assert isinstance(data, pd.DataFrame)
 
-    pd.testing.assert_frame_equal(
-        bundle.data, example_data["observations-sst"].astype(str)
-    )
+    pd.testing.assert_frame_equal(bundle.data, example_data["observations-sst"].astype(str))
 
 
 def test_read_data_raises_data_format(csv_path):
@@ -311,9 +302,7 @@ def test_read_tables_testdata_str_conversion(tmp_path):
     source = test_data[f"test_{imodel}"]["cdm_header"]
 
     db_type = read_tables(source, extension="pq")
-    write_tables(
-        db_type.data, out_dir=tmp_path, to_str=True, imodel=imodel, suffix="str"
-    )
+    write_tables(db_type.data, out_dir=tmp_path, to_str=True, imodel=imodel, suffix="str")
 
     db_tmp = read_tables(tmp_path, suffix="str")
 

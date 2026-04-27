@@ -1,27 +1,26 @@
 from __future__ import annotations
 
-import pytest  # noqa
-
 import pandas as pd
+import pytest
 
-from cdm_reader_mapper.duplicates.duplicates import (
-    convert_series,
-    add_history,
-    add_duplicates,
-    add_report_quality,
-    set_comparer,
-    remove_ignores,
-    change_offsets,
-    duplicate_check,
-    DupDetect,
-    reindex_nulls,
-    Comparer,
-)
 from cdm_reader_mapper.duplicates._duplicate_settings import (
+    Compare,
     _compare_kwargs,
     _histories,
     _method_kwargs,
-    Compare,
+)
+from cdm_reader_mapper.duplicates.duplicates import (
+    Comparer,
+    DupDetect,
+    add_duplicates,
+    add_history,
+    add_report_quality,
+    change_offsets,
+    convert_series,
+    duplicate_check,
+    reindex_nulls,
+    remove_ignores,
+    set_comparer,
 )
 
 
@@ -194,9 +193,7 @@ def test_comparer_basic():
             "primary_station_id": ["S1", "S1", "S2"],
             "longitude": [0.1, 0.15, 0.2],
             "latitude": [51.0, 51.01, 52.0],
-            "report_timestamp": pd.to_datetime(
-                ["2023-01-01 00:00", "2023-01-01 00:01", "2023-01-02 00:00"]
-            ),
+            "report_timestamp": pd.to_datetime(["2023-01-01 00:00", "2023-01-01 00:01", "2023-01-02 00:00"]),
             "station_speed": [10.0, 12.0, 8.0],
             "station_course": [90, 180, 270],
         }
@@ -299,9 +296,7 @@ def test_duplicate_check_reindex(dummy_data):
 
     result = dd.compared
 
-    exp_idx = pd.MultiIndex.from_tuples(
-        [(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)]
-    )
+    exp_idx = pd.MultiIndex.from_tuples([(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)])
     pd.testing.assert_index_equal(dd.compared.index, exp_idx)
 
     assert list(result.columns) == [
@@ -325,9 +320,7 @@ def test_get_duplicates_limit_and_equal_musts(dummy_data):
     expected_indexes = pd.MultiIndex.from_tuples([(5, 0)])
     pd.testing.assert_index_equal(matches_eq_str.index, expected_indexes)
 
-    matches_eq_list = dd.get_duplicates(
-        keep="first", equal_musts=["primary_station_id", "longitude"]
-    )
+    matches_eq_list = dd.get_duplicates(keep="first", equal_musts=["primary_station_id", "longitude"])
     expected_indexes = pd.MultiIndex.from_tuples([(5, 0)])
     pd.testing.assert_index_equal(matches_eq_list.index, expected_indexes)
 
@@ -353,9 +346,7 @@ def test_flag_duplicates(dummy_data, keep, exp_duplicate_status, exp_duplicates)
     expected_duplicate_status = pd.Series(exp_duplicate_status, name="duplicate_status")
     expected_duplicates = pd.Series(exp_duplicates, name="duplicates")
 
-    pd.testing.assert_series_equal(
-        result["duplicate_status"], expected_duplicate_status
-    )
+    pd.testing.assert_series_equal(result["duplicate_status"], expected_duplicate_status)
     pd.testing.assert_series_equal(result["duplicates"], expected_duplicates)
 
 
@@ -383,9 +374,7 @@ def test_get_total_score(dummy_data):
 
     expected = pd.Series(
         [5.0 / 6.0, 0.5, 2.0 / 3.0, 0.5, 1.0, 5.0 / 6.0, 2.0 / 3.0],
-        index=pd.MultiIndex.from_tuples(
-            [(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)]
-        ),
+        index=pd.MultiIndex.from_tuples([(1, 0), (3, 2), (4, 0), (4, 1), (5, 0), (5, 1), (5, 4)]),
     )
     pd.testing.assert_series_equal(dd.score, expected)
 

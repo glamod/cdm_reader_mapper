@@ -10,14 +10,16 @@
 'CI':
   - changed-files:
     - any-glob-to-any-file:
+      - '.editorconfig'
       - '.flake8'
       - '.gitignore'
       - '.pre-commit-config.yaml'
-      - '.pylintrc.toml'
       - '.readthedocs.yaml'
       - '.yamllint.yaml'
       - '.github/workflows/*'
       - 'docs/Makefile'
+      - 'tox.toml'
+      - 'CI/**/*'
       - 'Makefile'
 
 'docs':
@@ -25,49 +27,55 @@
     - any-glob-to-any-file:
       - '.readthedocs.yml'
       - 'docs/**/*'
+      - 'environment-docs.yml'
       - 'AUTHORS.rst'
       - 'CONTRIBUTING.rst'
+      - 'CODE_OF_CONDUCT.md'
+      - 'DISCUSSION_TEMPLATE/**/*'
+      - 'ISSUE_TEMPLATE/**/*'
+      - 'ISSUE_TEMPLATE.md'
+      - 'PULL_REQUEST_TEMPLATE.md'
       - 'README.rst'
-      - 'CHANGES.rst'
+      - 'CHANGELOG.rst'
 
 'cdm_mapper':
   - changed-files:
     - any-glob-to-any-file:
-      - 'cdm_reader_mapper/cdm_mapper/*.py'
-      - 'cdm_reader_mapper/cdm_mapper/**/*.py'
-      - 'cdm_reader_mapper/cdm_mapper/codes/**/*.json'
-      - 'cdm_reader_mapper/cdm_mapper/tables/**/*.json'
+      - 'src/cdm_reader_mapper/cdm_mapper/*.py'
+      - 'src/cdm_reader_mapper/cdm_mapper/**/*.py'
+      - 'src/cdm_reader_mapper/cdm_mapper/codes/**/*.json'
+      - 'src/cdm_reader_mapper/cdm_mapper/tables/**/*.json'
 
 'common':
   - changed-files:
     - any-glob-to-any-file:
-      - 'cdm_reader_mapper/common/*.py'
+      - 'src/cdm_reader_mapper/common/*.py'
 
 'mdf_reader':
   - changed-files:
     - any-glob-to-any-file:
-      - 'cdm_reader_mapper/mdf_reader/*.py'
-      - 'cdm_reader_mapper/mdf_reader/**/*.py'
-      - 'cdm_reader_mapper/mdf_reader/code_tables/**/*.json'
-      - 'cdm_reader_mapper/mdf_reader/schema/**/*.json'
-      - 'cdm_reader_mapper/mdf_reader/utils/*.py'
+      - 'src/cdm_reader_mapper/mdf_reader/*.py'
+      - 'src/cdm_reader_mapper/mdf_reader/**/*.py'
+      - 'src/cdm_reader_mapper/mdf_reader/code_tables/**/*.json'
+      - 'src/cdm_reader_mapper/mdf_reader/schema/**/*.json'
+      - 'src/cdm_reader_mapper/mdf_reader/utils/*.py'
 
 'metmetpy':
   - changed-files:
     - any-glob-to-any-file:
-      - 'cdm_reader_mapper/metmetpy/properties.py'
-      - 'cdm_reader_mapper/metmetpy/**/*.py'
+      - 'src/cdm_reader_mapper/metmetpy/properties.py'
+      - 'src/cdm_reader_mapper/metmetpy/**/*.py'
 
 'operations':
   - changed-files:
     - any-glob-to-any-file:
-      - 'cdm_reader_mapper/operations/*.py'
+      - 'src/cdm_reader_mapper/operations/*.py'
 
 'information':
   - changed-files:
     - any-glob-to-any-file:
       - 'CONTRIBUTING.rst'
-      - 'CHANGES.rst'
+      - 'CHANGELOG.rst'
 
 'license':
   - changed-files:
@@ -83,3 +91,9 @@
   - changed-files:
     - any-glob-to-any-file:
       - 'pyproject.toml'
+
+'testing suite':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**/*'
+      - 'tests/*'

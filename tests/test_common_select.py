@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.common.select import (
-    _split_df,
-    _split_by_index_df,
     _split_by_boolean_df,
     _split_by_column_df,
+    _split_by_index_df,
+    _split_df,
     split_by_boolean,
-    split_by_boolean_true,
     split_by_boolean_false,
+    split_by_boolean_true,
     split_by_column_entries,
     split_by_index,
 )
@@ -36,13 +35,9 @@ def sample_df():
 
 @pytest.fixture
 def sample_psr():
-    df1 = pd.DataFrame(
-        {"A": [1, 2], "B": ["x", "y"], "C": [True, False]}, index=[10, 11]
-    )
+    df1 = pd.DataFrame({"A": [1, 2], "B": ["x", "y"], "C": [True, False]}, index=[10, 11])
     df2 = pd.DataFrame({"A": [3], "B": ["z"], "C": [True]}, index=[12])
-    df3 = pd.DataFrame(
-        {"A": [4, 5], "B": ["x", "y"], "C": [False, True]}, index=[13, 14]
-    )
+    df3 = pd.DataFrame({"A": [4, 5], "B": ["x", "y"], "C": [False, True]}, index=[13, 14])
     return ParquetStreamReader([df1, df2, df3])
 
 
@@ -64,9 +59,7 @@ def sample_psr_multi():
         {("A", "a"): [1, 2], ("B", "b"): ["x", "y"], ("C", "c"): [True, False]},
         index=[10, 11],
     )
-    df2 = pd.DataFrame(
-        {("A", "a"): [3], ("B", "b"): ["z"], ("C", "c"): [True]}, index=[12]
-    )
+    df2 = pd.DataFrame({("A", "a"): [3], ("B", "b"): ["z"], ("C", "c"): [True]}, index=[12])
     df3 = pd.DataFrame(
         {("A", "a"): [4, 5], ("B", "b"): ["x", "y"], ("C", "c"): [False, True]},
         index=[13, 14],
@@ -134,22 +127,16 @@ def test_split_df_multiindex(sample_df_multi):
         ("C", False, [11, 13], [10, 12, 14]),
     ],
 )
-def test_split_by_boolean_df(
-    sample_df, column, boolean, expected_selected, expected_rejected
-):
+def test_split_by_boolean_df(sample_df, column, boolean, expected_selected, expected_rejected):
     mask = sample_df[[column]]
-    selected, rejected, _, _ = _split_by_boolean_df(
-        sample_df, mask, boolean=boolean, return_rejected=True
-    )
+    selected, rejected, _, _ = _split_by_boolean_df(sample_df, mask, boolean=boolean, return_rejected=True)
     assert list(selected.index) == expected_selected
     assert list(rejected.index) == expected_rejected
 
 
 def test_split_by_boolean_df_empty_mask(sample_df):
     mask = pd.DataFrame(columns=sample_df.columns)
-    selected, rejected, _, _ = _split_by_boolean_df(
-        sample_df, mask, boolean=True, return_rejected=True
-    )
+    selected, rejected, _, _ = _split_by_boolean_df(sample_df, mask, boolean=True, return_rejected=True)
     assert list(selected.index) == list(sample_df.index)
     assert rejected.empty
 
@@ -162,12 +149,8 @@ def test_split_by_boolean_df_empty_mask(sample_df):
         ("B", ["x", "z"], False, [10, 12, 13], []),
     ],
 )
-def test_split_by_column_df(
-    sample_df, col, values, return_rejected, expected_selected, expected_rejected
-):
-    selected, rejected, _, _ = _split_by_column_df(
-        sample_df, col, values, return_rejected=return_rejected
-    )
+def test_split_by_column_df(sample_df, col, values, return_rejected, expected_selected, expected_rejected):
+    selected, rejected, _, _ = _split_by_column_df(sample_df, col, values, return_rejected=return_rejected)
     assert list(selected.index) == expected_selected
     assert list(rejected.index) == expected_rejected
 
@@ -188,9 +171,7 @@ def test_split_by_index_helper(
     expected_selected,
     expected_rejected,
 ):
-    selected, rejected, _, _ = _split_by_index_df(
-        sample_df, index_list, inverse=inverse, return_rejected=return_rejected
-    )
+    selected, rejected, _, _ = _split_by_index_df(sample_df, index_list, inverse=inverse, return_rejected=return_rejected)
     assert list(selected.index) == expected_selected
     assert list(rejected.index) == expected_rejected
 
@@ -203,9 +184,7 @@ def test_split_by_index_df(sample_df):
 
 
 def test_split_by_index_prs(sample_psr):
-    selected, rejected, _, _ = split_by_index(
-        sample_psr, [11, 13], return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_index(sample_psr, [11, 13], return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -215,18 +194,14 @@ def test_split_by_index_prs(sample_psr):
 
 
 def test_split_by_index_multiindex_df(sample_df_multi):
-    selected, rejected, _, _ = split_by_index(
-        sample_df_multi, [11, 13], return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_index(sample_df_multi, [11, 13], return_rejected=True)
 
     assert list(selected.index) == [11, 13]
     assert list(rejected.index) == [10, 12, 14]
 
 
 def test_split_by_index_multiindex_psr(sample_psr_multi):
-    selected, rejected, _, _ = split_by_index(
-        sample_psr_multi, [11, 13], return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_index(sample_psr_multi, [11, 13], return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -236,18 +211,14 @@ def test_split_by_index_multiindex_psr(sample_psr_multi):
 
 
 def test_split_by_column_entries_df(sample_df):
-    selected, rejected, _, _ = split_by_column_entries(
-        sample_df, {"B": ["y"]}, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_column_entries(sample_df, {"B": ["y"]}, return_rejected=True)
 
     assert list(selected.index) == [11, 14]
     assert list(rejected.index) == [10, 12, 13]
 
 
 def test_split_by_column_entries_psr(sample_psr):
-    selected, rejected, _, _ = split_by_column_entries(
-        sample_psr, {"B": ["y"]}, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_column_entries(sample_psr, {"B": ["y"]}, return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -413,18 +384,14 @@ def test_split_by_boolean_psr_false(
 
 
 def test_split_by_boolean_true_df(sample_df, boolean_mask_true):
-    selected, rejected, _, _ = split_by_boolean_true(
-        sample_df, boolean_mask_true, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean_true(sample_df, boolean_mask_true, return_rejected=True)
 
     assert list(selected.index) == [10]
     assert list(rejected.index) == [11, 12, 13, 14]
 
 
 def test_split_by_boolean_true_psr(sample_psr, boolean_mask_true):
-    selected, rejected, _, _ = split_by_boolean_true(
-        sample_psr, boolean_mask_true, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean_true(sample_psr, boolean_mask_true, return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -434,18 +401,14 @@ def test_split_by_boolean_true_psr(sample_psr, boolean_mask_true):
 
 
 def test_split_by_boolean_false_df(sample_df, boolean_mask):
-    selected, rejected, _, _ = split_by_boolean_false(
-        sample_df, boolean_mask, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean_false(sample_df, boolean_mask, return_rejected=True)
 
     assert list(selected.index) == []
     assert list(rejected.index) == [10, 11, 12, 13, 14]
 
 
 def test_split_by_boolean_false_psr(sample_psr, boolean_mask):
-    selected, rejected, _, _ = split_by_boolean_false(
-        sample_psr, boolean_mask, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean_false(sample_psr, boolean_mask, return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -472,18 +435,14 @@ def test_split_by_index_empty_psr(empty_psr):
 
 
 def test_split_by_column_empty_df(empty_df):
-    selected, rejected, _, _ = split_by_column_entries(
-        empty_df, {"A": [1]}, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_column_entries(empty_df, {"A": [1]}, return_rejected=True)
 
     assert selected.empty
     assert rejected.empty
 
 
 def test_split_by_column_empty_psr(empty_psr):
-    selected, rejected, _, _ = split_by_column_entries(
-        empty_psr, {"A": [1]}, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_column_entries(empty_psr, {"A": [1]}, return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
@@ -494,9 +453,7 @@ def test_split_by_column_empty_psr(empty_psr):
 
 def test_split_by_boolean_empty_df(empty_df):
     mask = pd.DataFrame(columns=["A", "B", "C"], dtype=bool)
-    selected, rejected, _, _ = split_by_boolean(
-        empty_df, mask, boolean=True, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean(empty_df, mask, boolean=True, return_rejected=True)
 
     assert selected.empty
     assert rejected.empty
@@ -504,9 +461,7 @@ def test_split_by_boolean_empty_df(empty_df):
 
 def test_split_by_boolean_empty_psr(empty_psr):
     mask = ParquetStreamReader([pd.DataFrame(columns=["A", "B", "C"], dtype=bool)])
-    selected, rejected, _, _ = split_by_boolean(
-        empty_psr, mask, boolean=True, return_rejected=True
-    )
+    selected, rejected, _, _ = split_by_boolean(empty_psr, mask, boolean=True, return_rejected=True)
 
     selected = selected.read()
     rejected = rejected.read()
