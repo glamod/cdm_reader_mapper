@@ -61,7 +61,7 @@ def date2(object: Compare, *args: Any, **kwargs: Any) -> Compare:
         Object to with the new method should be added.
     \*args : Any
         Positional argument for `Date2`.
-    *kwargs : Any
+    \**kwargs : Any
         Keyword-arguments for `Date2`.
 
     Returns

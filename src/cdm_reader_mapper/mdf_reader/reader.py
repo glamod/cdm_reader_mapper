@@ -39,12 +39,35 @@ def validate_read_mdf_args(
     This function performs validation on file paths and numeric arguments
     required for reading an MDF dataset.
 
+    Parameters
+    ----------
+    source : str or Path-like
+        Source of input dataset.
+    imodel : str, optional
+        Name of data model, e.g. icoads_r300_d721.
+    ext_schema_path : str or Path-like, optional
+        Directory of external schema file.
+    ext_schema_file : str or Path-like, optional
+        Path of external schema file.
+    year_init : int, optional
+        Initial valid year.
+    year_end : int, optional
+        End valid year.
+    chunksize : int, optional
+        Number of lines to read from the file per chunk.
+    skiprows : int, optional
+        Number of lines to skip at the start of the file.
+
     Raises
     ------
     FileNotFoundError
         If the source file does not exist.
     ValueError
-        If required arguments are missing or numeric constraints are violated.
+        - If one of `imodel` or `ext_schema_path/ext_schema_file` is not provided.
+        - If `chunksize` is 0 or negative.
+        - If `skiprows` is negative.
+        - If `year_init` is greater than `year_end`.
+        - If any input parameter does not match requested types.
     """
     source = as_path(source, "source")
 
@@ -56,12 +79,14 @@ def validate_read_mdf_args(
 
     validate_arg("chunksize", chunksize, int)
     if chunksize is not None and chunksize <= 0:
-        raise ValueError("chunksize must be a positive integer")
+        raise ValueError("chunksize must be a real positive integer")
 
     validate_arg("skiprows", skiprows, int)
     if skiprows is not None and skiprows < 0:
-        raise ValueError("skiprows must be >= 0")
+        raise ValueError("skiprows must be positive integer.")
 
+    validate_arg("year_init", year_init, int)
+    validate_arg("year_end", year_end, int)
     if year_init is not None and year_end is not None:
         if year_init > year_end:
             raise ValueError("year_init must be <= year_end")
@@ -70,9 +95,9 @@ def validate_read_mdf_args(
 def read_mdf(
     source: str,
     imodel: str | None = None,
-    ext_schema_path: str | None = None,
-    ext_schema_file: str | None = None,
-    ext_table_path: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
+    ext_table_path: str | Path | None = None,
     year_init: int | None = None,
     year_end: int | None = None,
     encoding: str | None = None,
@@ -101,54 +126,59 @@ def read_mdf(
 
     Parameters
     ----------
-    source: str
+    source : str
         The file (including path) to be read.
-    imodel: str
-        Name of internally available input data model.
-        e.g. icoads_r300_d704
-    ext_schema_path: str, optional
+    imodel : str
+        Name of internally available input data model, e.g. icoads_r300_d704.
+    ext_schema_path : str or Path-like, optional
         The path to the external input data model schema file.
         The schema file must have the same name as the directory.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-    ext_schema_file: str, optional
+    ext_schema_file : str or Path-like, optional
         The external input data model schema file.
         One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-    year_init: str or int, optional
+    ext_table_path : str or Path-like, optional
+        The path to the external table file.
+        The table file must have the same name as the directory.
+    year_init : str or int, optional
         Left border of time axis.
-    year_end: str or int, optional
+    year_end : str or int, optional
         Right border of time axis.
     encoding : str, optional
         The encoding of the input file. Overrides the value in the imodel schema file.
     chunksize : int, optional
           Number of reports per chunk.
     skiprows : int, optional
-          Number of initial rows to skip from file, default: 0
-    convert_flag: bool, default: True
+          Number of initial rows to skip from file.
+    convert_flag : bool, default: True
           If True convert entries by using a pre-defined data model.
-    converter_dict: dict of {Hashable: func}, optional
+    converter_dict : dict of {Hashable: func}, optional
           Functions for converting values in specific columns.
           If None use information from a pre-defined data model.
-    converter_kwargs: dict of {Hashable: kwargs}, optional
+    converter_kwargs : dict of {Hashable: kwargs}, optional
           Key-word arguments for converting values in specific columns.
           If None use information from a pre-defined data model.
-    decode_flag: bool, default: True
+    decode_flag : bool, default: True
           If True decode entries by using a pre-defined data model.
-    decoder_dict: dict of {Hashable: func}, optional
+    decoder_dict : dict of {Hashable: func}, optional
           Functions for decoding values in specific columns.
           If None use information from a pre-defined data model.
-    validate_flag: bool, default: True
+    validate_flag : bool, default: True
           Validate data entries by using a pre-defined data model.
     sections : list, optional
-          List with subset of data model sections to output, optional
+          List with subset of data model sections to output.
           If None read pre-defined data model sections.
-    pd_kwargs: dict, optional
-          Additional pandas arguments
-    xr_kwargs: dict, optional
-          Additional xarray arguments
+    excludes : str or list of str, optional
+          MDF Sections to exclude.
+    pd_kwargs : dict, optional
+          Additional pandas arguments.
+    xr_kwargs : dict, optional
+          Additional xarray arguments.
 
     Returns
     -------
     cdm_reader_mapper.DataBundle
+        DaaBundle containing MDF data.
 
     See Also
     --------
@@ -233,7 +263,29 @@ def _read_data(
     data_kwargs: dict[str, Any],
     mask_kwargs: dict[str, Any],
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
-    """Helper function for reading data files from disk."""
+    """
+    Helper function for reading data files from disk.
+
+    Parameters
+    ----------
+    data_file : str
+        Path to data file.
+    mask_file : str
+        Path to mask file.
+    reader : Callable
+        Function to read `data_file` and/or `mask_file`.
+    col_subset : str or list of str or tuple of str
+        Subset of columns to select from `data_file` and/or `mask_file`.
+    data_kwargs : dict
+        Keyword-arguments to read `data_file`.
+    mask_kwargs : dict
+        Keyword-arguments to read `mask_file`.
+
+    Returns
+    -------
+    tuple of pd.DataFrame, pd.DataFrame and dict
+        Data as pd.DataFrame, mask as pd.DataFrame and information dictionary.
+    """
     data, info = reader(
         data_file,
         col_subset=col_subset,
@@ -264,23 +316,22 @@ def read_data(
     delimiter: str | None = None,
     **kwargs: Any,
 ) -> DataBundle:
-    """
+    r"""
     Read MDF data which is already on a pre-defined data model.
 
     Parameters
     ----------
-    data_file: str
+    data_file : str
         The data file (including path) to be read.
-    mask_file: str, optional
+    mask_file : str, optional
         The validation file (including path) to be read.
-    info_file: str, optional
+    info_file : str, optional
         The information file (including path) to be read.
-    data_format: {"csv", "parquet", "feather"}, default: "parquet"
+    data_format : {"csv", "parquet", "feather"}, default: "parquet"
         Format of input data file(s).
-    imodel: str, optional
-        Name of internally available input data model.
-        e.g. icoads_r300_d704
-    col_subset: str, tuple or list, optional
+    imodel : str, optional
+        Name of internally available input data model, e.g. icoads_r300_d704.
+    col_subset : str, tuple or list, optional
         Specify the section or sections of the file to write.
 
         - For multiple sections of the tables:
@@ -294,10 +345,13 @@ def read_data(
         The encoding of the input file. Overrides the value in the imodel schema file.
     delimiter : str, optional
         The delimiter used in the input file. Overrides the value in the imodel schema file.
+    \**kwargs : Any
+        Key-word arguments that will be passed to read fuunction.
 
     Returns
     -------
     cdm_reader_mapper.DataBundle
+        DataBundle containing MDF data.
 
     See Also
     --------

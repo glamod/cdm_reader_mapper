@@ -1,5 +1,5 @@
 """
-metmetpy correction package.
+Initial metmetpy correction package.
 
 Created on Tue Jun 25 09:00:19 2019
 
@@ -45,7 +45,6 @@ dependencies other than dck and can be basically classified in:
         (moored-6 of drifting-7, ?): set to 6,7? which, not really important so far,
         we just want to make sure it is not flagged as a ship....
 
-
 Reference names of different metadata fields used in the metmetpy modules
 and its location column|(section,column) in a data model are
 registered in ../properties.py in metadata_datamodels.
@@ -76,12 +75,46 @@ _base = f"{properties._base}"
 
 def _correct_dt(
     data: pd.DataFrame,
-    data_model: str,
+    imodel: str,
     dck: str,
     correction_method: dict[str, dict[str, str]],
     log_level: str = "INFO",
 ) -> pd.DataFrame:
-    """Apply deck-specific datetime corrections to a dataset."""
+    """
+    Apply deck-specific datetime corrections to a dataset.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to be corrected.
+    imodel : str
+        Name of the ICOADS data model.
+    dck : str
+        Name of the ICOADS deck.
+    correction_method : dict
+        DECK-specific correction methods.
+    log_level : str
+        Logging level (e.g., ``logging.INFO`` or ``'INFO'``).
+
+    Returns
+    -------
+    pd.DataFrame
+        Data containing corrected datetime information.
+
+    Raises
+    ------
+    TypeError
+        If data is a pd.Series.
+    AttributeError
+        If correction function is not found.
+    RuntimeError
+        If datetime correction could not be executed.
+
+    Notes
+    -----
+    - Log INFO if there is no datetime correction to apply to `dck`.
+    - Log INFO what datetime correction is applied.
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     if isinstance(data, pd.Series):
@@ -90,7 +123,7 @@ def _correct_dt(
     # 1. Optional deck specific corrections
     datetime_correction = correction_method.get(dck, {}).get("function")
     if not datetime_correction:
-        logger.info("No datetime correction to apply to deck %s data from data model %s.", dck, data_model)
+        logger.info("No datetime correction to apply to deck %s data from data model %s.", dck, imodel)
         return data
 
     logger.info('Applying "%s" datetime correction', datetime_correction)
@@ -110,16 +143,52 @@ def _correct_pt(
     imodel: str,
     dck: str,
     pt_col: str | list[str],
-    fix_methods: dict[str, dict[str, Any]],
+    correction_method: dict[str, dict[str, Any]],
     log_level: str = "INFO",
 ) -> pd.DataFrame:
-    """Apply platform-type corrections for a given deck."""
+    """
+    Apply platform-type corrections for a given deck.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to be corrected.
+    imodel : str
+        Name of the ICOADS data model.
+    dck : str
+        Name of the ICOADS deck.
+    pt_col : str or list of str
+        Name(s) of the columns containing platform-type information.
+    correction_method : dict
+        DECK-specific correction methods.
+    log_level : str
+        Logging level (e.g., ``logging.INFO`` or ``'INFO'``).
+
+    Returns
+    -------
+    pd.DataFrame
+        Data containing corrected platform-type information.
+
+    Raises
+    ------
+    TypeError
+        - If `data` is a pd.Series.
+    ValueError
+        - If `correction_method` does not contain all required information.
+        - If correction function do not contain all required information.
+        - If DECK-specific method from `correction_method` is not implemented.
+
+    Notes
+    -----
+    - Log INFO if there is no platform-type correction to apply to `dck`.
+    - LOG INFO if `pt_col` is not found in `data`.
+    """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
 
     if isinstance(data, pd.Series):
         raise TypeError("pd.Series is not supported now.")
 
-    deck_fix = fix_methods.get(dck)
+    deck_fix = correction_method.get(dck)
     if not deck_fix:
         logger.info("No platform type fixes to apply to deck %s data from dataset %s", dck, imodel)
         return data
@@ -163,23 +232,22 @@ def correct_datetime(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
     log_level: str = "INFO",
-    _base: str = _base,
+    base: str | None = None,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """
     Apply ICOADS deck specific datetime corrections.
 
     Parameters
     ----------
-    data: pandas.DataFrame or Iterable[pd.DataFrame]
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
-    imodel: str
-        Name of internally available data model.
-        e.g. icoads_d300_704
-    log_level: str
-        level of logging information to save.
-        Default: INFO
-    _base: str, optional
+    imodel : str
+        Name of internally available data model, e.g. icoads_d300_704.
+    log_level : str, default: INFO
+        Level of logging information to save.
+    base : str, optional
         Base path for datetime correction metadata.
+        If None use internal correction path.
 
     Returns
     -------
@@ -195,7 +263,9 @@ def correct_datetime(
         If `data` is a pd.Series.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    _base = f"{_base}.datetime"
+
+    if base is None:
+        base = f"{_base}.datetime"
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
@@ -204,7 +274,7 @@ def correct_datetime(
 
     dck = mrd[2]
 
-    replacements_method_files = collect_json_files(*mrd, base=_base)
+    replacements_method_files = collect_json_files(*mrd, base=base)
     if len(replacements_method_files) == 0:
         logger.warning("Data model %s has no replacements in library", imodel)
         logger.warning("Module will proceed with no attempt to apply id replacements")
@@ -213,13 +283,13 @@ def correct_datetime(
     if isinstance(data, pd.Series):
         raise TypeError("pd.Series is not supported now.")
 
-    correction_method = combine_dicts(replacements_method_files, base=_base)
+    correction_method = combine_dicts(replacements_method_files, base=base)
 
     return ProcessFunction(
         data=data,
         func=_correct_dt,
         func_kwargs={
-            "data_model": imodel,
+            "imodel": imodel,
             "dck": dck,
             "correction_method": correction_method,
             "log_level": log_level,
@@ -233,21 +303,22 @@ def correct_pt(
     data: pd.DataFrame | Iterable[pd.DataFrame],
     imodel: str,
     log_level: str = "INFO",
-    _base: str = _base,
+    base: str | None = None,
 ) -> pd.DataFrame | Iterable[pd.DataFrame]:
     """
     Apply ICOADS deck specific platform ID corrections.
 
     Parameters
     ----------
-    data: pandas.DataFrame or Iterable[pd.DataFrame]
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Input dataset.
-    imodel: str
-        Name of internally available data model.
-        e.g. icoads_d300_704
-    log_level: str
-      level of logging information to save.
-      Default: INFO
+    imodel : str
+        Name of internally available data model, e.g. icoads_d300_704.
+    log_level : str, default: INFO
+          Level of logging information to save.
+    base : str, optional
+        Base path for datetime correction metadata.
+        If None use internal correction path.
 
     Returns
     -------
@@ -264,7 +335,9 @@ def correct_pt(
         If `data` is a pd.Series.
     """
     logger = logging_hdlr.init_logger(__name__, level=log_level)
-    _base = f"{_base}.platform_type"
+
+    if base is None:
+        base = f"{_base}.platform_type"
 
     mrd = imodel.split("_")
     if len(mrd) < 3:
@@ -273,7 +346,7 @@ def correct_pt(
 
     dck = mrd[2]
 
-    fix_files = collect_json_files(*mrd, base=_base)
+    fix_files = collect_json_files(*mrd, base=base)
 
     if len(fix_files) == 0:
         logger.warning("Dataset %s not included in platform library", imodel)
@@ -282,7 +355,7 @@ def correct_pt(
     if isinstance(data, pd.Series):
         raise TypeError("pd.Series is not supported now.")
 
-    fix_methods = combine_dicts(fix_files, base=_base)
+    correction_method = combine_dicts(fix_files, base=base)
     pt_col = properties.metadata_datamodels["platform"].get(mrd[0])
 
     return ProcessFunction(
@@ -292,7 +365,7 @@ def correct_pt(
             "imodel": imodel,
             "dck": dck,
             "pt_col": pt_col,
-            "fix_methods": fix_methods,
+            "correction_method": correction_method,
             "log_level": log_level,
         },
         makecopy=False,

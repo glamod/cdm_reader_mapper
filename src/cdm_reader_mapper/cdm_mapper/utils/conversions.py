@@ -16,7 +16,7 @@ class BaseConverter:
     """
     Base class for managing type conversion functions.
 
-    Attributes
+    Parameters
     ----------
     converters : dict
         Mapping of type names to conversion functions.
@@ -297,7 +297,7 @@ def _convert_str_to_str(data: pd.Series, null_label: str) -> pd.Series:
         ----------
         x : Any
             Value to be converted.
-        null_label: str
+        null_label : str
             Label to replace missing value with.
 
         Returns
@@ -339,7 +339,7 @@ def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
         ----------
         x : Any
             Value to be converted.
-        null_label: str
+        null_label : str
             Label to replace missing value with.
 
         Returns
@@ -412,6 +412,21 @@ def _convert_integer_to_str(data: pd.Series, null_label: str) -> pd.Series:
     """
 
     def _return_str(x: Any, null_label: str) -> str:
+        """
+        Convert value to str.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+        null_label : str
+            Label to replace missing value with.
+
+        Returns
+        -------
+        str
+            Converted value.
+        """
         if pd.isna(x):
             return null_label
         try:
@@ -501,6 +516,23 @@ def _convert_float_to_str(data: pd.Series, null_label: str, decimal_places: int)
     """
 
     def _return_str(x: Any, null_label: str, format_float: str) -> str:
+        """
+        Convert value to str.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+        null_label : str
+            Label to replace missing value with.
+        format_float : str
+            Format specifier for floating-point values (e.g., ``'.2f'``).
+
+        Returns
+        -------
+        str
+            Converted value.
+        """
         if pd.isna(x):
             return null_label
         try:
@@ -589,6 +621,21 @@ def _convert_datetime_to_str(data: pd.Series, null_label: str) -> pd.Series:
     """
 
     def _return_str(x: Any, null_label: str) -> str:
+        """
+        Convert value to str.
+
+        Parameters
+        ----------
+        x : Any
+            Value to be converted.
+        null_label : str
+            Label to replace missing value with.
+
+        Returns
+        -------
+        str
+            Converted value.
+        """
         if pd.isna(x):
             return null_label
         if isinstance(x, str):

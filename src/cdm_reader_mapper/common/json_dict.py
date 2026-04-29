@@ -1,4 +1,4 @@
-"""json dictionary manipulator."""
+"""JSON dictionary manipulator."""
 
 from __future__ import annotations
 import json
@@ -35,14 +35,14 @@ def open_json_file(ifile: str | Path, encoding: str = "utf-8") -> dict[Any, Any]
 
 
 def collect_json_files(idir: str, *args: str, base: str | None = None, name: str | None = None) -> list[Path]:
-    """
+    r"""
     Collect JSON files recursively based on directory and optional subdirectories.
 
     Parameters
     ----------
     idir : str
         Base directory to search.
-    args : str
+    \*args : str
         Optional subdirectory names for recursive searching.
     base : str, optional
         Base path to prepend to idir.
@@ -90,6 +90,21 @@ def combine_dicts(list_of_files: str | Path | Sequence[str | Path | dict[str, An
     """
 
     def update_dict(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
+        """
+        Update dictionary.
+
+        Parameters
+        ----------
+        old : dict
+            Dictionary to be updated.
+        new : dict
+            Dictionary used for updating.
+
+        Returns
+        -------
+        dict
+            Updated dictionary.
+        """
         keys = set(old.keys()) | set(new.keys())
         for key in keys:
             if key not in new:

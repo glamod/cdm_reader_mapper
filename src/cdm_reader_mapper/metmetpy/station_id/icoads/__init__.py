@@ -1,1 +1,1 @@
-"""metmetpy station_id ICOADS table."""
+"""Initial metmetpy station_id ICOADS table."""

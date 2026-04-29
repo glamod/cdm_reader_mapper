@@ -297,7 +297,7 @@ def series_strptime(series: pd.Series, format: str) -> pd.Series:
     Returns
     -------
     pd.Series
-        Series with datetime
+        Series with datetime.
     """
     if series.empty:
         return pd.Series([])
@@ -305,9 +305,24 @@ def series_strptime(series: pd.Series, format: str) -> pd.Series:
 
 
 class MappingFunctions:
-    """Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets."""
+    """
+    Class for mapping Common Data Model (CDM) elements from IMMA1, GDAC, ICOADS, C-RAID, MAROB, Pub47, and IMMT datasets.
+
+    Parameters
+    ----------
+    imodel : str
+        Name of the input data model, e.g icoads_r302_d992.
+    """
 
     def __init__(self, imodel: str) -> None:
+        """
+        Save `imodel` and current datetime information.
+
+        Parameters
+        ----------
+        imodel : str
+            Name of the input data model, e.g icoads_r302_d992.
+        """
         self.imodel = imodel
         self.utc = datetime.UTC
 
@@ -380,6 +395,7 @@ class MappingFunctions:
     def datetime_imma1_to_utc(self, df: pd.DataFrame) -> pd.DatetimeIndex:
         """
         Convert to pandas datetime object for IMMA1 deck 701 format.
+
         Set missing hour to 12 and use latitude and longitude information
         to convert local midday to UTC time.
 
