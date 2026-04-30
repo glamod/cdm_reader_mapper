@@ -1,5 +1,5 @@
 """
-metmetpy correction functions.
+Internal metmetpy correction functions.
 
 Created on Tue Jun 25 09:07:05 2019
 
@@ -308,7 +308,7 @@ def deck_792_icoads(data: pd.DataFrame) -> pd.DataFrame:
 
 def deck_992_icoads(data: pd.DataFrame) -> pd.DataFrame:
     """
-    Adjust ICOADS platform codes for dataset 992:
+    Adjust ICOADS platform codes for dataset 992.
 
     Rules:
     1. If ID matches regex '^6202+$', has length 7, source='114', and platform='5',

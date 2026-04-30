@@ -30,7 +30,7 @@ from cdm_reader_mapper.common import get_filename, logging_hdlr
 
 from ..properties import SupportedFileTypes
 from .tables.tables import get_cdm_atts
-from .utils.conversions import convert_to_str_df
+from .utils.conversions import convert_from_str_df, convert_to_str_df
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset
 
 
@@ -42,6 +42,36 @@ def _table_to_file(
     encoding: str = "utf-8",
     **kwargs: Any,
 ) -> None:
+    r"""
+    Write a pandas DataFrame to disk in a selected file format.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        DataFrame to be written to disk.
+    filename : str or Path-like
+        Destination file path.
+    data_format : {"parquet", "csv", "feather"}, default "parquet"
+        Output file format.
+    delimiter : str, default "|"
+        Field delimiter used when writing CSV files.
+    encoding : str, default "utf-8"
+        Text encoding used when writing CSV files.
+    \**kwargs : Any
+        Additional keyword arguments forwarded to the underlying pandas
+        serialization function.
+
+    Returns
+    -------
+    None
+        This function performs a write operation and returns no value.
+
+    Raises
+    ------
+    ValueError
+        If `data_format` is not one of the supported formats defined by
+        ``SupportedFileTypes``.
+    """
     data = data.dropna(how="all")
     if data_format == "csv":
         header = True
@@ -76,37 +106,35 @@ def write_tables(
     col_subset: str | list[str] | dict[str, str] | None = None,
     delimiter: str = "|",
     encoding: str = "utf-8",
-    imodel: str | None = None,
     from_str: bool | None = None,
     to_str: bool | None = None,
-    null_label: str = "null",
-    **kwargs: Any,
+    imodel: str | None = None,
 ) -> None:
     """
     Write pandas.DataFrame to CDM-table file on file system.
 
     Parameters
     ----------
-    data: pandas.DataFrame
-        pandas.DataFrame to export.
-    data_format: {"csv", "parquet", "feather"}, default: "parqeut"
+    data : pandas.DataFrame
+        Data to export.
+    data_format : {"csv", "parquet", "feather"}, default: "parqeut"
         Format of input data file(s).
-    out_dir: str, optional
+    out_dir : str, optional
         Path to the output directory.
-        Default: current directory
-    prefix: str, optional
+        Defaults to current directory.
+    prefix : str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-    suffix: str, optional
+    suffix : str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-    extension: str, optional
+    extension : str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
-    separator : str, optional
-        Separator to join the file name pattern components (default "-").
-    filename: str or dict, optional
+    filename : str, Path-like or dict, optional
         Name of the output file name(s).
         List one filename for each table name in ``data`` ({<table>:<filename>}).
-        Default: Automatically create file name from table name, ``prefix`` and ``suffix``.
-    cdm_subset: str or list, optional
+        If None, automatically create file name from table name, ``prefix`` and ``suffix``.
+    separator : str, optional
+        Separator to join the file name pattern components (default "-").
+    cdm_subset : str or list of str, optional
         Specifies a subset of tables or a single table.
 
         - For multiple subsets of tables:
@@ -115,7 +143,7 @@ def write_tables(
 
         - For a single table:
           This function returns a pandas.DataFrame with a simple indexing for the columns.
-    col_subset: str, list or dict, optional
+    col_subset : str, list or dict, optional
         Specify the section or sections of the file to write.
 
         - For multiple sections of the tables:
@@ -124,11 +152,19 @@ def write_tables(
         - For a single section:
           e.g. list type object col_subset = [columns]
           This variable assumes that the column names are all conform to the cdm field names.
-    delimiter: str
+    delimiter : str, default: "|"
         Character or regex pattern to treat as the delimiter while reading with df.to_csv.
-        Default: '|'
-    encoding: str
+        This is only relevant if `data_format` is "csv".
+    encoding : str
         A string representing the encoding to use in the output file, defaults to utf-8.
+        This is only relevant if `data_format` is "csv".
+    from_str : bool, optional
+        If True convert original string data to `imodel`-specific data types.
+    to_str : bool, optional
+        If True convert original `imodel`-specific data types to strings.
+    imodel : str , optional
+        Name of data model, e.g. icoads.
+        Must be set if either `from_str` or `to_str` is set.
 
     See Also
     --------
@@ -139,8 +175,8 @@ def write_tables(
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
 
-    Note
-    ----
+    Notes
+    -----
     Use this function after reading CDM tables.
     """
     logger = logging_hdlr.init_logger(__name__, level="INFO")
@@ -176,6 +212,9 @@ def write_tables(
 
     if to_str is True:
         data = convert_to_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
+
+    if from_str is True:
+        data = convert_from_str_df(data.copy(), imode=imodel, cdm_subset=cdm_subset)
 
     for table in cdm_subset:
         cdm_atts = get_cdm_atts(table)[table]

@@ -1,10 +1,7 @@
 """
 Manage data model schema files.
 
-Functions to manage data model
-schema files and objects according to the
-requirements of the data reader tool
-
+Functions to manage data model schema files and objects according to the requirements of the data reader tool.
 """
 
 from __future__ import annotations
@@ -91,7 +88,32 @@ def _resolve_schema_files(
     ext_schema_path: str | None = None,
     ext_schema_file: str | None = None,
 ) -> list[Path]:
-    """Determine which schema file(s) to use based on the input parameters."""
+    """
+    Determine which schema file(s) to use based on the input parameters.
+
+    Parameters
+    ----------
+    imodel : str, optional
+        Internal model identifier used to infer schema file locations.
+        May include underscore-separated components (e.g., model_version).
+    ext_schema_path : str, optional
+        Path to an external schema directory. A JSON schema file with the same
+        name as the directory is expected inside it.
+    ext_schema_file : str, optional
+        Direct path to a schema file.
+
+    Returns
+    -------
+    list of Path-like
+        List containing resolved schema file path(s).
+
+    Raises
+    ------
+    FileNotFoundError
+        If a specified schema file or inferred schema path does not exist.
+    ValueError
+        If no valid input option is provided or the model is unsupported.
+    """
     if ext_schema_file:
         path = Path(ext_schema_file)
         if not path.is_file():
@@ -185,21 +207,20 @@ def read_schema(
 
     Parameters
     ----------
-    imodel: str, optional
-        Name of internally available input data model.
-        e.g. icoads_r300_d704
-    ext_schema_path: str, optional
+    imodel : str, optional
+        Name of internally available input data model, e.g. icoads_r300_d704.
+    ext_schema_path : str, optional
         The path to the external input data model schema file.
         The schema file must have the same name as the directory.
-        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
-    ext_schema_file: str, optional
+        One of `imodel` and `ext_schema_path` or `ext_schema_file` must be set.
+    ext_schema_file : str, optional
         The external input data model schema file.
-        One of ``imodel`` and ``ext_schema_path`` or ``ext_schema_file`` must be set.
+        One of `imodel` and `ext_schema_path` or `ext_schema_file` must be set.
 
     Returns
     -------
     SchemaDict
-        Data model schema
+        Data model schema.
     """
     schema_files: list[Any] = _resolve_schema_files(
         imodel=imodel,

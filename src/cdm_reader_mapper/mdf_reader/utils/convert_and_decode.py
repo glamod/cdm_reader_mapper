@@ -1,4 +1,4 @@
-"""pandas converting operators."""
+"""Internal pandas converting operators."""
 
 from __future__ import annotations
 from collections.abc import Callable
@@ -15,12 +15,12 @@ numeric_types = get_args(properties.NumericTypes)
 
 
 def max_decimal_places(*decimals: Decimal) -> int:
-    """
+    r"""
     Return the maximum number of decimal places among Decimal values.
 
     Parameters
     ----------
-    decimals : Decimal
+    \*decimals : Decimal
         One or more Decimal values.
 
     Returns
@@ -35,14 +35,6 @@ def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
     """
     Convert a value to a scaled Decimal with offset applied.
 
-    Rules
-    -----
-    - Boolean values are returned unchanged
-    - Empty or invalid values return False
-    - Strings are stripped and spaces replaced with zeros
-    - Result is quantized to the maximum decimal precision
-      of input, scale, or offset
-
     Parameters
     ----------
     x : Any
@@ -56,6 +48,14 @@ def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
     -------
     Decimal | bool
         Converted Decimal value, boolean, or False if invalid.
+
+    Notes
+    -----
+    - Boolean values are returned unchanged
+    - Empty or invalid values return False
+    - Strings are stripped and spaces replaced with zeros
+    - Result is quantized to the maximum decimal precision
+      of input, scale, or offset
     """
     x = convert_str_boolean(x)
 
@@ -85,18 +85,25 @@ class Decoders:
     Registry-based decoder dispatcher for column-wise decoding.
 
     Currently supports Base36 decoding for numeric-like fields.
+
+    Parameters
+    ----------
+    dtype : str
+            Target data type name (e.g. numeric field type).
+    encoding : str, default "base36"
+            Encoding scheme to use.
     """
 
     def __init__(self, dtype: str, encoding: str = "base36") -> None:
         """
-        Initialization.
+        Initialize a Decoders instance.
 
         Parameters
         ----------
         dtype : str
-            Target data type name (e.g. numeric field type)
+            Target data type name (e.g. numeric field type).
         encoding : str, default "base36"
-            Encoding scheme to use
+            Encoding scheme to use.
         """
         self.dtype = dtype
         self.encoding = encoding
@@ -112,7 +119,7 @@ class Decoders:
 
         Returns
         -------
-        callable or None
+        Callable or None
             Decoder function accepting a pandas Series, or None if encoding
             is unsupported.
 
@@ -139,15 +146,28 @@ class Decoders:
         Parameters
         ----------
         data : pd.Series
-            Input Series containing base36-encoded values
+            Input Series containing base36-encoded values.
 
         Returns
         -------
         pd.Series
-            Decoded Series with stringified integers or booleans
+            Decoded Series with stringified integers or booleans.
         """
 
         def _base36(x: Any) -> Any:
+            """
+            Decode a value from Base36 to stringified base-10 integer.
+
+            Parameters
+            ----------
+            x : Any
+                Value to be decoded.
+
+            Returns
+            -------
+            Any
+                Converted value.
+            """
             x = convert_str_boolean(x)
             if isinstance(x, bool):
                 return x
@@ -162,16 +182,21 @@ class Converters:
 
     Converts object-typed Series into numeric, datetime, or cleaned object
     representations based on the configured dtype.
+
+    Parameters
+    ----------
+    dtype : str
+            Target output dtype identifier.
     """
 
     def __init__(self, dtype: str) -> None:
         """
-        Initialization.
+        Initialize a Converters instance.
 
         Parameters
         ----------
         dtype : str
-            Target output dtype identifier
+            Target output dtype identifier.
         """
         self.dtype = dtype
         self.numeric_scale = 1.0 if self.dtype == "float" else 1
@@ -197,13 +222,13 @@ class Converters:
 
         Returns
         -------
-        callable
-            Converter function
+        Callable
+            Converter function.
 
         Raises
         ------
         KeyError
-            If no converter is registered for the dtype
+            If no converter is registered for the dtype.
         """
         if self.dtype in self._registry:
             return self._registry[self.dtype]
@@ -227,16 +252,16 @@ class Converters:
         Parameters
         ----------
         data : pd.Series
-            Object-typed Series
+            Object-typed Series.
         scale : numeric, optional
-            Scale factor
+            Scale factor.
         offset : numeric, optional
-            Offset value
+            Offset value.
 
         Returns
         -------
         pd.Series
-            Converted Series
+            Converted Series.
         """
         if data.dtype != "object":
             return data
@@ -264,14 +289,14 @@ class Converters:
         Parameters
         ----------
         data : pd.Series
-            Object-typed Series
+            Object-typed Series.
         disable_white_strip : bool or {"l", "r"}, default False
-            Control whitespace stripping behavior
+            Control whitespace stripping behavior.
 
         Returns
         -------
         pd.Series
-            Cleaned Series
+            Cleaned Series.
         """
         if data.dtype != "object":
             return data
@@ -298,14 +323,14 @@ class Converters:
         Parameters
         ----------
         data : pd.Series
-            Object-typed Series
+            Object-typed Series.
         datetime_format : str, default "%Y%m%d"
-            Datetime parsing format
+            Datetime parsing format.
 
         Returns
         -------
         pd.Series
-            Datetime Series
+            Datetime Series.
         """
         if data.dtype != "object":
             return data

@@ -1,1 +1,1 @@
-"""metmetpy datetime information package."""
+"""Internal metmetpy datetime information package."""

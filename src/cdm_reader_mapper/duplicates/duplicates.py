@@ -19,20 +19,17 @@ def convert_series(df: pd.DataFrame, conversion: dict[Any, Any]) -> pd.DataFrame
 
     Parameters
     ----------
-    df: pandas.DataFrame
-        Input DataFrame
-    conversion: dict
+    df : pd.DataFrame
+        Input DataFrame.
+    conversion : dict
         Conversion dictionary conating columns and
         new data type as key-value pairs.
 
     Returns
     -------
-    pandas.DataFrame
+    pd.DataFrame
+        DataFrame with converted data types.
     """
-    # def convert_date_to_float(date):
-    #    date = date.astype("datetime64[ns]")
-    #    return (date - date.min()) / np.timedelta64(1, "s")
-
     df = df.copy()
     for column, method in conversion.items():
         try:
@@ -67,7 +64,14 @@ def add_history(df: pd.DataFrame, indexes: Iterable[int]) -> pd.DataFrame:
     """
 
     def _datetime_now() -> str:
+        """
+        Get actual datetime.
 
+        Returns
+        -------
+        str
+            Actual datetime as string representative ("%Y-%m-%d %H:%M:%S").
+        """
         try:
             now = datetime.datetime.now(datetime.UTC)
         except AttributeError:
@@ -111,6 +115,19 @@ def add_duplicates(df: pd.DataFrame, dups: pd.DataFrame) -> pd.DataFrame:
     """
 
     def _add_dups(row: pd.Series) -> pd.Series:
+        """
+        Add duplicates as string representatives to series.
+
+        Parameters
+        ----------
+        row : pd.Series
+            Single row of a pd.DataFrame.
+
+        Returns
+        -------
+        pd.Series
+            Duplicates as string representatives added to `row`.
+        """
         idx = row.name
         if idx not in dups.index:
             return row
@@ -160,8 +177,7 @@ def add_report_quality(df: pd.DataFrame, indexes_bad: Iterable[int]) -> pd.DataF
 
 class DupDetect:
     """
-    Class to detect, flag, and remove duplicate entries in a DataFrame
-    using a comparison matrix from recordlinkage.
+    Class to detect, flag, and remove duplicate entries in a DataFrame using a comparison matrix from recordlinkage.
 
     Parameters
     ----------
@@ -185,6 +201,22 @@ class DupDetect:
         method_kwargs: dict[Any, Any],
         compare_kwargs: dict[Any, Any],
     ) -> None:
+        """
+        Initialize a DupDetect instance.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+          Original dataset.
+        compared : pd.DataFrame
+          Comparison matrix of the dataset.
+        method : str
+          Duplicate detection method used for recordlinkage indexing.
+        method_kwargs : dict
+          Keyword arguments for recordlinkage indexing method.
+        compare_kwargs : dict
+          Keyword arguments used for recordlinkage.Compare.
+        """
         self.data = data.copy()
         self.compared = compared
         self.method = method
@@ -248,11 +280,11 @@ class DupDetect:
         ----------
         keep : str or int
             Which entry to keep: 'first', 'last', or -1, 0.
-        limit : str or float, optional
+        limit : str or float, optional, default: default
             Threshold of total similarity score to consider as duplicate.
         equal_musts : str or list[str], optional
             Columns that must exactly match.
-        overwrite : bool
+        overwrite : bool, default: True
             Whether to recompute matches if already calculated.
 
         Returns
@@ -298,28 +330,46 @@ class DupDetect:
 
         Parameters
         ----------
-        keep: str, ["first", "last"]
+        keep : str or int, default: first
             Which entry should be kept in result dataset.
-        limit: float, optional
+        limit : str, int or float, optional
             Limit of total score that as to be exceeded to be declared as a duplicate.
-            Default: .991
-        equal_musts: str or list, optional
+            Defaults to .991.
+        equal_musts : str or list, optional
             Hashable of column name(s) that must totally be equal to be declared as a duplicate.
             Default: All column names found in method_kwargs.
 
         Returns
         -------
-        pandas.DataFrame
-            Input DataFrame with flagged duplicates.
-            Flags for ``duplicate_status``: see `duplicate_status`_
-            Flags for ``report_quality``: see `quality_flag`_
+        pd.DataFrame
+            Input DataFrame with flagged duplicates, including duplicate_status_ and quality_flag_.
 
-
+        References
+        ----------
         .. _duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
 
         def _get_similars(drop: dict[str, Any], keeps: Any) -> tuple[Any, Any]:
+            """
+            Get similar entries from a comparison dictionary.
+
+            Parameters
+            ----------
+            drop : dict
+                Dictionary containing values under keys `drop_` and `keep_` used
+                to determine similarity relationships.
+            keeps : Any
+                Reference collection used to determine whether a value in `drop` is
+                considered a match.
+
+            Returns
+            -------
+            tuple of Any and Any
+              A tuple containing the matched `drop` and `keep` values converted
+              to integers if possible. If the values are not convertible or no match
+              is found, returns `(None, None)`.
+            """
             if drop[drop_] in keeps:
                 drops = drop[drop_]
                 keeps = drop[keep_]
@@ -331,10 +381,41 @@ class DupDetect:
             return None, None
 
         def _get_duplicates(x: pd.DataFrame, last: Any) -> pd.Series:
+            """
+            Extract unique duplicate values from a DataFrame column.
+
+            Parameters
+            ----------
+            x : pd.DataFrame
+                Input DataFrame containing the column to inspect.
+            last : Any
+                Column name used to extract values for duplicate detection.
+
+            Returns
+            -------
+            pd.Series
+                Series containing a single key "dups" with the list of unique
+                duplicate values found in the specified column.
+            """
             b = list(set(x[last].values))
             return pd.Series({"dups": b})
 
         def _delete_values_equal_keys(dictionary: dict[Any, Any]) -> tuple[dict[Any, Any], list[Any]]:
+            """
+            Remove entries where keys and values are identical.
+
+            Parameters
+            ----------
+            dictionary : dict
+                Input mapping of keys to values.
+
+            Returns
+            -------
+            tuple of dict and list of Any
+                A tuple containing:
+                - A filtered dictionary with identical key-value pairs removed
+                - A list of values that were removed because key == value
+            """
             dictionary_ = {}
             drops_ = []
             for k, v in dictionary.items():
@@ -345,6 +426,22 @@ class DupDetect:
             return dictionary_, drops_
 
         def replace_keeps_and_drops(df: pd.DataFrame, keep_: Any) -> pd.DataFrame:
+            """
+            Iteratively resolve and replace duplicate mappings in a DataFrame.
+
+            Parameters
+            ----------
+            df : pd.DataFrame
+                Input DataFrame containing values to be deduplicated.
+            keep_ : Any
+                Column name used to identify canonical ("keep") values.
+
+            Returns
+            -------
+            pd.DataFrame
+                Updated DataFrame with resolved duplicate mappings and cleaned
+                keep-column values.
+            """
             keeps = df[keep_].values
             while True:
                 df = df.sort_index()
@@ -438,9 +535,9 @@ def set_comparer(compare_dict: dict[Any, Any]) -> Compare:
 
     Parameters
     ----------
-    compare_dict: dict
-        Dictionary of columns to compare, e.g.,
-        {"column_name": {"method": "exact" | "numeric" | "date2", "kwargs": {...}}}
+    compare_dict : dict
+        Dictionary of columns to compare,
+        e.g. {"column_name": {"method": "exact" | "numeric" | "date2", "kwargs": {...}}}.
 
     Returns
     -------
@@ -540,6 +637,8 @@ def reindex_nulls(df: pd.DataFrame, null_label: Any) -> pd.DataFrame:
     ----------
     df : pd.DataFrame
         Input DataFrame. Cells with the string "null" are counted as nulls.
+    null_label : Any
+        Missing value representative.
 
     Returns
     -------
@@ -549,6 +648,25 @@ def reindex_nulls(df: pd.DataFrame, null_label: Any) -> pd.DataFrame:
     """
 
     def is_missing(x: Any) -> bool:
+        """
+        Determine whether a value is considered missing.
+
+        This function supports scalar values as well as nested iterables
+        (lists, tuples, numpy arrays). A value is considered missing if it is:
+        - NaN (as defined by ``pandas.isna``)
+        - Equal to ``null_label``
+        - Any element inside an iterable is missing (recursively checked)
+
+        Parameters
+        ----------
+        x : Any
+            Value to check for missingness.
+
+        Returns
+        -------
+        bool
+          True if the value (or any nested value) is missing, otherwise False.
+        """
         if isinstance(x, (list, tuple, np.ndarray)):
             return any(is_missing(x_) for x_ in x)
 
@@ -561,6 +679,19 @@ def reindex_nulls(df: pd.DataFrame, null_label: Any) -> pd.DataFrame:
         return False
 
     def count_nulls(row: pd.Series) -> int:
+        """
+        Count the number of missing values in a pandas Series.
+
+        Parameters
+        ----------
+        row : pd.Series
+            Input row or Series to evaluate.
+
+        Returns
+        -------
+        int
+            Number of missing values in the Series.
+        """
         return sum(is_missing(x) for x in row)
 
     null_counts = df.apply(count_nulls, axis=1)
@@ -604,6 +735,24 @@ class Comparer:
         pairs_df: list[pd.DataFrame] | None = None,
         convert_data: bool = False,
     ):
+        """
+        Initialize a Comparer instance.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+          The dataset to compare.
+        method : str
+          The indexing method from `recordlinkage.index`, e.g., 'SortedNeighbourhood'.
+        method_kwargs : dict
+          Keyword arguments to pass to the indexing method.
+        compare_kwargs : dict
+          Dictionary specifying columns and comparison methods for recordlinkage.Compare.
+        pairs_df : list[pd.DataFrame], optional
+          Optional pre-split DataFrames to pass to the indexer. Defaults to `[data]`.
+        convert_data : bool, default False
+          Whether to convert data using `compare_kwargs` conversion dictionary.
+        """
         indexer = getattr(rl.index, method)(**method_kwargs)
         comparer = set_comparer(compare_kwargs)
         if convert_data is True:
@@ -637,38 +786,38 @@ def duplicate_check(
 
     Parameters
     ----------
-    data: pandas.DataFrame
+    data : pandas.DataFrame
         Dataset for duplicate check.
-    method: str
+    method : str, default: SortedNeighbourhood
         Duplicate check method for recordlinkage.
-        Default: SortedNeighbourhood
-    method_kwargs: dict, optional
+    method_kwargs : dict, optional
         Keyword arguments for recordlinkage duplicate check.
-        Default: _method_kwargs
-    compare_kwargs: dict, optional
+        Defaults to _method_kwargs.
+    compare_kwargs : dict, optional
         Keyword arguments for recordlinkage.Compare object.
-        Default: _compare_kwargs
-    table_name: str, optional
+        Defaults to _compare_kwargs.
+    table_name : str, optional
         Name of the CDM table to be selected from data.
-    ignore_columns: str or list, optional
+    ignore_columns : str or list, optional
         Name of data columns to be ignored for duplicate check.
-    ignore_entries: dict, optional
-        Key: Column name
-        Value: value to be ignored
-        E.g. offsets={"station_speed": null}
-    offsets: dict, optional
+    ignore_entries : dict, optional
+        Key: Column name.
+        Value: value to be ignored.
+        E.g. offsets={"station_speed": null}.
+    offsets : dict, optional
         Change offsets for recordlinkage Compare object.
-        Key: Column name
-        Value: new offset
-        E.g. offsets={"latitude": 0.1}
-    reindex_by_null: bool, optional
+        Key: Column name.
+        Value: new offset.
+        E.g. offsets={"latitude": 0.1}.
+    reindex_by_null : bool, optional
         If True data is re-indexed in ascending order according to the number of nulls in each row.
-    null_label: str, optional
+    null_label : str, optional
         Null label which is used if `reindex_by_null` is True.
 
     Returns
     -------
-        cdm_reader_mapper.DupDetect
+    cdm_reader_mapper.DupDetect
+        A DupDetect instance.
     """
     if reindex_by_null is True:
         data = reindex_nulls(data, null_label=null_label)

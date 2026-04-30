@@ -1,1 +1,1 @@
-"""metmetpy datetime ICOADS tables."""
+"""Internal metmetpy datetime ICOADS tables."""

@@ -187,10 +187,10 @@ def update_and_select(
     Parameters
     ----------
     df : pd.DataFrame
-        DataFrame to be updated
+        DataFrame to be updated.
     subset : str or list, optional
-        Column names to be selected
-    columns:
+        Column names to be selected.
+    column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
 
     Returns
@@ -215,7 +215,27 @@ def _read_data_from_file(
     column_names: pd.Index | pd.MultiIndex | None = None,
     reader_kwargs: dict[str, Any] | None = None,
 ) -> ProcessFunction:
-    """Helper file reader."""
+    """
+    Helper function for reading file.
+
+    Parameters
+    ----------
+    filepath : Path-like
+        Path to original file.
+    reader : Callable
+        Function to use for reading `filepath`.
+    col_subset : str or list of str, optional
+        Subset of `filepath` to be read.
+    column_names : pd.Index or pd.MultiIndex, optional
+        Columns of `filepath` to be read.
+    reader_kwargs : dict, optional
+        Additional keyword-arguments to read `filepath`.
+
+    Returns
+    -------
+    ProcessFunction
+        An instance containing all relevant information that has benn read.
+    """
     if filepath is None or not Path(filepath).is_file():
         raise FileNotFoundError(f"File not found: {filepath}")
 
@@ -238,25 +258,27 @@ def read_csv(
     column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
-    """
+    r"""
     Safe CSV reader that handles missing files and column subsets.
 
     Parameters
     ----------
     filepath : str or Path or None
         Path to the CSV file.
+    delimiter : str, default ","
+        Separator of CSV columns.
     col_subset : list of str, optional
         Subset of columns to read from the CSV.
-    column_names:
+    column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
-    kwargs : any
-        Additional keyword arguments passed to pandas.read_csv.
+    **\kwargs : any
+        Additional keyword arguments passed to pd.read_csv.
 
     Returns
     -------
-    tuple[pd.DataFrame, dict]
+    tuple of pd.DataFrame and dict
         - The CSV as a DataFrame. Empty if file does not exist.
-        - dictionary containing data column labels and data types
+        - dictionary containing data column labels and data types.
     """
     result = _read_data_from_file(
         filepath,
@@ -274,25 +296,25 @@ def read_parquet(
     column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
-    """
+    r"""
     Safe CSV reader that handles missing files and column subsets.
 
     Parameters
     ----------
     filepath : str or Path or None
-        Path to the CSV file.
+        Path to the PARQUET file.
     col_subset : list of str, optional
-        Subset of columns to read from the CSV.
-    column_names:
+        Subset of columns to read from the PARQUET.
+    column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
-    kwargs : any
-        Additional keyword arguments passed to pandas.read_csv.
+    \**kwargs : Any
+        Additional keyword arguments passed to pd.read_parquet.
 
     Returns
     -------
-    tuple[pd.DataFrame, dict]
+    tuple of pd.DataFrame and  dict
         - The PARQUET as a DataFrame. Empty if file does not exist.
-        - dictionary containing data column labels and data types
+        - dictionary containing data column labels and data types.
     """
     result = _read_data_from_file(
         filepath,
@@ -310,25 +332,25 @@ def read_feather(
     column_names: pd.Index | pd.MultiIndex | None = None,
     **kwargs: Any,
 ) -> tuple[pd.DataFrame | Iterable[pd.DataFrame], dict[str, Any]]:
-    """
+    r"""
     Safe CSV reader that handles missing files and column subsets.
 
     Parameters
     ----------
     filepath : str or Path or None
-        Path to the CSV file.
+        Path to the FEATHER file.
     col_subset : list of str, optional
-        Subset of columns to read from the CSV.
-    column_names:
+        Subset of columns to read from the FEATHER.
+    column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
-    kwargs : any
-        Additional keyword arguments passed to pandas.read_csv.
+    **kwargs : any
+        Additional keyword arguments passed to pd.read_feather.
 
     Returns
     -------
-    tuple[pd.DataFrame, dict]
+    tuple of pd.DataFrame and dict
         - The CSV as a DataFrame. Empty if file does not exist.
-        - dictionary containing data column labels and data types
+        - dictionary containing data column labels and data types.
     """
     result = _read_data_from_file(
         filepath,
@@ -393,7 +415,23 @@ def validate_arg(arg_name: str, arg_value: Any, arg_type: type) -> bool:
 
 
 def _adjust_dtype(dtype: Any, df: pd.DataFrame) -> Any:
-    """Filter dtype dictionary to only include columns present in the DataFrame."""
+    """
+    Filter dtype dictionary to only include columns present in the DataFrame.
+
+    Parameters
+    ----------
+    dtype : Any
+        Data type specification, typically a dictionary mapping column names
+        to dtype definitions. If not a dictionary, it is returned as-is.
+    df : pandas.DataFrame
+        DataFrame used to filter valid column names.
+
+    Returns
+    -------
+    Any
+        Filtered dtype dictionary containing only keys present in
+        `df.columns`, or the original `dtype` if it is not a dictionary.
+    """
     if not isinstance(dtype, dict):
         return dtype
     return {k: v for k, v in dtype.items() if k in df.columns}
@@ -421,7 +459,21 @@ def convert_str_boolean(x: Any) -> Any:
 
 
 def _remove_boolean_values(x: Any) -> Any:
-    """Remove boolean values or string representations of boolean."""
+    """
+    Remove boolean values or string representations of boolean.
+
+    Parameters
+    ----------
+    x : Any
+        Input value which may be a boolean, a boolean-like string, or any
+        other object.
+
+    Returns
+    -------
+    Any
+        Returns `None` if the input is a boolean or boolean-like value.
+        Otherwise returns the original input unchanged.
+    """
     x = convert_str_boolean(x)
     if x is True or x is False:
         return None

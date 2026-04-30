@@ -1,5 +1,5 @@
 """
-metmetpy properties.
+Internal metmetpy properties.
 
 Created on Wed Jul 10 09:18:41 2019
 

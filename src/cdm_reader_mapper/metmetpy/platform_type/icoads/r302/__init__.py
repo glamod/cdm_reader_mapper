@@ -1,1 +1,1 @@
-"""metmetpy platfrom_type ICOADS r302 tables."""
+"""Internal metmetpy platfrom_type ICOADS r302 tables."""

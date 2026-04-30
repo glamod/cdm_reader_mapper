@@ -37,7 +37,7 @@ class ParserConfig:
     """
     Configuration for dataset parsing.
 
-    Parameters
+    Attributes
     ----------
     order_specs : dict
         Column ordering specifications.
@@ -68,12 +68,42 @@ class ParserConfig:
 
 
 def _get_index(section: str, order: str, length: int) -> str | tuple[str, str]:
-    """Build an index key based on section count."""
+    """
+    Build an index key based on section count.
+
+    Parameters
+    ----------
+    section : str
+        Name of the section being indexed.
+    order : str
+        Order identifier used when multiple sections exist.
+    length : int
+        Number of elements in the section group.
+
+    Returns
+    -------
+    str or tuple of str and str
+        If `length == 1`, returns `section`.
+        Otherwise returns a tuple `(order, section)`.
+    """
     return section if length == 1 else (order, section)
 
 
 def _get_ignore(section_dict: dict[str, Any]) -> bool:
-    """Determine whether a section should be ignored."""
+    """
+    Determine whether a section should be ignored.
+
+    Parameters
+    ----------
+    section_dict : dict
+        Configuration dictionary for a section. May contain an "ignore"
+        key as a boolean or string representation of a boolean.
+
+    Returns
+    -------
+    bool
+        True if the section should be ignored, otherwise False.
+    """
     ignore = section_dict.get("ignore", False)
     if isinstance(ignore, str):
         ignore = ignore.lower() in {"true", "1", "yes"}
@@ -81,7 +111,24 @@ def _get_ignore(section_dict: dict[str, Any]) -> bool:
 
 
 def _convert_dtype_to_default(dtype: str | None) -> str | None:
-    """Normalize deprecated or aliased dtype strings."""
+    """
+    Normalize deprecated or aliased dtype strings.
+
+    Parameters
+    ----------
+    dtype : str or None
+        Input dtype specification, possibly deprecated or aliased.
+
+    Returns
+    -------
+    str or None
+        Normalized dtype string. May map deprecated float/int aliases to
+        standardized internal representations.
+
+    Notes
+    -----
+    Logs a warning when deprecated dtype formats are converted.
+    """
     if dtype is None:
         return None
     elif dtype == "float":
@@ -106,7 +153,31 @@ def _parse_fixed_width(
     excludes: set[str],
     out: dict[Any, Any],
 ) -> int:
-    """Parse a fixed-width section of a line into an output dictionary."""
+    """
+    Parse a fixed-width section of a line into an output dictionary.
+
+    Parameters
+    ----------
+    line : str
+        Input line to parse.
+    i : int
+        Current parsing position in the line.
+    header : dict
+        Section header metadata including length, delimiter, and sentinel.
+    elements : dict
+        Field definitions for the section.
+    sections : set of str or None
+        Optional subset of sections to include in parsing.
+    excludes : set of str
+        Section keys to exclude from parsing.
+    out : dict
+        Output dictionary to populate with parsed values.
+
+    Returns
+    -------
+    int
+        Updated index position after parsing the section.
+    """
     section_length = header.get("length", properties.MAX_FULL_REPORT_WIDTH)
     delimiter = header.get("delimiter")
     sentinel = header.get("sentinel")
@@ -158,7 +229,31 @@ def _parse_delimited(
     excludes: set[str],
     out: dict[Any, Any],
 ) -> int:
-    """Parse a delimiter-separated section of a line into an output dictionary."""
+    """
+    Parse a delimiter-separated section of a line into an output dictionary.
+
+    Parameters
+    ----------
+    line : str
+        Input line to parse.
+    i : int
+        Current parsing position in the line.
+    header : dict
+        Header metadata including delimiter definition.
+    elements : dict
+        Field definitions for the section.
+    sections : set of str or None
+        Optional subset of sections to include.
+    excludes : set of str
+        Section keys to exclude from parsing.
+    out : dict
+        Output dictionary to populate with parsed values.
+
+    Returns
+    -------
+    int
+        Final position in the line after parsing (typically end of line).
+    """
     delimiter = header["delimiter"]
     fields = next(csv.reader([line[i:]], delimiter=delimiter))
 
@@ -178,7 +273,25 @@ def _parse_line(
     sections: set[str] | None,
     excludes: set[str],
 ) -> dict[str, str]:
-    """Parse a line using the provided parser configuration."""
+    """
+    Parse a line using the provided parser configuration.
+
+    Parameters
+    ----------
+    line : str
+        Input line to parse.
+    order_specs : dict
+        Ordered specification of parsing rules for each section.
+    sections : set of str or None
+        Optional subset of sections to include in parsing.
+    excludes : set of str
+        Section keys to exclude from parsing.
+
+    Returns
+    -------
+    dict
+        Dictionary mapping parsed section keys to extracted values.
+    """
     i = 0
     out = {}
     max_width = properties.MAX_FULL_REPORT_WIDTH
