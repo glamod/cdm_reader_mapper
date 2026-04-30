@@ -179,7 +179,7 @@ This package was created with Cookiecutter_ and the `audreyfeldroy/cookiecutter-
 
 .. _C3S: https://climate.copernicus.eu/
 
-.. _C3S CDS Common Data Model: https://git.noc.ac.uk/brecinosrivas/cdm-mapper/-/blob/master/docs/cdm_latest.pdf
+.. _C3S CDS Common Data Model: https://github.com/glamod/common_data_model/blob/master/cdm_latest.pdf
 
 .. _Contributing Guidelines: https://github.com/glamod/cdm_reader_mapper/blob/main/CONTRIBUTING.rst
 
