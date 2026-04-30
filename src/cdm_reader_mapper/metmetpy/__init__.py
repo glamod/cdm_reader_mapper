@@ -1,4 +1,4 @@
-"""metmetpy  information package."""
+"""Internal metmetpy  information package."""
 
 from __future__ import annotations
 

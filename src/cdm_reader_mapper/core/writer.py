@@ -25,21 +25,21 @@ def write(
     mode: SupportedWriteModes = "data",
     **kwargs: Any,
 ) -> None:
-    """
+    r"""
     Write either MDF data or CDM tables on disk.
 
     Parameters
     ----------
-    data: pandas.DataFrame or Iterable[pd.DataFrame]
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Data to export.
-    mode: str, {data, tables}
+    mode : str, {data, tables}, default: data
         Write data mode:
 
           * "data" to write MDF data to disk
           * "tables" to write CDM tables to disk. Map MDF data to CDM tables with :py:func:`DataBundle.map_model`.
 
-
-        Default: data
+    \**kwargs : Any
+        Additional key-word arguments used to write `data` on disk.
 
     See Also
     --------
@@ -50,9 +50,8 @@ def write(
     read_data : Read MDF data and validation mask from disk.
     read_tables : Read CDM tables from disk.
 
-
-    Note
-    ----
+    Notes
+    -----
     `kwargs` are the keyword arguments for the specific `mode` reader.
     """
     if mode not in supported_write_modes:

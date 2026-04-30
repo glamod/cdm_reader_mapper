@@ -22,20 +22,44 @@ class LazyDataDict(dict[Any, Any]):
     Parameters
     ----------
     loader : Callable[[Any], Any]
-            Function used to load a value from a key.
+        Function used to load a value from a key.
     items : Mapping[Any, Any]
-            Mapping from keys to the *resource* used by `loader` (e.g. a file path).
+        Mapping from keys to the *resource* used by `loader` (e.g. a file path).
     attrs : Any, optional
-            Reserved for future use - currently ignored.
+        Reserved for future use - currently ignored.
     """
 
     def __init__(self, loader: Callable[[Any], Any], items: Mapping[Any, Any], attrs: Any = None) -> None:
+        """
+        Initialize LazyDataDict instance.
+
+        Parameters
+        ----------
+        loader : Callable[[Any], Any]
+            Function used to load a value from a key.
+        items : Mapping[Any, Any]
+            Mapping from keys to the *resource* used by `loader` (e.g. a file path).
+        attrs : Any, optional
+            Reserved for future use - currently ignored.
+        """
         super().__init__()
         self._loader = loader
         self._items = items
 
     def __getitem__(self, key: Any) -> Any:
-        """Make class subscriptable."""
+        """
+        Retrieve an item from the DataBundle.
+
+        Parameters
+        ----------
+        key : Any
+            Key used to access the underlying data or attribute.
+
+        Returns
+        -------
+        Any
+            The value associated with the given key.
+        """
         if key not in self:
             path = self._items[key]
             self[key] = self._loader(path)
@@ -43,210 +67,68 @@ class LazyDataDict(dict[Any, Any]):
 
 
 class TestData:
-    """CDM test data."""
+    """
+    Accessor for bundled CDM test data.
+
+    Attributes
+    ----------
+    name : str
+        Human-readable description of the test data collection.
+
+    Notes
+    -----
+    Data is loaded lazily via `LazyDataDict`.
+    Files are only accessed when explicitly requested.
+    """
 
     def __init__(self) -> None:
+        """Initialize the TestData container."""
         self.name = "CDM reader mapper input testing data."
 
-    @property
-    def test_icoads_r300_d714(self) -> LazyDataDict:
-        """IMMA1 deck 714 test data."""
-        return self._get_data_dict(
-            "2010-07-01_subset",
-            "icoads_r300_d714",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d701(self) -> LazyDataDict:
-        """IMMA1 deck 701 test data."""
-        return self._get_data_dict(
-            "1845-04-01_subset",
-            "icoads_r300_d701",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d706(self) -> LazyDataDict:
-        """IMMA1 deck 706 test data."""
-        return self._get_data_dict(
-            "1919-03-01_subset",
-            "icoads_r300_d706",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d705(self) -> LazyDataDict:
-        """IMMA1 deck 705 test data."""
-        return self._get_data_dict(
-            "1938-04-01_subset",
-            "icoads_r300_d705",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d702(self) -> LazyDataDict:
-        """IMMA1 deck 702 test data."""
-        return self._get_data_dict(
-            "1873-01-01_subset",
-            "icoads_r300_d702",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d707(self) -> LazyDataDict:
-        """IMMA1 deck 707 test data."""
-        return self._get_data_dict(
-            "1916-04-01_subset",
-            "icoads_r300_d707",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_mixed(self) -> LazyDataDict:
-        """IMMA1 mixed test data."""
-        return self._get_data_dict(
-            "1899-01-02_subset",
-            "icoads_r300_mixed",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r302_d794(self) -> LazyDataDict:
-        """IMMA1 deck 794 test data."""
-        return self._get_data_dict(
-            "2022-11-01_subset",
-            "icoads_r302_d794",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d704(self) -> LazyDataDict:
-        """IMMA1 deck 704 test data."""
-        return self._get_data_dict(
-            "1878-10-01_subset",
-            "icoads_r300_d704",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d721(self) -> LazyDataDict:
-        """IMMA1 deck 721 test data."""
-        return self._get_data_dict(
-            "1862-06-01_subset",
-            "icoads_r300_d721",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d730(self) -> LazyDataDict:
-        """IMMA1 deck 730 test data."""
-        return self._get_data_dict(
-            "1776-10-01_subset",
-            "icoads_r300_d730",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d781(self) -> LazyDataDict:
-        """IMMA1 deck 781 test data."""
-        return self._get_data_dict(
-            "1987-09-01_subset",
-            "icoads_r300_d781",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d703(self) -> LazyDataDict:
-        """IMMA1 deck 703 test data."""
-        return self._get_data_dict(
-            "1979-09-01_subset",
-            "icoads_r300_d703",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d201(self) -> LazyDataDict:
-        """IMMA1 deck 201 test data."""
-        return self._get_data_dict(
-            "1913-11-01_subset",
-            "icoads_r300_d201",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d892(self) -> LazyDataDict:
-        """IMMA1 deck 892 test data."""
-        return self._get_data_dict(
-            "1996-02-01_subset",
-            "icoads_r300_d892",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r300_d700(self) -> LazyDataDict:
-        """IMMA1 deck 700 test data."""
-        return self._get_data_dict(
-            "2002-08-01_subset",
-            "icoads_r300_d700",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r302_d792(self) -> LazyDataDict:
-        """IMMA1 deck 792 test data."""
-        return self._get_data_dict(
-            "2022-02-01_subset",
-            "icoads_r302_d792",
-            "imma",
-        )
-
-    @property
-    def test_icoads_r302_d992(self) -> LazyDataDict:
-        """IMMA1 deck 992 test data."""
-        return self._get_data_dict(
-            "2022-01-01_subset",
-            "icoads_r302_d992",
-            "imma",
-        )
-
-    @property
-    def test_gdac(self) -> LazyDataDict:
-        """IMMT test data."""
-        return self._get_data_dict(
-            "2003-02-01_subset",
-            "gdac",
-            "immt",
-        )
-
-    @property
-    def test_craid(self) -> LazyDataDict:
-        """C-RAID 1260810 test data."""
-        return self._get_data_dict("2004-12-20_subset", "craid", "nc")
-
-    @property
-    def test_marob(self) -> LazyDataDict:
-        """MAROB (DWD database) test data."""
-        return self._get_data_dict("2026-04-07_subset", "marob")
-
-    @property
-    def test_cmems(self) -> LazyDataDict:
-        """CMEMS (copernicusmarine) test data."""
-        return self._get_data_dict("2017-05-02_subset", "cmems", "nc")
-
-    @property
-    def test_pub47(self) -> dict[str, Any]:
-        """Pub47 v202501 test data."""
-        return {"source": load_file("Pub47/v202501/pub47_2022_01.csv")}
-
     def __getitem__(self, attr: str) -> Any:
-        """Make class subscriptable."""
+        """
+        Retrieve a test dataset by attribute name.
+
+        Parameters
+        ----------
+        attr : str
+            Name of the dataset attribute to access.
+
+        Returns
+        -------
+        Any
+            The dataset associated with the given attribute.
+
+        Raises
+        ------
+        KeyError
+            If the requested attribute does not exist.
+        """
         try:
             return getattr(self, attr)
         except AttributeError as err:
             raise KeyError(attr) from err
 
     def _load_file(self, ifile: str) -> Path | None:
+        """
+        Load a file from disk or remote source.
+
+        Parameters
+        ----------
+        ifile : str
+            File path or identifier to load.
+
+        Returns
+        -------
+        pathlib.Path or None
+            Path to the loaded file, or None if loading failed due to
+            an HTTP error.
+
+        Raises
+        ------
+        OSError
+            If a local file system error occurs during loading.
+        """
         try:
             return load_file(ifile)
         except HTTPError as err:
@@ -256,6 +138,32 @@ class TestData:
             raise err
 
     def _get_data_dict(self, data_file: str, data_model: str, source_ext: str = "csv") -> LazyDataDict:
+        """
+        Construct a lazy-loading dictionary of dataset file paths.
+
+        Parameters
+        ----------
+        data_file : str
+            Identifier for the dataset (typically a timestamped subset).
+        data_model : str
+            Name of the data model (e.g., `icoads_r300_d714`).
+        source_ext : str, default: csv
+            File extension of the source input data.
+
+        Returns
+        -------
+        LazyDataDict
+            Dictionary-like object mapping dataset components to file paths,
+            including source data, MDF outputs, validation files, and CDM tables.
+
+        Notes
+        -----
+        The returned dictionary includes keys such as:
+        - `source`: raw input file
+        - `mdf_data` / `mdf_mask`: processed MDF outputs
+        - `vadt` / `vaid`: validation outputs
+        - `cdm_*`: CDM table files
+        """
         drs = "/".join(data_model.split("_"))
         data_dict = {
             "source": f"{drs}/input/{data_model}_{data_file}.{source_ext}",
@@ -269,6 +177,358 @@ class TestData:
             data_dict[f"cdm_{cdm_table}"] = cdm_table_file
 
         return LazyDataDict(self._load_file, data_dict)
+
+    @property
+    def test_icoads_r300_d714(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 714 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2010-07-01_subset",
+            "icoads_r300_d714",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d701(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 701 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1845-04-01_subset",
+            "icoads_r300_d701",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d706(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 706 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1919-03-01_subset",
+            "icoads_r300_d706",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d705(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 705 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1938-04-01_subset",
+            "icoads_r300_d705",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d702(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 702 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1873-01-01_subset",
+            "icoads_r300_d702",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d707(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 707 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1916-04-01_subset",
+            "icoads_r300_d707",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_mixed(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 mixed test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1899-01-02_subset",
+            "icoads_r300_mixed",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r302_d794(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 794 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2022-11-01_subset",
+            "icoads_r302_d794",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d704(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 704 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1878-10-01_subset",
+            "icoads_r300_d704",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d721(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 721 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1862-06-01_subset",
+            "icoads_r300_d721",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d730(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 730 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1776-10-01_subset",
+            "icoads_r300_d730",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d781(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 781 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1987-09-01_subset",
+            "icoads_r300_d781",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d703(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 703 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1979-09-01_subset",
+            "icoads_r300_d703",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d201(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 201 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1913-11-01_subset",
+            "icoads_r300_d201",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d892(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 892 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "1996-02-01_subset",
+            "icoads_r300_d892",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r300_d700(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 700 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2002-08-01_subset",
+            "icoads_r300_d700",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r302_d792(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 792 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2022-02-01_subset",
+            "icoads_r302_d792",
+            "imma",
+        )
+
+    @property
+    def test_icoads_r302_d992(self) -> LazyDataDict:
+        """
+        Retrieve IMMA1 deck 992 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2022-01-01_subset",
+            "icoads_r302_d992",
+            "imma",
+        )
+
+    @property
+    def test_gdac(self) -> LazyDataDict:
+        """
+        Retrieve IMMT test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict(
+            "2003-02-01_subset",
+            "gdac",
+            "immt",
+        )
+
+    @property
+    def test_craid(self) -> LazyDataDict:
+        """
+        Retrieve C-RAID 1260810 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict("2004-12-20_subset", "craid", "nc")
+
+    @property
+    def test_marob(self) -> LazyDataDict:
+        """
+        Retrieve MAROB (DWD database) test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict("2026-04-07_subset", "marob")
+
+    @property
+    def test_cmems(self) -> LazyDataDict:
+        """
+        Retrieve CMEMS (copernicusmarine) test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return self._get_data_dict("2017-05-02_subset", "cmems", "nc")
+
+    @property
+    def test_pub47(self) -> dict[str, Any]:
+        """
+        Retrieve Pub47 v202501 test dataset.
+
+        Returns
+        -------
+        LazyDataDict
+            Lazy-loading dictionary containing file paths for this dataset.
+        """
+        return {"source": load_file("Pub47/v202501/pub47_2022_01.csv")}
 
 
 test_data = TestData()

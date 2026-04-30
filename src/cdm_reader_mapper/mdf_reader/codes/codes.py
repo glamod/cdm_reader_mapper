@@ -1,10 +1,7 @@
 """
 Manage data model code table files.
 
-Functions to manage data model
-code table files and objects according to the
-requirements of the data reader tool
-
+Functions to manage data model code table files and objects according to the requirements of the data reader tool.
 """
 
 from __future__ import annotations
@@ -35,11 +32,10 @@ def read_table(
     Parameters
     ----------
     code_table_name : str
-        The name of the code table (without file extension).
-        e.g., `"ICOADS.C0.IM"`
+        The name of the code table (without file extension), e.g., "ICOADS.C0.IM".
     imodel : str, optional
-        Internal data model name, e.g., `"icoads_r300_d704"`. Required if
-        `ext_table_path` is not provided.
+        Internal data model name, e.g., "icoads_r300_d704".
+        Required if `ext_table_path` is not provided.
     ext_table_path : str, optional
         External path containing the code table file. If set, this path
         takes precedence over `imodel`.

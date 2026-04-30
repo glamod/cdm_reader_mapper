@@ -23,7 +23,19 @@ from .. import properties
 
 
 def _eval(s: str) -> Any:
-    """Safely evaluate a string as a Python literal."""
+    """
+    Safely evaluate a string as a Python literal.
+
+    Parameters
+    ----------
+    s : str
+        Input string to evaluate.
+
+    Returns
+    -------
+    Any
+        Evaluated Python object if parsing succeeds, otherwise the original string.
+    """
     try:
         return ast.literal_eval(s)
     except (SyntaxError, ValueError):
@@ -31,7 +43,19 @@ def _eval(s: str) -> Any:
 
 
 def _to_int(x: Any) -> int | None:
-    """Convert input to an integer if possible."""
+    """
+    Convert input to an integer if possible.
+
+    Parameters
+    ----------
+    x : Any
+        Input value to convert.
+
+    Returns
+    -------
+    int or None
+        Integer representation of `x` if conversion succeeds, otherwise None.
+    """
     try:
         return int(x)
     except (TypeError, ValueError):
@@ -39,7 +63,24 @@ def _to_int(x: Any) -> int | None:
 
 
 def _expand_integer_range_key(d: Any) -> Any:
-    """Expand dictionary keys that are integer ranges into individual year keys."""
+    """
+    Expand dictionary keys that are integer ranges into individual year keys.
+
+    Keys that can be evaluated to a list of the form [start, end, step]
+    are expanded into individual string keys covering that range. The special
+    value "yyyy" for the upper bound is replaced with the current year.
+
+    Parameters
+    ----------
+    d : Any
+        Input object, typically a dictionary with string keys.
+
+    Returns
+    -------
+    Any
+        Dictionary with expanded keys if input is a dict, otherwise the input
+        unchanged.
+    """
     if not isinstance(d, dict):
         return d
 
@@ -67,13 +108,25 @@ def _expand_integer_range_key(d: Any) -> Any:
 
 
 def open_code_table(ifile: str | Path) -> Any:
-    """Open code table from json file on disk."""
+    """
+    Open code table from json file on disk.
+
+    Parameters
+    ----------
+    ifile : str or Path-like
+        Path to the JSON file containing the code table.
+
+    Returns
+    -------
+    Any
+        Parsed JSON content with integer range keys expanded into explicit keys.
+    """
     json_dict = open_json_file(ifile)
     return _expand_integer_range_key(json_dict)
 
 
 def get_code_table(data_model: str, *sub_models: str, code_table: str | None = None) -> dict[str, dict[str, Any]]:
-    """
+    r"""
     Load code tables into dictionary.
 
     Combine JSON code table files from a specified data model,
@@ -83,9 +136,9 @@ def get_code_table(data_model: str, *sub_models: str, code_table: str | None = N
     ----------
     data_model : str
         The main data model name, e.g., `icoads`.
-    sub_models : str
+    \*sub_models : str
         Optional submodel names, e.g. `r300`, `d721`.
-    code_table: str
+    code_table : str
         Name of the code table to load. If None, return empty dictionary.
 
     Returns

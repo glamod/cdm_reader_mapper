@@ -80,6 +80,27 @@ def _read_file(
     data_format: SupportedFileTypes,
     **kwargs: Any,
 ) -> pd.DataFrame:
+    r"""
+    Read a single file into a DataFrame using a format-specific reader.
+
+    Parameters
+    ----------
+    ifile : str
+        Path to the input file.
+    table : str
+        Table name used to determine column selection.
+    col_subset : str, list of str or dict or None
+        Column subset specification used to filter columns during reading.
+    data_format : SupportedFileTypes
+        File format used to select the appropriate reader.
+    \**kwargs : Any
+        Additional keyword arguments passed to the underlying reader.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the selected data from the file.
+    """
     usecols = get_usecols(table, col_subset)
     reader = READERS[data_format]
     reader_kwargs = {READER_KWARGS[data_format]: usecols, **kwargs}
@@ -94,6 +115,30 @@ def _read_single_file(
     null_label: str = "null",
     **kwargs: Any,
 ) -> pd.DataFrame:
+    r"""
+    Read and preprocess a single CDM file into a DataFrame.
+
+    Parameters
+    ----------
+    ifile : str
+        Path to the input file.
+    data_format : SupportedFileTypes
+        File format used to read the file.
+    cdm_subset : str or list of str
+        CDM table(s) to read. Only the first entry is used.
+    col_subset : str, list of str or dict or None
+        Column subset specification used to filter columns.
+    null_label : str, default: null
+        Label used to identify and remove null-index rows.
+    \**kwargs : Any
+        Additional keyword arguments passed to the reader.
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed DataFrame indexed by `report_id`. Returns an empty
+        DataFrame if no data is found.
+    """
     if isinstance(cdm_subset, str):
         cdm_subset = [cdm_subset]
     else:
@@ -131,6 +176,51 @@ def _read_multiple_files(
     logger: logging.Logger | None = None,
     **kwargs: Any,
 ) -> list[pd.DataFrame]:
+    r"""
+    Read multiple CDM files from a directory into a list of DataFrames.
+
+    Files are matched using naming patterns derived from prefix, suffix,
+    and table names. Each successfully read table is returned as a DataFrame
+    with a hierarchical column index.
+
+    Parameters
+    ----------
+    inp_dir : str
+        Directory containing input files.
+    data_format : SupportedFileTypes
+        File format used to read the files.
+    prefix : str, optional
+        Prefix used in file name matching.
+    suffix : str, optional
+        Suffix used in file name matching.
+    extension : str, optional
+        File extension to filter files.
+    separator : str, default "-"
+        Separator used in file naming patterns.
+    cdm_subset : str or list of str, optional
+        CDM table(s) to read. Must not be None.
+    col_subset : str or list of str or dict, optional
+        Column subset specification used to filter columns.
+    null_label : str, default: null
+        Label used to identify and remove null-index rows.
+    logger : logging.Logger or None
+        Logger used for informational and warning messages. Must not be None.
+    \**kwargs : Any
+        Additional keyword arguments passed to file readers.
+
+    Returns
+    -------
+    list of pandas.DataFrame
+        List of DataFrames, one per successfully read table, each with
+        a MultiIndex column structure.
+
+    Raises
+    ------
+    ValueError
+        If `cdm_subset` or `logger` is None.
+    FileNotFoundError
+        If no files match the constructed file pattern.
+    """
     if cdm_subset is None:
         raise ValueError("cdm_subset must be a string or a list of strings, not None.")
     if logger is None:
@@ -202,34 +292,32 @@ def read_tables(
     delimiter: str = "|",
     na_values: str | None = None,
     null_label: str = "null",
-    imodel: str | None = None,
     from_str: bool | None = None,
     to_str: bool | None = None,
+    imodel: str | None = None,
     **kwargs: Any,
 ) -> DataBundle:
-    """
+    r"""
     Read CDM-table-like files from file system to a pandas.DataFrame.
 
     Parameters
     ----------
-    source: str
+    source : str
         The file (including path) or the path to the file(s) to be read.
-    data_format: {"csv", "parquet", "feather"}, default: "parquet"
+    data_format : {"csv", "parquet", "feather"}, default: "parquet"
         Format of input data file(s).
-    prefix: str, optional
+    prefix : str, optional
         Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
-    suffix: str, optional
+    suffix : str, optional
         Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
-    extension: str, optional
+    extension : str, optional
         Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
         Could de used if `source` is a valid directory path.
-        Default: "psv"
-    separator : str, optional
+    separator : str, default: -
         Separator to join the file name pattern components.
-        Default: "-"
-    cdm_subset: str or list, optional
+    cdm_subset : str or list, optional
         Specifies a subset of tables or a single table.
 
         - For multiple subsets of tables:
@@ -240,7 +328,7 @@ def read_tables(
           This function returns a pandas.DataFrame with a simple indexing for the columns.
 
         Required if `source` is a valid file name.
-    col_subset: str, list or dict, optional
+    col_subset : str, list or dict, optional
         Specify the section or sections of the file to read.
 
         - For multiple sections of the tables:
@@ -249,19 +337,27 @@ def read_tables(
         - For a single section:
           e.g. list type object col_subset = [columns]
           This variable assumes that the column names are all conform to the cdm field names.
-    delimiter: str
+    delimiter : str, default: |
         Character or regex pattern to treat as the delimiter while reading with pandas.read_csv.
-        Default: '|'
-    na_values: Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
+    na_values : Hashable, Iterable of Hashable or dict of {Hashable: Iterable}, optional
         Additional strings to recognize as Na/NaN while reading input file with pandas.read_csv.
         For more details see: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
-    null_label: str
+    null_label : str, default: null
         String how to label non valid values in `data`.
-        Default: null
+    from_str : bool, optional
+        If True convert original string data to `imodel`-specific data types.
+    to_str : bool, optional
+        If True convert original `imodel`-specific data types to strings.
+    imodel : str , optional
+        Name of data model, e.g. icoads.
+        Must be set if either `from_str` or `to_str` is set.
+    \**kwargs : Any
+        Additional keyword-arguments pass to data reader.
 
     Returns
     -------
     cdm_reader_mapper.DataBundle
+        DataBundle instance containing successfully read CDM table(s).
 
     See Also
     --------

@@ -17,12 +17,36 @@ numeric_types = get_args(properties.NumericTypes)
 
 
 def _is_false(x: Any) -> bool:
-    """Check if a value is exactly False."""
+    """
+    Check if a value is exactly False.
+
+    Parameters
+    ----------
+    x : Any
+        Value to be checked if exactly False.
+
+    Returns
+    -------
+    bool
+        True if `x` is exactly False, otherwise False.
+    """
     return x is False
 
 
 def _is_true(x: Any) -> bool:
-    """Check if a value is exactly False."""
+    """
+    Check if a value is exactly True.
+
+    Parameters
+    ----------
+    x : Any
+        Value to be checked if exactly False.
+
+    Returns
+    -------
+    bool
+        True if `x` is exactly False, otherwise False.
+    """
     return x is True
 
 
@@ -35,12 +59,12 @@ def validate_datetime(series: pd.Series) -> pd.Series:
     Parameters
     ----------
     series : pd.Series
-        Series of object values to validate
+        Series of object values to validate.
 
     Returns
     -------
     pd.Series
-        Boolean Series indicating valid entries
+        Boolean Series indicating valid entries.
     """
     dates = pd.to_datetime(series, errors="coerce")
     return dates.notna() | series.isna()
@@ -56,16 +80,16 @@ def validate_numeric(series: pd.Series, valid_min: float, valid_max: float) -> p
     Parameters
     ----------
     series : pd.Series
-        Series of object values to validate
+        Series of object values to validate.
     valid_min : float
-        Minimum valid value
+        Minimum valid value.
     valid_max : float
-        Maximum valid value
+        Maximum valid value.
 
     Returns
     -------
     pd.Series
-        Boolean Series indicating valid entries
+        Boolean Series indicating valid entries.
     """
     converted = series.apply(convert_str_boolean)
     numeric = pd.to_numeric(converted, errors="coerce")
@@ -82,12 +106,12 @@ def validate_str(series: pd.Series) -> pd.Series:
     Parameters
     ----------
     series : pd.Series
-        Series of object values to validate
+        Series of object values to validate.
 
     Returns
     -------
     pd.Series
-        Boolean Series with all True
+        Boolean Series with all True.
     """
     return pd.Series(True, index=series.index, dtype="boolean")
 
@@ -101,16 +125,16 @@ def validate_codes(series: pd.Series, code_table: Iterable[Any], column_type: st
     Parameters
     ----------
     series : pd.Series
-        Series of object values to validate
+        Series of object values to validate.
     code_table : Iterable
-        Allowed codes for validation
+        Allowed codes for validation.
     column_type : str
-        Column type for dtype lookup (via properties.pandas_dtypes)
+        Column type for dtype lookup (via properties.pandas_dtypes).
 
     Returns
     -------
     pd.Series
-        Boolean Series indicating valid entries
+        Boolean Series indicating valid entries.
     """
     if not code_table:
         logging.error("Code table not found for element %s", series.name)
