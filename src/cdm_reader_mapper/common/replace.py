@@ -117,6 +117,8 @@ def replace_columns(
     """
     Replace columns in one DataFrame using row-matching from another.
 
+    This function works for both a pd.DataFrame and any Iterable of of pandas DataFrames.
+
     Parameters
     ----------
     df_l : pandas.DataFrame or Iterable[pd.dataFrame]
@@ -138,8 +140,8 @@ def replace_columns(
 
     Returns
     -------
-    pandas.DataFrame
-        Updated DataFrame with replacements applied.
+    pd.DataFrame or ParquetStreamReader
+        Updated data with replacements applied.
 
     Raises
     ------
@@ -157,6 +159,16 @@ def replace_columns(
 
     @process_function(data_only=True)
     def _replace_columns_hlp() -> ProcessFunction:
+        """
+        Replace columns in one DataFrame using row-matching from another.
+
+        This function works for both a pd.DataFrame and any Iterable of of pandas DataFrames.
+
+        Returns
+        -------
+        ProcessFunction
+            Updated data with replacements applied.
+        """
         return ProcessFunction(
             data=df_l,
             func=_replace_columns,

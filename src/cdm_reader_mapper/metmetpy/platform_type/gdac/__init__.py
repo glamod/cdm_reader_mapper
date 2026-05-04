@@ -1,1 +1,1 @@
-"""metmetpy platfrom_type GCC tables."""
+"""Internal metmetpy platfrom_type GCC tables."""

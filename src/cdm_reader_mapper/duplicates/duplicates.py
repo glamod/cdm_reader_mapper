@@ -350,13 +350,13 @@ class DupDetect:
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
 
-        def _get_similars(drop: dict[str, Any], keeps: Any) -> tuple[Any, Any]:
+        def _get_similars(drop_dict: dict[str, Any], keeps: Any) -> tuple[Any, Any]:
             """
             Get similar entries from a comparison dictionary.
 
             Parameters
             ----------
-            drop : dict
+            drop_dict : dict
                 Dictionary containing values under keys `drop_` and `keep_` used
                 to determine similarity relationships.
             keeps : Any
@@ -370,9 +370,9 @@ class DupDetect:
               to integers if possible. If the values are not convertible or no match
               is found, returns `(None, None)`.
             """
-            if drop[drop_] in keeps:
-                drops = drop[drop_]
-                keeps = drop[keep_]
+            if drop_dict[drop] in keeps:
+                drops = drop_dict[drop]
+                keeps = drop_dict[keep]
                 try:
                     return int(drops), int(keeps)
                 except ValueError:
@@ -425,7 +425,7 @@ class DupDetect:
                 dictionary_[k] = v
             return dictionary_, drops_
 
-        def replace_keeps_and_drops(df: pd.DataFrame, keep_: Any) -> pd.DataFrame:
+        def replace_keeps_and_drops(df: pd.DataFrame, keep: Any) -> pd.DataFrame:
             """
             Iteratively resolve and replace duplicate mappings in a DataFrame.
 
@@ -433,7 +433,7 @@ class DupDetect:
             ----------
             df : pd.DataFrame
                 Input DataFrame containing values to be deduplicated.
-            keep_ : Any
+            keep : Any
                 Column name used to identify canonical ("keep") values.
 
             Returns
@@ -442,7 +442,7 @@ class DupDetect:
                 Updated DataFrame with resolved duplicate mappings and cleaned
                 keep-column values.
             """
-            keeps = df[keep_].values
+            keeps = df[keep].values
             while True:
                 df = df.sort_index()
                 replaces = df.apply(lambda row, keeps=keeps: _get_similars(row, keeps), axis=1)
@@ -452,7 +452,7 @@ class DupDetect:
                 values = replaces.values()
                 if len(drops_) > 0:
                     df = df.drop(drops_, axis="index")
-                df[keep_] = df[keep_].replace(replaces)
+                df[keep] = df[keep].replace(replaces)
                 if not set(keys).intersection(values):
                     return df
 
@@ -467,23 +467,23 @@ class DupDetect:
 
         indexes = self.matches.index
         indexes_df = indexes.to_frame()
-        drop_ = indexes_df.columns[self.drop]
-        keep_ = indexes_df.columns[self.keep]
-        indexes_df = indexes_df.drop_duplicates(subset=[drop_])
-        indexes_df = replace_keeps_and_drops(indexes_df, keep_)
+        drop = indexes_df.columns[self.drop]
+        keep = indexes_df.columns[self.keep]
+        indexes_df = indexes_df.drop_duplicates(subset=[drop])
+        indexes_df = replace_keeps_and_drops(indexes_df, keep)
 
-        dup_keep = indexes_df.groupby(indexes_df[keep_]).apply(
-            lambda x: _get_duplicates(x, drop_),
+        dup_keep = indexes_df.groupby(indexes_df[keep]).apply(
+            lambda x: _get_duplicates(x, drop),
             include_groups=False,
         )
-        dup_drop = indexes_df.groupby(indexes_df[drop_]).apply(
-            lambda x: _get_duplicates(x, keep_),
+        dup_drop = indexes_df.groupby(indexes_df[drop]).apply(
+            lambda x: _get_duplicates(x, keep),
             include_groups=False,
         )
         duplicates = pd.concat([dup_keep, dup_drop])
 
-        indexes_good = indexes_df[keep_].values.tolist()
-        indexes_bad = indexes_df[drop_].values.tolist()
+        indexes_good = indexes_df[keep].values.tolist()
+        indexes_bad = indexes_df[drop].values.tolist()
         indexes = indexes_good + indexes_bad
         result.loc[indexes_good, "duplicate_status"] = 1
         result.loc[indexes_bad, "duplicate_status"] = 3

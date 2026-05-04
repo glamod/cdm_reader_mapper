@@ -87,7 +87,7 @@ def _select_years(
     selection : tuple of int or None
         Left and right borders of range.
     year_col : str or tuple of str
-        Column that contins year information.
+        Column that contains year information.
 
     Returns
     -------
@@ -121,6 +121,15 @@ class FileReader:
 
     Provides a high-level interface to read, parse, filter, convert,
     decode, and validate data from multiple sources (FWF, CSV, NetCDF).
+
+    Parameters
+    ----------
+    imodel : str, optional
+            Name of the data model (e.g., 'ICOADS').
+    ext_schema_path : str, optional
+            Directory of external MDF schema file.
+    ext_schema_file :  str, optional
+            Path to external MDF schema file.
     """
 
     def __init__(
@@ -138,8 +147,8 @@ class FileReader:
             Name of the data model (e.g., 'ICOADS').
         ext_schema_path : str, optional
             Directory of external MDF schema file.
-        ext_schema file :  str, optional
-            Path to external MDF schema file
+        ext_schema_file :  str, optional
+            Path to external MDF schema file.
         """
         self.imodel = imodel
         self.config: ParserConfig = build_parser_config(
@@ -289,15 +298,15 @@ class FileReader:
             Path or pattern for input file(s).
         open_with : str
             Parser backend: 'pandas' or 'netcdf'.
-        pd_kwargs: dict, optional
+        pd_kwargs : dict, optional
             Additional key-word arguments for parsing pandas-readable data.
-        xr_kwargs: dict, optional
+        xr_kwargs : dict, optional
             Additional key-word arguments for parsing xarray-readable data.
-        convert_kwargs: dict, optional
+        convert_kwargs : dict, optional
             Additional key-word arguments for data conversion.
-        decode_kwargs: dict, optional
+        decode_kwargs : dict, optional
             Additional key-word arguments for data decoding.
-        validate_kwargs: dict, optional
+        validate_kwargs : dict, optional
             Additional key-word arguments for data validation.
         select_kwargs : dict, optional
             Additional key-word arguments for selecting/filtering data.
@@ -310,6 +319,14 @@ class FileReader:
 
         @process_function()
         def _open_data() -> ProcessFunction:
+            """
+            Open source data according to parser consiguration.
+
+            Returns
+            -------
+            ProcessFunction
+                Containing data, mask and a configuration dictionary.
+            """
             return ProcessFunction(
                 data=to_parse,
                 func=self._process_data,
@@ -370,15 +387,15 @@ class FileReader:
         ----------
         source : str
             Path to input file(s).
-        pd_kwargs: dict, optional
+        pd_kwargs : dict, optional
             Additional key-word arguments for parsing pandas-readable data.
-        xr_kwargs: dict, optional
+        xr_kwargs : dict, optional
             Additional key-word arguments for parsing xarray-readable data.
-        convert_kwargs: dict, optional
+        convert_kwargs : dict, optional
             Additional key-word arguments for data conversion.
-        decode_kwargs: dict, optional
+        decode_kwargs : dict, optional
             Additional key-word arguments for data decoding.
-        validate_kwargs: dict, optional
+        validate_kwargs : dict, optional
             Additional key-word arguments for data validation.
         select_kwargs : dict, optional
             Additional key-word arguments for selecting/filtering data.

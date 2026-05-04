@@ -1,5 +1,5 @@
 """
-metmetpy validation package.
+Internal metmetpy validation package.
 
 Created on Tue Jun 25 09:00:19 2019
 
@@ -77,7 +77,26 @@ def _get_id_col(
     data: pd.DataFrame,
     imodel: str,
 ) -> str | list[str]:
-    """Retrieve the ID column(s) for a given data model from the metadata."""
+    """
+    Retrieve the ID column(s) for a given data model from the metadata.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Input data containing candidate ID columns.
+    imodel : str
+        Name of the data model used to look up ID columns.
+
+    Returns
+    -------
+    str or list of str
+        Column name if a single ID column is found, otherwise a list of column names.
+
+    Raises
+    ------
+    ValueError
+        If no ID definition exists for `imodel` or if none of the configured ID columns are present in `data`.
+    """
     id_col: str | tuple[str, str] | None = properties.metadata_datamodels["id"].get(imodel)
     if id_col is None:
         raise ValueError(f"Data model {imodel} ID column not defined in properties file.")
@@ -104,7 +123,27 @@ def _get_patterns(
     data_model_files: Sequence[str | Path],
     logger: logging.Logger,
 ) -> list[str]:
-    """Generate a list of validation patterns for a given deck.."""
+    """
+    Generate a list of validation patterns for a given deck.
+
+    Parameters
+    ----------
+    dck_id_model : dict
+        Dictionary containing deck validation metadata, including patterns.
+    blank : bool
+        If True, include a pattern that matches empty values.
+    dck : str
+        Deck identifier used for logging and lookup context.
+    data_model_files : Sequence of str or Path
+        Files from which the data model configuration was loaded.
+    logger : logging.Logger
+        Logger used to report missing or fallback pattern behavior.
+
+    Returns
+    -------
+    list of str
+        List of regex patterns used for validation.
+    """
     pattern_dict = dck_id_model.get("valid_patterns")
 
     if not pattern_dict:
@@ -123,7 +162,25 @@ def _get_patterns(
 
 
 def _validate_id(data: pd.DataFrame, mrd: list[str], combined_compiled: str, na_values: Any) -> pd.Series:
-    """Helper function to validate ID."""
+    """
+    Helper function to validate ID.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Input data containing the ID column.
+    mrd : list of str
+        Model reference identifiers used to determine the ID column.
+    combined_compiled : str
+        Compiled regex pattern used for validation.
+    na_values : Any
+        Values treated as valid missing entries.
+
+    Returns
+    -------
+    pd.Series
+        Boolean Series indicating valid ID matches.
+    """
     id_col = _get_id_col(data, mrd[0])
 
     id_series = data[id_col]
@@ -132,7 +189,26 @@ def _validate_id(data: pd.DataFrame, mrd: list[str], combined_compiled: str, na_
 
 
 def _validate_datetime(data: pd.DataFrame | pd.Series, model: str) -> pd.DataFrame | pd.Series:
-    """Helper function to validate datetime."""
+    """
+    Helper function to validate datetime.
+
+    Parameters
+    ----------
+    data : pd.DataFrame or pd.Series
+        Input data to validate.
+    model : str
+        Data model used to determine datetime conversion rules.
+
+    Returns
+    -------
+    pd.DataFrame or pd.Series
+        Boolean mask indicating valid datetime values.
+
+    Raises
+    ------
+    ValueError
+        If no columns are found for datetime conversion.
+    """
     data_model_datetime = model_datetimes.to_datetime(data, model)
 
     if len(data_model_datetime) == 0:

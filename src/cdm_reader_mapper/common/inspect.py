@@ -16,7 +16,19 @@ from .iterators import ParquetStreamReader, ProcessFunction, process_function
 
 
 def merge_sum_dicts(dicts: list[Mapping[str, Any]]) -> dict[str, Any]:
-    """Recursively merge dictionaries, summing numeric values at the leaves."""
+    """
+    Recursively merge dictionaries, summing numeric values at the leaves.
+
+    Parameters
+    ----------
+    dicts : list of Mapping
+        A list of dictionaries for recursiv merging.
+
+    Returns
+    -------
+    dict
+        Recursively merged dictionary.
+    """
     result = {}
 
     for d in dicts:
@@ -38,7 +50,21 @@ def merge_sum_dicts(dicts: list[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 def _count_by_cat(df: pd.DataFrame, columns: list[Any]) -> dict[Any, int]:
-    """Count unique values in a pandas Series, including NaNs."""
+    """
+    Count unique values in a pandas DataFrame, including NaNs.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to count unique values.
+    columns : list of Any
+        Column names for counting unique values.
+
+    Returns
+    -------
+    dict
+        Dictionary containing name and amount of unique values.
+    """
     count_dict: dict[Any, int] = {}
     for column in columns:
         counts = df[column].value_counts(dropna=False)
@@ -98,7 +124,19 @@ def count_by_cat(
 
 
 def _get_length(data: pd.DataFrame) -> int:
-    """Get length pd.DataFrame."""
+    """
+    Get length pd.DataFrame.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        DataFrame to get length.
+
+    Returns
+    -------
+    int
+        Length of `data`.
+    """
     return len(data)
 
 

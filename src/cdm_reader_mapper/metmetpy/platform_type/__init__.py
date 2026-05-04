@@ -1,1 +1,1 @@
-"""metmetpy platfrom_type information."""
+"""Internal metmetpy platfrom_type information."""

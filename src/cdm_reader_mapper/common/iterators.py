@@ -728,6 +728,7 @@ def _prepare_readers(
     -------
     tuple of list of ParquetStreamReader or list of Any or dict
         A tuple containing:
+
         - A list of ParquetStreamReader objects used for chunked iteration
           (including the primary reader and any detected in args/kwargs).
         - A list of non-stream positional arguments to be passed to the
@@ -917,6 +918,7 @@ def process_disk_backed(
     -------
     tuple of Any
         A tuple containing:
+
         - One or more ParquetStreamReader objects for chunked data outputs
           (if any data was produced)
         - Processed non-data outputs (metadata), optionally transformed by

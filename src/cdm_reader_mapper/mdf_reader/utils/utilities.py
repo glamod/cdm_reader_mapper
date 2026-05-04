@@ -271,7 +271,7 @@ def read_csv(
         Subset of columns to read from the CSV.
     column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
-    **\kwargs : any
+    \**kwargs : any
         Additional keyword arguments passed to pd.read_csv.
 
     Returns
@@ -343,7 +343,7 @@ def read_feather(
         Subset of columns to read from the FEATHER.
     column_names : pd.Index or pd.MultiIndex, optional
         Column labels for re-indexing.
-    **kwargs : any
+    \**kwargs : Any
         Additional keyword arguments passed to pd.read_feather.
 
     Returns

@@ -29,7 +29,24 @@ WRITERS = {
 def _normalize_data_chunks(
     data: pd.DataFrame | Iterable[pd.DataFrame] | None,
 ) -> list[pd.DataFrame] | ParquetStreamReader:
-    """Helper function to normalize data chunks."""
+    """
+    Helper function to normalize data chunks.
+
+    Parameters
+    ----------
+    data : pd.DataFrame of Iterable of pd.DataFrame or None
+        Data to be normalized.
+
+    Returns
+    -------
+    list of pd.DataFrame or ParquetStreamReader
+        Normalized data.
+
+    Raises
+    ------
+    TypeError
+        If `data` has an unsupported data type.
+    """
     if data is None:
         data = pd.DataFrame()
     if isinstance(data, pd.DataFrame):
@@ -60,42 +77,42 @@ def write_data(
     delimiter: str = ",",
     **kwargs: Any,
 ) -> None:
-    """
+    r"""
     Write pandas.DataFrame to MDF file on file system.
 
     Parameters
     ----------
-    data: pandas.DataFrame or Iterable[pd.DataFrame]
+    data : pandas.DataFrame or Iterable[pd.DataFrame]
         Data to export.
-    mask: pandas.DataFrame or Iterable[pd.DataFrame], optional
+    mask : pandas.DataFrame or Iterable[pd.DataFrame], optional
         Validation mask to export.
-    data_format: {"csv", "parquet", "feather"}, default: "parquet"
+    data_format : {"csv", "parquet", "feather"}, default: "parquet"
         Format of output data file(s).
-    dtypes: dict, optional
-        Dictionary of data types on ``data``.
-        Dump ``dtypes`` and ``parse_dates`` to json information file.
-    parse_dates: list | bool, default: False
+    dtypes : dict, optional
+        Dictionary of data types on `data`.
+        Dump `dtypes` and `parse_dates` to json information file.
+    parse_dates : list | bool, default: False
         Information of how to parse dates in :py:attr:`data`.
-        Dump ``dtypes`` and ``parse_dates`` to json information file.
+        Dump `dtypes` and `parse_dates` to json information file.
         For more information see :py:func:`pandas.read_csv`.
-    encoding: str, default: "utf-8"
+    encoding : str, default: "utf-8"
         A string representing the encoding to use in the output file, defaults to utf-8.
-    out_dir: str, default: "."
+    out_dir : str, default: "."
         Path to the output directory.
-    prefix: str, optional
-        Prefix of file name structure: ``<prefix>-data-*<suffix>.<extension>``.
-    suffix: str, optional
-        Suffix of file name structure: ``<prefix>-data-*<suffix>.<extension>``.
-    extension: str, optional
-        Extension of file name structure: ``<prefix>-data-*<suffix>.<extension>``.
+    prefix : str, optional
+        Prefix of file name structure: `<prefix>-data-*<suffix>.<extension>`.
+    suffix : str, optional
+        Suffix of file name structure: `<prefix>-data-*<suffix>.<extension>`.
+    extension : str, optional
+        Extension of file name structure: `<prefix>-data-*<suffix>.<extension>`.
         By default, extension depends on `data_format`.
+    filename : str or dict, optional
+        Name of the output file name(s).
+        List one filename for both `data` and `mask` ({"data":<filenameD>, "mask":<filenameM>}).
+        By default, automatically create file name from table name, `prefix` and `suffix`.
     separator : str, optional
         Separator to join the file name pattern components (default "_").
-    filename: str or dict, optional
-        Name of the output file name(s).
-        List one filename for both ``data`` and ``mask`` ({"data":<filenameD>, "mask":<filenameM>}).
-        By default, automatically create file name from table name, ``prefix`` and ``suffix``.
-    col_subset: str, tuple or list, optional
+    col_subset : str, tuple or list, optional
         Specify the section or sections of the file to write.
 
         - For multiple sections of the tables:
@@ -105,20 +122,28 @@ def write_data(
           e.g. list type object col_subset = [columns]
 
         Column labels could be both string or tuple.
-    delimiter: str, default: ","
+    delimiter : str, default: ","
         Character or regex pattern to treat as the delimiter while reading with df.to_csv.
+    \**kwargs : Any
+        Additional keyword-arguments passed to `to_csv` when `data_format` is 'csv'.
+
+    Raises
+    ------
+    ValueError
+        If `data_foramt` is not one of 'csv', 'parquet' or 'feather'.
+        If type of `data` and type of `mask` do not match.
 
     See Also
     --------
-    write: Write either MDF data or CDM tables to disk.
+    write : Write either MDF data or CDM tables to disk.
     write_tables : Write CDM tables to disk.
-    read: Read either original marine-meteorological data or MDF data or CDM tables from disk.
+    read : Read either original marine-meteorological data or MDF data or CDM tables from disk.
     read_data : Read MDF data and validation mask from disk.
     read_mdf : Read original marine-meteorological data from disk.
     read_tables : Read CDM tables from disk.
 
-    Note
-    ----
+    Notes
+    -----
     Use this function after reading MDF data.
     """
     supported_file_types = get_args(SupportedFileTypes)
@@ -126,7 +151,7 @@ def write_data(
         raise ValueError(f"data_format must be one of {supported_file_types}, not {data_format}.")
 
     if mask is not None and not isinstance(mask, type(data)):
-        raise ValueError("type of 'data' and type of 'mask' do not match.")
+        raise ValueError("Type of 'data' and type of 'mask' do not match.")
 
     extension = extension or data_format
 
