@@ -181,6 +181,9 @@ class DataBundle(_DataBundle):
 
             setattr(db_cp, data_attr, concatenated)
 
+        if db_cp is None:
+            return None
+
         return self._return_db(db_cp, inplace)
 
     def add(self, addition: dict[str, pd.DataFrame | pd.Series], inplace: bool = False) -> DataBundle | None:
@@ -209,6 +212,8 @@ class DataBundle(_DataBundle):
         for name, data in addition.items():
             data_cp = _copy(data)
             setattr(db_, f"_{name}", data_cp)
+        if db_ is None:
+            return None
         return self._return_db(db_, inplace)
 
     def copy(self) -> DataBundle:
@@ -347,6 +352,8 @@ class DataBundle(_DataBundle):
         >>> df_selected = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         _mask = _copy(db_._mask)
         db_._data, _, selected_idx, _ = split_by_boolean_true(db_._data, _mask, **kwargs)
         if do_mask is True:
@@ -394,6 +401,8 @@ class DataBundle(_DataBundle):
         >>> df_selected = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         _mask = _copy(db_._mask)
         db_._data, _, selected_idx, _ = split_by_boolean_false(db_._data, _mask, **kwargs)
         if do_mask is True:
@@ -448,6 +457,8 @@ class DataBundle(_DataBundle):
         >>> df_selected = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         db_._data, _, selected_idx, _ = split_by_column_entries(db_._data, selection, **kwargs)
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
@@ -496,6 +507,8 @@ class DataBundle(_DataBundle):
         >>> df_selected = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         db_._data, _, selected_idx, _ = split_by_index(db_._data, index, **kwargs)
         if do_mask is True:
             db_._mask, _, _, _ = split_by_index(db_._mask, selected_idx, **kwargs)
@@ -731,6 +744,8 @@ class DataBundle(_DataBundle):
             raise TypeError("Data must be a pd.DataFrame or pd.Series, not a {type(self._data)}.")
 
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         if subset is None:
             db_._data = replace_columns(df_l=db_._data, df_r=df_corr, **kwargs)
         else:
@@ -773,6 +788,8 @@ class DataBundle(_DataBundle):
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         db_._data = correct_datetime(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
@@ -846,6 +863,8 @@ class DataBundle(_DataBundle):
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         db_._data = correct_pt(db_._data, imodel, **kwargs)
         return self._return_db(db_, inplace)
 
@@ -913,6 +932,8 @@ class DataBundle(_DataBundle):
         """
         imodel = imodel or self._imodel
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         _tables = map_model(db_._data, imodel, **kwargs)
         db_._mode = "tables"
         db_._columns = _tables.columns
@@ -1019,6 +1040,8 @@ class DataBundle(_DataBundle):
         >>> db.duplicate_check()
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
         if db_._mode == "tables" and "header" in db_._data:
             data = db_._data["header"]
         else:
@@ -1070,6 +1093,8 @@ class DataBundle(_DataBundle):
         >>> flagged_tables = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
 
         if db_.DupDetect is None:
             raise RuntimeError("Before flagging duplicates, a duplictate check has to be done: 'db.duplicate_check()'")
@@ -1163,6 +1188,8 @@ class DataBundle(_DataBundle):
         >>> removed_tables = db.data
         """
         db_ = self._get_db(inplace)
+        if db_ is None:
+            return None
 
         if db_.DupDetect is None:
             raise RuntimeError("Before removing duplicates, a duplictate check has to be done: 'db.duplicate_check()'")

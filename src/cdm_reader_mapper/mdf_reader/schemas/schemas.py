@@ -85,8 +85,8 @@ class SchemaDict(TypedDict, total=False):
 def _resolve_schema_files(
     *,
     imodel: str | None = None,
-    ext_schema_path: str | None = None,
-    ext_schema_file: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
 ) -> list[Path]:
     """
     Determine which schema file(s) to use based on the input parameters.
@@ -96,10 +96,10 @@ def _resolve_schema_files(
     imodel : str, optional
         Internal model identifier used to infer schema file locations.
         May include underscore-separated components (e.g., model_version).
-    ext_schema_path : str, optional
+    ext_schema_path : str or Path, optional
         Path to an external schema directory. A JSON schema file with the same
         name as the directory is expected inside it.
-    ext_schema_file : str, optional
+    ext_schema_file : str or Path, optional
         Direct path to a schema file.
 
     Returns
@@ -195,8 +195,8 @@ def _normalize_schema(schema: SchemaDict) -> SchemaDict:
 
 def read_schema(
     imodel: str | None = None,
-    ext_schema_path: str | None = None,
-    ext_schema_file: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
 ) -> SchemaDict:
     """
     Load and normalize a data model schema.
@@ -209,11 +209,11 @@ def read_schema(
     ----------
     imodel : str, optional
         Name of internally available input data model, e.g. icoads_r300_d704.
-    ext_schema_path : str, optional
+    ext_schema_path : str or Path, optional
         The path to the external input data model schema file.
         The schema file must have the same name as the directory.
         One of `imodel` and `ext_schema_path` or `ext_schema_file` must be set.
-    ext_schema_file : str, optional
+    ext_schema_file : str or Path, optional
         The external input data model schema file.
         One of `imodel` and `ext_schema_path` or `ext_schema_file` must be set.
 

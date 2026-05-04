@@ -85,7 +85,7 @@ def _get_remote_file(lfile: str | Path, url: str, name: str | Path) -> tuple[Pat
     return lfile, response
 
 
-def _check_md5s(f: Path, md5: str, mode: Literal["error", "warning"]) -> bool:
+def _check_md5s(f: Path, md5: str, mode: Literal["error", "warning"] = "error") -> bool:
     """
     Verify the MD5 checksum of a file.
 

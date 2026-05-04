@@ -350,7 +350,7 @@ class DupDetect:
         .. _quality_flag: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
         """
 
-        def _get_similars(drop_dict: dict[str, Any], keeps: Any) -> tuple[Any, Any]:
+        def _get_similars(drop_dict: dict[str | int, Any], keeps: Any) -> tuple[Any, Any]:
             """
             Get similar entries from a comparison dictionary.
 

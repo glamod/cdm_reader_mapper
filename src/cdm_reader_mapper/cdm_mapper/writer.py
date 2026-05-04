@@ -214,7 +214,7 @@ def write_tables(
         data = convert_to_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
 
     if from_str is True:
-        data = convert_from_str_df(data.copy(), imode=imodel, cdm_subset=cdm_subset)
+        data = convert_from_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
 
     for table in cdm_subset:
         cdm_atts = get_cdm_atts(table)[table]

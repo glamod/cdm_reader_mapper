@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -26,7 +27,7 @@ from .utilities import remove_boolean_values
 from .validators import validate
 
 
-def _merge_kwargs(*dicts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+def _merge_kwargs(*dicts: Mapping[str, Any]) -> dict[str, Any]:
     r"""
     Merge multiple keyword-argument dictionarie.
 
@@ -126,17 +127,17 @@ class FileReader:
     ----------
     imodel : str, optional
             Name of the data model (e.g., 'ICOADS').
-    ext_schema_path : str, optional
+    ext_schema_path : str or Path, optional
             Directory of external MDF schema file.
-    ext_schema_file :  str, optional
+    ext_schema_file :  str or Path, optional
             Path to external MDF schema file.
     """
 
     def __init__(
         self,
         imodel: str | None,
-        ext_schema_path: str | None = None,
-        ext_schema_file: str | None = None,
+        ext_schema_path: str | Path | None = None,
+        ext_schema_file: str | Path | None = None,
     ):
         """
         Initialize FileReader with a data model and parser configuration.
@@ -145,9 +146,9 @@ class FileReader:
         ----------
         imodel : str, optional
             Name of the data model (e.g., 'ICOADS').
-        ext_schema_path : str, optional
+        ext_schema_path : str or Path, optional
             Directory of external MDF schema file.
-        ext_schema_file :  str, optional
+        ext_schema_file :  str or Path, optional
             Path to external MDF schema file.
         """
         self.imodel = imodel

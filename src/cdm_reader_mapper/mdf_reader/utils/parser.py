@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from copy import deepcopy
 from dataclasses import dataclass, replace
 from itertools import zip_longest
+from pathlib import Path
 from typing import Any, TypedDict
 
 import numpy as np
@@ -523,8 +524,8 @@ def parse_netcdf(
 
 def build_parser_config(
     imodel: str | None = None,
-    ext_schema_path: str | None = None,
-    ext_schema_file: str | None = None,
+    ext_schema_path: str | Path | None = None,
+    ext_schema_file: str | Path | None = None,
 ) -> ParserConfig:
     """
     Build a ParserConfig from a normalized schema definition.
@@ -538,9 +539,9 @@ def build_parser_config(
     ----------
     imodel : str or None, optional
         Internal model identifier used to locate the schema.
-    ext_schema_path : str or None, optional
+    ext_schema_path : str or Path, optional
         Path to an external schema directory.
-    ext_schema_file : str or None, optional
+    ext_schema_file : str or Path, optional
         Filename of an external schema definition.
 
     Returns
