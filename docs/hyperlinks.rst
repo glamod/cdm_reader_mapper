@@ -6,7 +6,7 @@
 
 .. _C-RAID: https://www.coriolis.eu.org/Observing-the-Ocean/DBCP-E-SURFMAR/C-RAID-Copernicus-in-situ-project
 
-.. _CDM: https://github.com/glamod/cdm_reader_mapper/tree/main/docs/cdm_latest.pdf
+.. _CDM: https://github.com/glamod/common_data_model/blob/master/cdm_latest.pdf
 
 .. _CDM code tables for duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
 
