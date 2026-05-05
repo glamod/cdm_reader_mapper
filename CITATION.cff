@@ -1,0 +1,23 @@
+# This CITATION.cff file was generated with cffinit and templated with cookiecutter.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: "1.2.0"
+title: "Common Data Model reader and mapper"
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: "software"
+authors:
+  - given-names: 'Ludwig'
+    family-names: 'Lierhammer'
+    email: 'ludwig.lierhammer@dwd.de'
+    orcid: 'https://orcid.org/0000-0002-7207-0003'
+contact:
+  - given-names: 'Ludwig'
+    family-names: 'Lierhammer'
+    email: 'ludwig.lierhammer@dwd.de'
+    orcid: 'https://orcid.org/0000-0002-7207-0003'
+repository-code: "https://github.com/glamod/cdm_reader_mapper"
+abstract: "This Python package is designed for reading data files compliant with a user specified data model, for mapping observed variables and its associated metadata from a data model or models combination to the C3S CDS Common Data Model (CDM) format, and for detecting and flagging or removing duplicated observations. It was developed to read the IMMA (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of data that is stored in a human-readable manner (ASCII format), data that is stored in a Network Common Data Format (NetCDF format), data that is organized in single line reports, reports that have a coherent internal structure and can be modelised, reports that have a fixed width or field delimited types, and reports that can be organized in sections, in which case each section can be of different types (fixed width of delimited)"
+license: "Apache-2.0"
+version: "0.1.0"

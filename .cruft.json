@@ -1,0 +1,30 @@
+{
+  "template": "https://github.com/Ouranosinc/cookiecutter-pypackage.git",
+  "commit": "cb8b26cb78a428f6ce447a0ab1b08c0c171ad5aa",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "full_name": "Ludwig Lierhammer",
+      "email": "ludwig.lierhammer@dwd.de",
+      "github_username": "glamod",
+      "orcid_id": "0000-0002-7207-0003",
+      "project_name": "Common Data Model reader and mapper",
+      "project_slug": "cdm_reader_mapper",
+      "project_short_description": "This Python package is designed for reading data files compliant with a user specified data model, for mapping observed variables and its associated metadata from a data model or models combination to the C3S CDS Common Data Model (CDM) format, and for detecting and flagging or removing duplicated observations. It was developed to read the IMMA (International Maritime Meteorological Archive) data format, but it has been enhanced to account for meteorological data formats in the case of data that is stored in a human-readable manner (ASCII format), data that is stored in a Network Common Data Format (NetCDF format), data that is organized in single line reports, reports that have a coherent internal structure and can be modelised, reports that have a fixed width or field delimited types, and reports that can be organized in sections, in which case each section can be of different types (fixed width of delimited)",
+      "pypi_username": "ludwiglierhammer",
+      "version": "2.4.1",
+      "use_pytest": "y",
+      "use_conda": "n",
+      "make_docs": "y",
+      "add_translations": "n",
+      "command_line_interface": "Click",
+      "create_author_file": "y",
+      "open_source_license": "Apache Software License 2.0",
+      "generated_with_cruft": "n",
+      "__gh_slug": "https://github.com/glamod/cdm_reader_mapper",
+      "_template": "https://github.com/Ouranosinc/cookiecutter-pypackage.git",
+      "_commit": "cb8b26cb78a428f6ce447a0ab1b08c0c171ad5aa"
+    }
+  },
+  "directory": null
+}

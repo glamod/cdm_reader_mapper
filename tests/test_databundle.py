@@ -3,10 +3,10 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from cdm_reader_mapper import DataBundle
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.duplicates.duplicates import DupDetect
 
-from cdm_reader_mapper import DataBundle
 
 YR = ("core", "YR")
 MO = ("core", "MO")
@@ -57,9 +57,7 @@ def sample_db_psr():
     data = ParquetStreamReader([data1, data2])
 
     mask1 = pd.DataFrame({"A": [True, True], "B": [True, True]}, index=[0, 1])
-    mask2 = pd.DataFrame(
-        {"A": [True, False, True], "B": [True, False, False]}, index=[2, 3, 4]
-    )
+    mask2 = pd.DataFrame({"A": [True, False, True], "B": [True, False, False]}, index=[2, 3, 4])
     mask = ParquetStreamReader([mask1, mask2])
 
     return DataBundle(data=data, mask=mask)
@@ -68,14 +66,10 @@ def sample_db_psr():
 @pytest.fixture
 def sample_db_psr_multi():
     data1 = pd.DataFrame({("A", "a"): [19, 26], ("B", "b"): [0, 1]}, index=[0, 1])
-    data2 = pd.DataFrame(
-        {("A", "a"): [27, 41, 91], ("B", "b"): [2, 3, 4]}, index=[2, 3, 4]
-    )
+    data2 = pd.DataFrame({("A", "a"): [27, 41, 91], ("B", "b"): [2, 3, 4]}, index=[2, 3, 4])
     data = ParquetStreamReader([data1, data2])
 
-    mask1 = pd.DataFrame(
-        {("A", "a"): [True, True], ("B", "b"): [True, True]}, index=[0, 1]
-    )
+    mask1 = pd.DataFrame({("A", "a"): [True, True], ("B", "b"): [True, True]}, index=[0, 1])
     mask2 = pd.DataFrame(
         {("A", "a"): [True, False, True], ("B", "b"): [True, False, False]},
         index=[2, 3, 4],
@@ -251,9 +245,7 @@ def test_select_operators_df(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_df, func)(
-        *args, reset_index=reset_index, inverse=inverse
-    )
+    result = getattr(sample_db_df, func)(*args, reset_index=reset_index, inverse=inverse)
 
     data = sample_db_df.data
     mask = sample_db_df.mask
@@ -297,9 +289,7 @@ def test_select_operators_psr(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_psr, func)(
-        *args, reset_index=reset_index, inverse=inverse
-    )
+    result = getattr(sample_db_psr, func)(*args, reset_index=reset_index, inverse=inverse)
 
     data = sample_db_psr.data.read()
     mask = sample_db_psr.mask.read()
@@ -343,9 +333,7 @@ def test_split_operators_df(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_df, func)(
-        *args, reset_index=reset_index, inverse=inverse
-    )
+    result = getattr(sample_db_df, func)(*args, reset_index=reset_index, inverse=inverse)
 
     data = sample_db_df.data
     mask = sample_db_df.mask
@@ -399,9 +387,7 @@ def test_split_operators_psr(
     reset_index,
     inverse,
 ):
-    result = getattr(sample_db_psr, func)(
-        *args, reset_index=reset_index, inverse=inverse
-    )
+    result = getattr(sample_db_psr, func)(*args, reset_index=reset_index, inverse=inverse)
 
     data = sample_db_psr.data.read()
     mask = sample_db_psr.mask.read()
@@ -699,9 +685,7 @@ def test_map_model_df():
             ("header", "location_quality"): [2, 0, 0, 0],
         }
     )
-    pd.testing.assert_frame_equal(
-        result.data[expected.columns], expected, check_dtype=False
-    )
+    pd.testing.assert_frame_equal(result.data[expected.columns], expected, check_dtype=False)
 
 
 def test_map_model_psr():
@@ -734,9 +718,7 @@ def test_map_model_psr():
         }
     )
 
-    pd.testing.assert_frame_equal(
-        result.data.read()[expected.columns], expected, check_dtype=False
-    )
+    pd.testing.assert_frame_equal(result.data.read()[expected.columns], expected, check_dtype=False)
 
 
 def test_duplicate_check_single_index():

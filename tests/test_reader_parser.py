@@ -1,29 +1,25 @@
 from __future__ import annotations
-
-import pytest  # noqa
-
 import logging
-
-import pandas as pd
-import xarray as xr  # noqa
-
-from pandas.testing import assert_frame_equal
-
 from types import MethodType
 
+import pandas as pd
+import pytest
+import xarray as xr
+from pandas.testing import assert_frame_equal
+
 from cdm_reader_mapper.mdf_reader.utils.parser import (
-    _get_index,
-    _get_ignore,
+    ParserConfig,
     _convert_dtype_to_default,
-    _parse_fixed_width,
+    _get_ignore,
+    _get_index,
     _parse_delimited,
+    _parse_fixed_width,
     _parse_line,
+    build_parser_config,
+    parse_netcdf,
     parse_pandas,
-    parse_netcdf,  # noqa
     update_pd_config,
     update_xr_config,
-    ParserConfig,
-    build_parser_config,
 )
 
 
@@ -99,12 +95,12 @@ def base_config_xr():
         order_specs={
             "core": {
                 "elements": {
-                    "TEMP": {
-                        "index": ("core", "TEMP"),
+                    "TEMPERATURE": {
+                        "index": ("core", "TEMPERATURE"),
                         "ignore": False,
                     },
-                    "PRES": {
-                        "index": ("core", "PRES"),
+                    "PRESSURE": {
+                        "index": ("core", "PRESSURE"),
                         "ignore": False,
                     },
                 }
@@ -115,8 +111,8 @@ def base_config_xr():
         parse_dates=[],
         convert_decode={},
         validation={
-            ("core", "TEMP"): {"units": "__from_file__"},
-            ("core", "PRES"): {"units": "__from_file__"},
+            ("core", "TEMPERATURE"): {"units": "__from_file__"},
+            ("core", "PRESSURE"): {"units": "__from_file__"},
         },
         encoding="utf-8",
         columns=None,
@@ -481,56 +477,56 @@ def test_update_pd_config_none_encoding(base_config_pd):
 def test_update_xr_config_ignores_missing_elements(base_config_xr):
     ds = xr.Dataset(
         data_vars={
-            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+            "TEMPERATURE": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
         }
     )
 
     new_config = update_xr_config(ds, base_config_xr)
 
     elements = new_config.order_specs["core"]["elements"]
-    assert elements["PRES"]["ignore"] is True
-    assert elements["TEMP"]["ignore"] is False
+    assert elements["PRESSURE"]["ignore"] is True
+    assert elements["TEMPERATURE"]["ignore"] is False
 
 
 def test_update_xr_config_populates_validation_from_attrs(base_config_xr):
     ds = xr.Dataset(
         data_vars={
-            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
-            "PRES": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
+            "TEMPERATURE": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+            "PRESSURE": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
         }
     )
 
     new_config = update_xr_config(ds, base_config_xr)
 
-    assert new_config.validation[("core", "TEMP")]["units"] == "K"
-    assert new_config.validation[("core", "PRES")]["units"] == "hPa"
+    assert new_config.validation[("core", "TEMPERATURE")]["units"] == "K"
+    assert new_config.validation[("core", "PRESSURE")]["units"] == "hPa"
 
 
 def test_update_xr_config_removes_missing_validation_attrs(base_config_xr):
     ds = xr.Dataset(
         data_vars={
-            "TEMP": xr.DataArray([1, 2, 3], attrs={}),
-            "PRES": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
+            "TEMPERATURE": xr.DataArray([1, 2, 3], attrs={}),
+            "PRESSURE": xr.DataArray([1010, 1011, 1012], attrs={"units": "hPa"}),
         }
     )
 
     new_config = update_xr_config(ds, base_config_xr)
 
-    assert "units" not in new_config.validation[("core", "TEMP")]
-    assert new_config.validation[("core", "PRES")]["units"] == "hPa"
+    assert "units" not in new_config.validation[("core", "TEMPERATURE")]
+    assert new_config.validation[("core", "PRESSURE")]["units"] == "hPa"
 
 
 def test_update_xr_config_does_not_mutate_original(base_config_xr):
     ds = xr.Dataset(
         data_vars={
-            "TEMP": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
+            "TEMPERATURE": xr.DataArray([1, 2, 3], attrs={"units": "K"}),
         }
     )
 
     _ = update_xr_config(ds, base_config_xr)
 
-    assert base_config_xr.order_specs["core"]["elements"]["PRES"]["ignore"] is False
-    assert base_config_xr.validation[("core", "TEMP")]["units"] == "__from_file__"
+    assert base_config_xr.order_specs["core"]["elements"]["PRESSURE"]["ignore"] is False
+    assert base_config_xr.validation[("core", "TEMPERATURE")]["units"] == "__from_file__"
 
 
 def test_build_parser_config_imodel():

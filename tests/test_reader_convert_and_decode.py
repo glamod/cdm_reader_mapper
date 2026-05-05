@@ -1,20 +1,18 @@
 from __future__ import annotations
-
+from decimal import Decimal
 from typing import get_args
 
 import pandas as pd
 import pytest
 
-from decimal import Decimal
-
+from cdm_reader_mapper.mdf_reader import properties
 from cdm_reader_mapper.mdf_reader.utils.convert_and_decode import (
+    Converters,
+    Decoders,
+    convert_and_decode,
     max_decimal_places,
     to_numeric,
-    Decoders,
-    Converters,
-    convert_and_decode,
 )
-from cdm_reader_mapper.mdf_reader import properties
 
 
 numeric_types = get_args(properties.NumericTypes)

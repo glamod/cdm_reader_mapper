@@ -74,7 +74,7 @@ With the above settings this tool supports mapping to the CDM format by:
 
    - Direct mapping from an ``imodel`` element
    - Assignment of a default value
-   - ``imodel`` elements transformation including any combination of the following: element combination, simple parameterization (input keyword arguments) or``imodel`` elements attributes.
+   - ``imodel`` elements transformation including any combination of the following: element combination, simple parameterization (input keyword arguments) or ``imodel`` elements attributes.
    - ``imodel`` or **CDM** coded values:
 
          - From ``imodel`` key to **CDM** key

@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=mdf_reader
+set SPHINXPROJ=cdm_reader_mapper
 
 if "%1" == "" goto help
 

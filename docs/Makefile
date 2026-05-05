@@ -5,7 +5,7 @@
 # from the environment for the first two.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = mdf_reader
+SPHINXPROJ    = cdm_reader_mapper
 SOURCEDIR     = .
 BUILDDIR      = _build
 

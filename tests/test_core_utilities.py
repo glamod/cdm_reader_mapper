@@ -1,20 +1,18 @@
 from __future__ import annotations
-
-import pytest
-
 from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from cdm_reader_mapper.common.iterators import ParquetStreamReader
 from cdm_reader_mapper.core._utilities import (
-    _copy,
-    method,
-    reader_method,
-    combine_attribute_values,
     SubscriptableMethod,
     _DataBundle,
+    _copy,
+    combine_attribute_values,
+    method,
+    reader_method,
 )
 
 
@@ -69,9 +67,7 @@ def test_copy_pandas():
 
 
 def test_copy_parquetstremareader():
-    psr = ParquetStreamReader(
-        [pd.DataFrame([{"a": 1, "b": 2}]), pd.DataFrame([{"a": 3, "b": 4}])]
-    )
+    psr = ParquetStreamReader([pd.DataFrame([{"a": 1, "b": 2}]), pd.DataFrame([{"a": 3, "b": 4}])])
     copy = _copy(psr)
 
     pd.testing.assert_frame_equal(psr.read(), copy.read())
@@ -110,9 +106,7 @@ def test_method_raises():
 
     obj = Dummy()
 
-    with pytest.raises(
-        ValueError, match="Attribute is neither callable nor subscriptable."
-    ):
+    with pytest.raises(ValueError, match="Attribute is neither callable nor subscriptable."):
         method(obj, 1)
 
 
@@ -290,9 +284,7 @@ def test_db_init_pd(test_db_pd):
     assert db.mode == "data"
 
     pd.testing.assert_frame_equal(db.data, pd.DataFrame({"a": [1, 3], "b": [2, 4]}))
-    pd.testing.assert_frame_equal(
-        db.mask, pd.DataFrame({"a": [True, True], "b": [True, True]})
-    )
+    pd.testing.assert_frame_equal(db.mask, pd.DataFrame({"a": [True, True], "b": [True, True]}))
 
 
 def test_db_init_psr(test_db_psr):
@@ -305,12 +297,8 @@ def test_db_init_psr(test_db_psr):
     assert db.imodel == "test_model"
     assert db.mode == "data"
 
-    pd.testing.assert_frame_equal(
-        db.data.read(), pd.DataFrame({"a": [1, 3], "b": [2, 4]})
-    )
-    pd.testing.assert_frame_equal(
-        db.mask.read(), pd.DataFrame({"a": [True, True], "b": [True, True]})
-    )
+    pd.testing.assert_frame_equal(db.data.read(), pd.DataFrame({"a": [1, 3], "b": [2, 4]}))
+    pd.testing.assert_frame_equal(db.mask.read(), pd.DataFrame({"a": [True, True], "b": [True, True]}))
 
 
 def test_db_init_raises():
@@ -344,7 +332,7 @@ def test_db_len(test_db_pd, test_db_psr):
 def test_db_getattr_pd(test_db_pd):
     db = test_db_pd
 
-    sum_method = getattr(db, "sum")
+    sum_method = db.sum
     assert isinstance(sum_method, SubscriptableMethod)
 
     result = sum_method(axis=1)
@@ -352,7 +340,7 @@ def test_db_getattr_pd(test_db_pd):
 
     pd.testing.assert_series_equal(result, expected)
 
-    columns = getattr(db, "columns")
+    columns = db.columns
     assert isinstance(columns, pd.Index)
     assert list(columns) == ["a", "b"]
 
@@ -360,7 +348,7 @@ def test_db_getattr_pd(test_db_pd):
 def test_db_getattr_psr(test_db_psr):
     db = test_db_psr
 
-    sum_method = getattr(db, "sum")
+    sum_method = db.sum
     assert isinstance(sum_method, SubscriptableMethod)
 
     result = sum_method(axis=1, process_kwargs={"non_data_output": "acc"}).read()
@@ -369,16 +357,16 @@ def test_db_getattr_psr(test_db_psr):
 
     pd.testing.assert_series_equal(result, expected)
 
-    columns = getattr(db, "columns")
+    columns = db.columns
     assert isinstance(columns, pd.Index)
     assert list(columns) == ["a", "b"]
 
-    assert getattr(db, "attrs") == {}
+    assert db.attrs == {}
 
 
 def test_db_getattr_raises_underscore(test_db_pd):
     with pytest.raises(AttributeError, match="DataBundle object has no attribute"):
-        getattr(test_db_pd, "__magic__")
+        _ = test_db_pd.__magic__
 
 
 def test_db_getattr_raises_invalid_type():
@@ -387,22 +375,20 @@ def test_db_getattr_raises_invalid_type():
 
     db = _DataBundle(data=Dummy())
     with pytest.raises(TypeError, match="expected DataFrame or ParquetStreamReader"):
-        getattr(db, "some_attr")
+        _ = db.some_attr
 
 
 def test_db_getattr_raises_empty(test_db_psr):
     db = test_db_psr.copy()
     db.read()
 
-    with pytest.raises(
-        ValueError, match="Cannot access attribute on empty data stream."
-    ):
-        getattr(db, "some_attr")
+    with pytest.raises(ValueError, match="Cannot access attribute on empty data stream."):
+        _ = db.some_attr
 
 
 def test_db_getattr_raises_invalid_attr(test_db_psr):
     with pytest.raises(AttributeError, match="DataFrame chunk has no attribute"):
-        getattr(test_db_psr, "invalid_attr")
+        _ = test_db_psr.invalid_attr
 
 
 def test_db_repr_pd(test_db_pd):
@@ -429,9 +415,7 @@ def test_setitem_psr(test_db_psr):
     db["mode"] = "tables"
     assert db.mode == "tables"
 
-    with pytest.raises(
-        TypeError, match="'ParquetStreamReader' object does not support item assignment"
-    ):
+    with pytest.raises(TypeError, match="'ParquetStreamReader' object does not support item assignment"):
         db["a"] = ParquetStreamReader([pd.Series([10, 20], name="a")])
 
 
@@ -524,9 +508,7 @@ def test_db_setitem_pd(test_db_pd):
 def test_db_setitem_psr(test_db_psr):
     db = test_db_psr
 
-    with pytest.raises(
-        TypeError, match="'ParquetStreamReader' object does not support item assignment"
-    ):
+    with pytest.raises(TypeError, match="'ParquetStreamReader' object does not support item assignment"):
         db["c"] = pd.Series([5, 6], name="c")
 
 

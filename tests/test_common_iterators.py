@@ -1,29 +1,26 @@
 from __future__ import annotations
-
-import pytest
-
 import tempfile
+from pathlib import Path
 
 import pandas as pd
 import pyarrow.parquet as pq
+import pytest
 import xarray as xr
 
-from pathlib import Path
-
 from cdm_reader_mapper.common.iterators import (
-    ProcessFunction,
     ParquetStreamReader,
-    _sort_chunk_outputs,
+    ProcessFunction,
     _initialize_storage,
-    _write_chunks_to_disk,
     _parquet_generator,
-    _process_chunks,
     _prepare_readers,
-    parquet_stream_from_iterable,
-    is_valid_iterator,
-    ensure_parquet_reader,
-    process_disk_backed,
+    _process_chunks,
     _process_function,
+    _sort_chunk_outputs,
+    _write_chunks_to_disk,
+    ensure_parquet_reader,
+    is_valid_iterator,
+    parquet_stream_from_iterable,
+    process_disk_backed,
     process_function,
 )
 
@@ -234,9 +231,7 @@ def test_context_manager_closes_stream():
         (("meta1", "meta2"), True, 0, 2),
     ],
 )
-def test_sort_chunk_outputs_parametrized(
-    outputs, capture_meta, expected_data_len, expected_meta_len
-):
+def test_sort_chunk_outputs_parametrized(outputs, capture_meta, expected_data_len, expected_meta_len):
     data, meta = _sort_chunk_outputs(
         outputs,
         capture_meta=capture_meta,
@@ -289,9 +284,7 @@ def test_initialize_storage_valid(inputs, expected_schema_types):
         # Check schemas
         assert len(schemas) == len(expected_schema_types)
 
-        for (actual_type, actual_meta), (exp_type, exp_meta) in zip(
-            schemas, expected_schema_types
-        ):
+        for (actual_type, actual_meta), (exp_type, exp_meta) in zip(schemas, expected_schema_types, strict=True):
             assert actual_type is exp_type
 
             if exp_type is pd.DataFrame:
@@ -955,13 +948,9 @@ def test_basic_processing(input_data, requested_types):
     assert all(isinstance(o, requested_types) for o in output)
 
     if isinstance(output[0], pd.DataFrame):
-        assert [row["a"].iloc[0] for row in output] == [
-            df["a"].iloc[0] for df in input_data if isinstance(df, pd.DataFrame)
-        ]
+        assert [row["a"].iloc[0] for row in output] == [df["a"].iloc[0] for df in input_data if isinstance(df, pd.DataFrame)]
     else:
-        assert [o.iloc[0] for o in output] == [
-            s.iloc[0] for s in input_data if isinstance(s, pd.Series)
-        ]
+        assert [o.iloc[0] for o in output] == [s.iloc[0] for s in input_data if isinstance(s, pd.Series)]
 
 
 def test_non_data_first_mode():
@@ -1098,9 +1087,7 @@ def test_parquet_stream_from_iterable_mixed_types_raises():
 
 
 def test_parquet_stream_from_iterable_wrong_type_first_raises():
-    with pytest.raises(
-        TypeError, match="Iterable must contain pd.DataFrame or pd.Series"
-    ):
+    with pytest.raises(TypeError, match="Iterable must contain pd.DataFrame or pd.Series"):
         parquet_stream_from_iterable([123, 456])
 
 
