@@ -284,6 +284,109 @@ class SubscriptableMethod:
         return self.func(*args, **kwargs)
 
 
+def _validate_mode(mode: str) -> None:
+    """
+    Validate the data bundle mode.
+
+    Parameters
+    ----------
+    mode : str
+        Mode string to validate.
+
+    Raises
+    ------
+    ValueError
+        If the mode is not one of the supported values.
+    """
+    if mode not in {"data", "tables"}:
+        raise ValueError(f"'mode' {mode} is not valid, use one of ['data', 'tables'].")
+
+
+def _normalize_data_input(
+    data: pd.DataFrame | Iterable[pd.DataFrame] | None,
+    columns: pd.Index | pd.MultiIndex | list[Any] | None,
+    dtypes: pd.Series | dict[str | tuple[str, str], Any] | None,
+) -> pd.DataFrame | ParquetStreamReader:
+    """
+    Normalize and validate the input data.
+
+    Parameters
+    ----------
+    data : pd.DataFrame, Iterable of pd.DataFrame, or None
+        Input data.
+    columns : pd.Index, pd.MultiIndex, or list, optional
+        Column labels used when initializing empty data.
+    dtypes : pd.Series or dict, optional
+        Data types for columns.
+
+    Returns
+    -------
+    pd.DataFrame or ParquetStreamReader
+        Normalized data representation.
+
+    Raises
+    ------
+    TypeError
+        If the data type is unsupported.
+    """
+    if data is None:
+        data = pd.DataFrame(columns=columns, dtype=dtypes)
+
+    if isinstance(data, (list, tuple)):
+        data = iter(data)
+
+    if is_valid_iterator(data) and not isinstance(data, ParquetStreamReader):
+        data = parquet_stream_from_iterable(data)
+
+    if not isinstance(data, (pd.DataFrame, ParquetStreamReader)):
+        raise TypeError(f"data has unsupported type {type(data)}")
+
+    return data
+
+
+def _normalize_mask_input(
+    mask: pd.DataFrame | Iterable[pd.DataFrame] | None,
+    data: pd.DataFrame | ParquetStreamReader,
+) -> pd.DataFrame | ParquetStreamReader:
+    """
+    Normalize and validate the mask aligned with the input data.
+
+    Parameters
+    ----------
+    mask : pd.DataFrame, Iterable of pd.DataFrame, or None
+        Input mask.
+    data : pd.DataFrame or ParquetStreamReader
+        Normalized data used to infer mask structure when mask is None.
+
+    Returns
+    -------
+    pd.DataFrame or ParquetStreamReader
+        Normalized mask.
+
+    Raises
+    ------
+    TypeError
+        If the mask type is unsupported.
+    """
+    if mask is None:
+        if isinstance(data, pd.DataFrame):
+            mask = pd.DataFrame(columns=data.columns, index=data.index, dtype=bool)
+        else:
+            data_cp = data.copy()
+            mask = [pd.DataFrame(columns=df.columns, index=df.index, dtype=bool) for df in data_cp]
+
+    if isinstance(mask, (list, tuple)):
+        mask = iter(mask)
+
+    if is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader):
+        mask = parquet_stream_from_iterable(mask)
+
+    if not isinstance(mask, (pd.DataFrame, ParquetStreamReader)):
+        raise TypeError(f"mask has unsupported type {type(mask)}")
+
+    return mask
+
+
 class _DataBundle:
     """
     Container for tabular data and associated metadata.
@@ -355,42 +458,10 @@ class _DataBundle:
         mode : {"data", "tables"}, default "data"
             Data representation mode.
         """
-        if mode not in ["data", "tables"]:
-            raise ValueError(f"'mode' {mode} is not valid, use one of ['data', 'tables'].")
+        _validate_mode(mode)
 
-        if data is None:
-            data = pd.DataFrame(columns=columns, dtype=dtypes)
-
-        if isinstance(data, (list, tuple)):
-            data = iter(data)
-
-        if data is None:
-            raise AssertionError("data should never be None here")
-
-        if (is_valid_iterator(data) and not isinstance(data, ParquetStreamReader)) or isinstance(data, (list, tuple)):
-            data = parquet_stream_from_iterable(data)
-
-        if not isinstance(data, (pd.DataFrame, ParquetStreamReader)):
-            raise TypeError(f"data has unsupported type {type(data)}")
-
-        if mask is None:
-            if isinstance(data, pd.DataFrame):
-                mask = pd.DataFrame(columns=data.columns, index=data.index, dtype=bool)
-            elif isinstance(data, ParquetStreamReader):
-                data_cp = data.copy()
-                mask = [pd.DataFrame(columns=df.columns, index=df.index, dtype=bool) for df in data_cp]
-
-        if isinstance(mask, (list, tuple)):
-            mask = iter(mask)
-
-        if mask is None:
-            raise AssertionError("mask should never be None here")
-
-        if (is_valid_iterator(mask) and not isinstance(mask, ParquetStreamReader)) or isinstance(mask, (list, tuple)):
-            mask = parquet_stream_from_iterable(mask)
-
-        if not isinstance(mask, (pd.DataFrame, ParquetStreamReader)):
-            raise TypeError(f"mask has unsupported type {type(data)}")
+        data = _normalize_data_input(data, columns, dtypes)
+        mask = _normalize_mask_input(mask, data)
 
         self._data: pd.DataFrame | ParquetStreamReader = data
         self._columns = columns

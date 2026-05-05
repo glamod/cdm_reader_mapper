@@ -566,6 +566,198 @@ def _parquet_generator(temp_dir: TemporaryDirectory[str], data_type: type, schem
         temp_dir.cleanup()
 
 
+def _validate_chunk(items: tuple[Any, ...], requested_types: tuple[type, ...]) -> None:
+    """
+    Validate that the current chunk contains supported data types.
+
+    Parameters
+    ----------
+    items : tuple of Any
+        A tuple of synchronized items (one per reader) for the current chunk.
+    requested_types : tuple of type
+        Requested data types (e.g., pd.DataFrame, pd.Series).
+
+    Raises
+    ------
+    TypeError
+        If the first item in the chunk is not of a supported type.
+    """
+    if not isinstance(items[0], requested_types):
+        raise TypeError(f"Unsupported data type: {type(items[0])}, expected {requested_types}")
+
+
+def _process_result(
+    result: Any, requested_types: tuple[type, ...], non_data_output: str, chunk_counter: int
+) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
+    """
+    Normalize and split a function result into data and metadata outputs.
+
+    Parameters
+    ----------
+    result : Any
+        Output returned by the user-provided processing function.
+    requested_types : tuple of type
+        Types considered valid data outputs.
+    non_data_output : str
+        Mode controlling metadata capture (e.g., "acc" for accumulate).
+    chunk_counter : int
+        Current chunk index (used to determine metadata capture behavior).
+
+    Returns
+    -------
+    tuple of list of pd.DataFrame or pd.Series and list of Any
+        A tuple containing:
+        - A list of extracted data objects (flattened if nested in lists)
+        - A list of metadata objects (empty if `capture_meta` is False)
+    """
+    if not isinstance(result, tuple):
+        result = (result,)
+
+    capture_meta = non_data_output == "acc" or chunk_counter == 0
+    return _sort_chunk_outputs(result, capture_meta, requested_types)
+
+
+def _accumulate_meta(store: dict[int, list[Any]], meta: Iterable[Any]) -> None:
+    """
+    Accumulate metadata outputs across chunks.
+
+    Parameters
+    ----------
+    store : dict of int to list of Any
+        Dictionary mapping metadata index to collected values across chunks.
+    meta : iterable of Any
+        Metadata values extracted from the current chunk.
+    """
+    for i, m in enumerate(meta):
+        store.setdefault(i, []).append(m)
+
+
+def _handle_data_write(
+    data: list[Any],
+    temp_dirs: list[TemporaryDirectory[str]] | None,
+    schemas: list[tuple[type, Any]] | None,
+    chunk_counter: int,
+) -> tuple[list[TemporaryDirectory[str]], list[tuple[type, Any]]]:
+    """
+    Initialize storage (if needed) and write data chunks to disk.
+
+    Parameters
+    ----------
+    data : list of Any
+        Data outputs for the current chunk (e.g., DataFrames).
+    temp_dirs : list of TemporaryDirectory or None
+        Temporary directories used for storing chunked parquet files.
+    schemas : list of tuple of type and Any or None
+        Schema information associated with each data stream.
+    chunk_counter : int
+        Index of the current chunk (used for file naming/order).
+
+    Returns
+    -------
+    tuple of list[TemporaryDirectory[str]], list[tuple[type, Any]]
+        Initialized or updated temporary directories and schemas.
+    """
+    if temp_dirs is None or schemas is None:
+        temp_dirs, schemas = _initialize_storage(data)
+
+    _write_chunks_to_disk(data, temp_dirs, chunk_counter)
+    return temp_dirs, schemas
+
+
+def _finalize_non_data(
+    store: dict[int, list[Any]],
+    proc: Callable[..., Any] | None,
+    args: tuple[Any, ...] | None,
+    kwargs: dict[str, Any] | None,
+) -> Any:
+    """
+    Finalize aggregated non-data (metadata) outputs.
+
+    Parameters
+    ----------
+    store : dict of int to list of Any
+        Collected metadata grouped by output position.
+    proc : Callable or None
+        Optional post-processing function applied to aggregated metadata.
+    args : tuple of Any or None
+        Positional arguments for the post-processing function.
+    kwargs : dict of str to Any or None
+        Keyword arguments for the post-processing function.
+
+    Returns
+    -------
+    Any
+        Final processed metadata output. May be a single value, list, or dict.
+    """
+    if len(store) == 1:
+        output: Any = next(iter(store.values()))
+    else:
+        output = store
+
+    if callable(proc):
+        output = proc(output, *(args or ()), **(kwargs or {}))
+
+    if isinstance(output, list) and len(output) == 1:
+        return output[0]
+
+    return output
+
+
+def _build_output(
+    temp_dirs: list[TemporaryDirectory[str]],
+    schemas: list[tuple[type, Any]],
+    output_non_data: Any,
+) -> tuple[ParquetStreamReader, ...] | tuple[Any, ...] | Any:
+    """
+    Construct final output combining data stream readers and metadata.
+
+    Parameters
+    ----------
+    temp_dirs : list of TemporaryDirectory
+        Temporary directories containing written parquet chunks.
+    schemas : list of tuple[type, Any]
+        Schema definitions corresponding to each data stream.
+    output_non_data : Any
+        Final processed metadata output.
+
+    Returns
+    -------
+    tuple of ParquetStreamReader or tuple of Any
+        Tuple containing:
+        - ParquetStreamReader objects (one per data stream)
+        - Followed by metadata outputs
+    """
+
+    def _make_parquet_reader(d: TemporaryDirectory[str], t: type, s: str | None) -> ParquetStreamReader:
+        """
+        Create a ParquetStreamReader bound to a temporary directory and schema.
+
+        Parameters
+        ----------
+        d : TemporaryDirectory
+            Temporary directory for saving parquet files.
+        t : type
+            Type of data to be saved.
+        s : str or None
+            Metadata used to restore Series structure.
+
+        Returns
+        -------
+        ParquetStreamReader
+            Data as ParquetStreamReader to save.
+        """
+        return ParquetStreamReader(lambda: _parquet_generator(d, t, s))
+
+    final_iterators: list[ParquetStreamReader] = [_make_parquet_reader(d, t, s) for d, (t, s) in zip(temp_dirs, schemas, strict=True)]
+
+    if not isinstance(output_non_data, tuple):
+        output_non_data = [output_non_data]
+    else:
+        output_non_data = list(output_non_data)
+
+    return tuple(final_iterators + output_non_data)
+
+
 def _process_chunks(
     readers: list[ParquetStreamReader],
     func: Callable[..., Any],
@@ -631,72 +823,36 @@ def _process_chunks(
     chunk_counter: int = 0
 
     for items in zip(*readers, strict=True):
-        if not isinstance(items[0], requested_types):
-            raise TypeError(f"Unsupported data type in Iterable {items[0]}: {type(items[0])}Requested types are: {requested_types} ")
+        _validate_chunk(items, requested_types)
 
         result = func(*items, *static_args, **static_kwargs)
 
-        if not isinstance(result, tuple):
-            result = (result,)
+        data, meta = _process_result(result, requested_types, non_data_output, chunk_counter)
 
-        # Sort outputs
-        capture_meta = non_data_output == "acc" or chunk_counter == 0
+        _accumulate_meta(output_non_data_dict, meta)
 
-        data, meta = _sort_chunk_outputs(result, capture_meta, requested_types)
-
-        for i, m in enumerate(meta):
-            output_non_data_dict.setdefault(i, []).append(m)
-
-        # Write DataFrames
         if data:
-            if temp_dirs is None:
-                temp_dirs, schemas = _initialize_storage(data)
-
-            _write_chunks_to_disk(data, temp_dirs, chunk_counter)
+            temo_dirs, schemas = _handle_data_write(data, temp_dirs, schemas, chunk_counter)
 
         chunk_counter += 1
 
     if chunk_counter == 0:
         raise ValueError("Iterable is empty.")
 
-    if len(output_non_data_dict) == 1:
-        first_key = list(output_non_data_dict.keys())[0]
-        output_non_data: Any = output_non_data_dict[first_key]
-    else:
-        output_non_data = output_non_data_dict
+    output_non_data = _finalize_non_data(
+        output_non_data_dict,
+        non_data_proc,
+        non_data_proc_args,
+        non_data_proc_kwargs,
+    )
 
-    if callable(non_data_proc):
-        output_non_data = non_data_proc(
-            output_non_data,
-            *(non_data_proc_args or ()),
-            **(non_data_proc_kwargs or {}),
-        )
-
-    if isinstance(output_non_data, list) and len(output_non_data) == 1:
-        output_non_data = output_non_data[0]
-
-    # If no data outputs at all
     if temp_dirs is None:
         return output_non_data
 
     if schemas is None:
         raise ValueError("Could not set schemas.")
 
-    final_iterators: list[ParquetStreamReader] = [
-        ParquetStreamReader(
-            (
-                lambda d=d, t=t, s=s: _parquet_generator(d, t, s)  # type: ignore[misc]
-            )
-        )
-        for d, (t, s) in zip(temp_dirs, schemas, strict=True)
-    ]
-
-    if isinstance(output_non_data, tuple):
-        output_non_data = list(output_non_data)
-    else:
-        output_non_data = [output_non_data]
-
-    return tuple(final_iterators + output_non_data)
+    return _build_output(temp_dirs, schemas, output_non_data)
 
 
 def _prepare_readers(

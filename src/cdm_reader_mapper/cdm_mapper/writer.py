@@ -21,6 +21,7 @@ of the imodel, the number of decimal places used comes from a default tool defin
 """
 
 from __future__ import annotations
+import logging
 from pathlib import Path
 from typing import Any, get_args
 
@@ -93,6 +94,81 @@ def _table_to_file(
         raise ValueError(f"data_format must be one of {get_args(SupportedFileTypes)} not {data_format}.")
 
 
+def _write_table(
+    data: pd.DataFrame,
+    table: str,
+    data_format: SupportedFileTypes,
+    filename: dict[str, str | Path],
+    separator: str | None,
+    prefix: str | None,
+    suffix: str | None,
+    extension: str,
+    delimiter: str,
+    encoding: str,
+    out_dir: Path,
+    logger: logging.Logger,
+) -> None:
+    """
+    Write single table to CDM-table file on file system.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to write on file system.
+    table : str
+        Name of the CDM table.
+    data_format : str
+        Format of output data file.
+    filename : dict
+        Dictionary containing CDM tables and their corresponding file names.
+    separator : str
+        Separator of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
+    prefix : str
+        Prefix of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
+    suffix : str
+        Suffix of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
+    extension : str
+        Extension of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
+    delimiter : str
+        Character or regex pattern to treat as the delimiter while reading with df.to_csv.
+    encoding : str
+        A string representing the encoding to use in the output file.
+    out_dir : str
+        Path to the output directory.
+    logger : logging.Logger
+        Logger instance used for logging.
+    """
+    cdm_atts = get_cdm_atts(table)[table]
+    table_columns = pd.Index(cdm_atts.keys())
+    if table in data:
+        cdm_table = data[table]
+    elif data.columns.equals(table_columns):
+        cdm_table = data
+    else:
+        cdm_table = pd.DataFrame(columns=table_columns)
+
+    filename_ = filename.get(table)
+    if not filename_:
+        filename_ = get_filename(
+            [prefix, table, suffix],
+            path=out_dir,
+            extension=extension,
+            separator=separator,
+        )
+    filename_ = adjust_filename(str(filename_), table=table, extension=extension)
+    if len(Path(filename_).parts) == 1:
+        filename_ = out_dir / filename_
+
+    logger.info("Writing table %s: %s", table, filename_)
+    _table_to_file(
+        cdm_table,
+        delimiter=delimiter,
+        encoding=encoding,
+        filename=filename_,
+        data_format=data_format,
+    )
+
+
 def write_tables(
     data: pd.DataFrame,
     data_format: SupportedFileTypes = "parquet",
@@ -118,22 +194,22 @@ def write_tables(
     data : pandas.DataFrame
         Data to export.
     data_format : {"csv", "parquet", "feather"}, default: "parqeut"
-        Format of input data file(s).
+        Format of output data file(s).
     out_dir : str, optional
         Path to the output directory.
         Defaults to current directory.
     prefix : str, optional
-        Prefix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Prefix of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
     suffix : str, optional
-        Suffix of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Suffix of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
     extension : str, optional
-        Extension of file name structure: ``<prefix>-<table>-*<suffix>.<extension>``.
+        Extension of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
     filename : str, Path-like or dict, optional
         Name of the output file name(s).
         List one filename for each table name in ``data`` ({<table>:<filename>}).
         If None, automatically create file name from table name, ``prefix`` and ``suffix``.
     separator : str, optional
-        Separator to join the file name pattern components (default "-").
+        Separator of file name structure: ``<prefix><separator><table><separator>*<suffix>.<extension>``.
     cdm_subset : str or list of str, optional
         Specifies a subset of tables or a single table.
 
@@ -217,32 +293,17 @@ def write_tables(
         data = convert_from_str_df(data.copy(), imodel=imodel, cdm_subset=cdm_subset)
 
     for table in cdm_subset:
-        cdm_atts = get_cdm_atts(table)[table]
-        table_columns = pd.Index(cdm_atts.keys())
-        if table in data:
-            cdm_table = data[table]
-        elif data.columns.equals(table_columns):
-            cdm_table = data
-        else:
-            cdm_table = pd.DataFrame(columns=table_columns)
-
-        filename_ = filename.get(table)
-        if not filename_:
-            filename_ = get_filename(
-                [prefix, table, suffix],
-                path=out_dir,
-                extension=extension,
-                separator=separator,
-            )
-        filename_ = adjust_filename(str(filename_), table=table, extension=extension)
-        if len(Path(filename_).parts) == 1:
-            filename_ = out_dir / filename_
-
-        logger.info("Writing table %s: %s", table, filename_)
-        _table_to_file(
-            cdm_table,
-            delimiter=delimiter,
-            encoding=encoding,
-            filename=filename_,
-            data_format=data_format,
+        _write_table(
+            data,
+            table,
+            data_format,
+            filename,
+            separator,
+            prefix,
+            suffix,
+            extension,
+            delimiter,
+            encoding,
+            out_dir,
+            logger,
         )
