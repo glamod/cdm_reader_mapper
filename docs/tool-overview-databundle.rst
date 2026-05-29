@@ -84,22 +84,4 @@ Now the meteorological data can be maqpped to the Common Data Model (CDM_) using
 
 For more information how the mapping is working, please see :ref:`tool-overview-mapper` and/or :ref:`how-to-register-a-new-data-model-mapping`.
 
-:ref:`dupdetect`
-^^^^^^^^^^^^^^^^
-
-After mapping to the CDM format it is useful to check if the CDM tables contain any duplicates. The duplicate checker included in the ``cdm_reader_mapper`` toolbox is based on python record linkage toolkit RecordLinkage_.
-
-The first step is to call the method function :func:`.DataBundle.duplicate_check`. This function scans the CDM tables for any duplicates.
-
-.. code-block:: console
-
-    db_dup = db.duplicate_check()
-
-Afterwards there are two options how to deal with the detected duplicates:
-
-1. :func:`.DataBundle.flag_duplicates`
-2. :func:`.DataBundle.remove_duplicates`
-
-The first function flags the detected duplicates. For more information about the flags see `CDM code tables for duplicate_status`_ and `CDM code tables for report_quality`_. The second function removes the detected duplicates.
-
 .. include:: hyperlinks.rst
