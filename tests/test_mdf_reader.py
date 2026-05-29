@@ -43,6 +43,7 @@ def _read_mdf_test_data(data_model, select=None, drop=None, drop_idx=None, **kwa
     data = test_data[f"test_{data_model}"]["mdf_data"]
     mask = test_data[f"test_{data_model}"]["mdf_mask"]
 
+    print(data)
     expected = read_data(data_file=data, mask_file=mask)
 
     if not isinstance(result.data, pd.DataFrame):
@@ -457,13 +458,15 @@ def test_validate_read_mdf_args_invalid_years(tmp_path):
 
 @pytest.fixture
 def example_data():
-    return pd.DataFrame(
+    df = pd.DataFrame(
         {
             "A": [1, 2, 3],
             "B": [4.0, 5.0, 6.0],
             "C": ["x", "y", "z"],
-        }
+        },
     )
+    df = df.astype({"A": "int", "B": "float", "C": "object"})
+    return df
 
 
 @pytest.fixture
@@ -530,6 +533,7 @@ def feather_files(tmp_path, example_data, example_mask):
 
 
 def test_read_data_with_mask_csv(csv_files, example_data, example_mask, example_info):
+    print(example_data)
     data_file, mask_file, _ = csv_files
     data, mask, info = _read_data(
         data_file=data_file,

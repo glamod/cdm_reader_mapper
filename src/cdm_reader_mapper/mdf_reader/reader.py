@@ -302,6 +302,14 @@ def _read_data(
             **mask_kwargs,
         )
 
+    string_cols = data.select_dtypes(include="str").columns
+    data[string_cols] = data[string_cols].astype(object)
+    object_cols = data.select_dtypes(include="object").columns
+    data[object_cols] = data[object_cols].fillna(None)
+
+    if "dtypes" in info:
+        info["dtypes"] = info["dtypes"].replace("str", "object")
+
     return data, mask, info
 
 

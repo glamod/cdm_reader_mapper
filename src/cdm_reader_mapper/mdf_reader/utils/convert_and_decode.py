@@ -263,6 +263,8 @@ class Converters:
         pd.Series
             Converted Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 
@@ -298,6 +300,8 @@ class Converters:
         pd.Series
             Cleaned Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 
@@ -308,7 +312,7 @@ class Converters:
         elif disable_white_strip == "r":
             data = data.str.lstrip()
 
-        return data.apply(lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x)
+        return data.replace({"": pd.NA})
 
     def object_to_datetime(
         self,
@@ -332,6 +336,8 @@ class Converters:
         pd.Series
             Datetime Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 

@@ -65,14 +65,14 @@ def _drop_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     Parameters
     ----------
     df : pd.DataFrame
-        Input DataFrame to drop duplictaed rows.
+        Input DataFrame to drop duplicated rows.
 
     Returns
     -------
     pd.DataFrame
         Input DataFrame with deleted duplicated rows.
     """
-    list_cols = [col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()]
+    list_cols = [col for col in df.columns if df[col].dtype == "object" and df[col].apply(lambda x: isinstance(x, list)).any()]
 
     for col in list_cols:
         df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
@@ -480,6 +480,11 @@ def _table_mapping(
 
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
+
+    string_cols = table_df.select_dtypes(include="string").columns
+    table_df[string_cols] = table_df[string_cols].astype(object)
+    object_cols = table_df.select_dtypes(include="object").columns
+    table_df[object_cols] = table_df[object_cols].fillna(None)
 
     return table_df
 

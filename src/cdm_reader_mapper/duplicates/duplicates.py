@@ -50,10 +50,11 @@ def convert_series(df: pd.DataFrame, conversion: dict[Any, Any]) -> pd.DataFrame
 
     df = df.copy()
     for column, method in conversion.items():
-        try:
-            df[column] = df[column].astype(method)
-        except TypeError:
+        if method in locals():
             df[column] = locals()[method](df[column])
+        else:
+            df[column] = df[column].fillna(np.nan)
+            df[column] = df[column].astype(method)
 
     df = df.infer_objects(copy=False).fillna(9999.0)
     return df
@@ -509,8 +510,12 @@ class DupDetect:
         result = add_history(result, indexes)
         result = result.sort_index(ascending=True)
         result = add_duplicates(result, duplicates)
+        result = result.astype(dtypes)
 
-        self.result = result.astype(dtypes)
+        object_cols = result.select_dtypes(include="object").columns
+        result[object_cols] = result[object_cols].fillna(None)
+
+        self.result = result
         self.data = self.data.sort_index(ascending=True)
 
         return self.result

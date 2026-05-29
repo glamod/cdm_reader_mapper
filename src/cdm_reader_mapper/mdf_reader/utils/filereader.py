@@ -279,6 +279,11 @@ class FileReader:
             for object_column in object_columns:
                 data[object_column] = data[object_column].str.encode(config.encoding).str.decode("utf-8")
 
+        string_cols = data.select_dtypes(include="str").columns
+        data[string_cols] = data[string_cols].astype(object)
+        object_cols = data.select_dtypes(include="object").columns
+        data[object_cols] = data[object_cols].fillna(None)
+
         return data, mask, config
 
     @process_function()

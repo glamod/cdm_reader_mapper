@@ -558,6 +558,11 @@ def _parquet_generator(temp_dir: TemporaryDirectory[str], data_type: type, schem
         for f in files:
             df = pd.read_parquet(f)
 
+            string_cols = df.select_dtypes(include="str").columns
+            df[string_cols] = df[string_cols].astype(object)
+            object_cols = df.select_dtypes(include="object").columns
+            df[object_cols] = df[object_cols].fillna(None)
+
             if data_type is pd.Series:
                 s = df.iloc[:, 0].copy()
                 s.name = schema
