@@ -153,7 +153,6 @@ class DataBundle:
         self._mask: pd.DataFrame | ParquetStreamReader = mask
         self._imodel = imodel
         self._mode = mode
-        self.DupDetect: DupDetect | None = None
 
     def __len__(self) -> int:
         """
