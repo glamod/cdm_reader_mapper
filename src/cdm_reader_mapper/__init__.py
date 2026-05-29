@@ -19,10 +19,6 @@ from .core.databundle import DataBundle
 from .core.reader import read
 from .core.writer import write
 from .data import test_data
-from .duplicates.duplicates import (
-    DupDetect,
-    duplicate_check,
-)
 from .mdf_reader.reader import read_data, read_mdf
 from .mdf_reader.writer import write_data
 from .metmetpy import (
@@ -35,11 +31,9 @@ from .metmetpy import (
 
 __all__ = [
     "DataBundle",
-    "DupDetect",
     "cdm_tables",
     "correct_datetime",
     "correct_pt",
-    "duplicate_check",
     "map_model",
     "read",
     "read_data",
