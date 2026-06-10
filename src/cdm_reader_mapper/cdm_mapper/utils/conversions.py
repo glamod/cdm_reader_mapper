@@ -269,7 +269,7 @@ def _convert_array_general_to_str(data: pd.Series, null_label: str, dtype: type 
 
         return "{" + ",".join(str_list) + "}"
 
-    return data.apply(_convert_value).astype(object)
+    return data.apply(_convert_value)
 
 
 def _convert_str_to_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -311,7 +311,7 @@ def _convert_str_to_str(data: pd.Series, null_label: str) -> pd.Series:
             return null_label
         return str(x)
 
-    return data.apply(lambda x: _return_str(x, null_label))
+    return data.apply(lambda x: _return_str(x, null_label)).astype(object)
 
 
 def _convert_str_from_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -372,7 +372,7 @@ def _convert_str_array_to_str(data: pd.Series, null_label: str) -> pd.Series:
     pd.Series
         Series with integer arrays in "{...}" format.
     """
-    return _convert_array_general_to_str(data, null_label, dtype=str)
+    return _convert_array_general_to_str(data, null_label, dtype=object)
 
 
 def _convert_str_array_from_str(data: pd.Series, null_label: str) -> pd.Series:
@@ -662,7 +662,10 @@ def _convert_datetime_from_str(data: pd.Series, null_label: str) -> pd.Series:
         Series with values converted to pandas datetime dtype (datetime64[ns]).
         Invalid or non-convertible values are set to NaT.
     """
-    return pd.to_datetime(data, errors="coerce")
+    dt = pd.to_datetime(data, errors="coerce")
+    if dt.dt.tz is not None:
+        dt = dt.dt.tz_localize(None)
+    return dt.astype("datetime64[ns]")
 
 
 def _convert_column(
@@ -832,6 +835,7 @@ def _convert_columns(
                 null_label,
                 converters,
             )
+
     return data
 
 

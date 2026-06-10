@@ -237,9 +237,9 @@ def validate(
     # Explicit boolean literals ("True"/"False") override validation results
     if validated_columns:
         validated_columns = list(dict.fromkeys(validated_columns))
-        to_bool = data[validated_columns].applymap(convert_str_boolean)
-        false_mask = to_bool.applymap(_is_false)
-        true_mask = to_bool.applymap(_is_true)
+        to_bool = data[validated_columns].apply(lambda col: col.map(convert_str_boolean))
+        false_mask = to_bool.apply(lambda col: col.map(_is_false))
+        true_mask = to_bool.apply(lambda col: col.map(_is_true))
         mask[validated_columns] = mask[validated_columns].mask(false_mask, False)
         mask[validated_columns] = mask[validated_columns].mask(true_mask, True)
 

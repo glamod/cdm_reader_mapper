@@ -89,7 +89,7 @@ def test_icoads_to_datetime_basis():
             ]
         )
     )
-    pd.testing.assert_series_equal(result, expected)
+    pd.testing.assert_series_equal(result, expected.astype("datetime64[ns]"))
 
 
 def test_icoads_to_datetime_missing_values():
@@ -113,7 +113,7 @@ def test_icoads_to_datetime_missing_values():
             ]
         )
     )
-    pd.testing.assert_series_equal(result, expected)
+    pd.testing.assert_series_equal(result, expected.astype("datetime64[ns]"))
 
 
 def test_icoads_from_datetime_basis():
@@ -202,7 +202,9 @@ def test_icoads_to_datetime_missing_columns():
 
     result = icoads(df, "to_datetime")
 
-    pd.testing.assert_series_equal(result, pd.Series(pd.to_datetime([None])))
+    expected = pd.Series(pd.to_datetime([None]))
+
+    pd.testing.assert_series_equal(result, expected.astype("datetime64[ns]"))
 
 
 def test_icoads_from_datetime_empty_series():
@@ -228,7 +230,7 @@ def test_to_datetime_basis():
 
     expected = pd.Series(pd.to_datetime(["2000-01-10 12:30:00", "2001-02-15 06:15:00"]))
 
-    pd.testing.assert_series_equal(result, expected)
+    pd.testing.assert_series_equal(result, expected.astype("datetime64[ns]"))
 
 
 def test_to_datetime_no_correction():
@@ -894,7 +896,7 @@ def test_correct_pt_valid_iterable():
     df2 = pd.DataFrame({PT: ["6", "7", None]}, index=[3, 4, 5])
     result = correct_pt(ParquetStreamReader(iter([df1, df2])), "icoads_r300_d993")
 
-    exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]})
+    exp = pd.DataFrame({PT: ["5", "7", "5", "6", "7", "5"]}, dtype="object")
     pd.testing.assert_frame_equal(result.read(), exp)
 
 

@@ -31,7 +31,6 @@ def db_data():
     pattern = f"test_{imodel}"
 
     data_file = test_data[pattern]["mdf_data"]
-
     db = read(data_file, mode="data")
     db.imodel = imodel
     return db
@@ -40,13 +39,13 @@ def db_data():
 def test_write_data_csv(tmp_path, db_data):
     db_data.write(out_dir=tmp_path, data_format="csv")
     tmppath = Path(tmp_path)
-    db_res = read(
+    db_exp = read(
         tmppath / "data.csv",
         info_file=tmppath / "info.json",
         data_format="csv",
         mode="data",
     )
-    pd.testing.assert_frame_equal(db_data.data, db_res.data)
+    pd.testing.assert_frame_equal(db_data.data, db_exp.data)
 
 
 def test_write_tables_csv(tmp_path, db_tables):

@@ -311,10 +311,10 @@ def test_datetime_decimalhour_to_hm(row, expected_hr, expected_m):
         (pd.DataFrame([]), pd.DatetimeIndex([])),
     ],
 )
-def test_datetime_imma1(df, expected):
+def test_datetime_imma1_base(df, expected):
     obj = MappingFunctions("dummy_model")
     result = obj.datetime_imma1(df)
-    pd.testing.assert_index_equal(result, expected)
+    pd.testing.assert_index_equal(result, expected.astype("datetime64[ns]"))
 
 
 @pytest.mark.parametrize(
@@ -360,7 +360,7 @@ def test_datetime_imma1_to_utc(df, expected):
 
     expected_naive = expected.tz_localize(None) if expected.tz else expected
 
-    pd.testing.assert_index_equal(result, expected_naive)
+    pd.testing.assert_index_equal(result, expected_naive.astype("datetime64[ns]"))
 
 
 @pytest.mark.parametrize(
@@ -394,7 +394,7 @@ def test_datetime_imma1_to_utc(df, expected):
 def test_datetime_imma1_701(df, expected):
     obj = MappingFunctions("dummy_model")
     result = obj.datetime_imma1_701(df)
-    pd.testing.assert_index_equal(result, expected)
+    pd.testing.assert_index_equal(result, expected.astype("datetime64[ns]"))
 
 
 @pytest.mark.parametrize(
@@ -418,6 +418,7 @@ def test_datetime_imma1_701(df, expected):
 def test_datetime_immt(df, expected):
     obj = MappingFunctions("dummy_model")
     result = obj.datetime_immt(df)
+    expected = expected.astype("datetime64[ns]")
     pd.testing.assert_index_equal(result, expected)
 
 
@@ -480,6 +481,7 @@ def test_datetime_craid(df, expected):
 def test_datetime_marob(df, expected):
     obj = MappingFunctions("dummy_model")
     result = obj.datetime_marob(df)
+    expected = expected.astype("datetime64[ns]")
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -756,13 +758,13 @@ def test_observing_programme(input_series, expected):
 @pytest.mark.parametrize(
     "input_series, prepend, append, separator, expected",
     [
-        (pd.Series(["a", None, "c"]), "X", "Y", "", pd.Series(["XaY", None, "XcY"])),
+        (pd.Series(["a", None, "c"], dtype=object), "X", "Y", "", pd.Series(["XaY", None, "XcY"], dtype=object)),
         (
-            pd.Series(["a", None, "c"]),
+            pd.Series(["a", None, "c"], dtype=object),
             "pre",
             "_app",
             "-",
-            pd.Series(["pre-a-_app", None, "pre-c-_app"]),
+            pd.Series(["pre-a-_app", None, "pre-c-_app"], dtype=object),
         ),
         (pd.Series([]), "X", "Y", "", pd.Series([], dtype=object)),
     ],
@@ -770,7 +772,7 @@ def test_observing_programme(input_series, expected):
 def test_string_add(input_series, prepend, append, separator, expected):
     obj = MappingFunctions("dummy_model")
     result = obj.string_add(input_series, prepend=prepend, append=append, separator=separator)
-    pd.testing.assert_series_equal(result, expected)
+    pd.testing.assert_series_equal(result, expected.astype(object))
 
 
 @pytest.mark.parametrize(
@@ -783,7 +785,7 @@ def test_string_add(input_series, prepend, append, separator, expected):
             "-",
             None,
             None,
-            pd.Series(["X-1-3-Y", "X-2-4-Y"]),
+            pd.Series(["X-1-3-Y", "X-2-4-Y"], dtype=object),
         ),
         (
             pd.DataFrame({"A": [1, 2], "B": [3, 4]}),
@@ -792,7 +794,7 @@ def test_string_add(input_series, prepend, append, separator, expected):
             "-",
             [0, 1],
             [2, 2],
-            pd.Series(["X-01-03-Y", "X-02-04-Y"]),
+            pd.Series(["X-01-03-Y", "X-02-04-Y"], dtype=object),
         ),
         (
             pd.DataFrame({"A": [1, 2], "B": [3, 4]}),
@@ -801,7 +803,7 @@ def test_string_add(input_series, prepend, append, separator, expected):
             "-",
             None,
             None,
-            pd.Series(["1-3", "2-4"]),
+            pd.Series(["1-3", "2-4"], dtype=object),
         ),
         (
             pd.DataFrame(columns=["A", "B"]),
@@ -819,7 +821,7 @@ def test_string_add(input_series, prepend, append, separator, expected):
             ":",
             [0],
             [3],
-            pd.Series(["P:005:Q", "P:006:Q"]),
+            pd.Series(["P:005:Q", "P:006:Q"], dtype=object),
         ),
     ],
 )
@@ -954,7 +956,7 @@ def test_feet_to_m(input_series, expected):
             pd.DataFrame({"AAAA": [12], "MM": [3], "YY": [7], "GG": [5]}),
             "",
             "",
-            pd.Series(["a57ea24d0eb65ca390a63bd175c906db"], dtype="object"),
+            pd.Series(["a57ea24d0eb65ca390a63bd175c906db"], dtype=object),
         ),
         (
             pd.DataFrame({"AAAA": [1, 2024], "MM": [1, 12], "YY": [1, 99], "GG": [1, 23]}),
@@ -965,20 +967,20 @@ def test_feet_to_m(input_series, expected):
                     "de3d414a8823554bbfde50f2305958d0",
                     "5f4b0ac6560552bf9e69cc9de0541bd6",
                 ],
-                dtype="object",
+                dtype=object,
             ),
         ),
         (
             pd.DataFrame({"AAAA": [50], "MM": [6], "YY": [24], "GG": [4]}),
             "PRE-",
             "-POST",
-            pd.Series(["PRE-1d37cb121ceb546daba6431da61cd309-POST"], dtype="object"),
+            pd.Series(["PRE-1d37cb121ceb546daba6431da61cd309-POST"], dtype=object),
         ),
         (
             pd.DataFrame({"AAAA": [], "MM": [], "YY": [], "GG": []}),
             "",
             "",
-            pd.Series([], dtype="object"),
+            pd.Series([], dtype=object),
         ),
     ],
 )

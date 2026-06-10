@@ -123,8 +123,6 @@ def _resolve_schema_files(
     if ext_schema_path:
         schema_path = Path(ext_schema_path).resolve()
         path = schema_path / f"{schema_path.name}.json"
-        # print(path)
-        # exit()
         if not path.is_file():
             raise FileNotFoundError(f"Can't find input schema path {ext_schema_path}")
         return [path]

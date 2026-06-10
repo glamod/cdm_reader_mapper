@@ -439,4 +439,9 @@ def read_tables(
     elif to_str is True:
         merged = convert_to_str_df(merged, imodel, cdm_subset=cdm_subset)
 
+    string_cols = merged.select_dtypes(include="string").columns
+    merged[string_cols] = merged[string_cols].astype(object)
+    object_cols = merged.select_dtypes(include="object").columns
+    merged[object_cols] = merged[object_cols].fillna(None)
+
     return DataBundle(data=merged, columns=merged.columns, mode="tables")

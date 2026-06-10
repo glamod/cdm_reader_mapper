@@ -202,7 +202,9 @@ def test_read_data_csv(csv_path, example_data):
     data = bundle.data
     assert isinstance(data, pd.DataFrame)
 
-    pd.testing.assert_frame_equal(bundle.data, example_data.astype(str))
+    exp_data = example_data.astype(str).astype(object)
+
+    pd.testing.assert_frame_equal(bundle.data, exp_data)
 
 
 def test_read_data_single_csv(csv_path, example_data):
@@ -214,7 +216,9 @@ def test_read_data_single_csv(csv_path, example_data):
     data = bundle.data
     assert isinstance(data, pd.DataFrame)
 
-    pd.testing.assert_frame_equal(bundle.data, example_data["observations-sst"].astype(str))
+    exp_data = example_data["observations-sst"].astype(str).astype(object)
+
+    pd.testing.assert_frame_equal(bundle.data, exp_data)
 
 
 def test_read_data_raises_data_format(csv_path):
@@ -244,7 +248,10 @@ def test_read_data_parquet(parquet_path, example_data):
     data = bundle.data
     assert isinstance(data, pd.DataFrame)
 
-    pd.testing.assert_frame_equal(bundle.data, example_data)
+    exp_data = example_data.copy()
+    exp_data[("observations-sst", "B")] = exp_data[("observations-sst", "B")].astype(object)
+
+    pd.testing.assert_frame_equal(bundle.data, exp_data)
 
 
 def test_read_data_feather(feather_path, example_data):
@@ -256,7 +263,10 @@ def test_read_data_feather(feather_path, example_data):
     data = bundle.data
     assert isinstance(data, pd.DataFrame)
 
-    pd.testing.assert_frame_equal(bundle.data, example_data)
+    exp_data = example_data.copy()
+    exp_data[("observations-sst", "B")] = exp_data[("observations-sst", "B")].astype(object)
+
+    pd.testing.assert_frame_equal(bundle.data, exp_data)
 
 
 def test_table_to_file_raises(csv_path, example_data):
@@ -307,6 +317,7 @@ def test_read_tables_testdata_str_conversion(tmp_path):
     db_tmp = read_tables(tmp_path, suffix="str")
 
     expected = read_tables(source, extension="pq", to_str=True, imodel=imodel)
+
     pd.testing.assert_frame_equal(db_tmp.data["header"], expected.data)
 
 

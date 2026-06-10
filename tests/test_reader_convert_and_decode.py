@@ -139,8 +139,7 @@ def test_object_to_object_strip():
     series = pd.Series([" a ", "", "   ", "b"])
 
     result = conv.object_to_object(series)
-
-    assert result.tolist() == ["a", None, None, "b"]
+    assert result.tolist() == ["a", pd.NA, pd.NA, "b"]
 
 
 def test_object_to_object_disable_lstrip():

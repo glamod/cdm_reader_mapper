@@ -291,6 +291,8 @@ def test_split_by_boolean_psr_true(
     )
 
     exp = sample_psr.copy().read()
+    exp["B"] = exp["B"].astype(object)
+
     exp_selected = exp.loc[exp_selected_idx]
     exp_rejected = exp.loc[exp_rejected_idx]
 
@@ -369,6 +371,8 @@ def test_split_by_boolean_psr_false(
     )
 
     exp = sample_psr.copy().read()
+    exp["B"] = exp["B"].astype(object)
+
     exp_selected = exp.loc[exp_selected_idx]
     exp_rejected = exp.loc[exp_rejected_idx]
 

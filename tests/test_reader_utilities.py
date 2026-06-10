@@ -231,12 +231,14 @@ def test_adjust_dtype():
     assert _adjust_dtype("str", df) == "str"
 
 
-def test_remove_boolean_values():
+def test_remove_boolean_values_sequence():
     df = pd.DataFrame({"A": ["True", "False", "hello"], "B": [1, 2, 3]})
     dtypes = {"A": "object", "B": "int"}
     result = remove_boolean_values(df, dtypes)
-    assert result.loc[0, "A"] is None
-    assert result.loc[1, "A"] is None
+    import numpy as np
+
+    assert result.loc[0, "A"] is np.nan
+    assert result.loc[1, "A"] is np.nan
     assert result.loc[2, "A"] == "hello"
     assert result["B"].dtype.name == "int64"
 

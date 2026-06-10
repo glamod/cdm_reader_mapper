@@ -61,7 +61,7 @@ def data_header_expected():
             ("header", "duplicate_status"): [4, 4, 4, 4],
             ("header", "platform_type"): [2, 33, 32, 45],
             ("header", "location_quality"): [2, 0, 0, 0],
-            ("header", "source_id"): [pd.NA, pd.NA, pd.NA, pd.NA],
+            ("header", "source_id"): [None, None, None, None],
         }
     )
     return data.astype(
@@ -493,39 +493,39 @@ def test_map_model_pub47():
     ]
 
     dtypes = {
-        ("header", "station_name"): str,
+        ("header", "station_name"): "object",
         ("header", "platform_sub_type"): "Int64",
-        ("header", "primary_station_id"): str,
+        ("header", "primary_station_id"): "object",
         ("header", "station_record_number"): "Int64",
         ("header", "report_duration"): "Int64",
         ("observations-at", "sensor_automation_status"): "Int64",
         ("observations-at", "z_coordinate"): "Float64",
         ("observations-at", "observation_height_above_station_surface"): "Float64",
-        ("observations-at", "sensor_id"): str,
+        ("observations-at", "sensor_id"): "object",
         ("observations-dpt", "sensor_automation_status"): "Int64",
         ("observations-dpt", "z_coordinate"): "Float64",
         ("observations-dpt", "observation_height_above_station_surface"): "Float64",
-        ("observations-dpt", "sensor_id"): str,
+        ("observations-dpt", "sensor_id"): "object",
         ("observations-slp", "sensor_automation_status"): "Int64",
         ("observations-slp", "z_coordinate"): "Float64",
         ("observations-slp", "observation_height_above_station_surface"): "Float64",
-        ("observations-slp", "sensor_id"): str,
+        ("observations-slp", "sensor_id"): "object",
         ("observations-sst", "sensor_automation_status"): "Int64",
         ("observations-sst", "z_coordinate"): "Float64",
         ("observations-sst", "observation_height_above_station_surface"): "Float64",
-        ("observations-sst", "sensor_id"): str,
+        ("observations-sst", "sensor_id"): "object",
         ("observations-wbt", "sensor_automation_status"): "Int64",
         ("observations-wbt", "z_coordinate"): "Float64",
         ("observations-wbt", "observation_height_above_station_surface"): "Float64",
-        ("observations-wbt", "sensor_id"): str,
+        ("observations-wbt", "sensor_id"): "object",
         ("observations-wd", "sensor_automation_status"): "Int64",
         ("observations-wd", "z_coordinate"): "Float64",
         ("observations-wd", "observation_height_above_station_surface"): "Float64",
-        ("observations-wd", "sensor_id"): str,
+        ("observations-wd", "sensor_id"): "object",
         ("observations-ws", "sensor_automation_status"): "Int64",
         ("observations-ws", "z_coordinate"): "Float64",
         ("observations-ws", "observation_height_above_station_surface"): "Float64",
-        ("observations-ws", "sensor_id"): str,
+        ("observations-ws", "sensor_id"): "object",
     }
 
     result = result[columns]
