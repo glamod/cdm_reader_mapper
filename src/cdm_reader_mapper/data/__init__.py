@@ -181,7 +181,7 @@ class TestData:
     @property
     def test_icoads_r300_d714(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 714 test dataset.
+        Test dataset for IMMA1 deck 714.
 
         Returns
         -------
@@ -197,7 +197,7 @@ class TestData:
     @property
     def test_icoads_r300_d701(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 701 test dataset.
+        Test dataset for IMMA1 deck 701.
 
         Returns
         -------
@@ -213,7 +213,7 @@ class TestData:
     @property
     def test_icoads_r300_d706(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 706 test dataset.
+        Test dataset for IMMA1 deck 706.
 
         Returns
         -------
@@ -229,7 +229,7 @@ class TestData:
     @property
     def test_icoads_r300_d705(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 705 test dataset.
+        Test dataset for IMMA1 deck 705.
 
         Returns
         -------
@@ -245,7 +245,7 @@ class TestData:
     @property
     def test_icoads_r300_d702(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 702 test dataset.
+        Test dataset for IMMA1 deck 702.
 
         Returns
         -------
@@ -261,7 +261,7 @@ class TestData:
     @property
     def test_icoads_r300_d707(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 707 test dataset.
+        Test dataset for IMMA1 deck 707.
 
         Returns
         -------
@@ -277,7 +277,7 @@ class TestData:
     @property
     def test_icoads_r300_mixed(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 mixed test dataset.
+        Test dataset for IMMA1 mixed.
 
         Returns
         -------
@@ -293,7 +293,7 @@ class TestData:
     @property
     def test_icoads_r302_d794(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 794 test dataset.
+        Test dataset for IMMA1 deck 794.
 
         Returns
         -------
@@ -309,7 +309,7 @@ class TestData:
     @property
     def test_icoads_r300_d704(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 704 test dataset.
+        Test dataset for IMMA1 deck 704.
 
         Returns
         -------
@@ -325,7 +325,7 @@ class TestData:
     @property
     def test_icoads_r300_d721(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 721 test dataset.
+        Test dataset for IMMA1 deck 721.
 
         Returns
         -------
@@ -341,7 +341,7 @@ class TestData:
     @property
     def test_icoads_r300_d730(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 730 test dataset.
+        Test dataset for IMMA1 deck 730.
 
         Returns
         -------
@@ -357,7 +357,7 @@ class TestData:
     @property
     def test_icoads_r300_d781(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 781 test dataset.
+        Test dataset for IMMA1 deck 781.
 
         Returns
         -------
@@ -373,7 +373,7 @@ class TestData:
     @property
     def test_icoads_r300_d703(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 703 test dataset.
+        Test dataset for IMMA1 deck 703.
 
         Returns
         -------
@@ -389,7 +389,7 @@ class TestData:
     @property
     def test_icoads_r300_d201(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 201 test dataset.
+        Test dataset for IMMA1 deck 201.
 
         Returns
         -------
@@ -405,7 +405,7 @@ class TestData:
     @property
     def test_icoads_r300_d892(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 892 test dataset.
+        Test dataset for IMMA1 deck 892.
 
         Returns
         -------
@@ -421,7 +421,7 @@ class TestData:
     @property
     def test_icoads_r300_d700(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 700 test dataset.
+        Test dataset for IMMA1 deck 700.
 
         Returns
         -------
@@ -437,7 +437,7 @@ class TestData:
     @property
     def test_icoads_r302_d792(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 792 test dataset.
+        Test dataset for IMMA1 deck 792.
 
         Returns
         -------
@@ -453,7 +453,7 @@ class TestData:
     @property
     def test_icoads_r302_d992(self) -> LazyDataDict:
         """
-        Retrieve IMMA1 deck 992 test dataset.
+        Test dataset for IMMA1 deck 992.
 
         Returns
         -------
@@ -469,7 +469,7 @@ class TestData:
     @property
     def test_gdac(self) -> LazyDataDict:
         """
-        Retrieve IMMT test dataset.
+        Test dataset for IMMT.
 
         Returns
         -------
@@ -485,7 +485,7 @@ class TestData:
     @property
     def test_craid(self) -> LazyDataDict:
         """
-        Retrieve C-RAID 1260810 test dataset.
+        Test dataset for C-RAID 1260810.
 
         Returns
         -------
@@ -497,7 +497,7 @@ class TestData:
     @property
     def test_marob(self) -> LazyDataDict:
         """
-        Retrieve MAROB (DWD database) test dataset.
+        Test dataset for MAROB (DWD database).
 
         Returns
         -------
@@ -509,7 +509,7 @@ class TestData:
     @property
     def test_cmems(self) -> LazyDataDict:
         """
-        Retrieve CMEMS (copernicusmarine) test dataset.
+        Test dataset for CMEMS (copernicusmarine).
 
         Returns
         -------
@@ -521,7 +521,7 @@ class TestData:
     @property
     def test_pub47(self) -> dict[str, Any]:
         """
-        Retrieve Pub47 v202501 test dataset.
+        Test dataset for Pub47 v202501.
 
         Returns
         -------
