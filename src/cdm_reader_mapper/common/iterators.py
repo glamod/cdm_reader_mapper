@@ -422,6 +422,9 @@ class ParquetStreamReader:
         self.close()
 
 
+ParquetStreamReader.__module__ = "cdm_reader_mapper.common"
+
+
 def _sort_chunk_outputs(
     outputs: tuple[Any, ...], capture_meta: bool, requested_types: tuple[type, ...]
 ) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
