@@ -9,7 +9,7 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from cdm_reader_mapper.common import ProcessFunction, process_function
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:
@@ -451,10 +451,12 @@ def convert_str_boolean(x: Any) -> Any:
     bool or original value
         True if 'True', False if 'False', else original value.
     """
+    if pd.isna(x):
+        return x
     if x == "True":
-        x = True
+        return True
     if x == "False":
-        x = False
+        return False
     return x
 
 
@@ -498,4 +500,5 @@ def remove_boolean_values(data: pd.DataFrame, dtypes: dict[str, str]) -> pd.Data
     """
     data = data.map(_remove_boolean_values)
     dtype = _adjust_dtype(dtypes, data)
+    data = data.apply(lambda series: series.str.strip() if series.dtype == "str" else series)
     return data.astype(dtype)

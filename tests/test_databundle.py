@@ -940,7 +940,7 @@ def test_correct_pt_psr():
 
     result = db.correct_pt()
 
-    expected = pd.DataFrame({PT: ["5", "7", "5"]})
+    expected = pd.DataFrame({PT: ["5", "7", "5"]}, dtype="object")
     pd.testing.assert_frame_equal(result.data.read(), expected)
 
 

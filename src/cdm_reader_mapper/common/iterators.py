@@ -18,6 +18,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import xarray as xr
 
+from .object_types import standardize_object_columns
+
 
 class ProcessFunction:
     r"""
@@ -420,6 +422,9 @@ class ParquetStreamReader:
         self.close()
 
 
+ParquetStreamReader.__module__ = "cdm_reader_mapper.common"
+
+
 def _sort_chunk_outputs(
     outputs: tuple[Any, ...], capture_meta: bool, requested_types: tuple[type, ...]
 ) -> tuple[list[pd.DataFrame | pd.Series], list[Any]]:
@@ -557,6 +562,8 @@ def _parquet_generator(temp_dir: TemporaryDirectory[str], data_type: type, schem
 
         for f in files:
             df = pd.read_parquet(f)
+
+            df = standardize_object_columns(df)
 
             if data_type is pd.Series:
                 s = df.iloc[:, 0].copy()

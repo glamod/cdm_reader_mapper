@@ -13,10 +13,10 @@ import h5py  # noqa: F401
 import pandas as pd
 import xarray as xr
 
-from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from cdm_reader_mapper.common import ProcessFunction, process_function, standardize_object_columns
 from cdm_reader_mapper.core.databundle import DataBundle
+from cdm_reader_mapper.mdf_reader import properties
 
-from .. import properties
 from .convert_and_decode import convert_and_decode
 from .parser import (
     ParserConfig,
@@ -278,6 +278,8 @@ class FileReader:
             object_columns = data.select_dtypes(include=["object", "string"]).columns
             for object_column in object_columns:
                 data[object_column] = data[object_column].str.encode(config.encoding).str.decode("utf-8")
+
+        data = standardize_object_columns(data)
 
         return data, mask, config
 

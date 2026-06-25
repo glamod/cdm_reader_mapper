@@ -29,7 +29,7 @@ import pandas as pd
 
 from cdm_reader_mapper.common import get_filename, logging_hdlr
 
-from ..properties import SupportedFileTypes
+from .properties import SupportedFileTypes
 from .tables.tables import get_cdm_atts
 from .utils.conversions import convert_from_str_df, convert_to_str_df
 from .utils.utilities import adjust_filename, dict_to_tuple_list, get_cdm_subset

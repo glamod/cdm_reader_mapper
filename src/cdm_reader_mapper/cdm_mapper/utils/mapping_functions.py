@@ -369,32 +369,31 @@ class MappingFunctions:
             DatetimeIndex of converted timestamps.
         """
         if df.empty:
-            return pd.DatetimeIndex([])
+            return pd.DatetimeIndex([], dtype="datetime64[ns]")
 
         df = df.iloc[:, 0:4]
         date_format = "%Y-%m-%d-%H-%M"
         hr_ = df.columns[-1]
         df = df.assign(HR=df.iloc[:, -1])
         df["M"] = df["HR"].copy()
-        df = df.drop(columns=hr_, axis=1)
-
+        df = df.drop(columns=hr_)
         hr_min = df.apply(lambda x: self.datetime_decimalhour_to_hm(x), axis=1)
         df["HR"] = hr_min["HR"]
         df["M"] = hr_min["M"]
         df = df.apply(lambda col: col.map(to_int))
 
-        strings = df.astype(str).apply("-".join, axis=1).values
+        strings = df.apply(lambda row: "-".join(map(str, row)), axis=1).values
         result = pd.to_datetime(
             strings,
             format=date_format,
             errors="coerce",
         )
         result.index = df.index
-        return result
+        return result.astype("datetime64[ns]")
 
     def datetime_imma1_to_utc(self, df: pd.DataFrame) -> pd.DatetimeIndex:
         """
-        Convert to pandas datetime object for IMMA1 deck 701 format.
+        Convert to pandas datetime object to UTC time.
 
         Set missing hour to 12 and use latitude and longitude information
         to convert local midday to UTC time.
@@ -402,7 +401,7 @@ class MappingFunctions:
         Parameters
         ----------
         df : pd.DataFrame
-            IMMA1 deck 701 dataset containing year, month, day, latitude, and longitude.
+            IMMA1 dataset containing year, month, day, latitude, and longitude.
 
         Returns
         -------
@@ -410,7 +409,7 @@ class MappingFunctions:
             DatetimeIndex with timestamps converted to UTC.
         """
         if df.empty:
-            return pd.DatetimeIndex([])
+            return pd.DatetimeIndex([], dtype="datetime64[ns]")
 
         date_format = "%Y-%m-%d-%H-%M"
 
@@ -437,7 +436,7 @@ class MappingFunctions:
 
         results = df_time.apply(lambda x: convert_to_utc_i(x["Dates"], x["Time_zone"]), axis=1)
         results.index = df.index
-        return pd.DatetimeIndex(results.dt.tz_convert(None))
+        return pd.DatetimeIndex(results.dt.tz_convert(None), dtype="datetime64[ns]")
 
     def datetime_imma1_701(self, df: pd.DataFrame) -> pd.DatetimeIndex:
         """
@@ -454,7 +453,7 @@ class MappingFunctions:
             DatetimeIndex with converted timestamps.
         """
         if df.empty:
-            return pd.DatetimeIndex([])
+            return pd.DatetimeIndex([], dtype="datetime64[ns]")
 
         hr = df.iloc[:, 3]
         valid_mask = hr.notna()
@@ -484,7 +483,7 @@ class MappingFunctions:
             DatetimeIndex of converted timestamps.
         """
         if df.empty:
-            return pd.DatetimeIndex([])
+            return pd.DatetimeIndex([], dtype="datetime64[ns]")
 
         date_format = "%Y-%m-%d-%H-%M"
         df = df.copy()
@@ -496,7 +495,7 @@ class MappingFunctions:
             format=date_format,
             errors="coerce",
         )
-        return pd.DatetimeIndex(result)
+        return pd.DatetimeIndex(result).astype("datetime64[ns]")
 
     def datetime_utcnow(self, df: pd.DataFrame) -> datetime.datetime:
         """
@@ -566,7 +565,7 @@ class MappingFunctions:
         pd.Series
             Series of converted dates.
         """
-        return series_strptime(series, format)
+        return series_strptime(series, format).astype("datetime64[ns]")
 
     def df_col_join(self, df: pd.DataFrame, sep: str) -> pd.Series:
         """
@@ -819,7 +818,6 @@ class MappingFunctions:
           Series with modified string values.
         """
         result = np.vectorize(string_add_i, otypes="O")(prepend, series, append, separator)
-
         return pd.Series(result, index=series.index, dtype="object")
 
     def string_join_add(
@@ -1016,7 +1014,7 @@ class MappingFunctions:
         for i, n in enumerate(name):
             uid[i] = str(prepend) + uuid.uuid5(uuid.NAMESPACE_OID, str(n)).hex + str(append)
         df["UUID"] = uid
-        return df["UUID"]
+        return df["UUID"].astype(object)
 
     def gdac_latitude(self, df: pd.DataFrame) -> pd.Series:
         """

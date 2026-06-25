@@ -62,9 +62,8 @@ from typing import Any
 
 import pandas as pd
 
-from ..common import logging_hdlr
-from ..common.iterators import ProcessFunction, process_function
-from ..common.json_dict import collect_json_files, combine_dicts
+from cdm_reader_mapper.common import ProcessFunction, collect_json_files, combine_dicts, logging_hdlr, process_function
+
 from . import properties
 from .datetime import correction_functions as corr_f_dt
 from .platform_type import correction_functions as corr_f_pt

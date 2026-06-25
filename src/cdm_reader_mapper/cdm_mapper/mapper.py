@@ -18,11 +18,12 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.iterators import (
+from cdm_reader_mapper.common import (
     ParquetStreamReader,
     ProcessFunction,
+    logging_hdlr,
     process_function,
+    standardize_object_columns,
 )
 
 from . import properties
@@ -65,14 +66,14 @@ def _drop_duplicated_rows(df: pd.DataFrame) -> pd.DataFrame:
     Parameters
     ----------
     df : pd.DataFrame
-        Input DataFrame to drop duplictaed rows.
+        Input DataFrame to drop duplicated rows.
 
     Returns
     -------
     pd.DataFrame
         Input DataFrame with deleted duplicated rows.
     """
-    list_cols = [col for col in df.columns if df[col].apply(lambda x: isinstance(x, list)).any()]
+    list_cols = [col for col in df.columns if df[col].dtype == "object" and df[col].apply(lambda x: isinstance(x, list)).any()]
 
     for col in list_cols:
         df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
@@ -481,7 +482,7 @@ def _table_mapping(
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
 
-    return table_df
+    return standardize_object_columns(table_df)
 
 
 def _prepare_cdm_tables(cdm_subset: str | Sequence[str]) -> dict[str, Any]:

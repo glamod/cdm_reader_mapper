@@ -10,7 +10,7 @@ Contributor to this version: Ludwig Lierhammer (:user:`ludwiglierhammer`)
 Announcements
 ^^^^^^^^^^^^^
 * `cdm_reader_mapper` now drops support for Python 3.10 (:pull:`419`)
-* `cdm_reader_mapper` now uses `cruft <https://cruft.github.io/cruft/>` and the `Ouranosinc cookiecutter template <https://github.com/Ouranosinc/cookiecutter-pypackage>` (:issue:`369`, :pull:`419`)
+* `cdm_reader_mapper` now uses `cruft <https://cruft.github.io/cruft/>`_ and the `Ouranosinc cookiecutter template <https://github.com/Ouranosinc/cookiecutter-pypackage>`_ (:issue:`369`, :pull:`419`)
 
 New features and enhancements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -20,7 +20,7 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * Development dependencies ("dev", "docs") are now installed via the new `dependency-groups` conventions (`PEP 735 <https://peps.python.org/pep-0735/>`_) (:pull:`419`)
 * `prek` is now the suggested pre-commit runner (installed by default via `pip install --group dev`) (:pull:`419`)
-* delete submodule ``src.cdm_reader_mapper.duplicates`` (:issue:`152`, :issue:`283`, :pull:`434`)
+* submodule ``src.cdm_reader_mapper.duplicates`` has been deleted and moved to `marine_qc <https://github.com/glamod/marine_qc/pull/207/>`_ (:issue:`283`, :pull:`434`)
 
   * ``cdm_reader_mapper.DupDetect`` is not importable anymore
   * ``cdm_reader_mapper.duplicate_check`` is not importable anymore
@@ -30,7 +30,8 @@ Breaking changes
   * ``cdm_reader_mapper.DataBundle.remove_duplicates`` is not callable anymore
   * ``cdm_reader_mapper.DataBundle`` does not have attribute ``DupDetect`` anymore
 
-* submodule ``src.cdm_reader_mapper.duplicates`` has been moved to `marine_qc <https://github.com/glamod/marine_qc/pull/207/>`_ (:issue:`283`, :pull:`434`)
+* the code has been updated to support pandas >= 3.0.0 (:pull:`435`)
+* reader functions now return object types instead of string types (:pull:`435`)
 
 
 Internal changes
@@ -53,6 +54,8 @@ Internal changes
 * remove helper class `core._utilities._DataBundle` and integrate it in `core.databundle.DataBundle` (:pull:`419`)
 * make use of `pathlib.Path` instead of `os.path` (:pull:`419`)
 * use consistently parameter "imodel" instead of "data_model" and "correction_method" instead of "fix_method" in `metmetpy` modules (:pull:`419`)
+* make some JSON and iterator utility functions directly importable in submodule ``cdm_reader_mapper.common`` (:pull:`435`)
+* replace relative imports with absolute imports for any submodules located one or more directories above the current submodule (:pull:`435`)
 
 
 2.4.1 (2016-04-16)

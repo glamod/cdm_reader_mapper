@@ -6,8 +6,8 @@ from typing import Any, get_args
 
 from cdm_reader_mapper.cdm_mapper.reader import read_tables
 from cdm_reader_mapper.mdf_reader.reader import read_data, read_mdf
+from cdm_reader_mapper.properties import SupportedReadModes
 
-from ..properties import SupportedReadModes
 from .databundle import DataBundle
 
 

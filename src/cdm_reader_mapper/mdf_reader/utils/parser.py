@@ -14,8 +14,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .. import properties
-from ..schemas.schemas import SchemaDict, read_schema
+from cdm_reader_mapper.mdf_reader import properties
+from cdm_reader_mapper.mdf_reader.schemas.schemas import SchemaDict, read_schema
+
 from .convert_and_decode import Converters, Decoders
 from .utilities import convert_dtypes
 

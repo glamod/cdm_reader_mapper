@@ -97,7 +97,7 @@ def test_convert_array_general_to_str(exp, dtype, data):
 def test_convert_str_to_str(data, exp):
     series = pd.Series(data)
     result = _convert_str_to_str(series, "null")
-    expected = pd.Series(exp)
+    expected = pd.Series(exp, dtype=object)
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -164,8 +164,8 @@ def test_convert_str_array_from_str(data, exp):
 def test_convert_integer_to_str(data, exp):
     series = pd.Series(data)
     result = _convert_integer_to_str(series, "null")
-    expected_series = pd.Series(exp)
-    pd.testing.assert_series_equal(result, expected_series)
+    expected = pd.Series(exp, dtype=object)
+    pd.testing.assert_series_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -238,7 +238,7 @@ def test_convert_integer_array_from_str(data, exp):
 def test_convert_float_to_str(data, decimal_places, exp):
     series = pd.Series(data)
     result = _convert_float_to_str(series, "null", decimal_places)
-    expected = pd.Series(exp)
+    expected = pd.Series(exp, dtype=object)
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -278,7 +278,7 @@ def test_convert_float_from_str(data, exp):
 def test_convert_float_array_to_str(data, exp):
     series = pd.Series(data)
     result = _convert_float_array_to_str(series, "null")
-    expected = pd.Series(exp, dtype=object)
+    expected = pd.Series(exp)
     pd.testing.assert_series_equal(result, expected)
 
 

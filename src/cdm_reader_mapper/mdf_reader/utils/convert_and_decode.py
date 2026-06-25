@@ -7,7 +7,8 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from .. import properties
+from cdm_reader_mapper.mdf_reader import properties
+
 from .utilities import convert_str_boolean
 
 
@@ -263,6 +264,8 @@ class Converters:
         pd.Series
             Converted Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 
@@ -298,6 +301,8 @@ class Converters:
         pd.Series
             Cleaned Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 
@@ -308,7 +313,7 @@ class Converters:
         elif disable_white_strip == "r":
             data = data.str.lstrip()
 
-        return data.apply(lambda x: None if isinstance(x, str) and (x.isspace() or not x) else x)
+        return data.replace({"": pd.NA})
 
     def object_to_datetime(
         self,
@@ -332,6 +337,8 @@ class Converters:
         pd.Series
             Datetime Series.
         """
+        if data.dtype == "str":
+            data = data.astype(object)
         if data.dtype != "object":
             return data
 

@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from . import json_dict
 from .getting_files import load_file
 from .inspect import count_by_cat, get_length
 from .io_files import get_filename
+from .iterators import ParquetStreamReader, ProcessFunction, is_valid_iterator, parquet_stream_from_iterable, process_disk_backed, process_function
+from .json_dict import collect_json_files, combine_dicts, open_json_file
+from .object_types import standardize_object_columns
 from .replace import replace_columns
 from .select import (
     split_by_boolean,
@@ -17,15 +19,24 @@ from .select import (
 
 
 __all__ = [
+    "ParquetStreamReader",
+    "ProcessFunction",
+    "collect_json_files",
+    "combine_dicts",
     "count_by_cat",
     "get_filename",
     "get_length",
-    "json_dict",
+    "is_valid_iterator",
     "load_file",
+    "open_json_file",
+    "parquet_stream_from_iterable",
+    "process_disk_backed",
+    "process_function",
     "replace_columns",
     "split_by_boolean",
     "split_by_boolean_false",
     "split_by_boolean_true",
     "split_by_column_entries",
     "split_by_index",
+    "standardize_object_columns",
 ]

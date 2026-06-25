@@ -8,9 +8,9 @@ from typing import Any, get_args
 import pandas as pd
 
 from cdm_reader_mapper import DataBundle
+from cdm_reader_mapper.common import open_json_file, standardize_object_columns
+from cdm_reader_mapper.properties import SupportedFileTypes
 
-from ..common.json_dict import open_json_file
-from ..properties import SupportedFileTypes
 from .utils.filereader import FileReader
 from .utils.utilities import as_list, as_path, read_csv, read_feather, read_parquet, validate_arg
 
@@ -301,6 +301,11 @@ def _read_data(
             column_names=info["columns"],
             **mask_kwargs,
         )
+
+    data = standardize_object_columns(data)
+
+    if "dtypes" in info:
+        info["dtypes"] = info["dtypes"].replace("str", "object")
 
     return data, mask, info
 

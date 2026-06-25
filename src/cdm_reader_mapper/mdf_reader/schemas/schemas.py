@@ -8,9 +8,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, TypedDict, get_args
 
-from cdm_reader_mapper.common.json_dict import collect_json_files, combine_dicts
-
-from .. import properties
+from cdm_reader_mapper.common import collect_json_files, combine_dicts
+from cdm_reader_mapper.mdf_reader import properties
 
 
 class SectionDict(TypedDict, total=False):
@@ -123,8 +122,6 @@ def _resolve_schema_files(
     if ext_schema_path:
         schema_path = Path(ext_schema_path).resolve()
         path = schema_path / f"{schema_path.name}.json"
-        # print(path)
-        # exit()
         if not path.is_file():
             raise FileNotFoundError(f"Can't find input schema path {ext_schema_path}")
         return [path]
