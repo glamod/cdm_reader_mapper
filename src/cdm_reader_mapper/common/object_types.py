@@ -1,20 +1,19 @@
 """Utility function for reading and writing files."""
 
 from __future__ import annotations
-from collections.abc import Sequence
-from pathlib import Path
 
 import pandas as pd
+
 
 def standardize_object_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
     Convert string columns to object dtype and replace NaNs with None.
-    
+
     Parameters
     ----------
     df : pd.DataFrame
         The input DataFrame to be standardized.
-        
+
     Returns
     -------
     pd.DataFrame
