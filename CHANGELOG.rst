@@ -20,6 +20,18 @@ Breaking changes
 ^^^^^^^^^^^^^^^^
 * Development dependencies ("dev", "docs") are now installed via the new `dependency-groups` conventions (`PEP 735 <https://peps.python.org/pep-0735/>`_) (:pull:`419`)
 * `prek` is now the suggested pre-commit runner (installed by default via `pip install --group dev`) (:pull:`419`)
+* delete submodule ``src.cdm_reader_mapper.duplicates`` (:issue:`152`, :issue:`283`, :pull:`434`)
+
+  * ``cdm_reader_mapper.DupDetect`` is not importable anymore
+  * ``cdm_reader_mapper.duplicate_check`` is not importable anymore
+  * ``cdm_reader_mapper.DataBundle.duplicate_check`` is not callable anymore
+  * ``cdm_reader_mapper.DataBundle.get_duplicates`` is not callable anymore
+  * ``cdm_reader_mapper.DataBundle.flag_duplicates`` is not callable anymore
+  * ``cdm_reader_mapper.DataBundle.remove_duplicates`` is not callable anymore
+  * ``cdm_reader_mapper.DataBundle`` does not have attribute ``DupDetect`` anymore
+
+* submodule ``src.cdm_reader_mapper.duplicates`` has been moved to `marine_qc <https://github.com/glamod/marine_qc/pull/207/>`_ (:issue:`283`, :pull:`434`)
+
 
 Internal changes
 ^^^^^^^^^^^^^^^^

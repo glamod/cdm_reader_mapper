@@ -8,8 +8,6 @@
 
 .. _CDM: https://github.com/glamod/common_data_model/blob/master/cdm_latest.pdf
 
-.. _CDM code tables for duplicate_status: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/duplicate_status/duplicate_status.html
-
 .. _CDM code tables for report_quality: https://glamod.github.io/cdm-obs-documentation/tables/code_tables/quality_flag/quality_flag.html
 
 .. _conda: https://docs.conda.io/en/latest/
