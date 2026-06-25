@@ -7,7 +7,6 @@ The **cdm_reader_mapper** toolbox is a python3_ tool designed for
 
 * reading original marine-meteorological data files compliant with a user specified data model (:ref:`data-models`) into a Marine Data Format (MDF) file.
 * mapping observed meteorological variables and its associated metadata from a data model (:ref:`data-models`) to the C3S CDS Common Data Model (CDM_) format or **imodel** as called in this tool.
-* to detect and flag or remove duplicated observations
 
 It was developed with the initial idea of reading data from the International Comprehensive Ocean-Atmosphere Data Set (ICOADS_) stored in the International Maritime Meteorological Archive (IMMA_) data format. In the meanwhile, it can read data C-RAID_ Copernicus in situ project too.
 
@@ -34,9 +33,6 @@ The reader allows for basic transformations of the data. This feature includes `
 In addition, the **cdm_reader_mapper.DataBundle** object has several main method functions:
 
 * :py:func:`DataBundle.map_model`: map observed variables and its associated metadata from a data model or models combination to the standardized C3S CDS Common Data Model (CDM_) format.
-* :py:func:`DataBundle.duplicate_check`: detect duplicated observations
-* :py:func:`DataBundle.flag_duplicates`: flag detected duplicated observations
-* :py:func:`DataBundle.remove_duplicates`: remove detected duplicated observations
 * :py:func:`DataBundle.write`: save both observational MDF files as a coma-separated list and observational standardized CDM tables as pipe-seperated lists
 
 .. toctree::

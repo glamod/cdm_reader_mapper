@@ -43,9 +43,6 @@ Useful functions
 .. autofunction:: cdm_reader_mapper.correct_pt
    :noindex:
 
-.. autofunction:: cdm_reader_mapper.duplicate_check
-   :noindex:
-
 .. autofunction:: cdm_reader_mapper.map_model
    :noindex:
 
@@ -83,13 +80,4 @@ Useful functions
    :noindex:
 
 .. autofunction:: cdm_reader_mapper.write_tables
-   :noindex:
-
-.. _dupdetect:
-
-DupDetect
-=========
-
-.. autoclass:: cdm_reader_mapper.DupDetect
-   :members:
    :noindex:
