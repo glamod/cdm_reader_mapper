@@ -8,15 +8,16 @@ import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper.mapper import map_model
 from cdm_reader_mapper.common import (
+    ParquetStreamReader,
     count_by_cat,
     get_length,
+    is_valid_iterator,
     replace_columns,
     split_by_boolean_false,
     split_by_boolean_true,
     split_by_column_entries,
     split_by_index,
 )
-from cdm_reader_mapper.common.iterators import ParquetStreamReader, is_valid_iterator
 from cdm_reader_mapper.metmetpy import (
     correct_datetime,
     correct_pt,

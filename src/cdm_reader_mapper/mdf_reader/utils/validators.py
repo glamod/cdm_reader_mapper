@@ -8,8 +8,9 @@ from typing import Any, get_args
 import numpy as np
 import pandas as pd
 
-from .. import properties
-from ..codes import codes
+from cdm_reader_mapper.mdf_reader import properties
+from cdm_reader_mapper.mdf_reader.codes import codes
+
 from .utilities import convert_str_boolean
 
 

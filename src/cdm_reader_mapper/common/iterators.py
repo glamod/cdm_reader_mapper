@@ -18,6 +18,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import xarray as xr
 
+from .object_types import standardize_object_columns
+
 
 class ProcessFunction:
     r"""
@@ -558,10 +560,7 @@ def _parquet_generator(temp_dir: TemporaryDirectory[str], data_type: type, schem
         for f in files:
             df = pd.read_parquet(f)
 
-            string_cols = df.select_dtypes(include="str").columns
-            df[string_cols] = df[string_cols].astype(object)
-            object_cols = df.select_dtypes(include="object").columns
-            df[object_cols] = df[object_cols].fillna(None)
+            df = standardize_object_columns(df)
 
             if data_type is pd.Series:
                 s = df.iloc[:, 0].copy()

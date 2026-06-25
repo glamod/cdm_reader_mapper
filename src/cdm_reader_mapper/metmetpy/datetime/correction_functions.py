@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from .. import properties
+from cdm_reader_mapper.metmetpy import properties
+
 from . import model_datetimes
 
 

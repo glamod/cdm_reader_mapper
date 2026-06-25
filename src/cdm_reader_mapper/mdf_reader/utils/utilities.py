@@ -9,7 +9,7 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.common.iterators import ProcessFunction, process_function
+from cdm_reader_mapper.common import ProcessFunction, process_function
 
 
 def as_list(x: str | Iterable[Any] | None) -> list[Any] | None:

@@ -8,8 +8,8 @@ from typing import Any, get_args
 import numpy as np
 import pandas as pd
 
-from .. import properties
-from ..tables.tables import get_cdm_atts, get_imodel_maps
+from cdm_reader_mapper.cdm_mapper import properties
+from cdm_reader_mapper.cdm_mapper.tables.tables import get_cdm_atts, get_imodel_maps
 
 
 class BaseConverter:

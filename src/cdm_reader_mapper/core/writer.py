@@ -8,8 +8,7 @@ import pandas as pd
 
 from cdm_reader_mapper.cdm_mapper.writer import write_tables
 from cdm_reader_mapper.mdf_reader.writer import write_data
-
-from ..properties import SupportedWriteModes
+from cdm_reader_mapper.properties import SupportedWriteModes
 
 
 supported_write_modes = get_args(SupportedWriteModes)

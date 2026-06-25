@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..properties import SupportedDataModels, SupportedFileTypes
+from cdm_reader_mapper.properties import SupportedDataModels, SupportedFileTypes
 
 
 __all__ = [
@@ -27,7 +27,7 @@ cdm_tables = [
     "observations-slp",
 ]
 
-# ...from CDM table definitions psuedo-sql(...) --------------------------------
+# ...from CDM table definitions pseudo-sql(...) --------------------------------
 pandas_dtypes: dict[str, dict[str, str]] = {}
 pandas_dtypes["from_sql"] = {}
 pandas_dtypes["from_sql"]["timestamp with timezone"] = "object"

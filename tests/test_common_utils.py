@@ -8,6 +8,8 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 
+import numpy as np
+import pandas as pd
 import pytest
 import requests
 
@@ -28,6 +30,7 @@ from cdm_reader_mapper.common.json_dict import (
     open_json_file,
 )
 from cdm_reader_mapper.common.logging_hdlr import init_logger
+from cdm_reader_mapper.common.object_types import standardize_object_columns
 
 
 def compute_md5(content: bytes) -> str:
@@ -481,3 +484,27 @@ def test_get_path_missing_file_module_not_found(tmp_path, caplog):
 
     assert result is None
     assert any("No module named" in msg for msg in caplog.messages)
+
+
+def test_standardize_object_columns():
+    df = pd.DataFrame(
+        {
+            "A": pd.Series(["x", "y", None], dtype="string"),
+            "B": pd.Series([1.1, 2.2, 3.3]),
+            "C": pd.Series([1, 2, 3]),
+            "D": pd.Series([True, False, np.nan]),
+        }
+    )
+
+    result = standardize_object_columns(df)
+
+    expected = pd.DataFrame(
+        {
+            "A": pd.Series(["x", "y", None], dtype=object),
+            "B": pd.Series([1.1, 2.2, 3.3]),
+            "C": pd.Series([1, 2, 3]),
+            "D": pd.Series([True, False, None], dtype=object),
+        }
+    )
+
+    pd.testing.assert_frame_equal(result, expected)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import get_args
 
-from ..properties import NumericTypes, ObjectTypes, SupportedDataModels
+from cdm_reader_mapper.properties import NumericTypes, ObjectTypes, SupportedDataModels
 
 
 __all__ = [

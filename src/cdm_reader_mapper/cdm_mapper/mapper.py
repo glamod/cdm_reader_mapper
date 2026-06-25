@@ -18,11 +18,12 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import logging_hdlr
-from cdm_reader_mapper.common.iterators import (
+from cdm_reader_mapper.common import (
     ParquetStreamReader,
     ProcessFunction,
+    logging_hdlr,
     process_function,
+    standardize_object_columns,
 )
 
 from . import properties
@@ -481,12 +482,7 @@ def _table_mapping(
     if drop_duplicates:
         table_df = _drop_duplicated_rows(table_df)
 
-    string_cols = table_df.select_dtypes(include="string").columns
-    table_df[string_cols] = table_df[string_cols].astype(object)
-    object_cols = table_df.select_dtypes(include="object").columns
-    table_df[object_cols] = table_df[object_cols].fillna(None)
-
-    return table_df
+    return standardize_object_columns(table_df)
 
 
 def _prepare_cdm_tables(cdm_subset: str | Sequence[str]) -> dict[str, Any]:
