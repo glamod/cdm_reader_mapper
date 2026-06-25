@@ -54,6 +54,8 @@ Internal changes
 * remove helper class `core._utilities._DataBundle` and integrate it in `core.databundle.DataBundle` (:pull:`419`)
 * make use of `pathlib.Path` instead of `os.path` (:pull:`419`)
 * use consistently parameter "imodel" instead of "data_model" and "correction_method" instead of "fix_method" in `metmetpy` modules (:pull:`419`)
+* make some JSON and iterator utility functions directly importable in submodule ``cdm_reader_mapper.common`` (:pull:`435`)
+* replace relative imports with absolute imports for any submodules located one or more directories above the current submodule (:pull:`435`)
 
 
 2.4.1 (2016-04-16)
