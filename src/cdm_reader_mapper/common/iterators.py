@@ -768,6 +768,59 @@ def _build_output(
     return tuple(final_iterators + output_non_data)
 
 
+def _restore_columns(item: Any) -> Any:
+    """
+    Restore columns from string literals if `item` is a pandas DataFrame or Series.
+
+    Parameters
+    ----------
+    item : Any
+        Object to restore.
+
+    Returns
+    -------
+    Any
+        Restored object.
+    """
+
+    def _literal_eval(column: Any) -> Any:
+        """
+        Evaluate a string literal if possible.
+
+        Parameters
+        ----------
+        column : Any
+            Column that is possibly a string literal.
+
+        Returns
+        -------
+        Any
+            Evaluated column.
+        """
+        if not isinstance(column, str):
+            return column
+        try:
+            from ast import literal_eval
+
+            return literal_eval(column)
+        except (ValueError, SyntaxError):
+            return column
+
+    if isinstance(item, pd.DataFrame):
+        columns = item.columns
+        new_columns = []
+        for column in columns:
+            column = _literal_eval(column)
+            new_columns.append(column)
+
+        item.columns = new_columns
+
+    if isinstance(item, pd.Series):
+        item.name = _literal_eval(item.name)
+
+    return item
+
+
 def _process_chunks(
     readers: list[ParquetStreamReader],
     func: Callable[..., Any],
@@ -834,6 +887,8 @@ def _process_chunks(
 
     for items in zip(*readers, strict=True):
         _validate_chunk(items, requested_types)
+
+        items = tuple([_restore_columns(item) for item in items])
 
         result = func(*items, *static_args, **static_kwargs)
         data, meta = _process_result(result, requested_types, non_data_output, chunk_counter)
