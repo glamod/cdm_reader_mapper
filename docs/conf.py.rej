@@ -1,0 +1,12 @@
+diff a/docs/conf.py b/docs/conf.py	(rejected hunks)
+@@ -55,8 +55,8 @@ autodoc_default_options = {
+ }
+ 
+ extlinks = {
+-    "issue": ("https://github.com/glamod/Common-Data-Model-reader-and-mapper/issues/%s", "GH/%s"),
+-    "pull": ("https://github.com/glamod/Common-Data-Model-reader-and-mapper/pull/%s", "PR/%s"),
++    "issue": ("https://github.com/glamod/cdm_reader_mapper/issues/%s", "GH/%s"),
++    "pull": ("https://github.com/glamod/cdm_reader_mapper/pull/%s", "PR/%s"),
+     "user": ("https://github.com/%s", "@%s"),
+ }
+ 

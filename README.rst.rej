@@ -1,0 +1,21 @@
+diff a/README.rst b/README.rst	(rejected hunks)
+@@ -32,8 +32,8 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
+ .. _Cookiecutter: https://github.com/cookiecutter/cookiecutter
+ .. _`Ouranosinc/cookiecutter-pypackage`: https://github.com/Ouranosinc/cookiecutter-pypackage
+ 
+-.. |build| image:: https://github.com/glamod/Common-Data-Model-reader-and-mapper/actions/workflows/main.yml/badge.svg
+-        :target: https://github.com/glamod/Common-Data-Model-reader-and-mapper/actions
++.. |build| image:: https://github.com/glamod/cdm_reader_mapper/actions/workflows/main.yml/badge.svg
++        :target: https://github.com/glamod/cdm_reader_mapper/actions
+         :alt: Build Status
+ 
+ .. |coveralls| image:: https://coveralls.io/repos/github/glamod/Common-Data-Model-reader-and-mapper/badge.svg
+@@ -45,7 +45,7 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
+         :alt: Documentation Status
+ 
+ .. |license| image:: https://img.shields.io/github/license/glamod/Common-Data-Model-reader-and-mapper.svg
+-        :target: https://github.com/glamod/Common-Data-Model-reader-and-mapper/blob/main/LICENSE
++        :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
+         :alt: License
+ 
+ ..
