@@ -2,6 +2,60 @@
 requires = ["flit_core >=3.12.0,<4"]
 build-backend = "flit_core.buildapi"
 
+[project]
+name = "cdm_reader_mapper"
+authors = [
+  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"},
+  {name = "Axel Andersson", email = "axel.andersson@dwd.de"},
+  {name = "Tina Leiding", email = "tina.leiding@dwd.de"},
+  {name = "Richard Cornes", email = "richard.cornes@noc.ac.uk"},
+  {name = "Elizabeth Kent", email = "eck@noc.ac.uk"}
+]
+maintainers = [
+  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
+  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
+  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"}
+]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">=3.11.0"
+keywords = ["cdm_reader_mapper"]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14"
+]
+dynamic = ["description", "version"]
+dependencies = [
+  "bottleneck >=1.3.1",
+  "dask[array] >= 2025.2.0",
+  "h5netcdf >=1.6.1",
+  "h5py >= 3.13.0",
+  "numpy>=2.1.3",
+  "pandas>=3.0.0",
+  "platformdirs >4.0.0",
+  "pyarrow >=15.0.0",
+  "requests",
+  "timezonefinder >6.5.0,<9.0.0",
+  "xarray >=2023.11.0,!=2024.10.0"
+]
+
+[project.urls]
+"Homepage" = "https://cdm-reader-mapper.readthedocs.io"
+"Changelog" = "https://cdm_reader_mapper.readthedocs.io/en/latest/changelog.html"
+"Issue tracker" = "https://github.com/glamod/cdm_reader_mapper"
+"Source" = "https://github.com/glamod/cdm_reader_mapper"
+
 [dependency-groups]
 lint = [
   # Linting tools
@@ -52,60 +106,6 @@ dev = [
   {include-group = "test"},
   {include-group = "tox"}
 ]
-
-[project]
-name = "cdm_reader_mapper"
-authors = [
-  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
-  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
-  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"},
-  {name = "Axel Andersson", email = "axel.andersson@dwd.de"},
-  {name = "Tina Leiding", email = "tina.leiding@dwd.de"},
-  {name = "Richard Cornes", email = "richard.cornes@noc.ac.uk"},
-  {name = "Elizabeth Kent", email = "eck@noc.ac.uk"}
-]
-maintainers = [
-  {name = "Ludwig Lierhammer", email = "ludwig.lierhammer@dwd.de"},
-  {name = "Joseph Siddons", email = "joseph.siddons@noc.ac.uk"},
-  {name = "Jan Marius Willruth", email = "jan.willruth@dwd.de"}
-]
-readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">=3.11.0"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
-keywords = ["cdm_reader_mapper"]
-classifiers = [
-  "Development Status :: 5 - Production/Stable",
-  "Intended Audience :: Developers",
-  "Intended Audience :: Science/Research",
-  "Natural Language :: English",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14"
-]
-dynamic = ["description", "version"]
-dependencies = [
-  "bottleneck >=1.3.1",
-  "dask[array] >= 2025.2.0",
-  "h5netcdf >=1.6.1",
-  "h5py >= 3.13.0",
-  "numpy>=2.1.3",
-  "pandas>=3.0.0",
-  "platformdirs >4.0.0",
-  "pyarrow >=15.0.0",
-  "requests",
-  "timezonefinder >6.5.0,<9.0.0",
-  "xarray >=2023.11.0,!=2024.10.0"
-]
-
-[project.urls]
-"Homepage" = "https://cdm-reader-mapper.readthedocs.io"
-"Source" = "https://github.com/glamod/cdm_reader_mapper"
-"Changelog" = "https://cdm_reader_mapper.readthedocs.io/en/latest/changelog.html"
-"Issue tracker" = "https://github.com/glamod/cdm_reader_mapper"
 
 [tool]
 
@@ -171,17 +171,20 @@ include = [
   ".zenodo.json",
   "AUTHORS.rst",
   "CHANGELOG.rst",
+  "CITATION.cff",
+  "CODE_OF_CONDUCT.md",
   "CONTRIBUTING.rst",
   "LICENSE",
   "Makefile",
   "README.rst",
   "environment-docs.yml",
+  "docs/_static/*",
   "docs/**/*.png",
   "docs/**/*.rst",
   "docs/**/*.txt",
-  "docs/Makefile",
   "docs/conf.py",
   "docs/make.bat",
+  "docs/Makefile",
   "cdm_reader_mapper/**/*.json",
   "cdm_reader_mapper/**/*.py",
   "cdm_reader_mapper/**/*.txt",
@@ -192,9 +195,16 @@ include = [
 exclude = [
   "*.py[co]",
   "__pycache__",
-  ".*",
+  ".editorconfig",
+  ".flake8",
+  ".github",
+  ".gitignore",
+  ".readthedocs.yml",
+  ".yamllint.yaml",
+  ".zizmor.yml",
   "docs/_*",
   "docs/modules.rst",
+  "pre-commit-config.yaml",
   "pylintrc"
 ]
 
@@ -339,6 +349,9 @@ max-doc-length = 180
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.tomlsort]
+sort_first = ["build-system", "project"]
 
 [tool.vulture]
 exclude = []

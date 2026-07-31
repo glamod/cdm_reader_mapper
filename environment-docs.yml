@@ -47,9 +47,10 @@ dependencies:
     - myst-nb >=1.2.0
     - nbconvert >=7.16.4
     - numpydoc >=1.8.0
-    - sphinx >=7.0.0
+    - sphinx >=8.2.0
     - sphinx-autodoc-typehints
-    - sphinx-copybutton
+    - sphinx-codeautolink >=0.16.2
+    - sphinx-copybutton >=0.5.2
     - furo >=2023.9.10
 
     #from pypi
