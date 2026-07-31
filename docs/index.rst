@@ -38,7 +38,7 @@ In addition, the **cdm_reader_mapper.DataBundle** object has several main method
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Contents:
+   :caption: Table of Contents:
 
    About <readme>
    tool-set-up
