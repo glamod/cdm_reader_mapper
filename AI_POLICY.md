@@ -53,7 +53,8 @@ AI-generated contributions must be compatible with this project's license. Contr
 
 ## Enforcement
 
-Maintainers may close AI-generated PRs that do not meet these standards without detailed feedback.
+- Maintainers may close AI-generated PRs that do not meet these standards at their sole discretion without detailed feedback.
+- Repeated low-quality AI submissions may result in the contributor being asked to stop using AI tools.
 
 ## Policy Evolution
 
