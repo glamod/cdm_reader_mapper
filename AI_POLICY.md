@@ -6,8 +6,9 @@ You are responsible for every line of code you submit, regardless of how it was 
 
 ## Pull Requests
 
-Pull Requests descriptions must be drafted by a human and adhere to the template selected on creation.
-Summaries of changes posted by AI are not accepted in Pull Requests.
+- Pull Requests descriptions must be drafted by a human and adhere to the template selected on creation.
+- Summaries of changes posted by AI are not accepted in Pull Requests.
+- AI-generated responses to reviewer comments are not accepted in Pull Requests.
 
 ## AI Tool Usage
 

@@ -34,7 +34,6 @@ on:
       - tests/**.py
       - tox.toml
       - src/cdm_reader_mapper/__init__.py
-  workflow_dispatch:
 
 permissions:
   contents: read
