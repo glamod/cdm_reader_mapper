@@ -193,9 +193,9 @@ Before you submit a pull request, check that it meets these guidelines:
 
 #. If you haven't already, ensure that you have read and agreed to the `Developer Certificate of Origin (DCO) <https://developercertificate.org/>`_, and that you have signed off on your commits using:
 
-.. code-block:: bash
+   .. code-block:: console
 
-        git commit -s/--signoff
+       $ git commit -s/--signoff
 
 This will add a `Signed-off-by:` line to your commit message, which indicates that you agree to the DCO.
 

@@ -70,7 +70,7 @@ lint: install-lint ## check style
 	python -m numpydoc lint src/cdm_reader_mapper/**.py
 	python -m vulture src/cdm_reader_mapper tests
 	codespell src/cdm_reader_mapper tests docs
-	python -m deptry src
+	python -m deptry src/cdm_reader_mapper
 	python -m yamllint --config-file=.yamllint.yaml src/cdm_reader_mapper
 
 test: install-test ## run tests quickly with the default Python
