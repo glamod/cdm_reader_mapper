@@ -6,7 +6,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 
-from requests.exceptions import HTTPError  # type: ignore[import-untyped]
+from requests.exceptions import HTTPError
 
 from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
 from cdm_reader_mapper.common import load_file
