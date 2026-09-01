@@ -155,7 +155,7 @@ If you would like to contribute code or documentation (which is greatly apprecia
 How to cite this library
 ========================
 
-If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/17403676.
+If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/19606640.
 
 License
 =======
@@ -287,7 +287,7 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
 
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.19606640.svg
         :target: https://doi.org/10.5281/zenodo.19606640
- 	      :alt: DOI
+        :alt: DOI
 
 .. |zizmor| image:: https://img.shields.io/badge/%F0%9F%8C%88-zizmor-white?labelColor=white
         :target: https://zizmor.sh/
