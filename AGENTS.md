@@ -4,13 +4,13 @@ Rules for AI coding agents working in this repository.
 
 ## General
 
-- Follow existing code conventions and patterns
-- Do not modify files outside the scope of the current task
-- Prefer editing existing files over creating new ones
-- Do not add dependencies without explicit approval
-- Keep changes atomic -- one concern per commit
-- Ask for clarification when requirements are ambiguous
-- Do not generate PR descriptions or review comments on others' code
+- Follow existing code conventions and patterns.
+- Do not modify files outside the scope of the current task.
+- Prefer editing existing files over creating new ones.
+- Do not add dependencies without explicit approval.
+- Keep changes atomic -- one concern per commit.
+- Ask for clarification when requirements are ambiguous.
+- Do not generate PR descriptions or review comments on others' code.
 
 ## Code Style
 
@@ -33,6 +33,7 @@ The package can be installed in developer mode in Python using the `$ make devel
 Do not modify:
 
 - `.*`
+- `LICENSE`
 - `.github`
 - `docs`
 - `tox.toml`
@@ -41,18 +42,18 @@ Do not modify:
 
 - Changes must be summarized in one or two sentences within the `CHANGELOG.rst` file.
 - New additions must be placed under the section labelled "(unreleased)".
-- Acceptable category types are all previously categories found in `CHANGELOG.rst`
+- Acceptable category types are all previously categories found in `CHANGELOG.rst`.
 - Entries must end with the issue number and PR number appended to the end: "(:issue:`#`, :pull:`#`)".
 
 ## Commits
 
-- Use clear, descriptive commit messages
-- One logical change per commit
-- Do not bundle unrelated changes
-- Reference relevant issues when applicable
-- Never push directly to main
-- Always use a PR branch and get human approval before merging
-- Include `Assisted-by: <tool name>` trailer on AI-assisted commits
+- Use clear, descriptive commit messages.
+- One logical change per commit.
+- Do not bundle unrelated changes.
+- Reference relevant issues when applicable.
+- Never push directly to main.
+- Always use a PR branch and get human approval before merging.
+- Include `Assisted-by: <tool name>` trailer on AI-assisted commits.
 
 ## Review
 
