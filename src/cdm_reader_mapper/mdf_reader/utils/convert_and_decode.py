@@ -7,8 +7,7 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.mdf_reader import properties
-
+from .. import properties
 from .utilities import convert_str_boolean
 
 

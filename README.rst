@@ -2,22 +2,22 @@
 Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 ==================================================================
 
-+----------------------------+----------------------------------------------------------------+
-| Versions                   | |pypi|                                                         |
-+----------------------------+----------------------------------------------------------------+
-| Documentation and Support  | |docs| |versions|                                              |
-+----------------------------+----------------------------------------------------------------+
-| Open Source                | |license| |zenodo|                                             |
-|                            | |fair-software| |ossf|                                         |
-+----------------------------+----------------------------------------------------------------+
-| Coding Standards           | |ruff| |prek| |pre-commit-ci|                                  |
-|                            | |codefactor| |security| |fossa|                                |
-+----------------------------+----------------------------------------------------------------+
-| Development Status         | |status| |build| |coveralls|                                   |
-+----------------------------+----------------------------------------------------------------+
-| Funding                    | |c3s|                                                          |
-|                            | |noc| |ukmcas|                                                 |
-+----------------------------+----------------------------------------------------------------+
++----------------------------+-----------------------------------------------------+
+| Versions                   | |pypi|                                              |
++----------------------------+-----------------------------------------------------+
+| Documentation and Support  | |docs| |versions|                                   |
++----------------------------+-----------------------------------------------------+
+| Open Source                | |license| |zenodo|                                  |
+|                            | |fair-software| |ossf|                              |
++----------------------------+-----------------------------------------------------+
+| Coding Standards           | |ruff| |prek| |pre-commit-ci| |zizmor|              |
+|                            | |codefactor| |security| |fossa|                     |
++----------------------------+-----------------------------------------------------+
+| Development Status         | |status| |build| |coveralls|                        |
++----------------------------+-----------------------------------------------------+
+| Funding                    | |c3s|                                               |
+|                            | |noc| |ukmcas|                                      |
++----------------------------+-----------------------------------------------------+
 
 Introduction
 ============
@@ -245,6 +245,10 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
 
+.. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
+        :target: https://noc.ac.uk/
+        :alt: NOC
+
 .. |ossf| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
         :target: https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper
         :alt: OpenSSF Scorecard
@@ -283,8 +287,8 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
 
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.19606640.svg
         :target: https://doi.org/10.5281/zenodo.19606640
- 	:alt: DOI
+ 	      :alt: DOI
 
-.. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
-        :target: https://noc.ac.uk/
-        :alt: NOC
+.. |zizmor| image:: https://img.shields.io/badge/%F0%9F%8C%88-zizmor-white?labelColor=white
+        :target: https://zizmor.sh/
+        :alt: zizmor

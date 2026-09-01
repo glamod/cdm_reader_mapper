@@ -8,12 +8,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from cdm_reader_mapper.common import (
+from ...common import (
     collect_json_files,
     combine_dicts,
     open_json_file,
 )
-from cdm_reader_mapper.mdf_reader import properties
+from .. import properties
 
 
 def read_table(
