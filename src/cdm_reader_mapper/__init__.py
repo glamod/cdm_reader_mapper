@@ -56,4 +56,4 @@ __all__ = [
 
 __author__ = """Ludwig Lierhammer"""
 __email__ = "ludwiglierhammer@dwd.de"
-__version__ = "2.4.2-dev.1"
+__version__ = "2.4.2-dev.2"
