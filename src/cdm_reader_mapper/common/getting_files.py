@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlparse
 
-import requests  # type: ignore[import-untyped]
+import requests
 from platformdirs import user_cache_dir
 
 

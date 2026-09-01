@@ -12,7 +12,7 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.metmetpy import properties
+from .. import properties
 
 
 def is_num(x: Any) -> bool:

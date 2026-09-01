@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cdm_reader_mapper.properties import SupportedDataModels, SupportedFileTypes
+from ..properties import SupportedDataModels, SupportedFileTypes
 
 
 __all__ = [

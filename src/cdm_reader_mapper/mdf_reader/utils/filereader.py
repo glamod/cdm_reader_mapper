@@ -13,10 +13,9 @@ import h5py  # noqa: F401
 import pandas as pd
 import xarray as xr
 
-from cdm_reader_mapper.common import ProcessFunction, process_function, standardize_object_columns
-from cdm_reader_mapper.core.databundle import DataBundle
-from cdm_reader_mapper.mdf_reader import properties
-
+from ...common import ProcessFunction, process_function, standardize_object_columns
+from ...core.databundle import DataBundle
+from .. import properties
 from .convert_and_decode import convert_and_decode
 from .parser import (
     ParserConfig,

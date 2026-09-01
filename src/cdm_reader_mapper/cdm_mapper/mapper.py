@@ -18,14 +18,13 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import (
+from ..common import (
     ParquetStreamReader,
     ProcessFunction,
     logging_hdlr,
     process_function,
     standardize_object_columns,
 )
-
 from . import properties
 from .codes.codes import get_code_table
 from .tables.tables import get_cdm_atts, get_imodel_maps

@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
-from cdm_reader_mapper.cdm_mapper import properties
+from .. import properties
 
 
 def dict_to_tuple_list(dic: dict[Any, Any]) -> list[tuple[Any, Any]]:

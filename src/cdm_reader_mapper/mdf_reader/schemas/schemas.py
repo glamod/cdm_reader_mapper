@@ -8,8 +8,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, TypedDict, get_args
 
-from cdm_reader_mapper.common import collect_json_files, combine_dicts
-from cdm_reader_mapper.mdf_reader import properties
+from ...common import collect_json_files, combine_dicts
+from .. import properties
 
 
 class SectionDict(TypedDict, total=False):

@@ -63,8 +63,7 @@ from typing import Any
 
 import pandas as pd
 
-from cdm_reader_mapper.common import ProcessFunction, collect_json_files, combine_dicts, logging_hdlr, process_function
-
+from ..common import ProcessFunction, collect_json_files, combine_dicts, logging_hdlr, process_function
 from . import properties
 from .datetime import model_datetimes
 

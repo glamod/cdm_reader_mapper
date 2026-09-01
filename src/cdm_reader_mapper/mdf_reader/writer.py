@@ -9,14 +9,13 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import (
+from ..common import (
     ParquetStreamReader,
     get_filename,
     is_valid_iterator,
     parquet_stream_from_iterable,
 )
-from cdm_reader_mapper.properties import SupportedFileTypes
-
+from ..properties import SupportedFileTypes
 from .utils.utilities import join, update_column_names, update_dtypes
 
 

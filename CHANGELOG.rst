@@ -56,6 +56,7 @@ Internal changes
 * use consistently parameter "imodel" instead of "data_model" and "correction_method" instead of "fix_method" in `metmetpy` modules (:pull:`419`)
 * make some JSON and iterator utility functions directly importable in submodule ``cdm_reader_mapper.common`` (:pull:`435`)
 * replace relative imports with absolute imports for any submodules located one or more directories above the current submodule (:pull:`435`)
+* replace absolute imports with relative imports in all submodules (:pull:`475`)
 
 
 2.4.1 (2016-04-16)
