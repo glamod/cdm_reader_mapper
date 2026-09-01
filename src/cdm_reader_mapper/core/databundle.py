@@ -6,8 +6,8 @@ from typing import Any, Literal
 
 import pandas as pd
 
-from cdm_reader_mapper.cdm_mapper.mapper import map_model
-from cdm_reader_mapper.common import (
+from ..cdm_mapper.mapper import map_model
+from ..common import (
     ParquetStreamReader,
     count_by_cat,
     get_length,
@@ -18,13 +18,12 @@ from cdm_reader_mapper.common import (
     split_by_column_entries,
     split_by_index,
 )
-from cdm_reader_mapper.metmetpy import (
+from ..metmetpy import (
     correct_datetime,
     correct_pt,
     validate_datetime,
     validate_id,
 )
-
 from ._utilities import (
     SubscriptableMethod,
     _copy,

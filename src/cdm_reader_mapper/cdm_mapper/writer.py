@@ -27,8 +27,7 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import get_filename, logging_hdlr
-
+from ..common import get_filename, logging_hdlr
 from .properties import SupportedFileTypes
 from .tables.tables import get_cdm_atts
 from .utils.conversions import convert_from_str_df, convert_to_str_df

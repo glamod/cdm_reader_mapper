@@ -8,8 +8,8 @@ from typing import Any
 
 from requests.exceptions import HTTPError
 
-from cdm_reader_mapper.cdm_mapper.properties import cdm_tables
-from cdm_reader_mapper.common import load_file
+from ..cdm_mapper.properties import cdm_tables
+from ..common import load_file
 
 
 __all__ = ["test_data"]

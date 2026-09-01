@@ -18,7 +18,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.metmetpy import properties
+from .. import properties
 
 
 def datetime_decimalhour_to_hm(decimal_hours: float) -> tuple[int, int]:

@@ -13,12 +13,13 @@ import datetime
 from pathlib import Path
 from typing import Any
 
-from cdm_reader_mapper.cdm_mapper import properties
-from cdm_reader_mapper.common import (
+from ...common import (
     collect_json_files,
     combine_dicts,
     open_json_file,
 )
+
+from .. import properties
 
 
 def _eval(s: str) -> Any:

@@ -51,9 +51,8 @@ from typing import Any, get_args
 
 import pandas as pd
 
-from cdm_reader_mapper.common import get_filename, logging_hdlr, standardize_object_columns
-from cdm_reader_mapper.core.databundle import DataBundle
-
+from ..common import get_filename, logging_hdlr, standardize_object_columns
+from ..core.databundle import DataBundle
 from .properties import SupportedFileTypes, cdm_tables
 from .utils.conversions import convert_from_str_df, convert_to_str_df
 from .utils.utilities import get_cdm_subset, get_usecols

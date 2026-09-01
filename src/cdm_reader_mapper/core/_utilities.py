@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from cdm_reader_mapper.common import (
+from ..common import (
     ParquetStreamReader,
     is_valid_iterator,
     parquet_stream_from_iterable,
