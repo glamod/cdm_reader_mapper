@@ -20,7 +20,6 @@ from ...common import (
     combine_dicts,
     open_json_file,
 )
-
 from .. import properties
 
 

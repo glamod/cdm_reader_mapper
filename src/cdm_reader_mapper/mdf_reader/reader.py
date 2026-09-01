@@ -8,7 +8,6 @@ from typing import Any, get_args
 import pandas as pd
 
 from ..common import open_json_file, standardize_object_columns
-
 from ..core.databundle import DataBundle
 from ..properties import SupportedFileTypes
 from .utils.filereader import FileReader
