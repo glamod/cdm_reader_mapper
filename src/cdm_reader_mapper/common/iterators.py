@@ -18,7 +18,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import xarray as xr
 
-from .object_types import standardize_object_columns
+from .dataframe_helpers import restore_columns, standardize_object_columns
 
 
 class ProcessFunction:
@@ -291,7 +291,8 @@ class ParquetStreamReader:
         if not chunks:
             return pd.DataFrame()
 
-        return pd.concat(chunks)
+        df = pd.concat(chunks)
+        return restore_columns(df)
 
     def copy(self) -> ParquetStreamReader:
         """
@@ -834,6 +835,8 @@ def _process_chunks(
 
     for items in zip(*readers, strict=True):
         _validate_chunk(items, requested_types)
+
+        items = tuple([restore_columns(item) for item in items])
 
         result = func(*items, *static_args, **static_kwargs)
         data, meta = _process_result(result, requested_types, non_data_output, chunk_counter)
