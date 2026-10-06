@@ -8,9 +8,9 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 | Documentation and Support  | |docs| |versions|                                   |
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
-|                            | |fair-software| |ossf|                              |
+|                            | |fair-software| |ossf-score|                        |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |ruff| |prek| |pre-commit-ci| |zizmor|              |
+| Coding Standards           | |ruff| |prek| |mypy| |pre-commit-ci| |zizmor|       |
 |                            | |codefactor| |security| |fossa|                     |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
@@ -245,11 +245,15 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
 
+.. |mypy| image:: https://www.mypy-lang.org/static/mypy_badge.svg
+        :target: https://mypy-lang.org/
+        :alt: mypy
+
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
         :alt: NOC
 
-.. |ossf| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
+.. |ossf-score| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
         :target: https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper
         :alt: OpenSSF Scorecard
 
