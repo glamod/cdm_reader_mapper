@@ -8,7 +8,7 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 | Documentation and Support  | |docs| |versions|                                   |
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
-|                            | |fair-software| |ossf-score|                              |
+|                            | |fair-software| |ossf-score|                        |
 +----------------------------+-----------------------------------------------------+
 | Coding Standards           | |ruff| |prek| |mypy| |pre-commit-ci| |zizmor|       |
 |                            | |codefactor| |security| |fossa|                     |
