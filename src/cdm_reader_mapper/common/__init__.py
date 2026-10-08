@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from .dataframe_helpers import restore_columns, standardize_object_columns
 from .getting_files import load_file
 from .inspect import count_by_cat, get_length
 from .io_files import get_filename
 from .iterators import ParquetStreamReader, ProcessFunction, is_valid_iterator, parquet_stream_from_iterable, process_disk_backed, process_function
 from .json_dict import collect_json_files, combine_dicts, open_json_file
-from .object_types import standardize_object_columns
 from .replace import replace_columns
 from .select import (
     split_by_boolean,
