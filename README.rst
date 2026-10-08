@@ -8,9 +8,9 @@ Common Data Model reader and mapper: ``cdm_reader_mapper`` toolbox
 | Documentation and Support  | |docs| |versions|                                   |
 +----------------------------+-----------------------------------------------------+
 | Open Source                | |license| |zenodo|                                  |
-|                            | |fair-software| |ossf|                              |
+|                            | |fair-software| |ossf-score|                        |
 +----------------------------+-----------------------------------------------------+
-| Coding Standards           | |ruff| |prek| |pre-commit-ci| |zizmor|              |
+| Coding Standards           | |ruff| |prek| |mypy| |pre-commit-ci| |zizmor|       |
 |                            | |codefactor| |security| |fossa|                     |
 +----------------------------+-----------------------------------------------------+
 | Development Status         | |status| |build| |coveralls|                        |
@@ -155,7 +155,7 @@ If you would like to contribute code or documentation (which is greatly apprecia
 How to cite this library
 ========================
 
-If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/17403676.
+If you wish to cite `cdm_reader_mapper` in a research publication, we kindly ask that you refer to Zenodo: https://zenodo.org/records/19606640.
 
 License
 =======
@@ -245,11 +245,15 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
         :target: https://github.com/glamod/cdm_reader_mapper/blob/main/LICENSE
         :alt: License
 
+.. |mypy| image:: https://www.mypy-lang.org/static/mypy_badge.svg
+        :target: https://mypy-lang.org/
+        :alt: mypy
+
 .. |noc| image:: https://img.shields.io/badge/Thanks%20to-NOC-blue.svg
         :target: https://noc.ac.uk/
         :alt: NOC
 
-.. |ossf| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
+.. |ossf-score| image:: https://api.securityscorecards.dev/projects/github.com/glamod/cdm_reader_mapper/badge
         :target: https://securityscorecards.dev/viewer/?uri=github.com/glamod/cdm_reader_mapper
         :alt: OpenSSF Scorecard
 
@@ -287,7 +291,7 @@ This package was created with Cookiecutter_ and the `Ouranosinc/cookiecutter-pyp
 
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.19606640.svg
         :target: https://doi.org/10.5281/zenodo.19606640
- 	      :alt: DOI
+        :alt: DOI
 
 .. |zizmor| image:: https://img.shields.io/badge/%F0%9F%8C%88-zizmor-white?labelColor=white
         :target: https://zizmor.sh/
