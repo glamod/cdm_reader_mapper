@@ -66,6 +66,9 @@ def to_numeric(x: Any, scale: Decimal, offset: Decimal) -> Decimal | bool:
         x = x.strip()
         x = x.replace(" ", "0")
 
+    if len(x) == 0:
+        return True
+
     try:
         x_dec = Decimal(str(x))
         decimal_places = max_decimal_places(offset, scale, x_dec)

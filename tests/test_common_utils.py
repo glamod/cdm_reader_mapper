@@ -13,6 +13,7 @@ import pandas as pd
 import pytest
 import requests
 
+from cdm_reader_mapper.common.dataframe_helpers import restore_columns, standardize_object_columns
 from cdm_reader_mapper.common.getting_files import (
     _check_md5s,
     _file_md5_checksum,
@@ -30,7 +31,6 @@ from cdm_reader_mapper.common.json_dict import (
     open_json_file,
 )
 from cdm_reader_mapper.common.logging_hdlr import init_logger
-from cdm_reader_mapper.common.object_types import standardize_object_columns
 
 
 def compute_md5(content: bytes) -> str:
@@ -508,3 +508,55 @@ def test_standardize_object_columns():
     )
 
     pd.testing.assert_frame_equal(result, expected)
+
+
+def test_restore_columns_index():
+    df = pd.DataFrame(columns=["a", "b", "c"])
+
+    result = restore_columns(df)
+    expected = pd.Index(["a", "b", "c"])
+
+    pd.testing.assert_index_equal(result.columns, expected)
+
+
+def test_restore_columns_evaluate():
+    df = pd.DataFrame(columns=["1", "b", "True"])
+
+    result = restore_columns(df)
+    expected = pd.Index([1, "b", True])
+
+    pd.testing.assert_index_equal(result.columns, expected)
+
+
+def test_restore_columns_multiindex():
+    df = pd.DataFrame(columns=["('a','d')", "('b','e')", "('c','f')"])
+
+    result = restore_columns(df)
+    expected = pd.MultiIndex.from_tuples([("a", "d"), ("b", "e"), ("c", "f")])
+
+    pd.testing.assert_index_equal(result.columns, expected)
+
+
+def test_restore_columns_mixed():
+    df = pd.DataFrame(columns=["a", "('b','e')", "('c','f')"])
+
+    result = restore_columns(df)
+    expected = pd.Index(["a", ("b", "e"), ("c", "f")])
+
+    pd.testing.assert_index_equal(result.columns, expected)
+
+
+def test_restore_columns_series():
+    s = pd.Series([1, 2, 3], name="('a', 'b')")
+
+    result = restore_columns(s)
+
+    assert result.name == ("a", "b")
+
+
+def test_restore_columns_no_pandas():
+    obj = {"a": 1}
+
+    result = restore_columns(obj)
+
+    assert result is obj
