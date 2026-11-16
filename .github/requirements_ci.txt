@@ -665,9 +665,9 @@ tomlkit==0.13.0 \
     # via
     #   bump-my-version
     #   pylint
-tox==4.67.11 \
-    --hash=sha256:9040a61d57304159fd2cbd726469c2a7cd513a8c669069433392eab1a756f344 \
-    --hash=sha256:a5760a98d440ef74321ab9c4d094f0a9071ed7f1f78e39c203f42dd694d5251f
+tox==4.67.13 \
+    --hash=sha256:4d6fa08dbe5e841f2abfee1dd4f5cdf31af30d68a3d78b85a7bf57eced5f3c6c \
+    --hash=sha256:9f70b44ca2e31d91d8fe2e2917f505554950adc3961c0ee70bb42db16d903f62
     # via
     #   -r requirements_ci.in
     #   tox-gh
