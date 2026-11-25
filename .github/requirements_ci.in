@@ -6,5 +6,5 @@ pip==26.3
 pydantic==2.14.3
 pylint==4.1.4
 tomli==2.5.0
-tox-gh==1.9.3
+tox-gh==1.9.4
 tox==4.67.15
